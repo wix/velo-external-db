@@ -1,0 +1,30 @@
+{
+  "name": "mysql-adapter-node",
+  "version": "1.0.0",
+  "description": "Wix Data basic MySQL adapter for Node.js",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js' --reporter spec",
+    "test-watch": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js' --reporter min --watch",
+    "deploy": "gcloud app deploy ./app.yaml"
+  },
+  "keywords": [
+    "mysql"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "mysql": "^2.16.0",
+    "uuid": "^3.4.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^5.15.3",
+    "mocha": "^6.0.2",
+    "proxyquire": "^2.1.0",
+    "sinon": "^7.2.7"
+  }
+}

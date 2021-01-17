@@ -1,0 +1,7 @@
+runtime: nodejs10
+
+service: mysql-adapter
+
+env_variables:
+  SQL_CONFIG: {MY_SQL_CONNECTION_STRING_JSON}
+  SECRET_KEY: wix-big-secret
