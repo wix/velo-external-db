@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "corvid-dal",
+  "private_key_id": "3b577728d4d59413e16ca77d4dd2ecbbb546c1d1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCyWPfdoowvjOwz\nUq6MZxc856qevzgcxN2CqKN/oxDgiUB+1e+oDoDkwujUcQp/B3yuQ481H6uwixoe\nprywgEuJvZZmCeUUHTTJfFD7riy+GvEOAU5g6PrGcx9dLQZ4OExMnMdKsLzV5JIa\ngganmDjuy+w4QPvHUAZ8vxqawtAj/ZSj8A+3qUqrLuddi/qQCp+qfyxF7Lmt9iCe\nh0tp/la2KYyQHNAV3dun5z+AMi5Z8ZSRDE8zbWqqhXzofRrrshBxx/HuowS480QA\n/PmRZ6ldao65yyIZUktGWFf8Q56hP4+wLzpoYipgQccy3MkeObwTKQV0GAJXvhXV\n1gg47zIzAgMBAAECggEARFTFBuRP7KoEF3fey4l2BE5Id1EROSiOLBDbr7v06+p6\nTP4/t7Zy2PL6jOaQnHHsacIVvMdZGyd4hvTgR4moJ2p9lLPG0qmL/4SDbKJjnySo\nZfLHKmcpKd6SzjrBh08eoJ3S14GWoCbWeZSG4zB147w60aTIMqmtCp+XnGL2p0rN\npKdv2DCQWIOpHZRBskhQ0+Q2TOZtLP0Vst61ky0wgZdlrHmSOHIsKm1LYn+piyuN\nf5Pt8jm4IpZ2jJfNsqkTgD2DBJ2ZXTApYr21C+6s91Ks7dm5Fq4rwiv3JltEQIzI\nzpHc3EeL/nretAsxnSXiXYQOVBZAjgmbqhW2jLbWnQKBgQDZpZ163lh/YdbjlqEf\ngqSQFeKQJvDnEzLekAD/KIHdV3jpTZODYqINMYNPyCXCjfEE9qYlFLVCUm9uftN8\njpoF0xXHv90HSg9xLxLBPTYChdtQ1co89+8Ch070tpBQlpXQklDdfUHOCnHcA93R\nLoJyv7Rw0u55SqEV7hPPCBoinwKBgQDRxn9F0s/ZHZ2sUaRD8Q+C7wIksQ4fXwp0\nj1F3Vl+w1wLmuUtXK6rOooA9l9SsKWvQcwPkMETa0hZ2dKZJb9HpQexcvXip4R+X\nzNTjcObayD/x5O9QVJInHQfGDTqwDnSS/iJFD1YL7JuZcskubVFJdvOHjXQt2yOe\nlB4JRK277QKBgC65C/6VfuARq+T9sCcoj5VS7WlOwsaIa5I1zdD47DANGCrVeYZq\nBSnZ6DuXVuvWNth+7pnlQSg0tDE/Tr1di5kWgIV6HcPz1S7SES+kqVSPUc6fpqPC\nAfBEBeIo0wBJ4218C5oQyrCls12tAtBmMKDboKvbzFADgmNH0b7PGXU3AoGAKI7n\nRpm2w/Sc6pcyWkx+QkNxt6Rf5aLbg6O+DYOupqM7lV5X+bego6j5gG8dmFe916SV\nKQZIGcKqwyZUjDhJbn7ncxrS/I1hLVlWA89tYvl6m4s21eI0C8nqGdmu8iEpWs41\n1AJeEZoij22JBifuonSUKy4nO0J2RY+/qu0TZhUCgYAT9lNYUoVrgQBrp9SAvMTK\nMINUzj63Za7J6+DvqiRhEDTXjSIHF1IlWdQ+3g0KAOTC/1RX505SmWfuCtVwiUud\nnODcbZHaFPwUhw86uhGN+SpzBPAe5OQN9qKmmhQyMVVF3AIZs0lxqyEg3ApeVVbs\nhv4BFDcdo/yBjhWVRS6qvQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "noam-poc@corvid-dal.iam.gserviceaccount.com",
+  "client_id": "101433847122272684592",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/noam-poc%40corvid-dal.iam.gserviceaccount.com"
+}
