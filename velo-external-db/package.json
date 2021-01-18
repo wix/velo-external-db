@@ -1,0 +1,14 @@
+{
+  "name": "velo-external-db",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js' --reporter spec",
+    "test-watch": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js' --reporter min --watch",
+    "deploy": "gcloud app deploy ./app.yaml"
+  },
+  "author": "",
+  "license": "ISC"
+}
