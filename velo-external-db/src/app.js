@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const compression = require('compression')
 // const DataController = require('./controllers/data')
 //const SeoWixCodeProcessor = require('./processors/seo-wix-code-processor')
 // const items = require('./controller/items')
@@ -12,6 +13,7 @@ const app = express()
 const port = process.env.PORT || 8080
 
 app.use(bodyParser.json())
+app.use(compression())
 // todo: use compression
 // app.use(authMiddleware)
 
