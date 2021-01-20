@@ -2,13 +2,21 @@
   "name": "velo-external-db",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node src/app.js",
     "test": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js' --reporter spec",
     "test-watch": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js' --reporter min --watch",
     "deploy": "gcloud app deploy ./app.yaml"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "axios": "^0.21.1",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.3"
+  }
 }
