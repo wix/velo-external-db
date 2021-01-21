@@ -14,7 +14,6 @@ const port = process.env.PORT || 8080
 
 app.use(bodyParser.json())
 app.use(compression())
-// todo: use compression
 // app.use(authMiddleware)
 
 //const { collectionName, filter, sort, skip, limit } = payload // find
