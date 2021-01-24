@@ -6,13 +6,31 @@ class DataService {
     }
 
     async find(collectionName, filter, sort, skip, limit) {
-
-        //return { items, totalCount }
         return {
             items: (await this.storage.list(collectionName, filter, sort, skip, limit))
-                                .map( asWixData ),
+                                      .map( asWixData ),
             totalCount: 0
         }
+    }
+
+    async getById(collectionName, itemId) {
+
+    }
+
+    async count(collectionName, filter) {
+
+    }
+
+    async insert(collectionName, item) {
+
+    }
+
+    async update(collectionName, item) {
+
+    }
+
+    async delete(collectionName, itemId) {
+
     }
 }
 

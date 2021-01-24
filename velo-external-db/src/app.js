@@ -1,13 +1,18 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const compression = require('compression')
-// const DataController = require('./controllers/data')
+const DataService = require('./service/data')
+// const DataProvider = require('./storage/gcp/sql/cloud_sql_data_provider.js')
+const DataProvider = require('./storage/storage')
 //const SeoWixCodeProcessor = require('./processors/seo-wix-code-processor')
 // const items = require('./controller/items')
 // const schemas = require('./controller/schemas')
 // const provision = require('./controller/provision')
 // const { wrapError, errorMiddleware } = require('./utils/error-middleware')
 // const authMiddleware = require('./utils/auth-middleware')
+
+const dataProvider = new DataProvider()
+const dataService = new DataService(dataProvider)
 
 const app = express()
 const port = process.env.PORT || 8080
@@ -18,7 +23,11 @@ app.use(compression())
 
 //const { collectionName, filter, sort, skip, limit } = payload // find
 
-// app.post('/schemas/find', wrapError(schemas.findSchemas))
+app.post('/data/find', async (req, res) => {
+    const { collectionName, filter, sort, skip, limit } = req.body
+    const data = await dataService.find(collectionName, filter, sort, skip, limit)
+    res.json(data)
+})
 // app.post('/schemas/list', wrapError(schemas.listSchemas))
 
 // app.post('/data/find', wrapError(items.findItems))
@@ -35,6 +44,7 @@ app.get('/', (req, res) => {
     // todo: render a welcoming page with user data
     res.send('ok')
 })
+
 // app.post('/data/insert', wrapError(items.insertItem))
 // app.post('/data/update', wrapError(items.updateItem))
 // app.post('/data/remove', wrapError(items.removeItem))

@@ -19,4 +19,8 @@ describe('Velo External DB', () => {
     it('answer default page with a welcoming response', async () => {
         expect((await axios.get(`/`)).data).to.be.eql('ok');
     })
+
+    it('find api e2e', async () => {
+        expect((await axios.post(`/data/find`, {collectionName: 'collectionName', filter: '', sort: '', skip: 0, limit: 25 })).data).to.be.eql({items: [ { _id: 'stub'} ], totalCount: 0});
+    })
 })
