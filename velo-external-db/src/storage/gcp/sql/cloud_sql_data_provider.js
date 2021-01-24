@@ -10,6 +10,9 @@ class DataProvider {
     async find(collectionName, filter, sort, skip, limit) {
         // validate all properties
         // return this.renderer.getWixCodeSeoData(this.renderRequest, this.santaPath)
+        return [{
+            _id: 'stub'
+        }]
     }
 }
 
