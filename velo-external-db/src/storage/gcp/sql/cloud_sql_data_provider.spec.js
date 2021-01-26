@@ -2,7 +2,7 @@ const {expect} = require('chai')
 const DataProvider = require('./cloud_sql_data_provider')
 const {SchemaProvider, SystemFields} = require('./cloud_sql_schema_provider')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
-const { randomEntities } = require('../../../../test/drivers/gen');
+const { randomEntities, randomEntity } = require('../../../../test/drivers/gen');
 const chance = new require('chance')();
 const mysqlSetup = require('@databases/mysql-test/jest/globalSetup')
 const mysqlTeardown = require('@databases/mysql-test/jest/globalTeardown')
@@ -23,10 +23,10 @@ describe('Cloud SQL Service', () => {
 
             const db = await env.schemaProvider.list()
             expect(db).to.be.deep.eql([{ id: ctx.collectionName,
-                                         fields: [{name: '_id', type: 'varchar(20)', isPrimary: true},
-                                                  {name: '_createdDate', type: 'datetime', isPrimary: false},
-                                                  {name: '_updatedDate', type: 'datetime', isPrimary: false},
-                                                  {name: '_owner', type: 'varchar(20)', isPrimary: false},
+                                         fields: [{name: '_id', type: 'varchar(256)', isPrimary: true},
+                                                  {name: '_createdDate', type: 'timestamp', isPrimary: false},
+                                                  {name: '_updatedDate', type: 'timestamp', isPrimary: false},
+                                                  {name: '_owner', type: 'varchar(256)', isPrimary: false},
                                                   // {name: 'title', type: 'varchar(20)', isPrimary: false},
                                                  ]
                                      }])
@@ -93,33 +93,33 @@ describe('Cloud SQL Service', () => {
         })
     })
 
-    // describe('Query API', () => {
-    //
-    //     it('search with empty filter and order by', async () => {
-    //
-    //         // const connection = mysql.createConnection({
-    //         //     host     : 'localhost',
-    //         //     user     : 'test-user',
-    //         //     password : 'password',
-    //         //     database : 'test-db'
-    //         // });
-    //         //
-    //         // connection.connect();
-    //
-    //         // const results = await env.connectionPool.query('SELECT 1 + 1 AS solution');
-    //         // console.log('The solution is: ', results[0].solution);
-    //
-    //         //results[0].solution
-    //
-    //         // connection.end();
-    //
-    //         //mysql://test-user:password@localhost:3306/test-db
-    //         // console.log(process.env.DATABASE_URL)
-    //         // givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-    //         //
-    //         expect( await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit) ).to.be.deep.eql([{ _id: 'stub' }]);
-    //     });
-    // })
+    describe.only('Query API', () => {
+
+        it('search with empty filter and order by and no data', async () => {
+            await env.schemaProvider.create(ctx.collectionName, [])
+
+            const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+
+            expect( res ).to.be.deep.eql([]);
+        });
+
+        it('bulk insert data into collection name and query all of it', async () => {
+            await env.schemaProvider.create(ctx.collectionName, [])
+
+            expect( await env.dataProvider.insert(ctx.collectionName, ctx.entity) ).to.be.eql(1)
+
+            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).to.be.deep.eql([ctx.entity]);
+        });
+
+        it('delete data from collection', async () => {
+            await env.schemaProvider.create(ctx.collectionName, [])
+            await Promise.all( ctx.entities.map(e => env.dataProvider.insert(ctx.collectionName, e) ))
+
+            expect( await env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).to.be.eql(ctx.entities.length)
+
+            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).to.be.deep.eql([]);
+        });
+    })
 
     const ctx = {
         collectionName: Uninitialized,
@@ -128,6 +128,7 @@ describe('Cloud SQL Service', () => {
         skip: Uninitialized,
         limit: Uninitialized,
         columnName: Uninitialized,
+        entity: Uninitialized,
         entities: Uninitialized,
     };
 
@@ -145,6 +146,7 @@ describe('Cloud SQL Service', () => {
         ctx.limit = chance.word();
         ctx.columnName = chance.word();
 
+        ctx.entity = randomEntity([]);
         ctx.entities = randomEntities();
 
     });
@@ -158,8 +160,10 @@ describe('Cloud SQL Service', () => {
             password : 'password',
             database : 'test-db',
             waitForConnections: true,
+            // debug: true,
             connectionLimit: 10,
-            queueLimit: 0
+            queueLimit: 0/*,
+            multipleStatements: true*/
         }).promise();
 
         env.dataProvider = new DataProvider(env.connectionPool)

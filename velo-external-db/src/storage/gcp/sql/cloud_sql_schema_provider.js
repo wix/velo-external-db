@@ -1,16 +1,16 @@
 
 const SystemFields = [
     {
-        name: '_id', type: 'varchar(20)', isPrimary: true
+        name: '_id', type: 'varchar(256)', isPrimary: true
     },
     {
-        name: '_createdDate', type: 'datetime'
+        name: '_createdDate', type: 'timestamp'
     },
     {
-        name: '_updatedDate', type: 'datetime'
+        name: '_updatedDate', type: 'timestamp'
     },
     {
-        name: '_owner', type: 'varchar(20)'
+        name: '_owner', type: 'varchar(256)'
     }]
 
 class SchemaProvider {
@@ -18,19 +18,6 @@ class SchemaProvider {
         this.pool = pool
 
         this.systemFields = SystemFields
-            // [
-            // {
-            //     name: '_id', type: 'varchar(20)', isPrimary: true
-            // },
-            // {
-            //     name: '_createdDate', type: 'datetime'
-            // },
-            // {
-            //     name: '_updatedDate', type: 'datetime'
-            // },
-            // {
-            //     name: '_owner', type: 'varchar(20)'
-            // }]
     }
 
     async list() {
@@ -91,8 +78,15 @@ const extractFieldType = dbType => {
         }
     }
 
+    defaultForColumnType(type) {
+        if (type === 'timestamp') {
+            return 'DEFAULT CURRENT_TIMESTAMP'
+        }
+        return ''
+    }
+
     async create(collectionName, columns) {
-        await this.pool.query(`CREATE TABLE IF NOT EXISTS ?? (${this.systemFields.map(f => `${f.name} ${f.type}`).join(', ')}, PRIMARY KEY (${this.systemFields.filter(f => f.isPrimary).map(f => `\`${f.name}\``).join(', ')}))`, [collectionName])
+        await this.pool.query(`CREATE TABLE IF NOT EXISTS ?? (${this.systemFields.map(f => `${f.name} ${f.type} ${this.defaultForColumnType(f.type)}`).join(', ')}, PRIMARY KEY (${this.systemFields.filter(f => f.isPrimary).map(f => `\`${f.name}\``).join(', ')}))`, [collectionName])
     }
 
     async addColumn(collectionName, column) {

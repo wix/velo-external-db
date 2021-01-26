@@ -9,13 +9,32 @@ const randomObject = () => {
     return obj;
 };
 
-const randomEntities = () => {
+const randomEntities = (columns) => {
     const num = chance.natural({min: 2, max: 20});
     const arr = [];
     for (let i = 0; i < num; i++) {
-        arr.push(randomObject())
+        arr.push(randomEntity(columns))
     }
     return arr;
 }
 
-module.exports = { randomEntities }
+const randomEntity = (columns) => {
+    const d = new Date()
+    d.setMilliseconds(0)
+
+    const entity = {
+        _id: chance.guid(),
+        _createdDate: d,
+        _updatedDate: d,
+        _owner: chance.guid(),
+    }
+
+    const _columns = columns || []
+
+    for (const column of _columns) {
+        entity[column] = chance.word()
+    }
+    return entity;
+}
+
+module.exports = { randomEntities, randomEntity }
