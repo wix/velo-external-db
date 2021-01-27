@@ -1,5 +1,5 @@
 const sinon = require('sinon');
-const FilterParser = require('../../src/storage/gcp/sql/sql_filter_transformer')
+const { EMPTY_SORT, FilterParser } = require('../../src/storage/gcp/sql/sql_filter_transformer')
 
 const filterParser = sinon.createStubInstance(FilterParser)
 
@@ -8,7 +8,7 @@ const stubEmptyFilterFor = (filter) => {
 }
 
 const stubEmptyOrderByFor = (sort) => {
-    filterParser.orderBy.withArgs(sort).returns({ sortExpr: '', sortColumns: [] })
+    filterParser.orderBy.withArgs(sort).returns( EMPTY_SORT )
 }
 
 const givenOrderByFor = (column, sort) => {

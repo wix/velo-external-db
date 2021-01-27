@@ -133,11 +133,11 @@ describe('Cloud SQL Service', () => {
             await env.dataProvider.insert(ctx.collectionName, ctx.entity)
             await env.dataProvider.insert(ctx.collectionName, ctx.anotherEntity)
             stubEmptyFilterFor(ctx.filter)
-            stubEmptyOrderByFor(ctx.sort)
+            givenOrderByFor('_owner', ctx.sort)
 
             const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1)
 
-            expect( res ).to.be.deep.eql([ctx.anotherEntity]);
+            expect( res ).to.be.deep.eql([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1));
         });
 
         it('bulk insert data into collection name and query all of it', async () => {
@@ -218,8 +218,4 @@ describe('Cloud SQL Service', () => {
     after(async () => {
         await mysqlTeardown();
     });
-
-
-
-
 })
