@@ -93,7 +93,7 @@ describe('Cloud SQL Service', () => {
         })
     })
 
-    describe.only('Query API', () => {
+    describe('Query API', () => {
 
         it('search with empty filter and order by and no data', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
@@ -160,7 +160,9 @@ describe('Cloud SQL Service', () => {
             password : 'password',
             database : 'test-db',
             waitForConnections: true,
+            namedPlaceholders: true,
             // debug: true,
+            // trace: true,
             connectionLimit: 10,
             queueLimit: 0/*,
             multipleStatements: true*/

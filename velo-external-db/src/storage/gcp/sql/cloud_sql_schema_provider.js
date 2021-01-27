@@ -90,13 +90,9 @@ const extractFieldType = dbType => {
     }
 
     async addColumn(collectionName, column) {
-        if (SystemFields.find(f => f.name === column.name)) {
-            console.log(`System field: [${column.name}]`)
-            return Promise.resolve()
-        }
-            console.log(SystemFields.find(f => f.name === column))
-        return await this.pool.query(`ALTER TABLE ?? ADD ?? ${column.type}`, [collectionName, column.name])
-                              .catch(err => console.log(err))
+        return await this.validateSystemFields(column.name)
+                         .then(() => this.pool.query(`ALTER TABLE ?? ADD ?? ${column.type}`, [collectionName, column.name]))
+                         .catch(err => console.log(err))
         /*
         code: 'ER_NO_SUCH_TABLE',
   errno: 1146,
@@ -107,13 +103,9 @@ const extractFieldType = dbType => {
     }
 
     async removeColumn(collectionName, columnName) {
-        if (SystemFields.find(f => f.name === columnName)) {
-            console.log(`System field: [${columnName}]`)
-            return Promise.resolve()
-        }
-
-        return await this.pool.query(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
-                              .catch(err => console.log(err))
+        return await this.validateSystemFields(columnName)
+                         .then(() => this.pool.query(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName]))
+                         .catch(err => console.log(err))
 
         /*
         code: 'ER_CANT_DROP_FIELD_OR_KEY',
@@ -123,7 +115,12 @@ const extractFieldType = dbType => {
          */
     }
 
-
+    validateSystemFields(columnName) {
+        if (SystemFields.find(f => f.name === columnName)) {
+            return Promise.reject('system field')
+        }
+        return Promise.resolve()
+    }
 }
 
 module.exports = {SchemaProvider, SystemFields}

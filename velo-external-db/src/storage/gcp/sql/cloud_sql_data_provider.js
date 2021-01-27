@@ -24,11 +24,14 @@ class DataProvider {
     }
 
     async delete(collectionName, itemIds) {
-        const sql = this.pool.format(`DELETE FROM ?? WHERE _id IN (?)`, [collectionName])
-        console.log(sql)
-        console.log(itemIds)
-        const resultset = await this.pool.execute(sql, itemIds);
-        return resultset[0].affectedRows
+        // const sql = this.pool.format(`DELETE FROM ?? WHERE _id IN (:itemIds)`, [collectionName])
+        // console.log(sql)
+        // console.log([itemIds])
+        // const rs = await this.pool.execute(sql, {itemIds: itemIds});
+        // return rs[0].affectedRows
+        const sql = this.pool.format(`DELETE FROM ?? WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`, [collectionName])
+        const rs = await this.pool.execute(sql, itemIds);
+        return rs[0].affectedRows
     }
 
 
