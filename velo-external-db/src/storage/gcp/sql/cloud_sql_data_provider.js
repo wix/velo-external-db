@@ -1,17 +1,17 @@
 const moment = require('moment')
 
 class DataProvider {
-    constructor(pool) {
+    constructor(pool, filterParser) {
+        this.filterParser = filterParser
         this.pool = pool
     }
 
     async find(collectionName, filter, sort, skip, limit) {
-        const resultset = await this.pool.execute(this.pool.format('SELECT * FROM ??', [collectionName]))
+        const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
+        const {sortExpr, sortColumns} = this.filterParser.orderBy(sort)
+        const sql = this.pool.format(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT ?, ?`, [collectionName].concat(filterColumns).concat(sortColumns))
+        const resultset = await this.pool.execute(sql, parameters.concat([skip, limit]))
         return resultset[0]
-    }
-
-    wildCardWith(n, char) {
-        return Array(n).fill(char, 0, n).join(', ')
     }
 
     async insert(collectionName, item) {
@@ -34,6 +34,10 @@ class DataProvider {
         return rs[0].affectedRows
     }
 
+
+    wildCardWith(n, char) {
+        return Array(n).fill(char, 0, n).join(', ')
+    }
 
     patchDateTime(item) {
         const obj = {}
