@@ -1,10 +1,12 @@
 const express = require('express')
 const path = require('path')
+const mysql = require('mysql2')
 const bodyParser = require('body-parser')
 const compression = require('compression')
 const DataService = require('./service/data')
 // const DataProvider = require('./storage/gcp/sql/cloud_sql_data_provider.js')
 const DataProvider = require('./storage/storage')
+const { SchemaProvider } = require('./storage/gcp/sql/cloud_sql_schema_provider')
 //const SeoWixCodeProcessor = require('./processors/seo-wix-code-processor')
 // const items = require('./controller/items')
 // const schemas = require('./controller/schemas')
@@ -12,6 +14,21 @@ const DataProvider = require('./storage/storage')
 // const { wrapError, errorMiddleware } = require('./utils/error-middleware')
 // const authMiddleware = require('./utils/auth-middleware')
 
+const pool = mysql.createPool({
+    host     : 'localhost',
+    user     : 'test-user',
+    password : 'password',
+    database : 'test-db',
+    waitForConnections: true,
+    namedPlaceholders: true,
+    // debug: true,
+    // trace: true,
+    connectionLimit: 10,
+    queueLimit: 0/*,
+                multipleStatements: true*/
+}).promise()
+
+const schemaProvider = new SchemaProvider(pool)
 const dataProvider = new DataProvider()
 const dataService = new DataService(dataProvider)
 
@@ -31,7 +48,29 @@ app.post('/data/find', async (req, res) => {
     const data = await dataService.find(collectionName, filter, sort, skip, limit)
     res.json(data)
 })
-// app.post('/schemas/list', wrapError(schemas.listSchemas))
+
+app.post('/schemas/list', async (req, res) => {
+    const data = await schemaProvider.list()
+    res.json(data)
+})
+
+app.post('/schemas/create', async (req, res) => {
+    const { collectionName } = req.body
+    const data = await schemaProvider.create(collectionName)
+    res.json(data)
+})
+
+app.post('/schemas/column/add', async (req, res) => {
+    const { collectionName, column } = req.body
+    const data = await schemaProvider.addColumn(collectionName, column)
+    res.json(data)
+})
+
+app.post('/schemas/column/remove', async (req, res) => {
+    const { collectionName, columnName } = req.body
+    const data = await schemaProvider.removeColumn(collectionName, columnName)
+    res.json(data)
+})
 
 // app.post('/data/find', wrapError(items.findItems))
 // app.post('/data/find', async (req, res) => {
