@@ -3,10 +3,8 @@ const DataProvider = require('./cloud_sql_data_provider')
 const {SchemaProvider, SystemFields} = require('./cloud_sql_schema_provider')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
 const { randomEntities, randomEntity } = require('../../../../test/drivers/gen');
+const { initMySqlEnv, shutdownMySqlEnv } = require('../../../../test/resources/mysql_resources');
 const chance = new require('chance')();
-const mysqlSetup = require('@databases/mysql-test/jest/globalSetup')
-const mysqlTeardown = require('@databases/mysql-test/jest/globalTeardown')
-const mysql = require('mysql2');
 const { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor, givenFilterByIdWith, stubEmptyFilterFor, filterParser } = require('../../../../test/drivers/sql_filter_transformer_test_support')
 
 describe('Cloud SQL Service', () => {
@@ -194,26 +192,12 @@ describe('Cloud SQL Service', () => {
 
     before(async function() {
         this.timeout(20000)
-        await mysqlSetup()
-        env.connectionPool = mysql.createPool({
-            host     : 'localhost',
-            user     : 'test-user',
-            password : 'password',
-            database : 'test-db',
-            waitForConnections: true,
-            namedPlaceholders: true,
-            // debug: true,
-            // trace: true,
-            connectionLimit: 10,
-            queueLimit: 0/*,
-            multipleStatements: true*/
-        }).promise();
-
+        env.connectionPool = await initMySqlEnv()
         env.dataProvider = new DataProvider(env.connectionPool, filterParser)
         env.schemaProvider = new SchemaProvider(env.connectionPool)
     });
 
     after(async () => {
-        await mysqlTeardown();
+        await shutdownMySqlEnv();
     });
 })
