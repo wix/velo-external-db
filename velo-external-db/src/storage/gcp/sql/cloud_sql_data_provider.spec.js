@@ -7,7 +7,7 @@ const chance = new require('chance')();
 const mysqlSetup = require('@databases/mysql-test/jest/globalSetup')
 const mysqlTeardown = require('@databases/mysql-test/jest/globalTeardown')
 const mysql = require('mysql2');
-const { givenOrderByFor, stubEmptyOrderByFor, givenFilterByIdWith, stubEmptyFilterFor, filterParser } = require('../../../../test/drivers/sql_filter_transformer_test_support')
+const { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor, givenFilterByIdWith, stubEmptyFilterFor, filterParser } = require('../../../../test/drivers/sql_filter_transformer_test_support')
 
 describe('Cloud SQL Service', () => {
 
@@ -94,8 +94,16 @@ describe('Cloud SQL Service', () => {
 
     describe('Query API', () => {
 
-        it('search with empty filter and order by and no data', async () => {
+        beforeEach(async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
+        });
+
+        const givenCollectionWith = async (entities, forCollection) => {
+            await Promise.all( entities.map(e => env.dataProvider.insert(forCollection, e) ))
+        }
+
+
+        it('search with empty filter and order by and no data', async () => {
             stubEmptyFilterFor(ctx.filter)
             stubEmptyOrderByFor(ctx.sort)
 
@@ -105,9 +113,7 @@ describe('Cloud SQL Service', () => {
         });
 
         it('search with non empty filter will return data', async () => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-            await env.dataProvider.insert(ctx.collectionName, ctx.entity)
-            await env.dataProvider.insert(ctx.collectionName, ctx.anotherEntity)
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
             givenFilterByIdWith(ctx.entity._id, ctx.filter)
             stubEmptyOrderByFor(ctx.sort)
 
@@ -117,9 +123,7 @@ describe('Cloud SQL Service', () => {
         });
 
         it('search with non empty order by will return sorted data', async () => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-            await env.dataProvider.insert(ctx.collectionName, ctx.entity)
-            await env.dataProvider.insert(ctx.collectionName, ctx.anotherEntity)
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
             stubEmptyFilterFor(ctx.filter)
             givenOrderByFor('_owner', ctx.sort)
 
@@ -129,9 +133,7 @@ describe('Cloud SQL Service', () => {
         });
 
         it('search with empty order and filter but with limit and skip', async () => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-            await env.dataProvider.insert(ctx.collectionName, ctx.entity)
-            await env.dataProvider.insert(ctx.collectionName, ctx.anotherEntity)
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
             stubEmptyFilterFor(ctx.filter)
             givenOrderByFor('_owner', ctx.sort)
 
@@ -141,9 +143,7 @@ describe('Cloud SQL Service', () => {
         });
 
         it('bulk insert data into collection name and query all of it', async () => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-            stubEmptyFilterFor('')
-            stubEmptyOrderByFor('')
+            stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.insert(ctx.collectionName, ctx.entity) ).to.be.eql(1)
 
@@ -151,10 +151,8 @@ describe('Cloud SQL Service', () => {
         });
 
         it('delete data from collection', async () => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-            await Promise.all( ctx.entities.map(e => env.dataProvider.insert(ctx.collectionName, e) ))
-            stubEmptyFilterFor('')
-            stubEmptyOrderByFor('')
+            await givenCollectionWith(ctx.entities, ctx.collectionName)
+            stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).to.be.eql(ctx.entities.length)
 
@@ -196,7 +194,7 @@ describe('Cloud SQL Service', () => {
 
     before(async function() {
         this.timeout(20000)
-        await mysqlSetup()/*.then(() => {*/
+        await mysqlSetup()
         env.connectionPool = mysql.createPool({
             host     : 'localhost',
             user     : 'test-user',
