@@ -117,7 +117,7 @@ const extractFieldType = dbType => {
 
     validateSystemFields(columnName) {
         if (SystemFields.find(f => f.name === columnName)) {
-            return Promise.reject('system field')
+            return Promise.reject('ERR: system field')
         }
         return Promise.resolve()
     }
