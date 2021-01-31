@@ -22,7 +22,7 @@ app.use(bodyParser.json())
 app.use(compression())
 // app.use(authMiddleware)
 
-app.use(express.static('assets'))
+app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
 
 //const { collectionName, filter, sort, skip, limit } = payload // find
 
