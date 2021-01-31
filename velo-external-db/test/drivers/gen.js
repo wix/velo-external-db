@@ -37,4 +37,14 @@ const randomEntity = (columns) => {
     return entity;
 }
 
-module.exports = { randomEntities, randomEntity }
+const randomFilter = () => {
+    const op = chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith'])
+    return {
+        // kind: 'filter',
+        operator: op,
+        fieldName: chance.word(),
+        value: op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
+    }
+}
+
+module.exports = { randomEntities, randomEntity, randomFilter }
