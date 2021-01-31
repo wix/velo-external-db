@@ -51,7 +51,7 @@ describe('Sql Parser', () => {
     })
 
 
-    describe.only('filter parser', () => {
+    describe('filter parser', () => {
 
         it('handles undefined filter', () => {
             expect( env.filterParser.parseFilter('') ).to.be.deep.eql([])

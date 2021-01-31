@@ -1,4 +1,6 @@
 const {expect} = require('chai')
+//const chaiHttp = require('chai-http');
+
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 });
@@ -17,7 +19,7 @@ describe('Velo External DB', () => {
 
 
     it('answer default page with a welcoming response', async () => {
-        expect((await axios.get(`/`)).data).to.be.eql('ok');
+        expect((await axios.get(`/`)).data).to.contain('<!doctype html>');
     })
 
     it('find api e2e', async () => {

@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 const bodyParser = require('body-parser')
 const compression = require('compression')
 const DataService = require('./service/data')
@@ -21,6 +22,8 @@ app.use(bodyParser.json())
 app.use(compression())
 // app.use(authMiddleware)
 
+app.use(express.static('assets'))
+
 //const { collectionName, filter, sort, skip, limit } = payload // find
 
 app.post('/data/find', async (req, res) => {
@@ -42,7 +45,8 @@ app.post('/data/find', async (req, res) => {
 // })
 app.get('/', (req, res) => {
     // todo: render a welcoming page with user data
-    res.send('ok')
+    // res.send('ok')
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
 })
 
 // app.post('/data/insert', wrapError(items.insertItem))
