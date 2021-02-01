@@ -23,6 +23,8 @@ class DataProvider {
         return resultset[0].affectedRows
     }
 
+    // update ???
+
     async delete(collectionName, itemIds) {
         // const sql = this.pool.format(`DELETE FROM ?? WHERE _id IN (:itemIds)`, [collectionName])
         // console.log(sql)

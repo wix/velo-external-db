@@ -47,4 +47,11 @@ const randomFilter = () => {
     }
 }
 
-module.exports = { randomEntities, randomEntity, randomFilter }
+const veloDate = () => {
+    const d = new Date();
+    d.setMilliseconds(0)
+
+    return { $date: d.toISOString() }
+}
+
+module.exports = { randomEntities, randomEntity, randomFilter, veloDate }

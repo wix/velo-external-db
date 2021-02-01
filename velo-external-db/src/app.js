@@ -54,6 +54,37 @@ app.post('/data/find', async (req, res) => {
     res.json(data)
 })
 
+app.post('/data/insert', async (req, res) => {
+    const { collectionName, item } = req.body
+    const data = await dataService.insert(collectionName, item)
+    res.json(data)
+})
+
+app.post('/data/get', async (req, res) => {
+    const { collectionName, itemId } = req.body
+    const data = await dataService.getById(collectionName, itemId)
+    res.json(data)
+})
+
+app.post('/data/update', async (req, res) => {
+    const { collectionName, item } = req.body
+    const data = await dataService.update(collectionName, item)
+    res.json(data)
+})
+
+app.post('/data/remove', async (req, res) => {
+    const { collectionName, itemId } = req.body
+    const data = await dataService.delete(collectionName, [itemId])
+    res.json(data)
+})
+
+app.post('/data/count', async (req, res) => {
+    const { collectionName, filter } = req.body
+    const data = await dataService.count(collectionName, filter)
+    res.json(data)
+})
+
+
 app.post('/schemas/list', async (req, res) => {
     const data = await schemaService.list()
     res.json(data)
@@ -77,68 +108,14 @@ app.post('/schemas/column/remove', async (req, res) => {
     res.json(data)
 })
 
-// app.post('/data/find', wrapError(items.findItems))
-// app.post('/data/find', async (req, res) => {
-//     const { collectionName, filter, sort, skip, limit } = req.body
-//     const resp = await data.find(collectionName, filter, sort, skip, limit)
-//
-//     res.json(resp)
-//
-//
-//     // wrapError(items.findItems)
-// })
+
 app.get('/', (req, res) => {
     // todo: render a welcoming page with user data
     // res.send('ok')
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 })
 
-// app.post('/data/insert', wrapError(items.insertItem))
-// app.post('/data/update', wrapError(items.updateItem))
-// app.post('/data/remove', wrapError(items.removeItem))
-// app.post('/data/count', wrapError(items.countItems))
-// app.post('/provision', wrapError(provision.provision))
 
-// app.use(errorMiddleware)
-
-/*
-exports.findItems = async (req, res) => {
-  const findResult = await Storage.find(req.body)
-
-  res.json(findResult)
-}
-
-exports.getItem = async (req, res) => {
-  const getResult = await Storage.get(req.body)
-
-  res.json(getResult)
-}
-
-exports.insertItem = async (req, res) => {
-  const insertResult = await Storage.insert(req.body)
-
-  res.json(insertResult)
-}
-
-exports.updateItem = async (req, res) => {
-  const updateResult = await Storage.update(req.body)
-
-  res.json(updateResult)
-}
-
-exports.removeItem = async (req, res) => {
-  const removeResult = await Storage.remove(req.body)
-
-  res.json(removeResult)
-}
-
-exports.countItems = async (req, res) => {
-  const countResult = await Storage.count(req.body)
-
-  res.json(countResult)
-}
-
- */
 
 const server = app.listen(port/*, () => console.log(`Server listening on port ${port}!`)*/)
 

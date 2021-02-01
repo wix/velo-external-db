@@ -1,4 +1,4 @@
-const { asWixData } = require('./transform')
+const { asWixData, unpackDates } = require('./transform')
 
 class DataService {
     constructor(storage) {
@@ -14,24 +14,36 @@ class DataService {
     }
 
     async getById(collectionName, itemId) {
+        const result = await this.find(collectionName, {
+            kind: 'filter',
+            operator: '$eq',
+            fieldName: '_id',
+            value: itemId
+        }, '', 0, 1)
 
+        return { item: result.items[0] }
     }
 
     async count(collectionName, filter) {
 
+        return { totalCount: 0 }
     }
 
     async insert(collectionName, item) {
-
+        return this.storage.insert(collectionName, unpackDates(item))
     }
 
     async update(collectionName, item) {
-
+        // return this.storage.update(collectionName, unpackDates(item))
+        return { item: item }
     }
 
-    async delete(collectionName, itemId) {
-
+    async delete(collectionName, itemIds) {
+        return this.storage.delete(collectionName, itemIds)
     }
+
+
+
 }
 
 module.exports = DataService
