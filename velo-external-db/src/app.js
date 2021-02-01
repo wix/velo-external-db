@@ -4,33 +4,40 @@ const mysql = require('mysql2')
 const bodyParser = require('body-parser')
 const compression = require('compression')
 const DataService = require('./service/data')
-// const DataProvider = require('./storage/gcp/sql/cloud_sql_data_provider.js')
-const DataProvider = require('./storage/storage')
-const { SchemaProvider } = require('./storage/gcp/sql/cloud_sql_schema_provider')
-//const SeoWixCodeProcessor = require('./processors/seo-wix-code-processor')
-// const items = require('./controller/items')
-// const schemas = require('./controller/schemas')
-// const provision = require('./controller/provision')
-// const { wrapError, errorMiddleware } = require('./utils/error-middleware')
-// const authMiddleware = require('./utils/auth-middleware')
+const SchemaService = require('./service/schema')
 
-const pool = mysql.createPool({
-    host     : 'localhost',
-    user     : 'test-user',
-    password : 'password',
-    database : 'test-db',
-    waitForConnections: true,
-    namedPlaceholders: true,
-    // debug: true,
-    // trace: true,
-    connectionLimit: 10,
-    queueLimit: 0/*,
-                multipleStatements: true*/
-}).promise()
+let schemaProvider, dataProvider;
 
-const schemaProvider = new SchemaProvider(pool)
-const dataProvider = new DataProvider()
+switch (process.env.TYPE) {
+    case 'gcp/sql':
+        console.log('INIT: gcp/sql')
+        const { SchemaProvider } = require('./storage/gcp/sql/cloud_sql_schema_provider')
+        const DataProvider = require('./storage/gcp/sql/cloud_sql_data_provider')
+        const { FilterParser } = require('./storage/gcp/sql/sql_filter_transformer')
+
+        const pool = mysql.createPool({
+            host     : process.env.HOST,
+            user     : process.env.USER,
+            password : process.env.PASSWORD,
+            database : process.env.DB,
+            waitForConnections: true,
+            namedPlaceholders: true,
+            // debug: true,
+            // trace: true,
+            connectionLimit: 10,
+            queueLimit: 0/*,
+                                multipleStatements: true*/
+        }).promise()
+        const filterParser = new FilterParser()
+        dataProvider = new DataProvider(pool, filterParser)
+        schemaProvider = new SchemaProvider(pool)
+
+        break;
+}
+
 const dataService = new DataService(dataProvider)
+const schemaService = new SchemaService(schemaProvider)
+
 
 const app = express()
 const port = process.env.PORT || 8080
@@ -41,8 +48,6 @@ app.use(compression())
 
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
 
-//const { collectionName, filter, sort, skip, limit } = payload // find
-
 app.post('/data/find', async (req, res) => {
     const { collectionName, filter, sort, skip, limit } = req.body
     const data = await dataService.find(collectionName, filter, sort, skip, limit)
@@ -50,25 +55,25 @@ app.post('/data/find', async (req, res) => {
 })
 
 app.post('/schemas/list', async (req, res) => {
-    const data = await schemaProvider.list()
+    const data = await schemaService.list()
     res.json(data)
 })
 
 app.post('/schemas/create', async (req, res) => {
     const { collectionName } = req.body
-    const data = await schemaProvider.create(collectionName)
+    const data = await schemaService.create(collectionName)
     res.json(data)
 })
 
 app.post('/schemas/column/add', async (req, res) => {
     const { collectionName, column } = req.body
-    const data = await schemaProvider.addColumn(collectionName, column)
+    const data = await schemaService.addColumn(collectionName, column)
     res.json(data)
 })
 
 app.post('/schemas/column/remove', async (req, res) => {
     const { collectionName, columnName } = req.body
-    const data = await schemaProvider.removeColumn(collectionName, columnName)
+    const data = await schemaService.removeColumn(collectionName, columnName)
     res.json(data)
 })
 

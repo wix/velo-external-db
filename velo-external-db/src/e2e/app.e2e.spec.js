@@ -26,10 +26,6 @@ describe('Velo External DB', () => {
         expect((await axios.get(`/`)).data).to.contain('<!doctype html>');
     })
 
-    it('find api e2e', async () => {
-        expect((await axios.post(`/data/find`, {collectionName: 'collectionName', filter: '', sort: '', skip: 0, limit: 25 })).data).to.be.eql({items: [ { _id: 'stub'} ], totalCount: 0});
-    })
-
     describe('Schema API', () => {
 
         it('list', async () => {
@@ -78,12 +74,25 @@ describe('Velo External DB', () => {
 
     })
 
+    describe('Data API', () => {
+        // beforeEach(async () => {
+        //     await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
+        // });
+
+        it('find api e2e', async () => {
+            await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
+
+            expect((await axios.post(`/data/find`, {collectionName: ctx.collectionName, filter: '', sort: '', skip: 0, limit: 25 })).data).to.be.eql({items: [ ], totalCount: 0});
+        })
+    })
+
+
     const ctx = {
         collectionName: Uninitialized,
         column: Uninitialized
     }
 
-    beforeEach(async function() {
+    beforeEach(async () => {
         ctx.collectionName = chance.word()
         ctx.column = {name: chance.word(), type: 'varchar(256)', isPrimary: false}
 
@@ -92,6 +101,13 @@ describe('Velo External DB', () => {
     before(async function() {
         this.timeout(20000)
         await initMySqlEnv()
+
+        process.env.TYPE = 'gcp/sql'
+        process.env.HOST = 'localhost'
+        process.env.USER = 'test-user'
+        process.env.PASSWORD = 'password'
+        process.env.DB = 'test-db'
+
         server = require('../app')
     });
 

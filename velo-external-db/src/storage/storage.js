@@ -3,7 +3,7 @@ class DataProvider {
 
     }
 
-    async list(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit) {
         return [{
             _id: 'stub'
         }]
