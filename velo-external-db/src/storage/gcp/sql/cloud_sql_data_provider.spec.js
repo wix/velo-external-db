@@ -83,7 +83,6 @@ describe('Cloud SQL Service', () => {
         sort: Uninitialized,
         skip: Uninitialized,
         limit: Uninitialized,
-        columnName: Uninitialized,
         entity: Uninitialized,
         anotherEntity: Uninitialized,
         entities: Uninitialized,
@@ -101,7 +100,6 @@ describe('Cloud SQL Service', () => {
         ctx.sort = chance.word();
         ctx.skip = 0;
         ctx.limit = 10;
-        ctx.columnName = chance.word();
 
         ctx.entity = randomDbEntity([]);
         ctx.anotherEntity = randomDbEntity([]);
