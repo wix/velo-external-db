@@ -117,7 +117,7 @@ describe('Velo External DB', () => {
             await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.item })
             await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.anotherItem })
 
-            expect((await axios.post(`/data/count`, {collectionName: ctx.collectionName, filter: '' })).data).to.be.eql({ totalCount: 0});
+            expect((await axios.post(`/data/count`, {collectionName: ctx.collectionName, filter: '' })).data).to.be.eql({ totalCount: 2});
         })
     })
 

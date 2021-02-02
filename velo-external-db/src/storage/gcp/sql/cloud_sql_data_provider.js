@@ -14,6 +14,10 @@ class DataProvider {
         return resultset[0]
     }
 
+    async count(collectionName, filter) {
+        return 2
+    }
+
     async insert(collectionName, item) {
         const n = Object.keys(item).length
         const sql = this.pool.format(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES (${this.wildCardWith(n, '?')})`, [collectionName].concat(Object.keys(item)))
@@ -23,19 +27,15 @@ class DataProvider {
         return resultset[0].affectedRows
     }
 
-    // update ???
+    update(collectionName, item) {
+
+    }
 
     async delete(collectionName, itemIds) {
-        // const sql = this.pool.format(`DELETE FROM ?? WHERE _id IN (:itemIds)`, [collectionName])
-        // console.log(sql)
-        // console.log([itemIds])
-        // const rs = await this.pool.execute(sql, {itemIds: itemIds});
-        // return rs[0].affectedRows
         const sql = this.pool.format(`DELETE FROM ?? WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`, [collectionName])
         const rs = await this.pool.execute(sql, itemIds);
         return rs[0].affectedRows
     }
-
 
     wildCardWith(n, char) {
         return Array(n).fill(char, 0, n).join(', ')

@@ -1,40 +1,42 @@
 
 const asWixData = e => packDates(e)
 
+const isObject = (o) => typeof o === 'object' && o !== null
+
+
 const unpackDates = item => {
-    Object.keys(item)
-          .map(key => {
+    const i = clone(item)
+
+    Object.keys(i)
+          .forEach(key => {
               const value = item[key];
-              if (value === null) return;
-
-              const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
-
-              if (typeof value === 'object' && '$date' in value) {
-                  item[key] = new Date(value['$date']);
-              }
-
-              if (typeof value === 'string') {
-                  const re = reISO.exec(value);
-                  if (re) {
-                      item[key] = new Date(value);
-                  }
+              // if (value === null) return;
+    //           const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
+    //
+              if (isObject(value) && '$date' in value) {
+                  i[key] = new Date(value['$date']);
+    //           } else if (typeof value === 'string') {
+    //               const re = reISO.exec(value);
+    //               if (re) {
+    //                   item2[key] = new Date(value);
+    //               }
               }
           })
 
-    return item
+    return i
 }
+
+const clone = o => Object.assign({}, o)
 
 const packDates = item => {
-    Object.keys(item)
-          .map(key => {
-              if (item[key] instanceof Date) {
-                  item[key] = { $date: item[key] }
+    const i = clone(item)
+    Object.keys(i)
+          .forEach(key => {
+              if (i[key] instanceof Date) {
+                  i[key] = { $date: i[key].toISOString() }
               }
           })
-
-return item
+    return i
 }
-/*
- */
 
 module.exports = { asWixData, unpackDates }

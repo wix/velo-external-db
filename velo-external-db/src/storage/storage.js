@@ -3,11 +3,13 @@ class DataProvider {
 
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
-        return [{
-            _id: 'stub'
-        }]
-    }
+    async find(collectionName, filter, sort, skip, limit) { }
+
+    async count(collectionName, filter) { }
+
+    async update(collectionName, item) { }
+
+    async insert(collectionName, item) { }
 }
 
 module.exports = DataProvider

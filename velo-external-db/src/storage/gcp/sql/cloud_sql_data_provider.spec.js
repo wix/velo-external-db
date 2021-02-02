@@ -2,7 +2,7 @@ const {expect} = require('chai')
 const DataProvider = require('./cloud_sql_data_provider')
 const {SchemaProvider, SystemFields} = require('./cloud_sql_schema_provider')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
-const { randomEntities, randomEntity } = require('../../../../test/drivers/gen');
+const { randomDbEntities, randomDbEntity } = require('../../../../test/drivers/gen');
 const { initMySqlEnv, shutdownMySqlEnv } = require('../../../../test/resources/mysql_resources');
 const chance = new require('chance')();
 const { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor, givenFilterByIdWith, stubEmptyFilterFor, filterParser } = require('../../../../test/drivers/sql_filter_transformer_test_support')
@@ -184,10 +184,9 @@ describe('Cloud SQL Service', () => {
         ctx.limit = 10;
         ctx.columnName = chance.word();
 
-        ctx.entity = randomEntity([]);
-        ctx.anotherEntity = randomEntity([]);
-        ctx.entities = randomEntities();
-
+        ctx.entity = randomDbEntity([]);
+        ctx.anotherEntity = randomDbEntity([]);
+        ctx.entities = randomDbEntities();
     });
 
     before(async function() {

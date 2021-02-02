@@ -18,14 +18,26 @@ const randomEntities = (columns) => {
     return arr;
 }
 
-const randomEntity = (columns) => {
+const randomDbEntities = (columns) => {
+    const num = chance.natural({min: 2, max: 20});
+    const arr = [];
+    for (let i = 0; i < num; i++) {
+        arr.push(randomDbEntity(columns))
+    }
+    return arr;
+}
+
+const newDate = () => {
     const d = new Date()
     d.setMilliseconds(0)
+    return d;
+}
 
+const randomEntity = (columns) => {
     const entity = {
         _id: chance.guid(),
-        _createdDate: d,
-        _updatedDate: d,
+        _createdDate: veloDate(),
+        _updatedDate: veloDate(),
         _owner: chance.guid(),
     }
 
@@ -37,6 +49,24 @@ const randomEntity = (columns) => {
     return entity;
 }
 
+const randomDbEntity = (columns) => {
+    const entity = {
+        _id: chance.guid(),
+        _createdDate: newDate(),
+        _updatedDate: newDate(),
+        _owner: chance.guid(),
+    }
+
+    const _columns = columns || []
+
+    for (const column of _columns) {
+        entity[column] = chance.word()
+    }
+    return entity;
+}
+
+
+
 const randomFilter = () => {
     const op = chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith'])
     return {
@@ -47,11 +77,6 @@ const randomFilter = () => {
     }
 }
 
-const veloDate = () => {
-    const d = new Date();
-    d.setMilliseconds(0)
+const veloDate = () => ( { $date: newDate().toISOString() } )
 
-    return { $date: d.toISOString() }
-}
-
-module.exports = { randomEntities, randomEntity, randomFilter, veloDate }
+module.exports = { randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities }
