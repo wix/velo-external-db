@@ -1,40 +1,12 @@
 const express = require('express')
 const path = require('path')
-const mysql = require('mysql2')
 const bodyParser = require('body-parser')
 const compression = require('compression')
 const DataService = require('./service/data')
 const SchemaService = require('./service/schema')
+const { init } = require('./storage/factory')
 
-let schemaProvider, dataProvider;
-
-switch (process.env.TYPE) {
-    case 'gcp/sql':
-        console.log('INIT: gcp/sql')
-        const { SchemaProvider } = require('./storage/gcp/sql/cloud_sql_schema_provider')
-        const DataProvider = require('./storage/gcp/sql/cloud_sql_data_provider')
-        const { FilterParser } = require('./storage/gcp/sql/sql_filter_transformer')
-
-        const pool = mysql.createPool({
-            host     : process.env.HOST,
-            user     : process.env.USER,
-            password : process.env.PASSWORD,
-            database : process.env.DB,
-            waitForConnections: true,
-            namedPlaceholders: true,
-            // debug: true,
-            // trace: true,
-            connectionLimit: 10,
-            queueLimit: 0/*,
-                                multipleStatements: true*/
-        }).promise()
-        const filterParser = new FilterParser()
-        dataProvider = new DataProvider(pool, filterParser)
-        schemaProvider = new SchemaProvider(pool)
-
-        break;
-}
-
+const {dataProvider, schemaProvider} = init(process.env.TYPE, process.env.HOST, process.env.USER, process.env.PASSWORD, process.env.DB)
 const dataService = new DataService(dataProvider)
 const schemaService = new SchemaService(schemaProvider)
 
@@ -48,6 +20,12 @@ app.use(compression())
 
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
+})
+
+
+// *************** Data API **********************
 app.post('/data/find', async (req, res) => {
     const { collectionName, filter, sort, skip, limit } = req.body
     const data = await dataService.find(collectionName, filter, sort, skip, limit)
@@ -83,8 +61,10 @@ app.post('/data/count', async (req, res) => {
     const data = await dataService.count(collectionName, filter)
     res.json(data)
 })
+// ***********************************************
 
 
+// *************** Schema API **********************
 app.post('/schemas/list', async (req, res) => {
     const data = await schemaService.list()
     res.json(data)
@@ -107,17 +87,7 @@ app.post('/schemas/column/remove', async (req, res) => {
     const data = await schemaService.removeColumn(collectionName, columnName)
     res.json(data)
 })
-
-
-app.get('/', (req, res) => {
-    // todo: render a welcoming page with user data
-    // res.send('ok')
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
-})
-
-
+// ***********************************************
 
 const server = app.listen(port/*, () => console.log(`Server listening on port ${port}!`)*/)
-
-
 module.exports = server;
