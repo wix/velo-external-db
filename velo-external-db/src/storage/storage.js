@@ -1,8 +1,4 @@
 class DataProvider {
-    constructor() {
-
-    }
-
     async find(collectionName, filter, sort, skip, limit) { }
 
     async count(collectionName, filter) { }
@@ -12,4 +8,14 @@ class DataProvider {
     async insert(collectionName, item) { }
 }
 
-module.exports = DataProvider
+class SchemaProvider {
+    async list() { }
+
+    async create(collectionName) { }
+
+    async addColumn(collectionName, column) { }
+
+    async removeColumn(collectionName, columnName) { }
+}
+
+module.exports = {DataProvider, SchemaProvider}

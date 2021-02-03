@@ -33,7 +33,18 @@ const newDate = () => {
     return d;
 }
 
+const randomArrayOf = (gen) => {
+    const arr = [];
+    const num = chance.natural({min: 2, max: 20});
+    for (let i = 0; i < num; i++) {
+        arr.push(gen())
+    }
+    return arr;
+}
+
 const randomCollectionName = () => chance.word()
+const randomDbField = () => ( {name: chance.word(), type: chance.word(), isPrimary: chance.bool()} )
+const randomDbFields = () => randomArrayOf( randomDbField )
 
 const randomColumn = () => ( {name: chance.word(), type: 'varchar(256)', isPrimary: false} )
 
@@ -83,4 +94,9 @@ const randomFilter = () => {
 
 const veloDate = () => ( { $date: newDate().toISOString() } )
 
-module.exports = { randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities, randomColumn, randomCollectionName }
+const randomDb = () => ( { id: randomCollectionName(),
+                           fields: randomDbFields() })
+
+const randomDbs = () => randomArrayOf( randomDb )
+
+module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities, randomColumn, randomCollectionName }

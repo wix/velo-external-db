@@ -1,5 +1,5 @@
 const sinon = require('sinon');
-const DataProvider = require('../../src/storage/storage')
+const { DataProvider } = require('../../src/storage/storage')
 const { unpackDates } = require('../../src/service/transform')
 const dataProvider = sinon.createStubInstance(DataProvider)
 
