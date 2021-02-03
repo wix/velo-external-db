@@ -20,6 +20,7 @@ app.use(compression())
 
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
 
+// *************** INFO **********************
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 })
