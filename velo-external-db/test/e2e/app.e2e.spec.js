@@ -1,10 +1,10 @@
 const {expect} = require('chai')
 //const chaiHttp = require('chai-http');
-const mysql = require('../../test/resources/mysql_resources');
-const { Uninitialized } = require('../../test/commons/test-commons');
-const schema = require('../../test/drivers/schema_api_rest_test_support');
-const data = require('../../test/drivers/data_api_rest_test_support');
-const gen = require('../../test/drivers/gen');
+const mysql = require('../resources/mysql_resources');
+const { Uninitialized } = require('../commons/test-commons');
+const schema = require('../drivers/schema_api_rest_test_support');
+const data = require('../drivers/data_api_rest_test_support');
+const gen = require('../drivers/gen');
 const chance = new require('chance')();
 
 const axios = require('axios').create({
@@ -126,7 +126,7 @@ describe('Velo External DB', () => {
         this.timeout(20000)
         await mysql.initMySqlEnv()
 
-        env.server = require('../app')
+        env.server = require('../..')
     });
 
     after(async () => {
