@@ -59,6 +59,24 @@ describe('Cloud SQL Service', () => {
             expect( res ).to.be.deep.eql([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1));
         });
 
+        it('count will run query', async () => {
+            await givenCollectionWith(ctx.entities, ctx.collectionName)
+            driver.stubEmptyFilterFor(ctx.filter)
+
+            const res = await env.dataProvider.count(ctx.collectionName, ctx.filter)
+
+            expect( res ).to.be.eql(ctx.entities.length);
+        });
+
+        it('count will run query with filter', async () => {
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
+            driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
+
+            const res = await env.dataProvider.count(ctx.collectionName, ctx.filter)
+
+            expect( res ).to.be.eql(1);
+        });
+
         it('bulk insert data into collection name and query all of it', async () => {
             driver.stubEmptyFilterAndSortFor('', '')
 

@@ -15,7 +15,10 @@ class DataProvider {
     }
 
     async count(collectionName, filter) {
-        return 2
+        const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
+        const sql = this.pool.format(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`, [collectionName].concat(filterColumns))
+        const resultset = await this.pool.execute(sql, parameters)
+        return resultset[0][0]['num']
     }
 
     async insert(collectionName, item) {
