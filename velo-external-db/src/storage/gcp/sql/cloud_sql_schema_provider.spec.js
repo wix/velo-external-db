@@ -1,7 +1,8 @@
 const {expect} = require('chai')
 const {SchemaProvider, SystemFields} = require('./cloud_sql_schema_provider')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
-const { initMySqlEnv, shutdownMySqlEnv } = require('../../../../test/resources/mysql_resources');
+const mysql = require('../../../../test/resources/mysql_resources');
+const gen = require('../../../../test/drivers/gen');
 const chance = new require('chance')();
 
 describe('Cloud SQL Service', () => {
@@ -41,7 +42,7 @@ describe('Cloud SQL Service', () => {
             await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime'})
 
             expect((await env.schemaProvider.list()).find(e => e.id === ctx.collectionName)
-                .fields.find(e => e.name === ctx.columnName)).to.be.deep.eql({name: ctx.columnName, type: 'datetime', isPrimary: false})
+                                            .fields.find(e => e.name === ctx.columnName)).to.be.deep.eql({name: ctx.columnName, type: 'datetime', isPrimary: false})
         })
 
         it('add duplicate column will fail', async () => {
@@ -55,9 +56,9 @@ describe('Cloud SQL Service', () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             SystemFields.map(f => f.name)
-                .map(async f => {
-                    await env.schemaProvider.addColumn(ctx.collectionName, {name: f, type: 'datetime'})
-                })
+                        .map(async f => {
+                            await env.schemaProvider.addColumn(ctx.collectionName, {name: f, type: 'datetime'})
+                        })
         })
 
         it('drop column on a an existing collection', async () => {
@@ -67,7 +68,7 @@ describe('Cloud SQL Service', () => {
             await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
 
             expect((await env.schemaProvider.list()).find(e => e.id === ctx.collectionName)
-                .fields.find(e => e.name === ctx.columnName)).to.be.an('undefined')
+                                            .fields.find(e => e.name === ctx.columnName)).to.be.an('undefined')
         })
 
         it('drop column on a a non existing collection', async () => {
@@ -78,7 +79,6 @@ describe('Cloud SQL Service', () => {
 
         it('drop system column will fail', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
-
 
             SystemFields.map(f => f.name)
                 .map(async f => {
@@ -98,17 +98,17 @@ describe('Cloud SQL Service', () => {
     };
 
     beforeEach(() => {
-        ctx.collectionName = chance.word();
+        ctx.collectionName = gen.randomCollectionName();
         ctx.columnName = chance.word();
     });
 
     before(async function() {
         this.timeout(20000)
-        env.connectionPool = await initMySqlEnv()
+        env.connectionPool = await mysql.initMySqlEnv()
         env.schemaProvider = new SchemaProvider(env.connectionPool)
     });
 
     after(async () => {
-        await shutdownMySqlEnv();
+        await mysql.shutdownMySqlEnv();
     });
 })

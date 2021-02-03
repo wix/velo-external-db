@@ -1,5 +1,5 @@
 const { expect } = require('chai')
-const { asWixData, unpackDates, packDates } = require('./transform')
+const { asWixData, unpackDates } = require('./transform')
 const { Uninitialized } = require('../../test/commons/test-commons');
 const gen = require('../../test/drivers/gen');
 const chance = new require('chance')();

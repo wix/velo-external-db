@@ -2,27 +2,27 @@ const { expect } = require('chai')
 const DataService = require('./data')
 const { Uninitialized } = require('../../test/commons/test-commons');
 const gen = require('../../test/drivers/gen');
-const { dataProvider, givenCountResult, givenListResult, expectInsertFor, expectUpdateFor } = require('../../test/drivers/data-provider-test-support');
+const driver = require('../../test/drivers/data-provider-test-support');
 const chance = new require('chance')();
 
 describe('Data Service', () => {
 
     it('delegate request to data provider and translate data to velo format', async () => {
-        givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
         const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
         expect( actual ).to.be.deep.eql({ items: ctx.entities, totalCount: 0 });
     })
 
     it('count data from collection', async () => {
-        givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
+        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
 
         const actual = await env.dataService.count(ctx.collectionName, ctx.filter)
         expect( actual ).to.be.deep.eql({ totalCount: ctx.total });
     })
 
     it('get by id will issue a call to find and transform the result', async () => {
-        givenListResult([ctx.entity], ctx.collectionName,
+        driver.givenListResult([ctx.entity], ctx.collectionName,
                         { kind: 'filter',
                                operator: '$eq',
                                fieldName: '_id',
@@ -34,14 +34,14 @@ describe('Data Service', () => {
     })
 
     it('insert will insert data into db', async () => {
-        expectInsertFor(ctx.entity, ctx.collectionName)
+        driver.expectInsertFor(ctx.entity, ctx.collectionName)
 
         const actual = await env.dataService.insert(ctx.collectionName, ctx.entity)
         return expect( actual  ).to.be.deep.eql({ item: ctx.entity });
     })
 
     it('update will update data into db', async () => {
-        expectUpdateFor(ctx.entity, ctx.collectionName)
+        driver.expectUpdateFor(ctx.entity, ctx.collectionName)
 
         const actual = await env.dataService.update(ctx.collectionName, ctx.entity)
         expect( actual ).to.be.deep.eql({ item: ctx.entity });
@@ -64,7 +64,7 @@ describe('Data Service', () => {
     };
 
     beforeEach(() => {
-        ctx.collectionName = chance.word();
+        ctx.collectionName = gen.randomCollectionName()
         ctx.filter = chance.word();
         ctx.sort = chance.word();
         ctx.skip = chance.word();
@@ -75,7 +75,7 @@ describe('Data Service', () => {
         ctx.entities = gen.randomEntities();
         ctx.entity = gen.randomEntity();
 
-        env.dataService = new DataService(dataProvider)
+        env.dataService = new DataService(driver.dataProvider)
     });
 
 

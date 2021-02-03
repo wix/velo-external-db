@@ -33,6 +33,10 @@ const newDate = () => {
     return d;
 }
 
+const randomCollectionName = () => chance.word()
+
+const randomColumn = () => ( {name: chance.word(), type: 'varchar(256)', isPrimary: false} )
+
 const randomEntity = (columns) => {
     const entity = {
         _id: chance.guid(),
@@ -79,4 +83,4 @@ const randomFilter = () => {
 
 const veloDate = () => ( { $date: newDate().toISOString() } )
 
-module.exports = { randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities }
+module.exports = { randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities, randomColumn, randomCollectionName }

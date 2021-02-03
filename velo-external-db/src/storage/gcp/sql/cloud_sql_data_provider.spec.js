@@ -2,10 +2,10 @@ const {expect} = require('chai')
 const DataProvider = require('./cloud_sql_data_provider')
 const {SchemaProvider} = require('./cloud_sql_schema_provider')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
-const { randomDbEntities, randomDbEntity } = require('../../../../test/drivers/gen');
-const { initMySqlEnv, shutdownMySqlEnv } = require('../../../../test/resources/mysql_resources');
+const gen = require('../../../../test/drivers/gen');
+const mysql = require('../../../../test/resources/mysql_resources');
 const chance = new require('chance')();
-const { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor, givenFilterByIdWith, stubEmptyFilterFor, filterParser } = require('../../../../test/drivers/sql_filter_transformer_test_support')
+const driver = require('../../../../test/drivers/sql_filter_transformer_test_support')
 
 describe('Cloud SQL Service', () => {
 
@@ -21,8 +21,8 @@ describe('Cloud SQL Service', () => {
 
 
         it('search with empty filter and order by and no data', async () => {
-            stubEmptyFilterFor(ctx.filter)
-            stubEmptyOrderByFor(ctx.sort)
+            driver.stubEmptyFilterFor(ctx.filter)
+            driver.stubEmptyOrderByFor(ctx.sort)
 
             const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
@@ -31,8 +31,8 @@ describe('Cloud SQL Service', () => {
 
         it('search with non empty filter will return data', async () => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            givenFilterByIdWith(ctx.entity._id, ctx.filter)
-            stubEmptyOrderByFor(ctx.sort)
+            driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
+            driver.stubEmptyOrderByFor(ctx.sort)
 
             const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
@@ -41,8 +41,8 @@ describe('Cloud SQL Service', () => {
 
         it('search with non empty order by will return sorted data', async () => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            stubEmptyFilterFor(ctx.filter)
-            givenOrderByFor('_owner', ctx.sort)
+            driver.stubEmptyFilterFor(ctx.filter)
+            driver.givenOrderByFor('_owner', ctx.sort)
 
             const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
@@ -51,8 +51,8 @@ describe('Cloud SQL Service', () => {
 
         it('search with empty order and filter but with limit and skip', async () => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            stubEmptyFilterFor(ctx.filter)
-            givenOrderByFor('_owner', ctx.sort)
+            driver.stubEmptyFilterFor(ctx.filter)
+            driver.givenOrderByFor('_owner', ctx.sort)
 
             const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1)
 
@@ -60,7 +60,7 @@ describe('Cloud SQL Service', () => {
         });
 
         it('bulk insert data into collection name and query all of it', async () => {
-            stubEmptyFilterAndSortFor('', '')
+            driver.stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.insert(ctx.collectionName, ctx.entity) ).to.be.eql(1)
 
@@ -69,7 +69,7 @@ describe('Cloud SQL Service', () => {
 
         it('delete data from collection', async () => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
-            stubEmptyFilterAndSortFor('', '')
+            driver.stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).to.be.eql(ctx.entities.length)
 
@@ -95,25 +95,25 @@ describe('Cloud SQL Service', () => {
     };
 
     beforeEach(() => {
-        ctx.collectionName = chance.word();
+        ctx.collectionName = gen.randomCollectionName()
         ctx.filter = chance.word();
         ctx.sort = chance.word();
         ctx.skip = 0;
         ctx.limit = 10;
 
-        ctx.entity = randomDbEntity([]);
-        ctx.anotherEntity = randomDbEntity([]);
-        ctx.entities = randomDbEntities();
+        ctx.entity = gen.randomDbEntity([]);
+        ctx.anotherEntity = gen.randomDbEntity([]);
+        ctx.entities = gen.randomDbEntities();
     });
 
     before(async function() {
         this.timeout(20000)
-        env.connectionPool = await initMySqlEnv()
-        env.dataProvider = new DataProvider(env.connectionPool, filterParser)
+        env.connectionPool = await mysql.initMySqlEnv()
+        env.dataProvider = new DataProvider(env.connectionPool, driver.filterParser)
         env.schemaProvider = new SchemaProvider(env.connectionPool)
     });
 
     after(async () => {
-        await shutdownMySqlEnv();
+        await mysql.shutdownMySqlEnv();
     });
 })

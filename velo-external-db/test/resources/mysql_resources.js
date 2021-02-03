@@ -5,6 +5,13 @@ const mysql = require('mysql2');
 
 const initMySqlEnv = async () => {
     await mysqlSetup()
+
+    process.env.TYPE = 'gcp/sql'
+    process.env.HOST = 'localhost'
+    process.env.USER = 'test-user'
+    process.env.PASSWORD = 'password'
+    process.env.DB = 'test-db'
+
     return mysql.createPool({
         host     : 'localhost',
         user     : 'test-user',
