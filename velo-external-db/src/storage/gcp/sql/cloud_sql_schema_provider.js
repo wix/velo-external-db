@@ -21,48 +21,6 @@ class SchemaProvider {
     }
 
     async list() {
-        /*
-{
-    displayName: table.table,
-    id: table.table,
-    allowedOperations: allowedOperations,
-    maxPageSize: 50,
-    ttl: 3600,
-    fields: convertFields(table.columns)
-  }
-
-{
-        displayName: field.name,
-        type: extractFieldType(field.type),
-
-
-const extractFieldType = dbType => {
-  const type = dbType
-    .toLowerCase()
-    .split('(')
-    .shift()
-
-  switch (type) {
-    case 'varchar':
-    case 'text':
-      return 'text'
-    case 'decimal':
-    case 'bigint':
-    case 'int':
-      return 'number'
-    case 'tinyint':
-      return 'boolean'
-    case 'date':
-    case 'datetime':
-    case 'time':
-      return 'datetime'
-    case 'json':
-    default:
-      return 'object'
-  }
-}
-
-         */
         const tables = await this.pool.query('SHOW TABLES')
         const columnName = tables[1][0].name
 
@@ -70,23 +28,14 @@ const extractFieldType = dbType => {
                                     .map( this.describeCollection.bind(this) ))
     }
 
-    async describeCollection(collectionName) {
-        const res = await this.pool.query('DESCRIBE ??', [collectionName])
-        return {
-            id: collectionName,
-            fields: res[0].map(r => ({ name: r.Field, type: r.Type, isPrimary: r.Key === 'PRI' }))
-        }
-    }
-
-    defaultForColumnType(type) {
-        if (type === 'timestamp') {
-            return 'DEFAULT CURRENT_TIMESTAMP'
-        }
-        return ''
-    }
-
     async create(collectionName, columns) {
-        await this.pool.query(`CREATE TABLE IF NOT EXISTS ?? (${this.systemFields.map(f => `${f.name} ${f.type} ${this.defaultForColumnType(f.type)}`).join(', ')}, PRIMARY KEY (${this.systemFields.filter(f => f.isPrimary).map(f => `\`${f.name}\``).join(', ')}))`, [collectionName])
+        const dbColumnsSql = this.systemFields.concat(columns || [])
+                                 .map( this.columnToDbColumnSql.bind(this) )
+                                 .join(', ')
+        const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => `\`${f.name}\``).join(', ')
+
+        await this.pool.query(`CREATE TABLE IF NOT EXISTS ?? (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
+                              [collectionName].concat((columns || []).map(c => c.name)))
     }
 
     async addColumn(collectionName, column) {
@@ -115,6 +64,26 @@ const extractFieldType = dbType => {
          */
     }
 
+    async describeCollection(collectionName) {
+        const res = await this.pool.query('DESCRIBE ??', [collectionName])
+        return {
+            id: collectionName,
+            fields: res[0].map(r => ({ name: r.Field, type: r.Type, isPrimary: r.Key === 'PRI' }))
+        }
+    }
+
+    defaultForColumnType(type) {
+        if (type === 'timestamp') {
+            return 'DEFAULT CURRENT_TIMESTAMP'
+        }
+        return ''
+    }
+
+    columnToDbColumnSql(f) {
+        return `${f.name} ${f.type} ${this.defaultForColumnType(f.type)}`
+    }
+
+
     validateSystemFields(columnName) {
         if (SystemFields.find(f => f.name === columnName)) {
             return Promise.reject('ERR: system field')
@@ -122,5 +91,49 @@ const extractFieldType = dbType => {
         return Promise.resolve()
     }
 }
+
+/*
+{
+displayName: table.table,
+id: table.table,
+allowedOperations: allowedOperations,
+maxPageSize: 50,
+ttl: 3600,
+fields: convertFields(table.columns)
+}
+
+{
+displayName: field.name,
+type: extractFieldType(field.type),
+
+
+const extractFieldType = dbType => {
+const type = dbType
+.toLowerCase()
+.split('(')
+.shift()
+
+switch (type) {
+case 'varchar':
+case 'text':
+return 'text'
+case 'decimal':
+case 'bigint':
+case 'int':
+return 'number'
+case 'tinyint':
+return 'boolean'
+case 'date':
+case 'datetime':
+case 'time':
+return 'datetime'
+case 'json':
+default:
+return 'object'
+}
+}
+
+ */
+
 
 module.exports = {SchemaProvider, SystemFields}

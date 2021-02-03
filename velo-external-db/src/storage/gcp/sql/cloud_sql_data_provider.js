@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { SystemFields } = require('./cloud_sql_schema_provider')
 
 class DataProvider {
     constructor(pool, filterParser) {
@@ -30,8 +31,19 @@ class DataProvider {
         return resultset[0].affectedRows
     }
 
-    update(collectionName, item) {
+    async update(collectionName, item) {
+        const systemFieldNames = SystemFields.map(f => f.name)
+        const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
 
+        if (updateFields.length === 0) {
+            return 0
+        }
+
+        const sql = this.pool.format(`UPDATE ?? SET ${updateFields.map(() => '?? = ?')} WHERE _id = ?`, [collectionName].concat(updateFields))
+        const updatable = updateFields.concat(['_id']).reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
+
+        const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
+        return resultset[0].changedRows
     }
 
     async delete(collectionName, itemIds) {

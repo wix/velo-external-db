@@ -90,7 +90,7 @@ describe('Velo External DB', () => {
 
             await axios.post(`/data/update`, {collectionName: ctx.collectionName, item: ctx.modifiedItem })
 
-            expect(await data.expectAllDataIn(ctx.collectionName)).to.be.eql({ items: [ctx.item/*ctx.modifiedItem*/], totalCount: 0});
+            expect(await data.expectAllDataIn(ctx.collectionName)).to.be.eql({ items: [ctx.modifiedItem], totalCount: 0});
         })
 
         it('count api', async () => {

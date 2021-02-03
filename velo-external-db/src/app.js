@@ -17,6 +17,7 @@ const port = process.env.PORT || 8080
 app.use(bodyParser.json())
 app.use(compression())
 // app.use(authMiddleware)
+// todo: add auth middleware
 
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
 
