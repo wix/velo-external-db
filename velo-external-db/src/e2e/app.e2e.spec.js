@@ -13,6 +13,13 @@ const axios = require('axios').create({
 describe('Velo External DB', () => {
     let server;
 
+    const givenCollection = async (name, columns) => {
+        await axios.post(`/schemas/create`, {collectionName: name})
+        await Promise.all( columns.map(async column => await axios.post(`/schemas/column/add`, {collectionName: name, column: column})) )
+    }
+
+    const givenItems = async (items, collectionName) => await Promise.all( items.map(async item => await axios.post(`/data/insert`, {collectionName: collectionName, item: item })) )
+
 
     it('answer default page with a welcoming response', async () => {
         expect((await axios.get(`/`)).data).to.contain('<!doctype html>');
@@ -25,7 +32,7 @@ describe('Velo External DB', () => {
         })
 
         it('create', async () => {
-            await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
+            await givenCollection(ctx.collectionName, [])
 
             const res = await axios.post(`/schemas/list`, {})
             expect(res.data).to.be.deep.eql([{ id: ctx.collectionName,
@@ -40,7 +47,7 @@ describe('Velo External DB', () => {
         })
 
         it('add column', async () => {
-            await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
+            await givenCollection(ctx.collectionName, [])
 
             await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column})
 
@@ -51,13 +58,11 @@ describe('Velo External DB', () => {
         })
 
         it('remove column', async () => {
-            await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
-            await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column})
+            await givenCollection(ctx.collectionName, [ctx.column])
 
             await axios.post(`/schemas/column/remove`, {collectionName: ctx.collectionName, columnName: ctx.column.name})
 
             const dbs = (await axios.post(`/schemas/list`, {})).data
-
             const field = dbs.find(e => e.id === ctx.collectionName)
                              .fields.find(e => e.name === ctx.column.name)
 
@@ -69,21 +74,16 @@ describe('Velo External DB', () => {
     describe('Data API', () => {
 
         it('find api', async () => {
-            await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
-            await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column})
-
-            await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.item })
-            await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.anotherItem })
+            await givenCollection(ctx.collectionName, [ctx.column])
+            await givenItems([ctx.item, ctx.anotherItem], ctx.collectionName)
 
             expect((await axios.post(`/data/find`, {collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 })).data).to.be.eql({ items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
                                                                                                                                                                                               totalCount: 0});
         })
 
         it('delete one api', async () => {
-            await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
-            await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column})
-
-            await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.item })
+            await givenCollection(ctx.collectionName, [ctx.column])
+            await givenItems([ctx.item], ctx.collectionName)
 
             await axios.post(`/data/remove`, {collectionName: ctx.collectionName, itemId: ctx.item._id })
 
@@ -92,18 +92,15 @@ describe('Velo External DB', () => {
         })
 
         it('get by id api', async () => {
-            await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
-            await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column})
-
-            await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.item })
+            await givenCollection(ctx.collectionName, [ctx.column])
+            await givenItems([ctx.item], ctx.collectionName)
 
             expect((await axios.post(`/data/get`, {collectionName: ctx.collectionName, itemId: ctx.item._id})).data).to.be.eql({ item: ctx.item });
         })
 
         it('update api e2e', async () => {
-            await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
-            await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column})
-            await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.item })
+            await givenCollection(ctx.collectionName, [ctx.column])
+            await givenItems([ctx.item], ctx.collectionName)
 
             await axios.post(`/data/update`, {collectionName: ctx.collectionName, item: ctx.modifiedItem })
 
@@ -112,10 +109,8 @@ describe('Velo External DB', () => {
         })
 
         it('count api', async () => {
-            await axios.post(`/schemas/create`, {collectionName: ctx.collectionName})
-            await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column})
-            await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.item })
-            await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.anotherItem })
+            await givenCollection(ctx.collectionName, [ctx.column])
+            await givenItems([ctx.item, ctx.anotherItem], ctx.collectionName)
 
             expect((await axios.post(`/data/count`, {collectionName: ctx.collectionName, filter: '' })).data).to.be.eql({ totalCount: 2});
         })
