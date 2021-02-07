@@ -10,21 +10,21 @@ class DataProvider {
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
         const {sortExpr, sortColumns} = this.filterParser.orderBy(sort)
-        const sql = this.pool.format(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT ?, ?`, [collectionName].concat(filterColumns).concat(sortColumns))
-        const resultset = await this.pool.execute(sql, parameters.concat([skip, limit]))
+        const sql = this.pool.format(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT ?, ?`, [collectionName, ...filterColumns, ...sortColumns])
+        const resultset = await this.pool.execute(sql, [...parameters, skip, limit])
         return resultset[0]
     }
 
     async count(collectionName, filter) {
         const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
-        const sql = this.pool.format(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`, [collectionName].concat(filterColumns))
+        const sql = this.pool.format(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`, [collectionName, ...filterColumns])
         const resultset = await this.pool.execute(sql, parameters)
         return resultset[0][0]['num']
     }
 
     async insert(collectionName, item) {
         const n = Object.keys(item).length
-        const sql = this.pool.format(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES (${this.wildCardWith(n, '?')})`, [collectionName].concat(Object.keys(item)))
+        const sql = this.pool.format(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES (${this.wildCardWith(n, '?')})`, [collectionName, ...Object.keys(item)])
 
         const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(item) ) )
 
@@ -39,8 +39,8 @@ class DataProvider {
             return 0
         }
 
-        const sql = this.pool.format(`UPDATE ?? SET ${updateFields.map(() => '?? = ?')} WHERE _id = ?`, [collectionName].concat(updateFields))
-        const updatable = updateFields.concat(['_id']).reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
+        const sql = this.pool.format(`UPDATE ?? SET ${updateFields.map(() => '?? = ?')} WHERE _id = ?`, [collectionName, ...updateFields])
+        const updatable = [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
 
         const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
         return resultset[0].changedRows

@@ -39,9 +39,12 @@ class SchemaProvider {
     }
 
     async addColumn(collectionName, column) {
-        return await this.validateSystemFields(column.name)
-                         .then(() => this.pool.query(`ALTER TABLE ?? ADD ?? ${column.type}`, [collectionName, column.name]))
-                         .catch(err => console.log(err))
+        try {
+            await this.validateSystemFields(column.name)
+            return await this.pool.query(`ALTER TABLE ?? ADD ?? ${column.type}`, [collectionName, column.name])
+        } catch (err) {
+            console.log(err)
+        }
         /*
         code: 'ER_NO_SUCH_TABLE',
   errno: 1146,
@@ -52,9 +55,12 @@ class SchemaProvider {
     }
 
     async removeColumn(collectionName, columnName) {
-        return await this.validateSystemFields(columnName)
-                         .then(() => this.pool.query(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName]))
-                         .catch(err => console.log(err))
+        try {
+            await this.validateSystemFields(columnName)
+            return await this.pool.query(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
+        } catch (err) {
+            console.log(err)
+        }
 
         /*
         code: 'ER_CANT_DROP_FIELD_OR_KEY',

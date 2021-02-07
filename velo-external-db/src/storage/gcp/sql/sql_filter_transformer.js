@@ -32,8 +32,8 @@ class FilterParser {
                 const op = filter.operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.map(r => r[0].filterExpr).join( op ),
-                    filterColumns: [].concat.apply([], res.map( s => s[0].filterColumns )),
-                    parameters: [].concat.apply([], res.map( s => s[0].parameters ))
+                    filterColumns: res.map( s => s[0].filterColumns ).flat(),
+                    parameters: res.map( s => s[0].parameters ).flat()
                 }]
             case '$not':
                 const res2 = this.parseFilter( filter.value )
@@ -140,7 +140,7 @@ class FilterParser {
 
         return {
             sortExpr: `ORDER BY ${results.map( s => s.expr).join(', ')}`,
-            sortColumns: [].concat.apply([], results.map( s => s.params ))
+            sortColumns: results.map( s => s.params ).flat()
         }
     }
 
