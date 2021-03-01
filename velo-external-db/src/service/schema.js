@@ -7,6 +7,11 @@ class SchemaService {
         return await this.storage.list()
     }
 
+    async find(collectionNames) {
+        const schemas = await Promise.all(collectionNames.map(collectionName => this.storage.describeCollection(collectionName)))
+        return { schemas }
+    }
+
     async create(collectionName) {
         return this.storage.create(collectionName);
     }

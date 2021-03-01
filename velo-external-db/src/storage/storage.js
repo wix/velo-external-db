@@ -11,6 +11,8 @@ class DataProvider {
 class SchemaProvider {
     async list() { }
 
+    async describeCollection(collectionName) { }
+
     async create(collectionName) { }
 
     async addColumn(collectionName, column) { }

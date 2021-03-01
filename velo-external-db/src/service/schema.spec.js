@@ -6,11 +6,18 @@ const driver = require('../../test/drivers/schema-provider-test-support');
 
 describe('Schema Service', () => {
 
-    it('retrieve all dbs from provider', async () => {
+    it('retrieve all collections from provider', async () => {
         driver.givenListResult(ctx.dbs)
 
         const actual = await env.schemaService.list()
         expect( actual ).to.be.deep.eql(ctx.dbs);
+    })
+
+    it('retrieve collections by ids from provider', async () => {
+        driver.givenFindResults(ctx.dbs)
+
+        const actual = await env.schemaService.find(ctx.dbs.map(db => db.id))
+        expect( actual ).to.be.deep.eql({ schemas: ctx.dbs });
     })
 
     it('create collection name', async () => {

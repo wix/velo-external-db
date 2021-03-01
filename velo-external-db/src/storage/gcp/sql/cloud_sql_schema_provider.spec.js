@@ -27,6 +27,20 @@ describe('Cloud SQL Service', () => {
             }])
         })
 
+        it('retrieve collection data by collection name', async () => {
+            await env.schemaProvider.create(ctx.collectionName)
+
+            const db = await env.schemaProvider.describeCollection(ctx.collectionName)
+            expect(db).to.be.deep.eql({ id: ctx.collectionName,
+                fields: [{name: '_id', type: 'varchar(256)', isPrimary: true},
+                    {name: '_createdDate', type: 'timestamp', isPrimary: false},
+                    {name: '_updatedDate', type: 'timestamp', isPrimary: false},
+                    {name: '_owner', type: 'varchar(256)', isPrimary: false},
+                    // {name: 'title', type: 'varchar(20)', isPrimary: false},
+                ]
+            })
+        })
+
         it('create collection twice will do nothing', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
             await env.schemaProvider.create(ctx.collectionName, [])

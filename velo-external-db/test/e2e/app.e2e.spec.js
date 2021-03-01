@@ -17,6 +17,10 @@ describe('Velo External DB', () => {
         expect((await axios.get(`/`)).data).to.contain('<!doctype html>');
     })
 
+    it('answer provision with stub response', async () => {
+        expect((await axios.post(`/provision`)).data).to.be.eql({});
+    })
+
     describe('Schema API', () => {
 
         it('list', async () => {
@@ -35,6 +39,21 @@ describe('Velo External DB', () => {
                                                         // {name: 'title', type: 'varchar(20)', isPrimary: false},
                                                        ]
                                             }])
+
+        })
+
+        it('find', async () => {
+            await schema.givenCollection(ctx.collectionName, [])
+
+            const res = await axios.post(`/schemas/find`, { schemaIds: [ctx.collectionName]})
+            expect(res.data).to.be.deep.eql({ schemas: [{ id: ctx.collectionName,
+                                                          fields: [{name: '_id', type: 'varchar(256)', isPrimary: true},
+                                                                   {name: '_createdDate', type: 'timestamp', isPrimary: false},
+                                                                   {name: '_updatedDate', type: 'timestamp', isPrimary: false},
+                                                                   {name: '_owner', type: 'varchar(256)', isPrimary: false},
+                                                                // {name: 'title', type: 'varchar(20)', isPrimary: false},
+                                                          ]
+                                                        }]})
 
         })
 

@@ -76,6 +76,12 @@ app.post('/schemas/list', async (req, res) => {
     res.json(data)
 })
 
+app.post('/schemas/find', async (req, res) => {
+    const { schemaIds } = req.body
+    const data = await schemaService.find(schemaIds)
+    res.json(data)
+})
+
 app.post('/schemas/create', async (req, res) => {
     const { collectionName } = req.body
     const data = await schemaService.create(collectionName)
