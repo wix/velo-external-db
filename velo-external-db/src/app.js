@@ -26,6 +26,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 })
 
+app.post('/provision', (req, res) => {
+    res.json({});
+})
+
 
 // *************** Data API **********************
 app.post('/data/find', async (req, res) => {
