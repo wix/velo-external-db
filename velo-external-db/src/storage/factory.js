@@ -1,6 +1,6 @@
 const mysql = require('mysql2')
 
-const init = (type, host, user, password, db) => {
+const init = (type, host, user, password, db, cloudSqlConnectionName) => {
     switch (type) {
         case 'gcp/sql':
             console.log('INIT: gcp/sql')
@@ -8,8 +8,7 @@ const init = (type, host, user, password, db) => {
             const DataProvider = require('./gcp/sql/cloud_sql_data_provider')
             const { FilterParser } = require('./gcp/sql/sql_filter_transformer')
 
-            const pool = mysql.createPool({
-                host     : host,
+            const config = {
                 user     : user,
                 password : password,
                 database : db,
@@ -20,7 +19,15 @@ const init = (type, host, user, password, db) => {
                 connectionLimit: 10,
                 queueLimit: 0/*,
                                     multipleStatements: true*/
-            }).promise()
+            }
+
+            if (cloudSqlConnectionName) {
+                config['socketPath'] = `/cloudsql/${cloudSqlConnectionName}`
+            } else {
+                config['host'] = host
+            }
+
+            const pool = mysql.createPool(config).promise()
             const filterParser = new FilterParser()
             const dataProvider = new DataProvider(pool, filterParser)
             const schemaProvider = new SchemaProvider(pool)

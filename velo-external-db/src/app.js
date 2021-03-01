@@ -6,7 +6,7 @@ const DataService = require('./service/data')
 const SchemaService = require('./service/schema')
 const { init } = require('./storage/factory')
 
-const {dataProvider, schemaProvider} = init(process.env.TYPE, process.env.HOST, process.env.USER, process.env.PASSWORD, process.env.DB)
+const {dataProvider, schemaProvider} = init(process.env.TYPE, process.env.HOST, process.env.USER, process.env.PASSWORD, process.env.DB, process.env.CLOUD_SQL_CONNECTION_NAME)
 const dataService = new DataService(dataProvider)
 const schemaService = new SchemaService(schemaProvider)
 
