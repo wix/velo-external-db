@@ -9,7 +9,7 @@ const givenCollection = async (name, columns) => {
 }
 
 const expectColumnInCollection = async (columnName, collectionName) => {
-    const dbs = (await axios.post(`/schemas/list`, {})).data
+    const dbs = (await axios.post(`/schemas/list`, {})).data.schemas
     const field = dbs.find(e => e.id === collectionName)
         .fields.find(e => e.name === columnName)
     return field

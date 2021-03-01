@@ -10,7 +10,7 @@ describe('Schema Service', () => {
         driver.givenListResult(ctx.dbs)
 
         const actual = await env.schemaService.list()
-        expect( actual ).to.be.deep.eql(ctx.dbs);
+        expect( actual ).to.be.deep.eql({ schemas: ctx.dbs });
     })
 
     it('retrieve collections by ids from provider', async () => {

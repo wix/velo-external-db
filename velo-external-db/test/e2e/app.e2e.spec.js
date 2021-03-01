@@ -24,21 +24,21 @@ describe('Velo External DB', () => {
     describe('Schema API', () => {
 
         it('list', async () => {
-            expect((await axios.post(`/schemas/list`, {})).data).to.be.eql([]);
+            expect((await axios.post(`/schemas/list`, {})).data).to.be.eql({ schemas: []});
         })
 
         it('create', async () => {
             await schema.givenCollection(ctx.collectionName, [])
 
             const res = await axios.post(`/schemas/list`, {})
-            expect(res.data).to.be.deep.eql([{ id: ctx.collectionName,
+            expect(res.data).to.be.deep.eql({ schemas: [{ id: ctx.collectionName,
                                                fields: [{name: '_id', type: 'varchar(256)', isPrimary: true},
                                                         {name: '_createdDate', type: 'timestamp', isPrimary: false},
                                                         {name: '_updatedDate', type: 'timestamp', isPrimary: false},
                                                         {name: '_owner', type: 'varchar(256)', isPrimary: false},
                                                         // {name: 'title', type: 'varchar(20)', isPrimary: false},
                                                        ]
-                                            }])
+                                            }] })
 
         })
 

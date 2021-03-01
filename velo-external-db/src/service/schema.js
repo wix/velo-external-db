@@ -4,7 +4,9 @@ class SchemaService {
     }
 
     async list() {
-        return await this.storage.list()
+        const schemas = await this.storage.list()
+
+        return { schemas }
     }
 
     async find(collectionNames) {
