@@ -54,7 +54,7 @@ module.exports = (functionsBuilder) => {
                     status: 500, body: `bye bye ${JSON.stringify(s)}`
                 })
             }
-            const msId = req.params['msId']
+            const msId = req.params['ms-id']
 
             const res = await signedInstanceFor(msId, ctx)
             return res
