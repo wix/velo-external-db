@@ -28,7 +28,7 @@ const verifyUserIsLoggedIn = async (ctx) => {
             ctx.logger.info(`webhooks-playground: session not found. throwing: ${JSON.stringify((myException))}`);
             return {
                 loggedIn: false,
-                message: 'User Not Permitted to edit this app'
+                message: `User Not Permitted to edit this app ${!acl.includes(userId)}`
             };
         } else {
             return { loggedIn: true, message: '' };
@@ -51,7 +51,7 @@ module.exports = (functionsBuilder) => {
             const s = await verifyUserIsLoggedIn(ctx)
             if (!s.loggedIn) {
                 return new FullHttpResponse({
-                    status: 500, body: `bye bye`
+                    status: 500, body: `bye bye ${s}`
                 })
             }
             const msId = req.params['msId']
