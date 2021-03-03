@@ -57,11 +57,8 @@ module.exports = (functionsBuilder) => {
                 })
             }
             const msId = req.query['ms-id']
-
-            return msId
-
-            // const res = await signedInstanceFor(msId, ctx)
-            // return res
+            const res = await signedInstanceFor(msId, ctx)
+            return res
         })
 };
 
