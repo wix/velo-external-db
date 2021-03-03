@@ -18,7 +18,9 @@ const getUserGuid = async (ctx) => {
 };
 
 
-const acl = ['eb633178-4b9d-4282-9ce0-4518ebe6b202']
+const acl = ['eb633178-4b9d-4282-9ce0-4518ebe6b202', // fhvdamsr@sharklasers.com
+             'dba7b643-18a9-4bdf-8ccc-13b4b571417b', // noama@wix.com
+            ]
 
 const verifyUserIsLoggedIn = async (ctx) => {
     try {
