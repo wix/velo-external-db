@@ -58,7 +58,7 @@ module.exports = (functionsBuilder, initContext) => {
             //     })
             // }
 
-            const res = await signedInstanceFor('1b86b6b0-0d2c-4991-ac37-92f0268715d9')
+            const res = await signedInstanceFor('1b86b6b0-0d2c-4991-ac37-92f0268715d9', ctx)
             return res
             // const url = (await webhookUrlFor(req.body.appId, req.body.slug, ctx)).webhookCallbackUrl;
             // const webhookRequest = webhookRequestFor(url, secret);
