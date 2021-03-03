@@ -56,7 +56,7 @@ module.exports = (functionsBuilder) => {
                     status: 500, body: `bye bye ${JSON.stringify(s)}`
                 })
             }
-            const msId = req.params['ms-id']
+            const msId = req.params/*['ms-id']*/
 
             return msId
 
