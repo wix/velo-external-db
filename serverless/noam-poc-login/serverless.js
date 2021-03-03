@@ -24,17 +24,15 @@ const acl = ['eb633178-4b9d-4282-9ce0-4518ebe6b202']
 const verifyUserIsLoggedIn = async (ctx) => {
     try {
         const userId = await getUserGuid(ctx);
-        // ctx.logger.info(`webhooks-playground: hasSession: ${hasSession}`);
         if (!userId && !acl.includes(userId)) {
             const myException = new HttpError({status: 403, message: 'User Not Permitted to edit this app'});
             ctx.logger.info(`webhooks-playground: session not found. throwing: ${JSON.stringify((myException))}`);
-            // throw myException;
             return {
                 loggedIn: false,
                 message: 'User Not Permitted to edit this app'
             };
         } else {
-            return { loggedIn: true, message: '' };
+            return { loggedIn: true, message: '', userId: userId };
         }
 
     }
@@ -55,6 +53,7 @@ module.exports = (functionsBuilder, initContext) => {
         .withContextPath('noam-poc-login')
         // .addWebFunction('POST', '/get-webhook-url', async (ctx, req) => await webhookUrlFor(req.body.appId, req.body.slug, ctx))
         .addWebFunction('GET', '/instance', async (ctx, req) => {
+
             const s = await verifyUserIsLoggedIn(ctx)
             return s
             if (!s.loggedIn) {
@@ -62,8 +61,9 @@ module.exports = (functionsBuilder, initContext) => {
                     status: 500, body: `bye bye`
                 })
             }
+            const msId = req.params.msId
 
-            const res = await signedInstanceFor('1b86b6b0-0d2c-4991-ac37-92f0268715d9', ctx)
+            const res = await signedInstanceFor(msId, ctx)
             return res
             // const url = (await webhookUrlFor(req.body.appId, req.body.slug, ctx)).webhookCallbackUrl;
             // const webhookRequest = webhookRequestFor(url, secret);
