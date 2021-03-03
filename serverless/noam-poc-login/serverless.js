@@ -51,12 +51,12 @@ module.exports = (functionsBuilder, initContext) => {
         .withContextPath('noam-poc-login')
         // .addWebFunction('POST', '/get-webhook-url', async (ctx, req) => await webhookUrlFor(req.body.appId, req.body.slug, ctx))
         .addWebFunction('GET', '/instance', async (ctx, req) => {
-            const s = await verifyUserIsLoggedIn(ctx)
-            if (!s.loggedIn) {
-                return new FullHttpResponse({
-                    status: 500, body: `test webhooks failed with: ${s.message}`
-                })
-            }
+            // const s = await verifyUserIsLoggedIn(ctx)
+            // if (!s.loggedIn) {
+            //     return new FullHttpResponse({
+            //         status: 500, body: `test webhooks failed with: ${s.message}`
+            //     })
+            // }
 
             const res = await signedInstanceFor('1b86b6b0-0d2c-4991-ac37-92f0268715d9')
             return res
