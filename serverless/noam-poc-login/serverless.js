@@ -1,6 +1,6 @@
 const {WixMetaSiteManagerWebapp} = require('@wix/ambassador-wix-meta-site-manager-webapp/rpc');
 const {FullHttpResponse, HttpError} = require('@wix/serverless-api');
-
+const { get } = require('lodash');
 
 const metaSiteManagerApi = WixMetaSiteManagerWebapp().MetaSiteManagerApi();
 
@@ -17,11 +17,15 @@ const getUserGuid = async (ctx) => {
     return identities.filter((identity) => identity.person).map((identity) => identity.person.id)[0]
 };
 
+
+const acl = ['eb633178-4b9d-4282-9ce0-4518ebe6b202']
+//eb633178-4b9d-4282-9ce0-4518ebe6b202
+
 const verifyUserIsLoggedIn = async (ctx) => {
     try {
-        const hasSession = await getUserGuid(ctx);
+        const userId = await getUserGuid(ctx);
         // ctx.logger.info(`webhooks-playground: hasSession: ${hasSession}`);
-        if (!hasSession) {
+        if (!userId && !acl.includes(userId)) {
             const myException = new HttpError({status: 403, message: 'User Not Permitted to edit this app'});
             ctx.logger.info(`webhooks-playground: session not found. throwing: ${JSON.stringify((myException))}`);
             // throw myException;
@@ -55,12 +59,12 @@ module.exports = (functionsBuilder, initContext) => {
             return context
         })
         .addWebFunction('GET', '/instance', async (ctx, req) => {
-            // const s = await verifyUserIsLoggedIn(ctx)
-            // if (!s.loggedIn) {
-            //     return new FullHttpResponse({
-            //         status: 500, body: `test webhooks failed with: ${s.message}`
-            //     })
-            // }
+            const s = await verifyUserIsLoggedIn(ctx)
+            if (!s.loggedIn) {
+                return new FullHttpResponse({
+                    status: 500, body: `bye bye`
+                })
+            }
 
             const res = await signedInstanceFor('1b86b6b0-0d2c-4991-ac37-92f0268715d9', ctx)
             return res
