@@ -4,7 +4,7 @@
   "description": "",
   "main": "serverless.js",
   "scripts": {
-    "test": "DEBUG='wix:*' mocha --exit --reporter mocha-env-reporter './*.spec.js'",
+    "test": ":",
     "build:proto": "wix-proto-codegen --module ."
   },
   "keywords": [],
