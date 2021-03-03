@@ -8,7 +8,7 @@ const signedInstanceFor = async (msId, ctx) => {
 
     const resp = await metaSiteManagerApi(ctx.aspects).fetchEditorClientSpecMap(msId)
 
-    return resp;
+    return resp['-666'];
 }
 
 const getUserGuid = async (ctx) => {
