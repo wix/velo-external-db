@@ -24,7 +24,7 @@ const acl = ['eb633178-4b9d-4282-9ce0-4518ebe6b202']
 const verifyUserIsLoggedIn = async (ctx) => {
     try {
         const userId = await getUserGuid(ctx);
-        if (!userId && !acl.includes(userId)) {
+        if (!userId) {
             const myException = new HttpError({status: 403, message: 'User Not Permitted to edit this app'});
             ctx.logger.info(`webhooks-playground: session not found. throwing: ${JSON.stringify((myException))}`);
             return {
@@ -32,7 +32,7 @@ const verifyUserIsLoggedIn = async (ctx) => {
                 message: 'User Not Permitted to edit this app'
             };
         } else {
-            return { loggedIn: true, message: '', userId: userId };
+            return { loggedIn: true, message: '', userId: userId, booooo: acl.includes(userId) };
         }
 
     }
