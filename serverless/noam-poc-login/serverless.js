@@ -19,12 +19,11 @@ const getUserGuid = async (ctx) => {
 
 
 const acl = ['eb633178-4b9d-4282-9ce0-4518ebe6b202']
-//eb633178-4b9d-4282-9ce0-4518ebe6b202
 
 const verifyUserIsLoggedIn = async (ctx) => {
     try {
         const userId = await getUserGuid(ctx);
-        if (!userId) {
+        if (!userId || !acl.includes(userId)) {
             const myException = new HttpError({status: 403, message: 'User Not Permitted to edit this app'});
             ctx.logger.info(`webhooks-playground: session not found. throwing: ${JSON.stringify((myException))}`);
             return {
@@ -32,7 +31,7 @@ const verifyUserIsLoggedIn = async (ctx) => {
                 message: 'User Not Permitted to edit this app'
             };
         } else {
-            return { loggedIn: true, message: '', userId: userId, booooo: acl.includes(userId) };
+            return { loggedIn: true, message: '' };
         }
 
     }
@@ -45,38 +44,21 @@ const verifyUserIsLoggedIn = async (ctx) => {
 }
 
 
-module.exports = (functionsBuilder, initContext) => {
-    const secret = initContext.getConfig('secret');
-    // const wixServiceAppId = initContext.getConfig('wixServiceAppId');
-
+module.exports = (functionsBuilder) => {
     return functionsBuilder
         .withContextPath('noam-poc-login')
-        // .addWebFunction('POST', '/get-webhook-url', async (ctx, req) => await webhookUrlFor(req.body.appId, req.body.slug, ctx))
         .addWebFunction('GET', '/instance', async (ctx, req) => {
-
             const s = await verifyUserIsLoggedIn(ctx)
-            return s
             if (!s.loggedIn) {
                 return new FullHttpResponse({
                     status: 500, body: `bye bye`
                 })
             }
-            const msId = req.params.msId
+            const msId = req.params['msId']
 
             const res = await signedInstanceFor(msId, ctx)
             return res
-            // const url = (await webhookUrlFor(req.body.appId, req.body.slug, ctx)).webhookCallbackUrl;
-            // const webhookRequest = webhookRequestFor(url, secret);
-            //
-            // ctx.logger.info(`webhooks-playground: webhooks request: ${JSON.stringify(webhookRequest)}`);
-            // const {statusCode, message} = await ctx.grpcClient(api.WebhooksDebugService, 'com.wixpress.iptf.webhooks-server')
-            //                                        .submit(ctx.aspects, webhookRequest);
-            // ctx.logger.info(`webhooks-playground: dispatch succeeded with status code: ${statusCode} and message: ${message}`)
-            // return {statusCode, message}
-
         })
-        // .addWebFunction('POST', '/generate-server-header', generateAuthHeader(secret, wixServiceAppId))
-        // .addWebFunction('POST', '/get-user-guid-from-ctx', async (ctx, req) => { return await getUserGuid(ctx) })
 };
 
 
