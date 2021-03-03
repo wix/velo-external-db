@@ -51,7 +51,7 @@ module.exports = (functionsBuilder) => {
             const s = await verifyUserIsLoggedIn(ctx)
             if (!s.loggedIn) {
                 return new FullHttpResponse({
-                    status: 500, body: `bye bye ${s}`
+                    status: 500, body: `bye bye ${JSON.stringify(s)}`
                 })
             }
             const msId = req.params['msId']
