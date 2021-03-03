@@ -50,6 +50,10 @@ module.exports = (functionsBuilder, initContext) => {
     return functionsBuilder
         .withContextPath('noam-poc-login')
         // .addWebFunction('POST', '/get-webhook-url', async (ctx, req) => await webhookUrlFor(req.body.appId, req.body.slug, ctx))
+        .addWebFunction('GET', '/instance2', async (ctx, req) => {
+            const context = await ctx.apiGatewayClient.contextV2();
+            return context
+        })
         .addWebFunction('GET', '/instance', async (ctx, req) => {
             // const s = await verifyUserIsLoggedIn(ctx)
             // if (!s.loggedIn) {
