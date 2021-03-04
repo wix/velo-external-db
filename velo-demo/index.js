@@ -161,9 +161,11 @@ const cloudRunUrl = async (projectId, instanceId) => {
 
     const resp = await run.namespaces.services.list(request)
 
-    const service = resp.data.items.find(i => i.metadata.name === instanceId)
-
-    return service.status.url
+    if (resp.data.items) {
+        const service = resp.data.items.find(i => i.metadata.name === instanceId)
+        return service.status.url
+    }
+    return undefined;
 }
 
 const modifyCloudRunAuthorizationPolicy = async (projectId, instanceId) => {
@@ -383,3 +385,5 @@ const main = async () => {
 }
 
 main()
+
+// blockUntilCloudRunAvailable("corvid-managed-f7eea6ba", "corvid-managed-f7eea6ba-b0ed2f15")
