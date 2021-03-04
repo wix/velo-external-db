@@ -287,6 +287,9 @@ const demo = async (authorization, msId, siteId) => {
     await startSpinnerWith(`Register external db to wix site`, () => registerEndpointWithWix(serviceUrl, authorization))
     console.log('')
     console.log(`Open Editor: https://editor.wix.com/html/editor/web/renderer/edit/${siteId}?metaSiteId=${msId}`)
+    console.log('')
+    console.log('')
+    console.log('')
 
     // open editor ???
     //https://editor.wix.com/html/editor/web/renderer/edit/5b8df24c-c62f-4681-ab34-ead3a684be71?metaSiteId=0dbb9085-ba04-4548-8e07-b058f08c211b
