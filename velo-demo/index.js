@@ -254,6 +254,8 @@ const addColumnToCollection = async (collectionName, serviceUrl) => {
 
 const demo = async (authorization, msId, siteId) => {
 
+    console.log('')
+    console.log('')
     console.log(`${green('[INFO]:')} Provision Cloud Sql and Cloud Run instances using Wix GCP`)
 
     const {instanceId, projectId} = await startSpinnerWith('Provision Cloud Sql instance', () => provisionSql(authorization), 'Cloud Sql instance created successfully.')
@@ -385,5 +387,3 @@ const main = async () => {
 }
 
 main()
-
-// blockUntilCloudRunAvailable("corvid-managed-f7eea6ba", "corvid-managed-f7eea6ba-b0ed2f15")
