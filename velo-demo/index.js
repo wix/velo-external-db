@@ -1,7 +1,7 @@
 const Spinner = require('cli-spinner').Spinner;
 const showBanner = require('node-banner');
 const { google } = require("googleapis");
-const { green, grey, yellowBright, redBright } = require('chalk');
+const { green, grey, greenBright, redBright } = require('chalk');
 const { waitFor } = require("poll-until-promise");
 const sql = google.sql("v1beta4");
 const run = google.run("v1");
@@ -81,7 +81,7 @@ const startSpinnerWith = async (msg, f, completeMsg) => {
 
         spinner.stop(true)
 
-        process.stderr.write(`\t\t ${yellowBright('✓')} ${grey(completeMsg || msg)}\n`)
+        process.stderr.write(`\t\t ${greenBright('✓')} ${grey(completeMsg || msg)}\n`)
 
         return res
     } catch (e) {
@@ -112,18 +112,30 @@ const blockUntil = async f => {
 
 const blockUntilCloudSqlInitiated = (projectId, instanceId) => blockUntil(() => checkDbInstanceState(projectId, instanceId))
 
-const blockUntilCloudRunAvailable = async (projectId, instanceId) => {
-    await startSpinnerWith(`Wait until Cloud Run instance is available`, () => blockUntil(async () => {
+const retrieveServiceUrl = async (projectId, instanceId) => {
+    await blockUntil(async () => {
         const s = await cloudRunUrl(projectId, instanceId)
         if (s === undefined) {
             throw new Error('try again')
         }
         return s
-    } ), `Cloud Run instance is available`)
+    } )
 
     const serviceUrl = await cloudRunUrl(projectId, instanceId)
+    if (serviceUrl === undefined) {
+        return await retrieveServiceUrl(projectId, instanceId)
+    }
+    return serviceUrl;
+}
 
-    await startSpinnerWith(`Wait until Cloud Run instance complete startup`, () => blockUntil(() => axios.get(serviceUrl)), `Cloud Run instance started successfully.`)
+const blockUntilCloudRunAvailable = async (projectId, instanceId) => {
+    const serviceUrl = await startSpinnerWith(`Wait until Cloud Run instance is available`, () => retrieveServiceUrl(projectId, instanceId), `Cloud Run instance is available`)
+
+    if (serviceUrl === undefined) {
+        throw new Error('error while retrieving service url')
+    }
+
+    await startSpinnerWith(`Wait until Cloud Run instance complete startup ${serviceUrl}`, () => blockUntil(() => axios.get(serviceUrl)), `Cloud Run instance started successfully.`)
 
     return serviceUrl
 }
@@ -163,7 +175,10 @@ const cloudRunUrl = async (projectId, instanceId) => {
 
     if (resp.data.items) {
         const service = resp.data.items.find(i => i.metadata.name === instanceId)
-        return service.status.url
+
+        if (service) {
+            return service.status.url
+        }
     }
     return undefined;
 }
