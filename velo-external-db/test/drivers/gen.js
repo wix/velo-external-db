@@ -42,7 +42,7 @@ const randomArrayOf = (gen) => {
     return arr;
 }
 
-const randomCollectionName = () => chance.word()
+const randomCollectionName = () => chance.word({ length: 5 })
 const randomDbField = () => ( {name: chance.word(), type: chance.word(), isPrimary: chance.bool()} )
 const randomDbFields = () => randomArrayOf( randomDbField )
 
