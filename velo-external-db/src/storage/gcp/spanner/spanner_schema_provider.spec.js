@@ -1,30 +1,28 @@
-const {expect} = require('chai')
+const deepEqualInAnyOrder = require('deep-equal-in-any-order');
+const chai = require('chai');
 const {SchemaProvider, SystemFields} = require('./spanner_schema_provider')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
 const gen = require('../../../../test/drivers/gen');
+const resource = require('../../../../test/resources/spanner_resources');
 const chance = new require('chance')();
-// const testkit = require('docker-compose')
-// const testkit = require('@seasquared/docker-compose-testkit')
-// const {Spanner} = require('@google-cloud/spanner');
+
+chai.use(deepEqualInAnyOrder);
+const { expect } = chai;
+
 
 describe.only('Spanner Service', function () {
-    this.timeout(50000);
 
     describe('Schema API', () => {
-        it.skip('list of empty db will result with an empty array', async function() {
-            // this.timeout(5000);
-
+        it('list of empty db will result with an empty array', async function() {
             const db = await env.schemaProvider.list()
             expect(db).to.be.deep.eql([])
         })
 
-        it.skip('create collection with default columns', async function() {
-            // this.timeout(10000);
-
+        it('create collection with default columns', async function() {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.list()
-            expect(db).to.be.deep.eql([{ id: ctx.collectionName,
+            expect(db).to.be.deep.equalInAnyOrder([{ id: ctx.collectionName,
                 fields: [{name: 'id_', type: 'STRING(256)', isPrimary: true},
                          {name: 'createdDate_', type: 'TIMESTAMP', isPrimary: false},
                          {name: 'updatedDate_', type: 'TIMESTAMP', isPrimary: false},
@@ -35,12 +33,10 @@ describe.only('Spanner Service', function () {
         })
 
         it('retrieve collection data by collection name', async function () {
-            // this.timeout(10000);
-
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            expect(db).to.be.deep.eql({ id: ctx.collectionName,
+            expect(db).to.be.deep.equalInAnyOrder({ id: ctx.collectionName,
                 fields: [{name: 'id_', type: 'STRING(256)', isPrimary: true},
                          {name: 'createdDate_', type: 'TIMESTAMP', isPrimary: false},
                          {name: 'updatedDate_', type: 'TIMESTAMP', isPrimary: false},
@@ -51,8 +47,6 @@ describe.only('Spanner Service', function () {
         })
 
         it.skip('create collection twice will do nothing', async function() {
-            // this.timeout(10000);
-
             await env.schemaProvider.create(ctx.collectionName, [])
             await env.schemaProvider.create(ctx.collectionName, [])
         })
@@ -122,29 +116,21 @@ describe.only('Spanner Service', function () {
     };
 
     beforeEach(() => {
-
         ctx.collectionName = gen.randomCollectionName();
         ctx.columnName = chance.word();
-
     });
 
     before(async function() {
-        this.timeout(20000)
+        const projectId = 'test-project'
+        const instanceId = 'test-instance'
+        const databaseId = 'test-database'
 
-        const projectId = 'corvid-managed-361ecdb3'
-        const instanceId = 'corvid-managed-361ecdb3-431b593c'
-        const databaseId = 'velo_db'
+        await resource.initSpannerEnv()
 
         env.schemaProvider = new SchemaProvider(projectId, instanceId, databaseId)
-    //
-    //     // const zz = await testkit.runDockerCompose('gcr.io/cloud-spanner-emulator/emulator')
-    //     // console.log(zz)
-    //
-    //     // env.connectionPool = await mysql.initMySqlEnv()
-    //     // env.schemaProvider = new SchemaProvider(env.connectionPool)
     });
 
-    // after(async () => {
-    //     // await mysql.shutdownMySqlEnv();
-    // });
+    after(async () => {
+        await resource.shutSpannerEnv()
+    });
 })

@@ -57,7 +57,6 @@ class SchemaProvider {
 
         const [operation] = await this.database.updateSchema(request);
 
-
         await operation.promise();
     }
 
@@ -157,7 +156,6 @@ class SchemaProvider {
 
     columnToDbColumnSql(f) {
         return `?? ${f.type} ${this.defaultForColumnType(f.type)}`
-        // return `${f.name} ${f.type} ${this.defaultForColumnType(f.type)}`
     }
 
 

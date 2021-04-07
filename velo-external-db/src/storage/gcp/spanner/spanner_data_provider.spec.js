@@ -5,15 +5,15 @@ const { Uninitialized } = require('../../../../test/commons/test-commons');
 const gen = require('../../../../test/drivers/gen');
 const chance = new require('chance')();
 const driver = require('../../../../test/drivers/sql_filter_transformer_test_support')
+const resource = require('../../../../test/resources/spanner_resources')
 
 
-describe('Cloud SQL Data Service', function() {
-    this.timeout(20000)
+describe.only('Cloud SQL Data Service', function() {
+    this.timeout(5000)
 
     const givenCollectionWith = async (entities, forCollection) => {
         await Promise.all( entities.map(e => env.dataProvider.insert(forCollection, e) ))
     }
-
 
     it('search with empty filter and order by and no data', async () => {
         driver.stubEmptyFilterFor(ctx.filter)
@@ -151,15 +151,17 @@ describe('Cloud SQL Data Service', function() {
     });
 
     before(async function() {
-        const projectId = 'corvid-managed-361ecdb3'
-        const instanceId = 'corvid-managed-361ecdb3-431b593c'
-        const databaseId = 'velo_db'
+        const projectId = 'test-project'
+        const instanceId = 'test-instance'
+        const databaseId = 'test-database'
+
+        await resource.initSpannerEnv()
 
         env.dataProvider = new DataProvider(projectId, instanceId, databaseId, driver.filterParser)
         env.schemaProvider = new SchemaProvider(projectId, instanceId, databaseId)
     });
 
     after(async () => {
-        // await mysql.shutdownMySqlEnv();
+        await resource.shutSpannerEnv()
     });
 })
