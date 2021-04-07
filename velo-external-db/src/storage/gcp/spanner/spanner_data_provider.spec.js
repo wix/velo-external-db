@@ -8,7 +8,7 @@ const driver = require('../../../../test/drivers/sql_filter_transformer_test_sup
 const resource = require('../../../../test/resources/spanner_resources')
 
 
-describe.only('Cloud SQL Data Service', function() {
+describe('Cloud SQL Data Service', function() {
     this.timeout(5000)
 
     const givenCollectionWith = async (entities, forCollection) => {

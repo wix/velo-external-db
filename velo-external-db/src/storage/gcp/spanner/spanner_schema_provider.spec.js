@@ -10,7 +10,7 @@ chai.use(deepEqualInAnyOrder);
 const { expect } = chai;
 
 
-describe.only('Spanner Service', function () {
+describe('Spanner Service', function () {
 
     describe('Schema API', () => {
         it('list of empty db will result with an empty array', async function() {
