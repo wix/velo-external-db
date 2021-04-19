@@ -1,24 +1,18 @@
 const {expect} = require('chai');
-// const {app, whenGrpcCalled} = require('@wix/serverless-testkit');
-// const MembersDao = require('../dist/members-dao').default;
-// const Member = require('../dist/members-dao').Member;
-// const MembersDaoV2 = require('../dist/members-dao-v2').default;
-// const MemberV2 = require('../dist/members-dao-v2').Member;
-// const wrapper = require('../generated/proto-generated');
 const WordPressService = require('../src/service/wordpress-service');
-// const faker = require('faker');
+const {Uninitialized} = require('./commons/test-commons');
 
-describe.only('wordpress service', function () {
+describe('wordpress service', function () {
 
     this.timeout(5000)
 
     const env = {
-        wordpressService: null,
+        wordpressService: Uninitialized,
     }
 
     const ctx = {
-        skip: null,
-        limit: null,
+        skip: Uninitialized,
+        limit: Uninitialized,
     }
 
     before(() => {

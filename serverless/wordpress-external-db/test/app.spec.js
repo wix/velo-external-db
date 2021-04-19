@@ -1,217 +1,48 @@
 const {expect} = require('chai');
 const {app, whenGrpcCalled} = require('@wix/serverless-testkit');
-// const MembersDao = require('../dist/members-dao').default;
-// const Member = require('../dist/members-dao').Member;
-// const MembersDaoV2 = require('../dist/members-dao-v2').default;
-// const MemberV2 = require('../dist/members-dao-v2').Member;
+const {Uninitialized} = require('./commons/test-commons');
 const wrapper = require('../generated/proto-generated');
-// const faker = require('faker');
 
-describe.skip('wordpress', () => {
+describe('serverless e2e', () => {
 
     const testkit = app('wordpress-external-db').beforeAndAfter(10000);
 
-    // const randomString = () => faker.name.lastName(1).toLowerCase();
-    // const randomEmail = () => `${randomString()}@mail.com`;
-    // const fakeToken = faker.random.alphaNumeric(16)
-
-    // testkit.setConfig('token', fakeToken);
-
-    // let membersReadServiceClient, membersWriteServiceClient, membersServiceV2Client, userMetadataStub, membersDao, membersDaoV2;
-
     const env = {
-        wordpressServiceClient: null,
+        wordpressServiceClient: Uninitialized,
+    }
+
+    const ctx = {
+        aspects: Uninitialized,
     }
 
     before(() => {
         env.wordpressServiceClient = testkit.grpcClient(wrapper.com.wixpress.wordpress.WordPressService, 10000);
-        // membersDao = new MembersDao(testkit.cloudStore);
-        // membersDaoV2 = new MembersDaoV2(testkit.cloudStore, testkit.getConfig('token'));
     });
 
     beforeEach(() => {
+        ctx.aspects = testkit.apiGwTestkit.callContextBuilder().aspects()
     });
 
     afterEach(() => {
         testkit.grpc.reset();
     });
 
-    context('members-read-service', () => {
+    context('wordpress serverless e2e', () => {
 
         it('check posts api', async () => {
-            const resp = await env.wordpressServiceClient.posts(aspects(), { what: 'ever'})
+            const resp = await env.wordpressServiceClient.posts(ctx.aspects, { what: 'ever'})
             expect(resp.posts).to.not.be.empty
 
         });
 
         it('check media api', async () => {
-            const resp = await env.wordpressServiceClient.media(aspects(), { what: 'ever'})
+            const resp = await env.wordpressServiceClient.media(ctx.aspects, { what: 'ever'})
             expect(resp.media).to.not.be.empty
         });
 
-
-    //
-    //     it('should return false for an invalid member', async () => {
-    //         expect(await membersReadServiceClient.isMember(aspects(), {email: randomEmail()})).to.deep.equal({member: false});
-    //         expect(await membersReadServiceClient.isMember(aspects(), {username: randomString()})).to.deep.equal({member: false});
-    //     });
-    //
-    //     it('should return false for an invalid request', async () => {
-    //         expect(await membersReadServiceClient.isMember(aspects(), {})).to.deep.equal({member: false});
-    //     });
-    // });
-    //
-    // context('members-write-service', () => {
-    //     it('should add a member with email and username', async () => {
-    //         const member = new Member(randomEmail(), randomString());
-    //
-    //         givenUserMetadataExistsFor(member);
-    //
-    //         await membersWriteServiceClient.addMember(aspects(), {email: member.email});
-    //
-    //         expect(await membersDao.exists(member.email)).to.equal(true);
-    //         expect(await membersDao.exists(member.username)).to.equal(true);
-    //     });
-    //
-    //     it('should add a member with email only', async () => {
-    //         const member = new Member(randomEmail(), randomString());
-    //
-    //         givenUserMetadataIsEmpty();
-    //
-    //         await membersWriteServiceClient.addMember(aspects(), {email: member.email});
-    //
-    //         expect(await membersDao.exists(member.email)).to.equal(true);
-    //         expect(await membersDao.exists(member.username)).to.equal(false);
-    //     });
-    //
-    //     it('should remove a member with email and username', async () => {
-    //         const member = new Member(randomEmail(), randomString());
-    //
-    //         givenUserMetadataExistsFor(member);
-    //         givenMemberExistsInCloudStore(member);
-    //
-    //         await membersWriteServiceClient.removeMember(aspects(), {email: member.email});
-    //
-    //         expect(await membersDao.exists(member.email)).to.equal(false);
-    //         expect(await membersDao.exists(member.username)).to.equal(false);
-    //     });
-    //
-    //     it('should remove a member with email only', async () => {
-    //         const member = new Member(randomEmail(), randomString());
-    //
-    //         givenUserMetadataIsEmpty();
-    //         givenMemberExistsInCloudStore(member);
-    //
-    //         await membersWriteServiceClient.removeMember(aspects(), {email: member.email});
-    //
-    //         expect(await membersDao.exists(member.email)).to.equal(false);
-    //         expect(await membersDao.exists(member.username)).to.equal(true);
-    //     });
-    // });
-    //
-    // context('members-service-v2', () => {
-    //     context('isMember should', () => {
-    //         it('return true for a valid member', async () => {
-    //             const member = new MemberV2(randomEmail(), randomString());
-    //
-    //             givenUserMetadataExistsFor(member);
-    //             givenMemberV2ExistsInCloudStore(member);
-    //
-    //             expect(await membersServiceV2Client.isMember(aspects(), {email: member.email})).to.deep.equal({member: true});
-    //             expect(await membersServiceV2Client.isMember(aspects(), {username: member.username})).to.deep.equal({member: true});
-    //         });
-    //
-    //         it('return false for an invalid member', async () => {
-    //             expect(await membersServiceV2Client.isMember(aspects(), {email: randomEmail()})).to.deep.equal({member: false});
-    //             expect(await membersServiceV2Client.isMember(aspects(), {username: randomString()})).to.deep.equal({member: false});
-    //         });
-    //
-    //         it('return false for an invalid request', async () => {
-    //             expect(await membersServiceV2Client.isMember(aspects(), {})).to.deep.equal({member: false});
-    //         });
-    //     });
-    //
-    //     context('addMember should', () => {
-    //         it('add a member with email and username', async () => {
-    //             const member = new MemberV2(randomEmail(), randomString());
-    //
-    //             givenUserMetadataExistsFor(member);
-    //
-    //             await membersServiceV2Client.addMember(aspects(), {email: member.email});
-    //
-    //             expect(await membersDaoV2.exists(member.email)).to.equal(true);
-    //             expect(await membersDaoV2.exists(member.username)).to.equal(true);
-    //         });
-    //
-    //         it('add a member with email only', async () => {
-    //             const member = new MemberV2(randomEmail(), randomString());
-    //
-    //             givenUserMetadataIsEmpty();
-    //
-    //             await membersServiceV2Client.addMember(aspects(), {email: member.email});
-    //
-    //             expect(await membersDaoV2.exists(member.email)).to.equal(true);
-    //             expect(await membersDaoV2.exists(member.username)).to.equal(false);
-    //         });
-    //     });
-    //
-    //     context('removeMember should', () => {
-    //         it('remove a member with email and username', async () => {
-    //             const member = new MemberV2(randomEmail(), randomString());
-    //
-    //             givenUserMetadataExistsFor(member);
-    //             givenMemberV2ExistsInCloudStore(member);
-    //
-    //             await membersServiceV2Client.removeMember(aspects(), {email: member.email});
-    //
-    //             expect(await membersDaoV2.exists(member.email)).to.equal(false);
-    //             expect(await membersDaoV2.exists(member.username)).to.equal(false);
-    //         });
-    //
-    //         it('remove a member with email only', async () => {
-    //             const member = new MemberV2(randomEmail(), randomString());
-    //
-    //             givenUserMetadataIsEmpty();
-    //             givenMemberV2ExistsInCloudStore(member);
-    //
-    //             await membersServiceV2Client.removeMember(aspects(), {email: member.email});
-    //
-    //             expect(await membersDaoV2.exists(member.email)).to.equal(false);
-    //             expect(await membersDaoV2.exists(member.username)).to.equal(true);
-    //         });
-    //     });
+        it('check categories api', async () => {
+            const resp = await env.wordpressServiceClient.categories(ctx.aspects, { what: 'ever'})
+            expect(resp.categories).to.not.be.empty
+        });
     });
-
-    function aspects() {
-        return testkit.apiGwTestkit.callContextBuilder().aspects();
-    }
-
-    // function givenUserMetadataIsEmpty() {
-    //     whenGrpcCalled(userMetadataStub.getByEmailLight)
-    //         .withAny()
-    //         .thenResolveWith({gitHubWixUser: null});
-    // }
-    //
-    // function givenUserMetadataExistsFor(member) {
-    //     const user = {
-    //         gitHubWixUser: {
-    //             email: member.email,
-    //             username: member.username,
-    //             blocked: false,
-    //             whitelisted: false,
-    //             fullName: ''
-    //         }
-    //     };
-    //     whenGrpcCalled(userMetadataStub.getByEmailLight)
-    //         .withArg({email: member.email})
-    //         .thenResolveWith(user);
-    //     return user.gitHubWixUser;
-    // }
-    //
-    // function givenMemberExistsInCloudStore(member) {
-    //     membersDao.put(member);
-    // }
-    // function givenMemberV2ExistsInCloudStore(member) {
-    //     membersDaoV2.put(member);
-    // }
 });

@@ -13,7 +13,7 @@ class WordPressServiceImpl extends com.wixpress.wordpress.WordPressService {
         const ctx = this.rpcContext.contextProvider(aspects);
         ctx.logger.debug(`req ${JSON.stringify(req)}`);
 
-        const posts = await service.retrievePosts()
+        const posts = await service.retrievePosts(0, 20)
         return { posts: posts/*[{ id: '1'}]*/ };
     }
 
@@ -21,9 +21,18 @@ class WordPressServiceImpl extends com.wixpress.wordpress.WordPressService {
         const ctx = this.rpcContext.contextProvider(aspects);
         ctx.logger.debug(`req ${JSON.stringify(req)}`);
 
-        const media = await service.retrieveMedia()
+        const media = await service.retrieveMedia(0, 20)
         // console.log(JSON.stringify(media[0]))
         return { media: media };
+    }
+
+    async categories (aspects, req) {
+        const ctx = this.rpcContext.contextProvider(aspects);
+        ctx.logger.debug(`req ${JSON.stringify(req)}`);
+
+        const categories = await service.retrieveCategories(0, 20)
+        // console.log(JSON.stringify(media[0]))
+        return { categories: categories };
     }
 }
 

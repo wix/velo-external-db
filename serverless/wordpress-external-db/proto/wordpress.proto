@@ -6,25 +6,21 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
 service WordPressService {
-  // Expose an RPC function called Greet
-  // that takes a message in the shape of HelloRequest
-  // and returns a message in the shape of HelloRequest
   rpc Posts (PostsRequest) returns (PostsReply) {}
   rpc Media (MediaRequest) returns (MediaReply) {}
+  rpc Categories (CategoriesRequest) returns (CategoriesReply) {}
 }
 
-// The HelloRequest message shape, that has one property of type string
 message PostsRequest {
   string site_url = 1;
 }
 
-// The HelloResponse message shape, that has one property of type string
 message PostsReply {
   repeated WordPressPosts posts = 1;
 }
 
 message WordPressPosts {
-  int64 id = 1;
+  int32 id = 1;
   string slug = 2;
   string status = 3;
   string title = 4;
@@ -41,7 +37,7 @@ message MediaReply {
 }
 
 message WordPressMedia {
-  int64 id = 1;
+  int32 id = 1;
   string url = 2;
   string caption = 3;
   repeated WordPressMediaDetails details = 4;
@@ -54,4 +50,19 @@ message WordPressMediaDetails {
   int32 height = 4;
   string type = 5;
   string url = 6;
+}
+
+message CategoriesRequest {
+  string site_url = 1;
+}
+
+message CategoriesReply {
+  repeated WordPressCategory categories = 1;
+}
+
+message WordPressCategory {
+  int32 id = 1;
+  int32 count = 2;
+  string name = 3;
+  string slug = 4;
 }
