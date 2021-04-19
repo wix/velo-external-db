@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package com.wixpress.wordpress;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+service WordPressService {
+  // Expose an RPC function called Greet
+  // that takes a message in the shape of HelloRequest
+  // and returns a message in the shape of HelloRequest
+  rpc Posts (PostsRequest) returns (PostsReply) {}
+  rpc Media (MediaRequest) returns (MediaReply) {}
+}
+
+// The HelloRequest message shape, that has one property of type string
+message PostsRequest {
+  string site_url = 1;
+}
+
+// The HelloResponse message shape, that has one property of type string
+message PostsReply {
+  repeated WordPressPosts posts = 1;
+}
+
+message WordPressPosts {
+  int64 id = 1;
+  string slug = 2;
+  string status = 3;
+  string title = 4;
+  string content = 5;
+  string excerpt = 6;
+}
+
+message MediaRequest {
+  string site_url = 1;
+}
+
+message MediaReply {
+  repeated WordPressMedia media = 1;
+}
+
+message WordPressMedia {
+  int64 id = 1;
+  string url = 2;
+  string caption = 3;
+  repeated WordPressMediaDetails details = 4;
+}
+
+message WordPressMediaDetails {
+  string name = 1;
+  string file = 2;
+  int32 width = 3;
+  int32 height = 4;
+  string type = 5;
+  string url = 6;
+}

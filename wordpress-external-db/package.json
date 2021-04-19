@@ -1,0 +1,27 @@
+{
+  "name": "wordpress-external-db",
+  "version": "1.0.0",
+  "main": "serverless.js",
+  "scripts": {
+    "build:proto": "rm -rf ./generated && wix-proto-codegen --module . --dir ./generated --skipClientServer --tsClasses",
+    "build": "npm run build:proto && tsc",
+    "test": "DEBUG='wix:*:serverless:wordpress-external-db' mocha --exit ./test/*.spec.js"
+  },
+  "dependencies": {
+    "@wix/github-metadata-api": "latest",
+    "@wix/wix-crypto": "^1.0.1283",
+    "faker": "^5.1.0",
+    "hash.js": "1.1.7",
+    "wpapi": "^1.2.1"
+  },
+  "devDependencies": {
+    "@wix/serverless-api": "^1.0.579",
+    "@wix/serverless-testkit": "latest",
+    "@wix/serverless-tsc-config": "^1.0.1",
+    "@wix/wix-proto-codegen": "latest",
+    "chai": "^4.2.0",
+    "mocha": "6.2.0",
+    "protos-common": "^1.0.11",
+    "typescript": "^4.0.2"
+  }
+}
