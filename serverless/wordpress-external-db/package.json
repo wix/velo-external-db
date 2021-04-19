@@ -8,10 +8,6 @@
     "test": "DEBUG='wix:*:serverless:wordpress-external-db' mocha --exit ./test/*.spec.js"
   },
   "dependencies": {
-    "@wix/github-metadata-api": "latest",
-    "@wix/wix-crypto": "^1.0.1283",
-    "faker": "^5.1.0",
-    "hash.js": "1.1.7",
     "wpapi": "^1.2.1"
   },
   "devDependencies": {
