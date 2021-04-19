@@ -3,7 +3,7 @@ const {app, whenGrpcCalled} = require('@wix/serverless-testkit');
 const {Uninitialized} = require('./commons/test-commons');
 const wrapper = require('../generated/proto-generated');
 
-describe('serverless e2e', function() {
+describe.skip('serverless e2e', function() {
     this.timeout(5000)
 
     const testkit = app('wordpress-external-db').beforeAndAfter(10000);
