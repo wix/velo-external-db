@@ -4,7 +4,7 @@
   "main": "serverless.js",
   "scripts": {
     "build:proto": "rm -rf ./generated && wix-proto-codegen --module . --dir ./generated --skipClientServer --tsClasses",
-    "build": "npm run build:proto && tsc",
+    "build": "npm run build:proto",
     "test": "DEBUG='wix:*:serverless:wordpress-external-db' mocha --exit ./test/*.spec.js"
   },
   "dependencies": {
