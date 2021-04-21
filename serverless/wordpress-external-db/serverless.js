@@ -1,5 +1,6 @@
 const { com } = require('./generated/proto-generated.js');
 const WordPressService = require('./src/service/wordpress-service');
+const { dbs } = require('./src/data/schema')
 
 const service = new WordPressService()
 
@@ -81,8 +82,11 @@ class WordPressServiceImpl extends com.wixpress.wordpress.WordPressService {
 
 module.exports = fb => fb.addGrpcService(WordPressServiceImpl)
                          .addWebFunction('POST', '/provision', async () => { return {} })
-                         .addWebFunction('POST', '/schemas/list', async () => { return { schemas: [] } })
-                         .addWebFunction('POST', '/schemas/find', async () => { return { schemas: [] } })
+                         .addWebFunction('POST', '/schemas/list', async () => { return { schemas: dbs } })
+                         .addWebFunction('POST', '/schemas/find', async () => { return { schemas: dbs } })
+
+
+
 
 
 // // *************** Schema API **********************

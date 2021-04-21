@@ -3,6 +3,7 @@ const axios = require('axios');
 const {app, whenGrpcCalled} = require('@wix/serverless-testkit');
 const {Uninitialized} = require('./commons/test-commons');
 const wrapper = require('../generated/proto-generated');
+const { dbs } = require('../src/data/schema');
 
 describe.only('serverless REST e2e', function() {
     this.timeout(5000)
@@ -38,12 +39,12 @@ describe.only('serverless REST e2e', function() {
 
         it('list all schemas', async () => {
             const result = await axios.post(testkit.getUrl('/schemas/list'));
-            expect(result.data).to.deep.equal({ schemas: [] });
+            expect(result.data).to.deep.equal({ schemas: dbs });
         });
 
         it('find specific collection by id', async () => {
             const result = await axios.post(testkit.getUrl('/schemas/find'));
-            expect(result.data).to.deep.equal({ schemas: [] });
+            expect(result.data).to.deep.equal({ schemas: dbs });
         });
 
         // it.skip('check posts api', async () => {
