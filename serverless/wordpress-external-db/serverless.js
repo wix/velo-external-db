@@ -50,34 +50,51 @@ module.exports = fb => fb.addGrpcService(WordPressServiceImpl)
                              const { schemaIds } = req.body
                              return { schemas: dbs.filter(item => schemaIds.includes( item.id )) } })
                          .addWebFunction('POST', '/data/find', async (ctx, req) => {
-                             const { collectionName } = req.body
-                             let items = [];
+                             const { collectionName, skip, limit } = req.body
+                             const _skip = skip || 0
+                             const _limit = limit || 20
+                             let resp = { items: [], totalCount: 0 };
                              if (collectionName === 'media') {
-                                 items = await service.retrieveMedia(0, 20)
+                                 resp = await service.retrieveMedia(_skip, _limit)
                              } else if (collectionName === 'categories') {
-                                 items = await service.retrieveCategories(0, 20)
+                                 resp = await service.retrieveCategories(_skip, _limit)
                              } else if (collectionName === 'posts') {
-                                 items = await service.retrievePosts(0, 20)
+                                 resp = await service.retrievePosts(_skip, _limit)
                              }
-                             items.forEach( patchEntities )
+                             resp.items.forEach( patchEntities )
 
-                             return { items: items, totalCount: 0 }
+                             return resp
                          })
                          .addWebFunction('POST', '/data/get', async (ctx, req) => {
                              const { collectionName, itemId } = req.body
-                             let items = [];
+                             const _skip = 0
+                             const _limit = 20
+                             let resp = { items: [], totalCount: 0 };
                              if (collectionName === 'media') {
-                                 items = await service.retrieveMedia(0, 20)
+                                 resp = await service.retrieveMedia(_skip, _limit)
                              } else if (collectionName === 'categories') {
-                                 items = await service.retrieveCategories(0, 20)
+                                 resp = await service.retrieveCategories(_skip, _limit)
                              } else if (collectionName === 'posts') {
-                                 items = await service.retrievePosts(0, 20)
+                                 resp = await service.retrievePosts(_skip, _limit)
                              }
-                             items.forEach( patchEntities )
+                             resp.items.forEach( patchEntities )
 
-                             return { item: items.find(i => i._id === itemId) }
+                             return { item: resp.items.find(i => i._id === itemId) }
                          })
-                         .addWebFunction('POST', '/data/count', async (ctx, req) => { return { totalCount: 0 } })
+                         .addWebFunction('POST', '/data/count', async (ctx, req) => {
+                             const { collectionName } = req.body
+                             const _skip = 0
+                             const _limit = 20
+                             let resp = { items: [], totalCount: 0 };
+                             if (collectionName === 'media') {
+                                 resp = await service.retrieveMedia(_skip, _limit)
+                             } else if (collectionName === 'categories') {
+                                 resp = await service.retrieveCategories(_skip, _limit)
+                             } else if (collectionName === 'posts') {
+                                 resp = await service.retrievePosts(_skip, _limit)
+                             }
+
+                             return { totalCount: resp.totalCount } })
                          .addWebFunction('POST', '/data/insert', async (ctx, req) => { return { item: { } } })
                          .addWebFunction('POST', '/data/update', async (ctx, req) => { return { item: { } } })
                          .addWebFunction('POST', '/data/remove', async (ctx, req) => { return { item: { } } })
