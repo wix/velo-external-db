@@ -2,7 +2,7 @@ const {expect} = require('chai');
 const WordPressService = require('../src/service/wordpress-service');
 const {Uninitialized} = require('./commons/test-commons');
 
-describe.skip('wordpress service', function () {
+describe('wordpress service', function () {
 
     this.timeout(5000)
 
