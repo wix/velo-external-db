@@ -28,7 +28,7 @@ describe('wordpress service', function () {
 
     context('wordpress service', function () {
 
-        it('check posts api', async () => {
+        it.skip('check posts api', async () => {
             const resp = await env.wordpressService.retrievePosts(ctx.skip, ctx.limit)
             // console.log(resp[0])
             expect(resp).to.not.be.empty

@@ -30,7 +30,7 @@ describe('serverless e2e', function() {
 
     context('wordpress serverless e2e', () => {
 
-        it('check posts api', async () => {
+        it.skip('check posts api', async () => {
             const resp = await env.wordpressServiceClient.posts(ctx.aspects, { what: 'ever'})
             expect(resp.posts).to.not.be.empty
 
