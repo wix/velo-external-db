@@ -7,17 +7,27 @@ class WordPressService {
 
     async retrievePosts(skip, limit) {
         const posts = await this.wp.posts().offset( skip ).perPage( limit ).get()
-        return posts.map( this.post2Dto )
+            // .catch(err => {
+            //     console.log(err.response.error)
+            //     return this.wp.posts().offset( skip ).perPage( limit ).get()
+            // } )
+        return { items: posts.map( this.post2Dto ), totalCount: this.paging2Dto(posts) }
     }
 
     async retrieveMedia(skip, limit) {
         const media = await this.wp.media().offset( skip ).perPage( limit ).get()
-        return media.map( this.media2Dto )
+            // .catch(err => {
+            //     // console.log(err)
+            //     return this.wp.media().offset( skip ).perPage( limit ).get()
+            // } )
+        return { items: media.map( this.media2Dto ), totalCount: this.paging2Dto(media) }
+
     }
 
     async retrieveCategories(skip, limit) {
         const category = await this.wp.categories().offset( skip ).perPage( limit ).get()
-        return category.map( this.category2Dto )
+                                      // .catch(err => this.wp.categories().offset( skip ).perPage( limit ).get())
+        return { items: category.map( this.category2Dto ), totalCount: this.paging2Dto(category) }
     }
 
 
@@ -56,6 +66,10 @@ class WordPressService {
             name: p.name,
             slug: p.slug,
         }
+    }
+
+    paging2Dto(r) {
+        return r['_paging'].total
     }
 }
 
