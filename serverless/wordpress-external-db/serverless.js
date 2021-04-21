@@ -37,6 +37,12 @@ class WordPressServiceImpl extends com.wixpress.wordpress.WordPressService {
     }
 }
 
+const patchEntities = item => {
+        Object.defineProperty(item, '_id',
+            Object.getOwnPropertyDescriptor(item, 'id'));
+        delete item['id'];
+}
+
 module.exports = fb => fb.addGrpcService(WordPressServiceImpl)
                          .addWebFunction('POST', '/provision', async () => { return {} })
                          .addWebFunction('POST', '/schemas/list', async () => { return { schemas: dbs } })
@@ -53,11 +59,25 @@ module.exports = fb => fb.addGrpcService(WordPressServiceImpl)
                              } else if (collectionName === 'posts') {
                                  items = await service.retrievePosts(0, 20)
                              }
+                             items.forEach( patchEntities )
 
                              return { items: items, totalCount: 0 }
                          })
+                         .addWebFunction('POST', '/data/get', async (ctx, req) => {
+                             const { collectionName, itemId } = req.body
+                             let items = [];
+                             if (collectionName === 'media') {
+                                 items = await service.retrieveMedia(0, 20)
+                             } else if (collectionName === 'categories') {
+                                 items = await service.retrieveCategories(0, 20)
+                             } else if (collectionName === 'posts') {
+                                 items = await service.retrievePosts(0, 20)
+                             }
+                             items.forEach( patchEntities )
+
+                             return { item: items.find(i => i._id === itemId) }
+                         })
                          .addWebFunction('POST', '/data/count', async (ctx, req) => { return { totalCount: 0 } })
-                         .addWebFunction('POST', '/data/get', async (ctx, req) => { return { item: { } } })
                          .addWebFunction('POST', '/data/insert', async (ctx, req) => { return { item: { } } })
                          .addWebFunction('POST', '/data/update', async (ctx, req) => { return { item: { } } })
                          .addWebFunction('POST', '/data/remove', async (ctx, req) => { return { item: { } } })
