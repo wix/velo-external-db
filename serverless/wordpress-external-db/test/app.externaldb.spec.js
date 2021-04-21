@@ -47,7 +47,7 @@ describe.only('serverless REST e2e', function() {
             expect(result.data).to.deep.equal({ schemas: [dbs[0]] });
         });
 
-        it('find all data', async () => {
+        it.skip('find all data', async () => {
             const result = await axios.post(testkit.getUrl('/data/find'), { collectionName: 'media'});
             expect(result.data.items).to.not.be.empty
         });
