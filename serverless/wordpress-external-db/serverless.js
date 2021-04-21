@@ -43,52 +43,21 @@ module.exports = fb => fb.addGrpcService(WordPressServiceImpl)
                          .addWebFunction('POST', '/schemas/find', async (ctx, req) => {
                              const { schemaIds } = req.body
                              return { schemas: dbs.filter(item => schemaIds.includes( item.id )) } })
+                         .addWebFunction('POST', '/data/find', async (ctx, req) => {
+                             const { collectionName } = req.body
+                             let items = [];
+                             if (collectionName === 'media') {
+                                 items = await service.retrieveMedia(0, 20)
+                             } else if (collectionName === 'categories') {
+                                 items = await service.retrieveCategories(0, 20)
+                             } else if (collectionName === 'posts') {
+                                 items = await service.retrievePosts(0, 20)
+                             }
 
-                         .addWebFunction('POST', '/data/find', async (ctx, req) => { return { items: [], totalCount: 0 } })
+                             return { items: items, totalCount: 0 }
+                         })
                          .addWebFunction('POST', '/data/count', async (ctx, req) => { return { totalCount: 0 } })
                          .addWebFunction('POST', '/data/get', async (ctx, req) => { return { item: { } } })
                          .addWebFunction('POST', '/data/insert', async (ctx, req) => { return { item: { } } })
                          .addWebFunction('POST', '/data/update', async (ctx, req) => { return { item: { } } })
                          .addWebFunction('POST', '/data/remove', async (ctx, req) => { return { item: { } } })
-
-
-
-// app.post('/data/find', async (req, res) => {
-//     const { collectionName, filter, sort, skip, limit } = req.body
-//     const data = await dataService.find(collectionName, filter, sort, skip, limit)
-//     res.json(data)
-// })
-//
-// app.post('/data/insert', async (req, res) => {
-//     const { collectionName, item } = req.body
-//     const data = await dataService.insert(collectionName, item)
-//     res.json(data)
-// })
-//
-// app.post('/data/get', async (req, res) => {
-//     const { collectionName, itemId } = req.body
-//     const data = await dataService.getById(collectionName, itemId)
-//     res.json(data)
-// })
-//
-// app.post('/data/update', async (req, res) => {
-//     const { collectionName, item } = req.body
-//     const data = await dataService.update(collectionName, item)
-//     res.json(data)
-// })
-//
-// app.post('/data/remove', async (req, res) => {
-//     const { collectionName, itemId } = req.body
-//     const data = await dataService.delete(collectionName, [itemId])
-//     res.json(data)
-// })
-//
-// app.post('/data/count', async (req, res) => {
-//     const { collectionName, filter } = req.body
-//     const data = await dataService.count(collectionName, filter)
-//     res.json(data)
-// })
-// // ***********************************************
-
-
-
