@@ -1,6 +1,9 @@
 const postsDb = { id: 'posts',
     fields: [
         {name: '_id', type: 'text', isPrimary: true},
+        {name: '_createdDate', type: 'datetime', isPrimary: false},
+        {name: '_updatedDate', type: 'datetime', isPrimary: false},
+        {name: '_owner', type: 'text', isPrimary: false},
         {name: 'slug', type: 'text', isPrimary: false},
         {name: 'status', type: 'text', isPrimary: false},
         {name: 'title', type: 'text', isPrimary: false},
@@ -8,43 +11,29 @@ const postsDb = { id: 'posts',
         {name: 'excerpt', type: 'text', isPrimary: false},
     ] }
 
-// switch (type) {
-//     case 'varchar':
-//     case 'text':
-//         return 'text'
-//     case 'decimal':
-//     case 'bigint':
-//     case 'int':
-//         return 'number'
-//     case 'tinyint':
-//         return 'boolean'
-//     case 'date':
-//     case 'datetime':
-//     case 'time':
-//         return 'datetime'
-//     case 'json':
-//     default:
-//         return 'object'
 
-// }
+const mediaDb = { id: 'media',
+    fields: [
+        {name: '_id', type: 'text', isPrimary: true},
+        {name: '_createdDate', type: 'datetime', isPrimary: false},
+        {name: '_updatedDate', type: 'datetime', isPrimary: false},
+        {name: '_owner', type: 'text', isPrimary: false},
+        {name: 'url', type: 'text', isPrimary: false},
+        {name: 'caption', type: 'text', isPrimary: false},
+        {name: 'details', type: 'object', isPrimary: false},
+    ] }
+
+const categoriesDb = { id: 'categories',
+    fields: [
+        {name: '_id', type: 'text', isPrimary: true},
+        {name: '_createdDate', type: 'datetime', isPrimary: false},
+        {name: '_updatedDate', type: 'datetime', isPrimary: false},
+        {name: '_owner', type: 'text', isPrimary: false},
+        {name: 'slug', type: 'text', isPrimary: false},
+        {name: 'name', type: 'text', isPrimary: false},
+        {name: 'count', type: 'number', isPrimary: false},
+
+    ] }
 
 
-// const mediaDb = { id: 'media',
-//     fields: [
-//         {name: chance.word(), type: chance.word(), isPrimary: chance.bool()},
-//         {name: chance.word(), type: chance.word(), isPrimary: chance.bool()},
-//     ] }
-//
-// const categoriesDb = { id: 'categories',
-//     fields: [
-//         {name: chance.word(), type: chance.word(), isPrimary: chance.bool()},
-//         {name: chance.word(), type: chance.word(), isPrimary: chance.bool()},
-//     ] }
-
-/*
-const randomDbField = () => ( {name: chance.word(), type: chance.word(), isPrimary: chance.bool()} )
-const randomDbFields = () => randomArrayOf( randomDbField )
-
- */
-
-module.exports = { dbs: [ postsDb ] }
+module.exports = { dbs: [ postsDb, mediaDb, categoriesDb ] }

@@ -43,8 +43,8 @@ describe.only('serverless REST e2e', function() {
         });
 
         it('find specific collection by id', async () => {
-            const result = await axios.post(testkit.getUrl('/schemas/find'));
-            expect(result.data).to.deep.equal({ schemas: dbs });
+            const result = await axios.post(testkit.getUrl('/schemas/find'), { schemaIds: [dbs[0].id]});
+            expect(result.data).to.deep.equal({ schemas: [dbs[0]] });
         });
 
         // it.skip('check posts api', async () => {

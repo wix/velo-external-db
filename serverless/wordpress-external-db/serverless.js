@@ -83,7 +83,9 @@ class WordPressServiceImpl extends com.wixpress.wordpress.WordPressService {
 module.exports = fb => fb.addGrpcService(WordPressServiceImpl)
                          .addWebFunction('POST', '/provision', async () => { return {} })
                          .addWebFunction('POST', '/schemas/list', async () => { return { schemas: dbs } })
-                         .addWebFunction('POST', '/schemas/find', async () => { return { schemas: dbs } })
+                         .addWebFunction('POST', '/schemas/find', async (ctx, req) => {
+                             const { schemaIds } = req.body
+                             return { schemas: dbs.filter(item => schemaIds.includes( item.id )) } })
 
 
 
