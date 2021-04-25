@@ -13,6 +13,33 @@ const SystemFields = [
         name: '_owner', type: 'varchar(256)'
     }]
 
+const TypeConverter = [
+    {
+        wixDataType: 'text',
+        dbType: 'varchar'
+    },
+
+    {
+        wixDataType: 'number',
+        dbType: 'decimal'
+    },
+
+    {
+        wixDataType: 'boolean',
+        dbType: 'tinyint'
+    },
+
+    {
+        wixDataType: 'datetime',
+        dbType: 'timestamp'
+    },
+
+    {
+        wixDataType: 'object',
+        dbType: 'json'
+    },
+]
+
 class SchemaProvider {
     constructor(pool) {
         this.pool = pool
@@ -41,7 +68,7 @@ class SchemaProvider {
     async addColumn(collectionName, column) {
         try {
             await this.validateSystemFields(column.name)
-            return await this.pool.query(`ALTER TABLE ?? ADD ?? ${column.type}`, [collectionName, column.name])
+            return await this.pool.query(`ALTER TABLE ?? ADD ?? ${column.type} ${this.defaultForColumnType(column.type)}`, [collectionName, column.name])
         } catch (err) {
             console.log(err)
         }
@@ -74,9 +101,18 @@ class SchemaProvider {
         const res = await this.pool.query('DESCRIBE ??', [collectionName])
         return {
             id: collectionName,
-            fields: res[0].map(r => ({ name: r.Field, type: r.Type, isPrimary: r.Key === 'PRI' }))
+            fields: res[0].map(r => ({ name: r.Field, type: this.translateType(r.Type), isPrimary: r.Key === 'PRI' }))
         }
     }
+
+    translateType(dbType) {
+        const type = dbType.toLowerCase()
+                           .split('(')
+                           .shift()
+        return TypeConverter.find(t => t.dbType === type).wixDataType
+
+    }
+
 
     defaultForColumnType(type) {
         if (type === 'timestamp') {

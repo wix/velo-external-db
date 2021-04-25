@@ -32,10 +32,10 @@ describe('Velo External DB', () => {
 
             const res = await axios.post(`/schemas/list`, {})
             expect(res.data).to.be.deep.eql({ schemas: [{ id: ctx.collectionName,
-                                               fields: [{name: '_id', type: 'varchar(256)', isPrimary: true},
-                                                        {name: '_createdDate', type: 'timestamp', isPrimary: false},
-                                                        {name: '_updatedDate', type: 'timestamp', isPrimary: false},
-                                                        {name: '_owner', type: 'varchar(256)', isPrimary: false},
+                                               fields: [{name: '_id', type: 'text', isPrimary: true},
+                                                        {name: '_createdDate', type: 'datetime', isPrimary: false},
+                                                        {name: '_updatedDate', type: 'datetime', isPrimary: false},
+                                                        {name: '_owner', type: 'text', isPrimary: false},
                                                         // {name: 'title', type: 'varchar(20)', isPrimary: false},
                                                        ]
                                             }] })
@@ -47,10 +47,10 @@ describe('Velo External DB', () => {
 
             const res = await axios.post(`/schemas/find`, { schemaIds: [ctx.collectionName]})
             expect(res.data).to.be.deep.eql({ schemas: [{ id: ctx.collectionName,
-                                                          fields: [{name: '_id', type: 'varchar(256)', isPrimary: true},
-                                                                   {name: '_createdDate', type: 'timestamp', isPrimary: false},
-                                                                   {name: '_updatedDate', type: 'timestamp', isPrimary: false},
-                                                                   {name: '_owner', type: 'varchar(256)', isPrimary: false},
+                                                          fields: [{name: '_id', type: 'text', isPrimary: true},
+                                                                   {name: '_createdDate', type: 'datetime', isPrimary: false},
+                                                                   {name: '_updatedDate', type: 'datetime', isPrimary: false},
+                                                                   {name: '_owner', type: 'text', isPrimary: false},
                                                                 // {name: 'title', type: 'varchar(20)', isPrimary: false},
                                                           ]
                                                         }]})
@@ -63,7 +63,7 @@ describe('Velo External DB', () => {
             await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column})
 
             const field = await schema.expectColumnInCollection(ctx.column.name, ctx.collectionName)
-            expect(field).to.be.deep.eql(ctx.column)
+            expect(field).to.be.deep.eql({name: ctx.column.name, type: 'text', isPrimary: false})
         })
 
         it('remove column', async () => {

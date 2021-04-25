@@ -18,11 +18,11 @@ describe('Cloud SQL Service', () => {
 
             const db = await env.schemaProvider.list()
             expect(db).to.be.deep.eql([{ id: ctx.collectionName,
-                fields: [{name: '_id', type: 'varchar(256)', isPrimary: true},
-                    {name: '_createdDate', type: 'timestamp', isPrimary: false},
-                    {name: '_updatedDate', type: 'timestamp', isPrimary: false},
-                    {name: '_owner', type: 'varchar(256)', isPrimary: false},
-                    // {name: 'title', type: 'varchar(20)', isPrimary: false},
+                fields: [{name: '_id', type: 'text', isPrimary: true},
+                         {name: '_createdDate', type: 'datetime', isPrimary: false},
+                         {name: '_updatedDate', type: 'datetime', isPrimary: false},
+                         {name: '_owner', type: 'text', isPrimary: false},
+                         // {name: 'title', type: 'varchar(20)', isPrimary: false},
                 ]
             }])
         })
@@ -32,11 +32,11 @@ describe('Cloud SQL Service', () => {
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
             expect(db).to.be.deep.eql({ id: ctx.collectionName,
-                fields: [{name: '_id', type: 'varchar(256)', isPrimary: true},
-                    {name: '_createdDate', type: 'timestamp', isPrimary: false},
-                    {name: '_updatedDate', type: 'timestamp', isPrimary: false},
-                    {name: '_owner', type: 'varchar(256)', isPrimary: false},
-                    // {name: 'title', type: 'varchar(20)', isPrimary: false},
+                fields: [{name: '_id', type: 'text', isPrimary: true},
+                         {name: '_createdDate', type: 'datetime', isPrimary: false},
+                         {name: '_updatedDate', type: 'datetime', isPrimary: false},
+                         {name: '_owner', type: 'text', isPrimary: false},
+                         // {name: 'title', type: 'varchar(20)', isPrimary: false},
                 ]
             })
         })
@@ -47,23 +47,23 @@ describe('Cloud SQL Service', () => {
         })
 
         it('add column on a non existing collection will fail', async () => {
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime'})
+            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
         })
 
         it('add column on a an existing collection', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime'})
+            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
 
-            expect((await env.schemaProvider.list()).find(e => e.id === ctx.collectionName)
+            expect((await env.schemaProvider.describeCollection(ctx.collectionName))
                                             .fields.find(e => e.name === ctx.columnName)).to.be.deep.eql({name: ctx.columnName, type: 'datetime', isPrimary: false})
         })
 
         it('add duplicate column will fail', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime'})
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime'})
+            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
+            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
         })
 
         it('add system column will fail', async () => {
@@ -71,13 +71,13 @@ describe('Cloud SQL Service', () => {
 
             SystemFields.map(f => f.name)
                         .map(async f => {
-                            await env.schemaProvider.addColumn(ctx.collectionName, {name: f, type: 'datetime'})
+                            await env.schemaProvider.addColumn(ctx.collectionName, {name: f, type: 'timestamp'})
                         })
         })
 
         it('drop column on a an existing collection', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime'})
+            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
 
             await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
 
