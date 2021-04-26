@@ -31,30 +31,14 @@ describe('Velo External DB', () => {
             await schema.givenCollection(ctx.collectionName, [])
 
             const res = await axios.post(`/schemas/list`, {})
-            expect(res.data).to.be.deep.eql({ schemas: [{ id: ctx.collectionName,
-                                               fields: [{name: '_id', type: 'text', isPrimary: true},
-                                                        {name: '_createdDate', type: 'datetime', isPrimary: false},
-                                                        {name: '_updatedDate', type: 'datetime', isPrimary: false},
-                                                        {name: '_owner', type: 'text', isPrimary: false},
-                                                        // {name: 'title', type: 'varchar(20)', isPrimary: false},
-                                                       ]
-                                            }] })
-
+            schema.expectDefaultCollectionWith(ctx.collectionName, res)
         })
 
         it('find', async () => {
             await schema.givenCollection(ctx.collectionName, [])
 
             const res = await axios.post(`/schemas/find`, { schemaIds: [ctx.collectionName]})
-            expect(res.data).to.be.deep.eql({ schemas: [{ id: ctx.collectionName,
-                                                          fields: [{name: '_id', type: 'text', isPrimary: true},
-                                                                   {name: '_createdDate', type: 'datetime', isPrimary: false},
-                                                                   {name: '_updatedDate', type: 'datetime', isPrimary: false},
-                                                                   {name: '_owner', type: 'text', isPrimary: false},
-                                                                // {name: 'title', type: 'varchar(20)', isPrimary: false},
-                                                          ]
-                                                        }]})
-
+            schema.expectDefaultCollectionWith(ctx.collectionName, res)
         })
 
         it('add column', async () => {
@@ -63,7 +47,22 @@ describe('Velo External DB', () => {
             await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column})
 
             const field = await schema.expectColumnInCollection(ctx.column.name, ctx.collectionName)
-            expect(field).to.be.deep.eql({name: ctx.column.name, type: 'text', isPrimary: false})
+            expect(field).to.be.deep.eql({displayName: ctx.column.name,
+                                          type: 'text',
+                                          queryOperators: [
+                                              "eq",
+                                              "lt",
+                                              "gt",
+                                              "hasSome",
+                                              "and",
+                                              "lte",
+                                              "gte",
+                                              "or",
+                                              "not",
+                                              "ne",
+                                              "startsWith",
+                                              "endsWith",
+                                          ]})
         })
 
         it('remove column', async () => {

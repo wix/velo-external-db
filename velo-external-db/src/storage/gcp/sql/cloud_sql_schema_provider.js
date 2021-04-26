@@ -101,7 +101,35 @@ class SchemaProvider {
         const res = await this.pool.query('DESCRIBE ??', [collectionName])
         return {
             id: collectionName,
-            fields: res[0].map(r => ({ name: r.Field, type: this.translateType(r.Type), isPrimary: r.Key === 'PRI' }))
+            displayName: collectionName,
+            allowedOperations: [
+                "get",
+                "find",
+                "count",
+                "update",
+                "insert",
+                "remove"
+            ],
+            maxPageSize: 50,
+            ttl: 3600,
+            fields: res[0].reduce( (o, r) => Object.assign(o, { [r.Field]: {
+                    displayName: r.Field,
+                    type: this.translateType(r.Type),
+                    queryOperators: [
+                        "eq",
+                        "lt",
+                        "gt",
+                        "hasSome",
+                        "and",
+                        "lte",
+                        "gte",
+                        "or",
+                        "not",
+                        "ne",
+                        "startsWith",
+                        "endsWith" // todo: customize this list according to type
+                    ]
+                } }), {} )
         }
     }
 

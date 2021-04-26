@@ -18,12 +18,91 @@ describe('Cloud SQL Service', () => {
 
             const db = await env.schemaProvider.list()
             expect(db).to.be.deep.eql([{ id: ctx.collectionName,
-                fields: [{name: '_id', type: 'text', isPrimary: true},
-                         {name: '_createdDate', type: 'datetime', isPrimary: false},
-                         {name: '_updatedDate', type: 'datetime', isPrimary: false},
-                         {name: '_owner', type: 'text', isPrimary: false},
-                         // {name: 'title', type: 'varchar(20)', isPrimary: false},
-                ]
+                displayName: ctx.collectionName,
+                allowedOperations: [
+                    "get",
+                    "find",
+                    "count",
+                    "update",
+                    "insert",
+                    "remove"
+                ],
+                maxPageSize: 50,
+                ttl: 3600,
+                fields: {
+                    _id: {
+                        displayName: '_id',
+                        type: 'text',
+                        queryOperators: [
+                            "eq",
+                            "lt",
+                            "gt",
+                            "hasSome",
+                            "and",
+                            "lte",
+                            "gte",
+                            "or",
+                            "not",
+                            "ne",
+                            "startsWith",
+                            "endsWith"
+                        ]
+                    },
+                    _createdDate: {
+                        displayName: '_createdDate',
+                        type: 'datetime',
+                        queryOperators: [
+                            "eq",
+                            "lt",
+                            "gt",
+                            "hasSome",
+                            "and",
+                            "lte",
+                            "gte",
+                            "or",
+                            "not",
+                            "ne",
+                            "startsWith",
+                            "endsWith"
+                        ]
+                    },
+                    _updatedDate: {
+                        displayName: '_updatedDate',
+                        type: 'datetime',
+                        queryOperators: [
+                            "eq",
+                            "lt",
+                            "gt",
+                            "hasSome",
+                            "and",
+                            "lte",
+                            "gte",
+                            "or",
+                            "not",
+                            "ne",
+                            "startsWith",
+                            "endsWith"
+                        ]
+                    },
+                    _owner: {
+                        displayName: '_owner',
+                        type: 'text',
+                        queryOperators: [
+                            "eq",
+                            "lt",
+                            "gt",
+                            "hasSome",
+                            "and",
+                            "lte",
+                            "gte",
+                            "or",
+                            "not",
+                            "ne",
+                            "startsWith",
+                            "endsWith"
+                        ]
+                    },
+                }
             }])
         })
 
@@ -32,12 +111,91 @@ describe('Cloud SQL Service', () => {
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
             expect(db).to.be.deep.eql({ id: ctx.collectionName,
-                fields: [{name: '_id', type: 'text', isPrimary: true},
-                         {name: '_createdDate', type: 'datetime', isPrimary: false},
-                         {name: '_updatedDate', type: 'datetime', isPrimary: false},
-                         {name: '_owner', type: 'text', isPrimary: false},
-                         // {name: 'title', type: 'varchar(20)', isPrimary: false},
-                ]
+                                        displayName: ctx.collectionName,
+                                        allowedOperations: [
+                                            "get",
+                                            "find",
+                                            "count",
+                                            "update",
+                                            "insert",
+                                            "remove"
+                                        ],
+                                        maxPageSize: 50,
+                                        ttl: 3600,
+                                        fields: {
+                                            _id: {
+                                                displayName: '_id',
+                                                type: 'text',
+                                                queryOperators: [
+                                                    "eq",
+                                                    "lt",
+                                                    "gt",
+                                                    "hasSome",
+                                                    "and",
+                                                    "lte",
+                                                    "gte",
+                                                    "or",
+                                                    "not",
+                                                    "ne",
+                                                    "startsWith",
+                                                    "endsWith"
+                                                ]
+                                            },
+                                            _createdDate: {
+                                                displayName: '_createdDate',
+                                                type: 'datetime',
+                                                queryOperators: [
+                                                    "eq",
+                                                    "lt",
+                                                    "gt",
+                                                    "hasSome",
+                                                    "and",
+                                                    "lte",
+                                                    "gte",
+                                                    "or",
+                                                    "not",
+                                                    "ne",
+                                                    "startsWith",
+                                                    "endsWith"
+                                                ]
+                                            },
+                                            _updatedDate: {
+                                                displayName: '_updatedDate',
+                                                type: 'datetime',
+                                                queryOperators: [
+                                                    "eq",
+                                                    "lt",
+                                                    "gt",
+                                                    "hasSome",
+                                                    "and",
+                                                    "lte",
+                                                    "gte",
+                                                    "or",
+                                                    "not",
+                                                    "ne",
+                                                    "startsWith",
+                                                    "endsWith"
+                                                ]
+                                            },
+                                            _owner: {
+                                                displayName: '_owner',
+                                                type: 'text',
+                                                queryOperators: [
+                                                    "eq",
+                                                    "lt",
+                                                    "gt",
+                                                    "hasSome",
+                                                    "and",
+                                                    "lte",
+                                                    "gte",
+                                                    "or",
+                                                    "not",
+                                                    "ne",
+                                                    "startsWith",
+                                                    "endsWith"
+                                                ]
+                                            },
+                                        }
             })
         })
 
@@ -56,7 +214,22 @@ describe('Cloud SQL Service', () => {
             await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
 
             expect((await env.schemaProvider.describeCollection(ctx.collectionName))
-                                            .fields.find(e => e.name === ctx.columnName)).to.be.deep.eql({name: ctx.columnName, type: 'datetime', isPrimary: false})
+                                            .fields).to.have.deep.property(ctx.columnName,
+                                                                           { displayName: ctx.columnName, type: 'datetime',
+                                                                             queryOperators: [
+                                                                                 "eq",
+                                                                                 "lt",
+                                                                                 "gt",
+                                                                                 "hasSome",
+                                                                                 "and",
+                                                                                 "lte",
+                                                                                 "gte",
+                                                                                 "or",
+                                                                                 "not",
+                                                                                 "ne",
+                                                                                 "startsWith",
+                                                                                 "endsWith",
+                                                                             ]})
         })
 
         it('add duplicate column will fail', async () => {
@@ -81,8 +254,7 @@ describe('Cloud SQL Service', () => {
 
             await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
 
-            expect((await env.schemaProvider.list()).find(e => e.id === ctx.collectionName)
-                                            .fields.find(e => e.name === ctx.columnName)).to.be.an('undefined')
+            expect((await env.schemaProvider.describeCollection(ctx.collectionName)).fields).to.not.have.property(ctx.columnName)
         })
 
         it('drop column on a a non existing collection', async () => {
