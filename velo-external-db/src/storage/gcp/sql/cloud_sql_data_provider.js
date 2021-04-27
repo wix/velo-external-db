@@ -43,7 +43,7 @@ class DataProvider {
         const sql = this.pool.format(`UPDATE ?? SET ${updateFields.map(() => '?? = ?')} WHERE _id = ?`, [collectionName, ...updateFields])
         const updatable = [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
 
-        console.log(sql, Object.values(this.patchDateTime(item)))
+        console.log(item, sql, Object.values(this.patchDateTime(item)))
         const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
         return resultset[0].changedRows
     }
