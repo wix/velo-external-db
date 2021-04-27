@@ -10,30 +10,25 @@ class DataProvider {
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
         const {sortExpr, sortColumns} = this.filterParser.orderBy(sort)
-        const sql = this.pool.format(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT ?, ?`, [collectionName, ...filterColumns, ...sortColumns])
+        const sql = this.sqlFormat(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT ?, ?`, [collectionName, ...filterColumns, ...sortColumns])
         const resultset = await this.pool.execute(sql, [...parameters, skip, limit])
         return resultset[0]
     }
 
     async count(collectionName, filter) {
         const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
-        const sql = this.pool.format(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`, [collectionName, ...filterColumns])
+        const sql = this.sqlFormat(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`, [collectionName, ...filterColumns])
         const resultset = await this.pool.execute(sql, parameters)
         return resultset[0][0]['num']
     }
 
     async insert(collectionName, item) {
         const n = Object.keys(item).length
-        const sql = this.pool.format(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES (${this.wildCardWith(n, '?')})`, [collectionName, ...Object.keys(item)])
+        const sql = this.sqlFormat(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES (${this.wildCardWith(n, '?')})`, [collectionName, ...Object.keys(item)])
 
-        console.log(sql, Object.values(this.patchDateTime(item)))
         const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(item) ) )
 
         return resultset[0].affectedRows
-    }
-
-    sqlFormat(template, values) {
-        return values.reduce( (sql, f) => sql.replace('??', this.pool.escapeId(f)), template )
     }
 
     async update(collectionName, item) {
@@ -52,7 +47,7 @@ class DataProvider {
     }
 
     async delete(collectionName, itemIds) {
-        const sql = this.pool.format(`DELETE FROM ?? WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`, [collectionName])
+        const sql = this.sqlFormat(`DELETE FROM ?? WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`, [collectionName])
         const rs = await this.pool.execute(sql, itemIds);
         return rs[0].affectedRows
     }
@@ -76,6 +71,10 @@ class DataProvider {
 
     asParamArrays(item) {
         return Object.values(item);
+    }
+
+    sqlFormat(template, values) {
+        return values.reduce( (sql, f) => sql.replace('??', this.pool.escapeId(f)), template )
     }
 }
 
