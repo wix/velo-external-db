@@ -26,6 +26,7 @@ class DataProvider {
         const n = Object.keys(item).length
         const sql = this.pool.format(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES (${this.wildCardWith(n, '?')})`, [collectionName, ...Object.keys(item)])
 
+        console.log(sql, Object.values(this.patchDateTime(item)))
         const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(item) ) )
 
         return resultset[0].affectedRows
@@ -42,6 +43,7 @@ class DataProvider {
         const sql = this.pool.format(`UPDATE ?? SET ${updateFields.map(() => '?? = ?')} WHERE _id = ?`, [collectionName, ...updateFields])
         const updatable = [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
 
+        console.log(sql, Object.values(this.patchDateTime(item)))
         const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
         return resultset[0].changedRows
     }
