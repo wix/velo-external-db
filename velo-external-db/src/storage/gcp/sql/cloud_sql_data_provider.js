@@ -32,6 +32,10 @@ class DataProvider {
         return resultset[0].affectedRows
     }
 
+    sqlFormat(template, values) {
+        return values.reduce( (sql, f) => sql.replace('??', this.pool.escapeId(f)), template )
+    }
+
     async update(collectionName, item) {
         const systemFieldNames = SystemFields.map(f => f.name)
         const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
@@ -40,10 +44,9 @@ class DataProvider {
             return 0
         }
 
-        const sql = this.pool.format(`UPDATE ?? SET ${updateFields.map(() => '?? = ?').join(', ')} WHERE _id = ?`, [collectionName, ...updateFields])
+        const sql = this.sqlFormat(`UPDATE ?? SET ${updateFields.map(() => '?? = ?').join(', ')} WHERE _id = ?`, [collectionName, ...updateFields])
         const updatable = [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
 
-        console.log('update', `UPDATE ?? SET ${updateFields.map(() => '?? = ?').join(', ')} WHERE _id = ?`, updateFields, sql)
         const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
         return resultset[0].changedRows
     }
