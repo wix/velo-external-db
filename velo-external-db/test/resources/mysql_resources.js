@@ -1,6 +1,6 @@
 const mysqlSetup = require('@databases/mysql-test/jest/globalSetup')
 const mysqlTeardown = require('@databases/mysql-test/jest/globalTeardown')
-const mysql = require('mysql2');
+const mysql = require('mysql');
 
 
 const initMySqlEnv = async () => {
@@ -17,14 +17,13 @@ const initMySqlEnv = async () => {
         user     : 'test-user',
         password : 'password',
         database : 'test-db',
+
         waitForConnections: true,
         namedPlaceholders: true,
-        // debug: true,
-        // trace: true,
+
         connectionLimit: 10,
-        queueLimit: 0/*,
-                multipleStatements: true*/
-    }).promise();
+        queueLimit: 0
+    });
 }
 
 const shutdownMySqlEnv = async () => {

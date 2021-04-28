@@ -1,4 +1,4 @@
-const mysql = require('mysql2')
+const mysql = require('mysql')
 
 const init = (type, host, user, password, db, cloudSqlConnectionName) => {
     switch (type) {
@@ -27,7 +27,7 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
                 config['host'] = host
             }
 
-            const pool = mysql.createPool(config).promise()
+            const pool = mysql.createPool(config)
             const filterParser = new FilterParser()
             const dataProvider = new DataProvider(pool, filterParser)
             const schemaProvider = new SchemaProvider(pool)

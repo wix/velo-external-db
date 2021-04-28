@@ -1,3 +1,4 @@
+const { promisify } = require('util')
 
 const SystemFields = [
     {
@@ -48,11 +49,10 @@ class SchemaProvider {
     }
 
     async list() {
-        const tables = await this.pool.query('SHOW TABLES')
-        const columnName = tables[1][0].name
+        const tables = await promisify(this.pool.query).bind(this.pool)('SHOW TABLES')
 
-        return Promise.all(tables[0].map(r => r[columnName])
-                                    .map( this.describeCollection.bind(this) ))
+        return Promise.all(tables.map(r => Object.values(r)[0])
+                                 .map( this.describeCollection.bind(this) ))
     }
 
     async create(collectionName, columns) {
@@ -61,14 +61,14 @@ class SchemaProvider {
                                  .join(', ')
         const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => `\`${f.name}\``).join(', ')
 
-        await this.pool.query(`CREATE TABLE IF NOT EXISTS ?? (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
-                              [collectionName].concat((columns || []).map(c => c.name)))
+        await promisify(this.pool.query).bind(this.pool)(`CREATE TABLE IF NOT EXISTS ?? (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
+                                                         [collectionName].concat((columns || []).map(c => c.name)))
     }
 
     async addColumn(collectionName, column) {
         try {
             await this.validateSystemFields(column.name)
-            return await this.pool.query(`ALTER TABLE ?? ADD ?? ${column.type} ${this.defaultForColumnType(column.type)}`, [collectionName, column.name])
+            return await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? ADD ?? ${column.type} ${this.defaultForColumnType(column.type)}`, [collectionName, column.name])
         } catch (err) {
             console.log(err)
         }
@@ -84,7 +84,7 @@ class SchemaProvider {
     async removeColumn(collectionName, columnName) {
         try {
             await this.validateSystemFields(columnName)
-            return await this.pool.query(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
+            return await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
         } catch (err) {
             console.log(err)
         }
@@ -98,7 +98,7 @@ class SchemaProvider {
     }
 
     async describeCollection(collectionName) {
-        const res = await this.pool.query('DESCRIBE ??', [collectionName])
+        const res = await promisify(this.pool.query).bind(this.pool)('DESCRIBE ??', [collectionName])
         return {
             id: collectionName,
             displayName: collectionName,
@@ -112,7 +112,7 @@ class SchemaProvider {
             ],
             maxPageSize: 50,
             ttl: 3600,
-            fields: res[0].reduce( (o, r) => Object.assign(o, { [r.Field]: {
+            fields: res.reduce( (o, r) => Object.assign(o, { [r.Field]: {
                     displayName: r.Field,
                     type: this.translateType(r.Type),
                     queryOperators: [
@@ -161,49 +161,5 @@ class SchemaProvider {
         return Promise.resolve()
     }
 }
-
-/*
-{
-displayName: table.table,
-id: table.table,
-allowedOperations: allowedOperations,
-maxPageSize: 50,
-ttl: 3600,
-fields: convertFields(table.columns)
-}
-
-{
-displayName: field.name,
-type: extractFieldType(field.type),
-
-
-const extractFieldType = dbType => {
-const type = dbType
-.toLowerCase()
-.split('(')
-.shift()
-
-switch (type) {
-case 'varchar':
-case 'text':
-return 'text'
-case 'decimal':
-case 'bigint':
-case 'int':
-return 'number'
-case 'tinyint':
-return 'boolean'
-case 'date':
-case 'datetime':
-case 'time':
-return 'datetime'
-case 'json':
-default:
-return 'object'
-}
-}
-
- */
-
 
 module.exports = {SchemaProvider, SystemFields}

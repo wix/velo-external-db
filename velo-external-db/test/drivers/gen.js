@@ -47,6 +47,10 @@ const randomDbField = () => ( {name: chance.word(), type: chance.word(), isPrima
 const randomDbFields = () => randomArrayOf( randomDbField )
 
 const randomColumn = () => ( {name: chance.word(), type: 'varchar(256)', isPrimary: false} )
+const randomNumberColumns = () => {
+    return [ {name: chance.word(), type: 'INTEGER(10)', isPrimary: false},
+             {name: chance.word(), type: 'DECIMAL(10,2)', isPrimary: false} ]
+}
 
 const randomEntity = (columns) => {
     const entity = {
@@ -74,9 +78,29 @@ const randomDbEntity = (columns) => {
 
     const _columns = columns || []
 
-    for (const column of _columns) {
-        entity[column] = chance.word()
+    _columns.forEach(column => entity[column] = chance.word())
+
+    return entity;
+}
+
+const randomNumberDbEntity = (columns) => {
+    const entity = {
+        _id: chance.guid(),
+        _createdDate: newDate(),
+        _updatedDate: newDate(),
+        _owner: chance.guid(),
     }
+
+    const _columns = columns || []
+
+    _columns.forEach(column => {
+        if (column.type === 'INTEGER(10)') {
+            entity[column.name] = chance.integer({ min: 0, max: 10000 })
+        } else if (column.type === 'DECIMAL(10,2)') {
+            entity[column.name] = chance.floating({ min: 0, max: 10000, fixed: 2 })
+        }
+    })
+
     return entity;
 }
 
@@ -99,4 +123,4 @@ const randomDb = () => ( { id: randomCollectionName(),
 
 const randomDbs = () => randomArrayOf( randomDb )
 
-module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities, randomColumn, randomCollectionName }
+module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomNumberColumns }

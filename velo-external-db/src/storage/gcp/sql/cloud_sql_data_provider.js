@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { promisify } = require('util')
 const { SystemFields } = require('./cloud_sql_schema_provider')
 
 class DataProvider {
@@ -11,24 +12,23 @@ class DataProvider {
         const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
         const {sortExpr, sortColumns} = this.filterParser.orderBy(sort)
         const sql = this.sqlFormat(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT ?, ?`, [collectionName, ...filterColumns, ...sortColumns])
-        const resultset = await this.pool.execute(sql, [...parameters, skip, limit])
-        return resultset[0]
+        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, [...parameters, skip, limit])
+        return resultset
     }
 
     async count(collectionName, filter) {
         const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
         const sql = this.sqlFormat(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`, [collectionName, ...filterColumns])
-        const resultset = await this.pool.execute(sql, parameters)
-        return resultset[0][0]['num']
+        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, parameters)
+        return resultset[0]['num']
     }
 
     async insert(collectionName, item) {
         const n = Object.keys(item).length
         const sql = this.sqlFormat(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES (${this.wildCardWith(n, '?')})`, [collectionName, ...Object.keys(item)])
 
-        const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(item) ) )
-
-        return resultset[0].affectedRows
+        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, this.asParamArrays( this.patchDateTime(item) ) )
+        return resultset.affectedRows
     }
 
     async update(collectionName, item) {
@@ -42,14 +42,14 @@ class DataProvider {
         const sql = this.sqlFormat(`UPDATE ?? SET ${updateFields.map(() => '?? = ?').join(', ')} WHERE _id = ?`, [collectionName, ...updateFields])
         const updatable = [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
 
-        const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
-        return resultset[0].changedRows
+        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
+        return resultset.changedRows
     }
 
     async delete(collectionName, itemIds) {
         const sql = this.sqlFormat(`DELETE FROM ?? WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`, [collectionName])
-        const rs = await this.pool.execute(sql, itemIds);
-        return rs[0].affectedRows
+        const rs = await promisify(this.pool.query).bind(this.pool)(sql, itemIds);
+        return rs.affectedRows
     }
 
     wildCardWith(n, char) {

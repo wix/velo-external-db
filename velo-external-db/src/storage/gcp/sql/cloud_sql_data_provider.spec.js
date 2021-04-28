@@ -79,6 +79,15 @@ describe('Cloud SQL Data Service', () => {
         expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).to.be.deep.eql([ctx.entity]);
     });
 
+    it('insert entity with number', async () => {
+        await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
+        driver.stubEmptyFilterAndSortFor('', '')
+
+        expect( await env.dataProvider.insert(ctx.numericCollectionName, ctx.numberEntity) ).to.be.eql(1)
+
+        expect( await env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50) ).to.be.deep.eql([ctx.numberEntity]);
+    });
+
     it('delete data from collection', async () => {
         await givenCollectionWith(ctx.entities, ctx.collectionName)
         driver.stubEmptyFilterAndSortFor('', '')
@@ -109,12 +118,15 @@ describe('Cloud SQL Data Service', () => {
 
     const ctx = {
         collectionName: Uninitialized,
+        numericCollectionName: Uninitialized,
         filter: Uninitialized,
         sort: Uninitialized,
         skip: Uninitialized,
         limit: Uninitialized,
         column: Uninitialized,
+        numericColumns: Uninitialized,
         entity: Uninitialized,
+        numberEntity: Uninitialized,
         modifiedEntity: Uninitialized,
         anotherEntity: Uninitialized,
         entities: Uninitialized,
@@ -128,7 +140,9 @@ describe('Cloud SQL Data Service', () => {
 
     beforeEach(async () => {
         ctx.collectionName = gen.randomCollectionName()
+        ctx.numericCollectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
+        ctx.numericColumns = gen.randomNumberColumns()
         ctx.filter = chance.word();
         ctx.sort = chance.word();
         ctx.skip = 0;
@@ -138,6 +152,7 @@ describe('Cloud SQL Data Service', () => {
         ctx.modifiedEntity = Object.assign({}, ctx.entity, {[ctx.column.name]: chance.word()} )
         ctx.anotherEntity = gen.randomDbEntity([ctx.column.name]);
         ctx.entities = gen.randomDbEntities([ctx.column.name]);
+        ctx.numberEntity = gen.randomNumberDbEntity(ctx.numericColumns);
 
         await env.schemaProvider.create(ctx.collectionName, [ctx.column])
     });
