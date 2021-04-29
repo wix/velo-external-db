@@ -24,7 +24,7 @@ const initMySqlEnv = async () => {
     process.env.DB = 'test-db'
 
     await compose.upOne('db', { cwd: __dirname, log: true, commandOptions: [['--force-recreate']] } )
-    await compose.logs('db', { cwd: __dirname, log: true });
+    // await compose.logs('db', { cwd: __dirname, log: true });
 
     await sleep( 500 )
 

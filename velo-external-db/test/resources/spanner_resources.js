@@ -8,7 +8,7 @@ const initSpannerEnv = async () => {
     process.env.SPANNER_EMULATOR_HOST = 'localhost:9010'
 
     await compose.upOne('spanner', { cwd: __dirname, log: true })
-    await compose.logs('spanner', { cwd: __dirname, log: true });
+    // await compose.logs('spanner', { cwd: __dirname, log: true });
 
     await sleep( 500 )
 }
