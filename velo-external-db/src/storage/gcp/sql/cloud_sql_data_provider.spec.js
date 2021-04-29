@@ -7,7 +7,8 @@ const mysql = require('../../../../test/resources/mysql_resources');
 const chance = new require('chance')();
 const driver = require('../../../../test/drivers/sql_filter_transformer_test_support')
 
-describe('Cloud SQL Data Service', () => {
+describe('Cloud SQL Data Service', function() {
+    this.timeout(20000)
 
     const givenCollectionWith = async (entities, forCollection) => {
         await Promise.all( entities.map(e => env.dataProvider.insert(forCollection, e) ))

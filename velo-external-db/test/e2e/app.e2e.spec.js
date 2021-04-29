@@ -12,7 +12,9 @@ const axios = require('axios').create({
 });
 
 
-describe('Velo External DB', () => {
+describe('Velo External DB', function () {
+    this.timeout(20000)
+
     it('answer default page with a welcoming response', async () => {
         expect((await axios.get(`/`)).data).to.contain('<!doctype html>');
     })

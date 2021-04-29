@@ -26,6 +26,16 @@ const TypeConverter = [
     },
 
     {
+        wixDataType: 'number',
+        dbType: 'integer'
+    },
+
+    {
+        wixDataType: 'number',
+        dbType: 'int'
+    },
+
+    {
         wixDataType: 'boolean',
         dbType: 'tinyint'
     },

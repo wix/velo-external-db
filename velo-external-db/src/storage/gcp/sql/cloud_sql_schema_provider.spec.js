@@ -5,11 +5,13 @@ const mysql = require('../../../../test/resources/mysql_resources');
 const gen = require('../../../../test/drivers/gen');
 const chance = new require('chance')();
 
-describe('Cloud SQL Service', () => {
+describe('Cloud SQL Service', function() {
+    this.timeout(20000)
 
     describe('Schema API', () => {
         it('list of empty db will result with an empty array', async () => {
             const db = await env.schemaProvider.list()
+            console.log(db.length)
             expect(db).to.be.deep.eql([])
         })
 

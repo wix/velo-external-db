@@ -1,7 +1,7 @@
 const {Spanner} = require('@google-cloud/spanner')
 // const moment = require('moment')
 const { SystemFields } = require('./spanner_schema_provider')
-const mysql = require('mysql2')
+const mysql = require('mysql')
 
 class DataProvider {
     constructor(projectId, instanceId, databaseId, filterParser) {

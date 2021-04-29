@@ -1,5 +1,5 @@
 const {Spanner} = require('@google-cloud/spanner')
-const mysql = require('mysql2')
+const mysql = require('mysql')
 
 const SystemFields = [
     {
