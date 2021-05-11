@@ -5,6 +5,7 @@ const compression = require('compression')
 const DataService = require('./service/data')
 const SchemaService = require('./service/schema')
 const { init } = require('./storage/factory')
+const { errorMiddleware } = require('./web/error-middleware')
 
 const {dataProvider, schemaProvider} = init(process.env.TYPE, process.env.HOST, process.env.USER, process.env.PASSWORD, process.env.DB, process.env.CLOUD_SQL_CONNECTION_NAME)
 const dataService = new DataService(dataProvider)
@@ -15,10 +16,10 @@ const app = express()
 const port = process.env.PORT || 8080
 
 app.use(bodyParser.json())
+app.use(errorMiddleware)
 app.use(compression())
 // app.use(authMiddleware)
 // todo: add auth middleware
-
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
 
 // *************** INFO **********************
@@ -32,40 +33,64 @@ app.post('/provision', (req, res) => {
 
 
 // *************** Data API **********************
-app.post('/data/find', async (req, res) => {
-    const { collectionName, filter, sort, skip, limit } = req.body
-    const data = await dataService.find(collectionName, filter, sort, skip, limit)
-    res.json(data)
+app.post('/data/find', async (req, res, next) => {
+    try {
+        const { collectionName, filter, sort, skip, limit } = req.body
+        const data = await dataService.find(collectionName, filter, sort, skip, limit)
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
 })
 
-app.post('/data/insert', async (req, res) => {
-    const { collectionName, item } = req.body
-    const data = await dataService.insert(collectionName, item)
-    res.json(data)
+app.post('/data/insert', async (req, res, next) => {
+    try {
+        const { collectionName, item } = req.body
+        const data = await dataService.insert(collectionName, item)
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
 })
 
-app.post('/data/get', async (req, res) => {
-    const { collectionName, itemId } = req.body
-    const data = await dataService.getById(collectionName, itemId)
-    res.json(data)
+app.post('/data/get', async (req, res, next) => {
+    try {
+        const { collectionName, itemId } = req.body
+        const data = await dataService.getById(collectionName, itemId)
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
 })
 
-app.post('/data/update', async (req, res) => {
-    const { collectionName, item } = req.body
-    const data = await dataService.update(collectionName, item)
-    res.json(data)
+app.post('/data/update', async (req, res, next) => {
+    try {
+        const { collectionName, item } = req.body
+        const data = await dataService.update(collectionName, item)
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
 })
 
-app.post('/data/remove', async (req, res) => {
-    const { collectionName, itemId } = req.body
-    const data = await dataService.delete(collectionName, [itemId])
-    res.json(data)
+app.post('/data/remove', async (req, res, next) => {
+    try {
+        const { collectionName, itemId } = req.body
+        const data = await dataService.delete(collectionName, [itemId])
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
 })
 
-app.post('/data/count', async (req, res) => {
-    const { collectionName, filter } = req.body
-    const data = await dataService.count(collectionName, filter)
-    res.json(data)
+app.post('/data/count', async (req, res, next) => {
+    try {
+        const { collectionName, filter } = req.body
+        const data = await dataService.count(collectionName, filter)
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
 })
 // ***********************************************
 

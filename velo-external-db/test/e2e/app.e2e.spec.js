@@ -1,11 +1,12 @@
-const {expect} = require('chai')
-//const chaiHttp = require('chai-http');
+const chai = require('chai')
 const mysql = require('../resources/mysql_resources');
 const { Uninitialized } = require('../commons/test-commons');
 const schema = require('../drivers/schema_api_rest_test_support');
 const data = require('../drivers/data_api_rest_test_support');
 const gen = require('../drivers/gen');
 const chance = new require('chance')();
+
+const { expect } = chai
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
