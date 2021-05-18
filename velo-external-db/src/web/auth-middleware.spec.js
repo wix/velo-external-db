@@ -1,96 +1,52 @@
-const { expect, assert } = require('chai')
+const { expect } = require('chai')
+const { Uninitialized } = require('../../test/commons/test-commons');
+const { authMiddleware } = require('./auth-middleware');
+const { UnauthorizedError } = require('../error/errors')
+const chance = new require('chance')();
 const sinon = require('sinon')
-const proxyquire = require('proxyquire').noCallThru()
 
-// const BadRequestError = require('../model/error/bad-request')
-// const UnauthorizedError = require('../model/error/unauthorized')
+const requestBodyWith = secretKey => ({ body: {
+        requestContext: {
+            settings: {
+                secretKey: secretKey
+            } } } } )
 
-// describe.skip('Auth Middleware', () => {
-//   describe('authMiddleware', () => {
-//     const secretKey = 'wix-big-secret' // 'bird-is-the-word'
-//     const loadStub = sinon.stub()
-//     loadStub.withArgs(sinon.match.any).returns({ secretKey })
-//     const authMiddleware = require('./auth-middleware') //, {
-//     //   './file-loader': {
-//     //     load: loadStub
-//     //   }
-//     // })
-//
-//     it('should throw when requestContext is missing', () => {
-//       const request = {
-//         body: {}
-//       }
-//
-//       const throwing = () => authMiddleware(request)
-//
-//       assert.throws(throwing, BadRequestError, 'Missing request context')
-//     })
-//
-//     it('should throw when settings are not in requestContext', () => {
-//       const request = {
-//         body: {
-//           requestContext: {}
-//         }
-//       }
-//
-//       const throwing = () => authMiddleware(request)
-//
-//       assert.throws(
-//         throwing,
-//         UnauthorizedError,
-//         'Missing secret key in request context'
-//       )
-//     })
-//
-//     it('should throw when secret key is not in settings', () => {
-//       const request = {
-//         body: {
-//           requestContext: {
-//             settings: {}
-//           }
-//         }
-//       }
-//
-//       const throwing = () => authMiddleware(request)
-//
-//       assert.throws(throwing, UnauthorizedError, 'Missing secret key in request context')
-//     })
-//
-//     it('should throw when secret key does not match', () => {
-//       const request = {
-//         body: {
-//           requestContext: {
-//             settings: {
-//               secretKey: 'kaboom'
-//             }
-//           }
-//         }
-//       }
-//
-//       const throwing = () => authMiddleware(request)
-//
-//       assert.throws(
-//         throwing,
-//         UnauthorizedError,
-//         'Provided secret key does not match'
-//       )
-//     })
-//
-//     it('should call next when secret key matches', () => {
-//       const next = sinon.mock()
-//       const request = {
-//         body: {
-//           requestContext: {
-//             settings: {
-//               secretKey
-//             }
-//           }
-//         }
-//       }
-//
-//       authMiddleware(request, null, next)
-//
-//       sinon.assert.calledOnce(next)
-//     })
-//   })
-// })
+describe('Auth Middleware', () => {
+
+    const ctx = {
+        secretKey: Uninitialized,
+        anotherSecretKey: Uninitialized,
+        next: Uninitialized,
+    };
+
+    const env = {
+        auth: Uninitialized,
+    };
+
+    beforeEach(() => {
+        ctx.secretKey = chance.word()
+        ctx.anotherSecretKey = chance.word()
+        ctx.next = sinon.mock()
+
+        env.auth = authMiddleware({ secretKey: ctx.secretKey })
+    });
+
+    it('should throw when request does not contain auth', () => {
+        expect( () => env.auth({body: { } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: {} } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: '' } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: { settings: {} } } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: { settings: '' } } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: [] } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
+    })
+
+    it('should throw when secret key does not match', () => {
+        expect( () => env.auth(requestBodyWith(ctx.anotherSecretKey), Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
+    })
+
+    it('should call next when secret key matches', () => {
+      env.auth(requestBodyWith(ctx.secretKey), Uninitialized, ctx.next)
+
+      sinon.assert.calledOnce(ctx.next)
+    })
+})

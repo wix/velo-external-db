@@ -4,15 +4,15 @@ const axios = require('axios').create({
 });
 
 
-const givenCollection = async (name, columns) => {
-    await axios.post(`/schemas/create`, {collectionName: name})
-    await Promise.all( columns.map(async column => await axios.post(`/schemas/column/add`, {collectionName: name, column: column})) )
+const givenCollection = async (name, columns, auth) => {
+    await axios.post(`/schemas/create`, {collectionName: name}, auth)
+    await Promise.all( columns.map(async column => await axios.post(`/schemas/column/add`, {collectionName: name, column: column}, auth)) )
 }
 
-const expectColumnInCollection = async (columnName, collectionName) => {
-    const dbs = (await axios.post(`/schemas/list`, {})).data.schemas
+const expectColumnInCollection = async (columnName, collectionName, auth) => {
+    const dbs = (await axios.post(`/schemas/list`, {}, auth)).data.schemas
     const field = dbs.find(e => e.id === collectionName)
-        .fields[columnName]
+                     .fields[columnName]
     return field
 }
 

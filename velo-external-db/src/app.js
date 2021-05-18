@@ -6,6 +6,8 @@ const DataService = require('./service/data')
 const SchemaService = require('./service/schema')
 const { init } = require('./storage/factory')
 const { errorMiddleware } = require('./web/error-middleware')
+const { authMiddleware } = require('./web/auth-middleware')
+const { unless } = require('./web/middleware-support')
 
 const {dataProvider, schemaProvider} = init(process.env.TYPE, process.env.HOST, process.env.USER, process.env.PASSWORD, process.env.DB, process.env.CLOUD_SQL_CONNECTION_NAME)
 const dataService = new DataService(dataProvider)
@@ -16,10 +18,9 @@ const app = express()
 const port = process.env.PORT || 8080
 
 app.use(bodyParser.json())
+app.use(unless('/', authMiddleware({ secretKey: process.env.SECRET_KEY })));
 app.use(errorMiddleware)
 app.use(compression())
-// app.use(authMiddleware)
-// todo: add auth middleware
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
 
 // *************** INFO **********************
