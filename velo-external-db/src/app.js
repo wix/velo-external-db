@@ -18,7 +18,7 @@ const app = express()
 const port = process.env.PORT || 8080
 
 app.use(bodyParser.json())
-app.use(unless('/', authMiddleware({ secretKey: process.env.SECRET_KEY })));
+app.use(unless(['/', '/provision'], authMiddleware({ secretKey: process.env.SECRET_KEY })));
 app.use(errorMiddleware)
 app.use(compression())
 app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
