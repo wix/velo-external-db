@@ -16,7 +16,8 @@
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "moment": "^2.29.1",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "nested-property": "^4.0.0"
   },
   "devDependencies": {
     "axios": "^0.21.1",
@@ -25,7 +26,6 @@
     "deep-equal-in-any-order": "^1.1.4",
     "docker-compose": "^0.23.6",
     "mocha": "^6.2.3",
-    "nested-property": "^4.0.0",
     "sinon": "^9.2.4"
   }
 }
