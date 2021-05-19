@@ -141,21 +141,22 @@ const blockUntilCloudRunAvailable = async (projectId, instanceId) => {
 }
 
 
-const provisionCloudRun = async (instanceId, authorization) => {
+const provisionCloudRun = async (instanceId, secretKey, authorization) => {
     return await axios.post(`${gpmUrl}/project/cloud`, {
         projectName: 'Velo Test Project',
-        instanceId: instanceId
+        instanceId: instanceId,
+        secretKey: secretKey
     }, { headers: {
             'Content-Type': 'application/json',
             'Authorization': authorization,
         }})
 }
 
-const registerEndpointWithWix = async (serviceUrl, authorization) => {
+const registerEndpointWithWix = async (serviceUrl, secretKey, authorization) => {
     await axios.post(`https://code.wix.com/_api/cloud-data/v1/connector/settings/register`, {
         id: { "namespace": "velo_demo"},
         endpoint: serviceUrl,
-        configuration: {"k":"z"}
+        configuration: JSON.stringify( { secretKey: secretKey } )
     }, { headers: {
             'Content-Type': 'application/json',
             'Authorization': authorization,
@@ -253,21 +254,23 @@ const patchingProjectAuthentication = async (projectId) => {
     await setProjectIAM(projectId, [r1, r2, ...bindings], data.version, data.etag)
 }
 
-const createCollection = async (collectionName, serviceUrl) => {
+const createCollection = async (collectionName, secretKey, serviceUrl) => {
     return await axios.post(`${serviceUrl}/schemas/create`, {
-        collectionName: collectionName
+        collectionName: collectionName,
+        requestContext: {settings: {secretKey: secretKey}}
     })
 }
 
-const addColumnToCollection = async (collectionName, serviceUrl) => {
+const addColumnToCollection = async (collectionName, secretKey, serviceUrl) => {
     return await axios.post(`${serviceUrl}/schemas/column/add`, {
         collectionName: collectionName,
+        requestContext: {settings: {secretKey: secretKey}},
         column: {name: 'demo_column', type: 'varchar(256)', isPrimary: false}
     })
 }
 
 
-const demo = async (authorization, msId, siteId) => {
+const demo = async (authorization, msId, siteId, secretKey) => {
 
     console.log('')
     console.log('')
@@ -276,7 +279,7 @@ const demo = async (authorization, msId, siteId) => {
     const {instanceId, projectId} = await startSpinnerWith('Provision Cloud Sql instance', () => provisionSql(authorization), 'Cloud Sql instance created successfully.')
 
     await startSpinnerWith(`Waiting for Cloud Sql instance to start`, () => blockUntilCloudSqlInitiated(projectId, instanceId), `Cloud Sql instance started successfully.`)
-    await startSpinnerWith(`Provisioning Cloud Run instance`, () => provisionCloudRun(instanceId, authorization), `Cloud Run instance created successfully.`)
+    await startSpinnerWith(`Provisioning Cloud Run instance`, () => provisionCloudRun(instanceId, secretKey, authorization), `Cloud Run instance created successfully.`)
 
     console.log('')
     console.log(`${green('[INFO]:')} Cloud Sql instance created: ${instanceId} - https://console.cloud.google.com/sql/instances?project=${projectId}`)
@@ -297,13 +300,13 @@ const demo = async (authorization, msId, siteId) => {
     console.log('')
     console.log('')
     console.log(`${green('[INFO]:')} Creating Velo Db schema using schema API`)
-    await startSpinnerWith(`Creating demo collection`, () => createCollection('demo_collection', serviceUrl))
-    await startSpinnerWith(`Adding Column to demo collection`, () => addColumnToCollection('demo_collection', serviceUrl))
+    await startSpinnerWith(`Creating demo collection`, () => createCollection('demo_collection', secretKey, serviceUrl))
+    await startSpinnerWith(`Adding Column to demo collection`, () => addColumnToCollection('demo_collection', secretKey, serviceUrl))
 
     console.log('')
     console.log('')
     console.log(`${green('[INFO]:')} Provision Wix Editor`)
-    await startSpinnerWith(`Register external db to wix site`, () => registerEndpointWithWix(serviceUrl, authorization))
+    await startSpinnerWith(`Register external db to wix site`, () => registerEndpointWithWix(serviceUrl, secretKey, authorization))
     console.log('')
     console.log(`Open Editor: https://editor.wix.com/html/editor/web/renderer/edit/${siteId}?metaSiteId=${msId}`)
     console.log('')
@@ -389,6 +392,8 @@ const siteForProvision = (user, passwd) => inquirer.prompt([
 
 const CorvidAppDefId = '675bbcef-18d8-41f5-800e-131ec9e08762'
 
+const randomStr = () => Math.random().toString(36).slice(2)
+
 const main = async () => {
     await showBanner('Velo External DB', 'Demo for Velo External DB automation', 'blue', 'magenta')
     console.log('')
@@ -398,7 +403,8 @@ const main = async () => {
     const { value } = await siteForProvision(user, passwd)
 
     const instance = await signedInstanceFor(value.site.msId, CorvidAppDefId, value.session)
-    await demo(instance, value.site.msId, value.site.siteId)
+    const secretKey = randomStr()
+    await demo(instance, value.site.msId, value.site.siteId, secretKey)
 }
 
 main()
