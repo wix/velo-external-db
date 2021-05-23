@@ -1,8 +1,9 @@
-const { expect } = require('chai')
+// const { expect } = require('chai')
 const { Uninitialized } = require('../../test/commons/test-commons');
 const { authMiddleware } = require('./auth-middleware');
 const { UnauthorizedError } = require('../error/errors')
-const chance = new require('chance')();
+const Chance = require('chance')
+const chance = Chance();
 const sinon = require('sinon')
 
 const requestBodyWith = secretKey => ({ body: {
@@ -32,16 +33,16 @@ describe('Auth Middleware', () => {
     });
 
     it('should throw when request does not contain auth', () => {
-        expect( () => env.auth({body: { } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: {} } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: '' } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { settings: {} } } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { settings: '' } } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: [] } }, Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
+        expect( () => env.auth({body: { } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: {} } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: '' } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: { settings: {} } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: { settings: '' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({body: { requestContext: [] } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
     })
 
     it('should throw when secret key does not match', () => {
-        expect( () => env.auth(requestBodyWith(ctx.anotherSecretKey), Uninitialized, ctx.next) ).to.throw(UnauthorizedError)
+        expect( () => env.auth(requestBodyWith(ctx.anotherSecretKey), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
     })
 
     it('should call next when secret key matches', () => {

@@ -1,4 +1,5 @@
-const chance = new require('chance')();
+const Chance = require('chance')
+const chance = Chance();
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080',
 });

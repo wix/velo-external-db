@@ -1,13 +1,12 @@
-const chai = require('chai')
 const mysql = require('../resources/mysql_resources');
 const { Uninitialized } = require('../commons/test-commons');
 const schema = require('../drivers/schema_api_rest_test_support');
 const data = require('../drivers/data_api_rest_test_support');
 const gen = require('../drivers/gen');
 const { authInit, auth } = require('../drivers/auth-test-support')
-const chance = new require('chance')();
+const Chance = require('chance')
+const chance = Chance();
 
-const { expect } = chai
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
@@ -15,20 +14,18 @@ const axios = require('axios').create({
 
 
 describe('Velo External DB', function () {
-    this.timeout(20000)
-
     it('answer default page with a welcoming response', async () => {
         expect((await axios.get(`/`)).data).to.contain('<!doctype html>');
     })
 
     it('answer provision with stub response', async () => {
-        expect((await axios.post(`/provision`, {}, auth)).data).to.be.eql({});
+        expect((await axios.post(`/provision`, {}, auth)).data).toEqual({});
     })
 
     describe('Schema API', () => {
 
         it('list', async () => {
-            expect((await axios.post(`/schemas/list`, {}, auth)).data).to.be.eql({ schemas: []});
+            expect((await axios.post(`/schemas/list`, {}, auth)).data).toEqual({ schemas: []});
         })
 
         it('create', async () => {
@@ -51,7 +48,7 @@ describe('Velo External DB', function () {
             await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column}, auth)
 
             const field = await schema.expectColumnInCollection(ctx.column.name, ctx.collectionName, auth)
-            expect(field).to.be.deep.eql({displayName: ctx.column.name,
+            expect(field).toEqual({displayName: ctx.column.name,
                                           type: 'text',
                                           queryOperators: [
                                               "eq",
@@ -86,7 +83,7 @@ describe('Velo External DB', function () {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, auth)
 
-            expect((await axios.post(`/data/find`, {collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, auth)).data).to.be.eql({ items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
+            expect((await axios.post(`/data/find`, {collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, auth)).data).toEqual({ items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
                                                                                                                                                                                               totalCount: 0});
         })
 
@@ -96,14 +93,14 @@ describe('Velo External DB', function () {
 
             await axios.post(`/data/remove`, {collectionName: ctx.collectionName, itemId: ctx.item._id }, auth)
 
-            expect(await data.expectAllDataIn(ctx.collectionName, auth)).to.be.eql({ items: [ ], totalCount: 0});
+            expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ ], totalCount: 0});
         })
 
         it('get by id api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item], ctx.collectionName, auth)
 
-            expect((await axios.post(`/data/get`, {collectionName: ctx.collectionName, itemId: ctx.item._id}, auth)).data).to.be.eql({ item: ctx.item });
+            expect((await axios.post(`/data/get`, {collectionName: ctx.collectionName, itemId: ctx.item._id}, auth)).data).toEqual({ item: ctx.item });
         })
 
         it('update api e2e', async () => {
@@ -112,14 +109,14 @@ describe('Velo External DB', function () {
 
             await axios.post(`/data/update`, {collectionName: ctx.collectionName, item: ctx.modifiedItem }, auth)
 
-            expect(await data.expectAllDataIn(ctx.collectionName, auth)).to.be.eql({ items: [ctx.modifiedItem], totalCount: 0});
+            expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ctx.modifiedItem], totalCount: 0});
         })
 
         it('count api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, auth)
 
-            expect((await axios.post(`/data/count`, {collectionName: ctx.collectionName, filter: '' }, auth)).data).to.be.eql({ totalCount: 2});
+            expect((await axios.post(`/data/count`, {collectionName: ctx.collectionName, filter: '' }, auth)).data).toEqual({ totalCount: 2});
         })
     })
 
@@ -145,8 +142,7 @@ describe('Velo External DB', function () {
         ctx.anotherItem = gen.randomEntity([ctx.column.name])
     });
 
-    before(async function() {
-        this.timeout(20000)
+    beforeAll(async function() {
         await mysql.initMySqlEnv()
 
         authInit()
@@ -154,7 +150,7 @@ describe('Velo External DB', function () {
         env.server = require('../..')
     });
 
-    after(async () => {
+    afterAll(async () => {
         await env.server.close()
         await mysql.shutdownMySqlEnv();
     });

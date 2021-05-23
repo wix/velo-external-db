@@ -1,25 +1,25 @@
-const {expect} = require('chai')
 const {SchemaProvider, SystemFields} = require('./cloud_sql_schema_provider')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
 const mysql = require('../../../../test/resources/mysql_resources');
 const gen = require('../../../../test/drivers/gen');
-const chance = new require('chance')();
+const Chance = require('chance')
+const chance = Chance();
 
-describe('Cloud SQL Service', function() {
-    this.timeout(20000)
+
+describe.only('Cloud SQL Service', function() {
 
     describe('Schema API', () => {
         it('list of empty db will result with an empty array', async () => {
             const db = await env.schemaProvider.list()
             console.log(db.length)
-            expect(db).to.be.deep.eql([])
+            expect(db).toEqual([])
         })
 
         it('create collection with default columns', async () => {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.list()
-            expect(db).to.be.deep.eql([{ id: ctx.collectionName,
+            expect(db).toEqual([{ id: ctx.collectionName,
                 displayName: ctx.collectionName,
                 allowedOperations: [
                     "get",
@@ -112,7 +112,7 @@ describe('Cloud SQL Service', function() {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            expect(db).to.be.deep.eql({ id: ctx.collectionName,
+            expect(db).toEqual({ id: ctx.collectionName,
                                         displayName: ctx.collectionName,
                                         allowedOperations: [
                                             "get",
@@ -216,7 +216,7 @@ describe('Cloud SQL Service', function() {
             await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
 
             expect((await env.schemaProvider.describeCollection(ctx.collectionName))
-                                            .fields).to.have.deep.property(ctx.columnName,
+                                            .fields).toHaveProperty(ctx.columnName,
                                                                            { displayName: ctx.columnName, type: 'datetime',
                                                                              queryOperators: [
                                                                                  "eq",
@@ -256,7 +256,7 @@ describe('Cloud SQL Service', function() {
 
             await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
 
-            expect((await env.schemaProvider.describeCollection(ctx.collectionName)).fields).to.not.have.property(ctx.columnName)
+            expect((await env.schemaProvider.describeCollection(ctx.collectionName)).fields).not.toHaveProperty(ctx.columnName)
         })
 
         it('drop column on a a non existing collection', async () => {
@@ -290,13 +290,13 @@ describe('Cloud SQL Service', function() {
         ctx.columnName = chance.word();
     });
 
-    before(async function() {
-        this.timeout(20000)
+    beforeAll(async function() {
         env.connectionPool = await mysql.initMySqlEnv()
         env.schemaProvider = new SchemaProvider(env.connectionPool)
-    });
+    }, 20000);
 
-    after(async () => {
+    afterAll(async () => {
         await mysql.shutdownMySqlEnv();
     });
+
 })

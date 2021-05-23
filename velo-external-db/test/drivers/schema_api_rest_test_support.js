@@ -1,4 +1,3 @@
-const {expect} = require('chai')
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 });
@@ -17,7 +16,7 @@ const expectColumnInCollection = async (columnName, collectionName, auth) => {
 }
 
 const expectDefaultCollectionWith = (collectionName, res) => {
-    expect(res.data).to.be.deep.eql({ schemas: [{ id: collectionName,
+    expect(res.data).toEqual({ schemas: [{ id: collectionName,
             displayName: collectionName,
             allowedOperations: [
                 "get",

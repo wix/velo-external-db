@@ -4,9 +4,11 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "test": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js' --reporter spec",
-    "test-watch": "./node_modules/.bin/mocha './{,!(node_modules)/**}/*.spec.js' --reporter min --watch",
+    "build": "rm -rf ./build && npm run build:proto && tsc",
+    "test": "jest --detectOpenHandles",
+    "test:one": "jest -t 'verify permission for msid param' --detectOpenHandles",
+    "test:watch": "jest --detectOpenHandles --watch",
+    "start": "npm run build && jest --watch",
     "deploy": "gcloud app deploy ./app.yaml"
   },
   "author": "",
@@ -21,11 +23,10 @@
   },
   "devDependencies": {
     "axios": "^0.21.1",
-    "chai": "^4.3.0",
     "chance": "^1.1.7",
-    "deep-equal-in-any-order": "^1.1.4",
     "docker-compose": "^0.23.6",
-    "mocha": "^6.2.3",
-    "sinon": "^9.2.4"
+    "jest": "^26.6.3",
+    "sinon": "^9.2.4",
+    "ts-jest": "^26.5.6"
   }
 }

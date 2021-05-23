@@ -1,4 +1,3 @@
-const { expect } = require('chai')
 const SchemaService = require('./schema')
 const { Uninitialized } = require('../../test/commons/test-commons');
 const gen = require('../../test/drivers/gen');
@@ -10,14 +9,14 @@ describe('Schema Service', () => {
         driver.givenListResult(ctx.dbs)
 
         const actual = await env.schemaService.list()
-        expect( actual ).to.be.deep.eql({ schemas: ctx.dbs });
+        expect( actual ).toEqual({ schemas: ctx.dbs });
     })
 
     it('retrieve collections by ids from provider', async () => {
         driver.givenFindResults(ctx.dbs)
 
         const actual = await env.schemaService.find(ctx.dbs.map(db => db.id))
-        expect( actual ).to.be.deep.eql({ schemas: ctx.dbs });
+        expect( actual ).toEqual({ schemas: ctx.dbs });
     })
 
     it('create collection name', async () => {

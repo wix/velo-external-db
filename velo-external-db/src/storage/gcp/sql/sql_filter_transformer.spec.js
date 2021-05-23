@@ -1,52 +1,52 @@
-const { expect } = require('chai')
 const { EMPTY_FILTER, EMPTY_SORT, FilterParser } = require('./sql_filter_transformer')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
 const { randomFilter } = require('../../../../test/drivers/gen');
-const chance = new require('chance')();
+const Chance = require('chance')
+const chance = Chance();
 
 describe('Sql Parser', () => {
     describe('sort parser', () => {
 
         // todo: should we even check for valid input or should we let the validation library to handle this ?
         it('handles undefined sort', () => {
-            expect( env.filterParser.orderBy('') ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy('    ') ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy(undefined) ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy(null) ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy({invalid: 'object'}) ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy(555) ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy([5555]) ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy(['sdfsdf']) ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy([null]) ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy([undefined]) ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy([{invalid: 'object'}]) ).to.be.deep.eql(EMPTY_SORT)
-            expect( env.filterParser.orderBy([]) ).to.be.deep.eql(EMPTY_SORT)
+            expect( env.filterParser.orderBy('') ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy('    ') ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy(undefined) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy(null) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy({invalid: 'object'}) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy(555) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([5555]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy(['sdfsdf']) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([null]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([undefined]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([{invalid: 'object'}]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([]) ).toEqual(EMPTY_SORT)
         })
 
         it('process single sort expression invalid sort will return empty result', () => {
-            expect( env.filterParser.parseSort({ }) ).to.be.deep.eql([])
-            expect( env.filterParser.parseSort({ invalid: 'object' }) ).to.be.deep.eql([])
+            expect( env.filterParser.parseSort({ }) ).toEqual([])
+            expect( env.filterParser.parseSort({ invalid: 'object' }) ).toEqual([])
         })
 
         it('process single sort expression', () => {
-            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'asc' }) ).to.be.deep.eql([{ expr: `?? ASC`, params: [ctx.fieldName] }])
-            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'aSc' }) ).to.be.deep.eql([{ expr: `?? ASC`, params: [ctx.fieldName] }])
-            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'desc' }) ).to.be.deep.eql([{ expr: `?? DESC`, params: [ctx.fieldName] }])
-            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName }) ).to.be.deep.eql([{ expr: `?? ASC`, params: [ctx.fieldName] }])
+            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'asc' }) ).toEqual([{ expr: `?? ASC`, params: [ctx.fieldName] }])
+            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'aSc' }) ).toEqual([{ expr: `?? ASC`, params: [ctx.fieldName] }])
+            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'desc' }) ).toEqual([{ expr: `?? DESC`, params: [ctx.fieldName] }])
+            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName }) ).toEqual([{ expr: `?? ASC`, params: [ctx.fieldName] }])
         })
 
         it('process single sort with valid expression', () => {
-            expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' }]) ).to.be.deep.eql({sortExpr: 'ORDER BY ?? ASC', sortColumns: [ctx.fieldName]})
+            expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' }]) ).toEqual({sortExpr: 'ORDER BY ?? ASC', sortColumns: [ctx.fieldName]})
         })
 
         it('process single sort with two valid expression', () => {
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
-                { fieldName: ctx.anotherFieldName, direction: 'desc' }]) ).to.be.deep.eql({sortExpr: 'ORDER BY ?? ASC, ?? DESC', sortColumns: [ctx.fieldName, ctx.anotherFieldName]})
+                { fieldName: ctx.anotherFieldName, direction: 'desc' }]) ).toEqual({sortExpr: 'ORDER BY ?? ASC, ?? DESC', sortColumns: [ctx.fieldName, ctx.anotherFieldName]})
         })
 
         it('process single sort with one valid and one invalid expression', () => {
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
-                { invalid: 'object' }]) ).to.be.deep.eql({sortExpr: 'ORDER BY ?? ASC', sortColumns: [ctx.fieldName]})
+                { invalid: 'object' }]) ).toEqual({sortExpr: 'ORDER BY ?? ASC', sortColumns: [ctx.fieldName]})
         })
     })
 
@@ -54,22 +54,22 @@ describe('Sql Parser', () => {
     describe('filter parser', () => {
 
         it('handles undefined filter', () => {
-            expect( env.filterParser.parseFilter('') ).to.be.deep.eql([])
-            // expect( env.filterParser.parseFilter('    ') ).to.be.deep.eql(EMPTY_FILTER)
-            expect( env.filterParser.parseFilter(undefined) ).to.be.deep.eql([])
-            expect( env.filterParser.parseFilter(null) ).to.be.deep.eql([])
-            // expect( env.filterParser.parseFilter({invalid: 'object'}) ).to.be.deep.eql(EMPTY_FILTER)
-            expect( env.filterParser.parseFilter(555) ).to.be.deep.eql([])
-            expect( env.filterParser.parseFilter([5555]) ).to.be.deep.eql([])
-            // expect( env.filterParser.parseFilter(['sdfsdf']) ).to.be.deep.eql(EMPTY_FILTER)
-            // expect( env.filterParser.parseFilter([null]) ).to.be.deep.eql(EMPTY_FILTER)
-            // expect( env.filterParser.parseFilter([undefined]) ).to.be.deep.eql(EMPTY_FILTER)
-            // expect( env.filterParser.parseFilter([{invalid: 'object'}]) ).to.be.deep.eql(EMPTY_FILTER)
-            // expect( env.filterParser.parseFilter([]) ).to.be.deep.eql(EMPTY_FILTER)
+            expect( env.filterParser.parseFilter('') ).toEqual([])
+            // expect( env.filterParser.parseFilter('    ') ).toEqual(EMPTY_FILTER)
+            expect( env.filterParser.parseFilter(undefined) ).toEqual([])
+            expect( env.filterParser.parseFilter(null) ).toEqual([])
+            // expect( env.filterParser.parseFilter({invalid: 'object'}) ).toEqual(EMPTY_FILTER)
+            expect( env.filterParser.parseFilter(555) ).toEqual([])
+            expect( env.filterParser.parseFilter([5555]) ).toEqual([])
+            // expect( env.filterParser.parseFilter(['sdfsdf']) ).toEqual(EMPTY_FILTER)
+            // expect( env.filterParser.parseFilter([null]) ).toEqual(EMPTY_FILTER)
+            // expect( env.filterParser.parseFilter([undefined]) ).toEqual(EMPTY_FILTER)
+            // expect( env.filterParser.parseFilter([{invalid: 'object'}]) ).toEqual(EMPTY_FILTER)
+            // expect( env.filterParser.parseFilter([]) ).toEqual(EMPTY_FILTER)
         })
 
         it('transform filter', () => {
-            expect( env.filterParser.transform(ctx.filter) ).to.be.deep.eql({
+            expect( env.filterParser.transform(ctx.filter) ).toEqual({
                 filterExpr: `WHERE ${env.filterParser.parseFilter(ctx.filter)[0].filterExpr}`,
                 filterColumns: [ctx.filter.fieldName],
                 parameters: env.filterParser.parseFilter(ctx.filter)[0].parameters
@@ -87,7 +87,7 @@ describe('Sql Parser', () => {
                         value: ctx.fieldValue
                     }
 
-                    expect( env.filterParser.parseFilter(filter) ).to.be.deep.eql([{
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `?? ${env.filterParser.veloOperatorToMySqlOperator(o, ctx.fieldValue)} ?`,
                         filterColumns: [ctx.fieldName],
                         parameters: [ctx.fieldValue]
@@ -105,7 +105,7 @@ describe('Sql Parser', () => {
                     value: ctx.fieldListValue
                 }
 
-                expect( env.filterParser.parseFilter(filter) ).to.be.deep.eql([{
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: `?? IN (?, ?, ?, ?, ?)`,
                     filterColumns: [ctx.fieldName],
                     parameters: ctx.fieldListValue
@@ -119,7 +119,7 @@ describe('Sql Parser', () => {
                     fieldName: ctx.fieldName,
                 }
 
-                expect( env.filterParser.parseFilter(filter) ).to.be.deep.eql([{
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: `?? IS NULL`,
                     filterColumns: [ctx.fieldName],
                     parameters: []
@@ -137,7 +137,7 @@ describe('Sql Parser', () => {
                         value: ctx.fieldValue
                     }
 
-                    expect( env.filterParser.parseFilter(filter) ).to.be.deep.eql([{
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `?? LIKE ?`,
                         filterColumns: [ctx.fieldName],
                         parameters: [`%${ctx.fieldValue}%`]
@@ -153,7 +153,7 @@ describe('Sql Parser', () => {
                         value: ctx.fieldValue
                     }
 
-                    expect( env.filterParser.parseFilter(filter) ).to.be.deep.eql([{
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `?? LIKE ?`,
                         filterColumns: [ctx.fieldName],
                         parameters: [`${ctx.fieldValue}%`]
@@ -169,7 +169,7 @@ describe('Sql Parser', () => {
                         value: ctx.fieldValue
                     }
 
-                    expect( env.filterParser.parseFilter(filter) ).to.be.deep.eql([{
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `?? LIKE ?`,
                         filterColumns: [ctx.fieldName],
                         parameters: [`%${ctx.fieldValue}`]
@@ -184,7 +184,7 @@ describe('Sql Parser', () => {
                         value: ctx.fieldListValue
                     }
 
-                    expect( env.filterParser.parseFilter(filter) ).to.be.deep.eql([{
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: 'LOWER(??) RLIKE ?',
                         filterColumns: [ctx.fieldName],
                         parameters: [ctx.fieldListValue.map(s => s.toLowerCase()).join('[- ]')]
@@ -203,7 +203,7 @@ describe('Sql Parser', () => {
                     }
                     const op = o === '$and' ? 'AND' : 'OR'
 
-                    expect( env.filterParser.parseFilter(filter) ).to.be.deep.eql([{
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `${env.filterParser.parseFilter(ctx.filter)[0].filterExpr} ${op} ${env.filterParser.parseFilter(ctx.anotherFilter)[0].filterExpr}`,
                         filterColumns: [ctx.filter.fieldName, ctx.anotherFilter.fieldName],
                         parameters: [].concat(env.filterParser.parseFilter(ctx.filter)[0].parameters)
@@ -219,7 +219,7 @@ describe('Sql Parser', () => {
                     value: ctx.filter
                 }
 
-                expect( env.filterParser.parseFilter(filter) ).to.be.deep.eql([{
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: `NOT (${env.filterParser.parseFilter(ctx.filter)[0].filterExpr})`,
                     filterColumns: [ctx.filter.fieldName],
                     parameters: env.filterParser.parseFilter(ctx.filter)[0].parameters
@@ -253,7 +253,7 @@ describe('Sql Parser', () => {
         ctx.anotherFilter = randomFilter();
     });
 
-    before(function() {
+    beforeAll(function() {
         env.filterParser = new FilterParser
     });
 

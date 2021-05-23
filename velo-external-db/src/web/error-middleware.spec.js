@@ -1,6 +1,6 @@
-const { expect } = require('chai')
 const sinon = require('sinon')
-const chance = new require('chance')();
+const Chance = require('chance')
+const chance = Chance();
 
 // const BadRequestError = require('../model/error/bad-request')
 // const AlreadyExistsError = require('../model/error/already-exists')

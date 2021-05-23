@@ -1,15 +1,14 @@
-const {expect} = require('chai')
 const DataProvider = require('./spanner_data_provider')
 const {SchemaProvider} = require('./spanner_schema_provider')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
 const gen = require('../../../../test/drivers/gen');
-const chance = new require('chance')();
+const Chance = require('chance')
+const chance = Chance();
 const driver = require('../../../../test/drivers/sql_filter_transformer_test_support')
 const resource = require('../../../../test/resources/spanner_resources')
 
 
-describe('Cloud SQL Data Service', function() {
-    this.timeout(5000)
+describe.skip('Spanner Data Service', function() {
 
     const givenCollectionWith = async (entities, forCollection) => {
         await Promise.all( entities.map(e => env.dataProvider.insert(forCollection, e) ))
@@ -21,7 +20,7 @@ describe('Cloud SQL Data Service', function() {
 
         const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
-        expect( res ).to.be.deep.eql([]);
+        expect( res ).toEqual([]);
     });
 
     it('search with non empty filter will return data', async () => {
@@ -41,7 +40,7 @@ describe('Cloud SQL Data Service', function() {
 
         const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
-        expect( res ).to.be.deep.eql([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner > b._owner) ? 1 : -1));
+        expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner > b._owner) ? 1 : -1));
     });
 
     it('search with empty order and filter but with limit and skip', async () => {
@@ -51,7 +50,7 @@ describe('Cloud SQL Data Service', function() {
 
         const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1)
 
-        expect( res ).to.be.deep.eql([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1));
+        expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1));
     });
 
     it('count will run query', async () => {
@@ -60,7 +59,7 @@ describe('Cloud SQL Data Service', function() {
 
         const res = await env.dataProvider.count(ctx.collectionName, ctx.filter)
 
-        expect( res ).to.be.eql(ctx.entities.length);
+        expect( res ).toEqual(ctx.entities.length);
     });
 
     it('count will run query with filter', async () => {
@@ -69,16 +68,16 @@ describe('Cloud SQL Data Service', function() {
 
         const res = await env.dataProvider.count(ctx.collectionName, ctx.filter)
 
-        expect( res ).to.be.eql(1);
+        expect( res ).toEqual(1);
     });
 
     it('bulk insert data into collection name and query all of it', async () => {
         driver.stubEmptyFilterAndSortFor('', '')
 
         await env.dataProvider.insert(ctx.collectionName, ctx.entity)
-        // expect( await env.dataProvider.insert(ctx.collectionName, ctx.entity) ).to.be.eql(1)
+        // expect( await env.dataProvider.insert(ctx.collectionName, ctx.entity) ).toEqual(1)
 
-        expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).to.be.deep.eql([ctx.entity]);
+        expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
     });
 
     it('delete data from collection', async () => {
@@ -87,7 +86,7 @@ describe('Cloud SQL Data Service', function() {
 
         await env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id))
 
-        expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).to.be.deep.eql([]);
+        expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([]);
     });
 
     it('allow update for entity', async () => {
@@ -97,7 +96,7 @@ describe('Cloud SQL Data Service', function() {
 
         await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntity)
 
-        expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).to.be.deep.eql([ctx.modifiedEntity]);
+        expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.modifiedEntity]);
     });
 
     it('if update does not have and updatable fields, do nothing', async () => {
@@ -108,10 +107,8 @@ describe('Cloud SQL Data Service', function() {
 
         env.dataProvider.update(ctx.collectionName, ctx.modifiedEntity)
 
-        expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).to.be.deep.eql([ctx.entity]);
+        expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
     });
-
-
 
     const ctx = {
         collectionName: Uninitialized,
@@ -148,9 +145,9 @@ describe('Cloud SQL Data Service', function() {
         ctx.entities = gen.randomDbEntities([ctx.column.name]);
 
         await env.schemaProvider.create(ctx.collectionName, [ctx.column])
-    });
+    }, 20000);
 
-    before(async function() {
+    beforeAll(async function() {
         const projectId = 'test-project'
         const instanceId = 'test-instance'
         const databaseId = 'test-database'
@@ -159,9 +156,9 @@ describe('Cloud SQL Data Service', function() {
 
         env.dataProvider = new DataProvider(projectId, instanceId, databaseId, driver.filterParser)
         env.schemaProvider = new SchemaProvider(projectId, instanceId, databaseId)
-    });
+    }, 20000);
 
-    after(async () => {
+    afterAll(async () => {
         await resource.shutSpannerEnv()
     });
 })

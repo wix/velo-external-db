@@ -1,4 +1,5 @@
-const chance = new require('chance')();
+const Chance = require('chance')
+const chance = Chance();
 
 const randomObject = () => {
     const obj = {};
