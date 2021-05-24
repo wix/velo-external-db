@@ -1,5 +1,6 @@
 const { promisify } = require('util')
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField } = require('../../../error/errors')
+const translateErrorCodes = require('./sql_exception_translator')
+const { CannotModifySystemField } = require('../../../error/errors')
 
 const SystemFields = [
     {
@@ -77,37 +78,15 @@ class SchemaProvider {
     }
 
     async addColumn(collectionName, column) {
-        try {
-            await this.validateSystemFields(column.name)
-            await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? ADD ?? ${column.type} ${this.defaultForColumnType(column.type)}`, [collectionName, column.name])
-        } catch (err) {
-            this.translateErrorCodesFor(err)
-        }
-    }
-
-    translateErrorCodesFor(err) {
-        switch (err.code) {
-            case 'SYSTEM_FIELD':
-                throw err
-            case 'ER_CANT_DROP_FIELD_OR_KEY':
-                throw new FieldDoesNotExist('Collection does not contain a field with this name')
-            case 'ER_DUP_FIELDNAME':
-                throw new FieldAlreadyExists('Collection already has a field with the same name')
-            case 'ER_NO_SUCH_TABLE':
-                throw new CollectionDoesNotExists('Collection does not exists')
-            default :
-                console.log(err)
-                throw new Error(`default ${err.code}`)
-        }
+        await this.validateSystemFields(column.name)
+        await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? ADD ?? ${column.type} ${this.defaultForColumnType(column.type)}`, [collectionName, column.name])
+                                 .catch( translateErrorCodes )
     }
 
     async removeColumn(collectionName, columnName) {
-        try {
-            await this.validateSystemFields(columnName)
-            return await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
-        } catch (err) {
-            this.translateErrorCodesFor(err)
-        }
+        await this.validateSystemFields(columnName)
+        return await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
+                                        .catch( translateErrorCodes )
     }
 
     async describeCollection(collectionName) {

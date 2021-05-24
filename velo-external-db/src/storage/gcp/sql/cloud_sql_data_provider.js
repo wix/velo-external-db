@@ -1,6 +1,7 @@
 const moment = require('moment')
 const { promisify } = require('util')
 const { SystemFields } = require('./cloud_sql_schema_provider')
+const translateErrorCodes = require('./sql_exception_translator')
 
 class DataProvider {
     constructor(pool, filterParser) {
@@ -13,6 +14,7 @@ class DataProvider {
         const {sortExpr, sortColumns} = this.filterParser.orderBy(sort)
         const sql = this.sqlFormat(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT ?, ?`, [collectionName, ...filterColumns, ...sortColumns])
         const resultset = await promisify(this.pool.query).bind(this.pool)(sql, [...parameters, skip, limit])
+                                                   .catch( translateErrorCodes )
         return resultset
     }
 
@@ -20,6 +22,7 @@ class DataProvider {
         const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
         const sql = this.sqlFormat(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`, [collectionName, ...filterColumns])
         const resultset = await promisify(this.pool.query).bind(this.pool)(sql, parameters)
+                                                   .catch( translateErrorCodes )
         return resultset[0]['num']
     }
 
@@ -28,6 +31,7 @@ class DataProvider {
         const sql = this.sqlFormat(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES (${this.wildCardWith(n, '?')})`, [collectionName, ...Object.keys(item)])
 
         const resultset = await promisify(this.pool.query).bind(this.pool)(sql, this.asParamArrays( this.patchDateTime(item) ) )
+                                                   .catch( translateErrorCodes )
         return resultset.affectedRows
     }
 
@@ -43,12 +47,14 @@ class DataProvider {
         const updatable = [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
 
         const resultset = await promisify(this.pool.query).bind(this.pool)(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
+                                                   .catch( translateErrorCodes )
         return resultset.changedRows
     }
 
     async delete(collectionName, itemIds) {
         const sql = this.sqlFormat(`DELETE FROM ?? WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`, [collectionName])
-        const rs = await promisify(this.pool.query).bind(this.pool)(sql, itemIds);
+        const rs = await promisify(this.pool.query).bind(this.pool)(sql, itemIds)
+                                            .catch( translateErrorCodes )
         return rs.affectedRows
     }
 
