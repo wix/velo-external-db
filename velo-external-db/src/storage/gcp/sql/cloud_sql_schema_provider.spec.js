@@ -1,4 +1,5 @@
 const {SchemaProvider, SystemFields} = require('./cloud_sql_schema_provider')
+const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('../../../error/errors')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
 const mysql = require('../../../../test/resources/mysql_resources');
 const gen = require('../../../../test/drivers/gen');
@@ -6,12 +7,12 @@ const Chance = require('chance')
 const chance = Chance();
 
 
-describe.only('Cloud SQL Service', function() {
+describe('Cloud SQL Service', function() {
 
     describe('Schema API', () => {
         it('list of empty db will result with an empty array', async () => {
             const db = await env.schemaProvider.list()
-            console.log(db.length)
+
             expect(db).toEqual([])
         })
 
@@ -207,7 +208,7 @@ describe.only('Cloud SQL Service', function() {
         })
 
         it('add column on a non existing collection will fail', async () => {
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
+            await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})).rejects.toThrow(CollectionDoesNotExists)
         })
 
         it('add column on a an existing collection', async () => {
@@ -238,7 +239,8 @@ describe.only('Cloud SQL Service', function() {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
+
+            await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})).rejects.toThrow(FieldAlreadyExists)
         })
 
         it('add system column will fail', async () => {
@@ -246,7 +248,7 @@ describe.only('Cloud SQL Service', function() {
 
             SystemFields.map(f => f.name)
                         .map(async f => {
-                            await env.schemaProvider.addColumn(ctx.collectionName, {name: f, type: 'timestamp'})
+                            await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: f, type: 'timestamp'})).rejects.toThrow(CannotModifySystemField)
                         })
         })
 
@@ -262,7 +264,7 @@ describe.only('Cloud SQL Service', function() {
         it('drop column on a a non existing collection', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
-            await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
+            await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
         })
 
         it('drop system column will fail', async () => {
@@ -270,7 +272,7 @@ describe.only('Cloud SQL Service', function() {
 
             SystemFields.map(f => f.name)
                 .map(async f => {
-                    await env.schemaProvider.removeColumn(ctx.collectionName, f)
+                    await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
                 })
         })
     })

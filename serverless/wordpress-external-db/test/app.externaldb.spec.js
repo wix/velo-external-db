@@ -5,7 +5,7 @@ const {Uninitialized} = require('./commons/test-commons');
 const wrapper = require('../generated/proto-generated');
 const { dbs } = require('../src/data/schema');
 
-describe.only('serverless REST e2e', function() {
+describe('serverless REST e2e', function() {
     this.timeout(5000)
 
     const testkit = app('wordpress-external-db').beforeAndAfter(10000);
