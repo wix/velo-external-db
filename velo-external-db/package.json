@@ -4,7 +4,6 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "build": "rm -rf ./build && npm run build:proto && tsc",
     "test": "jest --detectOpenHandles",
     "test:one": "jest -t 'verify permission for msid param' --detectOpenHandles",
     "test:watch": "jest --detectOpenHandles --watch",
