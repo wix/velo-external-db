@@ -8,6 +8,7 @@ const run = google.run("v1");
 const cloudResourceManager = google.cloudresourcemanager("v1");
 const inquirer = require('inquirer');
 const fs = require('fs');
+const { v4: uuid } = require('uuid')
 
 const serviceAccountRaw = fs.readFileSync("serviceAccountCredentials.json", "utf8");
 const serviceAccount = JSON.parse(serviceAccountRaw)
@@ -262,10 +263,42 @@ const createCollection = async (collectionName, secretKey, serviceUrl) => {
 }
 
 const addColumnToCollection = async (collectionName, secretKey, serviceUrl) => {
-    return await axios.post(`${serviceUrl}/schemas/column/add`, {
+    await axios.post(`${serviceUrl}/schemas/column/add`, {
         collectionName: collectionName,
         requestContext: {settings: {secretKey: secretKey}},
         column: {name: 'demo_column', type: 'varchar(256)', isPrimary: false}
+    })
+
+    await axios.post(`${serviceUrl}/schemas/column/add`, {
+        collectionName: collectionName,
+        requestContext: {settings: {secretKey: secretKey}},
+        column: {name: 'title', type: 'varchar(256)', isPrimary: false}
+    })
+
+    await axios.post(`${serviceUrl}/schemas/column/add`, {
+        collectionName: collectionName,
+        requestContext: {settings: {secretKey: secretKey}},
+        column: {name: 'description', type: 'varchar(256)', isPrimary: false}
+    })
+}
+
+const generateSampleData = async (collectionName, secretKey, serviceUrl) => {
+    await axios.post(`${serviceUrl}/data/insert`, {
+        collectionName: collectionName,
+        requestContext: {settings: {secretKey: secretKey}},
+        item: { _id: uuid(), demo_column: 'sample data', title: 'title1', description: 'description1'}
+    })
+
+    await axios.post(`${serviceUrl}/data/insert`, {
+        collectionName: collectionName,
+        requestContext: {settings: {secretKey: secretKey}},
+        item: { _id: uuid(), demo_column: 'sample data', title: 'title2', description: 'description2'}
+    })
+
+    await axios.post(`${serviceUrl}/data/insert`, {
+        collectionName: collectionName,
+        requestContext: {settings: {secretKey: secretKey}},
+        item: { _id: uuid(), demo_column: 'sample data', title: 'title3', description: 'description3'}
     })
 }
 
@@ -302,6 +335,10 @@ const demo = async (authorization, msId, siteId, secretKey) => {
     console.log(`${green('[INFO]:')} Creating Velo Db schema using schema API`)
     await startSpinnerWith(`Creating demo collection`, () => createCollection('demo_collection', secretKey, serviceUrl))
     await startSpinnerWith(`Adding Column to demo collection`, () => addColumnToCollection('demo_collection', secretKey, serviceUrl))
+
+    await generateSampleData('demo_collection', secretKey, serviceUrl)
+
+    await startSpinnerWith(`Generating sample data`, () => generateSampleData('demo_collection', secretKey, serviceUrl))
 
     console.log('')
     console.log('')

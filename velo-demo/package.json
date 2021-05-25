@@ -19,6 +19,7 @@
     "googleapis": "^66.0.0",
     "inquirer": "^8.0.0",
     "node-banner": "^1.4.0",
-    "poll-until-promise": "^3.6.1"
+    "poll-until-promise": "^3.6.1",
+    "uuid": "^8.3.2"
   }
 }
