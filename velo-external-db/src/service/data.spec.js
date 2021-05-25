@@ -64,6 +64,8 @@ describe('Data Service', () => {
     };
 
     beforeEach(() => {
+        driver.reset()
+
         ctx.collectionName = gen.randomCollectionName()
         ctx.filter = chance.word();
         ctx.sort = chance.word();

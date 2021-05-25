@@ -48,6 +48,8 @@ describe('Schema Service', () => {
     };
 
     beforeEach(() => {
+        driver.reset()
+
         ctx.dbs = gen.randomDbs()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()

@@ -1,19 +1,34 @@
-const sinon = require('sinon');
-const { DataProvider } = require('../../src/storage/storage')
 const { unpackDates } = require('../../src/service/transform')
-const dataProvider = sinon.createStubInstance(DataProvider)
+const { when } = require('jest-when')
+
+const dataProvider = {
+    find: jest.fn(),
+    count: jest.fn(),
+    insert: jest.fn(),
+    update: jest.fn(),
+}
 
 const givenListResult = (entities, forCollectionName, filter, sort, skip, andLimit) =>
-    dataProvider.find.withArgs(forCollectionName, filter, sort, skip, andLimit).resolves(entities.map( unpackDates ))
+    when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit)
+                           .mockResolvedValue(entities.map( unpackDates ))
 
 const givenCountResult = (total, forCollectionName, filter) =>
-    dataProvider.count.withArgs(forCollectionName, filter).resolves(total)
+    when(dataProvider.count).calledWith(forCollectionName, filter)
+                            .mockResolvedValue(total)
 
 const expectInsertFor = (item, forCollectionName) =>
-    dataProvider.insert.withArgs(forCollectionName, unpackDates(item)).resolves(1)
+    when(dataProvider.insert).calledWith(forCollectionName, unpackDates(item))
+                             .mockResolvedValue(1)
 
 const expectUpdateFor = (item, forCollectionName) =>
-    dataProvider.update.withArgs(forCollectionName, unpackDates(item)).resolves(1)
+    when(dataProvider.update).calledWith(forCollectionName, unpackDates(item))
+                             .mockResolvedValue(1)
 
+const reset = () => {
+    dataProvider.find.mockClear()
+    dataProvider.count.mockClear()
+    dataProvider.insert.mockClear()
+    dataProvider.update.mockClear()
+}
 
-module.exports = { givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult }
+module.exports = { givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult, reset }

@@ -1,21 +1,38 @@
-const sinon = require('sinon');
-const { SchemaProvider } = require('../../src/storage/storage')
-const schemaProvider = sinon.createStubInstance(SchemaProvider)
+const { when } = require('jest-when')
+
+const schemaProvider = {
+    list: jest.fn(),
+    describeCollection: jest.fn(),
+    create: jest.fn(),
+    addColumn: jest.fn(),
+    removeColumn: jest.fn(),
+}
 
 const givenListResult = (dbs) =>
-    schemaProvider.list.resolves(dbs)
+    schemaProvider.list.mockResolvedValue(dbs)
 
 const givenFindResults = (dbs) =>
-    dbs.forEach(db => schemaProvider.describeCollection.withArgs(db.id).resolves(db))
+    dbs.forEach(db => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db) )
 
 const expectCreateOf = (collectionName) =>
-    schemaProvider.create.withArgs(collectionName).resolves()
+    when(schemaProvider.create).calledWith(collectionName)
+                               .mockResolvedValue()
 
 const expectCreateColumnOf = (column, collectionName) =>
-    schemaProvider.addColumn.withArgs(collectionName, column).resolves()
+    when(schemaProvider.addColumn).calledWith(collectionName, column)
+                                  .mockResolvedValue()
 
 const expectRemoveColumnOf = (columnName, collectionName) =>
-    schemaProvider.removeColumn.withArgs(collectionName, columnName).resolves()
+    when(schemaProvider.removeColumn).calledWith(collectionName, columnName)
+                                     .mockResolvedValue()
+
+const reset = () => {
+    schemaProvider.list.mockClear()
+    schemaProvider.describeCollection.mockClear()
+    schemaProvider.create.mockClear()
+    schemaProvider.addColumn.mockClear()
+    schemaProvider.removeColumn.mockClear()
+}
 
 
-module.exports = { givenFindResults, expectRemoveColumnOf, givenListResult, expectCreateOf, expectCreateColumnOf, schemaProvider }
+module.exports = { givenFindResults, expectRemoveColumnOf, givenListResult, expectCreateOf, expectCreateColumnOf, schemaProvider, reset }
