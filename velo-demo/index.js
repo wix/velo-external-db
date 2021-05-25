@@ -154,8 +154,10 @@ const provisionCloudRun = async (instanceId, secretKey, authorization) => {
 }
 
 const registerEndpointWithWix = async (serviceUrl, secretKey, authorization) => {
+    const randomPart = uuid().substring(0, 8)
+
     await axios.post(`https://code.wix.com/_api/cloud-data/v1/connector/settings/register`, {
-        id: { namespace: "velo_demo"},
+        id: { namespace: `velo_demo ${randomPart}`},
         endpoint: serviceUrl,
         configuration: { secretKey: secretKey }
     }, { headers: {
