@@ -129,6 +129,10 @@ class SchemaProvider {
         const type = dbType.toLowerCase()
                            .split('(')
                            .shift()
+
+        if (!TypeConverter.find(t => t.dbType === type)) {
+            console.error(`can't find type for ${dbType}`)
+        }
         return TypeConverter.find(t => t.dbType === type).wixDataType
 
     }
