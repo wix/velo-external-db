@@ -3,7 +3,6 @@ const { authMiddleware } = require('./auth-middleware');
 const { UnauthorizedError } = require('../error/errors')
 const Chance = require('chance')
 const chance = Chance();
-const sinon = require('sinon')
 
 const requestBodyWith = secretKey => ({ body: {
         requestContext: {
@@ -26,7 +25,7 @@ describe('Auth Middleware', () => {
     beforeEach(() => {
         ctx.secretKey = chance.word()
         ctx.anotherSecretKey = chance.word()
-        ctx.next = sinon.mock()
+        ctx.next = jest.fn().mockName('next')
 
         env.auth = authMiddleware({ secretKey: ctx.secretKey })
     });
@@ -47,6 +46,7 @@ describe('Auth Middleware', () => {
     it('should call next when secret key matches', () => {
       env.auth(requestBodyWith(ctx.secretKey), Uninitialized, ctx.next)
 
-      sinon.assert.calledOnce(ctx.next)
+      expect(ctx.next).toHaveBeenCalled()
+
     })
 })

@@ -3,15 +3,15 @@ const chance = Chance();
 const errors = require('../error/errors')
 const { errorMiddleware } = require('./error-middleware')
 
-describe.skip('Error Middleware', () => {
+describe('Error Middleware', () => {
   const ctx = {
     res: null,
   }
 
   beforeEach(() => {
     ctx.res = {
-      status: jest.fn().mockName('status').mockReturnThis()/*.mockName('status')*/,
-      send: jest.fn().mockName('send').mockReturnThis()/*.mockName('send')*/
+      status: jest.fn().mockName('status').mockReturnThis(),
+      send: jest.fn().mockName('send').mockReturnThis()
     }
   })
 

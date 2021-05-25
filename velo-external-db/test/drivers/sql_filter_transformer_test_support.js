@@ -1,7 +1,10 @@
-const sinon = require('sinon');
-const { EMPTY_SORT, FilterParser } = require('../../src/storage/gcp/sql/sql_filter_transformer')
+const { EMPTY_SORT } = require('../../src/storage/gcp/sql/sql_filter_transformer')
+const { when } = require('jest-when')
 
-const filterParser = sinon.createStubInstance(FilterParser)
+const filterParser = {
+    transform: jest.fn(),
+    orderBy: jest.fn(),
+}
 
 const stubEmptyFilterAndSortFor = (filter, sort) => {
     stubEmptyFilterFor(filter)
@@ -9,20 +12,29 @@ const stubEmptyFilterAndSortFor = (filter, sort) => {
 }
 
 const stubEmptyFilterFor = (filter) => {
-    filterParser.transform.withArgs(filter).returns({ filterExpr: '', filterColumns: [], parameters: [] })
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: '', filterColumns: [], parameters: [] })
 }
 
 const stubEmptyOrderByFor = (sort) => {
-    filterParser.orderBy.withArgs(sort).returns( EMPTY_SORT )
+    when(filterParser.orderBy).calledWith(sort)
+                              .mockReturnValue(EMPTY_SORT)
 }
 
 const givenOrderByFor = (column, sort) => {
-    filterParser.orderBy.withArgs(sort).returns({ sortExpr: 'ORDER BY ?? ASC', sortColumns: [column] })
+    when(filterParser.orderBy).calledWith(sort)
+                              .mockReturnValue({ sortExpr: 'ORDER BY ?? ASC', sortColumns: [column] })
 }
 
 
 const givenFilterByIdWith = (id, filter) => {
-    filterParser.transform.withArgs(filter).returns({ filterExpr: 'WHERE ?? = ?', filterColumns: ['_id'], parameters: [id] })
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: 'WHERE ?? = ?', filterColumns: ['_id'], parameters: [id] })
 }
 
-module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor, stubEmptyFilterFor, givenFilterByIdWith, filterParser }
+const reset = () => {
+    filterParser.transform.mockClear()
+    filterParser.orderBy.mockClear()
+}
+
+module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor, stubEmptyFilterFor, givenFilterByIdWith, filterParser, reset }
