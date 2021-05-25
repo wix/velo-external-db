@@ -48,6 +48,11 @@ const TypeConverter = [
     },
 
     {
+        wixDataType: 'datetime',
+        dbType: 'datetime'
+    },
+
+    {
         wixDataType: 'object',
         dbType: 'json'
     },
