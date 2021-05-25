@@ -7,7 +7,7 @@
     "test": "jest --detectOpenHandles",
     "test:one": "jest -t 'verify permission for msid param' --detectOpenHandles",
     "test:watch": "jest --detectOpenHandles --watch",
-    "start": "npm run build && jest --watch",
+    "start": "node src/app.js",
     "deploy": "gcloud app deploy ./app.yaml"
   },
   "author": "",
