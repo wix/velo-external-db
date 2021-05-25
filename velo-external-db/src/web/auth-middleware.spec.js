@@ -1,4 +1,3 @@
-// const { expect } = require('chai')
 const { Uninitialized } = require('../../test/commons/test-commons');
 const { authMiddleware } = require('./auth-middleware');
 const { UnauthorizedError } = require('../error/errors')

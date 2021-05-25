@@ -1,13 +1,39 @@
-class UnauthorizedError extends Error {}
-class CollectionDoesNotExists extends Error {}
-class FieldAlreadyExists extends Error {}
-class FieldDoesNotExist extends Error {}
-class CannotModifySystemField extends Error {
-    constructor(message) {
-        super();
-        this.message = message;
-        this.code = 'SYSTEM_FIELD'
+class BaseHttpError extends Error {
+    constructor(message, status) {
+        super(message);
+        this.status = status
     }
 }
+
+class UnauthorizedError extends BaseHttpError {
+    constructor(message) {
+        super(message, 401);
+    }
+}
+
+class CollectionDoesNotExists extends BaseHttpError {
+    constructor(message) {
+        super(message, 404);
+    }
+}
+
+class FieldAlreadyExists extends BaseHttpError {
+    constructor(message) {
+        super(message, 400);
+    }
+}
+
+class FieldDoesNotExist extends BaseHttpError {
+    constructor(message) {
+        super(message, 404);
+    }
+}
+
+class CannotModifySystemField extends BaseHttpError {
+    constructor(message) {
+        super(message, 400);
+    }
+}
+
 
 module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField }
