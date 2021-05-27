@@ -14,7 +14,7 @@ describe.skip('Spanner Data Service', function() {
         await Promise.all( entities.map(e => env.dataProvider.insert(forCollection, e) ))
     }
 
-    it('search with empty filter and order by and no data', async () => {
+    test('search with empty filter and order by and no data', async () => {
         driver.stubEmptyFilterFor(ctx.filter)
         driver.stubEmptyOrderByFor(ctx.sort)
 
@@ -23,7 +23,7 @@ describe.skip('Spanner Data Service', function() {
         expect( res ).toEqual([]);
     });
 
-    it('search with non empty filter will return data', async () => {
+    test('search with non empty filter will return data', async () => {
         await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
         driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
         driver.stubEmptyOrderByFor(ctx.sort)
@@ -33,7 +33,7 @@ describe.skip('Spanner Data Service', function() {
         expect( res ).to.have.same.deep.members([ctx.entity]);
     });
 
-    it('search with non empty order by will return sorted data', async () => {
+    test('search with non empty order by will return sorted data', async () => {
         await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
         driver.stubEmptyFilterFor(ctx.filter)
         driver.givenOrderByFor('_owner', ctx.sort)
@@ -43,7 +43,7 @@ describe.skip('Spanner Data Service', function() {
         expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner > b._owner) ? 1 : -1));
     });
 
-    it('search with empty order and filter but with limit and skip', async () => {
+    test('search with empty order and filter but with limit and skip', async () => {
         await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
         driver.stubEmptyFilterFor(ctx.filter)
         driver.givenOrderByFor('_owner', ctx.sort)
@@ -53,7 +53,7 @@ describe.skip('Spanner Data Service', function() {
         expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1));
     });
 
-    it('count will run query', async () => {
+    test('count will run query', async () => {
         await givenCollectionWith(ctx.entities, ctx.collectionName)
         driver.stubEmptyFilterFor(ctx.filter)
 
@@ -62,7 +62,7 @@ describe.skip('Spanner Data Service', function() {
         expect( res ).toEqual(ctx.entities.length);
     });
 
-    it('count will run query with filter', async () => {
+    test('count will run query with filter', async () => {
         await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
         driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
 
@@ -71,7 +71,7 @@ describe.skip('Spanner Data Service', function() {
         expect( res ).toEqual(1);
     });
 
-    it('bulk insert data into collection name and query all of it', async () => {
+    test('bulk insert data into collection name and query all of it', async () => {
         driver.stubEmptyFilterAndSortFor('', '')
 
         await env.dataProvider.insert(ctx.collectionName, ctx.entity)
@@ -80,7 +80,7 @@ describe.skip('Spanner Data Service', function() {
         expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
     });
 
-    it('delete data from collection', async () => {
+    test('delete data from collection', async () => {
         await givenCollectionWith(ctx.entities, ctx.collectionName)
         driver.stubEmptyFilterAndSortFor('', '')
 
@@ -89,7 +89,7 @@ describe.skip('Spanner Data Service', function() {
         expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([]);
     });
 
-    it('allow update for entity', async () => {
+    test('allow update for entity', async () => {
         await givenCollectionWith([ctx.entity], ctx.collectionName)
         driver.stubEmptyFilterFor('')
         driver.stubEmptyOrderByFor('')
@@ -99,7 +99,7 @@ describe.skip('Spanner Data Service', function() {
         expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.modifiedEntity]);
     });
 
-    it('if update does not have and updatable fields, do nothing', async () => {
+    test('if update does not have and updatable fields, do nothing', async () => {
         await givenCollectionWith([ctx.entity], ctx.collectionName)
         driver.stubEmptyFilterFor('')
         driver.stubEmptyOrderByFor('')

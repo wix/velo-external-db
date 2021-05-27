@@ -7,21 +7,21 @@ const chance = new Chance();
 
 describe('Data Service', () => {
 
-    it('delegate request to data provider and translate data to velo format', async () => {
+    test('delegate request to data provider and translate data to velo format', async () => {
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
         const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
         expect( actual ).toEqual({ items: ctx.entities, totalCount: 0 });
     })
 
-    it('count data from collection', async () => {
+    test('count data from collection', async () => {
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
 
         const actual = await env.dataService.count(ctx.collectionName, ctx.filter)
         expect( actual ).toEqual({ totalCount: ctx.total });
     })
 
-    it('get by id will issue a call to find and transform the result', async () => {
+    test('get by id will issue a call to find and transform the result', async () => {
         driver.givenListResult([ctx.entity], ctx.collectionName,
                         { kind: 'filter',
                                operator: '$eq',
@@ -33,14 +33,14 @@ describe('Data Service', () => {
         expect( actual ).toEqual({ item: ctx.entity });
     })
 
-    it('insert will insert data into db', async () => {
+    test('insert will insert data into db', async () => {
         driver.expectInsertFor(ctx.entity, ctx.collectionName)
 
         const actual = await env.dataService.insert(ctx.collectionName, ctx.entity)
         return expect( actual  ).toEqual({ item: ctx.entity });
     })
 
-    it('update will update data into db', async () => {
+    test('update will update data into db', async () => {
         driver.expectUpdateFor(ctx.entity, ctx.collectionName)
 
         const actual = await env.dataService.update(ctx.collectionName, ctx.entity)

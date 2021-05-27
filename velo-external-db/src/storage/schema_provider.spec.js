@@ -50,13 +50,13 @@ describe('Schema API', () => {
         // ['Spanner', env2],
     ]).describe('%s', (name, env) => {
 
-        it('list of empty db will result with an empty array', async () => {
+        test('list of empty db will result with an empty array', async () => {
             const db = await env.schemaProvider.list()
 
             expect(db).toEqual([])
         })
 
-        it('create collection with default columns', async () => {
+        test('create collection with default columns', async () => {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.list()
@@ -149,7 +149,7 @@ describe('Schema API', () => {
             }])
         })
 
-        it('retrieve collection data by collection name', async () => {
+        test('retrieve collection data by collection name', async () => {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
@@ -242,16 +242,16 @@ describe('Schema API', () => {
             })
         })
 
-        it('create collection twice will do nothing', async () => {
+        test('create collection twice will do nothing', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
             await env.schemaProvider.create(ctx.collectionName, [])
         })
 
-        it('add column on a non existing collection will fail', async () => {
+        test('add column on a non existing collection will fail', async () => {
             await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})).rejects.toThrow(CollectionDoesNotExists)
         })
 
-        it('add column on a an existing collection', async () => {
+        test('add column on a an existing collection', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
@@ -275,7 +275,7 @@ describe('Schema API', () => {
                                                                              ]})
         })
 
-        it('add duplicate column will fail', async () => {
+        test('add duplicate column will fail', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
@@ -283,7 +283,7 @@ describe('Schema API', () => {
             await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})).rejects.toThrow(FieldAlreadyExists)
         })
 
-        it('add system column will fail', async () => {
+        test('add system column will fail', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             SystemFields.map(f => f.name)
@@ -292,7 +292,7 @@ describe('Schema API', () => {
                         })
         })
 
-        it('drop column on a an existing collection', async () => {
+        test('drop column on a an existing collection', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
             await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
 
@@ -301,13 +301,13 @@ describe('Schema API', () => {
             expect((await env.schemaProvider.describeCollection(ctx.collectionName)).fields).not.toHaveProperty(ctx.columnName)
         })
 
-        it('drop column on a a non existing collection', async () => {
+        test('drop column on a a non existing collection', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
         })
 
-        it('drop system column will fail', async () => {
+        test('drop system column will fail', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             SystemFields.map(f => f.name)

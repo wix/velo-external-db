@@ -8,7 +8,7 @@ describe('Sql Parser', () => {
     describe('sort parser', () => {
 
         // todo: should we even check for valid input or should we let the validation library to handle this ?
-        it('handles undefined sort', () => {
+        test('handles undefined sort', () => {
             expect( env.filterParser.orderBy('') ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy('    ') ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy(undefined) ).toEqual(EMPTY_SORT)
@@ -23,28 +23,28 @@ describe('Sql Parser', () => {
             expect( env.filterParser.orderBy([]) ).toEqual(EMPTY_SORT)
         })
 
-        it('process single sort expression invalid sort will return empty result', () => {
+        test('process single sort expression invalid sort will return empty result', () => {
             expect( env.filterParser.parseSort({ }) ).toEqual([])
             expect( env.filterParser.parseSort({ invalid: 'object' }) ).toEqual([])
         })
 
-        it('process single sort expression', () => {
+        test('process single sort expression', () => {
             expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'asc' }) ).toEqual([{ expr: `?? ASC`, params: [ctx.fieldName] }])
             expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'aSc' }) ).toEqual([{ expr: `?? ASC`, params: [ctx.fieldName] }])
             expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'desc' }) ).toEqual([{ expr: `?? DESC`, params: [ctx.fieldName] }])
             expect( env.filterParser.parseSort({ fieldName: ctx.fieldName }) ).toEqual([{ expr: `?? ASC`, params: [ctx.fieldName] }])
         })
 
-        it('process single sort with valid expression', () => {
+        test('process single sort with valid expression', () => {
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' }]) ).toEqual({sortExpr: 'ORDER BY ?? ASC', sortColumns: [ctx.fieldName]})
         })
 
-        it('process single sort with two valid expression', () => {
+        test('process single sort with two valid expression', () => {
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
                 { fieldName: ctx.anotherFieldName, direction: 'desc' }]) ).toEqual({sortExpr: 'ORDER BY ?? ASC, ?? DESC', sortColumns: [ctx.fieldName, ctx.anotherFieldName]})
         })
 
-        it('process single sort with one valid and one invalid expression', () => {
+        test('process single sort with one valid and one invalid expression', () => {
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
                 { invalid: 'object' }]) ).toEqual({sortExpr: 'ORDER BY ?? ASC', sortColumns: [ctx.fieldName]})
         })
@@ -53,7 +53,7 @@ describe('Sql Parser', () => {
 
     describe('filter parser', () => {
 
-        it('handles undefined filter', () => {
+        test('handles undefined filter', () => {
             expect( env.filterParser.parseFilter('') ).toEqual([])
             // expect( env.filterParser.parseFilter('    ') ).toEqual(EMPTY_FILTER)
             expect( env.filterParser.parseFilter(undefined) ).toEqual([])
@@ -68,7 +68,7 @@ describe('Sql Parser', () => {
             // expect( env.filterParser.parseFilter([]) ).toEqual(EMPTY_FILTER)
         })
 
-        it('transform filter', () => {
+        test('transform filter', () => {
             expect( env.filterParser.transform(ctx.filter) ).toEqual({
                 filterExpr: `WHERE ${env.filterParser.parseFilter(ctx.filter)[0].filterExpr}`,
                 filterColumns: [ctx.filter.fieldName],
@@ -79,7 +79,7 @@ describe('Sql Parser', () => {
         describe('handle single field operator', () => {
             ['$ne', '$lt', '$lte', '$gt', '$gte', '$eq', ].forEach(o => {
 
-                it(`correctly transform operator [${o}]`, () => {
+                test(`correctly transform operator [${o}]`, () => {
                     const filter = {
                         // kind: 'filter',
                         operator: o,
@@ -97,7 +97,7 @@ describe('Sql Parser', () => {
             })
 
             // todo: $hasAll ???
-            it(`correctly transform operator [$hasSome]`, () => {
+            test(`correctly transform operator [$hasSome]`, () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$hasSome',
@@ -112,7 +112,7 @@ describe('Sql Parser', () => {
                 }])
             })
 
-            it(`correctly transform operator [$eq] with null value`, () => {
+            test(`correctly transform operator [$eq] with null value`, () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$eq',
@@ -129,7 +129,7 @@ describe('Sql Parser', () => {
 
             describe('handle string operators', () => {
                 //'$contains', '', ''
-                it(`correctly transform operator [$contains]`, () => {
+                test(`correctly transform operator [$contains]`, () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$contains',
@@ -145,7 +145,7 @@ describe('Sql Parser', () => {
 
                 })
 
-                it(`correctly transform operator [$startsWith]`, () => {
+                test(`correctly transform operator [$startsWith]`, () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$startsWith',
@@ -161,7 +161,7 @@ describe('Sql Parser', () => {
 
                 })
 
-                it(`correctly transform operator [$endsWith]`, () => {
+                test(`correctly transform operator [$endsWith]`, () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$endsWith',
@@ -176,7 +176,7 @@ describe('Sql Parser', () => {
                     }])
                 })
 
-                it(`correctly transform operator [$urlized]`, () => {
+                test(`correctly transform operator [$urlized]`, () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$urlized',
@@ -195,7 +195,7 @@ describe('Sql Parser', () => {
         describe('handle multi field operator', () => {
             ['$and', '$or'].forEach(o => {
 
-                it(`correctly transform operator [${o}]`, () => {
+                test(`correctly transform operator [${o}]`, () => {
                     const filter = {
                         // kind: 'filter',
                         operator: o,
@@ -212,7 +212,7 @@ describe('Sql Parser', () => {
                 })
             })
 
-            it(`correctly transform operator [$not]`, () => {
+            test(`correctly transform operator [$not]`, () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$not',

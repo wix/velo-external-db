@@ -17,7 +17,7 @@ describe('Error Middleware', () => {
 
   describe('errorMiddleware', () => {
 
-    it('converts unknown error with message and default status code of 500', () => {
+    test('converts unknown error with message and default status code of 500', () => {
       const err = new Error(chance.word())
 
       errorMiddleware(err, null, ctx.res)
@@ -26,7 +26,7 @@ describe('Error Middleware', () => {
       expect(ctx.res.send).toHaveBeenCalledWith( { message: err.message } )
     })
 
-    it('converts exceptions to http error response', () => {
+    test('converts exceptions to http error response', () => {
       Object.values(errors)
             .forEach(Exception => {
               const err = new Exception(chance.word())

@@ -14,35 +14,35 @@ const axios = require('axios').create({
 
 
 describe('Velo External DB', function () {
-    it('answer default page with a welcoming response', async () => {
+    test('answer default page with a welcoming response', async () => {
         expect((await axios.get(`/`)).data).to.contain('<!doctype html>');
     })
 
-    it('answer provision with stub response', async () => {
+    test('answer provision with stub response', async () => {
         expect((await axios.post(`/provision`, {}, auth)).data).toEqual({});
     })
 
     describe('Schema API', () => {
 
-        it('list', async () => {
+        test('list', async () => {
             expect((await axios.post(`/schemas/list`, {}, auth)).data).toEqual({ schemas: []});
         })
 
-        it('create', async () => {
+        test('create', async () => {
             await schema.givenCollection(ctx.collectionName, [], auth)
 
             const res = await axios.post(`/schemas/list`, {}, auth)
             schema.expectDefaultCollectionWith(ctx.collectionName, res)
         })
 
-        it('find', async () => {
+        test('find', async () => {
             await schema.givenCollection(ctx.collectionName, [], auth)
 
             const res = await axios.post(`/schemas/find`, { schemaIds: [ctx.collectionName]}, auth)
             schema.expectDefaultCollectionWith(ctx.collectionName, res)
         })
 
-        it('add column', async () => {
+        test('add column', async () => {
             await schema.givenCollection(ctx.collectionName, [], auth)
 
             await axios.post(`/schemas/column/add`, {collectionName: ctx.collectionName, column: ctx.column}, auth)
@@ -66,7 +66,7 @@ describe('Velo External DB', function () {
                                           ]})
         })
 
-        it('remove column', async () => {
+        test('remove column', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
 
             await axios.post(`/schemas/column/remove`, {collectionName: ctx.collectionName, columnName: ctx.column.name}, auth)
@@ -79,7 +79,7 @@ describe('Velo External DB', function () {
 
     describe('Data API', () => {
 
-        it('find api', async () => {
+        test('find api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, auth)
 
@@ -87,7 +87,7 @@ describe('Velo External DB', function () {
                                                                                                                                                                                               totalCount: 0});
         })
 
-        it('delete one api', async () => {
+        test('delete one api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item], ctx.collectionName, auth)
 
@@ -96,14 +96,14 @@ describe('Velo External DB', function () {
             expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ ], totalCount: 0});
         })
 
-        it('get by id api', async () => {
+        test('get by id api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item], ctx.collectionName, auth)
 
             expect((await axios.post(`/data/get`, {collectionName: ctx.collectionName, itemId: ctx.item._id}, auth)).data).toEqual({ item: ctx.item });
         })
 
-        it('update api e2e', async () => {
+        test('update api e2e', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item], ctx.collectionName, auth)
 
@@ -112,7 +112,7 @@ describe('Velo External DB', function () {
             expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ctx.modifiedItem], totalCount: 0});
         })
 
-        it('count api', async () => {
+        test('count api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, auth)
 
