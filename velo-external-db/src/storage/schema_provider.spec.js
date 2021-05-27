@@ -1,15 +1,55 @@
-const {SchemaProvider, SystemFields} = require('./cloud_sql_schema_provider')
-const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('../../../error/errors')
-const { Uninitialized } = require('../../../../test/commons/test-commons');
-const mysql = require('../../../../test/resources/mysql_resources');
-const gen = require('../../../../test/drivers/gen');
+const cloudSql = require('./gcp/sql/cloud_sql_schema_provider')
+const spanner = require('./gcp/spanner/spanner_schema_provider')
+const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('../error/errors')
+const { Uninitialized } = require('../../test/commons/test-commons');
+const mysql = require('../../test/resources/mysql_resources');
+const resource = require('../../test/resources/spanner_resources');
+const gen = require('../../test/drivers/gen');
 const Chance = require('chance')
 const chance = Chance();
+const each = require('jest-each').default
+const SystemFields = cloudSql.SystemFields
 
 
-describe('Cloud SQL Service', function() {
+const env1 = {
+    schemaProvider: Uninitialized,
+    connectionPool: Uninitialized,
+};
 
-    describe('Schema API', () => {
+// const env2 = {
+//     schemaProvider: Uninitialized,
+//     connectionPool: Uninitialized,
+// };
+
+beforeAll(async () => {
+    // cloud Sql
+    env1.connectionPool = await mysql.initMySqlEnv()
+    env1.schemaProvider = new cloudSql.SchemaProvider(env1.connectionPool)
+
+    // // spanner
+    // const projectId = 'test-project'
+    // const instanceId = 'test-instance'
+    // const databaseId = 'test-database'
+    //
+    // await resource.initSpannerEnv()
+    //
+    // env2.schemaProvider = new spanner.SchemaProvider(projectId, instanceId, databaseId)
+}, 20000);
+
+
+afterAll(async () => {
+    await mysql.shutdownMySqlEnv();
+
+    // await resource.shutSpannerEnv()
+}, 20000);
+
+describe('Schema API', () => {
+
+    each([
+        ['Cloud Sql', env1],
+        // ['Spanner', env2],
+    ]).describe('%s', (name, env) => {
+
         it('list of empty db will result with an empty array', async () => {
             const db = await env.schemaProvider.list()
 
@@ -271,34 +311,20 @@ describe('Cloud SQL Service', function() {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             SystemFields.map(f => f.name)
-                .map(async f => {
-                    await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
-                })
+                        .map(async f => {
+                            await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
+                        })
         })
+
+        const ctx = {
+            collectionName: Uninitialized,
+            columnName: Uninitialized,
+        };
+
+        beforeEach(() => {
+            ctx.collectionName = gen.randomCollectionName();
+            ctx.columnName = chance.word();
+        });
     })
-
-    const ctx = {
-        collectionName: Uninitialized,
-        columnName: Uninitialized,
-    };
-
-    const env = {
-        schemaProvider: Uninitialized,
-        connectionPool: Uninitialized,
-    };
-
-    beforeEach(() => {
-        ctx.collectionName = gen.randomCollectionName();
-        ctx.columnName = chance.word();
-    });
-
-    beforeAll(async function() {
-        env.connectionPool = await mysql.initMySqlEnv()
-        env.schemaProvider = new SchemaProvider(env.connectionPool)
-    }, 20000);
-
-    afterAll(async () => {
-        await mysql.shutdownMySqlEnv();
-    });
-
 })
+
