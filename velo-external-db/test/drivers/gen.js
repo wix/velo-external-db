@@ -47,10 +47,10 @@ const randomCollectionName = () => chance.word({ length: 5 })
 const randomDbField = () => ( {name: chance.word(), type: chance.word(), isPrimary: chance.bool()} )
 const randomDbFields = () => randomArrayOf( randomDbField )
 
-const randomColumn = () => ( {name: chance.word(), type: 'varchar(256)', isPrimary: false} )
+const randomColumn = () => ( {name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false} )
 const randomNumberColumns = () => {
-    return [ {name: chance.word(), type: 'INTEGER(10)', isPrimary: false},
-             {name: chance.word(), type: 'DECIMAL(10,2)', isPrimary: false} ]
+    return [ {name: chance.word(), type: 'number', subtype: 'int', isPrimary: false},
+             {name: chance.word(), type: 'number', subtype: 'decimal', precision: '10,2', isPrimary: false} ]
 }
 
 const randomEntity = (columns) => {
@@ -95,9 +95,9 @@ const randomNumberDbEntity = (columns) => {
     const _columns = columns || []
 
     _columns.forEach(column => {
-        if (column.type === 'INTEGER(10)') {
+        if (column.type === 'number' && column.subtype === 'int') {
             entity[column.name] = chance.integer({ min: 0, max: 10000 })
-        } else if (column.type === 'DECIMAL(10,2)') {
+        } else if (column.type === 'number' && column.subtype === 'decimal') {
             entity[column.name] = chance.floating({ min: 0, max: 10000, fixed: 2 })
         }
     })

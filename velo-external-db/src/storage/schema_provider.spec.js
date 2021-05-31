@@ -248,13 +248,13 @@ describe('Schema API', () => {
         })
 
         test('add column on a non existing collection will fail', async () => {
-            await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})).rejects.toThrow(CollectionDoesNotExists)
+            await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime', subtype: 'timestamp'})).rejects.toThrow(CollectionDoesNotExists)
         })
 
         test('add column on a an existing collection', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
+            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime', subtype: 'timestamp'})
 
             expect((await env.schemaProvider.describeCollection(ctx.collectionName))
                                             .fields).toHaveProperty(ctx.columnName,
@@ -278,9 +278,9 @@ describe('Schema API', () => {
         test('add duplicate column will fail', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
+            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime', subtype: 'timestamp'})
 
-            await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})).rejects.toThrow(FieldAlreadyExists)
+            await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime', subtype: 'timestamp'})).rejects.toThrow(FieldAlreadyExists)
         })
 
         test('add system column will fail', async () => {
@@ -288,13 +288,13 @@ describe('Schema API', () => {
 
             SystemFields.map(f => f.name)
                         .map(async f => {
-                            await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: f, type: 'timestamp'})).rejects.toThrow(CannotModifySystemField)
+                            await expect(env.schemaProvider.addColumn(ctx.collectionName, {name: f, type: 'datetime', subtype: 'timestamp'})).rejects.toThrow(CannotModifySystemField)
                         })
         })
 
         test('drop column on a an existing collection', async () => {
             await env.schemaProvider.create(ctx.collectionName, [])
-            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'timestamp'})
+            await env.schemaProvider.addColumn(ctx.collectionName, {name: ctx.columnName, type: 'datetime', subtype: 'timestamp'})
 
             await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
 
