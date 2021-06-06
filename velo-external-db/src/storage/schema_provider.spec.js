@@ -38,8 +38,7 @@ beforeAll(async () => {
 
 
 afterAll(async () => {
-    await mysql.shutdownMySqlEnv();
-
+    return await mysql.shutdownMySqlEnv();
     // await resource.shutSpannerEnv()
 }, 20000);
 
