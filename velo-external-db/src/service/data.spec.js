@@ -47,6 +47,12 @@ describe('Data Service', () => {
         expect( actual ).toEqual({ item: ctx.entity });
     })
 
+    test('truncate will clear collection', async () => {
+        driver.expectTruncateFor(ctx.collectionName)
+
+        await env.dataService.truncate(ctx.collectionName)
+    })
+
     const ctx = {
         collectionName: Uninitialized,
         filter: Uninitialized,

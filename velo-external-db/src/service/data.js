@@ -42,6 +42,10 @@ class DataService {
     async delete(collectionName, itemIds) {
         return this.storage.delete(collectionName, itemIds)
     }
+
+    async truncate(collectionName) {
+        return this.storage.truncate(collectionName)
+    }
 }
 
 module.exports = DataService

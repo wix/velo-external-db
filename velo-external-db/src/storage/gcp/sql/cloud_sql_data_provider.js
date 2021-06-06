@@ -58,6 +58,12 @@ class DataProvider {
         return rs.affectedRows
     }
 
+    async truncate(collectionName) {
+        const sql = this.sqlFormat('TRUNCATE ??', [collectionName])
+        await promisify(this.pool.query).bind(this.pool)(sql)
+                                 .catch( translateErrorCodes )
+    }
+
     wildCardWith(n, char) {
         return Array(n).fill(char, 0, n).join(', ')
     }

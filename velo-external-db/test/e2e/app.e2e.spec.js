@@ -15,7 +15,7 @@ const axios = require('axios').create({
 
 describe('Velo External DB', function () {
     test('answer default page with a welcoming response', async () => {
-        expect((await axios.get(`/`)).data).to.contain('<!doctype html>');
+        expect((await axios.get(`/`)).data).toContain('<!doctype html>');
     })
 
     test('answer provision with stub response', async () => {
@@ -72,7 +72,7 @@ describe('Velo External DB', function () {
             await axios.post(`/schemas/column/remove`, {collectionName: ctx.collectionName, columnName: ctx.column.name}, auth)
 
             const field = await schema.expectColumnInCollection(ctx.column.name, ctx.collectionName, auth)
-            expect(field).to.be.undefined
+            expect(field).toBeUndefined()
         })
 
     })
@@ -93,7 +93,7 @@ describe('Velo External DB', function () {
 
             await axios.post(`/data/remove`, {collectionName: ctx.collectionName, itemId: ctx.item._id }, auth)
 
-            expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ ], totalCount: 0});
+            expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ ], totalCount: 0})
         })
 
         test('get by id api', async () => {
@@ -117,6 +117,15 @@ describe('Velo External DB', function () {
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, auth)
 
             expect((await axios.post(`/data/count`, {collectionName: ctx.collectionName, filter: '' }, auth)).data).toEqual({ totalCount: 2});
+        })
+
+        test('truncate api', async () => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
+            await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, auth)
+
+            await axios.post(`/data/truncate`, {collectionName: ctx.collectionName }, auth)
+
+            expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ ], totalCount: 0})
         })
     })
 

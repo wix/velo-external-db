@@ -102,6 +102,16 @@ app.post('/data/count', async (req, res, next) => {
         next(e)
     }
 })
+
+app.post('/data/truncate', async (req, res, next) => {
+    try {
+        const { collectionName } = req.body
+        const data = await dataService.truncate(collectionName)
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
+})
 // ***********************************************
 
 

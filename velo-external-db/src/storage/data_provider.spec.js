@@ -155,6 +155,15 @@ describe('Data API', () => {
             expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
         });
 
+        test('truncate will remove all data from collection', async () => {
+            await givenCollectionWith([ctx.entity], ctx.collectionName)
+            driver.stubEmptyFilterAndSortFor('', '')
+
+            await env.dataProvider.truncate(ctx.collectionName)
+
+            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([]);
+        });
+
         const ctx = {
             collectionName: Uninitialized,
             numericCollectionName: Uninitialized,
