@@ -1,9 +1,9 @@
 const cloudSql = require('./gcp/sql/cloud_sql_schema_provider')
-const spanner = require('./gcp/spanner/spanner_schema_provider')
+// const spanner = require('./gcp/spanner/spanner_schema_provider')
 const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('../error/errors')
 const { Uninitialized } = require('../../test/commons/test-commons');
 const mysql = require('../../test/resources/mysql_resources');
-const resource = require('../../test/resources/spanner_resources');
+// const resource = require('../../test/resources/spanner_resources');
 const gen = require('../../test/drivers/gen');
 const Chance = require('chance')
 const chance = Chance();
