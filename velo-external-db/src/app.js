@@ -34,6 +34,15 @@ app.post('/provision', (req, res) => {
 
 
 // *************** Data API **********************
+// missing:
+// save (upsert)
+// patch (partial update)
+// patch where
+// truncate
+// query (?)
+// distinct
+// bulk operations (insert/update/upsert/delete/partial update)
+
 app.post('/data/find', async (req, res, next) => {
     try {
         const { collectionName, filter, sort, skip, limit } = req.body
