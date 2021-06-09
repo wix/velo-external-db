@@ -1,6 +1,7 @@
-const { EMPTY_FILTER, EMPTY_SORT, FilterParser } = require('./sql_filter_transformer')
+const { EMPTY_SORT, FilterParser } = require('./sql_filter_transformer')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
 const { randomFilter } = require('../../../../test/drivers/gen');
+const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance();
 
@@ -77,23 +78,22 @@ describe('Sql Parser', () => {
         })
 
         describe('handle single field operator', () => {
-            ['$ne', '$lt', '$lte', '$gt', '$gte', '$eq', ].forEach(o => {
+            each([
+                '$ne', '$lt', '$lte', '$gt', '$gte', '$eq',
+            ]).test(`correctly transform operator [%s]`, (o) => {
+                const filter = {
+                    // kind: 'filter',
+                    operator: o,
+                    fieldName: ctx.fieldName,
+                    value: ctx.fieldValue
+                }
 
-                test(`correctly transform operator [${o}]`, () => {
-                    const filter = {
-                        // kind: 'filter',
-                        operator: o,
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldValue
-                    }
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    filterExpr: `?? ${env.filterParser.veloOperatorToMySqlOperator(o, ctx.fieldValue)} ?`,
+                    filterColumns: [ctx.fieldName],
+                    parameters: [ctx.fieldValue]
+                }])
 
-                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `?? ${env.filterParser.veloOperatorToMySqlOperator(o, ctx.fieldValue)} ?`,
-                        filterColumns: [ctx.fieldName],
-                        parameters: [ctx.fieldValue]
-                    }])
-
-                })
             })
 
             // todo: $hasAll ???
@@ -193,23 +193,22 @@ describe('Sql Parser', () => {
             })
         });
         describe('handle multi field operator', () => {
-            ['$and', '$or'].forEach(o => {
+            each([
+                '$and', '$or'
+            ]).test(`correctly transform operator [%s]`, (o) => {
+                const filter = {
+                    // kind: 'filter',
+                    operator: o,
+                    value: [ctx.filter, ctx.anotherFilter]
+                }
+                const op = o === '$and' ? 'AND' : 'OR'
 
-                test(`correctly transform operator [${o}]`, () => {
-                    const filter = {
-                        // kind: 'filter',
-                        operator: o,
-                        value: [ctx.filter, ctx.anotherFilter]
-                    }
-                    const op = o === '$and' ? 'AND' : 'OR'
-
-                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `${env.filterParser.parseFilter(ctx.filter)[0].filterExpr} ${op} ${env.filterParser.parseFilter(ctx.anotherFilter)[0].filterExpr}`,
-                        filterColumns: [ctx.filter.fieldName, ctx.anotherFilter.fieldName],
-                        parameters: [].concat(env.filterParser.parseFilter(ctx.filter)[0].parameters)
-                                      .concat(env.filterParser.parseFilter(ctx.anotherFilter)[0].parameters)
-                    }])
-                })
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    filterExpr: `${env.filterParser.parseFilter(ctx.filter)[0].filterExpr} ${op} ${env.filterParser.parseFilter(ctx.anotherFilter)[0].filterExpr}`,
+                    filterColumns: [ctx.filter.fieldName, ctx.anotherFilter.fieldName],
+                    parameters: [].concat(env.filterParser.parseFilter(ctx.filter)[0].parameters)
+                                  .concat(env.filterParser.parseFilter(ctx.anotherFilter)[0].parameters)
+                }])
             })
 
             test(`correctly transform operator [$not]`, () => {
@@ -227,6 +226,60 @@ describe('Sql Parser', () => {
             })
         });
 
+
+        describe('aggregation functions', () => {
+
+            describe('transform select fields', () => {
+                test(`single id field`, () => {
+                    const aggregation = {
+                        _id: ctx.fieldName
+                    }
+
+                    expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
+                        fieldsStatement: '??',
+                        filterColumns: [ctx.fieldName],
+                        groupByColumns: [ctx.fieldName],
+                    })
+                })
+
+                test(`multiple id fields`, () => {
+                    const aggregation = {
+                        _id: {
+                            field1: ctx.fieldName,
+                            field2: ctx.anotherFieldName
+                        }
+                    }
+
+                    expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
+                        fieldsStatement: '??, ??',
+                        filterColumns: [ctx.fieldName, ctx.anotherFieldName],
+                        groupByColumns: [ctx.fieldName, ctx.anotherFieldName],
+                    })
+                })
+
+                each([
+                    ['AVG', '$avg'],
+                    ['MIN', '$min'],
+                    ['MAX', '$max'],
+                    ['SUM', '$sum'],
+                ]).test(`translate %s function`, (mySqlFunction, wixDataFunction) => {
+                    const aggregation = {
+                        _id: ctx.fieldName,
+                        [ctx.moreFieldName]: {
+                            [wixDataFunction]: ctx.anotherFieldName
+                        }
+                    }
+
+                    expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
+                        fieldsStatement: `??, ${mySqlFunction}(??) AS ??`,
+                        filterColumns: [ctx.fieldName, ctx.anotherFieldName, ctx.moreFieldName],
+                        groupByColumns: [ctx.fieldName],
+                    })
+                })
+            })
+
+        })
+
     })
 
     const ctx = {
@@ -234,6 +287,7 @@ describe('Sql Parser', () => {
         fieldValue: Uninitialized,
         fieldListValue: Uninitialized,
         anotherFieldName: Uninitialized,
+        moreFieldName: Uninitialized,
         filter: Uninitialized,
         anotherFilter: Uninitialized,
     };
@@ -245,6 +299,7 @@ describe('Sql Parser', () => {
     beforeEach(() => {
         ctx.fieldName = chance.word();
         ctx.anotherFieldName = chance.word();
+        ctx.moreFieldName = chance.word();
 
         ctx.fieldValue = chance.word();
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()];

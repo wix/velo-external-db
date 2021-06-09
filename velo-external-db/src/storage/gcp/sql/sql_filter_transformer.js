@@ -20,6 +20,52 @@ class FilterParser {
         return typeof o === 'object' && o !== null
     }
 
+    wixDataFunction2Sql(f) {
+        switch (f) {
+            case '$avg':
+                return 'AVG'
+            case '$max':
+                return 'MAX'
+            case '$min':
+                return 'MIN'
+            case '$sum':
+                return 'SUM'
+            default:
+                throw new Error(`Unrecognized function ${f}`)
+        }
+    }
+
+    parseAggregation(aggregation) {
+        const filterColumns = []
+        const groupByColumns = []
+        const filterColumnsStr = []
+        if (this.isObject(aggregation._id)) {
+            filterColumnsStr.push(...Object.values(aggregation._id).map(() => '??'))
+            filterColumns.push(...Object.values(aggregation._id))
+            groupByColumns.push(...Object.values(aggregation._id))
+        } else {
+            filterColumnsStr.push('??')
+            filterColumns.push(aggregation._id)
+            groupByColumns.push(aggregation._id)
+        }
+
+        Object.keys(aggregation)
+              .filter(f => f !== '_id')
+              .forEach(fieldAlias => {
+                  Object.entries(aggregation[fieldAlias])
+                        .forEach(([func, field]) => {
+                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(??) AS ??`)
+                            filterColumns.push(field, fieldAlias)
+                        })
+              })
+
+        return {
+            fieldsStatement: filterColumnsStr.join(', '),
+            groupByColumns,
+            filterColumns,
+        }
+    }
+
     parseFilter(filter) {
         if (!filter || !this.isObject(filter)|| filter.operator === undefined) {
             return [];
