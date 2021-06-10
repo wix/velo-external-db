@@ -61,8 +61,8 @@ class FilterParser {
 
         return {
             fieldsStatement: filterColumnsStr.join(', '),
+            fieldsStatementColumns: filterColumns,
             groupByColumns,
-            filterColumns,
         }
     }
 

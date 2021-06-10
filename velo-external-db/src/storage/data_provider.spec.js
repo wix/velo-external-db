@@ -94,6 +94,53 @@ describe('Data API', () => {
             expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1));
         });
 
+        test('aggregate api without filter', async () => {
+            await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
+            await env.dataProvider.insert(ctx.numericCollectionName, ctx.numberEntity)
+            await env.dataProvider.insert(ctx.numericCollectionName, ctx.anotherNumberEntity)
+
+            driver.stubEmptyFilterFor(ctx.filter)
+            driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep)
+            driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
+
+            const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
+
+            expect( res ).toEqual(expect.arrayContaining([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name]},
+                                                          { _id: ctx.anotherNumberEntity._id, [ctx.aliasColumns[0]]: ctx.anotherNumberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.anotherNumberEntity[ctx.numericColumns[1].name] }
+            ]));
+        });
+
+        test('aggregate api without having', async () => {
+            await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
+            await env.dataProvider.insert(ctx.numericCollectionName, ctx.numberEntity)
+            await env.dataProvider.insert(ctx.numericCollectionName, ctx.anotherNumberEntity)
+
+            driver.stubEmptyFilterFor(ctx.filter)
+            driver.stubEmptyHavingFilterFor(ctx.aggregation.postFilteringStep)
+            driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
+
+            const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
+
+            expect( res ).toEqual(expect.arrayContaining([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name]},
+                                                          { _id: ctx.anotherNumberEntity._id, [ctx.aliasColumns[0]]: ctx.anotherNumberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.anotherNumberEntity[ctx.numericColumns[1].name] }
+            ]));
+        });
+
+        test('aggregate api with filter', async () => {
+            await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
+            await env.dataProvider.insert(ctx.numericCollectionName, ctx.numberEntity)
+            await env.dataProvider.insert(ctx.numericCollectionName, ctx.anotherNumberEntity)
+
+            driver.givenFilterByIdWith(ctx.numberEntity._id, ctx.filter)
+            driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep)
+            driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
+
+            const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
+
+            expect( res ).toEqual([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name]}])
+        });
+
+
         test('count will run query', async () => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
             driver.stubEmptyFilterFor(ctx.filter)
@@ -168,13 +215,16 @@ describe('Data API', () => {
             collectionName: Uninitialized,
             numericCollectionName: Uninitialized,
             filter: Uninitialized,
+            aggregation: Uninitialized,
             sort: Uninitialized,
             skip: Uninitialized,
             limit: Uninitialized,
             column: Uninitialized,
             numericColumns: Uninitialized,
+            aliasColumns: Uninitialized,
             entity: Uninitialized,
             numberEntity: Uninitialized,
+            anotherNumberEntity: Uninitialized,
             modifiedEntity: Uninitialized,
             anotherEntity: Uninitialized,
             entities: Uninitialized,
@@ -185,7 +235,9 @@ describe('Data API', () => {
             ctx.numericCollectionName = gen.randomCollectionName()
             ctx.column = gen.randomColumn()
             ctx.numericColumns = gen.randomNumberColumns()
+            ctx.aliasColumns = ctx.numericColumns.map(() => chance.word())
             ctx.filter = chance.word();
+            ctx.aggregation = {processingStep: chance.word(), postFilteringStep: chance.word() }
             ctx.sort = chance.word();
             ctx.skip = 0;
             ctx.limit = 10;
@@ -195,6 +247,7 @@ describe('Data API', () => {
             ctx.anotherEntity = gen.randomDbEntity([ctx.column.name]);
             ctx.entities = gen.randomDbEntities([ctx.column.name]);
             ctx.numberEntity = gen.randomNumberDbEntity(ctx.numericColumns);
+            ctx.anotherNumberEntity = gen.randomNumberDbEntity(ctx.numericColumns);
 
             await env.schemaProvider.create(ctx.collectionName, [ctx.column])
         });

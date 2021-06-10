@@ -237,7 +237,7 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: '??',
-                        filterColumns: [ctx.fieldName],
+                        fieldsStatementColumns: [ctx.fieldName],
                         groupByColumns: [ctx.fieldName],
                     })
                 })
@@ -252,7 +252,7 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: '??, ??',
-                        filterColumns: [ctx.fieldName, ctx.anotherFieldName],
+                        fieldsStatementColumns: [ctx.fieldName, ctx.anotherFieldName],
                         groupByColumns: [ctx.fieldName, ctx.anotherFieldName],
                     })
                 })
@@ -272,7 +272,7 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: `??, ${mySqlFunction}(??) AS ??`,
-                        filterColumns: [ctx.fieldName, ctx.anotherFieldName, ctx.moreFieldName],
+                        fieldsStatementColumns: [ctx.fieldName, ctx.anotherFieldName, ctx.moreFieldName],
                         groupByColumns: [ctx.fieldName],
                     })
                 })

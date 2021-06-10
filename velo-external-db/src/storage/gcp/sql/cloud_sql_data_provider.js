@@ -64,6 +64,21 @@ class DataProvider {
                                  .catch( translateErrorCodes )
     }
 
+    async aggregate(collectionName, filter, aggregation, sort, skip, limit) {
+        const {filterExpr: whereFilterExpr, filterColumns: whereFilterColumns, parameters: whereParameters} = this.filterParser.transform(filter)
+        const {fieldsStatement, groupByColumns, fieldsStatementColumns} = this.filterParser.parseAggregation(aggregation.processingStep)
+        const {filterExpr, filterColumns, parameters} = this.filterParser.parseFilter(aggregation.postFilteringStep)
+        let havingFilterExpr = ''
+        if (filterExpr !=='') {
+            havingFilterExpr = `HAVING ${filterExpr}`
+        }
+
+        const sql = this.sqlFormat(`SELECT ${fieldsStatement} FROM ?? ${whereFilterExpr} GROUP BY ${this.wildCardWith(groupByColumns.length, '??')} ${havingFilterExpr}`, [...fieldsStatementColumns, collectionName, ...whereFilterColumns, ...groupByColumns, ...filterColumns])
+        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, [...whereParameters, ...parameters, skip, limit])
+                                                   .catch( translateErrorCodes )
+        return resultset
+    }
+
     wildCardWith(n, char) {
         return Array(n).fill(char, 0, n).join(', ')
     }
