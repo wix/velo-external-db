@@ -33,13 +33,12 @@ class SchemaProvider {
     }
 
     async create(collectionName, columns) {
-        const dbColumnsSql = this.systemFields.concat(columns || [])
-                                 .map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
-                                 .join(', ')
+        const dbColumnsSql = [...this.systemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
+                                                                       .join(', ')
         const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => `\`${f.name}\``).join(', ')
 
         await promisify(this.pool.query).bind(this.pool)(`CREATE TABLE IF NOT EXISTS ?? (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
-                                                         [collectionName].concat((columns || []).map(c => c.name)))
+                                                         [collectionName, ...(columns || []).map(c => c.name)])
     }
 
     async addColumn(collectionName, column) {
