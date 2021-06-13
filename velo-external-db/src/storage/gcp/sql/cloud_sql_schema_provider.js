@@ -8,10 +8,10 @@ const SystemFields = [
         name: '_id', type: 'text', subtype: 'string', precision: '50', isPrimary: true
     },
     {
-        name: '_createdDate', type: 'datetime', subtype: 'timestamp'
+        name: '_createdDate', type: 'datetime', subtype: 'datetime'
     },
     {
-        name: '_updatedDate', type: 'datetime', subtype: 'timestamp'
+        name: '_updatedDate', type: 'datetime', subtype: 'datetime'
     },
     {
         name: '_owner', type: 'text', subtype: 'string', precision: '50'
@@ -43,8 +43,7 @@ class SchemaProvider {
 
     async addColumn(collectionName, column) {
         await this.validateSystemFields(column.name)
-        //${this.defaultForColumnType(column.type)}
-        await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? ADD ?? ${column.type}`, [collectionName, column.name])
+        await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? ADD ?? ${this.sqlSchemaTranslator.dbTypeFor(column)}`, [collectionName, column.name])
                                  .catch( translateErrorCodes )
     }
 

@@ -94,7 +94,7 @@ class FilterParser {
             return [{
                 filterExpr: `?? ${this.veloOperatorToMySqlOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value, filter.operator)}`.trim(),
                 filterColumns: [filter.fieldName],
-                parameters: filter.value ? [].concat( filter.value ) :  []
+                parameters: filter.value !== undefined ? [].concat( filter.value ) : []
             }]
         }
 
@@ -144,7 +144,7 @@ class FilterParser {
         if (operator === '$hasSome') {
             return `(${this.wildCardWith(value.length, '?')})`
         }
-        if (operator === '$eq' && !value) {
+        if (operator === '$eq' && value === undefined) {
             return ''
         }
 
@@ -154,7 +154,7 @@ class FilterParser {
     veloOperatorToMySqlOperator(operator, value) {
         switch (operator) {
             case '$eq':
-                if (value) {
+                if (value !== undefined) {
                     return '='
                 }
                 return 'IS NULL'

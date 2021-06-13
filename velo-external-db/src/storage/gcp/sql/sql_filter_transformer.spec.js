@@ -96,6 +96,21 @@ describe('Sql Parser', () => {
 
             })
 
+            test(`correctly extract filter value if value is 0`, () => {
+                const filter = {
+                    operator: '$eq',
+                    fieldName: ctx.fieldName,
+                    value: 0
+                }
+
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    filterExpr: `?? = ?`,
+                    filterColumns: [ctx.fieldName],
+                    parameters: [0]
+                }])
+
+            })
+
             // todo: $hasAll ???
             test(`correctly transform operator [$hasSome]`, () => {
                 const filter = {

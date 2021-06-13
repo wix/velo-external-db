@@ -46,6 +46,14 @@ class DataService {
     async truncate(collectionName) {
         return this.storage.truncate(collectionName)
     }
+
+    async aggregate(collectionName, filter, aggregation) {
+        return {
+            items: (await this.storage.aggregate(collectionName, filter, aggregation))
+                                      .map( asWixData ),
+            totalCount: 0
+        }
+    }
 }
 
 module.exports = DataService

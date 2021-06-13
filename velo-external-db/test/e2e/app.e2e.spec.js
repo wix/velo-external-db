@@ -87,6 +87,38 @@ describe('Velo External DB', function () {
                                                                                                                                                                                               totalCount: 0});
         })
 
+        test('aggregate api', async () => {
+            await schema.givenCollection(ctx.collectionName, ctx.numberColumns, auth)
+            await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, auth)
+
+            expect((await axios.post(`/data/aggregate`,
+                                    { collectionName: ctx.collectionName,
+                                            filter: { operator: '$eq', fieldName: '_id', value: ctx.numberItem._id },
+                                            aggregation: {
+                                                processingStep: {
+                                                    _id: {
+                                                        field1: '_id',
+                                                        field2: '_owner',
+                                                    },
+                                                    myAvg: {
+                                                        $avg: ctx.numberColumns[0].name
+                                                    },
+                                                    mySum: {
+                                                        $sum: ctx.numberColumns[1].name
+                                                    }
+                                                },
+                                                postFilteringStep: {
+                                                    operator: '$and', value: [
+                                                        {operator: '$gt', fieldName: 'myAvg', value: 0},
+                                                        {operator: '$gt', fieldName: 'mySum', value: 0}
+
+                                                    ],
+                                                },
+                                            }
+                                    }, auth)).data).toEqual({ items: [ { _id: ctx.numberItem._id, _owner: ctx.numberItem._owner, myAvg: ctx.numberItem[ctx.numberColumns[0].name], mySum: ctx.numberItem[ctx.numberColumns[1].name] } ],
+                                                                       totalCount: 0});
+        })
+
         test('delete one api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item], ctx.collectionName, auth)
@@ -133,9 +165,12 @@ describe('Velo External DB', function () {
     const ctx = {
         collectionName: Uninitialized,
         column: Uninitialized,
+        numberColumns: Uninitialized,
         item: Uninitialized,
         modifiedItem: Uninitialized,
         anotherItem: Uninitialized,
+        numberItem: Uninitialized,
+        anotherNumberItem: Uninitialized,
     }
 
     const env = {
@@ -146,9 +181,12 @@ describe('Velo External DB', function () {
     beforeEach(async () => {
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
+        ctx.numberColumns = gen.randomNumberColumns()
         ctx.item = gen.randomEntity([ctx.column.name])
         ctx.modifiedItem = Object.assign({}, ctx.item, {[ctx.column.name]: chance.word()} )
         ctx.anotherItem = gen.randomEntity([ctx.column.name])
+        ctx.numberItem = gen.randomNumberDbEntity(ctx.numberColumns)
+        ctx.anotherNumberItem = gen.randomNumberDbEntity(ctx.numberColumns)
     });
 
     beforeAll(async function() {
@@ -157,10 +195,10 @@ describe('Velo External DB', function () {
         authInit()
 
         env.server = require('../..')
-    });
+    }, 20000);
 
     afterAll(async () => {
         await env.server.close()
         await mysql.shutdownMySqlEnv();
-    });
+    }, 20000)
 })

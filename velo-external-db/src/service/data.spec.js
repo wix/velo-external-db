@@ -53,9 +53,18 @@ describe('Data Service', () => {
         await env.dataService.truncate(ctx.collectionName)
     })
 
+    test('aggregate api', async () => {
+        driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
+
+        const actual = await env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)
+
+        expect( actual ).toEqual({ items: ctx.entities, totalCount: 0 });
+    })
+
     const ctx = {
         collectionName: Uninitialized,
         filter: Uninitialized,
+        aggregation: Uninitialized,
         sort: Uninitialized,
         skip: Uninitialized,
         limit: Uninitialized,
@@ -74,6 +83,7 @@ describe('Data Service', () => {
 
         ctx.collectionName = gen.randomCollectionName()
         ctx.filter = chance.word();
+        ctx.aggregation = chance.word();
         ctx.sort = chance.word();
         ctx.skip = chance.word();
         ctx.limit = chance.word();

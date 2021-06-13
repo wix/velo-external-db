@@ -53,6 +53,16 @@ app.post('/data/find', async (req, res, next) => {
     }
 })
 
+app.post('/data/aggregate', async (req, res, next) => {
+    try {
+        const { collectionName, filter, aggregation } = req.body
+        const data = await dataService.aggregate(collectionName, filter, aggregation)
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
+})
+
 app.post('/data/insert', async (req, res, next) => {
     try {
         const { collectionName, item } = req.body

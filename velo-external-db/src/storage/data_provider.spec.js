@@ -96,14 +96,13 @@ describe('Data API', () => {
 
         test('aggregate api without filter', async () => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
-            await env.dataProvider.insert(ctx.numericCollectionName, ctx.numberEntity)
-            await env.dataProvider.insert(ctx.numericCollectionName, ctx.anotherNumberEntity)
+            await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
 
             driver.stubEmptyFilterFor(ctx.filter)
             driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep)
             driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
 
-            const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
+            const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
 
             expect( res ).toEqual(expect.arrayContaining([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name]},
                                                           { _id: ctx.anotherNumberEntity._id, [ctx.aliasColumns[0]]: ctx.anotherNumberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.anotherNumberEntity[ctx.numericColumns[1].name] }
@@ -112,14 +111,13 @@ describe('Data API', () => {
 
         test('aggregate api without having', async () => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
-            await env.dataProvider.insert(ctx.numericCollectionName, ctx.numberEntity)
-            await env.dataProvider.insert(ctx.numericCollectionName, ctx.anotherNumberEntity)
+            await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
 
             driver.stubEmptyFilterFor(ctx.filter)
             driver.stubEmptyHavingFilterFor(ctx.aggregation.postFilteringStep)
             driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
 
-            const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
+            const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
 
             expect( res ).toEqual(expect.arrayContaining([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name]},
                                                           { _id: ctx.anotherNumberEntity._id, [ctx.aliasColumns[0]]: ctx.anotherNumberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.anotherNumberEntity[ctx.numericColumns[1].name] }
@@ -128,14 +126,13 @@ describe('Data API', () => {
 
         test('aggregate api with filter', async () => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
-            await env.dataProvider.insert(ctx.numericCollectionName, ctx.numberEntity)
-            await env.dataProvider.insert(ctx.numericCollectionName, ctx.anotherNumberEntity)
+            await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
 
             driver.givenFilterByIdWith(ctx.numberEntity._id, ctx.filter)
             driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep)
             driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
 
-            const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
+            const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
 
             expect( res ).toEqual([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name]}])
         });

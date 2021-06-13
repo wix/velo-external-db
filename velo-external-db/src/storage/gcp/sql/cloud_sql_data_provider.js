@@ -1,6 +1,7 @@
 const moment = require('moment')
 const { promisify } = require('util')
 const { SystemFields } = require('./cloud_sql_schema_provider')
+const { EMPTY_FILTER } = require('./sql_filter_transformer')
 const translateErrorCodes = require('./sql_exception_translator')
 
 class DataProvider {
@@ -64,17 +65,18 @@ class DataProvider {
                                  .catch( translateErrorCodes )
     }
 
-    async aggregate(collectionName, filter, aggregation, sort, skip, limit) {
+    async aggregate(collectionName, filter, aggregation) {
         const {filterExpr: whereFilterExpr, filterColumns: whereFilterColumns, parameters: whereParameters} = this.filterParser.transform(filter)
         const {fieldsStatement, groupByColumns, fieldsStatementColumns} = this.filterParser.parseAggregation(aggregation.processingStep)
-        const {filterExpr, filterColumns, parameters} = this.filterParser.parseFilter(aggregation.postFilteringStep)
-        let havingFilterExpr = ''
-        if (filterExpr !=='') {
-            havingFilterExpr = `HAVING ${filterExpr}`
-        }
+        const havingFilter = this.filterParser.parseFilter(aggregation.postFilteringStep)
 
-        const sql = this.sqlFormat(`SELECT ${fieldsStatement} FROM ?? ${whereFilterExpr} GROUP BY ${this.wildCardWith(groupByColumns.length, '??')} ${havingFilterExpr}`, [...fieldsStatementColumns, collectionName, ...whereFilterColumns, ...groupByColumns, ...filterColumns])
-        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, [...whereParameters, ...parameters, skip, limit])
+        const {filterExpr, filterColumns, parameters} =
+            havingFilter.map(({filterExpr, filterColumns, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+                                                                             filterColumns, parameters}))
+                        .concat(EMPTY_FILTER)[0]
+
+        const sql = this.sqlFormat(`SELECT ${fieldsStatement} FROM ?? ${whereFilterExpr} GROUP BY ${this.wildCardWith(groupByColumns.length, '??')} ${filterExpr}`, [...fieldsStatementColumns, collectionName, ...whereFilterColumns, ...groupByColumns, ...filterColumns])
+        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, [...whereParameters, ...parameters])
                                                    .catch( translateErrorCodes )
         return resultset
     }
@@ -87,8 +89,12 @@ class DataProvider {
         const obj = {}
         for (const key of Object.keys(item)) {
             const value = item[key]
+            const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
+
             if (value instanceof Date) {
-                obj[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
+                obj[key] = moment(value).format('YYYY-MM-DD HH:mm:ss')
+            } else if (reISO.test(value)) {
+                obj[key] = moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss')
             } else {
                 obj[key] = value
             }

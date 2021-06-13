@@ -20,12 +20,12 @@ const stubEmptyFilterFor = (filter) => {
 
 const stubEmptyHavingFilterFor = (filter) => {
     when(filterParser.parseFilter).calledWith(filter)
-                                  .mockReturnValue({ filterExpr: '', filterColumns: [], parameters: [] })
+                                  .mockReturnValue([ { filterExpr: '', filterColumns: [], parameters: [] } ])
 }
 
 const givenHavingFilterWith = (columns, filter) => {
     when(filterParser.parseFilter).calledWith(filter)
-                                  .mockReturnValue({ filterExpr: columns.map(() => '?? > ?').join(' AND '), filterColumns: columns, parameters: [0, 0] })
+                                  .mockReturnValue([ { filterExpr: columns.map(() => '?? > ?').join(' AND '), filterColumns: columns, parameters: [0, 0] } ])
 }
 
 const stubEmptyOrderByFor = (sort) => {
