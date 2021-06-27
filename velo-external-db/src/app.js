@@ -66,7 +66,7 @@ app.post('/data/aggregate', async (req, res, next) => {
 app.post('/data/insert', async (req, res, next) => {
     try {
         const { collectionName, item } = req.body
-        const data = await dataService.insert(collectionName, item)
+        const data = await dataService.insert(collectionName, [item])
         res.json(data)
     } catch (e) {
         next(e)
@@ -86,7 +86,7 @@ app.post('/data/get', async (req, res, next) => {
 app.post('/data/update', async (req, res, next) => {
     try {
         const { collectionName, item } = req.body
-        const data = await dataService.update(collectionName, item)
+        const data = await dataService.update(collectionName, [item])
         res.json(data)
     } catch (e) {
         next(e)

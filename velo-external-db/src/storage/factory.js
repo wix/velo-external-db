@@ -12,13 +12,15 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
                 user     : user,
                 password : password,
                 database : db,
+
                 waitForConnections: true,
                 namedPlaceholders: true,
+                multipleStatements: true,
+
                 // debug: true,
                 // trace: true,
                 connectionLimit: 10,
-                queueLimit: 0/*,
-                                    multipleStatements: true*/
+                queueLimit: 0,
             }
 
             if (cloudSqlConnectionName) {

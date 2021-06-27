@@ -27,16 +27,20 @@ class DataProvider {
         return resultset[0]['num']
     }
 
-    async insert(collectionName, item) {
+    // todo: check if we can get schema in a safer way. should be according to schema of the table
+    async insert(collectionName, items) {
+        const item = items[0]
         const n = Object.keys(item).length
-        const sql = this.sqlFormat(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES (${this.wildCardWith(n, '?')})`, [collectionName, ...Object.keys(item)])
-
-        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, this.asParamArrays( this.patchDateTime(item) ) )
+        const sql = this.sqlFormat(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES ?`, [collectionName, ...Object.keys(item)])
+        
+        const data = items.map(item => this.asParamArrays( this.patchDateTime(item) ) )
+        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, [data])
                                                    .catch( translateErrorCodes )
         return resultset.affectedRows
     }
 
-    async update(collectionName, item) {
+    async update(collectionName, items) {
+        const item = items[0]
         const systemFieldNames = SystemFields.map(f => f.name)
         const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
 
@@ -44,12 +48,14 @@ class DataProvider {
             return 0
         }
 
-        const sql = this.sqlFormat(`UPDATE ?? SET ${updateFields.map(() => '?? = ?').join(', ')} WHERE _id = ?`, [collectionName, ...updateFields])
-        const updatable = [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
-
-        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
+        const queries = items.map(() => this.sqlFormat(`UPDATE ?? SET ${updateFields.map(() => '?? = ?').join(', ')} WHERE _id = ?`, [collectionName, ...updateFields]) )
+                             .join(';')
+        const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
+                                .map(u => this.asParamArrays( this.patchDateTime(u) ))
+        const resultset = await promisify(this.pool.query).bind(this.pool)(queries, [].concat(...updatables))
                                                    .catch( translateErrorCodes )
-        return resultset.changedRows
+
+        return Array.isArray(resultset) ? resultset.reduce((s, r) => s + r.changedRows, 0) : resultset.changedRows
     }
 
     async delete(collectionName, itemIds) {

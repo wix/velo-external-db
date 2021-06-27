@@ -52,7 +52,7 @@ describe('Data API', () => {
     ]).describe('%s', (name, env) => {
 
         const givenCollectionWith = async (entities, forCollection) => {
-            await Promise.all( entities.map(e => env.dataProvider.insert(forCollection, e) ))
+            await env.dataProvider.insert(forCollection, entities)
         }
 
         test('search with empty filter and order by and no data', async () => {
@@ -156,19 +156,27 @@ describe('Data API', () => {
             expect( res ).toEqual(1);
         });
 
+        test('insert data into collection name and query all of it', async () => {
+            driver.stubEmptyFilterAndSortFor('', '')
+
+            expect( await env.dataProvider.insert(ctx.collectionName, [ctx.entity]) ).toEqual(1)
+
+            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
+        });
+
         test('bulk insert data into collection name and query all of it', async () => {
             driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.insert(ctx.collectionName, ctx.entity) ).toEqual(1)
+            expect( await env.dataProvider.insert(ctx.collectionName, ctx.entities) ).toEqual(ctx.entities.length)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
+            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual(expect.arrayContaining(ctx.entities));
         });
 
         test('insert entity with number', async () => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
             driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.insert(ctx.numericCollectionName, ctx.numberEntity) ).toEqual(1)
+            expect( await env.dataProvider.insert(ctx.numericCollectionName, [ctx.numberEntity]) ).toEqual(1)
 
             expect( await env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50) ).toEqual([ctx.numberEntity]);
         });
@@ -182,19 +190,29 @@ describe('Data API', () => {
             expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([]);
         });
 
-        test('allow update for entity', async () => {
+        test('allow update for single entity', async () => {
             await givenCollectionWith([ctx.entity], ctx.collectionName)
+            driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntity) ).toEqual(1)
+            expect( await env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).toEqual(1)
 
             expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.modifiedEntity]);
+        });
+
+        test('allow update for multiple entities', async () => {
+            await givenCollectionWith(ctx.entities, ctx.collectionName)
+            driver.stubEmptyFilterAndSortFor('', '')
+
+            expect( await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntities) ).toEqual(ctx.modifiedEntities.length)
+
+            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual(expect.arrayContaining(ctx.modifiedEntities));
         });
 
         test('if update does not have and updatable fields, do nothing', async () => {
             await givenCollectionWith([ctx.entity], ctx.collectionName)
             delete ctx.modifiedEntity[ctx.column.name]
 
-            expect( await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntity) ).toEqual(0)
+            expect( await env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).toEqual(0)
 
             expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
         });
@@ -225,6 +243,7 @@ describe('Data API', () => {
             modifiedEntity: Uninitialized,
             anotherEntity: Uninitialized,
             entities: Uninitialized,
+            modifiedEntities: Uninitialized,
         };
 
         beforeEach(async () => {
@@ -243,6 +262,7 @@ describe('Data API', () => {
             ctx.modifiedEntity = Object.assign({}, ctx.entity, {[ctx.column.name]: chance.word()} )
             ctx.anotherEntity = gen.randomDbEntity([ctx.column.name]);
             ctx.entities = gen.randomDbEntities([ctx.column.name]);
+            ctx.modifiedEntities = ctx.entities.map(e => Object.assign({}, e, {[ctx.column.name]: chance.word()} ))
             ctx.numberEntity = gen.randomNumberDbEntity(ctx.numericColumns);
             ctx.anotherNumberEntity = gen.randomNumberDbEntity(ctx.numericColumns);
 

@@ -22,13 +22,14 @@ const givenAggregateResult = (total, forCollectionName, filter, andAggregation) 
     when(dataProvider.aggregate).calledWith(forCollectionName, filter, andAggregation)
                                 .mockResolvedValue(total)
 
-const expectInsertFor = (item, forCollectionName) =>
-    when(dataProvider.insert).calledWith(forCollectionName, unpackDates(item))
-                             .mockResolvedValue(1)
+const expectInsertFor = (items, forCollectionName) =>
+    when(dataProvider.insert).calledWith(forCollectionName, items.map(i => unpackDates(i)))
+                             .mockResolvedValue(items.length)
 
-const expectUpdateFor = (item, forCollectionName) =>
-    when(dataProvider.update).calledWith(forCollectionName, unpackDates(item))
-                             .mockResolvedValue(1)
+
+const expectUpdateFor = (items, forCollectionName) =>
+    when(dataProvider.update).calledWith(forCollectionName, items.map(i => unpackDates(i)))
+                             .mockResolvedValue(items.length)
 
 const expectTruncateFor = (collectionName) =>
     when(dataProvider.truncate).calledWith(collectionName)

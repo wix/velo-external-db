@@ -36,6 +36,7 @@ const initMySqlEnv = async () => {
 
         waitForConnections: true,
         namedPlaceholders: true,
+        multipleStatements: true,
 
         connectionLimit: 10,
         queueLimit: 0

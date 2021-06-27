@@ -33,18 +33,18 @@ describe('Data Service', () => {
         expect( actual ).toEqual({ item: ctx.entity });
     })
 
-    test('insert will insert data into db', async () => {
-        driver.expectInsertFor(ctx.entity, ctx.collectionName)
+    test('bulk insert will insert data into db', async () => {
+        driver.expectInsertFor(ctx.entities, ctx.collectionName)
 
-        const actual = await env.dataService.insert(ctx.collectionName, ctx.entity)
-        return expect( actual  ).toEqual({ item: ctx.entity });
+        const actual = await env.dataService.insert(ctx.collectionName, ctx.entities)
+        return expect( actual  ).toEqual({ items: ctx.entities });
     })
 
-    test('update will update data into db', async () => {
-        driver.expectUpdateFor(ctx.entity, ctx.collectionName)
+    test('bulk update will update data into db', async () => {
+        driver.expectUpdateFor(ctx.entities, ctx.collectionName)
 
-        const actual = await env.dataService.update(ctx.collectionName, ctx.entity)
-        expect( actual ).toEqual({ item: ctx.entity });
+        const actual = await env.dataService.update(ctx.collectionName, ctx.entities)
+        expect( actual ).toEqual({ items: ctx.entities });
     })
 
     test('truncate will clear collection', async () => {

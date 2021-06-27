@@ -29,14 +29,14 @@ class DataService {
         return { totalCount: c }
     }
 
-    async insert(collectionName, item) {
-        await this.storage.insert(collectionName, unpackDates(item))
-        return { item: item }
+    async insert(collectionName, items) {
+        await this.storage.insert(collectionName, items.map(i => unpackDates(i)))
+        return { items: items }
     }
 
-    async update(collectionName, item) {
-        await this.storage.update(collectionName, unpackDates(item))
-        return { item: item }
+    async update(collectionName, items) {
+        await this.storage.update(collectionName, items.map(i => unpackDates(i)))
+        return { items: items }
     }
 
     async delete(collectionName, itemIds) {
