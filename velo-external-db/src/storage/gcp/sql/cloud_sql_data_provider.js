@@ -8,22 +8,24 @@ class DataProvider {
     constructor(pool, filterParser) {
         this.filterParser = filterParser
         this.pool = pool
+
+        this.query = promisify(this.pool.query).bind(this.pool)
     }
 
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
         const {sortExpr, sortColumns} = this.filterParser.orderBy(sort)
         const sql = this.sqlFormat(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT ?, ?`, [collectionName, ...filterColumns, ...sortColumns])
-        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, [...parameters, skip, limit])
-                                                   .catch( translateErrorCodes )
+        const resultset = await this.query(sql, [...parameters, skip, limit])
+                                    .catch( translateErrorCodes )
         return resultset
     }
 
     async count(collectionName, filter) {
         const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
         const sql = this.sqlFormat(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`, [collectionName, ...filterColumns])
-        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, parameters)
-                                                   .catch( translateErrorCodes )
+        const resultset = await this.query(sql, parameters)
+                                    .catch( translateErrorCodes )
         return resultset[0]['num']
     }
 
@@ -34,8 +36,8 @@ class DataProvider {
         const sql = this.sqlFormat(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES ?`, [collectionName, ...Object.keys(item)])
         
         const data = items.map(item => this.asParamArrays( this.patchDateTime(item) ) )
-        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, [data])
-                                                   .catch( translateErrorCodes )
+        const resultset = await this.query(sql, [data])
+                                    .catch( translateErrorCodes )
         return resultset.affectedRows
     }
 
@@ -52,23 +54,22 @@ class DataProvider {
                              .join(';')
         const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
                                 .map(u => this.asParamArrays( this.patchDateTime(u) ))
-        const resultset = await promisify(this.pool.query).bind(this.pool)(queries, [].concat(...updatables))
-                                                   .catch( translateErrorCodes )
+        const resultset = await this.query(queries, [].concat(...updatables))
+                                    .catch( translateErrorCodes )
 
         return Array.isArray(resultset) ? resultset.reduce((s, r) => s + r.changedRows, 0) : resultset.changedRows
     }
 
     async delete(collectionName, itemIds) {
         const sql = this.sqlFormat(`DELETE FROM ?? WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`, [collectionName])
-        const rs = await promisify(this.pool.query).bind(this.pool)(sql, itemIds)
-                                            .catch( translateErrorCodes )
+        const rs = await this.query(sql, itemIds)
+                             .catch( translateErrorCodes )
         return rs.affectedRows
     }
 
     async truncate(collectionName) {
         const sql = this.sqlFormat('TRUNCATE ??', [collectionName])
-        await promisify(this.pool.query).bind(this.pool)(sql)
-                                 .catch( translateErrorCodes )
+        await this.query(sql).catch( translateErrorCodes )
     }
 
     async aggregate(collectionName, filter, aggregation) {
@@ -82,8 +83,8 @@ class DataProvider {
                         .concat(EMPTY_FILTER)[0]
 
         const sql = this.sqlFormat(`SELECT ${fieldsStatement} FROM ?? ${whereFilterExpr} GROUP BY ${this.wildCardWith(groupByColumns.length, '??')} ${filterExpr}`, [...fieldsStatementColumns, collectionName, ...whereFilterColumns, ...groupByColumns, ...filterColumns])
-        const resultset = await promisify(this.pool.query).bind(this.pool)(sql, [...whereParameters, ...parameters])
-                                                   .catch( translateErrorCodes )
+        const resultset = await this.query(sql, [...whereParameters, ...parameters])
+                                    .catch( translateErrorCodes )
         return resultset
     }
 

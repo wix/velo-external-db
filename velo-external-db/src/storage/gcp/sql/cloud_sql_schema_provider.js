@@ -23,10 +23,12 @@ class SchemaProvider {
 
         this.systemFields = SystemFields
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
+
+        this.query = promisify(this.pool.query).bind(this.pool)
     }
 
     async list() {
-        const tables = await promisify(this.pool.query).bind(this.pool)('SHOW TABLES')
+        const tables = await this.query('SHOW TABLES')
 
         return Promise.all(tables.map(r => Object.values(r)[0])
                                  .map( this.describeCollection.bind(this) ))
@@ -37,24 +39,24 @@ class SchemaProvider {
                                                                        .join(', ')
         const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => `\`${f.name}\``).join(', ')
 
-        await promisify(this.pool.query).bind(this.pool)(`CREATE TABLE IF NOT EXISTS ?? (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
-                                                         [collectionName, ...(columns || []).map(c => c.name)])
+        await this.query(`CREATE TABLE IF NOT EXISTS ?? (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
+                         [collectionName, ...(columns || []).map(c => c.name)])
     }
 
     async addColumn(collectionName, column) {
         await this.validateSystemFields(column.name)
-        await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? ADD ?? ${this.sqlSchemaTranslator.dbTypeFor(column)}`, [collectionName, column.name])
-                                 .catch( translateErrorCodes )
+        await this.query(`ALTER TABLE ?? ADD ?? ${this.sqlSchemaTranslator.dbTypeFor(column)}`, [collectionName, column.name])
+                  .catch( translateErrorCodes )
     }
 
     async removeColumn(collectionName, columnName) {
         await this.validateSystemFields(columnName)
-        return await promisify(this.pool.query).bind(this.pool)(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
-                                        .catch( translateErrorCodes )
+        return await this.query(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
+                         .catch( translateErrorCodes )
     }
 
     async describeCollection(collectionName) {
-        const res = await promisify(this.pool.query).bind(this.pool)('DESCRIBE ??', [collectionName])
+        const res = await this.query('DESCRIBE ??', [collectionName])
         return {
             id: collectionName,
             displayName: collectionName,
