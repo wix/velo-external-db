@@ -28,10 +28,17 @@ class SchemaProvider {
     }
 
     async list() {
-        const tables = await this.query('SHOW TABLES')
+        const currentDb = this.pool.config.connectionConfig.database
+        const data = await this.query('SELECT TABLE_NAME, COLUMN_NAME as Field, DATA_TYPE as Type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION', currentDb)
+        const tables = data.reduce((o, r) => {
+            const arr = o[r.TABLE_NAME] || []
+            arr.push(r)
+            o[r.TABLE_NAME] = arr
+            return o
+        }, {})
 
-        return Promise.all(tables.map(r => Object.values(r)[0])
-                                 .map( this.describeCollection.bind(this) ))
+        return Object.entries(tables)
+                     .map(([collectionName, rs]) => this.asWixSchema(rs, collectionName))
     }
 
     async create(collectionName, columns) {
@@ -57,6 +64,10 @@ class SchemaProvider {
 
     async describeCollection(collectionName) {
         const res = await this.query('DESCRIBE ??', [collectionName])
+        return this.asWixSchema(res, collectionName)
+    }
+
+    asWixSchema(res, collectionName) {
         return {
             id: collectionName,
             displayName: collectionName,

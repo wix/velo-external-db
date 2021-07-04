@@ -42,7 +42,7 @@ afterAll(async () => {
     // await resource.shutSpannerEnv()
 }, 20000);
 
-describe('Schema API', () => {
+fdescribe('Schema API', () => {
 
     each([
         ['Cloud Sql', env1],
@@ -55,190 +55,42 @@ describe('Schema API', () => {
             expect(db).toEqual([])
         })
 
+        test('list db will result with a list of wix databases', async () => {
+            await env.schemaProvider.create(ctx.collectionName)
+            await env.schemaProvider.create(ctx.anotherCollectionName)
+
+            const dbs = await env.schemaProvider.list()
+
+            expect(dbs).toEqual(expect.arrayContaining([
+                                    env.schemaProvider.asWixSchema([{ Field: '_id', Type: 'varchar'},
+                                                                        { Field: '_createdDate', Type: 'datetime'},
+                                                                        { Field: '_updatedDate', Type: 'datetime'},
+                                                                        { Field: '_owner', Type: 'varchar'}], ctx.collectionName),
+                                    env.schemaProvider.asWixSchema([{ Field: '_id', Type: 'varchar'},
+                                                                        { Field: '_createdDate', Type: 'datetime'},
+                                                                        { Field: '_updatedDate', Type: 'datetime'},
+                                                                        { Field: '_owner', Type: 'varchar'}], ctx.anotherCollectionName),
+            ]))
+        })
+
         test('create collection with default columns', async () => {
             await env.schemaProvider.create(ctx.collectionName)
 
-            const db = await env.schemaProvider.list()
-            expect(db).toEqual([{ id: ctx.collectionName,
-                displayName: ctx.collectionName,
-                allowedOperations: [
-                    "get",
-                    "find",
-                    "count",
-                    "update",
-                    "insert",
-                    "remove"
-                ],
-                maxPageSize: 50,
-                ttl: 3600,
-                fields: {
-                    _id: {
-                        displayName: '_id',
-                        type: 'text',
-                        queryOperators: [
-                            "eq",
-                            "lt",
-                            "gt",
-                            "hasSome",
-                            "and",
-                            "lte",
-                            "gte",
-                            "or",
-                            "not",
-                            "ne",
-                            "startsWith",
-                            "endsWith"
-                        ]
-                    },
-                    _createdDate: {
-                        displayName: '_createdDate',
-                        type: 'datetime',
-                        queryOperators: [
-                            "eq",
-                            "lt",
-                            "gt",
-                            "hasSome",
-                            "and",
-                            "lte",
-                            "gte",
-                            "or",
-                            "not",
-                            "ne",
-                            "startsWith",
-                            "endsWith"
-                        ]
-                    },
-                    _updatedDate: {
-                        displayName: '_updatedDate',
-                        type: 'datetime',
-                        queryOperators: [
-                            "eq",
-                            "lt",
-                            "gt",
-                            "hasSome",
-                            "and",
-                            "lte",
-                            "gte",
-                            "or",
-                            "not",
-                            "ne",
-                            "startsWith",
-                            "endsWith"
-                        ]
-                    },
-                    _owner: {
-                        displayName: '_owner',
-                        type: 'text',
-                        queryOperators: [
-                            "eq",
-                            "lt",
-                            "gt",
-                            "hasSome",
-                            "and",
-                            "lte",
-                            "gte",
-                            "or",
-                            "not",
-                            "ne",
-                            "startsWith",
-                            "endsWith"
-                        ]
-                    },
-                }
-            }])
+            const db = await env.schemaProvider.describeCollection(ctx.collectionName)
+            expect(db).toEqual(env.schemaProvider.asWixSchema([{ Field: '_id', Type: 'varchar'},
+                                                                             { Field: '_createdDate', Type: 'datetime'},
+                                                                             { Field: '_updatedDate', Type: 'datetime'},
+                                                                             { Field: '_owner', Type: 'varchar'}], ctx.collectionName))
         })
 
         test('retrieve collection data by collection name', async () => {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            expect(db).toEqual({ id: ctx.collectionName,
-                                        displayName: ctx.collectionName,
-                                        allowedOperations: [
-                                            "get",
-                                            "find",
-                                            "count",
-                                            "update",
-                                            "insert",
-                                            "remove"
-                                        ],
-                                        maxPageSize: 50,
-                                        ttl: 3600,
-                                        fields: {
-                                            _id: {
-                                                displayName: '_id',
-                                                type: 'text',
-                                                queryOperators: [
-                                                    "eq",
-                                                    "lt",
-                                                    "gt",
-                                                    "hasSome",
-                                                    "and",
-                                                    "lte",
-                                                    "gte",
-                                                    "or",
-                                                    "not",
-                                                    "ne",
-                                                    "startsWith",
-                                                    "endsWith"
-                                                ]
-                                            },
-                                            _createdDate: {
-                                                displayName: '_createdDate',
-                                                type: 'datetime',
-                                                queryOperators: [
-                                                    "eq",
-                                                    "lt",
-                                                    "gt",
-                                                    "hasSome",
-                                                    "and",
-                                                    "lte",
-                                                    "gte",
-                                                    "or",
-                                                    "not",
-                                                    "ne",
-                                                    "startsWith",
-                                                    "endsWith"
-                                                ]
-                                            },
-                                            _updatedDate: {
-                                                displayName: '_updatedDate',
-                                                type: 'datetime',
-                                                queryOperators: [
-                                                    "eq",
-                                                    "lt",
-                                                    "gt",
-                                                    "hasSome",
-                                                    "and",
-                                                    "lte",
-                                                    "gte",
-                                                    "or",
-                                                    "not",
-                                                    "ne",
-                                                    "startsWith",
-                                                    "endsWith"
-                                                ]
-                                            },
-                                            _owner: {
-                                                displayName: '_owner',
-                                                type: 'text',
-                                                queryOperators: [
-                                                    "eq",
-                                                    "lt",
-                                                    "gt",
-                                                    "hasSome",
-                                                    "and",
-                                                    "lte",
-                                                    "gte",
-                                                    "or",
-                                                    "not",
-                                                    "ne",
-                                                    "startsWith",
-                                                    "endsWith"
-                                                ]
-                                            },
-                                        }
-            })
+            expect(db).toEqual(env.schemaProvider.asWixSchema([{ Field: '_id', Type: 'varchar'},
+                                                                             { Field: '_createdDate', Type: 'datetime'},
+                                                                             { Field: '_updatedDate', Type: 'datetime'},
+                                                                             { Field: '_owner', Type: 'varchar'}], ctx.collectionName))
         })
 
         test('create collection twice will do nothing', async () => {
@@ -317,11 +169,13 @@ describe('Schema API', () => {
 
         const ctx = {
             collectionName: Uninitialized,
+            anotherCollectionName: Uninitialized,
             columnName: Uninitialized,
         };
 
         beforeEach(() => {
             ctx.collectionName = gen.randomCollectionName();
+            ctx.anotherCollectionName = gen.randomCollectionName();
             ctx.columnName = chance.word();
         });
     })
