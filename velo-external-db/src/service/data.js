@@ -29,18 +29,34 @@ class DataService {
         return { totalCount: c }
     }
 
-    async insert(collectionName, items) {
+    async insert(collectionName, item) {
+        const resp = await this.bulkInsert(collectionName, [item])
+        return { item: resp.items[0] }
+    }
+
+    async bulkInsert(collectionName, items) {
         await this.storage.insert(collectionName, items.map(i => unpackDates(i)))
         return { items: items }
     }
 
-    async update(collectionName, items) {
+    async update(collectionName, item) {
+        const resp = await this.bulkUpdate(collectionName, [item])
+        return { item: resp.items[0] }
+    }
+
+    async bulkUpdate(collectionName, items) {
         await this.storage.update(collectionName, items.map(i => unpackDates(i)))
         return { items: items }
     }
 
-    async delete(collectionName, itemIds) {
-        return this.storage.delete(collectionName, itemIds)
+    async delete(collectionName, itemId) {
+        await this.bulkDelete(collectionName, [itemId])
+        return { item: {} }
+    }
+
+    async bulkDelete(collectionName, itemIds) {
+        await this.storage.delete(collectionName, itemIds)
+        return { items: [] }
     }
 
     async truncate(collectionName) {

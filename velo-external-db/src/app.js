@@ -66,7 +66,17 @@ app.post('/data/aggregate', async (req, res, next) => {
 app.post('/data/insert', async (req, res, next) => {
     try {
         const { collectionName, item } = req.body
-        const data = await dataService.insert(collectionName, [item])
+        const data = await dataService.insert(collectionName, item)
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.post('/data/insert/bulk', async (req, res, next) => {
+    try {
+        const { collectionName, items } = req.body
+        const data = await dataService.bulkInsert(collectionName, items)
         res.json(data)
     } catch (e) {
         next(e)
@@ -86,7 +96,17 @@ app.post('/data/get', async (req, res, next) => {
 app.post('/data/update', async (req, res, next) => {
     try {
         const { collectionName, item } = req.body
-        const data = await dataService.update(collectionName, [item])
+        const data = await dataService.update(collectionName, item)
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.post('/data/update/bulk', async (req, res, next) => {
+    try {
+        const { collectionName, items } = req.body
+        const data = await dataService.bulkUpdate(collectionName, items)
         res.json(data)
     } catch (e) {
         next(e)
@@ -97,6 +117,16 @@ app.post('/data/remove', async (req, res, next) => {
     try {
         const { collectionName, itemId } = req.body
         const data = await dataService.delete(collectionName, [itemId])
+        res.json(data)
+    } catch (e) {
+        next(e)
+    }
+})
+
+app.post('/data/remove/bulk', async (req, res, next) => {
+    try {
+        const { collectionName, itemIds } = req.body
+        const data = await dataService.delete(collectionName, itemIds)
         res.json(data)
     } catch (e) {
         next(e)

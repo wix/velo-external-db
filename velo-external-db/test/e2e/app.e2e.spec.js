@@ -87,6 +87,22 @@ describe('Velo External DB', function () {
                                                                                                                                                                                               totalCount: 0});
         })
 
+        test('insert api', async () => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
+
+            await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.item }, auth)
+
+            expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ctx.item], totalCount: 0});
+        })
+
+        test('bulk insert api', async () => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
+
+            await axios.post(`/data/insert/bulk`, {collectionName: ctx.collectionName, items: ctx.items }, auth)
+
+            expect((await data.expectAllDataIn(ctx.collectionName, auth)).items).toEqual(expect.arrayContaining(ctx.items));
+        })
+
         test('aggregate api', async () => {
             await schema.givenCollection(ctx.collectionName, ctx.numberColumns, auth)
             await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, auth)
@@ -128,6 +144,15 @@ describe('Velo External DB', function () {
             expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ ], totalCount: 0})
         })
 
+        test('bulk delete api', async () => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
+            await data.givenItems(ctx.items, ctx.collectionName, auth)
+
+            await axios.post(`/data/remove/bulk`, {collectionName: ctx.collectionName, itemIds: ctx.items.map(i => i._id) }, auth)
+
+            expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ ], totalCount: 0})
+        })
+
         test('get by id api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item], ctx.collectionName, auth)
@@ -135,13 +160,22 @@ describe('Velo External DB', function () {
             expect((await axios.post(`/data/get`, {collectionName: ctx.collectionName, itemId: ctx.item._id}, auth)).data).toEqual({ item: ctx.item });
         })
 
-        test('update api e2e', async () => {
+        test('update api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item], ctx.collectionName, auth)
 
             await axios.post(`/data/update`, {collectionName: ctx.collectionName, item: ctx.modifiedItem }, auth)
 
             expect(await data.expectAllDataIn(ctx.collectionName, auth)).toEqual({ items: [ctx.modifiedItem], totalCount: 0});
+        })
+
+        test('bulk update api', async () => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
+            await data.givenItems(ctx.items, ctx.collectionName, auth)
+
+            await axios.post(`/data/update/bulk`, {collectionName: ctx.collectionName, items: ctx.modifiedItems }, auth)
+
+            expect((await data.expectAllDataIn(ctx.collectionName, auth)).items).toEqual(expect.arrayContaining(ctx.modifiedItems));
         })
 
         test('count api', async () => {
@@ -167,7 +201,9 @@ describe('Velo External DB', function () {
         column: Uninitialized,
         numberColumns: Uninitialized,
         item: Uninitialized,
+        items: Uninitialized,
         modifiedItem: Uninitialized,
+        modifiedItems: Uninitialized,
         anotherItem: Uninitialized,
         numberItem: Uninitialized,
         anotherNumberItem: Uninitialized,
@@ -183,6 +219,8 @@ describe('Velo External DB', function () {
         ctx.column = gen.randomColumn()
         ctx.numberColumns = gen.randomNumberColumns()
         ctx.item = gen.randomEntity([ctx.column.name])
+        ctx.items = Array.from({length: 10}, () => gen.randomEntity([ctx.column.name]))
+        ctx.modifiedItems = ctx.items.map(i => Object.assign({}, i, {[ctx.column.name]: chance.word()} ) )
         ctx.modifiedItem = Object.assign({}, ctx.item, {[ctx.column.name]: chance.word()} )
         ctx.anotherItem = gen.randomEntity([ctx.column.name])
         ctx.numberItem = gen.randomNumberDbEntity(ctx.numberColumns)

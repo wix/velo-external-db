@@ -8,6 +8,7 @@ const dataProvider = {
     update: jest.fn(),
     truncate: jest.fn(),
     aggregate: jest.fn(),
+    delete: jest.fn(),
 }
 
 const givenListResult = (entities, forCollectionName, filter, sort, skip, andLimit) =>
@@ -31,6 +32,10 @@ const expectUpdateFor = (items, forCollectionName) =>
     when(dataProvider.update).calledWith(forCollectionName, items.map(i => unpackDates(i)))
                              .mockResolvedValue(items.length)
 
+const expectDeleteFor = (itemIds, forCollectionName) =>
+    when(dataProvider.delete).calledWith(forCollectionName, itemIds)
+                             .mockResolvedValue(itemIds.length)
+
 const expectTruncateFor = (collectionName) =>
     when(dataProvider.truncate).calledWith(collectionName)
                                .mockResolvedValue(1)
@@ -42,6 +47,7 @@ const reset = () => {
     dataProvider.update.mockClear()
     dataProvider.truncate.mockClear()
     dataProvider.aggregate.mockClear()
+    dataProvider.delete.mockClear()
 }
 
-module.exports = { givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult, expectTruncateFor, givenAggregateResult, reset }
+module.exports = { givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult, expectTruncateFor, givenAggregateResult, expectDeleteFor, reset }

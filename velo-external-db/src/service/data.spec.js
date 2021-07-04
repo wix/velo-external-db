@@ -33,18 +33,46 @@ describe('Data Service', () => {
         expect( actual ).toEqual({ item: ctx.entity });
     })
 
+    test('insert will insert data into db', async () => {
+        driver.expectInsertFor([ctx.entity], ctx.collectionName)
+
+        const actual = await env.dataService.insert(ctx.collectionName, ctx.entity)
+        return expect( actual  ).toEqual({ item: ctx.entity });
+    })
+
     test('bulk insert will insert data into db', async () => {
         driver.expectInsertFor(ctx.entities, ctx.collectionName)
 
-        const actual = await env.dataService.insert(ctx.collectionName, ctx.entities)
+        const actual = await env.dataService.bulkInsert(ctx.collectionName, ctx.entities)
         return expect( actual  ).toEqual({ items: ctx.entities });
+    })
+
+    test('update will update data into db', async () => {
+        driver.expectUpdateFor([ctx.entity], ctx.collectionName)
+
+        const actual = await env.dataService.update(ctx.collectionName, ctx.entity)
+        expect( actual ).toEqual({ item: ctx.entity });
     })
 
     test('bulk update will update data into db', async () => {
         driver.expectUpdateFor(ctx.entities, ctx.collectionName)
 
-        const actual = await env.dataService.update(ctx.collectionName, ctx.entities)
+        const actual = await env.dataService.bulkUpdate(ctx.collectionName, ctx.entities)
         expect( actual ).toEqual({ items: ctx.entities });
+    })
+
+    test('delete by item id', async () => {
+        driver.expectDeleteFor([ctx.itemId], ctx.collectionName)
+
+        const actual = await env.dataService.delete(ctx.collectionName, ctx.itemId)
+        expect( actual ).toEqual({ item: {} });
+    })
+
+    test('bulk delete by item ids', async () => {
+        driver.expectDeleteFor(ctx.itemIds, ctx.collectionName)
+
+        const actual = await env.dataService.bulkDelete(ctx.collectionName, ctx.itemIds)
+        expect( actual ).toEqual({ items: [] });
     })
 
     test('truncate will clear collection', async () => {
@@ -71,6 +99,7 @@ describe('Data Service', () => {
         entities: Uninitialized,
         entity: Uninitialized,
         itemId: Uninitialized,
+        itemIds: Uninitialized,
         total: Uninitialized,
     };
 
@@ -88,6 +117,7 @@ describe('Data Service', () => {
         ctx.skip = chance.word();
         ctx.limit = chance.word();
         ctx.itemId = chance.guid();
+        ctx.itemIds = Array.from({length: 10}, () => chance.guid())
         ctx.total = chance.natural({min: 2, max: 20});
 
         ctx.entities = gen.randomEntities();
