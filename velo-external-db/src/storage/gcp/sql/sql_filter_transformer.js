@@ -1,3 +1,5 @@
+const { InvalidQuery } = require('../../../error/errors')
+
 class FilterParser {
     constructor() {
     }
@@ -31,7 +33,7 @@ class FilterParser {
             case '$sum':
                 return 'SUM'
             default:
-                throw new Error(`Unrecognized function ${f}`)
+                throw new InvalidQuery(`Unrecognized function ${f}`)
         }
     }
 
@@ -142,6 +144,9 @@ class FilterParser {
 
     valueForOperator(value, operator) {
         if (operator === '$hasSome') {
+            if (value === undefined || value.length === 0) {
+                throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
+            }
             return `(${this.wildCardWith(value.length, '?')})`
         } else if (operator === '$eq' && value === undefined) {
             return ''

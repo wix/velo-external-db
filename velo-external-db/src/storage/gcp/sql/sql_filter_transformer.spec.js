@@ -1,5 +1,6 @@
 const { EMPTY_SORT, FilterParser } = require('./sql_filter_transformer')
 const { Uninitialized } = require('../../../../test/commons/test-commons');
+const { InvalidQuery } = require('../../../error/errors');
 const { randomFilter } = require('../../../../test/drivers/gen');
 const each = require('jest-each').default
 const Chance = require('chance')
@@ -125,6 +126,17 @@ describe('Sql Parser', () => {
                     filterColumns: [ctx.fieldName],
                     parameters: ctx.fieldListValue
                 }])
+            })
+
+            test(`operator [$hasSome] with empty list of values will throw an exception`, () => {
+                const filter = {
+                    // kind: 'filter',
+                    operator: '$hasSome',
+                    fieldName: ctx.fieldName,
+                    value: []
+                }
+
+                expect( () => env.filterParser.parseFilter(filter) ).toThrow(InvalidQuery)
             })
 
             test(`correctly transform operator [$eq] with null value`, () => {

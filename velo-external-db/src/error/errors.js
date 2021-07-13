@@ -35,5 +35,11 @@ class CannotModifySystemField extends BaseHttpError {
     }
 }
 
+class InvalidQuery extends BaseHttpError {
+    constructor(message) {
+        super(message, 400);
+    }
+}
 
-module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField }
+
+module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField, InvalidQuery }
