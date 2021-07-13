@@ -142,6 +142,21 @@ describe('Sql Parser', () => {
 
             })
 
+            test(`correctly transform operator [$eq] with boolean value`, () => {
+                const filter = {
+                    operator: '$eq',
+                    fieldName: ctx.fieldName,
+                    value: chance.bool()
+                }
+
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    filterExpr: `?? = ?`,
+                    filterColumns: [ctx.fieldName],
+                    parameters: [filter.value ? 1 : 0]
+                }])
+
+            })
+
             describe('handle string operators', () => {
                 //'$contains', '', ''
                 test(`correctly transform operator [$contains]`, () => {
