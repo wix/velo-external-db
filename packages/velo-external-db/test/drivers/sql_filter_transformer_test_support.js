@@ -1,4 +1,4 @@
-const { EMPTY_SORT } = require('../../src/storage/gcp/sql/sql_filter_transformer')
+const { EMPTY_SORT } = require('external-db-mysql')
 const { when } = require('jest-when')
 
 const filterParser = {

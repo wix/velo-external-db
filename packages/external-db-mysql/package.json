@@ -1,0 +1,40 @@
+{
+  "name": "external-db-mysql",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Noam Almog <noama@wix.com>",
+  "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "http://npm.dev.wixpress.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/wix-private/noam-external-db-poc/issues"
+  },
+  "devDependencies": {
+    "chance": "^1.1.7",
+    "jest": "^27.0.6",
+    "jest-each": "^27.0.6",
+    "jest-when": "^3.3.1",
+    "test-commons": "^0.0.0",
+    "ts-jest": "^27.0.3"
+  },
+  "dependencies": {
+    "velo-external-db-commons": "^0.0.0"
+  }
+}

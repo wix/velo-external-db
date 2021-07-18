@@ -4,9 +4,10 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
     switch (type) {
         case 'gcp/sql':
             console.log('INIT: gcp/sql')
-            const { SchemaProvider } = require('./gcp/sql/cloud_sql_schema_provider')
-            const DataProvider = require('./gcp/sql/cloud_sql_data_provider')
-            const { FilterParser } = require('./gcp/sql/sql_filter_transformer')
+            const { SchemaProvider, DataProvider, FilterParser } = require('external-db-mysql')
+            // const { SchemaProvider } = require('./gcp/sql/cloud_sql_schema_provider')
+            // const DataProvider = require('./gcp/sql/cloud_sql_data_provider')
+            // const { FilterParser } = require('./gcp/sql/sql_filter_transformer')
 
             const config = {
                 user     : user,

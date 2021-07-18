@@ -1,5 +1,5 @@
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { Uninitialized } = require('../../../../test/commons/test-commons');
+const { Uninitialized } = require('test-commons')
 const Chance = require('chance')
 const chance = Chance();
 

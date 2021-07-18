@@ -1,7 +1,6 @@
 const { EMPTY_SORT, FilterParser } = require('./sql_filter_transformer')
-const { Uninitialized } = require('../../../../test/commons/test-commons');
-const { InvalidQuery } = require('../../../error/errors');
-const { randomFilter } = require('../../../../test/drivers/gen');
+const { Uninitialized, gen } = require('test-commons')
+const { InvalidQuery } = require('velo-external-db-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance();
@@ -346,8 +345,8 @@ describe('Sql Parser', () => {
         ctx.fieldValue = chance.word();
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()];
 
-        ctx.filter = randomFilter();
-        ctx.anotherFilter = randomFilter();
+        ctx.filter = gen.randomFilter();
+        ctx.anotherFilter = gen.randomFilter();
     });
 
     beforeAll(function() {

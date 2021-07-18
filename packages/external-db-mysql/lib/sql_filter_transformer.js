@@ -1,4 +1,4 @@
-const { InvalidQuery } = require('../../../error/errors')
+const { InvalidQuery } = require('velo-external-db-commons')
 
 class FilterParser {
     constructor() {

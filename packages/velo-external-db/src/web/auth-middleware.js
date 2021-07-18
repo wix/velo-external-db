@@ -1,5 +1,5 @@
 const nestedProperty = require('nested-property')
-const { UnauthorizedError } = require('../error/errors')
+const { UnauthorizedError } = require('velo-external-db-commons')
 
 const extractSecretKey = body => {
     if (!nestedProperty.has(body, 'requestContext.settings.secretKey')) {

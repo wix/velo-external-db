@@ -1,8 +1,7 @@
 const mysql = require('../resources/mysql_resources');
-const { Uninitialized } = require('../commons/test-commons');
+const { Uninitialized, gen } = require('test-commons')
 const schema = require('../drivers/schema_api_rest_test_support');
 const data = require('../drivers/data_api_rest_test_support');
-const gen = require('../drivers/gen');
 const { authInit, auth } = require('../drivers/auth-test-support')
 const Chance = require('chance')
 const chance = Chance();

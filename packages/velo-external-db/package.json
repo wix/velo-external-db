@@ -16,17 +16,20 @@
     "@google-cloud/spanner": "^5.12.0",
     "compression": "^1.7.4",
     "express": "^4.17.1",
+    "external-db-mysql": "^0.0.0",
     "moment": "^2.29.1",
     "mysql": "^2.18.1",
-    "nested-property": "^4.0.0"
+    "nested-property": "^4.0.0",
+    "velo-external-db-commons": "^0.0.0"
   },
   "devDependencies": {
     "axios": "^0.21.1",
     "chance": "^1.1.7",
     "docker-compose": "^0.23.12",
-    "jest": "^26.6.3",
-    "jest-each": "^26.6.2",
+    "jest": "^27.0.6",
+    "jest-each": "^27.0.6",
     "jest-when": "^3.3.1",
-    "ts-jest": "^26.5.6"
+    "test-commons": "^0.0.0",
+    "ts-jest": "^27.0.3"
   }
 }

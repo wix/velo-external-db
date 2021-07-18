@@ -1,6 +1,5 @@
 const { asWixData, unpackDates } = require('./transform')
-const { Uninitialized } = require('../../test/commons/test-commons');
-const gen = require('../../test/drivers/gen');
+const { Uninitialized, gen } = require('test-commons')
 const Chance = require('chance')
 const chance = Chance();
 

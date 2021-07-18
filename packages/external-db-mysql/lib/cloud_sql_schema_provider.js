@@ -1,7 +1,7 @@
 const { promisify } = require('util')
 const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { CannotModifySystemField } = require('../../../error/errors')
+const { CannotModifySystemField } = require('velo-external-db-commons')
 
 const SystemFields = [
     {

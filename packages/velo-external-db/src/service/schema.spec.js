@@ -1,6 +1,5 @@
 const SchemaService = require('./schema')
-const { Uninitialized } = require('../../test/commons/test-commons');
-const gen = require('../../test/drivers/gen');
+const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/schema-provider-test-support');
 
 describe('Schema Service', () => {

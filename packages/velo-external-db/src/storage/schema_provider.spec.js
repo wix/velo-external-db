@@ -1,10 +1,9 @@
-const cloudSql = require('./gcp/sql/cloud_sql_schema_provider')
+const cloudSql = require('external-db-mysql')
 // const spanner = require('./gcp/spanner/spanner_schema_provider')
-const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('../error/errors')
-const { Uninitialized } = require('../../test/commons/test-commons');
+const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('velo-external-db-commons')
+const { Uninitialized, gen } = require('test-commons')
 const mysql = require('../../test/resources/mysql_resources');
 // const resource = require('../../test/resources/spanner_resources');
-const gen = require('../../test/drivers/gen');
 const Chance = require('chance')
 const chance = Chance();
 const each = require('jest-each').default

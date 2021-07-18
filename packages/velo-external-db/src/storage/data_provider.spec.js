@@ -1,8 +1,6 @@
-const CloudSqlDataProvider = require('./gcp/sql/cloud_sql_data_provider')
-const cloudSql = require('./gcp/sql/cloud_sql_schema_provider')
+const cloudSql = require('external-db-mysql')
 const driver = require('../../test/drivers/sql_filter_transformer_test_support')
-const { Uninitialized } = require('../../test/commons/test-commons');
-const gen = require('../../test/drivers/gen');
+const { Uninitialized, gen } = require('test-commons')
 const mysql = require('../../test/resources/mysql_resources');
 const each = require('jest-each').default
 const Chance = require('chance');
@@ -24,7 +22,7 @@ beforeAll(async () => {
     // cloud Sql
     env1.connectionPool = await mysql.initMySqlEnv()
     env1.schemaProvider = new cloudSql.SchemaProvider(env1.connectionPool)
-    env1.dataProvider = new CloudSqlDataProvider(env1.connectionPool, driver.filterParser)
+    env1.dataProvider = new cloudSql.DataProvider(env1.connectionPool, driver.filterParser)
 
     // // spanner
     // const projectId = 'test-project'

@@ -1,6 +1,6 @@
 const Chance = require('chance')
 const chance = Chance();
-const errors = require('../error/errors')
+const errors = require('velo-external-db-commons')
 const { errorMiddleware } = require('./error-middleware')
 
 describe('Error Middleware', () => {
