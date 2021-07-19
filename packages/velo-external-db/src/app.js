@@ -8,7 +8,10 @@ const { errorMiddleware } = require('./web/error-middleware')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
 
-const {dataProvider, schemaProvider} = init(process.env.TYPE, process.env.HOST, process.env.USER, process.env.PASSWORD, process.env.DB, process.env.CLOUD_SQL_CONNECTION_NAME)
+//todo: extract this logic to external class and allow different implementations for gcp, aws, azure.
+const { type, host, user, password, db, cloudSqlConnectionName } = {type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME}
+
+const {dataProvider, schemaProvider} = init(type, host, user, password, db, cloudSqlConnectionName)
 const dataService = new DataService(dataProvider)
 const schemaService = new SchemaService(schemaProvider)
 
