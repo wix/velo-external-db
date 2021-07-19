@@ -3,6 +3,6 @@ module.exports = {
     verbose: true,
     roots: ['<rootDir>/lib'],
     preset: "ts-jest",
-    testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.js?$',
+    testRegex: '(.*\\.spec\\.)js$',
     testEnvironment: "node"
 };
