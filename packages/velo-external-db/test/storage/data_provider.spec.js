@@ -1,7 +1,7 @@
 const cloudSql = require('external-db-mysql')
-const driver = require('../../test/drivers/sql_filter_transformer_test_support')
+const driver = require('../drivers/sql_filter_transformer_test_support')
 const { Uninitialized, gen } = require('test-commons')
-const mysql = require('../../test/resources/mysql_resources');
+const mysql = require('../resources/mysql_resources');
 const each = require('jest-each').default
 const Chance = require('chance');
 const chance = new Chance();
