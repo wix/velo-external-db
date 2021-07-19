@@ -1,5 +1,3 @@
-const mysql = require('mysql')
-
 const init = (type, host, user, password, db, cloudSqlConnectionName) => {
     switch (type) {
         case 'gcp/sql':
@@ -29,6 +27,8 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
             } else {
                 config['host'] = host
             }
+
+            const mysql = require('mysql')
 
             const pool = mysql.createPool(config)
             const filterParser = new FilterParser()
