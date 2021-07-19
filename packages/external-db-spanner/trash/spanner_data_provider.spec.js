@@ -1,11 +1,11 @@
-const DataProvider = require('./spanner_data_provider')
-const {SchemaProvider} = require('./spanner_schema_provider')
-const { Uninitialized } = require('test-commons')
-const gen = require('../../../../test/drivers/gen');
-const Chance = require('chance')
-const chance = Chance();
-const driver = require('../../../../test/drivers/sql_filter_transformer_test_support')
-const resource = require('../../../../test/resources/spanner_resources')
+// const DataProvider = require('./spanner_data_provider')
+// const {SchemaProvider} = require('./spanner_schema_provider')
+// const { Uninitialized, gen } = require('test-commons')
+// const Chance = require('chance')
+// const { gen } = require('test-commons')
+// const chance = Chance();
+// const driver = require('../../../../test/drivers/sql_filter_transformer_test_support')
+// const resource = require('../../../../test/resources/spanner_resources')
 
 
 describe.skip('Spanner Data Service', function() {

@@ -1,9 +1,9 @@
-const {SchemaProvider, SystemFields} = require('./spanner_schema_provider')
+// const {SchemaProvider, SystemFields} = require('./spanner_schema_provider')
 const { Uninitialized } = require('test-commons')
-const gen = require('../../../../test/drivers/gen');
-const resource = require('../../../../test/resources/spanner_resources');
-const Chance = require('chance')
-const chance = Chance();
+// const gen = require('../../../../test/drivers/gen');
+// const resource = require('../../../../test/resources/spanner_resources');
+// const Chance = require('chance')
+// const chance = Chance();
 
 
 describe.skip('Spanner Service', function () {
