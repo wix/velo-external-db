@@ -13,11 +13,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/spanner": "^5.12.0",
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "external-db-mysql": "^0.0.0",
-    "moment": "^2.29.1",
     "mysql": "^2.18.1",
     "nested-property": "^4.0.0",
     "velo-external-db-commons": "^0.0.0",
