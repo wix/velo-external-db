@@ -1,4 +1,4 @@
-const { unpackDates } = require('../../src/service/transform')
+const { unpackDates } = require('../../lib/service/transform')
 const { when } = require('jest-when')
 
 const dataProvider = {
