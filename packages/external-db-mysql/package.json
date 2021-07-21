@@ -25,16 +25,8 @@
   "bugs": {
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
-  "devDependencies": {
-    "chance": "^1.1.7",
-    "moment": "^2.29.1",
-    "jest": "^27.0.6",
-    "jest-each": "^27.0.6",
-    "jest-when": "^3.3.1",
-    "test-commons": "^0.0.0",
-    "ts-jest": "^27.0.3"
-  },
   "dependencies": {
+    "moment": "^2.29.1",
     "velo-external-db-commons": "^0.0.0"
   }
 }
