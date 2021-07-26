@@ -1,7 +1,9 @@
 const init = (type, host, user, password, db, cloudSqlConnectionName) => {
     switch (type) {
+        case 'env/sql':
+        case 'aws/sql':
         case 'gcp/sql':
-            console.log('INIT: gcp/sql')
+            console.log(`INIT: ${type}`)
             const { SchemaProvider, DataProvider, FilterParser } = require('external-db-mysql')
             // const { SchemaProvider } = require('./gcp/sql/cloud_sql_schema_provider')
             // const DataProvider = require('./gcp/sql/cloud_sql_data_provider')
@@ -21,7 +23,7 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
                 connectionLimit: 10,
                 queueLimit: 0,
             }
-
+            
             if (cloudSqlConnectionName) {
                 config['socketPath'] = `/cloudsql/${cloudSqlConnectionName}`
             } else {
@@ -29,7 +31,6 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
             }
 
             const mysql = require('mysql')
-
             const pool = mysql.createPool(config)
             const filterParser = new FilterParser()
             const dataProvider = new DataProvider(pool, filterParser)
@@ -39,4 +40,27 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
     }
 }
 
-module.exports = { init }
+const initViaSecretManger = async (type) => {
+    switch (type) {
+        case 'aws/sql':
+            console.log(`SECRET MANGER: ${type}`);
+            const { SecretsManagerClient, GetSecretValueCommand , DescribeSecretCommand  } = require("@aws-sdk/client-secrets-manager");
+            const region = process.env.REGION || process.env.AWS_DEFAULT_REGION;
+            const SecretId = process.env.SECRETNAME || 'DB_INFO';
+            const SMClient = new SecretsManagerClient({ region });
+            const getValueCommand = new GetSecretValueCommand({ SecretId });
+        
+            try {
+                const response = await SMClient.send(getValueCommand);
+                console.log(response);
+                const { host, port, username, password,DB, SECRET_KEY } = JSON.parse(response.SecretString);
+                return {init : init(type,host,username,password,DB), SECRET_KEY};
+            } catch (e) {
+                console.error(e);
+                return Promise.reject(e.name); 
+            }
+
+    }
+}
+
+module.exports = { init, initViaSecretManger }

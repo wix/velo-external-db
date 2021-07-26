@@ -24,14 +24,14 @@ class SecretMangerClientENV {
 
         const { HOST, USERNAME, PASSWORD, DB, SECRET_KEY } = process.env;
         
-        return ({ HOST ,USERNAME, PASSWORD, DB, SECRET_KEY});
+        return ({ host: HOST ,username: USERNAME, password: PASSWORD, DB, SECRET_KEY});
     }
 }
 
 class SecretMangerClientAWS {
-    constructor( secretId = 'DB_INFO' , region = 'us-east-1' ){
+    constructor( SecretId = 'DB_INFO' , region = 'us-east-1' ){
         this.SMClient = new SecretsManagerClient({ region });
-        this.getValueCommand = new GetSecretValueCommand({ secretId });
+        this.getValueCommand = new GetSecretValueCommand({ SecretId });
         this.requiredProps = ['host', 'username', 'password','DB', 'SECRET_KEY'];
     }
 

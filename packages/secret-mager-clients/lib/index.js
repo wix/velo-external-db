@@ -1,7 +1,6 @@
 'use strict';
 
-module.exports = secretmangerclients;
+const {SecretMangerClientENV,SecretMangerClientAWS } = require('./secret_mager_aws')
 
-function secretmangerclients() {
-    // TODO
-}
+module.exports = { SecretMangerClientENV,SecretMangerClientAWS };
+
