@@ -53,5 +53,5 @@ class SecretMangerClientAWS {
     }
 }
 
-module.exports = { SecretMangerClientENV,SecretMangerClientAWS }
+module.exports = { SecretMangerClientENV,SecretMangerClientAWS, missingRequiredProps }
 

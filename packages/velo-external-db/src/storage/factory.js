@@ -2,6 +2,7 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
     switch (type) {
         case 'env/sql':
         case 'aws/sql':
+        case 'azr/sql':
         case 'gcp/sql':
             console.log(`INIT: ${type}`)
             const { SchemaProvider, DataProvider, FilterParser } = require('external-db-mysql')
@@ -32,6 +33,7 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
 
             const mysql = require('mysql')
             const pool = mysql.createPool(config)
+            //TODO: need to check if the connection succeeded.
             const filterParser = new FilterParser()
             const dataProvider = new DataProvider(pool, filterParser)
             const schemaProvider = new SchemaProvider(pool)
@@ -39,6 +41,7 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
             return { dataProvider: dataProvider, schemaProvider: schemaProvider }
     }
 }
+
 
 const initViaSecretManger = async (type) => {
     switch (type) {

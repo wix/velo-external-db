@@ -8,7 +8,7 @@ const { errorMiddleware } = require('./web/error-middleware')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
 const { createRouter } = require('./router');
-const { SecretMangerClientENV, SecretMangerClientAWS } = require('secret-manger-clients');
+const { SecretMangerClientENV, SecretMangerClientAWS, SecretMangerClientAzure } = require('secret-manger-clients');
 
 const startup = async (type = 'aws/sql') => {
     var secretMangerClient;
@@ -21,9 +21,12 @@ const startup = async (type = 'aws/sql') => {
             console.log(`SECRET MANGER: ${type}`);
             secretMangerClient = new SecretMangerClientAWS();   
             break;
+        case 'azr/sql':
+            console.log(`SECRET MANGER: ${type}`);
+            secretMangerClient = new SecretMangerClientAzure(); 
+            break;
         default:
             return Promise.reject(`Type not supplied or not recognized!`);
-                
     }
     const secrets = await secretMangerClient.getSecrets();
     const initRes = init(type,secrets.host,secrets.username,secrets.password,secrets.DB);
