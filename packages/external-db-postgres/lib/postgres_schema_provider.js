@@ -1,6 +1,6 @@
-const { promisify } = require('util')
 const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
+const { escapeIdentifier } = require('./postgres_utils')
 const { CannotModifySystemField } = require('velo-external-db-commons')
 
 const SystemFields = [
@@ -23,14 +23,12 @@ class SchemaProvider {
 
         this.systemFields = SystemFields
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
-
-        this.query = promisify(this.pool.query).bind(this.pool)
     }
 
     async list() {
-        const currentDb = this.pool.config.connectionConfig.database
-        const data = await this.query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION', currentDb)
-        const tables = data.reduce((o, r) => {
+        const data = await this.pool.query('SELECT table_name, column_name AS field, data_type, udt_name AS type FROM information_schema.columns WHERE table_schema = $1 ORDER BY table_name', ['public'])
+
+        const tables = data.rows.reduce((o, r) => {
             const arr = o[r.table_name] || []
             arr.push(r)
             o[r.table_name] = arr
@@ -41,30 +39,34 @@ class SchemaProvider {
                      .map(([collectionName, rs]) => this.asWixSchema(rs, collectionName))
     }
 
-    async create(collectionName, columns) {
-        const dbColumnsSql = [...this.systemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
-                                                                       .join(', ')
-        const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => `\`${f.name}\``).join(', ')
 
-        await this.query(`CREATE TABLE IF NOT EXISTS ?? (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
-                         [collectionName, ...(columns || []).map(c => c.name)])
+    async create(collectionName, _columns) {
+        const columns = _columns || []
+        const dbColumnsSql = [...this.systemFields, ...columns].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
+                                                               .join(', ')
+        const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => escapeIdentifier(f.name)).join(', ')
+
+        await this.pool.query(`CREATE TABLE IF NOT EXISTS ${escapeIdentifier(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`)
+                             // /* [...columns.map(c => c.name)]*/)
     }
 
     async addColumn(collectionName, column) {
         await this.validateSystemFields(column.name)
-        await this.query(`ALTER TABLE ?? ADD ?? ${this.sqlSchemaTranslator.dbTypeFor(column)}`, [collectionName, column.name])
+
+        await this.pool.query(`ALTER TABLE ${escapeIdentifier(collectionName)} ADD ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
                   .catch( translateErrorCodes )
     }
 
     async removeColumn(collectionName, columnName) {
         await this.validateSystemFields(columnName)
-        return await this.query(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
+
+        return await this.pool.query(`ALTER TABLE ${escapeIdentifier(collectionName)} DROP COLUMN ${escapeIdentifier(columnName)}`)
                          .catch( translateErrorCodes )
     }
 
     async describeCollection(collectionName) {
-        const res = await this.query('DESCRIBE ??', [collectionName])
-        return this.asWixSchema(res.map(r => ({field: r.Field, type: r.Type})), collectionName)
+        const res = await this.pool.query('SELECT table_name, column_name AS field, data_type, udt_name AS type, character_maximum_length FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2 ORDER BY table_name', ['public', collectionName])
+        return this.asWixSchema(res.rows, collectionName)
     }
 
     asWixSchema(res, collectionName) {

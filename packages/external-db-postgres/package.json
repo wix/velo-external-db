@@ -1,5 +1,5 @@
 {
-  "name": "external-db-mysql",
+  "name": "external-db-postgres",
   "version": "0.0.0",
   "description": "> TODO: description",
   "author": "Noam Almog <noama@wix.com>",
@@ -27,6 +27,8 @@
   },
   "dependencies": {
     "moment": "^2.29.1",
+    "pg": "^8.6.0",
+    "pg-escape": "^0.2.0",
     "velo-external-db-commons": "^0.0.0"
   },
   "devDependencies": {

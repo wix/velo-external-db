@@ -23,7 +23,7 @@ const initMySqlEnv = async () => {
     process.env.PASSWORD = 'password'
     process.env.DB = 'test-db'
 
-    await compose.upOne('db', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] } )
+    await compose.upOne('mysql', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] } )
     // await compose.logs('db', { cwd: __dirname, log: true });
 
     await sleep( 500 )
@@ -47,7 +47,7 @@ const initMySqlEnv = async () => {
 }
 
 const shutdownMySqlEnv = async () => {
-    await compose.stopOne('db', { cwd: __dirname, log: true })
+    await compose.stopOne('mysql', { cwd: __dirname, log: true })
 }
 
 module.exports = { initMySqlEnv, shutdownMySqlEnv }

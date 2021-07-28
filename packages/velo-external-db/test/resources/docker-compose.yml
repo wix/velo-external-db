@@ -9,7 +9,16 @@ services:
       - SPANNER_DATABASE_ID=test-database
       - SPANNER_INSTANCE_ID=test-instance
       - SPANNER_PROJECT_ID=test-project
-  db:
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: 'test-user'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_DB: 'test-db'
+  mysql:
     image: mysql:5.7
     restart: always
     environment:

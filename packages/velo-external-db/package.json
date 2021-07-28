@@ -16,8 +16,10 @@
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "external-db-mysql": "^0.0.0",
+    "external-db-postgres": "^0.0.0",
     "mysql": "^2.18.1",
     "nested-property": "^4.0.0",
+    "pg": "^8.6.0",
     "velo-external-db-commons": "^0.0.0",
     "velo-external-db-core": "^0.0.0"
   },

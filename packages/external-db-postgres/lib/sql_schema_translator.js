@@ -1,4 +1,4 @@
-
+const { escapeIdentifier } = require('./postgres_utils')
 
 class SchemaColumnTranslator {
 
@@ -7,33 +7,46 @@ class SchemaColumnTranslator {
 
     translateType(dbType) {
         const type = dbType.toLowerCase()
-            .split('(')
-            .shift()
+                           .split('(')
+                           .shift()
 
         switch (type) {
             case 'int':
+            case 'int2':
+            case 'int4':
+            case 'int8':
+            case 'smallint':
             case 'integer':
             case 'bigint':
-            case 'smallint':
-            case 'float':
-            case 'double':
+            case 'serial':
+            case 'smallserial':
+            case 'bigserial':
+
             case 'decimal':
+            case 'numeric':
+            case 'real':
+            case 'double precision':
+            case 'float4':
+            case 'float8':
+
+            case 'money':
                 return 'number'
 
             case 'date':
-            case 'datetime':
-            case 'timestamp':
             case 'time':
-            case 'year':
+            case 'timez':
+            case 'timestamp':
+            case 'timestamptz':
                 return 'datetime'
 
+            case 'character':
+            case 'character varying':
             case 'varchar':
+            case 'char':
             case 'text':
-            case 'mediumtext':
-            case 'longtext':
                 return 'text'
 
-            case 'tinyint':
+            case 'boolean':
                 return 'boolean'
 
             default:
@@ -42,9 +55,8 @@ class SchemaColumnTranslator {
         }
     }
 
-
     columnToDbColumnSql(f) {
-        return `${f.name} ${this.dbTypeFor(f)}`
+        return `${escapeIdentifier(f.name)} ${this.dbTypeFor(f)}`
     }
 
     dbTypeFor(f) {
@@ -54,62 +66,44 @@ class SchemaColumnTranslator {
     dbType(type, subtype, precision) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
             case 'number_int':
-                return 'INT'
+                return 'integer'
 
             case 'number_bigint':
-                return 'BIGINT'
+                return 'bigint'
 
             case 'number_float':
-                return `FLOAT${this.parsePrecision(precision)}`
+                return `decimal`
 
             case 'number_double':
-                return `DOUBLE${this.parsePrecision(precision)}`
+                return `double precision`
 
             case 'number_decimal':
-                return `DECIMAL${this.parsePrecision(precision)}`
+                return `real`
 
             case 'datetime_date':
-                return `DATE`
+                return `date`
 
             case 'datetime_time':
-                return `TIME`
-
-            case 'datetime_year':
-                return `YEAR`
-
-            case 'datetime_datetime':
-                return `DATETIME`
+                return `time`
 
             case 'datetime_timestamp':
-                return `TIMESTAMP DEFAULT CURRENT_TIMESTAMP`
+            case 'datetime_datetime':
+                return `timestamp`
 
             case 'text_string':
-                return `VARCHAR${this.parseLength(precision)}`
+                return `varchar${this.parseLength(precision)}`
 
             case 'text_small':
-                return `TEXT`
-
             case 'text_medium':
-                return `MEDIUMTEXT`
-
             case 'text_large':
-                return `LONGTEXT`
+                return `text`
 
             case 'boolean_':
-                return `BOOLEAN`
+                return `boolean`
 
             default:
                 throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)
 
-        }
-    }
-
-    parsePrecision(precision) {
-        try {
-            const parsed = precision.split(',').map(s => s.trim()).map(s => parseInt(s))
-            return `(${parsed.join(',')})`
-        } catch (e) {
-            return '(5,2)'
         }
     }
 

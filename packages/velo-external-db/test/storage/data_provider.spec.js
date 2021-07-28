@@ -1,52 +1,57 @@
-const cloudSql = require('external-db-mysql')
-const driver = require('../drivers/sql_filter_transformer_test_support')
+const mysql = require('external-db-mysql')
+const postgres = require('external-db-postgres')
 const { Uninitialized, gen } = require('test-commons')
-const mysql = require('../resources/mysql_resources');
+const mysqlTestEnv = require('../resources/mysql_resources');
+const postgresTestEnv = require('../resources/postgres_resources');
 const each = require('jest-each').default
 const Chance = require('chance');
 const chance = new Chance();
-
 
 const env1 = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
     connectionPool: Uninitialized,
+    driver: Uninitialized,
 };
 
-// const env2 = {
-//     schemaProvider: Uninitialized,
-//     connectionPool: Uninitialized,
-// };
+const env2 = {
+    dataProvider: Uninitialized,
+    schemaProvider: Uninitialized,
+    connectionPool: Uninitialized,
+    driver: Uninitialized,
+};
 
-beforeAll(async () => {
-    // cloud Sql
-    env1.connectionPool = await mysql.initMySqlEnv()
-    env1.schemaProvider = new cloudSql.SchemaProvider(env1.connectionPool)
-    env1.dataProvider = new cloudSql.DataProvider(env1.connectionPool, driver.filterParser)
+const postgresTestEnvInit = async () => {
+    env2.connectionPool = await postgresTestEnv.initEnv()
+    env2.dataProvider = new postgres.DataProvider(env2.connectionPool, postgres.driver.filterParser)
+    env2.schemaProvider = new postgres.SchemaProvider(env2.connectionPool)
+    env2.driver = postgres.driver
+}
 
-    // // spanner
-    // const projectId = 'test-project'
-    // const instanceId = 'test-instance'
-    // const databaseId = 'test-database'
-    //
-    // await resource.initSpannerEnv()
-    //
-    // env2.schemaProvider = new spanner.SchemaProvider(projectId, instanceId, databaseId)
+const mysqlTestEnvInit = async () => {
+    env1.connectionPool = await mysqlTestEnv.initMySqlEnv()
+    env1.schemaProvider = new mysql.SchemaProvider(env1.connectionPool)
+    env1.driver = mysql.driver
+    env1.dataProvider = new mysql.DataProvider(env1.connectionPool, env1.driver.filterParser)
+}
+
+beforeAll(async () => {``
+    await mysqlTestEnvInit()
+    await postgresTestEnvInit()
 }, 20000);
 
-
 afterAll(async () => {
-    await mysql.shutdownMySqlEnv();
-
-    // await resource.shutSpannerEnv()
+    await env2.connectionPool.end()
+    await postgresTestEnv.shutdownEnv();
+    return await mysqlTestEnv.shutdownMySqlEnv();
 }, 20000);
 
 
 describe('Data API', () => {
 
     each([
-        ['Cloud Sql', env1],
-        // ['Spanner', env2],
+        ['MySql', env1],
+        ['Postgres', env2],
     ]).describe('%s', (name, env) => {
 
         const givenCollectionWith = async (entities, forCollection) => {
@@ -54,8 +59,8 @@ describe('Data API', () => {
         }
 
         test('search with empty filter and order by and no data', async () => {
-            driver.stubEmptyFilterFor(ctx.filter)
-            driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.stubEmptyFilterFor(ctx.filter)
+            env.driver.stubEmptyOrderByFor(ctx.sort)
 
             const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
@@ -64,8 +69,8 @@ describe('Data API', () => {
 
         test('search with non empty filter will return data', async () => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
-            driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
+            env.driver.stubEmptyOrderByFor(ctx.sort)
 
             const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
@@ -74,8 +79,8 @@ describe('Data API', () => {
 
         test('search with non empty order by will return sorted data', async () => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            driver.stubEmptyFilterFor(ctx.filter)
-            driver.givenOrderByFor('_owner', ctx.sort)
+            env.driver.stubEmptyFilterFor(ctx.filter)
+            env.driver.givenOrderByFor('_owner', ctx.sort)
 
             const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
@@ -84,8 +89,8 @@ describe('Data API', () => {
 
         test('search with empty order and filter but with limit and skip', async () => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            driver.stubEmptyFilterFor(ctx.filter)
-            driver.givenOrderByFor('_owner', ctx.sort)
+            env.driver.stubEmptyFilterFor(ctx.filter)
+            env.driver.givenOrderByFor('_owner', ctx.sort)
 
             const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1)
 
@@ -96,9 +101,9 @@ describe('Data API', () => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
             await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
 
-            driver.stubEmptyFilterFor(ctx.filter)
-            driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep)
-            driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
+            env.driver.stubEmptyFilterFor(ctx.filter)
+            env.driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep, ctx.numericColumns)
+            env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
 
             const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
 
@@ -111,9 +116,9 @@ describe('Data API', () => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
             await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
 
-            driver.stubEmptyFilterFor(ctx.filter)
-            driver.stubEmptyHavingFilterFor(ctx.aggregation.postFilteringStep)
-            driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
+            env.driver.stubEmptyFilterFor(ctx.filter)
+            env.driver.stubEmptyHavingFilterFor(ctx.aggregation.postFilteringStep)
+            env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
 
             const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
 
@@ -126,19 +131,18 @@ describe('Data API', () => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
             await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
 
-            driver.givenFilterByIdWith(ctx.numberEntity._id, ctx.filter)
-            driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep)
-            driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
+            env.driver.givenFilterByIdWith(ctx.numberEntity._id, ctx.filter)
+            env.driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep, ctx.numericColumns, 1)
+            env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
 
             const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
 
             expect( res ).toEqual([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name]}])
         });
 
-
         test('count will run query', async () => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
-            driver.stubEmptyFilterFor(ctx.filter)
+            env.driver.stubEmptyFilterFor(ctx.filter)
 
             const res = await env.dataProvider.count(ctx.collectionName, ctx.filter)
 
@@ -147,7 +151,7 @@ describe('Data API', () => {
 
         test('count will run query with filter', async () => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
+            env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
 
             const res = await env.dataProvider.count(ctx.collectionName, ctx.filter)
 
@@ -155,7 +159,7 @@ describe('Data API', () => {
         });
 
         test('insert data into collection name and query all of it', async () => {
-            driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.insert(ctx.collectionName, [ctx.entity]) ).toEqual(1)
 
@@ -163,7 +167,7 @@ describe('Data API', () => {
         });
 
         test('bulk insert data into collection name and query all of it', async () => {
-            driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.insert(ctx.collectionName, ctx.entities) ).toEqual(ctx.entities.length)
 
@@ -172,7 +176,7 @@ describe('Data API', () => {
 
         test('insert entity with number', async () => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
-            driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.insert(ctx.numericCollectionName, [ctx.numberEntity]) ).toEqual(1)
 
@@ -181,7 +185,7 @@ describe('Data API', () => {
 
         test('delete data from collection', async () => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
-            driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).toEqual(ctx.entities.length)
 
@@ -190,7 +194,7 @@ describe('Data API', () => {
 
         test('allow update for single entity', async () => {
             await givenCollectionWith([ctx.entity], ctx.collectionName)
-            driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).toEqual(1)
 
@@ -199,7 +203,7 @@ describe('Data API', () => {
 
         test('allow update for multiple entities', async () => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
-            driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.stubEmptyFilterAndSortFor('', '')
 
             expect( await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntities) ).toEqual(ctx.modifiedEntities.length)
 
@@ -217,7 +221,7 @@ describe('Data API', () => {
 
         test('truncate will remove all data from collection', async () => {
             await givenCollectionWith([ctx.entity], ctx.collectionName)
-            driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.stubEmptyFilterAndSortFor('', '')
 
             await env.dataProvider.truncate(ctx.collectionName)
 
