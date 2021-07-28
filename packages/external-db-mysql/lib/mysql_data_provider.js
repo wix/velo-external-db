@@ -1,6 +1,6 @@
 const moment = require('moment')
 const { promisify } = require('util')
-const { SystemFields } = require('./cloud_sql_schema_provider')
+const { SystemFields } = require('./mysql_schema_provider')
 const { EMPTY_FILTER } = require('./sql_filter_transformer')
 const translateErrorCodes = require('./sql_exception_translator')
 
