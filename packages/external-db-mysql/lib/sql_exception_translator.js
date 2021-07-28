@@ -8,6 +8,8 @@ const translateErrorCodes = err => {
             throw new FieldAlreadyExists('Collection already has a field with the same name')
         case 'ER_NO_SUCH_TABLE':
             throw new CollectionDoesNotExists('Collection does not exists')
+        case 'ER_ACCESS_DENIED_ERROR' :
+            throw new Error (`Connection to MySQL failed, probably wrong credentials:  ${err.message}`)
         default :
             console.log(err)
             throw new Error(`default ${err.code}`)

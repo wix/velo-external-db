@@ -1,4 +1,8 @@
-const init = (type, host, user, password, db, cloudSqlConnectionName) => {
+const { resolve } = require('path')
+const { promisify } = require('util')
+const translateErrorCodes = require('../../../external-db-mysql/lib/sql_exception_translator')
+
+const init = async (type, host, user, password, db, cloudSqlConnectionName) => {
     switch (type) {
         case 'env/sql':
         case 'aws/sql':
@@ -11,9 +15,9 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
             // const { FilterParser } = require('./gcp/sql/sql_filter_transformer')
 
             const config = {
-                user     : user,
-                password : password,
-                database : db,
+                user: user,
+                password: password,
+                database: db,
 
                 waitForConnections: true,
                 namedPlaceholders: true,
@@ -24,15 +28,15 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
                 connectionLimit: 10,
                 queueLimit: 0,
             }
-            
+
             if (cloudSqlConnectionName) {
                 config['socketPath'] = `/cloudsql/${cloudSqlConnectionName}`
             } else {
                 config['host'] = host
             }
+                    
+            const pool = await createPool(config);
 
-            const mysql = require('mysql')
-            const pool = mysql.createPool(config)
             //TODO: need to check if the connection succeeded.
             const filterParser = new FilterParser()
             const dataProvider = new DataProvider(pool, filterParser)
@@ -42,25 +46,36 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
     }
 }
 
+const createPool = async (config) => {
+    const mysql = require('mysql')
+    const pool = mysql.createPool(config)
+    await checkIfConnectionSucceeded(pool)
+    return pool
+}
+
+const checkIfConnectionSucceeded = async (pool) => {
+    const query = promisify(pool.query).bind(pool);
+    return await query('SELECT 1 + 1 AS solution').catch(translateErrorCodes)
+}
 
 const initViaSecretManger = async (type) => {
     switch (type) {
         case 'aws/sql':
             console.log(`SECRET MANGER: ${type}`);
-            const { SecretsManagerClient, GetSecretValueCommand , DescribeSecretCommand  } = require("@aws-sdk/client-secrets-manager");
+            const { SecretsManagerClient, GetSecretValueCommand, DescribeSecretCommand } = require("@aws-sdk/client-secrets-manager");
             const region = process.env.REGION || process.env.AWS_DEFAULT_REGION;
             const SecretId = process.env.SECRETNAME || 'DB_INFO';
             const SMClient = new SecretsManagerClient({ region });
             const getValueCommand = new GetSecretValueCommand({ SecretId });
-        
+
             try {
                 const response = await SMClient.send(getValueCommand);
                 console.log(response);
-                const { host, port, username, password,DB, SECRET_KEY } = JSON.parse(response.SecretString);
-                return {init : init(type,host,username,password,DB), SECRET_KEY};
+                const { host, port, username, password, DB, SECRET_KEY } = JSON.parse(response.SecretString);
+                return { init: init(type, host, username, password, DB), SECRET_KEY };
             } catch (e) {
                 console.error(e);
-                return Promise.reject(e.name); 
+                return Promise.reject(e.name);
             }
 
     }

@@ -29,7 +29,7 @@ const startup = async (type = 'aws/sql') => {
             return Promise.reject(`Type not supplied or not recognized!`);
     }
     const secrets = await secretMangerClient.getSecrets();
-    const initRes = init(type,secrets.host,secrets.username,secrets.password,secrets.DB);
+    const initRes = await init(type,secrets.host,secrets.username,secrets.password,secrets.DB);
     return {...initRes, SECRET_KEY : secrets.SECRET_KEY};
 }
 
@@ -55,8 +55,9 @@ startup(process.env.TYPE).then(res => {
     const server = app.listen(port/*, () => console.log(`Server listening on port ${port}!`)*/)
     module.exports = server;
 }).catch(e =>{
+    console.log('error catched:  ',e);
     app.get('/', (req, res) => {
-        res.send(e);
+        res.send(e.message);
     })
     const server = app.listen(port/*, () => console.log(`Server listening on port ${port}!`)*/)
     module.exports = server;
