@@ -3,36 +3,20 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const compression = require('compression')
 const { DataService, SchemaService } = require('velo-external-db-core')
-const { init, initViaSecretManger } = require('./storage/factory')
+const { init } = require('./storage/factory')
 const { errorMiddleware } = require('./web/error-middleware')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
 const { createRouter } = require('./router');
-const { SecretMangerClientENV, SecretMangerClientAWS, SecretMangerClientAzure } = require('secret-manger-clients');
+const { createSecretClient } = require('secret-manger-clients');
 
-const startup = async (type = 'aws/sql') => {
-    var secretMangerClient;
-    switch ( type ) {
-        case 'env/sql':
-            console.log(`SECRET MANGER: ${type}`);
-            secretMangerClient = new SecretMangerClientAWS();
-            break;
-        case 'aws/sql':
-            console.log(`SECRET MANGER: ${type}`);
-            secretMangerClient = new SecretMangerClientAWS();   
-            break;
-        case 'azr/sql':
-            console.log(`SECRET MANGER: ${type}`);
-            secretMangerClient = new SecretMangerClientAzure(); 
-            break;
-        default:
-            return Promise.reject(`Type not supplied or not recognized!`);
-    }
+const startup = async ( type ) => {
+    const secretMangerClient = createSecretClient(type);
     const secrets = await secretMangerClient.getSecrets();
-    const initRes = await init(type,secrets.host,secrets.username,secrets.password,secrets.DB);
-    return {...initRes, SECRET_KEY : secrets.SECRET_KEY};
+    const initRes = await init(type,secrets.host,secrets.username,secrets.password,secrets.db,secrets.cloudSqlConnectionName);
+    console.log('Initialization completed successfully!');
+    return {...initRes, secretKey : secrets.secretKey};
 }
-
 
 const app = express()
 const port = process.env.PORT || 8080
@@ -43,7 +27,7 @@ startup(process.env.TYPE).then(res => {
     const schemaService = new SchemaService(schemaProvider);
     
     app.use(bodyParser.json())
-    app.use(unless(['/', '/provision'], authMiddleware({ secretKey: res.SECRET_KEY })));
+    app.use(unless(['/', '/provision'], authMiddleware({ secretKey: res.secretKey })));
     app.use(errorMiddleware)
     app.use(compression())
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
@@ -54,11 +38,12 @@ startup(process.env.TYPE).then(res => {
 
     const server = app.listen(port/*, () => console.log(`Server listening on port ${port}!`)*/)
     module.exports = server;
-}).catch(e =>{
-    console.log('error catched:  ',e);
+}).catch(err => {
+    console.log(err);
     app.get('/', (req, res) => {
-        res.send(e.message);
+        res.send(err.message);
     })
     const server = app.listen(port/*, () => console.log(`Server listening on port ${port}!`)*/)
     module.exports = server;
 });
+
