@@ -1,25 +1,32 @@
 const mockClient = require('aws-sdk-client-mock');
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
-const { SecretMangerClientENV, SecretMangerClientAWS } = require('./secret_mager_aws')
+const { SecretMangerClientENV, SecretMangerClientAWS } = require('./secretMagerClients')
 
 const SecretsManagerMock = mockClient.mockClient(SecretsManagerClient);
 
 
 describe('Secrect Manger Clients', () => {
+    
+    const ENVs  = { 
+        HOST : 'host',
+        USERNAME : 'userName',
+        PASSWORD : 'password',
+        DB : 'DB',
+        SECRET_KEY : 'SECRET_KEY',
+    };
+    const SecretString  = { 
+        host : 'host',
+        username : 'userName',
+        password : 'password',
+        db : 'DB',
+        secretKey : 'SECRET_KEY',
+    };
 
-    describe('ENV - Secrect Manger Client', () => {
+    describe('ENV/AZR/GCP - Secrect Manger Client', () => {
         
-        const SecretString  = { 
-            HOST : 'host',
-            USERNAME : 'userName',
-            PASSWORD : 'password',
-            DB : 'DB',
-            SECRET_KEY : 'SECRET_KEY',
-        };
-
         beforeEach(() => {
             jest.resetModules();
-            process.env = { ...process.env, ...SecretString };
+            process.env = { ...process.env, ...ENVs };
         });
     
     
@@ -30,38 +37,30 @@ describe('Secrect Manger Clients', () => {
 
         test('get secerts with not all the required fields', async () => {
             delete process.env.HOST;
-            await expect(env.env_secretMangerClient.getSecrets()).rejects.toEqual('Missing required props: HOST');
+            await expect(env.env_secretMangerClient.getSecrets()).rejects.toThrow('Please set the next variable/s in your secret manger: HOST');
         });
 
     });
     
     describe('AWS - Secrect Manger Client', () => {
         
-        const SecretString  = { 
-            host : 'host',
-            port : 'port',
-            username : 'userName',
-            password : 'password',
-            DB : 'DB',
-            SECRET_KEY : 'SECRET_KEY',
-        };
-
         beforeEach(() => {
             jest.resetModules();
             SecretsManagerMock.reset();
         });
 
         test('get secerts', async () => {
-            SecretsManagerMock.on(GetSecretValueCommand).resolves({ SecretString : JSON.stringify(SecretString) });
+            const secretsLikeinAWS = {...SecretString , DB: SecretString.db , SECRET_KEY: SecretString.secretKey }
+            SecretsManagerMock.on(GetSecretValueCommand).resolves({ SecretString : JSON.stringify(secretsLikeinAWS) });
             const result = await env.aws_secretMangerClient.getSecrets();
             expect(result).toStrictEqual(SecretString);
         });
 
         test('get secerts with not all the required fields', async () => {
-            const brokenSecretThings = SecretString;
-            delete brokenSecretThings.host;
-            SecretsManagerMock.on(GetSecretValueCommand).resolves({ SecretString : JSON.stringify(brokenSecretThings) });
-            await expect(env.aws_secretMangerClient.getSecrets()).rejects.toEqual('Missing required props: host');
+            const brokenSecret = {...SecretString , DB: SecretString.db , SECRET_KEY: SecretString.secretKey }
+            delete brokenSecret.host;
+            SecretsManagerMock.on(GetSecretValueCommand).resolves({ SecretString : JSON.stringify(brokenSecret) });
+            await expect(env.aws_secretMangerClient.getSecrets()).rejects.toThrow('Error occurred retrieving secerts: Error: Please set the next variable/s in your secret manger: host');
         });
 
     });
