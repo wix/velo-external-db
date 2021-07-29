@@ -9,7 +9,11 @@ const translateErrorCodes = err => {
         case 'ER_NO_SUCH_TABLE':
             throw new CollectionDoesNotExists('Collection does not exists')
         case 'ER_ACCESS_DENIED_ERROR' :
-            throw new Error (`Connection to MySQL failed, probably wrong credentials:  ${err.message}`)
+        case 'ER_NOT_SUPPORTED_AUTH_MODE' :
+        case 'ENOTFOUND' :
+            throw new Error (`Connection to MySQL failed, probably wrong credentials.`)
+        case 'ER_BAD_DB_ERROR' :
+            throw new Error (`Connection to database failed, probably wrong database name: ${err.message}`)
         default :
             console.log(err)
             throw new Error(`default ${err.code}`)
