@@ -11,7 +11,7 @@ const { unless } = require('./web/middleware-support')
 //todo: extract this logic to external class and allow different implementations for gcp, aws, azure.
 const { type, host, user, password, db, cloudSqlConnectionName } = {type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME}
 
-const {dataProvider, schemaProvider} = init(type, host, user, password, db, cloudSqlConnectionName)
+const {dataProvider, schemaProvider, cleanup} = init(type, host, user, password, db, cloudSqlConnectionName)
 const dataService = new DataService(dataProvider)
 const schemaService = new SchemaService(schemaProvider)
 
@@ -118,7 +118,7 @@ app.post('/data/update/bulk', async (req, res, next) => {
 app.post('/data/remove', async (req, res, next) => {
     try {
         const { collectionName, itemId } = req.body
-        const data = await dataService.delete(collectionName, [itemId])
+        const data = await dataService.delete(collectionName, itemId)
         res.json(data)
     } catch (e) {
         next(e)
@@ -128,7 +128,7 @@ app.post('/data/remove', async (req, res, next) => {
 app.post('/data/remove/bulk', async (req, res, next) => {
     try {
         const { collectionName, itemIds } = req.body
-        const data = await dataService.delete(collectionName, itemIds)
+        const data = await dataService.bulkDelete(collectionName, itemIds)
         res.json(data)
     } catch (e) {
         next(e)
@@ -189,4 +189,5 @@ app.post('/schemas/column/remove', async (req, res) => {
 // ***********************************************
 
 const server = app.listen(port/*, () => console.log(`Server listening on port ${port}!`)*/)
-module.exports = server;
+
+module.exports = { server, cleanup};

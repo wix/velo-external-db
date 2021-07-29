@@ -5,8 +5,8 @@ class FilterParser {
     constructor() {
     }
 
-    transform(filter, offset) {
-        const results = this.parseFilter(filter, offset)
+    transform(filter) {
+        const results = this.parseFilter(filter, 1, {})
 
         if (results.length === 0) {
             return EMPTY_FILTER;
@@ -39,7 +39,7 @@ class FilterParser {
         }
     }
 
-    parseAggregation(aggregation) {
+    parseAggregation(aggregation, postFilter, offset) {
         const groupByColumns = []
         const filterColumnsStr = []
         if (this.isObject(aggregation._id)) {
@@ -50,26 +50,36 @@ class FilterParser {
             groupByColumns.push(aggregation._id)
         }
 
+        const aliasToFunction = {}
         Object.keys(aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
                   Object.entries(aggregation[fieldAlias])
                         .forEach(([func, field]) => {
                             filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)}) AS ${escapeIdentifier(fieldAlias)}`)
+                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)})`
                         })
               })
+
+        const havingFilter = this.parseFilter(postFilter, offset, aliasToFunction)
+
+        const {filterExpr, parameters} =
+            havingFilter.map(({filterExpr, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+                                                              parameters: parameters}))
+                        .concat(EMPTY_FILTER)[0]
+
 
         return {
             fieldsStatement: filterColumnsStr.join(', '),
             fieldsStatementColumns: [],
             groupByColumns,
+            havingFilter: filterExpr,
+            parameters: parameters,
         }
     }
 
-    parseFilter(filter, offset) {
-        if (!offset) {
-            throw new Error(`offset ${offset}`)
-        }
+    parseFilter(filter, offset, inlineFields) {
+        // console.log('parseFilter', inlineFields)
         if (!filter || !this.isObject(filter)|| filter.operator === undefined) {
             return [];
         }
@@ -78,7 +88,7 @@ class FilterParser {
             case '$and':
             case '$or':
                 const res = filter.value.reduce((o, f) => {
-                    const res = this.parseFilter.bind(this)(f, o.offset)
+                    const res = this.parseFilter.bind(this)(f, o.offset, inlineFields)
                     return {
                         filter: o.filter.concat( ...res ),
                         offset: res.length === 1 ? res[0].offset : o.offset
@@ -92,7 +102,7 @@ class FilterParser {
                     parameters: res.filter.map( s => s.parameters ).flat()
                 }]
             case '$not':
-                const res2 = this.parseFilter( filter.value, offset )
+                const res2 = this.parseFilter( filter.value, offset, inlineFields )
                 return [{
                     filterExpr: `NOT (${res2[0].filterExpr})`,
                     filterColumns: [],
@@ -105,16 +115,17 @@ class FilterParser {
             const params = this.valueForOperator(filter.value, filter.operator, offset)
 
             return [{
-                filterExpr: `${escapeIdentifier(filter.fieldName)} ${this.veloOperatorToMySqlOperator(filter.operator, filter.value)} ${params.sql}`.trim(),
+                filterExpr: `${this.inlineVariableIfNeeded(filter.fieldName, inlineFields)} ${this.veloOperatorToMySqlOperator(filter.operator, filter.value)} ${params.sql}`.trim(),
                 filterColumns: [],
                 offset: params.offset,
                 parameters: filter.value !== undefined ? [].concat( this.patchTrueFalseValue(filter.value) ) : []
             }]
         }
 
+
         if (this.isSingleFieldStringOperator(filter.operator)) {
             return [{
-                filterExpr: `${escapeIdentifier(filter.fieldName)} LIKE $${offset}`,
+                filterExpr: `${this.inlineVariableIfNeeded(filter.fieldName, inlineFields)} LIKE $${offset}`,
                 filterColumns: [],
                 offset: offset + 1,
                 parameters: [this.valueForStringOperator(filter.operator, filter.value)]
@@ -238,6 +249,15 @@ class FilterParser {
         return value
     }
 
+    inlineVariableIfNeeded(fieldName, inlineFields) {
+        if (inlineFields) {
+            if (inlineFields[fieldName]) {
+                return inlineFields[fieldName]
+            }
+        }
+        return escapeIdentifier(fieldName)
+    }
+
 }
 
 const EMPTY_SORT = {
@@ -248,7 +268,8 @@ const EMPTY_SORT = {
 const EMPTY_FILTER = {
     filterExpr: '',
     filterColumns: [],
-    parameters: []
+    parameters: [],
+    offset: 1
 }
 
 module.exports = { EMPTY_FILTER, EMPTY_SORT, FilterParser }

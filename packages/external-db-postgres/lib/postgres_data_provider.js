@@ -1,7 +1,6 @@
 const moment = require('moment')
 const { escapeIdentifier } = require('./postgres_utils')
 const { SystemFields } = require('./postgres_schema_provider')
-const { EMPTY_FILTER } = require('./sql_filter_transformer')
 const translateErrorCodes = require('./sql_exception_translator')
 
 class DataProvider {
@@ -11,10 +10,10 @@ class DataProvider {
     }
 
     async find(collectionName, filter, sort, skip, limit) {
-        const {filterExpr, parameters} = this.filterParser.transform(filter)
+        const {filterExpr, parameters, offset} = this.filterParser.transform(filter)
         const {sortExpr} = this.filterParser.orderBy(sort)
 
-        const resultset = await this.pool.query(`SELECT * FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${parameters.length + 1} LIMIT $${parameters.length + 2}`, [...parameters, skip, limit])
+        const resultset = await this.pool.query(`SELECT * FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultset.rows
     }
@@ -73,17 +72,11 @@ class DataProvider {
     }
 
     async aggregate(collectionName, filter, aggregation) {
-        const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
-        const {fieldsStatement, groupByColumns} = this.filterParser.parseAggregation(aggregation.processingStep)
-        const havingFilter = this.filterParser.parseFilter(aggregation.postFilteringStep)
-
-        const {filterExpr, parameters} =
-            havingFilter.map(({filterExpr, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                              parameters: parameters}))
-                        .concat(EMPTY_FILTER)[0]
+        const {filterExpr: whereFilterExpr, parameters: whereParameters, offset} = this.filterParser.transform(filter)
+        const {fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep, offset)
 
         const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr}`
-        const rs = await this.pool.query(sql, [...whereParameters, ...parameters])
+        const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters])
                                   .catch( translateErrorCodes )
         return rs.rows
     }

@@ -71,11 +71,11 @@ describe('Sql Parser', () => {
         })
 
         test('transform filter', () => {
-            expect( env.filterParser.transform(ctx.filter, ctx.offset) ).toEqual({
-                filterExpr: `WHERE ${env.filterParser.parseFilter(ctx.filter, ctx.offset)[0].filterExpr}`,
+            expect( env.filterParser.transform(ctx.filter) ).toEqual({
+                filterExpr: `WHERE ${env.filterParser.parseFilter(ctx.filter, 1)[0].filterExpr}`,
                 filterColumns: [],
-                offset: env.filterParser.parseFilter(ctx.filter, ctx.offset)[0].offset,
-                parameters: env.filterParser.parseFilter(ctx.filter, ctx.offset)[0].parameters
+                offset: env.filterParser.parseFilter(ctx.filter, 1)[0].offset,
+                parameters: env.filterParser.parseFilter(ctx.filter, 1)[0].parameters
             })
         })
 
@@ -291,6 +291,8 @@ describe('Sql Parser', () => {
                         fieldsStatement: escapeIdentifier(ctx.fieldName),
                         fieldsStatementColumns: [],
                         groupByColumns: [ctx.fieldName],
+                        havingFilter: '',
+                        parameters: []
                     })
                 })
 
@@ -306,6 +308,27 @@ describe('Sql Parser', () => {
                         fieldsStatement: `${escapeIdentifier(ctx.fieldName)}, ${escapeIdentifier(ctx.anotherFieldName)}`,
                         fieldsStatementColumns: [],
                         groupByColumns: [ctx.fieldName, ctx.anotherFieldName],
+                        havingFilter: '',
+                        parameters: [],
+                    })
+                })
+
+                test(`process having filter`, () => {
+                    const aggregation = {
+                        _id: ctx.fieldName,
+                        [ctx.moreFieldName]: {
+                            '$avg': ctx.anotherFieldName
+                        }
+                    }
+
+                    const havingFilter = { operator: '$gt', fieldName: ctx.moreFieldName, value: ctx.fieldValue}
+
+                    expect( env.filterParser.parseAggregation(aggregation, havingFilter, ctx.offset) ).toEqual({
+                        fieldsStatement: `${escapeIdentifier(ctx.fieldName)}, AVG(${escapeIdentifier(ctx.anotherFieldName)}) AS ${escapeIdentifier(ctx.moreFieldName)}`,
+                        fieldsStatementColumns: [],
+                        groupByColumns: [ctx.fieldName],
+                        havingFilter: `HAVING AVG(${escapeIdentifier(ctx.anotherFieldName)}) > $${ctx.offset}`,
+                        parameters: [ctx.fieldValue],
                     })
                 })
 
@@ -326,6 +349,8 @@ describe('Sql Parser', () => {
                         fieldsStatement: `${escapeIdentifier(ctx.fieldName)}, ${mySqlFunction}(${escapeIdentifier(ctx.anotherFieldName)}) AS ${escapeIdentifier(ctx.moreFieldName)}`,
                         fieldsStatementColumns: [],
                         groupByColumns: [ctx.fieldName],
+                        havingFilter: '',
+                        parameters: [],
                     })
                 })
             })

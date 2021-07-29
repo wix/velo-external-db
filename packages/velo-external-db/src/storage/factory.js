@@ -1,12 +1,10 @@
 const init = (type, host, user, password, db, cloudSqlConnectionName) => {
     switch (type) {
-        case 'gcp/sql':
-            console.log('INIT: gcp/sql')
-            const { SchemaProvider, DataProvider, FilterParser } = require('external-db-mysql')
-            // const { SchemaProvider } = require('./gcp/sql/cloud_sql_schema_provider')
-            // const DataProvider = require('./gcp/sql/cloud_sql_data_provider')
-            // const { FilterParser } = require('./gcp/sql/sql_filter_transformer')
+        case 'sql/mysql':
+        case 'gcp/sql': {
+            console.log('INIT: sql/mysql')
 
+            const { SchemaProvider, DataProvider, FilterParser } = require('external-db-mysql')
             const config = {
                 user     : user,
                 password : password,
@@ -16,8 +14,6 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
                 namedPlaceholders: true,
                 multipleStatements: true,
 
-                // debug: true,
-                // trace: true,
                 connectionLimit: 10,
                 queueLimit: 0,
             }
@@ -35,7 +31,45 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
             const dataProvider = new DataProvider(pool, filterParser)
             const schemaProvider = new SchemaProvider(pool)
 
-            return { dataProvider: dataProvider, schemaProvider: schemaProvider }
+            return { dataProvider: dataProvider, schemaProvider: schemaProvider, cleanup: () => pool.end() }
+        }
+        case 'sql/postgres': {
+
+            console.log('INIT: sql/postgres')
+            const { SchemaProvider, DataProvider, FilterParser } = require('external-db-postgres')
+
+            const { Pool, types } = require('pg')
+            const { builtins } = require('pg-types')
+
+            types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
+
+            const config = {
+                host: host,
+                user: user,
+                password: password,
+                database: db,
+                port: 5432,
+
+                max: 10,
+                idleTimeoutMillis: 30000,
+                connectionTimeoutMillis: 2000,
+            }
+
+            // console.log('config', config)
+            const filterParser = new FilterParser()
+            const pool = new Pool(config)
+
+            pool.on('error', (err) => {
+                console.log(err)
+            })
+
+
+            const dataProvider = new DataProvider(pool, filterParser)
+            const schemaProvider = new SchemaProvider(pool)
+
+            return { dataProvider: dataProvider, schemaProvider: schemaProvider, cleanup: () => pool.end() }
+        }
+
     }
 }
 
