@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { escapeId } = require('mysql')
 const { promisify } = require('util')
 const { SystemFields } = require('./mysql_schema_provider')
 const { EMPTY_FILTER } = require('./sql_filter_transformer')
@@ -13,17 +14,17 @@ class DataProvider {
     }
 
     async find(collectionName, filter, sort, skip, limit) {
-        const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
-        const {sortExpr, sortColumns} = this.filterParser.orderBy(sort)
-        const sql = this.sqlFormat(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT ?, ?`, [collectionName, ...filterColumns, ...sortColumns])
+        const {filterExpr, parameters} = this.filterParser.transform(filter)
+        const {sortExpr} = this.filterParser.orderBy(sort)
+        const sql = `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
         const resultset = await this.query(sql, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultset
     }
 
     async count(collectionName, filter) {
-        const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
-        const sql = this.sqlFormat(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`, [collectionName, ...filterColumns])
+        const {filterExpr, parameters} = this.filterParser.transform(filter)
+        const sql = `SELECT COUNT(*) AS num FROM ${escapeId(collectionName)} ${filterExpr}`
         const resultset = await this.query(sql, parameters)
                                     .catch( translateErrorCodes )
         return resultset[0]['num']
@@ -32,8 +33,7 @@ class DataProvider {
     // todo: check if we can get schema in a safer way. should be according to schema of the table
     async insert(collectionName, items) {
         const item = items[0]
-        const n = Object.keys(item).length
-        const sql = this.sqlFormat(`INSERT INTO ?? (${this.wildCardWith(n, '??')}) VALUES ?`, [collectionName, ...Object.keys(item)])
+        const sql = `INSERT INTO ${escapeId(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES ?`
         
         const data = items.map(item => this.asParamArrays( this.patchDateTime(item) ) )
         const resultset = await this.query(sql, [data])
@@ -50,7 +50,7 @@ class DataProvider {
             return 0
         }
 
-        const queries = items.map(() => this.sqlFormat(`UPDATE ?? SET ${updateFields.map(() => '?? = ?').join(', ')} WHERE _id = ?`, [collectionName, ...updateFields]) )
+        const queries = items.map(() => `UPDATE ${escapeId(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ?`).join(', ')} WHERE _id = ?` )
                              .join(';')
         const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
                                 .map(u => this.asParamArrays( this.patchDateTime(u) ))
@@ -61,28 +61,27 @@ class DataProvider {
     }
 
     async delete(collectionName, itemIds) {
-        const sql = this.sqlFormat(`DELETE FROM ?? WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`, [collectionName])
+        const sql = `DELETE FROM ${escapeId(collectionName)} WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`
         const rs = await this.query(sql, itemIds)
                              .catch( translateErrorCodes )
         return rs.affectedRows
     }
 
     async truncate(collectionName) {
-        const sql = this.sqlFormat('TRUNCATE ??', [collectionName])
-        await this.query(sql).catch( translateErrorCodes )
+        await this.query(`TRUNCATE ${escapeId(collectionName)}`).catch( translateErrorCodes )
     }
 
     async aggregate(collectionName, filter, aggregation) {
-        const {filterExpr: whereFilterExpr, filterColumns: whereFilterColumns, parameters: whereParameters} = this.filterParser.transform(filter)
-        const {fieldsStatement, groupByColumns, fieldsStatementColumns} = this.filterParser.parseAggregation(aggregation.processingStep)
+        const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
+        const {fieldsStatement, groupByColumns} = this.filterParser.parseAggregation(aggregation.processingStep)
         const havingFilter = this.filterParser.parseFilter(aggregation.postFilteringStep)
 
-        const {filterExpr, filterColumns, parameters} =
+        const {filterExpr, parameters} =
             havingFilter.map(({filterExpr, filterColumns, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
                                                                              filterColumns, parameters}))
                         .concat(EMPTY_FILTER)[0]
 
-        const sql = this.sqlFormat(`SELECT ${fieldsStatement} FROM ?? ${whereFilterExpr} GROUP BY ${this.wildCardWith(groupByColumns.length, '??')} ${filterExpr}`, [...fieldsStatementColumns, collectionName, ...whereFilterColumns, ...groupByColumns, ...filterColumns])
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${filterExpr}`
         const resultset = await this.query(sql, [...whereParameters, ...parameters])
                                     .catch( translateErrorCodes )
         return resultset
@@ -111,10 +110,6 @@ class DataProvider {
 
     asParamArrays(item) {
         return Object.values(item);
-    }
-
-    sqlFormat(template, values) {
-        return values.reduce( (sql, f) => sql.replace('??', this.pool.escapeId(f)), template )
     }
 }
 

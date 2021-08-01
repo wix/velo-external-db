@@ -1,4 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons')
+const { escapeId } = require('mysql')
 
 class FilterParser {
     constructor() {
@@ -13,7 +14,6 @@ class FilterParser {
 
         return {
             filterExpr: `WHERE ${results[0].filterExpr}`,
-            filterColumns: results[0].filterColumns,
             parameters: results[0].parameters
         };
     }
@@ -38,16 +38,13 @@ class FilterParser {
     }
 
     parseAggregation(aggregation) {
-        const filterColumns = []
         const groupByColumns = []
         const filterColumnsStr = []
         if (this.isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(aggregation._id).map(() => '??'))
-            filterColumns.push(...Object.values(aggregation._id))
+            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(f) ))
             groupByColumns.push(...Object.values(aggregation._id))
         } else {
-            filterColumnsStr.push('??')
-            filterColumns.push(aggregation._id)
+            filterColumnsStr.push(escapeId(aggregation._id))
             groupByColumns.push(aggregation._id)
         }
 
@@ -56,14 +53,12 @@ class FilterParser {
               .forEach(fieldAlias => {
                   Object.entries(aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(??) AS ??`)
-                            filterColumns.push(field, fieldAlias)
+                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeId(field)}) AS ${escapeId(fieldAlias)}`)
                         })
               })
 
         return {
             fieldsStatement: filterColumnsStr.join(', '),
-            fieldsStatementColumns: filterColumns,
             groupByColumns,
         }
     }
@@ -80,38 +75,33 @@ class FilterParser {
                 const op = filter.operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.map(r => r[0].filterExpr).join( op ),
-                    filterColumns: res.map( s => s[0].filterColumns ).flat(),
                     parameters: res.map( s => s[0].parameters ).flat()
                 }]
             case '$not':
                 const res2 = this.parseFilter( filter.value )
                 return [{
                     filterExpr: `NOT (${res2[0].filterExpr})`,
-                    filterColumns: res2[0].filterColumns,
                     parameters: res2[0].parameters
                 }]
         }
 
         if (this.isSingleFieldOperator(filter.operator)) {
             return [{
-                filterExpr: `?? ${this.veloOperatorToMySqlOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value, filter.operator)}`.trim(),
-                filterColumns: [filter.fieldName],
+                filterExpr: `${escapeId(filter.fieldName)} ${this.veloOperatorToMySqlOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value, filter.operator)}`.trim(),
                 parameters: filter.value !== undefined ? [].concat( this.patchTrueFalseValue(filter.value) ) : []
             }]
         }
 
         if (this.isSingleFieldStringOperator(filter.operator)) {
             return [{
-                filterExpr: `?? LIKE ?`,
-                filterColumns: [filter.fieldName],
+                filterExpr: `${escapeId(filter.fieldName)} LIKE ?`,
                 parameters: [this.valueForStringOperator(filter.operator, filter.value)]
             }]
         }
 
         if (filter.operator === '$urlized') {
             return [{
-                filterExpr: 'LOWER(??) RLIKE ?',
-                filterColumns: [filter.fieldName],
+                filterExpr: `LOWER(${escapeId(filter.fieldName)}) RLIKE ?`,
                 parameters: [filter.value.map(s => s.toLowerCase()).join('[- ]')]
             }]
         }
@@ -190,8 +180,7 @@ class FilterParser {
         }
 
         return {
-            sortExpr: `ORDER BY ${results.map( s => s.expr).join(', ')}`,
-            sortColumns: results.map( s => s.params ).flat()
+            sortExpr: `ORDER BY ${results.map( s => s.expr).join(', ')}`
         }
     }
 
@@ -204,8 +193,7 @@ class FilterParser {
         const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC';
 
         return [{
-            expr: `?? ${dir}`,
-            params: [fieldName]
+            expr: `${escapeId(fieldName)} ${dir}`,
         }]
     }
 
@@ -220,12 +208,10 @@ class FilterParser {
 
 const EMPTY_SORT = {
     sortExpr: '',
-    sortColumns: []
 }
 
 const EMPTY_FILTER = {
     filterExpr: '',
-    filterColumns: [],
     parameters: []
 }
 

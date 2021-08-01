@@ -3,6 +3,7 @@ const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
+const { escapeId } = require('mysql')
 const chance = Chance();
 
 describe('Sql Parser', () => {
@@ -30,24 +31,25 @@ describe('Sql Parser', () => {
         })
 
         test('process single sort expression', () => {
-            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'asc' }) ).toEqual([{ expr: `?? ASC`, params: [ctx.fieldName] }])
-            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'aSc' }) ).toEqual([{ expr: `?? ASC`, params: [ctx.fieldName] }])
-            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'desc' }) ).toEqual([{ expr: `?? DESC`, params: [ctx.fieldName] }])
-            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName }) ).toEqual([{ expr: `?? ASC`, params: [ctx.fieldName] }])
+            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'asc' }) ).toEqual([{ expr: `${escapeId(ctx.fieldName)} ASC` }])
+            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'aSc' }) ).toEqual([{ expr: `${escapeId(ctx.fieldName)} ASC` }])
+            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'desc' }) ).toEqual([{ expr: `${escapeId(ctx.fieldName)} DESC` }])
+            expect( env.filterParser.parseSort({ fieldName: ctx.fieldName }) ).toEqual([{ expr: `${escapeId(ctx.fieldName)} ASC` }])
         })
 
         test('process single sort with valid expression', () => {
-            expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' }]) ).toEqual({sortExpr: 'ORDER BY ?? ASC', sortColumns: [ctx.fieldName]})
+            expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' }]) ).toEqual({sortExpr: `ORDER BY ${escapeId(ctx.fieldName)} ASC`})
         })
 
         test('process single sort with two valid expression', () => {
-            expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
-                { fieldName: ctx.anotherFieldName, direction: 'desc' }]) ).toEqual({sortExpr: 'ORDER BY ?? ASC, ?? DESC', sortColumns: [ctx.fieldName, ctx.anotherFieldName]})
+            expect( env.filterParser
+                       .orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
+                                 { fieldName: ctx.anotherFieldName, direction: 'desc' }]) ).toEqual({ sortExpr: `ORDER BY ${escapeId(ctx.fieldName)} ASC, ${escapeId(ctx.anotherFieldName)} DESC`})
         })
 
         test('process single sort with one valid and one invalid expression', () => {
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
-                { invalid: 'object' }]) ).toEqual({sortExpr: 'ORDER BY ?? ASC', sortColumns: [ctx.fieldName]})
+                { invalid: 'object' }]) ).toEqual({ sortExpr: `ORDER BY ${escapeId(ctx.fieldName)} ASC` })
         })
     })
 
@@ -72,7 +74,6 @@ describe('Sql Parser', () => {
         test('transform filter', () => {
             expect( env.filterParser.transform(ctx.filter) ).toEqual({
                 filterExpr: `WHERE ${env.filterParser.parseFilter(ctx.filter)[0].filterExpr}`,
-                filterColumns: [ctx.filter.fieldName],
                 parameters: env.filterParser.parseFilter(ctx.filter)[0].parameters
             })
         })
@@ -89,8 +90,7 @@ describe('Sql Parser', () => {
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `?? ${env.filterParser.veloOperatorToMySqlOperator(o, ctx.fieldValue)} ?`,
-                    filterColumns: [ctx.fieldName],
+                    filterExpr: `${escapeId(ctx.fieldName)} ${env.filterParser.veloOperatorToMySqlOperator(o, ctx.fieldValue)} ?`,
                     parameters: [ctx.fieldValue]
                 }])
 
@@ -104,8 +104,7 @@ describe('Sql Parser', () => {
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `?? = ?`,
-                    filterColumns: [ctx.fieldName],
+                    filterExpr: `${escapeId(ctx.fieldName)} = ?`,
                     parameters: [0]
                 }])
 
@@ -121,8 +120,7 @@ describe('Sql Parser', () => {
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `?? IN (?, ?, ?, ?, ?)`,
-                    filterColumns: [ctx.fieldName],
+                    filterExpr: `${escapeId(ctx.fieldName)} IN (?, ?, ?, ?, ?)`,
                     parameters: ctx.fieldListValue
                 }])
             })
@@ -146,8 +144,7 @@ describe('Sql Parser', () => {
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `?? IS NULL`,
-                    filterColumns: [ctx.fieldName],
+                    filterExpr: `${escapeId(ctx.fieldName)} IS NULL`,
                     parameters: []
                 }])
 
@@ -161,8 +158,7 @@ describe('Sql Parser', () => {
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `?? = ?`,
-                    filterColumns: [ctx.fieldName],
+                    filterExpr: `${escapeId(ctx.fieldName)} = ?`,
                     parameters: [filter.value ? 1 : 0]
                 }])
 
@@ -179,8 +175,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `?? LIKE ?`,
-                        filterColumns: [ctx.fieldName],
+                        filterExpr: `${escapeId(ctx.fieldName)} LIKE ?`,
                         parameters: [`%${ctx.fieldValue}%`]
                     }])
 
@@ -195,8 +190,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `?? LIKE ?`,
-                        filterColumns: [ctx.fieldName],
+                        filterExpr: `${escapeId(ctx.fieldName)} LIKE ?`,
                         parameters: [`${ctx.fieldValue}%`]
                     }])
 
@@ -211,8 +205,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `?? LIKE ?`,
-                        filterColumns: [ctx.fieldName],
+                        filterExpr: `${escapeId(ctx.fieldName)} LIKE ?`,
                         parameters: [`%${ctx.fieldValue}`]
                     }])
                 })
@@ -226,8 +219,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: 'LOWER(??) RLIKE ?',
-                        filterColumns: [ctx.fieldName],
+                        filterExpr: `LOWER(${escapeId(ctx.fieldName)}) RLIKE ?`,
                         parameters: [ctx.fieldListValue.map(s => s.toLowerCase()).join('[- ]')]
                     }])
                 })
@@ -246,7 +238,6 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: `${env.filterParser.parseFilter(ctx.filter)[0].filterExpr} ${op} ${env.filterParser.parseFilter(ctx.anotherFilter)[0].filterExpr}`,
-                    filterColumns: [ctx.filter.fieldName, ctx.anotherFilter.fieldName],
                     parameters: [].concat(env.filterParser.parseFilter(ctx.filter)[0].parameters)
                                   .concat(env.filterParser.parseFilter(ctx.anotherFilter)[0].parameters)
                 }])
@@ -261,7 +252,6 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: `NOT (${env.filterParser.parseFilter(ctx.filter)[0].filterExpr})`,
-                    filterColumns: [ctx.filter.fieldName],
                     parameters: env.filterParser.parseFilter(ctx.filter)[0].parameters
                 }])
             })
@@ -277,8 +267,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
-                        fieldsStatement: '??',
-                        fieldsStatementColumns: [ctx.fieldName],
+                        fieldsStatement: escapeId(ctx.fieldName),
                         groupByColumns: [ctx.fieldName],
                     })
                 })
@@ -292,8 +281,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
-                        fieldsStatement: '??, ??',
-                        fieldsStatementColumns: [ctx.fieldName, ctx.anotherFieldName],
+                        fieldsStatement: `${escapeId(ctx.fieldName)}, ${escapeId(ctx.anotherFieldName)}`,
                         groupByColumns: [ctx.fieldName, ctx.anotherFieldName],
                     })
                 })
@@ -312,8 +300,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
-                        fieldsStatement: `??, ${mySqlFunction}(??) AS ??`,
-                        fieldsStatementColumns: [ctx.fieldName, ctx.anotherFieldName, ctx.moreFieldName],
+                        fieldsStatement: `${escapeId(ctx.fieldName)}, ${mySqlFunction}(${escapeId(ctx.anotherFieldName)}) AS ${escapeId(ctx.moreFieldName)}`,
                         groupByColumns: [ctx.fieldName],
                     })
                 })

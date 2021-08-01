@@ -1,5 +1,6 @@
 const { EMPTY_SORT } = require('./sql_filter_transformer')
 const { when } = require('jest-when')
+const {escapeId} = require("mysql");
 
 const filterParser = {
     transform: jest.fn(),
@@ -15,17 +16,17 @@ const stubEmptyFilterAndSortFor = (filter, sort) => {
 
 const stubEmptyFilterFor = (filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: '', filterColumns: [], parameters: [] })
+                                .mockReturnValue({ filterExpr: '', parameters: [] })
 }
 
 const stubEmptyHavingFilterFor = (filter) => {
     when(filterParser.parseFilter).calledWith(filter)
-                                  .mockReturnValue([ { filterExpr: '', filterColumns: [], parameters: [] } ])
+                                  .mockReturnValue([ { filterExpr: '', parameters: [] } ])
 }
 
 const givenHavingFilterWith = (columns, filter) => {
     when(filterParser.parseFilter).calledWith(filter)
-                                  .mockReturnValue([ { filterExpr: columns.map(() => '?? > ?').join(' AND '), filterColumns: columns, parameters: [0, 0] } ])
+                                  .mockReturnValue([ { filterExpr: columns.map(c => `${escapeId(c)} > ?`).join(' AND '), parameters: [0, 0] } ])
 }
 
 const stubEmptyOrderByFor = (sort) => {
@@ -35,27 +36,20 @@ const stubEmptyOrderByFor = (sort) => {
 
 const givenOrderByFor = (column, sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue({ sortExpr: 'ORDER BY ?? ASC', sortColumns: [column] })
+                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeId(column)} ASC` })
 }
 
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: 'WHERE ?? = ?', filterColumns: ['_id'], parameters: [id] })
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeId('_id')} = ?`, parameters: [id] })
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns) => {
     const c = numericColumns.map(c => c.name)
-    const columns = []
-    for (let i = 0; i < columnAliases.length; i++) {
-        columns.push(c[i])
-        columns.push(columnAliases[i])
-    }
-
     when(filterParser.parseAggregation).calledWith(having)
                                        .mockReturnValue({
-                                           fieldsStatement: `??, MAX(??) AS ??, SUM(??) AS ??`,
-                                           fieldsStatementColumns: [...groupByColumns, ...columns],
+                                           fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
                                            groupByColumns: groupByColumns,
                                        })
 }

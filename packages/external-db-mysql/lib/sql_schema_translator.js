@@ -1,4 +1,4 @@
-
+const { escapeId } = require('mysql')
 
 class SchemaColumnTranslator {
 
@@ -44,7 +44,7 @@ class SchemaColumnTranslator {
 
 
     columnToDbColumnSql(f) {
-        return `${f.name} ${this.dbTypeFor(f)}`
+        return `${escapeId(f.name)} ${this.dbTypeFor(f)}`
     }
 
     dbTypeFor(f) {

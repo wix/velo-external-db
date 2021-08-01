@@ -2,6 +2,7 @@ const { promisify } = require('util')
 const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { CannotModifySystemField } = require('velo-external-db-commons')
+const {escapeId} = require("mysql");
 
 const SystemFields = [
     {
@@ -44,32 +45,32 @@ class SchemaProvider {
     async create(collectionName, columns) {
         const dbColumnsSql = [...this.systemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                        .join(', ')
-        const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => `\`${f.name}\``).join(', ')
+        const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
 
-        await this.query(`CREATE TABLE IF NOT EXISTS ?? (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
-                         [collectionName, ...(columns || []).map(c => c.name)])
+        await this.query(`CREATE TABLE IF NOT EXISTS ${escapeId(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
+                         [...(columns || []).map(c => c.name)])
                   .catch( translateErrorCodes )
     }
 
     async drop(collectionName) {
-        await this.query(`DROP TABLE IF EXISTS ??`, [collectionName])
+        await this.query(`DROP TABLE IF EXISTS ${escapeId(collectionName)}`)
                   .catch( translateErrorCodes )
     }
 
     async addColumn(collectionName, column) {
         await this.validateSystemFields(column.name)
-        await this.query(`ALTER TABLE ?? ADD ?? ${this.sqlSchemaTranslator.dbTypeFor(column)}`, [collectionName, column.name])
+        await this.query(`ALTER TABLE ${escapeId(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
                   .catch( translateErrorCodes )
     }
 
     async removeColumn(collectionName, columnName) {
         await this.validateSystemFields(columnName)
-        return await this.query(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
+        return await this.query(`ALTER TABLE ${escapeId(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
                          .catch( translateErrorCodes )
     }
 
     async describeCollection(collectionName) {
-        const res = await this.query('DESCRIBE ??', [collectionName])
+        const res = await this.query(`DESCRIBE ${escapeId(collectionName)}`)
                               .catch( translateErrorCodes )
         return this.asWixSchema(res.map(r => ({field: r.Field, type: r.Type})), collectionName)
     }
