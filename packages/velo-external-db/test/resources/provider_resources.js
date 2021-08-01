@@ -13,7 +13,7 @@ const env = {
 }
 
 const dbInit = async (testEnv, impl) => {
-    await testEnv.initEnv()
+    await testEnv.cleanup()
 
     const pool = testEnv.connection()
     const driver = impl.driver()
@@ -25,10 +25,8 @@ const dbInit = async (testEnv, impl) => {
     env.driver = driver
 }
 
-const dbTeardown = async impl => {
+const dbTeardown = async () => {
     await env.connectionPool.end()
-    await impl.shutdownEnv();
-
     env.dataProvider = Uninitialized
     env.schemaProvider = Uninitialized
     env.connectionPool = Uninitialized
@@ -38,11 +36,8 @@ const dbTeardown = async impl => {
 
 const postgresTestEnvInit = async () => await dbInit(postgresTestEnv, postgres)
 const mysqlTestEnvInit = async () => await dbInit(mysqlTestEnv, mysql)
-const postgresTestEnvTeardown = async () => await dbTeardown(postgresTestEnv, postgres)
-const mysqlTestEnvTeardown = async () => await dbTeardown(mysqlTestEnv, mysql)
-
 
 module.exports = { env,
-                   postgresTestEnvInit, postgresTestEnvTeardown,
-                   mysqlTestEnvInit, mysqlTestEnvTeardown
+                   postgresTestEnvInit, dbTeardown,
+                   mysqlTestEnvInit,
 }

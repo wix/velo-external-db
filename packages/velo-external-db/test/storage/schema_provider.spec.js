@@ -2,23 +2,23 @@ const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, Fie
 const { Uninitialized, gen } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance');
-const { env, postgresTestEnvInit, postgresTestEnvTeardown, mysqlTestEnvInit, mysqlTestEnvTeardown } = require('../resources/provider_resources')
+const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit } = require('../resources/provider_resources')
 const chance = new Chance();
 const { SystemFields } = require('external-db-mysql')
 
 
 describe('Schema API', () => {
     each([
-        ['MySql', mysqlTestEnvInit, mysqlTestEnvTeardown],
-        ['Postgres', postgresTestEnvInit, postgresTestEnvTeardown],
-    ]).describe('%s', (name, setup, teardown) => {
+        ['MySql', mysqlTestEnvInit],
+        ['Postgres', postgresTestEnvInit],
+    ]).describe('%s', (name, setup) => {
 
         beforeAll(async () => {
             await setup()
         }, 20000);
 
         afterAll(async () => {
-            await teardown()
+            await dbTeardown()
         }, 20000);
 
         test('list of empty db will result with an empty array', async () => {

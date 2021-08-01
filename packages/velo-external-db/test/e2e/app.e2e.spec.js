@@ -1,6 +1,6 @@
 const { auth } = require('../drivers/auth-test-support')
 const each = require('jest-each').default
-const { mysqlTestEnvInit, mysqlTestEnvTeardown, postgresTestEnvInit, postgresTestEnvTeardown, initApp, teardownApp} = require("../resources/e2e_resources")
+const { mysqlTestEnvInit, dbTeardown, postgresTestEnvInit, initApp, teardownApp} = require("../resources/e2e_resources")
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
@@ -12,8 +12,8 @@ afterAll(async () => {
 
 describe('Velo External DB',  () => {
     each([
-        ['MySql', mysqlTestEnvInit, mysqlTestEnvTeardown],
-        ['Postgres', postgresTestEnvInit, postgresTestEnvTeardown],
+        ['MySql', mysqlTestEnvInit],
+        ['Postgres', postgresTestEnvInit],
     ]).describe('%s', (name, setup, teardown) => {
         beforeAll(async () => {
             await setup()
@@ -22,7 +22,7 @@ describe('Velo External DB',  () => {
         }, 20000);
 
         afterAll(async () => {
-            await teardown()
+            await dbTeardown()
         }, 20000);
 
 

@@ -3,7 +3,7 @@ const schema = require('../drivers/schema_api_rest_test_support');
 const { auth } = require('../drivers/auth-test-support')
 const Chance = require('chance')
 const each = require('jest-each').default
-const { initApp, teardownApp, postgresTestEnvInit, postgresTestEnvTeardown, mysqlTestEnvInit, mysqlTestEnvTeardown} = require('../resources/e2e_resources')
+const { initApp, teardownApp, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit} = require('../resources/e2e_resources')
 const chance = Chance();
 
 const axios = require('axios').create({
@@ -16,8 +16,8 @@ afterAll(async () => {
 
 describe('Velo External DB Schema REST API',  () => {
     each([
-        ['MySql', mysqlTestEnvInit, mysqlTestEnvTeardown],
-        ['Postgres', postgresTestEnvInit, postgresTestEnvTeardown],
+        ['MySql', mysqlTestEnvInit],
+        ['Postgres', postgresTestEnvInit],
     ]).describe('%s', (name, setup, teardown) => {
         beforeAll(async () => {
             await setup()
@@ -26,7 +26,7 @@ describe('Velo External DB Schema REST API',  () => {
         }, 20000);
 
         afterAll(async () => {
-            await teardown()
+            await dbTeardown()
         }, 20000);
 
         test('list', async () => {

@@ -57,4 +57,4 @@ const shutdownEnv = async () => {
     await compose.stopOne('postgres', { cwd: __dirname, log: true })
 }
 
-module.exports = { initEnv, shutdownEnv, setActive, connection }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }

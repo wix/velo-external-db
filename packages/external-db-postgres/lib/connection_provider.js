@@ -6,9 +6,7 @@ const { FilterParser } = require('./sql_filter_transformer')
 
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
-const init = (type, host, user, password, db) => {
-    console.log('INIT: sql/postgres')
-
+const init = ([host, user, password, db]) => {
     const config = {
         host: host,
         user: user,
@@ -23,10 +21,6 @@ const init = (type, host, user, password, db) => {
 
     const filterParser = new FilterParser()
     const pool = new Pool(config)
-
-    pool.on('error', (err) => {
-        console.log(err)
-    })
 
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)

@@ -24,24 +24,19 @@ const teardownApp = async () => {
 }
 
 const dbInit = async impl => {
-    await impl.initEnv()
+    await impl.cleanup()
     impl.setActive()
 }
 
-const dbTeardown = async impl => {
+const dbTeardown = async () => {
     await env.app.cleanup()
-
-    await impl.shutdownEnv()
 }
 
 const postgresTestEnvInit = async () => await dbInit(postgres)
 const mysqlTestEnvInit = async () => await dbInit(mysql)
-const mysqlTestEnvTeardown = async () => await dbTeardown(mysql)
-const postgresTestEnvTeardown = async () => await dbTeardown(postgres)
 
 
-
-module.exports = { env, initApp, teardownApp,
-                   postgresTestEnvInit, postgresTestEnvTeardown,
-                   mysqlTestEnvInit, mysqlTestEnvTeardown
+module.exports = { env, initApp, teardownApp, dbTeardown,
+                   postgresTestEnvInit,
+                   mysqlTestEnvInit
 }

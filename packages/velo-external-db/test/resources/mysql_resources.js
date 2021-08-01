@@ -1,5 +1,5 @@
-const mysql = require('mysql');
-const { promisify } = require('util');
+const mysql = require('mysql')
+const { promisify } = require('util')
 const compose = require('docker-compose')
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -19,7 +19,6 @@ const connection = () => {
         queueLimit: 0
     });
 }
-
 
 const list = async (pool) => {
     const res = await promisify(pool.query).bind(pool)('SHOW TABLES')
@@ -60,4 +59,4 @@ const setActive = () => {
 
 
 
-module.exports = { initEnv, shutdownEnv, setActive, connection }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }

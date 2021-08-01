@@ -4,7 +4,7 @@ const data = require('../drivers/data_api_rest_test_support');
 const { auth } = require('../drivers/auth-test-support')
 const Chance = require('chance')
 const each = require('jest-each').default
-const { initApp, teardownApp, postgresTestEnvInit, postgresTestEnvTeardown, mysqlTestEnvInit, mysqlTestEnvTeardown} = require('../resources/e2e_resources')
+const { initApp, teardownApp, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit} = require('../resources/e2e_resources')
 
 const chance = Chance();
 
@@ -19,9 +19,9 @@ afterAll(async () => {
 
 describe('Velo External DB Data REST API',  () => {
     each([
-        ['MySql', mysqlTestEnvInit, mysqlTestEnvTeardown],
-        ['Postgres', postgresTestEnvInit, postgresTestEnvTeardown],
-    ]).describe('%s', (name, setup, teardown) => {
+        ['MySql', mysqlTestEnvInit],
+        ['Postgres', postgresTestEnvInit],
+    ]).describe('%s', (name, setup) => {
         beforeAll(async () => {
             await setup()
 
@@ -29,10 +29,10 @@ describe('Velo External DB Data REST API',  () => {
         }, 20000);
 
         afterAll(async () => {
-            await teardown()
+            await dbTeardown()
         }, 20000);
 
-        test('find api', async () => {
+        test.only('find api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, auth)
 

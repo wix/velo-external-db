@@ -3,10 +3,9 @@ const { SchemaProvider } = require('./mysql_schema_provider')
 const DataProvider  = require('./mysql_data_provider')
 const { FilterParser } = require('./sql_filter_transformer')
 
-const init = (type, host, user, password, db, cloudSqlConnectionName) => {
-    console.log('INIT: sql/mysql')
-
+const init = ([host, user, password, db, cloudSqlConnectionName]) => {
     const config = {
+        host     : host,
         user     : user,
         password : password,
         database : db,
@@ -25,14 +24,12 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
         config['host'] = host
     }
 
-
-
     const pool = mysql.createPool(config)
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, cleanup: () => pool.end() }
+    return { dataProvider: dataProvider, schemaProvider: schemaProvider, connection: pool, cleanup: () => pool.end() }
 }
 
 module.exports = init
