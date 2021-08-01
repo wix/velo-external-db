@@ -32,7 +32,7 @@ describe('Velo External DB Data REST API',  () => {
             await dbTeardown()
         }, 20000);
 
-        test.only('find api', async () => {
+        test('find api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, auth)
 

@@ -48,6 +48,12 @@ class SchemaProvider {
 
         await this.query(`CREATE TABLE IF NOT EXISTS ?? (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
                          [collectionName, ...(columns || []).map(c => c.name)])
+                  .catch( translateErrorCodes )
+    }
+
+    async drop(collectionName) {
+        await this.query(`DROP TABLE IF EXISTS ??`, [collectionName])
+                  .catch( translateErrorCodes )
     }
 
     async addColumn(collectionName, column) {
@@ -64,6 +70,7 @@ class SchemaProvider {
 
     async describeCollection(collectionName) {
         const res = await this.query('DESCRIBE ??', [collectionName])
+                              .catch( translateErrorCodes )
         return this.asWixSchema(res.map(r => ({field: r.Field, type: r.Type})), collectionName)
     }
 

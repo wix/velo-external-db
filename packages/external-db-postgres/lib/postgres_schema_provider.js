@@ -1,7 +1,7 @@
 const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeIdentifier } = require('./postgres_utils')
-const { CannotModifySystemField } = require('velo-external-db-commons')
+const { CannotModifySystemField, CollectionDoesNotExists} = require('velo-external-db-commons')
 
 const SystemFields = [
     {
@@ -47,8 +47,14 @@ class SchemaProvider {
         const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => escapeIdentifier(f.name)).join(', ')
 
         await this.pool.query(`CREATE TABLE IF NOT EXISTS ${escapeIdentifier(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`)
-                             // /* [...columns.map(c => c.name)]*/)
+                  .catch( translateErrorCodes )
     }
+
+    async drop(collectionName) {
+        await this.pool.query(`DROP TABLE IF EXISTS ${escapeIdentifier(collectionName)}`)
+                  .catch( translateErrorCodes )
+    }
+
 
     async addColumn(collectionName, column) {
         await this.validateSystemFields(column.name)
@@ -66,6 +72,10 @@ class SchemaProvider {
 
     async describeCollection(collectionName) {
         const res = await this.pool.query('SELECT table_name, column_name AS field, data_type, udt_name AS type, character_maximum_length FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2 ORDER BY table_name', ['public', collectionName])
+                              .catch( translateErrorCodes )
+        if (res.rows.length === 0) {
+            throw new CollectionDoesNotExists('Collection does not exists')
+        }
         return this.asWixSchema(res.rows, collectionName)
     }
 

@@ -55,6 +55,14 @@ describe('Schema API', () => {
                                                                { field: '_owner', type: env.schemaColumnTranslator.dbType('text', 'string', 50)}], ctx.collectionName))
         })
 
+        test('drop collection', async () => {
+            await env.schemaProvider.create(ctx.collectionName)
+
+            await env.schemaProvider.drop(ctx.collectionName)
+
+            await expect(env.schemaProvider.describeCollection(ctx.collectionName)).rejects.toThrow(CollectionDoesNotExists)
+        })
+
         test('collection name and variables are case sensitive', async () => {
             await env.schemaProvider.create(ctx.collectionName.toUpperCase())
 
