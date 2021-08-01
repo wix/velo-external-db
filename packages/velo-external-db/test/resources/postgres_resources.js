@@ -1,6 +1,7 @@
 const compose = require('docker-compose')
 const { types, Pool} = require('pg')
 const { builtins } = require('pg-types')
+const { init } = require('external-db-postgres')
 
 // make postgres driver parse numbers
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
@@ -21,18 +22,12 @@ const connection = () => {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const list = async (pool) => {
-    const res = await pool.query('SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != $1 AND schemaname != $2', ['pg_catalog', 'information_schema'])
-    return res.rows.map(r => Object.values(r)[0])
-}
-const drop = (table, pool) => pool.query(`DROP TABLE "${table}"`)
-
 const cleanup = async () => {
-    const client = connection()
-    const tables = await list(client)
-    await Promise.all(tables.map( t => drop(t, client) ))
+    const {schemaProvider, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'])
+    const tables = await schemaProvider.list()
+    await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
 
-    await client.end()
+    await cleanup();
 }
 
 const initEnv = async () => {

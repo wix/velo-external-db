@@ -1,6 +1,6 @@
-const mysql = require('mysql')
-const { promisify } = require('util')
+const { init } = require('external-db-mysql')
 const compose = require('docker-compose')
+const mysql = require('mysql')
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -20,20 +20,12 @@ const connection = () => {
     });
 }
 
-const list = async (pool) => {
-    const res = await promisify(pool.query).bind(pool)('SHOW TABLES')
-    return res.map(r => Object.values(r)[0])
-}
-const drop = (table, pool) => promisify(pool.query).bind(pool)(`DROP TABLE ??`, [table])
-
 const cleanup = async () => {
+    const {schemaProvider, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'])
+    const tables = await schemaProvider.list()
+    await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
 
-    const conn = connection()
-
-    const tables = await list(conn)
-    await Promise.all(tables.map( t => drop(t, conn) ))
-
-    await conn.end();
+    await cleanup();
 }
 
 const initEnv = async () => {
