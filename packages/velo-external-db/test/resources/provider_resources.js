@@ -16,7 +16,7 @@ const dbInit = async (testEnv, impl) => {
     await testEnv.initEnv()
 
     const pool = testEnv.connection()
-    const driver = impl.driver
+    const driver = impl.driver()
 
     env.connectionPool = pool
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
