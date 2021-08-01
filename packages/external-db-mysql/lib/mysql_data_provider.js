@@ -71,6 +71,7 @@ class DataProvider {
         await this.query(`TRUNCATE ${escapeId(collectionName)}`).catch( translateErrorCodes )
     }
 
+    // todo: fix logic to be the same as postgres !
     async aggregate(collectionName, filter, aggregation) {
         const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
         const {fieldsStatement, groupByColumns} = this.filterParser.parseAggregation(aggregation.processingStep)
