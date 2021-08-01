@@ -1,59 +1,25 @@
-const mysql = require('external-db-mysql')
-const postgres = require('external-db-postgres')
 const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('velo-external-db-commons')
 const { Uninitialized, gen } = require('test-commons')
-const mysqlTestEnv = require('../resources/mysql_resources');
-const postgresTestEnv = require('../resources/postgres_resources');
-const Chance = require('chance')
-const chance = Chance();
 const each = require('jest-each').default
-const SystemFields = mysql.SystemFields
+const Chance = require('chance');
+const { env, postgresTestEnvInit, postgresTestEnvTeardown, mysqlTestEnvInit, mysqlTestEnvTeardown } = require('../resources/provider_resources')
+const chance = new Chance();
+const { SystemFields } = require('external-db-mysql')
 
-
-const env1 = {
-    schemaProvider: Uninitialized,
-    connectionPool: Uninitialized,
-    schemaColumnTranslator: Uninitialized,
-};
-
-const env2 = {
-    schemaProvider: Uninitialized,
-    connectionPool: Uninitialized,
-    schemaColumnTranslator: Uninitialized,
-};
-
-const mySqlTestEnvInit = async () => {
-    env1.connectionPool = await mysqlTestEnv.initMySqlEnv()
-    env1.schemaProvider = new mysql.SchemaProvider(env1.connectionPool)
-    env1.schemaColumnTranslator = new mysql.SchemaColumnTranslator()
-}
-
-const postgresTestEnvInit = async () => {
-    env2.connectionPool = await postgresTestEnv.initEnv()
-    env2.schemaProvider = new postgres.SchemaProvider(env2.connectionPool)
-    env2.schemaColumnTranslator = new postgres.SchemaColumnTranslator()
-}
-
-beforeAll(async () => {
-    await mySqlTestEnvInit()
-    await postgresTestEnvInit()
-}, 20000);
-
-
-afterAll(async () => {
-    if (env2.connectionPool) {
-        await env2.connectionPool.end()
-    }
-    await postgresTestEnv.shutdownEnv();
-    return await mysqlTestEnv.shutdownMySqlEnv();
-}, 20000);
 
 describe('Schema API', () => {
-
     each([
-        ['MySql', env1],
-        ['Postgres', env2],
-    ]).describe('%s', (name, env) => {
+        ['MySql', mysqlTestEnvInit, mysqlTestEnvTeardown],
+        ['Postgres', postgresTestEnvInit, postgresTestEnvTeardown],
+    ]).describe('%s', (name, setup, teardown) => {
+
+        beforeAll(async () => {
+            await setup()
+        }, 20000);
+
+        afterAll(async () => {
+            await teardown()
+        }, 20000);
 
         test('list of empty db will result with an empty array', async () => {
             const db = await env.schemaProvider.list()
@@ -187,13 +153,13 @@ describe('Schema API', () => {
             collectionName: Uninitialized,
             anotherCollectionName: Uninitialized,
             columnName: Uninitialized,
-        };
+        }
 
         beforeEach(() => {
             ctx.collectionName = gen.randomCollectionName()
             ctx.anotherCollectionName = gen.randomCollectionName()
             ctx.columnName = chance.word()
-        });
+        })
     })
 })
 

@@ -16,12 +16,12 @@ const stubEmptyFilterAndSortFor = (filter, sort) => {
 
 const stubEmptyFilterFor = (filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: '', filterColumns: [], parameters: [] })
+                                .mockReturnValue({ filterExpr: '', filterColumns: [], parameters: [], offset: 1 })
 }
 
 const stubEmptyHavingFilterFor = (filter) => {
     when(filterParser.parseFilter).calledWith(filter)
-                                  .mockReturnValue([ { filterExpr: '', filterColumns: [], parameters: [] } ])
+                                  .mockReturnValue([ { filterExpr: '', filterColumns: [], parameters: [], offset: 1 } ])
 }
 
 const givenHavingFilterWith = (columnAlias, filter, columns, _offset) => {
@@ -43,15 +43,18 @@ const givenOrderByFor = (column, sort) => {
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeIdentifier('_id')} = $1`, filterColumns: [], parameters: [id] })
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeIdentifier('_id')} = $1`, filterColumns: [], parameters: [id], offset: 2 })
 }
 
-const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns) => {
-    when(filterParser.parseAggregation).calledWith(having)
+const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter, offest) => {
+    when(filterParser.parseAggregation).calledWith(having, filter, offest)
                                        .mockReturnValue({
                                            fieldsStatement: `${groupByColumns.map( escapeIdentifier ).join(', ')}, MAX(${escapeIdentifier(numericColumns[0].name)}) AS ${escapeIdentifier(columnAliases[0])}, SUM(${escapeIdentifier(numericColumns[1].name)}) AS ${escapeIdentifier(columnAliases[1])}`,
                                            fieldsStatementColumns: [],
                                            groupByColumns: groupByColumns,
+                                           offset: offest,
+                                           havingFilter: '',
+                                           parameters: [],
                                        })
 }
 

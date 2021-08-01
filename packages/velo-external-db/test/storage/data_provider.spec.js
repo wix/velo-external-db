@@ -1,58 +1,24 @@
-const mysql = require('external-db-mysql')
-const postgres = require('external-db-postgres')
 const { Uninitialized, gen } = require('test-commons')
-const mysqlTestEnv = require('../resources/mysql_resources');
-const postgresTestEnv = require('../resources/postgres_resources');
 const each = require('jest-each').default
 const Chance = require('chance');
+const { env, postgresTestEnvInit, postgresTestEnvTeardown, mysqlTestEnvInit, mysqlTestEnvTeardown } = require("../resources/provider_resources")
 const chance = new Chance();
-
-const env1 = {
-    dataProvider: Uninitialized,
-    schemaProvider: Uninitialized,
-    connectionPool: Uninitialized,
-    driver: Uninitialized,
-};
-
-const env2 = {
-    dataProvider: Uninitialized,
-    schemaProvider: Uninitialized,
-    connectionPool: Uninitialized,
-    driver: Uninitialized,
-};
-
-const postgresTestEnvInit = async () => {
-    env2.connectionPool = await postgresTestEnv.initEnv()
-    env2.dataProvider = new postgres.DataProvider(env2.connectionPool, postgres.driver.filterParser)
-    env2.schemaProvider = new postgres.SchemaProvider(env2.connectionPool)
-    env2.driver = postgres.driver
-}
-
-const mysqlTestEnvInit = async () => {
-    env1.connectionPool = await mysqlTestEnv.initMySqlEnv()
-    env1.schemaProvider = new mysql.SchemaProvider(env1.connectionPool)
-    env1.driver = mysql.driver
-    env1.dataProvider = new mysql.DataProvider(env1.connectionPool, env1.driver.filterParser)
-}
-
-beforeAll(async () => {``
-    await mysqlTestEnvInit()
-    await postgresTestEnvInit()
-}, 20000);
-
-afterAll(async () => {
-    await env2.connectionPool.end()
-    await postgresTestEnv.shutdownEnv();
-    return await mysqlTestEnv.shutdownMySqlEnv();
-}, 20000);
-
 
 describe('Data API', () => {
 
     each([
-        ['MySql', env1],
-        ['Postgres', env2],
-    ]).describe('%s', (name, env) => {
+        ['MySql', mysqlTestEnvInit, mysqlTestEnvTeardown],
+        ['Postgres', postgresTestEnvInit, postgresTestEnvTeardown],
+    ]).describe('%s', (name, setup, teardown) => {
+
+        beforeAll(async () => {
+            await setup()
+        }, 20000);
+
+        afterAll(async () => {
+            await teardown()
+        }, 20000);
+
 
         const givenCollectionWith = async (entities, forCollection) => {
             await env.dataProvider.insert(forCollection, entities)
@@ -103,7 +69,7 @@ describe('Data API', () => {
 
             env.driver.stubEmptyFilterFor(ctx.filter)
             env.driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep, ctx.numericColumns)
-            env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
+            env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 1)
 
             const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
 
@@ -118,7 +84,7 @@ describe('Data API', () => {
 
             env.driver.stubEmptyFilterFor(ctx.filter)
             env.driver.stubEmptyHavingFilterFor(ctx.aggregation.postFilteringStep)
-            env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
+            env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 1)
 
             const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
 
@@ -133,7 +99,7 @@ describe('Data API', () => {
 
             env.driver.givenFilterByIdWith(ctx.numberEntity._id, ctx.filter)
             env.driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep, ctx.numericColumns, 1)
-            env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'])
+            env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 2)
 
             const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
 

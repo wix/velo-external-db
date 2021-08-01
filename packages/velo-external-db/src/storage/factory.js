@@ -55,7 +55,6 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
                 connectionTimeoutMillis: 2000,
             }
 
-            // console.log('config', config)
             const filterParser = new FilterParser()
             const pool = new Pool(config)
 
@@ -63,11 +62,10 @@ const init = (type, host, user, password, db, cloudSqlConnectionName) => {
                 console.log(err)
             })
 
-
             const dataProvider = new DataProvider(pool, filterParser)
             const schemaProvider = new SchemaProvider(pool)
 
-            return { dataProvider: dataProvider, schemaProvider: schemaProvider, cleanup: () => pool.end() }
+            return { dataProvider: dataProvider, schemaProvider: schemaProvider, cleanup: async () => await pool.end(() => {}) }
         }
 
     }

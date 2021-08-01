@@ -8,13 +8,18 @@ const { errorMiddleware } = require('./web/error-middleware')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
 
-//todo: extract this logic to external class and allow different implementations for gcp, aws, azure.
-const { type, host, user, password, db, cloudSqlConnectionName } = {type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME}
+let dataService, schemaService, cleanup
 
-const {dataProvider, schemaProvider, cleanup} = init(type, host, user, password, db, cloudSqlConnectionName)
-const dataService = new DataService(dataProvider)
-const schemaService = new SchemaService(schemaProvider)
+const load = () => {
+    const { type, host, user, password, db, cloudSqlConnectionName } = {type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME}
 
+    const {dataProvider, schemaProvider, cleanup: cleanupDbFunc} = init(type, host, user, password, db, cloudSqlConnectionName)
+    dataService = new DataService(dataProvider)
+    schemaService = new SchemaService(schemaProvider)
+    cleanup = cleanupDbFunc
+}
+
+load()
 
 const app = express()
 const port = process.env.PORT || 8080
@@ -188,6 +193,6 @@ app.post('/schemas/column/remove', async (req, res) => {
 })
 // ***********************************************
 
-const server = app.listen(port/*, () => console.log(`Server listening on port ${port}!`)*/)
+const server = app.listen(port)
 
-module.exports = { server, cleanup};
+module.exports = { server, cleanup, load};
