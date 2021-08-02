@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject } = require('velo-external-db-commons')
 const { escapeIdentifier } = require('./postgres_utils')
 
 class FilterParser {
@@ -21,10 +21,6 @@ class FilterParser {
         };
     }
 
-    isObject(o) {
-        return typeof o === 'object' && o !== null
-    }
-
     wixDataFunction2Sql(f) {
         switch (f) {
             case '$avg':
@@ -43,7 +39,7 @@ class FilterParser {
     parseAggregation(aggregation, postFilter, offset) {
         const groupByColumns = []
         const filterColumnsStr = []
-        if (this.isObject(aggregation._id)) {
+        if (isObject(aggregation._id)) {
             filterColumnsStr.push(...Object.values(aggregation._id).map( escapeIdentifier ))
             groupByColumns.push(...Object.values(aggregation._id))
         } else {
@@ -80,7 +76,7 @@ class FilterParser {
 
     parseFilter(filter, offset, inlineFields) {
         // console.log('parseFilter', inlineFields)
-        if (!filter || !this.isObject(filter)|| filter.operator === undefined) {
+        if (!filter || !isObject(filter)|| filter.operator === undefined) {
             return [];
         }
 
@@ -214,7 +210,7 @@ class FilterParser {
     }
 
     orderBy(sort) {
-        if (!Array.isArray(sort) || !sort.every(this.isObject)) {
+        if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EMPTY_SORT;
         }
 

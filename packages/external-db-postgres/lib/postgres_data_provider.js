@@ -1,5 +1,5 @@
-const { escapeIdentifier, patchDateTime, prepareStatementVariables, asParamArrays  } = require('./postgres_utils')
-const { SystemFields } = require('velo-external-db-commons')
+const { escapeIdentifier, prepareStatementVariables  } = require('./postgres_utils')
+const { SystemFields, asParamArrays, patchDateTime } = require('velo-external-db-commons')
 const translateErrorCodes = require('./sql_exception_translator')
 
 class DataProvider {

@@ -1,9 +1,8 @@
 const { promisify } = require('util')
 const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { CannotModifySystemField } = require('velo-external-db-commons').errors
-const {escapeId} = require("mysql");
-const { SystemFields } = require('velo-external-db-commons')
+const { escapeId } = require('mysql')
+const { SystemFields, validateSystemFields } = require('velo-external-db-commons')
 
 class SchemaProvider {
     constructor(pool) {
@@ -45,13 +44,13 @@ class SchemaProvider {
     }
 
     async addColumn(collectionName, column) {
-        await this.validateSystemFields(column.name)
+        await validateSystemFields(column.name)
         await this.query(`ALTER TABLE ${escapeId(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
                   .catch( translateErrorCodes )
     }
 
     async removeColumn(collectionName, columnName) {
-        await this.validateSystemFields(columnName)
+        await validateSystemFields(columnName)
         return await this.query(`ALTER TABLE ${escapeId(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
                          .catch( translateErrorCodes )
     }
@@ -95,13 +94,6 @@ class SchemaProvider {
                     ]
                 } }), {} )
         }
-    }
-
-    validateSystemFields(columnName) {
-        if (SystemFields.find(f => f.name === columnName)) {
-            throw new CannotModifySystemField('Cannot modify system field')
-        }
-        return Promise.resolve()
     }
 }
 

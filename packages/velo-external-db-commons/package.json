@@ -22,6 +22,9 @@
   "scripts": {
     "test": ""
   },
+  "dependencies": {
+    "moment": "^2.29.1"
+  },
   "bugs": {
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   }

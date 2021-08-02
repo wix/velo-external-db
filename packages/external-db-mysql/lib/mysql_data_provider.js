@@ -1,8 +1,8 @@
 const { escapeId } = require('mysql')
 const { promisify } = require('util')
-const { SystemFields } = require('velo-external-db-commons')
+const { SystemFields, asParamArrays, patchDateTime } = require('velo-external-db-commons')
 const translateErrorCodes = require('./sql_exception_translator')
-const { wildCardWith, asParamArrays, patchDateTime } = require('./mysql_utils')
+const { wildCardWith } = require('./mysql_utils')
 
 class DataProvider {
     constructor(pool, filterParser) {
