@@ -1,13 +1,8 @@
 const moment = require('moment')
 
-// Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
-const escapeIdentifier = (str) => `"${(str || '').replace(/"/g, '""')}"`
+const wildCardWith = (n, char) => Array(n).fill(char, 0, n).join(', ')
 
-const prepareStatementVariables = (n) => {
-    return Array.from({length: n}, (_, i) => i + 1)
-        .map(i => `$${i}`)
-        .join(', ')
-}
+const isObject = (o) => typeof o === 'object' && o !== null
 
 const patchDateTime = (item) => {
     const obj = {}
@@ -26,9 +21,6 @@ const patchDateTime = (item) => {
     return obj
 }
 
-const asParamArrays = (item) => {
-    return Object.values(item);
-}
+const asParamArrays = (item) => Object.values(item)
 
-
-module.exports = { escapeIdentifier, asParamArrays, prepareStatementVariables, patchDateTime }
+module.exports = { wildCardWith, isObject, asParamArrays, patchDateTime }

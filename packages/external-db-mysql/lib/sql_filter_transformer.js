@@ -1,5 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons')
 const { escapeId } = require('mysql')
+const { wildCardWith, isObject } = require('./mysql_utils')
 
 class FilterParser {
     constructor() {
@@ -16,10 +17,6 @@ class FilterParser {
             filterExpr: `WHERE ${results[0].filterExpr}`,
             parameters: results[0].parameters
         };
-    }
-
-    isObject(o) {
-        return typeof o === 'object' && o !== null
     }
 
     wixDataFunction2Sql(f) {
@@ -40,7 +37,7 @@ class FilterParser {
     parseAggregation(aggregation, postFilter) {
         const groupByColumns = []
         const filterColumnsStr = []
-        if (this.isObject(aggregation._id)) {
+        if (isObject(aggregation._id)) {
             filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(f) ))
             groupByColumns.push(...Object.values(aggregation._id))
         } else {
@@ -73,7 +70,7 @@ class FilterParser {
     }
 
     parseFilter(filter) {
-        if (!filter || !this.isObject(filter)|| filter.operator === undefined) {
+        if (!filter || !isObject(filter)|| filter.operator === undefined) {
             return [];
         }
 
@@ -137,16 +134,12 @@ class FilterParser {
         return ['$contains', '$startsWith', '$endsWith'].includes(operator)
     }
 
-    wildCardWith(n, char) {
-        return Array(n).fill(char, 0, n).join(', ')
-    }
-
     valueForOperator(value, operator) {
         if (operator === '$hasSome') {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
             }
-            return `(${this.wildCardWith(value.length, '?')})`
+            return `(${wildCardWith(value.length, '?')})`
         } else if (operator === '$eq' && value === undefined) {
             return ''
         // } else if (operator === '$eq' && (value === true || value === true)) {
@@ -178,7 +171,7 @@ class FilterParser {
     }
 
     orderBy(sort) {
-        if (!Array.isArray(sort) || !sort.every(this.isObject)) {
+        if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EMPTY_SORT;
         }
 

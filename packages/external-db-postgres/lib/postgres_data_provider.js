@@ -1,5 +1,4 @@
-const moment = require('moment')
-const { escapeIdentifier } = require('./postgres_utils')
+const { escapeIdentifier, patchDateTime, prepareStatementVariables, asParamArrays  } = require('./postgres_utils')
 const { SystemFields } = require('./postgres_schema_provider')
 const translateErrorCodes = require('./sql_exception_translator')
 
@@ -32,8 +31,8 @@ class DataProvider {
 
         const res = await Promise.all(
             items.map(async item => {
-                const data = this.asParamArrays( this.patchDateTime(item) )
-                const res = await this.pool.query(`INSERT INTO ${escapeIdentifier(collectionName)} (${Object.keys(item).map( escapeIdentifier )}) VALUES (${this.prepareStatementVariables(n)})`, data)
+                const data = asParamArrays( patchDateTime(item) )
+                const res = await this.pool.query(`INSERT INTO ${escapeIdentifier(collectionName)} (${Object.keys(item).map( escapeIdentifier )}) VALUES (${prepareStatementVariables(n)})`, data)
                                .catch( translateErrorCodes )
                 return res.rowCount
             } ) )
@@ -50,7 +49,7 @@ class DataProvider {
         }
 
         const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
-                                .map(u => this.asParamArrays( this.patchDateTime(u) ))
+                                .map(u => asParamArrays( patchDateTime(u) ))
 
         const res = await Promise.all(
                         updatables.map(async updatable => {
@@ -62,7 +61,7 @@ class DataProvider {
     }
 
     async delete(collectionName, itemIds) {
-        const rs = await this.pool.query(`DELETE FROM ${escapeIdentifier(collectionName)} WHERE _id IN (${this.prepareStatementVariables(itemIds.length)})`, itemIds)
+        const rs = await this.pool.query(`DELETE FROM ${escapeIdentifier(collectionName)} WHERE _id IN (${prepareStatementVariables(itemIds.length)})`, itemIds)
                              .catch( translateErrorCodes )
         return rs.rowCount
     }
@@ -79,33 +78,6 @@ class DataProvider {
         const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters])
                                   .catch( translateErrorCodes )
         return rs.rows
-    }
-
-    prepareStatementVariables(n) {
-        return Array.from({length: n}, (_, i) => i + 1)
-                    .map(i => `$${i}`)
-                    .join(', ')
-    }
-
-    patchDateTime(item) {
-        const obj = {}
-        for (const key of Object.keys(item)) {
-            const value = item[key]
-            const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
-
-            if (value instanceof Date) {
-                obj[key] = moment(value).format('YYYY-MM-DD HH:mm:ss')
-            } else if (reISO.test(value)) {
-                obj[key] = moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss')
-            } else {
-                obj[key] = value
-            }
-        }
-        return obj
-    }
-
-    asParamArrays(item) {
-        return Object.values(item);
     }
 }
 

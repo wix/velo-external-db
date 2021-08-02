@@ -1,9 +1,8 @@
-const moment = require('moment')
 const { escapeId } = require('mysql')
 const { promisify } = require('util')
 const { SystemFields } = require('./mysql_schema_provider')
-const { EMPTY_FILTER } = require('./sql_filter_transformer')
 const translateErrorCodes = require('./sql_exception_translator')
+const { wildCardWith, asParamArrays, patchDateTime } = require('./mysql_utils')
 
 class DataProvider {
     constructor(pool, filterParser) {
@@ -35,7 +34,7 @@ class DataProvider {
         const item = items[0]
         const sql = `INSERT INTO ${escapeId(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES ?`
         
-        const data = items.map(item => this.asParamArrays( this.patchDateTime(item) ) )
+        const data = items.map(item => asParamArrays( patchDateTime(item) ) )
         const resultset = await this.query(sql, [data])
                                     .catch( translateErrorCodes )
         return resultset.affectedRows
@@ -53,7 +52,7 @@ class DataProvider {
         const queries = items.map(() => `UPDATE ${escapeId(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ?`).join(', ')} WHERE _id = ?` )
                              .join(';')
         const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
-                                .map(u => this.asParamArrays( this.patchDateTime(u) ))
+                                .map(u => asParamArrays( patchDateTime(u) ))
         const resultset = await this.query(queries, [].concat(...updatables))
                                     .catch( translateErrorCodes )
 
@@ -61,7 +60,7 @@ class DataProvider {
     }
 
     async delete(collectionName, itemIds) {
-        const sql = `DELETE FROM ${escapeId(collectionName)} WHERE _id IN (${this.wildCardWith(itemIds.length, '?')})`
+        const sql = `DELETE FROM ${escapeId(collectionName)} WHERE _id IN (${wildCardWith(itemIds.length, '?')})`
         const rs = await this.query(sql, itemIds)
                              .catch( translateErrorCodes )
         return rs.affectedRows
@@ -79,31 +78,6 @@ class DataProvider {
         const resultset = await this.query(sql, [...whereParameters, ...parameters])
                                     .catch( translateErrorCodes )
         return resultset
-    }
-
-    wildCardWith(n, char) {
-        return Array(n).fill(char, 0, n).join(', ')
-    }
-
-    patchDateTime(item) {
-        const obj = {}
-        for (const key of Object.keys(item)) {
-            const value = item[key]
-            const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
-
-            if (value instanceof Date) {
-                obj[key] = moment(value).format('YYYY-MM-DD HH:mm:ss')
-            } else if (reISO.test(value)) {
-                obj[key] = moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss')
-            } else {
-                obj[key] = value
-            }
-        }
-        return obj
-    }
-
-    asParamArrays(item) {
-        return Object.values(item);
     }
 }
 
