@@ -23,16 +23,11 @@ const init = ([host, user, password, db]) => {
     const filterParser = new FilterParser()
     const pool = new Pool(config)
 
-    // pool.on('error', (err) => {
-    //     console.log(err)
-    // })
-
     const databaseOperations = new DatabaseOperations(pool)
-    databaseOperations.checkIfConnectionSucceeded()
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, cleanup: async () => await pool.end(() => {}) }
+    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, cleanup: async () => await pool.end(() => {}) }
 }
 
 module.exports = init

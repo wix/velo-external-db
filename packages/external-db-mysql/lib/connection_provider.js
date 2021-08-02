@@ -27,12 +27,12 @@ const init = ([host, user, password, db, cloudSqlConnectionName]) => {
 
     const pool = mysql.createPool(config)
     const databaseOperations = new DatabaseOperations(pool)
-    databaseOperations.checkIfConnectionSucceeded()
+
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, connection: pool, cleanup: () => pool.end() }
+    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup: () => pool.end() }
 }
 
 module.exports = init
