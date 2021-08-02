@@ -1,6 +1,6 @@
 const { escapeId } = require('mysql')
 const { promisify } = require('util')
-const { SystemFields } = require('./mysql_schema_provider')
+const { SystemFields } = require('velo-external-db-commons')
 const translateErrorCodes = require('./sql_exception_translator')
 const { wildCardWith, asParamArrays, patchDateTime } = require('./mysql_utils')
 

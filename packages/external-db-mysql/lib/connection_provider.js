@@ -1,5 +1,5 @@
 const mysql = require('mysql')
-const { SchemaProvider } = require('./mysql_schema_provider')
+const SchemaProvider = require('./mysql_schema_provider')
 const DataProvider  = require('./mysql_data_provider')
 const { FilterParser } = require('./sql_filter_transformer')
 

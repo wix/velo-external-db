@@ -2,20 +2,7 @@ const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeIdentifier } = require('./postgres_utils')
 const { CannotModifySystemField, CollectionDoesNotExists} = require('velo-external-db-commons').errors
-
-const SystemFields = [
-    {
-        name: '_id', type: 'text', subtype: 'string', precision: '50', isPrimary: true
-    },
-    {
-        name: '_createdDate', type: 'datetime', subtype: 'datetime'
-    },
-    {
-        name: '_updatedDate', type: 'datetime', subtype: 'datetime'
-    },
-    {
-        name: '_owner', type: 'text', subtype: 'string', precision: '50'
-    }]
+const { SystemFields } = require('velo-external-db-commons')
 
 class SchemaProvider {
     constructor(pool) {
@@ -122,4 +109,4 @@ class SchemaProvider {
     }
 }
 
-module.exports = {SchemaProvider, SystemFields}
+module.exports = SchemaProvider

@@ -4,7 +4,7 @@ const each = require('jest-each').default
 const Chance = require('chance');
 const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit } = require('../resources/provider_resources')
 const chance = new Chance();
-const { SystemFields } = require('external-db-mysql')
+const { SystemFields } = require('velo-external-db-commons')
 
 
 describe('Schema API', () => {
