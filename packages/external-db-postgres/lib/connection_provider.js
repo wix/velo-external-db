@@ -3,6 +3,7 @@ const { builtins } = require('pg-types')
 const SchemaProvider = require('./postgres_schema_provider')
 const DataProvider = require('./postgres_data_provider')
 const FilterParser = require('./sql_filter_transformer')
+const DatabaseOperations = require ('./postgres_operations')
 
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
@@ -22,6 +23,12 @@ const init = ([host, user, password, db]) => {
     const filterParser = new FilterParser()
     const pool = new Pool(config)
 
+    pool.on('error', (err) => {
+        console.log(err)
+    })
+
+    const databaseOperations = new DatabaseOperations(pool)
+    databaseOperations.checkIfConnectionSucceeded();
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 

@@ -1,4 +1,5 @@
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist,AccessDeniedError,wrongDatabaseError,
+        HostDoesNotExists } = require('velo-external-db-commons').errors
 
 const translateErrorCodes = err => {
     switch (err.code) {
@@ -8,9 +9,15 @@ const translateErrorCodes = err => {
             throw new FieldAlreadyExists('Collection already has a field with the same name')
         case 'ER_NO_SUCH_TABLE':
             throw new CollectionDoesNotExists('Collection does not exists')
+        case 'ER_DBACCESS_DENIED_ERROR':
+        case 'ER_BAD_DB_ERROR':
+            throw new wrongDatabaseError(`Database does not exists or you don\'t have access to it, sql message: ${err.sqlMessage}`)
+        case 'ER_ACCESS_DENIED_ERROR':
+            throw new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.sqlMessage} `)
+        case 'ENOTFOUND':
+            throw new HostDoesNotExists('Database host does not found.')
         default :
-            console.log(err)
-            throw new Error(`default ${err.code}`)
+            throw new Error(`default ${err.sqlMessage}`)
     }
 }
 

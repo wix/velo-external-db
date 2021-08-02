@@ -2,6 +2,7 @@ const mysql = require('mysql')
 const SchemaProvider = require('./mysql_schema_provider')
 const DataProvider  = require('./mysql_data_provider')
 const FilterParser = require('./sql_filter_transformer')
+const DatabaseOperations = require('./mysql_operations')
 
 const init = ([host, user, password, db, cloudSqlConnectionName]) => {
     const config = {
@@ -25,6 +26,8 @@ const init = ([host, user, password, db, cloudSqlConnectionName]) => {
     }
 
     const pool = mysql.createPool(config)
+    const databaseOperations = new DatabaseOperations(pool)
+    databaseOperations.checkIfConnectionSucceeded();
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
