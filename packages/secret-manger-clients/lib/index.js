@@ -1,6 +1,6 @@
 'use strict';
 
-const {SecretMangerClientENV,SecretMangerClientAWS, SecretMangerClientAzure, SecretMangerClientGCP } = require('./secretMagerClients')
+const {SecretMangerClientENV,SecretMangerClientAWS, SecretMangerClientAzure, SecretMangerClientGCP } = require('./secretMangerClients')
 
 const createSecretClient = (type) => { 
     switch ( type ) {
