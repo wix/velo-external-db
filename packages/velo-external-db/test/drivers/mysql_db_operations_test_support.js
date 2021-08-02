@@ -18,14 +18,15 @@ const config = {
 
 const createPool = (modify) => mysql.createPool(Object.assign({}, config, modify ))
 
-const dbOperationGivenDBWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ))
+const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ))
 
-const dbOperationGivenDBWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { database: 'wrong'} ))
+const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { database: 'wrong'} ))
 
-const dbOperationGivenDBWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong'} ))
+const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong'} ))
 
-const dbOperationGivenValidDB = () => new DatabaseOperations( createPool({ } ))
+const dbOperationWithValidDB = () => new DatabaseOperations( createPool({ } ))
 
-
-
-module.exports = { dbOperationGivenDBWithMisconfiguredPassword, dbOperationGivenDBWithMisconfiguredDatabase, dbOperationGivenDBWithMisconfiguredHost, dbOperationGivenValidDB }
+module.exports = {
+    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
+    dbOperationWithMisconfiguredHost, dbOperationWithValidDB
+}
