@@ -1,4 +1,5 @@
-const { EMPTY_SORT, FilterParser } = require('./sql_filter_transformer')
+const FilterParser = require('./sql_filter_transformer')
+const { EMPTY_SORT } = require('velo-external-db-commons')
 const { escapeIdentifier } = require('./postgres_utils')
 const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors

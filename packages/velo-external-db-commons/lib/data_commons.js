@@ -4,7 +4,9 @@ const EMPTY_SORT = {
 
 const EMPTY_FILTER = {
     filterExpr: '',
-    parameters: []
+    parameters: [],
+    offset: 1
+
 }
 
 module.exports = { EMPTY_FILTER, EMPTY_SORT }

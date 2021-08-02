@@ -1,7 +1,7 @@
 const mysql = require('mysql')
 const SchemaProvider = require('./mysql_schema_provider')
 const DataProvider  = require('./mysql_data_provider')
-const { FilterParser } = require('./sql_filter_transformer')
+const FilterParser = require('./sql_filter_transformer')
 
 const init = ([host, user, password, db, cloudSqlConnectionName]) => {
     const config = {

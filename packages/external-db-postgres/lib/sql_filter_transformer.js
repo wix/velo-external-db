@@ -1,4 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
+const { EMPTY_FILTER, EMPTY_SORT } = require('velo-external-db-commons')
 const { escapeIdentifier } = require('./postgres_utils')
 
 class FilterParser {
@@ -256,19 +257,6 @@ class FilterParser {
         }
         return escapeIdentifier(fieldName)
     }
-
 }
 
-const EMPTY_SORT = {
-    sortExpr: '',
-    sortColumns: []
-}
-
-const EMPTY_FILTER = {
-    filterExpr: '',
-    filterColumns: [],
-    parameters: [],
-    offset: 1
-}
-
-module.exports = { EMPTY_FILTER, EMPTY_SORT, FilterParser }
+module.exports = FilterParser

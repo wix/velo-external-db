@@ -1,4 +1,4 @@
-const { EMPTY_SORT } = require('./sql_filter_transformer')
+const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
 const { escapeIdentifier } = require('./postgres_utils')
 

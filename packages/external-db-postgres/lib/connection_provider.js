@@ -2,7 +2,7 @@ const { Pool, types } = require('pg')
 const { builtins } = require('pg-types')
 const SchemaProvider = require('./postgres_schema_provider')
 const DataProvider = require('./postgres_data_provider')
-const { FilterParser } = require('./sql_filter_transformer')
+const FilterParser = require('./sql_filter_transformer')
 
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
