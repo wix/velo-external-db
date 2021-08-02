@@ -4,7 +4,7 @@ const DataProvider  = require('./mysql_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mysql_operations')
 
-const init = ([host, user, password, db, cloudSqlConnectionName]) => {
+const init =async ([host, user, password, db, cloudSqlConnectionName]) => {
     const config = {
         host     : host,
         user     : user,
@@ -27,7 +27,7 @@ const init = ([host, user, password, db, cloudSqlConnectionName]) => {
 
     const pool = mysql.createPool(config)
     const databaseOperations = new DatabaseOperations(pool)
-
+    await databaseOperations.checkIfConnectionSucceeded()
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
