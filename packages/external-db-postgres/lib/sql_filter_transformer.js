@@ -71,7 +71,6 @@ class FilterParser {
 
         return {
             fieldsStatement: filterColumnsStr.join(', '),
-            fieldsStatementColumns: [],
             groupByColumns,
             havingFilter: filterExpr,
             parameters: parameters,

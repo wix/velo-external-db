@@ -68,7 +68,6 @@ describe('Data API', () => {
             await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
 
             env.driver.stubEmptyFilterFor(ctx.filter)
-            env.driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep, ctx.numericColumns)
             env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 1)
 
             const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
@@ -83,7 +82,6 @@ describe('Data API', () => {
             await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
 
             env.driver.stubEmptyFilterFor(ctx.filter)
-            env.driver.stubEmptyHavingFilterFor(ctx.aggregation.postFilteringStep)
             env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 1)
 
             const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
@@ -98,7 +96,6 @@ describe('Data API', () => {
             await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
 
             env.driver.givenFilterByIdWith(ctx.numberEntity._id, ctx.filter)
-            env.driver.givenHavingFilterWith(ctx.aliasColumns, ctx.aggregation.postFilteringStep, ctx.numericColumns, 1)
             env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 2)
 
             const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)

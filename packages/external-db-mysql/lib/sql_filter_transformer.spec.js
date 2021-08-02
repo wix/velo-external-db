@@ -269,6 +269,8 @@ describe('Sql Parser', () => {
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: escapeId(ctx.fieldName),
                         groupByColumns: [ctx.fieldName],
+                        havingFilter: '',
+                        parameters: [],
                     })
                 })
 
@@ -283,8 +285,29 @@ describe('Sql Parser', () => {
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: `${escapeId(ctx.fieldName)}, ${escapeId(ctx.anotherFieldName)}`,
                         groupByColumns: [ctx.fieldName, ctx.anotherFieldName],
+                        havingFilter: '',
+                        parameters: [],
                     })
                 })
+
+                test(`process having filter`, () => {
+                    const aggregation = {
+                        _id: ctx.fieldName,
+                        [ctx.moreFieldName]: {
+                            '$avg': ctx.anotherFieldName
+                        }
+                    }
+
+                    const havingFilter = { operator: '$gt', fieldName: ctx.moreFieldName, value: ctx.fieldValue}
+
+                    expect( env.filterParser.parseAggregation(aggregation, havingFilter) ).toEqual({
+                        fieldsStatement: `${escapeId(ctx.fieldName)}, AVG(${escapeId(ctx.anotherFieldName)}) AS ${escapeId(ctx.moreFieldName)}`,
+                        groupByColumns: [ctx.fieldName],
+                        havingFilter: `HAVING ${escapeId(ctx.moreFieldName)} > ?`,
+                        parameters: [ctx.fieldValue],
+                    })
+                })
+
 
                 each([
                     ['AVG', '$avg'],
@@ -302,6 +325,8 @@ describe('Sql Parser', () => {
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: `${escapeId(ctx.fieldName)}, ${mySqlFunction}(${escapeId(ctx.anotherFieldName)}) AS ${escapeId(ctx.moreFieldName)}`,
                         groupByColumns: [ctx.fieldName],
+                        havingFilter: '',
+                        parameters: [],
                     })
                 })
             })

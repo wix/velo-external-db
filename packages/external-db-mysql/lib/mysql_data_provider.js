@@ -71,18 +71,11 @@ class DataProvider {
         await this.query(`TRUNCATE ${escapeId(collectionName)}`).catch( translateErrorCodes )
     }
 
-    // todo: fix logic to be the same as postgres !
     async aggregate(collectionName, filter, aggregation) {
         const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
-        const {fieldsStatement, groupByColumns} = this.filterParser.parseAggregation(aggregation.processingStep)
-        const havingFilter = this.filterParser.parseFilter(aggregation.postFilteringStep)
+        const {fieldsStatement, groupByColumns, havingFilter, parameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
 
-        const {filterExpr, parameters} =
-            havingFilter.map(({filterExpr, filterColumns, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                                             filterColumns, parameters}))
-                        .concat(EMPTY_FILTER)[0]
-
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${filterExpr}`
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
         const resultset = await this.query(sql, [...whereParameters, ...parameters])
                                     .catch( translateErrorCodes )
         return resultset

@@ -37,7 +37,7 @@ class FilterParser {
         }
     }
 
-    parseAggregation(aggregation) {
+    parseAggregation(aggregation, postFilter) {
         const groupByColumns = []
         const filterColumnsStr = []
         if (this.isObject(aggregation._id)) {
@@ -57,9 +57,18 @@ class FilterParser {
                         })
               })
 
+        const havingFilter = this.parseFilter(postFilter)
+        const {filterExpr, parameters} =
+            havingFilter.map(({filterExpr, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+                                                              parameters: parameters}))
+                        .concat(EMPTY_FILTER)[0]
+
+
         return {
             fieldsStatement: filterColumnsStr.join(', '),
             groupByColumns,
+            havingFilter: filterExpr,
+            parameters: parameters,
         }
     }
 
