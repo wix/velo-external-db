@@ -1,7 +1,7 @@
 const { EMPTY_SORT, FilterParser } = require('./sql_filter_transformer')
 const { escapeIdentifier } = require('./postgres_utils')
 const { Uninitialized, gen } = require('test-commons')
-const { InvalidQuery } = require('velo-external-db-commons')
+const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance();

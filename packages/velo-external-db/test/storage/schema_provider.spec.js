@@ -1,4 +1,4 @@
-const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('velo-external-db-commons')
+const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('velo-external-db-commons').errors
 const { Uninitialized, gen } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance');

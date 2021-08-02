@@ -1,7 +1,7 @@
 const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeIdentifier } = require('./postgres_utils')
-const { CannotModifySystemField, CollectionDoesNotExists} = require('velo-external-db-commons')
+const { CannotModifySystemField, CollectionDoesNotExists} = require('velo-external-db-commons').errors
 
 const SystemFields = [
     {

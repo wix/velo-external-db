@@ -1,4 +1,4 @@
-const { InvalidQuery } = require('velo-external-db-commons')
+const { InvalidQuery } = require('velo-external-db-commons').errors
 const { escapeIdentifier } = require('./postgres_utils')
 
 class FilterParser {

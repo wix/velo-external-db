@@ -1,6 +1,6 @@
 const { Uninitialized } = require('test-commons')
 const { authMiddleware } = require('./auth-middleware');
-const { UnauthorizedError } = require('velo-external-db-commons')
+const { UnauthorizedError } = require('velo-external-db-commons').errors
 const Chance = require('chance')
 const chance = Chance();
 

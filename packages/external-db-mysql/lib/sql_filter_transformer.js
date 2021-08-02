@@ -1,4 +1,4 @@
-const { InvalidQuery } = require('velo-external-db-commons')
+const { InvalidQuery } = require('velo-external-db-commons').errors
 const { escapeId } = require('mysql')
 const { wildCardWith, isObject } = require('./mysql_utils')
 
