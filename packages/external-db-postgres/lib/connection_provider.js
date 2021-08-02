@@ -23,12 +23,12 @@ const init = ([host, user, password, db]) => {
     const filterParser = new FilterParser()
     const pool = new Pool(config)
 
-    pool.on('error', (err) => {
-        console.log(err)
-    })
+    // pool.on('error', (err) => {
+    //     console.log(err)
+    // })
 
     const databaseOperations = new DatabaseOperations(pool)
-    databaseOperations.checkIfConnectionSucceeded();
+    databaseOperations.checkIfConnectionSucceeded()
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 

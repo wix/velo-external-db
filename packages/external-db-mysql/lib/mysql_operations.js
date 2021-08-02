@@ -1,6 +1,6 @@
-const mysql = require('mysql')
 const {promisify} = require ('util')
 const translateErrorCodes = require('./sql_exception_translator')
+
 class DatabaseOperations {
     constructor(pool) {
         this.pool = pool;

@@ -27,7 +27,7 @@ const init = ([host, user, password, db, cloudSqlConnectionName]) => {
 
     const pool = mysql.createPool(config)
     const databaseOperations = new DatabaseOperations(pool)
-    databaseOperations.checkIfConnectionSucceeded();
+    databaseOperations.checkIfConnectionSucceeded()
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
