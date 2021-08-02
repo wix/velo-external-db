@@ -97,9 +97,9 @@ const deleteRandomSecret = ( secrets ) => {
 };
 
 const deleteRandomSecretFromEnv = ( secrets ) => {
-    const { deletedKey, secretsAfterDeletion } = deleteRandomSecret( secrets );
+    deletedKey = randomKey(secrets);
     delete process.env[deletedKey];
-    return {deletedKey, secretsAfterDeletion};
+    return deletedKey
 };
 
 const clearRandomSecretFromEnv = ( secrets ) => {
