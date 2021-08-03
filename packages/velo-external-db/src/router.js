@@ -5,7 +5,6 @@ const createRouter = async (dataService, schemaService) => {
     
     const router = express.Router()
 
-    router.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
 
     // *************** INFO **********************
     router.get('/', (req, res) => {

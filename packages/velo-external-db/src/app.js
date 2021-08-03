@@ -7,6 +7,7 @@ const { errorMiddleware } = require('./web/error-middleware')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
 const createRouter = require('./router')
+const path = require('path')
 
 const load = async () => {
     const { type, host, user, password, db, cloudSqlConnectionName } = { type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME }
@@ -24,6 +25,7 @@ load().then(async (res) => {
     const app = express()
     const port = process.env.PORT || 8080
 
+    app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(bodyParser.json())
     app.use(unless(['/', '/provision'], authMiddleware({ secretKey: process.env.SECRET_KEY })));
     app.use(errorMiddleware)
