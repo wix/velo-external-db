@@ -1,15 +1,15 @@
 const mysql = require('mysql')
 const SchemaProvider = require('./mysql_schema_provider')
-const DataProvider  = require('./mysql_data_provider')
+const DataProvider = require('./mysql_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mysql_operations')
 
 const init = ([host, user, password, db, cloudSqlConnectionName]) => {
     const config = {
-        host     : host,
-        user     : user,
-        password : password,
-        database : db,
+        host: host,
+        user: user,
+        password: password,
+        database: db,
 
         waitForConnections: true,
         namedPlaceholders: true,
@@ -32,7 +32,7 @@ const init = ([host, user, password, db, cloudSqlConnectionName]) => {
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup: () => pool.end() }
+    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup: () => pool.end(), databaseOperations: databaseOperations }
 }
 
 module.exports = init
