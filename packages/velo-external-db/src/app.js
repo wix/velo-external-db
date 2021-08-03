@@ -11,8 +11,8 @@ const createRouter = require('./router')
 const load = async () => {
     const { type, host, user, password, db, cloudSqlConnectionName } = { type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME }
 
-    const { dataProvider, schemaProvider, cleanup: cleanupDbFunc } = await init(type, host, user, password, db, cloudSqlConnectionName)
-
+    const { dataProvider, schemaProvider, cleanup: cleanupDbFunc, databaseOperations } = init(type, host, user, password, db, cloudSqlConnectionName)
+    await databaseOperations.checkIfConnectionSucceeded()
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)
     const cleanup = cleanupDbFunc
@@ -28,17 +28,17 @@ load().then(async (res) => {
     app.use(unless(['/', '/provision'], authMiddleware({ secretKey: process.env.SECRET_KEY })));
     app.use(errorMiddleware)
     app.use(compression())
-   
+
     const router = await createRouter(res.dataService, res.schemaService)
     app.use('/', router)
 
     const server = app.listen(port)
 
     module.exports = { server, cleanup: res.cleanup, load };
-}).catch(err =>{
+}).catch(err => {
     const app = express()
     const port = process.env.PORT || 8080
-    app.use('/',(req,res)=>{
+    app.use('/', (req, res) => {
         res.send(err.message)
     })
 
