@@ -1,6 +1,5 @@
-
 const { Uninitialized } = require('test-commons');
-const {secretMangerTestHelper,secertMangerAWShelper,randomSecret} = require('./secretMangerClients_test_support');
+const {secretMangerTestHelper,secertMangerAWShelper,randomSecret} = require('../tests/drivers/secretMangerClients_test_support');
 const { SecretMangerClient , SecretMangerClientAWS, SecretMangerClientGCP } = require('./secretMangerClients');
 
 
