@@ -1,6 +1,6 @@
 const { Uninitialized, gen } = require('test-commons')
 const schema = require('../drivers/schema_api_rest_test_support');
-const { auth } = require('../drivers/auth-test-support')
+const { auth } = require('../drivers/auth_test_support')
 const Chance = require('chance')
 const each = require('jest-each').default
 const { initApp, teardownApp, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit} = require('../resources/e2e_resources')

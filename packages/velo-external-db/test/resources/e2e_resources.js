@@ -1,5 +1,5 @@
 const {Uninitialized} = require("test-commons");
-const {authInit} = require("../drivers/auth-test-support");
+const {authInit} = require("../drivers/auth_test_support");
 const postgres = require("../resources/postgres_resources");
 const mysql = require("../resources/mysql_resources");
 

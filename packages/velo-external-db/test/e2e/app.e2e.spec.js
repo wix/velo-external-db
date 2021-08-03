@@ -1,4 +1,4 @@
-const { auth } = require('../drivers/auth-test-support')
+const { auth } = require('../drivers/auth_test_support')
 const each = require('jest-each').default
 const { mysqlTestEnvInit, dbTeardown, postgresTestEnvInit, initApp, teardownApp} = require("../resources/e2e_resources")
 
