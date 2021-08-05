@@ -8,17 +8,19 @@ const env = {
     app: Uninitialized,
 }
 
-const initApp = () => {
-    authInit()
+const initApp = async () => {
+    env.secretKey = authInit()
     if (env.app) {
-        env.app.load()
+        await env.app.load()
     }
-    env.app = require('../..')
+    const createApp = require('../..');
+    env.app = await createApp();
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const teardownApp = async () => {
+
     await sleep(500)
     await env.app.server.close()
 }
