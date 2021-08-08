@@ -47,7 +47,6 @@ const setActive = () => {
     process.env.USER = 'test-user'
     process.env.PASSWORD = 'password'
     process.env.DB = 'test-db'
-    process.env.PORT = 8080
 }
 
 
