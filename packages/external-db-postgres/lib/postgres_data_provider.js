@@ -6,7 +6,6 @@ class DataProvider {
     constructor(pool, filterParser) {
         this.filterParser = filterParser
         this.pool = pool
-        this.dataProviderType = 'postgress'
     }
 
     async find(collectionName, filter, sort, skip, limit) {
