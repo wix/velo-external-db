@@ -6,23 +6,23 @@ const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 });
 
-afterAll(async () => {
-    await teardownApp()
-}, 20000);
-
 describe('Velo External DB',  () => {
     each([
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
     ]).describe('%s', (name, setup, teardown) => {
         beforeAll(async () => {
+            jest.resetModules()
+
             await setup()
 
-            initApp()
+            await initApp()
         }, 20000);
 
         afterAll(async () => {
             await dbTeardown()
+            await teardownApp()
+
         }, 20000);
 
 

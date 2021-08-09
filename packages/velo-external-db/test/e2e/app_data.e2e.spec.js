@@ -12,30 +12,26 @@ const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 });
 
-afterAll(async () => {
-    await teardownApp()
-}, 20000);
-
-
 describe('Velo External DB Data REST API',  () => {
     each([
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
     ]).describe('%s', (name, setup) => {
         beforeAll(async () => {
+            jest.resetModules()
             await setup()
-
-            initApp()
+            
+            await initApp()
         }, 20000);
 
         afterAll(async () => {
+            await teardownApp()
             await dbTeardown()
         }, 20000);
 
         test('find api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, auth)
-
             expect((await axios.post(`/data/find`, {collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, auth)).data).toEqual({ items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
                 totalCount: 0});
         })

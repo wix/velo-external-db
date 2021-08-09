@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Velo External DB</title>
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="preload" as="font">
+<link type="image/png" href="https://www.wix.com/favicon.ico" rel="shortcut icon">
+<style>
+ body {
+	font-family: 'Roboto', sans-serif;
+	font-display: fallback;
+	background: url('/assets/cloud_bg.svg');
+	background-size: cover;
+	background-position: center;
+	line-height: 1.6;
+ }
+h1 {
+	font-size: 24px;
+	font-weight: bold;
+	margin-bottom: 0px;
+}
+
+.congrats {
+	font-size: 18px;
+	font-weight: normal;
+	margin-top: 4px;
+}
+
+h3 {
+	font-size: 20px;
+	margin-bottom: 0px;
+}
+
+.next {
+    font-size: 15px;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.container {
+	max-width: 700px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.hero {
+	margin-top: 172px;
+}
+
+.hero .logo {
+	width: 140px;
+	float: left;
+	margin-right: 32px;
+}
+
+.hero .message {
+	font-size: 15px;
+	text-align: center;
+	margin-bottom: 24px;
+}
+
+.details {
+	clear: both;
+	height: 400px;
+	line-height: 1.8;
+}
+
+.callout {
+	font-size: 14px;
+	color: #1967D2;
+	font-weight: 600;
+	padding: 16px 24px 16px 40px;
+	background: url('/assets/lightbulb_icon.svg') #E8F0FE ;
+	background-position: 16px 16px;
+	background-repeat: no-repeat;
+	line-height: 1.6;
+}
+
+code {
+	font-family: 'Roboto Mono', Courier, monospace;
+	color: #A30038;
+	background-color: #F8F8F8;
+	border: 1px solid #DDD;
+	border-radius: 2px;
+	padding: 0 6px;
+	font-weight: 500;
+}
+
+.cta a {
+	background-color:rgba(233, 233, 233, 0.9);
+	color: rgb(14, 14, 14);
+	text-decoration: none;
+	padding: 8px 12px;
+	margin-top: 8px;
+	margin-right: 4px;
+	min-height: 36px;
+	border-radius: 2px;
+	font-weight: 600;
+}
+
+.cta a:hover {
+	background-color:rgba(213, 213, 213, 0.9);
+}
+
+.cta a.primary {
+	color: white;
+	background-color: rgb(14, 101, 241);
+}
+
+.cta a.primary:hover {
+    background-color: rgb(66, 133, 244, 0.9);
+}
+
+@media (max-width: 600px) {
+    .hero .logo {
+        float: initial;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+	.container {
+        margin-top: 0;
+	}
+
+    .hero {
+        margin-top: 0;
+        margin-bottom: 24px;
+	}
+}
+
+
+</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="hero">
+			<div style="text-align:center;">
+				<picture>
+					<source srcset="/assets/celebration-dark.svg" alt="A group celebrating" media="(prefers-color-scheme: dark)">
+					<img src="/assets/celebration.svg" alt="A group celebrating" width="427" height="231">
+				</picture>
+			</div>
+
+			<div class="message">
+				<h1>It's running!</h1>
+			</div>
+		</div>
+
+		<div class="details">
+		<h3>MySql Endpoint URL: </h3>
+			<p class="next"><%= DB_URL %> </p>
+      <h3>DB name: </h3>
+			<p class="next"><%= DB_NAME %> </p>
+		<h3>DB connection status: </h3>
+			<p class="next"><%= DB_CONNECTION_STATUS %> </p>
+		</div>
+
+	</div>
+</body>
+</html>

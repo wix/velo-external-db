@@ -45,7 +45,6 @@ const setActive = () => {
     process.env.USER = 'test-user'
     process.env.PASSWORD = 'password'
     process.env.DB = 'test-db'
-
 }
 
 const shutdownEnv = async () => {
