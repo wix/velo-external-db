@@ -32,13 +32,12 @@ class SecretMangerClient {
 }
 class SecretMangerClientAWS extends SecretMangerClient {
 
-    constructor( secretId, region ){
+    constructor( secretId , region){
         super();
         this.requiredProps = AWSRequiredSecertsKeys;
         this.secretMagerClient = new AwsSecretMangerClient({ region });
         this.getSecertsCommand = new AwsGetSecretValueCommand({ SecretId : secretId });
-        this.retrieveSecrets = this.secretMagerClient.send(this.getSecertsCommand); 
-    }
+    } 
 
     async getSecrets() {
         try {
