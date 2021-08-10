@@ -19,32 +19,32 @@ const load = async () => {
     return { dataService, schemaService, cleanup }
 }
 
-const app = express()
-const port = process.env.PORT || 8080
 
-app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
-app.use(bodyParser.json())
-app.use(unless(['/', '/provision'], authMiddleware({ secretKey: process.env.SECRET_KEY })));
-app.use(errorMiddleware)
-app.use(compression())
-
-if (process.env.NODE_ENV !== 'test'){
+const main = async () => {
+    const app = express()
+    const port = process.env.PORT || 8080
     
-    load().then( ({dataService,schemaService }) => {
+    app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
+    app.use(bodyParser.json())
+    app.use(unless(['/', '/provision'], authMiddleware({ secretKey: process.env.SECRET_KEY })));
+    app.use(errorMiddleware)
+    app.use(compression())
+    try {
+        const  { dataService, schemaService, cleanup } = await load();
         const router = createRouter(dataService, schemaService)
         app.use('/', router)
-        app.listen(port)
-    }).catch(err => {
+        const server =  app.listen(port)
+        return {server, cleanup,load }
+    } catch (err) {
         app.use('/', (req, res) => {
             res.send(err.message)
         })
         app.listen(port)
-    })  
+    }
 }
 
-module.exports = async () => {
-    const  { dataService, schemaService, cleanup } = await load();
-    app.use('/',  createRouter(dataService, schemaService))
-    const server = app.listen(port);
-    return {server, cleanup, load}
-};
+if (process.env.NODE_ENV !== 'test'){
+    main();
+}
+
+module.exports = main;
