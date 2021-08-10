@@ -1,10 +1,11 @@
 const { SecretsManagerClient: AwsSecretMangerClient , GetSecretValueCommand: AwsGetSecretValueCommand  } = require("@aws-sdk/client-secrets-manager");
+const translateErrorCodes = require('./external_db_config_exception_translator')
 
 const RequiredSecertsKeys = ['HOST', 'USERNAME', 'PASSWORD','DB', 'SECRET_KEY'];
 const AWSRequiredSecertsKeys = ['host', 'username', 'password','DB', 'SECRET_KEY'];
 const GCPRequiredSecertsKeys = ['CLOUD_SQL_CONNECTION_NAME', 'USERNAME', 'PASSWORD','DB', 'SECRET_KEY'];
 
-class SecretMangerClient {
+class ExternalDbConfigClient {
     constructor(){
         this.requiredSecrets = RequiredSecertsKeys;
     }
@@ -23,16 +24,16 @@ class SecretMangerClient {
                 return missingRequiredProps;
         },[]);
 
-        if (missingRequiredProps.length){
-            throw new Error(`Please set the next variable/s in your secret manger: ${missingRequiredProps}`);   
+        if (missingRequiredProps.length){            
+            translateErrorCodes('MISSING_VARIABLE',missingRequiredProps);
         }
 
         return Promise.resolve(secrets);
     }
 }
-class SecretMangerClientAWS extends SecretMangerClient {
+class ExternalDbConfigClientAWS extends ExternalDbConfigClient {
 
-    constructor( secretId , region){
+    constructor(secretId , region){;
         super();
         this.requiredProps = AWSRequiredSecertsKeys;
         this.secretMagerClient = new AwsSecretMangerClient({ region });
@@ -48,16 +49,16 @@ class SecretMangerClientAWS extends SecretMangerClient {
             return ({ host, username, password, db, secretKey });
 
         } catch ( err ) {
-            throw new Error (`Error occurred retrieving secerts: ${err}`);
+            translateErrorCodes(err);
         }
         
     }
 }  
 
-class SecretMangerClientAzure extends SecretMangerClient {
+class ExternalDbConfigClientAzure extends ExternalDbConfigClient {
 }
 
-class SecretMangerClientGCP extends SecretMangerClient {
+class ExternalDbConfigClientGCP extends ExternalDbConfigClient {
     constructor(){
         super();
         this.requiredProps = GCPRequiredSecertsKeys;
@@ -71,5 +72,5 @@ class SecretMangerClientGCP extends SecretMangerClient {
     }
 }
 
-module.exports = { SecretMangerClient,SecretMangerClientAWS, SecretMangerClientAzure, SecretMangerClientGCP }
+module.exports = { ExternalDbConfigClient,ExternalDbConfigClientAWS, ExternalDbConfigClientAzure, ExternalDbConfigClientGCP }
 

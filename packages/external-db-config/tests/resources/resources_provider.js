@@ -1,5 +1,5 @@
 const { Uninitialized } = require('test-commons');
-const { SecretMangerClient, SecretMangerClientAWS, SecretMangerClientGCP,SecretMangerClientAzure } = require('../../lib/secretMangerClients');
+const { SecretMangerClient, SecretMangerClientAWS, SecretMangerClientGCP,SecretMangerClientAzure } = require('../../lib/external_db_config_clients');
 
 const secretMangerAwsTestEnv = require ("./aws_secretManger_resources");
 const secretMangerTestEnv = require("./env_secretManger_resources");
