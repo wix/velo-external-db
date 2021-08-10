@@ -8,11 +8,15 @@ const { errorMiddleware } = require('./web/error-middleware')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
 const createRouter = require('./router')
+const {createExternalDbConfigClient} = require("external-db-config")
 
 
 const load = async () => {
-    const { type, host, user, password, db, cloudSqlConnectionName } = { type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME }
-    const { dataProvider, schemaProvider, cleanup, databaseOperations } = init(type, host, user, password, db, cloudSqlConnectionName)
+    const type = process.env.TYPE;
+    const secretId = process.env.SECRET_ID;
+    const extrenalDbConfigClient = createExternalDbConfigClient(type,secretId);
+    const { host, username, password, db, cloudSqlConnectionName } = await extrenalDbConfigClient.getSecrets();
+    const { dataProvider, schemaProvider, cleanup, databaseOperations } = init(type, host, username, password, db, cloudSqlConnectionName)
     await databaseOperations.checkIfConnectionSucceeded()
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)

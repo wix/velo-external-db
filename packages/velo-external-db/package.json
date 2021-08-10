@@ -15,6 +15,7 @@
   "dependencies": {
     "compression": "^1.7.4",
     "express": "^4.17.1",
+    "external-db-config": "^0.0.0",
     "external-db-mysql": "^0.0.0",
     "external-db-postgres": "^0.0.0",
     "mysql": "^2.18.1",
