@@ -12,13 +12,6 @@ const createRouter = require('./router')
 
 
 
-process.env.TYPE="gcp/sql"
-process.env.HOST="velo-external-db-mysql22.mysql.database.azure.com"
-process.env.USER="demo_admin@velo-external-db-mysql22"
-process.env.DB="guest"
-process.env.PASSWORD="veloPassword1"
-process.env.SECRET_KEY="hello"
-
 const load = async () => {
     const { type, host, user, password, db, cloudSqlConnectionName } = { type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME }
     const { dataProvider, schemaProvider, cleanup, databaseOperations } = init(type, host, user, password, db, cloudSqlConnectionName)
