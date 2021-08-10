@@ -28,7 +28,7 @@ class SchemaColumnTranslator {
             case 'double precision':
             case 'float4':
             case 'float8':
-
+            case 'oid':
             case 'money':
                 return 'number'
 
@@ -45,7 +45,8 @@ class SchemaColumnTranslator {
             case 'char':
             case 'text':
                 return 'text'
-
+                
+            case 'bool':
             case 'boolean':
                 return 'boolean'
 
