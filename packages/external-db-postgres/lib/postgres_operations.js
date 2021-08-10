@@ -6,7 +6,11 @@ class DatabaseOperations {
     }
 
     async checkIfConnectionSucceeded() {
-        return await this.pool.query('SELECT 1').catch(translateErrorCodes);
+        await this.pool.query('SELECT 1').catch(translateErrorCodes);
+        return Promise.resolve("Connected to DB successfully")
+    }
+    getPoolConfig() {
+        return this.pool.options;
     }
 }
 

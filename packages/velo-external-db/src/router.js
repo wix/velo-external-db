@@ -1,14 +1,21 @@
 const path = require('path')
 const express = require('express')
+const createRouter = (dataService, schemaService, databaseOperations) => {
 
-const createRouter = (dataService, schemaService) => {
-    
     const router = express.Router()
 
-
+    const getConnectionStatusString = async () => {
+        try {
+            return await databaseOperations.checkIfConnectionSucceeded()
+        } catch (e) {
+            return `Connection to database failed, ${e.message}`
+        }
+    }
     // *************** INFO **********************
-    router.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'index.html'));
+    router.get('/', async (req, res) => {
+        const connectionStatus = await getConnectionStatusString()
+
+        res.render('index', {STATUS:connectionStatus,...databaseOperations.getPoolConfig()});
     })
 
     router.post('/provision', (req, res) => {

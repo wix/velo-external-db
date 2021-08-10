@@ -1,4 +1,4 @@
-const {promisify} = require ('util')
+const { promisify } = require('util')
 const translateErrorCodes = require('./sql_exception_translator')
 
 class DatabaseOperations {
@@ -8,7 +8,11 @@ class DatabaseOperations {
     }
 
     async checkIfConnectionSucceeded() {
-        return await this.query('SELECT 1').catch(translateErrorCodes);
+        await this.query('SELECT 1').catch(translateErrorCodes);
+        return Promise.resolve("Connected to DB successfully")
+    }
+    getPoolConfig() {
+        return this.pool.config.connectionConfig
     }
 }
 
