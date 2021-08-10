@@ -48,7 +48,7 @@ describe('SECRET MANGER', () => {
             const host = chance.url();
             ctx.secret = {
                 HOST: host,
-                USERNAME: chance.first(),
+                USER: chance.first(),
                 PASSWORD: chance.guid(),
                 SECRET_KEY: chance.guid(),
                 DB: chance.word(),

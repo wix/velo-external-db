@@ -1,9 +1,9 @@
 const { SecretsManagerClient: AwsSecretMangerClient , GetSecretValueCommand: AwsGetSecretValueCommand  } = require("@aws-sdk/client-secrets-manager");
 const translateErrorCodes = require('./external_db_config_exception_translator')
 
-const RequiredSecertsKeys = ['HOST', 'USERNAME', 'PASSWORD','DB', 'SECRET_KEY'];
+const RequiredSecertsKeys = ['HOST', 'USER', 'PASSWORD','DB', 'SECRET_KEY'];
 const AWSRequiredSecertsKeys = ['host', 'username', 'password','DB', 'SECRET_KEY'];
-const GCPRequiredSecertsKeys = ['CLOUD_SQL_CONNECTION_NAME', 'USERNAME', 'PASSWORD','DB', 'SECRET_KEY'];
+const GCPRequiredSecertsKeys = ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD','DB', 'SECRET_KEY'];
 
 class ExternalDbConfigClient {
     constructor(){
@@ -12,8 +12,8 @@ class ExternalDbConfigClient {
 
     async getSecrets() {
         await this.validateSecrets(this.requiredSecrets,process.env);
-        const { HOST: host , USERNAME: username, PASSWORD: password, DB: db, SECRET_KEY: secretKey } = process.env;
-        return ({ host, username, password, db, secretKey });
+        const { HOST: host , USER: user, PASSWORD: password, DB: db, SECRET_KEY: secretKey } = process.env;
+        return ({ host, user, password, db, secretKey });
     }
 
     validateSecrets(requiredSecertsKeys,secrets) {
@@ -33,11 +33,11 @@ class ExternalDbConfigClient {
 }
 class ExternalDbConfigClientAWS extends ExternalDbConfigClient {
 
-    constructor(secretId , region){;
-        super();
-        this.requiredProps = AWSRequiredSecertsKeys;
-        this.secretMagerClient = new AwsSecretMangerClient({ region });
-        this.getSecertsCommand = new AwsGetSecretValueCommand({ SecretId : secretId });
+    constructor(secretId , region){
+        super()
+        this.requiredProps = AWSRequiredSecertsKeys
+        this.secretMagerClient = new AwsSecretMangerClient({ region })
+        this.getSecertsCommand = new AwsGetSecretValueCommand({ SecretId : secretId })
     } 
 
     async getSecrets() {
@@ -46,7 +46,7 @@ class ExternalDbConfigClientAWS extends ExternalDbConfigClient {
             const secrets =  JSON.parse( data.SecretString );
             await this.validateSecrets(this.requiredProps,secrets);
             const {host, username, password, DB : db, SECRET_KEY: secretKey} = secrets;
-            return ({ host, username, password, db, secretKey });
+            return ({ host, user: username, password, db, secretKey });
 
         } catch ( err ) {
             translateErrorCodes(err);
@@ -66,9 +66,9 @@ class ExternalDbConfigClientGCP extends ExternalDbConfigClient {
 
     async getSecrets() {
         await this.validateSecrets(this.requiredProps,process.env);
-        const { CLOUD_SQL_CONNECTION_NAME: cloudSqlConnectionName, USERNAME: username, PASSWORD: password, DB: db, SECRET_KEY: secretKey} = process.env;
+        const { CLOUD_SQL_CONNECTION_NAME: cloudSqlConnectionName, USER: user, PASSWORD: password, DB: db, SECRET_KEY: secretKey} = process.env;
         
-        return ({ cloudSqlConnectionName, username, password, db, secretKey });
+        return ({ cloudSqlConnectionName, user, password, db, secretKey });
     }
 }
 

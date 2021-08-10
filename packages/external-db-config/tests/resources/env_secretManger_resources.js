@@ -16,7 +16,7 @@ const createDriver = () => {
         },
         restore: () => {
             delete process.env.HOST;
-            delete process.env.USERNAME;
+            delete process.env.USER;
             delete process.env.PASSWORD;
             delete process.env.CLOUD_SQL_CONNECTION_NAME;
             delete process.env.DB;

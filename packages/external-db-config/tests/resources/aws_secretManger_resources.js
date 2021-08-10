@@ -29,7 +29,7 @@ const testHelper = () => {
     return {
         serviceFormat: (secret) => {
             secret.host = secret.HOST;
-            secret.username = secret.USERNAME;
+            secret.username = secret.USER;
             secret.password = secret.PASSWORD;
 
             delete secret.HOST;
@@ -41,7 +41,9 @@ const testHelper = () => {
         secretClientFormat: (secret) => {
             const formatedSecret = lowercaseKeys(secret);
             formatedSecret.secretKey = formatedSecret.secret_key;
+            formatedSecret.user = formatedSecret.username;
             delete formatedSecret.secret_key;
+            delete formatedSecret.username;
             return formatedSecret;
         }
     }

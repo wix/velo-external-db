@@ -1,5 +1,5 @@
 const { Uninitialized } = require('test-commons');
-const { SecretMangerClient, SecretMangerClientAWS, SecretMangerClientGCP,SecretMangerClientAzure } = require('../../lib/external_db_config_clients');
+const { ExternalDbConfigClient, ExternalDbConfigClientAWS, ExternalDbConfigClientAzure, ExternalDbConfigClientGCP } = require('../../lib/external_db_config_clients');
 
 const secretMangerAwsTestEnv = require ("./aws_secretManger_resources");
 const secretMangerTestEnv = require("./env_secretManger_resources");
@@ -18,10 +18,10 @@ const secretMangerInit = async (impl,testEnv) => {
 }
 
 
-const secretMangerTestEnvInit = async () => await secretMangerInit(SecretMangerClient,secretMangerTestEnv);
-const secretMangerTestAWSEnvInit = async () => await secretMangerInit(SecretMangerClientAWS,secretMangerAwsTestEnv);
-const secretMangerTestGCPEnvInit = async () => await secretMangerInit(SecretMangerClientGCP,secretMangerGCPTestEnv);
-const secretMangerTestAzureEnvInit = async () => await secretMangerInit(SecretMangerClientAzure,secretMangerTestEnv);
+const secretMangerTestEnvInit = async () => await secretMangerInit(ExternalDbConfigClient,secretMangerTestEnv);
+const secretMangerTestAWSEnvInit = async () => await secretMangerInit(ExternalDbConfigClientAWS,secretMangerAwsTestEnv);
+const secretMangerTestGCPEnvInit = async () => await secretMangerInit(ExternalDbConfigClientGCP,secretMangerGCPTestEnv);
+const secretMangerTestAzureEnvInit = async () => await secretMangerInit(ExternalDbConfigClientAzure,secretMangerTestEnv);
 
 
 module.exports = {
