@@ -24,7 +24,7 @@ const dbInit = async (testEnv, impl) => {
 }
 
 const dbTeardown = async () => {
-    await env.connectionPool.end(/*() => {}*/)
+    await env.connectionPool.end(() => {})
     env.dataProvider = Uninitialized
     env.schemaProvider = Uninitialized
     env.connectionPool = Uninitialized

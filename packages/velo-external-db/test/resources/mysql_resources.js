@@ -30,7 +30,6 @@ const cleanup = async () => {
 
 const initEnv = async () => {
     await compose.upOne('mysql', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] } )
-    // await compose.logs('db', { cwd: __dirname, log: true });
 
     await sleep( 500 )
 
@@ -38,7 +37,7 @@ const initEnv = async () => {
 }
 
 const shutdownEnv = async () => {
-    await compose.stopOne('mysql', { cwd: __dirname, log: true })
+    await compose.stopOne('mysql', { cwd: __dirname })
 }
 
 const setActive = () => {

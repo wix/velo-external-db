@@ -14,8 +14,8 @@ const connection = () => {
         database: 'test-db',
         port: 5432,
 
-        max: 10,
-        idleTimeoutMillis: 30000,
+        max: 1,
+        idleTimeoutMillis: 1000,
         connectionTimeoutMillis: 2000,
     })
 }
@@ -48,7 +48,7 @@ const setActive = () => {
 }
 
 const shutdownEnv = async () => {
-    await compose.stopOne('postgres', { cwd: __dirname, log: true })
+    await compose.stopOne('postgres', { cwd: __dirname })
 }
 
 module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }

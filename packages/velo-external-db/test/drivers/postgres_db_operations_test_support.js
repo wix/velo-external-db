@@ -1,5 +1,5 @@
 const {Pool} = require('pg')
-const { DatabaseOperations } = require('external-db-mysql')
+const { DatabaseOperations } = require('external-db-postgres')
 
 const config = {
     host: 'localhost',
@@ -8,7 +8,7 @@ const config = {
     database: 'test-db',
     port: 5432,
 
-    max: 10,
+    max: 1,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
 }
