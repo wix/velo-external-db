@@ -2,7 +2,7 @@ const { promisify } = require('util')
 const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeId } = require('mysql')
-const { SystemFields, validateSystemFields } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, asWixSchema } = require('velo-external-db-commons')
 
 class SchemaProvider {
     constructor(pool) {
@@ -17,16 +17,11 @@ class SchemaProvider {
     async list() {
         const currentDb = this.pool.config.connectionConfig.database
         const data = await this.query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION', currentDb)
-        const tables = data.reduce((o, r) => {
-            const arr = o[r.table_name] || []
-            arr.push(r)
-            o[r.table_name] = arr
-            return o
-        }, {})
-
+        const tables = this.parseTableData( data )
         return Object.entries(tables)
-                     .map(([collectionName, rs]) => this.asWixSchema(rs, collectionName))
+                     .map(([collectionName, rs]) => asWixSchema(rs.map( this.translateDbTypes.bind(this) ), collectionName))
     }
+
 
     async create(collectionName, columns) {
         const dbColumnsSql = [...this.systemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
@@ -58,42 +53,21 @@ class SchemaProvider {
     async describeCollection(collectionName) {
         const res = await this.query(`DESCRIBE ${escapeId(collectionName)}`)
                               .catch( translateErrorCodes )
-        return this.asWixSchema(res.map(r => ({field: r.Field, type: r.Type})), collectionName)
+        return asWixSchema(res.map(r => ({field: r.Field, type: r.Type})).map( this.translateDbTypes.bind(this) ), collectionName)
     }
 
-    asWixSchema(res, collectionName) {
-        return {
-            id: collectionName,
-            displayName: collectionName,
-            allowedOperations: [
-                "get",
-                "find",
-                "count",
-                "update",
-                "insert",
-                "remove"
-            ],
-            maxPageSize: 50,
-            ttl: 3600,
-            fields: res.reduce( (o, r) => Object.assign(o, { [r.field]: {
-                    displayName: r.field,
-                    type: this.sqlSchemaTranslator.translateType(r.type),
-                    queryOperators: [
-                        "eq",
-                        "lt",
-                        "gt",
-                        "hasSome",
-                        "and",
-                        "lte",
-                        "gte",
-                        "or",
-                        "not",
-                        "ne",
-                        "startsWith",
-                        "endsWith" // todo: customize this list according to type
-                    ]
-                } }), {} )
-        }
+    translateDbTypes(row) {
+        row.type = this.sqlSchemaTranslator.translateType(row.type)
+        return row
+    }
+
+    parseTableData(data) {
+        return data.reduce((o, r) => {
+                                const arr = o[r.table_name] || []
+                                arr.push(r)
+                                o[r.table_name] = arr
+                                return o
+                            }, {})
     }
 }
 

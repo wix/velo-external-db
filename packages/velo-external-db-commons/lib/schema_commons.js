@@ -15,7 +15,7 @@ const SystemFields = [
     }]
 
 
-const asWixSchema = (res, collectionName, translateType) => {
+const asWixSchema = (res, collectionName) => {
     return {
         id: collectionName,
         displayName: collectionName,
@@ -31,7 +31,7 @@ const asWixSchema = (res, collectionName, translateType) => {
         ttl: 3600,
         fields: res.reduce( (o, r) => Object.assign(o, { [r.field]: {
                 displayName: r.field,
-                type: translateType(r.type),
+                type: r.type,
                 queryOperators: [
                     "eq",
                     "lt",

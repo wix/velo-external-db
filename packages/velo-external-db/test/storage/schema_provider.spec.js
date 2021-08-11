@@ -4,7 +4,7 @@ const each = require('jest-each').default
 const Chance = require('chance');
 const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit } = require('../resources/provider_resources')
 const chance = new Chance();
-const { SystemFields } = require('velo-external-db-commons')
+const { SystemFields, asWixSchema } = require('velo-external-db-commons')
 
 
 describe('Schema API', () => {
@@ -34,14 +34,14 @@ describe('Schema API', () => {
             const dbs = await env.schemaProvider.list()
 
             expect(dbs).toEqual(expect.arrayContaining([
-                                    env.schemaProvider.asWixSchema([{ field: '_id', type: env.schemaColumnTranslator.dbType('text', 'string', 50) },
-                                                                    { field: '_createdDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                                    { field: '_updatedDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                                    { field: '_owner', type: env.schemaColumnTranslator.dbType('text', 'string', 50)}], ctx.collectionName),
-                                    env.schemaProvider.asWixSchema([{ field: '_id', type: env.schemaColumnTranslator.dbType('text', 'string', 50)},
-                                                                    { field: '_createdDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                                    { field: '_updatedDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                                    { field: '_owner', type: env.schemaColumnTranslator.dbType('text', 'string', 50)}], ctx.anotherCollectionName),
+                                    asWixSchema([{ field: '_id', type: 'text' },
+                                                                    { field: '_createdDate', type: 'datetime'},
+                                                                    { field: '_updatedDate', type: 'datetime'},
+                                                                    { field: '_owner', type: 'text'}], ctx.collectionName),
+                                    asWixSchema([{ field: '_id', type: 'text'},
+                                                                    { field: '_createdDate', type: 'datetime'},
+                                                                    { field: '_updatedDate', type: 'datetime'},
+                                                                    { field: '_owner', type: 'text'}], ctx.anotherCollectionName),
             ]))
         })
 
@@ -49,10 +49,10 @@ describe('Schema API', () => {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            expect(db).toEqual(env.schemaProvider.asWixSchema([{ field: '_id', type: env.schemaColumnTranslator.dbType('text', 'string', 50)},
-                                                               { field: '_createdDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                               { field: '_updatedDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                               { field: '_owner', type: env.schemaColumnTranslator.dbType('text', 'string', 50)}], ctx.collectionName))
+            expect(db).toEqual(asWixSchema([{ field: '_id', type: 'text'},
+                                                               { field: '_createdDate', type: 'datetime'},
+                                                               { field: '_updatedDate', type: 'datetime'},
+                                                               { field: '_owner', type: 'text'}], ctx.collectionName))
         })
 
         test('drop collection', async () => {
@@ -67,20 +67,20 @@ describe('Schema API', () => {
             await env.schemaProvider.create(ctx.collectionName.toUpperCase())
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName.toUpperCase())
-            expect(db).toEqual(env.schemaProvider.asWixSchema([{ field: '_id', type: env.schemaColumnTranslator.dbType('text', 'string', 50)},
-                                                               { field: '_createdDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                               { field: '_updatedDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                               { field: '_owner', type: env.schemaColumnTranslator.dbType('text', 'string', 50)}], ctx.collectionName.toUpperCase()))
+            expect(db).toEqual(asWixSchema([{ field: '_id', type: 'text'},
+                                                               { field: '_createdDate', type: 'datetime'},
+                                                               { field: '_updatedDate', type: 'datetime'},
+                                                               { field: '_owner', type: 'text'}], ctx.collectionName.toUpperCase()))
         })
 
         test('retrieve collection data by collection name', async () => {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            expect(db).toEqual(env.schemaProvider.asWixSchema([{ field: '_id', type: env.schemaColumnTranslator.dbType('text', 'string', 50)},
-                                                               { field: '_createdDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                               { field: '_updatedDate', type: env.schemaColumnTranslator.dbType('datetime', 'datetime')},
-                                                               { field: '_owner', type: env.schemaColumnTranslator.dbType('text', 'string', 50)}], ctx.collectionName))
+            expect(db).toEqual(asWixSchema([{ field: '_id', type: 'text'},
+                                                               { field: '_createdDate', type: 'datetime'},
+                                                               { field: '_updatedDate', type: 'datetime'},
+                                                               { field: '_owner', type: 'text'}], ctx.collectionName))
         })
 
         test('create collection twice will do nothing', async () => {
