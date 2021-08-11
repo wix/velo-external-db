@@ -3,21 +3,21 @@ class OperationService {
         this.databaseOperation = databaseOperation;
     }
 
-    checkIfConnectionSucceeded = async () => {
-        return await this.databaseOperation.checkIfConnectionSucceeded()
+    validateConnection = async () => {
+        return await this.databaseOperation.validateConnection()
     }
 
-    getConnectionStatusString = async () => {
+    connectionStatus = async () => {
         try {
-            await this.databaseOperation.checkIfConnectionSucceeded()
+            await this.databaseOperation.validateConnection()
             return "Connected to database successfully"
         } catch (e) {
             return `Connection to database failed, ${e.message}`
         }
     }
 
-    getPoolConfig = () => {
-        return this.databaseOperation.getPoolConfig();
+    config = () => {
+        return this.databaseOperation.config();
     }
 }
 

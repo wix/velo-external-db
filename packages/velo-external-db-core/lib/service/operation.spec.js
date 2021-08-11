@@ -5,14 +5,14 @@ const { AccessDeniedError, wrongDatabaseError, HostDoesNotExists } = require('..
 
 describe('Operation Service', () => {
 
-    test('retrieve resolve when check if valid pool is connected', async () => {
+    test('retrieve resolve when validate connection of valid pool', async () => {
         driver.givenValidPool();
-        await expect(env.operationService.checkIfConnectionSucceeded()).resolves.not.toThrow();
+        await expect(env.operationService.validateConnection()).resolves.not.toThrow();
     })
 
-    test('retrieve throw with appropriate error when check if invalid pool is connected', async () => {
+    test('retrieve throw with appropriate error when validate connection of invalid pool', async () => {
         driver.givenInvalidPool(ctx.error);
-        await expect(env.operationService.checkIfConnectionSucceeded()).rejects.toThrow(ctx.error)
+        await expect(env.operationService.validateConnection()).rejects.toThrow(ctx.error)
     })
 
     const ctx = {

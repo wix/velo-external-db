@@ -7,12 +7,12 @@ class DatabaseOperations {
         this.query = promisify(this.pool.query).bind(this.pool);
     }
 
-    async checkIfConnectionSucceeded() {
+    async validateConnection() {
         return await this.query('SELECT 1').catch(translateErrorCodes);
     }
-    getPoolConfig() {
+    config() {
         const config = Object.assign({},this.pool.config.connectionConfig)
-        if (config.password) delete config.password
+        if (config.password) config.password = '*********'
         return config
     }
 }

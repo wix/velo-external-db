@@ -18,7 +18,7 @@ const load = async () => {
     const operationService = new OperationService(databaseOperations)
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)
-    await operationService.checkIfConnectionSucceeded()
+    await operationService.validateConnection()
     return { dataService, schemaService, operationService, cleanup }
 }
 

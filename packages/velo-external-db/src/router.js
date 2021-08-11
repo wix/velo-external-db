@@ -7,7 +7,7 @@ const createRouter = (dataService, schemaService, operationService) => {
 
     // *************** INFO **********************
     router.get('/', async (req, res) => {
-        res.render('index', { STATUS: await operationService.getConnectionStatusString(), ...operationService.getPoolConfig() });
+        res.render('index', { STATUS: await operationService.connectionStatus(), ...operationService.config() });
     })
 
     router.post('/provision', (req, res) => {
