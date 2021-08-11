@@ -3,6 +3,10 @@ class OperationService {
         this.databaseOperation = databaseOperation;
     }
 
+    checkIfConnectionSucceeded = async () => {
+        return await this.databaseOperation.checkIfConnectionSucceeded()
+    }
+
     getConnectionStatusString = async () => {
         try {
             await this.databaseOperation.checkIfConnectionSucceeded()
@@ -12,10 +16,6 @@ class OperationService {
         }
     }
 
-    checkIfConnectionSucceeded = async () => {
-        return this.databaseOperation.checkIfConnectionSucceeded()
-    }
-    
     getPoolConfig = () => {
         return this.databaseOperation.getPoolConfig();
     }

@@ -124,4 +124,6 @@ const randomDb = () => ( { id: randomCollectionName(),
 
 const randomDbs = () => randomArrayOf( randomDb )
 
-module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomNumberColumns }
+const randomObjectFromArray = (array) => randomItem = array[Math.floor(Math.random()*array.length)];
+
+module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomNumberColumns,randomObjectFromArray }
