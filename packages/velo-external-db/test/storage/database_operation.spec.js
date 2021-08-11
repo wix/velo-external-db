@@ -12,23 +12,23 @@ describe('Check Pool Connection', () => {
 
         test('pool connection with wrong password will throw AccessDeniedError.', async () => {
             const dbOperation = driver.dbOperationWithMisconfiguredDatabase()
-            await expect(dbOperation.checkIfConnectionSucceeded()).rejects.toThrow(AccessDeniedError)
+            await expect(dbOperation.validateConnection()).rejects.toThrow(AccessDeniedError)
         })
 
         test('pool connection with wrong database will throw DatabaseDoesNotExists.', async () => {
             const dbOperation = driver.dbOperationWithMisconfiguredDatabase()
-            await expect(dbOperation.checkIfConnectionSucceeded()).rejects.toThrow(wrongDatabaseError)
+            await expect(dbOperation.validateConnection()).rejects.toThrow(wrongDatabaseError)
         })
 
         test('pool connection with wrong host will throw HostDoesNotExists.', async () => {
             const dbOperation = driver.dbOperationWithMisconfiguredHost()
-            await expect(dbOperation.checkIfConnectionSucceeded()).rejects.toThrow(HostDoesNotExists)
+            await expect(dbOperation.validateConnection()).rejects.toThrow(HostDoesNotExists)
         })
 
         test('pool connection with valid DB will not throw', async () => {
             const {dbOperations, cleanup} = driver.dbOperationWithValidDB()
 
-            await expect(dbOperations.checkIfConnectionSucceeded()).resolves.not.toThrow();
+            await expect(dbOperations.validateConnection()).resolves.not.toThrow();
             await cleanup()
         })
     })
