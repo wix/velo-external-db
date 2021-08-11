@@ -6,7 +6,7 @@ const translateErrorCodes = (err,missingRequiredProps) => {
         case 'MISSING_VARIABLE':
             throw new Error(`Please set the next variable/s in your secret manger: ${missingRequiredProps}`);   
         default:
-            throw new Error (`Error occurred retrieving secerts: ${err}`);
+            throw new Error (`Error occurred retrieving secrets: ${err}`);
     }
 }
 
