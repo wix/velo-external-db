@@ -1,21 +1,14 @@
 const path = require('path')
 const express = require('express')
 const createRouter = (dataService, schemaService, databaseOperations) => {
+const { getConnectionStatusString } = require('../views/view-helper')
 
     const router = express.Router()
 
-    const getConnectionStatusString = async () => {
-        try {
-            return await databaseOperations.checkIfConnectionSucceeded()
-        } catch (e) {
-            return `Connection to database failed, ${e.message}`
-        }
-    }
+
     // *************** INFO **********************
     router.get('/', async (req, res) => {
-        const connectionStatus = await getConnectionStatusString()
-
-        res.render('index', {STATUS:connectionStatus,...databaseOperations.getPoolConfig()});
+        res.render('index', { STATUS: await getConnectionStatusString(databaseOperations), ...databaseOperations.getPoolConfig() });
     })
 
     router.post('/provision', (req, res) => {

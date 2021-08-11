@@ -8,6 +8,7 @@ const { errorMiddleware } = require('./web/error-middleware')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
 const createRouter = require('./router')
+const { getHostAndDB } = require('../views/view-helper')
 
 
 
@@ -25,7 +26,7 @@ const load = async () => {
 const main = async () => {
     const app = express()
     const port = process.env.PORT || 8080
-    
+
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(bodyParser.json())
     app.use(unless(['/', '/provision'], authMiddleware({ secretKey: process.env.SECRET_KEY })));
@@ -34,14 +35,14 @@ const main = async () => {
     app.set('view engine', 'ejs');
 
     try {
-        const  { dataService, schemaService, databaseOperations, cleanup } = await load();
+        const { dataService, schemaService, databaseOperations, cleanup } = await load();
         const router = createRouter(dataService, schemaService, databaseOperations)
         app.use('/', router)
-        const server =  app.listen(port)
-        return {server, cleanup,load }
+        const server = app.listen(port)
+        return { server, cleanup, load }
     } catch (err) {
         app.get('/', (req, res) => {
-            res.render('error', { STATUS: err.message, host: process.env.HOST, database: process.env.DB });
+            res.render('error', { STATUS: err.message, ...getHostAndDB() });
         })
 
         app.use('/', (req, res) => {
@@ -51,7 +52,7 @@ const main = async () => {
     }
 }
 
-if (process.env.NODE_ENV !== 'test'){
+if (process.env.NODE_ENV !== 'test') {
     main();
 }
 

@@ -8,11 +8,12 @@ class DatabaseOperations {
     }
 
     async checkIfConnectionSucceeded() {
-        await this.query('SELECT 1').catch(translateErrorCodes);
-        return Promise.resolve("Connected to DB successfully")
+        return await this.query('SELECT 1').catch(translateErrorCodes);
     }
     getPoolConfig() {
-        return this.pool.config.connectionConfig
+        const config = Object.assign({},this.pool.config.connectionConfig)
+        if (config.password) delete config.password
+        return config
     }
 }
 
