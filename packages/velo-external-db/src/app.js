@@ -2,13 +2,12 @@ const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
 const compression = require('compression')
-const { DataService, SchemaService } = require('velo-external-db-core')
+const { DataService, SchemaService, OperationService } = require('velo-external-db-core')
 const { init } = require('./storage/factory')
 const { errorMiddleware } = require('./web/error-middleware')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
 const createRouter = require('./router')
-const { getHostAndDB } = require('../views/view-helper')
 
 
 
@@ -16,10 +15,11 @@ const { getHostAndDB } = require('../views/view-helper')
 const load = async () => {
     const { type, host, user, password, db, cloudSqlConnectionName } = { type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME }
     const { dataProvider, schemaProvider, cleanup, databaseOperations } = init(type, host, user, password, db, cloudSqlConnectionName)
-    await databaseOperations.checkIfConnectionSucceeded()
+    const operationService = new OperationService(databaseOperations)
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)
-    return { dataService, schemaService, databaseOperations, cleanup }
+    await operationService.checkIfConnectionSucceeded()
+    return { dataService, schemaService, operationService, cleanup }
 }
 
 
@@ -35,14 +35,14 @@ const main = async () => {
     app.set('view engine', 'ejs');
 
     try {
-        const { dataService, schemaService, databaseOperations, cleanup } = await load();
-        const router = createRouter(dataService, schemaService, databaseOperations)
+        const { dataService, schemaService, operationService, cleanup } = await load();
+        const router = createRouter(dataService, schemaService, operationService)
         app.use('/', router)
         const server = app.listen(port)
         return { server, cleanup, load }
     } catch (err) {
         app.get('/', (req, res) => {
-            res.render('error', { STATUS: err.message, ...getHostAndDB() });
+            res.render('error', { error: err.message });
         })
 
         app.use('/', (req, res) => {

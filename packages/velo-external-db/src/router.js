@@ -1,14 +1,13 @@
 const path = require('path')
 const express = require('express')
-const createRouter = (dataService, schemaService, databaseOperations) => {
-const { getConnectionStatusString } = require('../views/view-helper')
 
+const createRouter = (dataService, schemaService, operationService) => {
     const router = express.Router()
 
 
     // *************** INFO **********************
     router.get('/', async (req, res) => {
-        res.render('index', { STATUS: await getConnectionStatusString(databaseOperations), ...databaseOperations.getPoolConfig() });
+        res.render('index', { STATUS: await operationService.getConnectionStatusString(), ...operationService.getPoolConfig() });
     })
 
     router.post('/provision', (req, res) => {
