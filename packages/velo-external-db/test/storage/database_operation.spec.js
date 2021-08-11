@@ -24,9 +24,12 @@ describe('Check Pool Connection', () => {
             const dbOperation = driver.dbOperationWithMisconfiguredHost()
             await expect(dbOperation.checkIfConnectionSucceeded()).rejects.toThrow(HostDoesNotExists)
         })
+
         test('pool connection with valid DB will not throw', async () => {
-            const dbOperation = driver.dbOperationWithValidDB()
-            await expect(dbOperation.checkIfConnectionSucceeded()).resolves.not.toThrow();
+            const {dbOperations, cleanup} = driver.dbOperationWithValidDB()
+
+            await expect(dbOperations.checkIfConnectionSucceeded()).resolves.not.toThrow();
+            await cleanup()
         })
     })
 })
