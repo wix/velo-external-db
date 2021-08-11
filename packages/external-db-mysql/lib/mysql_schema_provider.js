@@ -2,7 +2,7 @@ const { promisify } = require('util')
 const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeId } = require('mysql')
-const { SystemFields, validateSystemFields, asWixSchema } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
 
 class SchemaProvider {
     constructor(pool) {
@@ -17,7 +17,7 @@ class SchemaProvider {
     async list() {
         const currentDb = this.pool.config.connectionConfig.database
         const data = await this.query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION', currentDb)
-        const tables = this.parseTableData( data )
+        const tables = parseTableData( data )
         return Object.entries(tables)
                      .map(([collectionName, rs]) => asWixSchema(rs.map( this.translateDbTypes.bind(this) ), collectionName))
     }
@@ -53,21 +53,14 @@ class SchemaProvider {
     async describeCollection(collectionName) {
         const res = await this.query(`DESCRIBE ${escapeId(collectionName)}`)
                               .catch( translateErrorCodes )
-        return asWixSchema(res.map(r => ({field: r.Field, type: r.Type})).map( this.translateDbTypes.bind(this) ), collectionName)
+        const rows = res.map(r => ({field: r.Field, type: r.Type}))
+                        .map( this.translateDbTypes.bind(this) )
+        return asWixSchema(rows, collectionName)
     }
 
     translateDbTypes(row) {
         row.type = this.sqlSchemaTranslator.translateType(row.type)
         return row
-    }
-
-    parseTableData(data) {
-        return data.reduce((o, r) => {
-                                const arr = o[r.table_name] || []
-                                arr.push(r)
-                                o[r.table_name] = arr
-                                return o
-                            }, {})
     }
 }
 

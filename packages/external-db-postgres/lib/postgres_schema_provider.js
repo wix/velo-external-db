@@ -2,7 +2,7 @@ const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeIdentifier } = require('./postgres_utils')
 const { CollectionDoesNotExists} = require('velo-external-db-commons').errors
-const { SystemFields, validateSystemFields, asWixSchema } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
 
 class SchemaProvider {
     constructor(pool) {
@@ -15,7 +15,7 @@ class SchemaProvider {
     async list() {
         const data = await this.pool.query('SELECT table_name, column_name AS field, data_type, udt_name AS type FROM information_schema.columns WHERE table_schema = $1 ORDER BY table_name', ['public'])
 
-        const tables = this.parseTableData(data.rows)
+        const tables = parseTableData(data.rows)
         return Object.entries(tables)
                      .map(([collectionName, rs]) => asWixSchema(rs.map( this.translateDbTypes.bind(this) ), collectionName))
     }
@@ -63,15 +63,6 @@ class SchemaProvider {
     translateDbTypes(row) {
         row.type = this.sqlSchemaTranslator.translateType(row.type)
         return row
-    }
-
-    parseTableData(rows) {
-        return rows.reduce((o, r) => {
-                                const arr = o[r.table_name] || []
-                                arr.push(r)
-                                o[r.table_name] = arr
-                                return o
-                            }, {})
     }
 }
 

@@ -57,4 +57,12 @@ const validateSystemFields = (columnName) => {
     return Promise.resolve()
 }
 
-module.exports = { SystemFields, asWixSchema, validateSystemFields }
+const parseTableData = data => data.reduce((o, r) => {
+                                                    const arr = o[r.table_name] || []
+                                                    arr.push(r)
+                                                    o[r.table_name] = arr
+                                                    return o
+                                                }, {})
+
+
+module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData }
