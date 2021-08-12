@@ -1,7 +1,6 @@
+const { lowercaseObjectKeys } = require("./test_commons");
 
-const { lowercaseKeys } = require("./test_commons");
-
-const secretMangerTestEnv = require("./env_secretManger_resources");
+const secretMangerTestEnv = require("./external_db_config_resources");
 
 
 const createDriver = () => {
@@ -18,7 +17,7 @@ const testHelper = () => {
         return secret;
     };
     gcpTestHelper.secretClientFormat = (secret) => {
-        const formatedSecret = lowercaseKeys(secret);
+        const formatedSecret = lowercaseObjectKeys(secret);
         formatedSecret.cloudSqlConnectionName = formatedSecret.cloud_sql_connection_name;
         delete formatedSecret.cloud_sql_connection_name;
         formatedSecret.secretKey = formatedSecret.secret_key;

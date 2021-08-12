@@ -1,16 +1,16 @@
-
-const { lowercaseKeys,deleteRandomSecret,clearRandomSecretKey } = require("./test_commons");
+const { gen } = require('test-commons')
+const { lowercaseObjectKeys } = require("./test_commons");
 
 const createDriver = () => {
     const driver = {
         stubSecret: (secret) => process.env = Object.assign(process.env, secret),
         stubBrokenSecret: (secret) => {
-            const { deletedKey, newSecret } = deleteRandomSecret(secret);
+            const { deletedKey, newObject: newSecret } = gen.deleteRandomKeyObject(secret);
             process.env = Object.assign(process.env, newSecret);
             return { deletedKey, newSecret };
         },
         stubSecretWithEmptyField: (secret) => {
-            const { clearedKey, newSecret } = clearRandomSecretKey(secret);
+            const { clearedKey, newObject: newSecret } = gen.clearRandomKeyObject(secret);
             process.env = Object.assign(process.env, newSecret);
             return { clearedKey, newSecret: secret };
         },
@@ -30,7 +30,7 @@ const testHelper = () => {
     return {
         serviceFormat: (secret) => secret,
         secretClientFormat: (secret) => {
-            const formatedSecret = lowercaseKeys(secret);
+            const formatedSecret = lowercaseObjectKeys(secret);
             formatedSecret.secretKey = formatedSecret.secret_key;
             delete formatedSecret.secret_key;
             return formatedSecret;
