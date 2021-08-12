@@ -6,7 +6,19 @@ class DatabaseOperations {
     }
 
     async validateConnection() {
-        return await this.pool.query('SELECT 1').catch(translateErrorCodes);
+        let res
+        try {
+            await this.pool.query('SELECT 1')
+            res = { valid: true }
+        } catch (e) {
+            try {
+                translateErrorCodes(e)
+            }
+            catch (error) {
+                res = { valid: false, error }
+            }
+        }
+        return res;
     }
     config() {
         const config = Object.assign({}, this.pool.options)

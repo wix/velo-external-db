@@ -8,10 +8,22 @@ class DatabaseOperations {
     }
 
     async validateConnection() {
-        return await this.query('SELECT 1').catch(translateErrorCodes);
+        let res
+        try {
+            await this.query('SELECT 1')
+            res = { valid: true }
+        } catch (e) {
+            try {
+                translateErrorCodes(e)
+            }
+            catch (error) {
+                res = { valid: false, error }
+            }
+        }
+        return res;
     }
     config() {
-        const config = Object.assign({},this.pool.config.connectionConfig)
+        const config = Object.assign({}, this.pool.config.connectionConfig)
         if (config.password) config.password = '*********'
         return config
     }
