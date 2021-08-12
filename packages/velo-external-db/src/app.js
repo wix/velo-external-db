@@ -15,7 +15,7 @@ const load = async () => {
     const type = process.env.TYPE;
     const secretId = process.env.SECRET_ID;
     const externalDbConfigClient = createExternalDbConfigClient(type,secretId);
-    const { host, user, password, db, cloudSqlConnectionName } = await externalDbConfigClient.getSecrets();
+    const { host, user, password, db, cloudSqlConnectionName } = await externalDbConfigClient.readConfig();
     const { dataProvider, schemaProvider, cleanup, databaseOperations } = init(type, host, user, password, db, cloudSqlConnectionName)
     await databaseOperations.checkIfConnectionSucceeded()
     const dataService = new DataService(dataProvider)

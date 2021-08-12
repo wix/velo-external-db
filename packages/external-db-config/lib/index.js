@@ -1,9 +1,7 @@
-const { ExternalDbConfigClient, ExternalDbConfigClientAWS, ExternalDbConfigClientAzure, ExternalDbConfigClientGCP } = require('./external_db_config_clients')
+const { ExternalDbConfigClient, ExternalDbConfigClientAWS, ExternalDbConfigClientGCP } = require('./external_db_config_clients')
 
 const createExternalDbConfigClient = (type, secretId = 'DB_INFO') => {
     switch (type) {
-        case 'env/mysql':
-        case 'env/postgres':
         case 'sql/mysql':
         case 'sql/postgres':
             console.log(`EXTERNAL DB CONFIG: ${type}`);
@@ -15,7 +13,7 @@ const createExternalDbConfigClient = (type, secretId = 'DB_INFO') => {
         case 'azr/mysql':
         case 'azr/postgres':
             console.log(`EXTERNAL DB CONFIG: ${type}`);
-            return new ExternalDbConfigClientAzure();
+            return new ExternalDbConfigClient();
         case 'gcp/mysql':
         case 'gcp/postgres':
             console.log(`EXTERNAL DB CONFIG: ${type}`);

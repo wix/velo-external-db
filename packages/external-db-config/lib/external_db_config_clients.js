@@ -10,7 +10,7 @@ class ExternalDbConfigClient {
         this.requiredSecrets = RequiredSecretsKeys;
     }
 
-    async getSecrets() {
+    async readConfig() {
         await this.validateSecrets(this.requiredSecrets,process.env);
         const { HOST: host , USER: user, PASSWORD: password, DB: db, SECRET_KEY: secretKey } = process.env;
         return ({ host, user, password, db, secretKey });
@@ -36,13 +36,14 @@ class ExternalDbConfigClientAWS extends ExternalDbConfigClient {
     constructor(secretId , region){
         super()
         this.requiredProps = AWSRequiredSecretsKeys
-        this.secretMagerClient = new AwsSecretMangerClient({ region })
-        this.getSecretsCommand = new AwsGetSecretValueCommand({ SecretId : secretId })
+        this.secretId = secretId
+        this.secretMangerClient = new AwsSecretMangerClient({ region })
     } 
 
-    async getSecrets() {
+    async readConfig() {
         try {
-            const data = await this.secretMagerClient.send(this.getSecretsCommand);
+            const getSecretsCommand = new AwsGetSecretValueCommand({ SecretId : this.secretId })
+            const data = await this.secretMangerClient.send(getSecretsCommand)
             const secrets =  JSON.parse( data.SecretString );
             await this.validateSecrets(this.requiredProps,secrets);
             const {host, username, password, DB : db, SECRET_KEY: secretKey} = secrets;
@@ -55,16 +56,13 @@ class ExternalDbConfigClientAWS extends ExternalDbConfigClient {
     }
 }  
 
-class ExternalDbConfigClientAzure extends ExternalDbConfigClient {
-}
-
 class ExternalDbConfigClientGCP extends ExternalDbConfigClient {
     constructor(){
         super();
         this.requiredProps = GCPRequiredSecretsKeys;
     }
 
-    async getSecrets() {
+    async readConfig() {
         await this.validateSecrets(this.requiredProps,process.env);
         const { CLOUD_SQL_CONNECTION_NAME: cloudSqlConnectionName, USER: user, PASSWORD: password, DB: db, SECRET_KEY: secretKey} = process.env;
         
@@ -72,5 +70,5 @@ class ExternalDbConfigClientGCP extends ExternalDbConfigClient {
     }
 }
 
-module.exports = { ExternalDbConfigClient,ExternalDbConfigClientAWS, ExternalDbConfigClientAzure, ExternalDbConfigClientGCP }
+module.exports = { ExternalDbConfigClient,ExternalDbConfigClientAWS, ExternalDbConfigClientGCP }
 
