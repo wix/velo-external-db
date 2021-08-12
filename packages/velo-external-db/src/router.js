@@ -128,33 +128,53 @@ const createRouter = (dataService, schemaService, operationService) => {
 
 
     // *************** Schema API **********************
-    router.post('/schemas/list', async (req, res) => {
-        const data = await schemaService.list()
-        res.json(data)
+    router.post('/schemas/list', async (req, res, next) => {
+        try {
+            const data = await schemaService.list()
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
     })
 
-    router.post('/schemas/find', async (req, res) => {
-        const { schemaIds } = req.body
-        const data = await schemaService.find(schemaIds)
-        res.json(data)
+    router.post('/schemas/find', async (req, res, next) => {
+        try {
+            const { schemaIds } = req.body
+            const data = await schemaService.find(schemaIds)
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
     })
 
-    router.post('/schemas/create', async (req, res) => {
-        const { collectionName } = req.body
-        const data = await schemaService.create(collectionName)
-        res.json(data)
+    router.post('/schemas/create', async (req, res, next) => {
+        try {
+            const { collectionName } = req.body
+            const data = await schemaService.create(collectionName)
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
     })
 
-    router.post('/schemas/column/add', async (req, res) => {
-        const { collectionName, column } = req.body
-        const data = await schemaService.addColumn(collectionName, column)
-        res.json(data)
+    router.post('/schemas/column/add', async (req, res, next) => {
+        try {
+            const { collectionName, column } = req.body
+            const data = await schemaService.addColumn(collectionName, column)
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
     })
 
-    router.post('/schemas/column/remove', async (req, res) => {
-        const { collectionName, columnName } = req.body
-        const data = await schemaService.removeColumn(collectionName, columnName)
-        res.json(data)
+    router.post('/schemas/column/remove', async (req, res, next) => {
+        try {
+            const { collectionName, columnName } = req.body
+            const data = await schemaService.removeColumn(collectionName, columnName)
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
     })
     // ***********************************************
     return router
