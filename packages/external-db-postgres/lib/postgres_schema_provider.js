@@ -2,7 +2,7 @@ const translateErrorCodes = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeIdentifier } = require('./postgres_utils')
 const { CollectionDoesNotExists} = require('velo-external-db-commons').errors
-const { SystemFields, validateSystemFields } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
 
 class SchemaProvider {
     constructor(pool) {
@@ -15,17 +15,10 @@ class SchemaProvider {
     async list() {
         const data = await this.pool.query('SELECT table_name, column_name AS field, data_type, udt_name AS type FROM information_schema.columns WHERE table_schema = $1 ORDER BY table_name', ['public'])
 
-        const tables = data.rows.reduce((o, r) => {
-            const arr = o[r.table_name] || []
-            arr.push(r)
-            o[r.table_name] = arr
-            return o
-        }, {})
-
+        const tables = parseTableData(data.rows)
         return Object.entries(tables)
-                     .map(([collectionName, rs]) => this.asWixSchema(rs, collectionName))
+                     .map(([collectionName, rs]) => asWixSchema(rs.map( this.translateDbTypes.bind(this) ), collectionName))
     }
-
 
     async create(collectionName, _columns) {
         const columns = _columns || []
@@ -63,42 +56,13 @@ class SchemaProvider {
         if (res.rows.length === 0) {
             throw new CollectionDoesNotExists('Collection does not exists')
         }
-        return this.asWixSchema(res.rows, collectionName)
+        return asWixSchema(res.rows.map( this.translateDbTypes.bind(this) ), collectionName)
     }
 
-    asWixSchema(res, collectionName) {
-        return {
-            id: collectionName,
-            displayName: collectionName,
-            allowedOperations: [
-                "get",
-                "find",
-                "count",
-                "update",
-                "insert",
-                "remove"
-            ],
-            maxPageSize: 50,
-            ttl: 3600,
-            fields: res.reduce( (o, r) => Object.assign(o, { [r.field]: {
-                    displayName: r.field,
-                    type: this.sqlSchemaTranslator.translateType(r.type),
-                    queryOperators: [
-                        "eq",
-                        "lt",
-                        "gt",
-                        "hasSome",
-                        "and",
-                        "lte",
-                        "gte",
-                        "or",
-                        "not",
-                        "ne",
-                        "startsWith",
-                        "endsWith" // todo: customize this list according to type
-                    ]
-                } }), {} )
-        }
+
+    translateDbTypes(row) {
+        row.type = this.sqlSchemaTranslator.translateType(row.type)
+        return row
     }
 }
 

@@ -5,8 +5,13 @@ class DatabaseOperations {
         this.pool = pool;
     }
 
-    async checkIfConnectionSucceeded() {
+    async validateConnection() {
         return await this.pool.query('SELECT 1').catch(translateErrorCodes);
+    }
+    config() {
+        const config = Object.assign({}, this.pool.options)
+        if (config.password) config.password = '*********'
+        return config
     }
 }
 

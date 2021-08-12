@@ -20,7 +20,7 @@ describe('Velo External DB Data REST API',  () => {
         beforeAll(async () => {
             jest.resetModules()
             await setup()
-            
+
             await initApp()
         }, 20000);
 

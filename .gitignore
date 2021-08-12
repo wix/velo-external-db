@@ -6,3 +6,5 @@ schemas.json
 .eslint
 .idea
 .vscode
+packages/.DS_Store
+.DS_Store

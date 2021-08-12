@@ -9,7 +9,6 @@ const env = {
     schemaProvider: Uninitialized,
     connectionPool: Uninitialized,
     driver: Uninitialized,
-    schemaColumnTranslator: Uninitialized,
 }
 
 const dbInit = async (testEnv, impl) => {
@@ -21,12 +20,11 @@ const dbInit = async (testEnv, impl) => {
     env.connectionPool = pool
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
     env.schemaProvider = new impl.SchemaProvider(pool)
-    env.schemaColumnTranslator = new impl.SchemaColumnTranslator()
     env.driver = driver
 }
 
 const dbTeardown = async () => {
-    await env.connectionPool.end(/*() => {}*/)
+    await env.connectionPool.end(() => {})
     env.dataProvider = Uninitialized
     env.schemaProvider = Uninitialized
     env.connectionPool = Uninitialized

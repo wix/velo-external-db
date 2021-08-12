@@ -10,9 +10,6 @@ const env = {
 
 const initApp = async () => {
     env.secretKey = authInit()
-    if (env.app) {
-        await env.app.load()
-    }
     const createApp = require('../..');
     env.app = await createApp();
 }
@@ -20,8 +17,8 @@ const initApp = async () => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const teardownApp = async () => {
-
     await sleep(500)
+    await env.app.cleanup()
     await env.app.server.close()
 }
 

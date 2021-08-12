@@ -27,7 +27,7 @@ const init = ([host, user, password, db]) => {
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, cleanup: async () => pool.end(() => { }) }
+    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, cleanup: async () => await pool.end(() => { }) }
 }
 
 module.exports = init

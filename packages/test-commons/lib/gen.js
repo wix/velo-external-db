@@ -5,7 +5,7 @@ const randomObject = () => {
     const obj = {};
     const num = chance.natural({min: 2, max: 20});
     for (let i = 0; i < num; i++) {
-        Object.assign(obj, {[chance.word()]: chance.sentence()});
+        Object.assign(obj, {[chance.word()]: chance.se/./ntence()});
     }
     return obj;
 };
@@ -124,6 +124,8 @@ const randomDb = () => ( { id: randomCollectionName(),
 
 const randomDbs = () => randomArrayOf( randomDb )
 
+const randomObjectFromArray = (array) => randomItem = array[chance.integer({ min: 0, max: array.length - 1 })];
+
 const randomKeyObject = (obj) => {
     objectKeys = Object.keys(obj)
     selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
@@ -155,5 +157,7 @@ const randomSecret = () => {
 }
 
 module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject,
-     randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity,
+     randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
       randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomSecret }
+
+

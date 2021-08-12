@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang=en>
+<%- include("partials/header.ejs") %>
+
+<body>
+	<div class="container">
+		<div class="hero">
+			<div style="text-align:center;">
+				<picture>
+					<source srcset="/assets/celebration-dark.svg" alt="sad-unicorn"
+						media="(prefers-color-scheme: dark)">
+					<img src="/assets/sad-unicorn.svg" alt="sad-unicorn" width="186" height="284">
+				</picture>
+			</div>
+
+			<div class="message">
+				<h1>Something went wrong...</h1>
+			</div>
+		</div>
+		<div class="details">
+			<h3>Error: </h3>
+			<p class="next">
+				<%= error %>
+			</p>
+	</div>
+</body>
+
+</html>

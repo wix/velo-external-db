@@ -1,14 +1,13 @@
 const path = require('path')
 const express = require('express')
 
-const createRouter = (dataService, schemaService) => {
-    
+const createRouter = (dataService, schemaService, operationService) => {
     const router = express.Router()
 
 
     // *************** INFO **********************
-    router.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'index.html'));
+    router.get('/', async (req, res) => {
+        res.render('index', { STATUS: await operationService.connectionStatus(), ...operationService.config() });
     })
 
     router.post('/provision', (req, res) => {
