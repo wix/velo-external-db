@@ -124,4 +124,26 @@ const randomDb = () => ( { id: randomCollectionName(),
 
 const randomDbs = () => randomArrayOf( randomDb )
 
-module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomNumberColumns }
+const randomKeyObject = (obj) => {
+    objectKeys = Object.keys(obj)
+    selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
+    return selectedKey
+}
+
+const deleteRandomKeyObject = (obj) => {
+    const newObject = {...obj}
+    const deletedKey = randomKeyObject(newObject);
+    delete newObject[deletedKey]
+    return { deletedKey, newObject }
+};
+
+const clearRandomKeyObject = (obj) => {
+    const newObject = {...obj}
+    const clearedKey = randomKeyObject(newObject);
+    newObject[clearedKey] = '';
+    return { clearedKey, newObject };
+}
+
+module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject,
+     randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity,
+      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject }
