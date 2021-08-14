@@ -5,7 +5,7 @@ const randomObject = () => {
     const obj = {};
     const num = chance.natural({min: 2, max: 20});
     for (let i = 0; i < num; i++) {
-        Object.assign(obj, {[chance.word()]: chance.se/./ntence()});
+        Object.assign(obj, {[chance.word()]: chance.sentence()});
     }
     return obj;
 };
