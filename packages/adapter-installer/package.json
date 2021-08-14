@@ -1,0 +1,36 @@
+{
+  "name": "adapter-installer",
+  "version": "0.0.1",
+  "description": "> TODO: description",
+  "keywords": [
+    "installer"
+  ],
+  "author": "Max Polsky <maxim.polski@gmail.com>",
+  "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
+  "license": "ISC",
+  "main": "lib/index.js ",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/wix-private/noam-external-db-poc/issues"
+  },
+  "dependencies": {
+    "@aws-sdk/client-apprunner": "^3.26.0",
+    "@aws-sdk/client-rds": "^3.26.0",
+    "consola": "^2.15.3",
+    "inquirer": "^8.1.2",
+    "mysql": "^2.18.1"
+  }
+}
