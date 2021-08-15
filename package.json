@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "build:dev" : "lerna bootstrap --hoist",
     "test": "lerna exec \"npm test\"",
     "release": "lerna version --no-push",
     "ci:publish": "lerna publish -y from-git"
