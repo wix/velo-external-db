@@ -1,5 +1,6 @@
 const path = require('path')
 const express = require('express')
+const { errorMiddleware } = require('./web/error-middleware')
 
 const createRouter = (dataService, schemaService, operationService) => {
     const router = express.Router()
@@ -177,6 +178,9 @@ const createRouter = (dataService, schemaService, operationService) => {
         }
     })
     // ***********************************************
+    
+    router.use(errorMiddleware)
+    
     return router
 }
 module.exports = createRouter
