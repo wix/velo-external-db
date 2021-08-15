@@ -1,8 +1,14 @@
-const path = require('path')
 const express = require('express')
 const { errorMiddleware } = require('./web/error-middleware')
 
-const createRouter = (dataService, schemaService, operationService) => {
+let dataService, schemaService, operationService
+
+const createRouter = (_dataService, _schemaService, _operationService) => {
+
+    dataService = _dataService
+    schemaService = _schemaService
+    operationService = _operationService
+
     const router = express.Router()
 
 
