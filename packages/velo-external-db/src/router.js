@@ -3,14 +3,14 @@ const { errorMiddleware } = require('./web/error-middleware')
 
 let dataService, schemaService, operationService
 
-const createRouter = (_dataService, _schemaService, _operationService) => {
-
+const initServices = (_dataService, _schemaService, _operationService) => {
     dataService = _dataService
     schemaService = _schemaService
     operationService = _operationService
+}
 
+const createRouter = () => {
     const router = express.Router()
-
 
     // *************** INFO **********************
     router.get('/', async (req, res) => {
@@ -186,7 +186,7 @@ const createRouter = (_dataService, _schemaService, _operationService) => {
     // ***********************************************
     
     router.use(errorMiddleware)
-    
+
     return router
 }
-module.exports = createRouter
+module.exports = { createRouter, initServices }

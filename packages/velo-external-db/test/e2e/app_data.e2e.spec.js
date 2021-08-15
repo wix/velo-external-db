@@ -18,14 +18,12 @@ describe('Velo External DB Data REST API',  () => {
         ['Postgres', postgresTestEnvInit],
     ]).describe('%s', (name, setup) => {
         beforeAll(async () => {
-            jest.resetModules()
             await setup()
 
             await initApp()
         }, 20000);
 
         afterAll(async () => {
-            await teardownApp()
             await dbTeardown()
         }, 20000);
 
@@ -158,6 +156,7 @@ describe('Velo External DB Data REST API',  () => {
         anotherNumberItem: Uninitialized,
     }
 
+    afterAll(async () => await teardownApp());
 
     beforeEach(async () => {
         ctx.collectionName = gen.randomCollectionName()

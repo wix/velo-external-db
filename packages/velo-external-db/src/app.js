@@ -6,8 +6,10 @@ const { DataService, SchemaService, OperationService } = require('velo-external-
 const { init } = require('./storage/factory')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
-const createRouter = require('./router')
+const { createRouter, initServices } = require('./router')
 
+let started = false
+let server, _cleanup
 
 const load = async () => {
     const secretKey = process.env.SECRET_KEY
@@ -15,14 +17,14 @@ const load = async () => {
     const operationService = new OperationService(databaseOperations)
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)
-    return { dataService, schemaService, operationService, secretKey, cleanup }
+    initServices(dataService, schemaService, operationService)
+    _cleanup = cleanup
+    return { secretKey }
 }
 
 
-const main = async () => {
+load().then(({ secretKey}) => {
     const app = express()
-    const port = process.env.PORT || 8080
-    const { dataService, schemaService, operationService, secretKey, cleanup } = await load();
 
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(bodyParser.json())
@@ -30,14 +32,17 @@ const main = async () => {
     app.use(compression())
     app.set('view engine', 'ejs');
 
-    const router = createRouter(dataService, schemaService, operationService)
+    const router = createRouter()
+
     app.use('/', router)
-    const server = app.listen(port)
-    return { server, cleanup, load }
-}
 
-if (process.env.NODE_ENV !== 'test') {
-    main();
-}
+    const port = process.env.PORT || 8080
+    server = app.listen(port)
 
-module.exports = main;
+    started = true
+})
+
+const internals = () => ({ server: server, cleanup: _cleanup, started: started, load: load })
+
+
+module.exports = { internals, load };
