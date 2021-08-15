@@ -1,7 +1,7 @@
-const {Uninitialized} = require("test-commons");
-const {authInit} = require("../drivers/auth_test_support");
-const postgres = require("../resources/postgres_resources");
-const mysql = require("../resources/mysql_resources");
+const {Uninitialized} = require("test-commons")
+const {authInit} = require("../drivers/auth_test_support")
+const postgres = require("../resources/postgres_resources")
+const mysql = require('../resources/mysql_resources')
 
 const env = {
     secretKey: Uninitialized,
@@ -10,11 +10,11 @@ const env = {
 
 const initApp = async () => {
     env.secretKey = authInit()
-    const createApp = require('../..');
-    env.app = await createApp();
+    const createApp = require('../..')
+    env.app = await createApp()
 }
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const teardownApp = async () => {
     await sleep(500)
