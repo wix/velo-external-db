@@ -1,25 +1,27 @@
-'use strict';
+const { ExternalDbConfigClient, ExternalDbConfigClientAWS, ExternalDbConfigClientGCP } = require('./external_db_config_clients')
 
-const {SecretMangerClientENV,SecretMangerClientAWS, SecretMangerClientAzure, SecretMangerClientGCP } = require('./secretMangerClients')
-
-const createSecretClient = (type) => { 
-    switch ( type ) {
-        case 'env/sql':
-            console.log(`SECRET MANGER: ${type}`);
-            return new SecretMangerClientENV();
-        case 'aws/sql':
-            console.log(`SECRET MANGER: ${type}`);
-            return  new SecretMangerClientAWS();   
-        case 'azr/sql':
-            console.log(`SECRET MANGER: ${type}`);
-            return new SecretMangerClientAzure(); 
-        case 'gcp/sql':
-            console.log(`SECRET MANGER: ${type}`);
-            return new SecretMangerClientGCP(); 
+const createExternalDbConfigClient = (type) => {
+    switch (type) {
+        case 'sql/mysql':
+        case 'sql/postgres':
+            console.log(`EXTERNAL DB CONFIG: ${type}`);
+            return new ExternalDbConfigClient();
+        case 'aws/mysql':
+        case 'aws/postgres':
+            console.log(`EXTERNAL DB CONFIG: ${type}`);
+            return new ExternalDbConfigClientAWS();
+        case 'azr/mysql':
+        case 'azr/postgres':
+            console.log(`EXTERNAL DB CONFIG: ${type}`);
+            return new ExternalDbConfigClient();
+        case 'gcp/mysql':
+        case 'gcp/postgres':
+            console.log(`EXTERNAL DB CONFIG: ${type}`);
+            return new ExternalDbConfigClientGCP();
         default:
-            throw new Error (`Type variable not supplied or not recognized.`);
+            throw new Error(`Type variable not supplied or not recognized.`);
     }
 }
 
-module.exports = { createSecretClient };
+module.exports = { createExternalDbConfigClient };
 

@@ -10,11 +10,8 @@ const { unless } = require('./web/middleware-support')
 const createRouter = require('./router')
 
 
-
-
 const load = async () => {
-    const { type, host, user, password, db, cloudSqlConnectionName } = { type: process.env.TYPE, host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, db: process.env.DB, cloudSqlConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME }
-    const { dataProvider, schemaProvider, cleanup, databaseOperations } = init(type, host, user, password, db, cloudSqlConnectionName)
+    const { dataProvider, schemaProvider, cleanup, databaseOperations } = await init()
     const operationService = new OperationService(databaseOperations)
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)

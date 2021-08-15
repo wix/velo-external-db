@@ -126,4 +126,38 @@ const randomDbs = () => randomArrayOf( randomDb )
 
 const randomObjectFromArray = (array) => randomItem = array[chance.integer({ min: 0, max: array.length - 1 })];
 
-module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject, randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomNumberColumns, randomObjectFromArray }
+const randomKeyObject = (obj) => {
+    objectKeys = Object.keys(obj)
+    selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
+    return selectedKey
+}
+
+const deleteRandomKeyObject = (obj) => {
+    const deletedKey = randomKeyObject(obj)
+    delete obj[deletedKey]
+    return { deletedKey, newObject:obj }
+}
+
+const clearRandomKeyObject = (obj) => {
+    const newObject = {...obj}
+    const clearedKey = randomKeyObject(newObject);
+    newObject[clearedKey] = '';
+    return { clearedKey, newObject };
+}
+
+const randomSecret = () => {
+    const secret = {
+        HOST: chance.url(),
+        USER: chance.first(),
+        PASSWORD: chance.guid(),
+        SECRET_KEY: chance.guid(),
+        DB: chance.word(),
+    }
+    return secret
+}
+
+module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject,
+     randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
+      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomSecret }
+
+
