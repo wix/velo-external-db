@@ -36,7 +36,7 @@ class ExternalDbConfigClientAWS extends ExternalDbConfigClient {
     constructor(secretId , region){
         super()
         this.requiredProps = AWSRequiredSecretsKeys
-        this.secretId = secretId
+        this.secretId = 'VELO-EXTERNAL-DB-SECRETS'
         this.secretMangerClient = new AwsSecretMangerClient({ region })
     } 
 

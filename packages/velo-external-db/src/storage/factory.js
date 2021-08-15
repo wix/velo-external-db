@@ -1,9 +1,8 @@
-const {createExternalDbConfigClient} = require("external-db-config")
+const { createExternalDbConfigClient } = require("external-db-config")
 
 const init = async() => {
     const type = process.env.TYPE;
-    const secretId = process.env.SECRET_ID;
-    const externalDbConfigClient = createExternalDbConfigClient(type,secretId);
+    const externalDbConfigClient = createExternalDbConfigClient(type);
     const { host, user, password, db, cloudSqlConnectionName } = await externalDbConfigClient.readConfig();
     switch (type) {
         case 'aws/mysql':
