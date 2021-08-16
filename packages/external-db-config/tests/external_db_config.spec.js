@@ -1,7 +1,7 @@
 const { Uninitialized, gen } = require('test-commons');
 const { env, secretMangerTestEnvInit, secretMangerTestAWSEnvInit, secretMangerTestGCPEnvInit } = require("./resources/resources_provider")
 const each = require('jest-each').default
-const errors = require ('../lib/errors')
+const errors = require('../lib/errors')
 
 describe('SECRET MANGER', () => {
 
@@ -27,14 +27,24 @@ describe('SECRET MANGER', () => {
 
         test('get secret without all the required fields', async () => {
             const secret = env.testHelper.serviceFormat(ctx.secret)
-            env.driver.stubBrokenSecret(secret)
-            await expect(env.secretClient.readConfig()).rejects.toThrow(errors.MissingRequiredProps)
+            const { deletedKey } = env.driver.stubBrokenSecret(secret)
+            try {
+                await env.secretClient.readConfig()
+            } catch (error) {
+                expect(error).toBeInstanceOf(errors.MissingRequiredProps)
+                expect(error).toHaveProperty('missingProps', [deletedKey])
+            }
         });
 
         test('get secret with a field that is empty', async () => {
             const secret = env.testHelper.serviceFormat(ctx.secret)
-            env.driver.stubSecretWithEmptyField(secret)
-            await expect(env.secretClient.readConfig()).rejects.toThrow(errors.MissingRequiredProps)
+            const { clearedKey } = env.driver.stubSecretWithEmptyField(secret)
+            try {
+                await env.secretClient.readConfig()
+            } catch (error) {
+                expect(error).toBeInstanceOf(errors.MissingRequiredProps)
+                expect(error).toHaveProperty('missingProps', [clearedKey])
+            }
         });
 
         const ctx = {
