@@ -12,20 +12,14 @@ const env = {
 
 const initApp = async () => {
     if (env.app) {
-        await env.app.load()
-        env.app = env.internals()
+        await env.app.reload()
     } else {
         env.secretKey = authInit()
-        const { internals } = require('../..')
+        env.internals = require('../..').internals
 
-        await waitUntil(() => {
-            const { started } = internals()
-            return started
-        });
-
-        env.app = internals()
-        env.internals = internals
+        await waitUntil(() => env.internals().started)
     }
+    env.app = env.internals()
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))

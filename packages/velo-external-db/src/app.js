@@ -42,7 +42,7 @@ load().then(({ secretKey}) => {
     started = true
 })
 
-const internals = () => ({ server: server, cleanup: _cleanup, started: started, load: load })
+const internals = () => ({ server: server, cleanup: _cleanup, started: started, reload: load })
 
 
-module.exports = { internals, load };
+module.exports = { internals };
