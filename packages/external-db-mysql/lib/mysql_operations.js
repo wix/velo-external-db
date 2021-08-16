@@ -1,5 +1,5 @@
 const { promisify } = require('util')
-const translateErrorCodes = require('./sql_exception_translator')
+const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
 
 class DatabaseOperations {
     constructor(pool) {
@@ -8,19 +8,7 @@ class DatabaseOperations {
     }
 
     async validateConnection() {
-        let res
-        try {
-            await this.query('SELECT 1')
-            res = { valid: true }
-        } catch (e) {
-            try {
-                translateErrorCodes(e)
-            }
-            catch (error) {
-                res = { valid: false, error }
-            }
-        }
-        return res;
+        return await this.query('SELECT 1').then((res) => { return { valid: true } }).catch((e) => { return { valid: false, error: notThrowingTranslateErrorCodes(e) } })
     }
     config() {
         const config = Object.assign({}, this.pool.config.connectionConfig)
