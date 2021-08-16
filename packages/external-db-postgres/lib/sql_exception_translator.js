@@ -9,14 +9,13 @@ const translateErrorCodes = err => {
         case '42P01':
             throw new CollectionDoesNotExists('Collection does not exists')
         case '28P01':
-            throw new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.sqlMessage}`)
+            throw new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.message}`)
         case '3D000':
-            throw new wrongDatabaseError(`Database does not exists or you don\'t have access to it, sql message: ${err.sqlMessage}`)
+            throw new wrongDatabaseError(`Database does not exists or you don\'t have access to it, sql message: ${err.message}`)
         case 'ENOTFOUND':
             throw new HostDoesNotExists('Database host does not found.')
         default :
-            console.log(err)
-            throw new Error(`default ${err.code}`)
+            throw new Error(`default ${err.code}, ${err.message}`)
     }
 }
 
