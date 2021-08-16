@@ -1,5 +1,6 @@
 const { SecretsManagerClient: AwsSecretMangerClient , GetSecretValueCommand: AwsGetSecretValueCommand  } = require("@aws-sdk/client-secrets-manager");
 const translateErrorCodes = require('./external_db_config_exception_translator')
+const { ExternalDbConfigError } = require ('./errors')
 
 const RequiredSecretsKeys = ['HOST', 'USER', 'PASSWORD','DB', 'SECRET_KEY'];
 const AWSRequiredSecretsKeys = ['host', 'username', 'password','DB', 'SECRET_KEY'];
@@ -50,6 +51,7 @@ class ExternalDbConfigClientAWS extends ExternalDbConfigClient {
             return ({ host, user: username, password, db, secretKey });
 
         } catch ( err ) {
+            if (err instanceof ExternalDbConfigError) throw err
             translateErrorCodes(err);
         }
         
