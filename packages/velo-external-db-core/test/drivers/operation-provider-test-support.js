@@ -3,10 +3,10 @@ const dataOperation = {
 }
 
 const givenValidPool = () =>
-    dataOperation.validateConnection.mockResolvedValue({ '1': 1 })
+    dataOperation.validateConnection.mockResolvedValue({ valid: true })
 
 const givenInvalidPool = (error) =>
-    dataOperation.validateConnection.mockImplementation(() => { throw new error })
+    dataOperation.validateConnection.mockImplementation(() => { return { valid: false, error } })
 
 const reset = () => {
     dataOperation.validateConnection.mockClear()

@@ -14,7 +14,8 @@ const createRouter = () => {
 
     // *************** INFO **********************
     router.get('/', async (req, res) => {
-        res.render('index', { STATUS: await operationService.connectionStatus(), ...operationService.config() });
+        const connectionStatus = await operationService.connectionStatus()
+        res.render(connectionStatus.error ? 'error' : 'index', connectionStatus);
     })
 
     router.post('/provision', (req, res) => {

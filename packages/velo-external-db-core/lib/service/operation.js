@@ -3,20 +3,24 @@ class OperationService {
         this.databaseOperation = databaseOperation;
     }
 
-    validateConnection = async () => {
+    async validateConnection() {
         return await this.databaseOperation.validateConnection()
     }
 
-    connectionStatus = async () => {
-        try {
-            await this.databaseOperation.validateConnection()
-            return "Connected to database successfully"
-        } catch (e) {
-            return `Connection to database failed, ${e.message}`
+    async connectionStatus() {
+        const connectionStatus = await this.databaseOperation.validateConnection()
+        if (connectionStatus.valid) {
+            return {
+                STATUS: "Connected to database successfully",
+                ...this.config()
+            }
+        }
+        return {
+            error: connectionStatus.error.message,
         }
     }
 
-    config = () => {
+    config() {
         return this.databaseOperation.config();
     }
 }
