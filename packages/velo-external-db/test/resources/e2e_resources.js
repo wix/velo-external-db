@@ -11,6 +11,7 @@ const env = {
 }
 
 const initApp = async () => {
+    process.env.CLOUD_VENDOR = 'sql/mysql'
     if (env.app) {
         await env.app.reload()
     } else {

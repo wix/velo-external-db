@@ -10,10 +10,12 @@ const { createRouter, initServices } = require('./router')
 
 let started = false
 let server, _cleanup
+const vendor = process.env.CLOUD_VENDOR
+
 
 const load = async () => {
     const adapterType = process.env.TYPE
-    const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey } = await init(adapterType)
+    const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey } = await init(adapterType, vendor)
     const operationService = new OperationService(databaseOperations)
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)
