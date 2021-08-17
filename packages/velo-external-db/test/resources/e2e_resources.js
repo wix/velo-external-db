@@ -1,4 +1,4 @@
-const {Uninitialized} = require("test-commons")
+const {Uninitialized, sleep} = require('test-commons')
 const {authInit} = require("../drivers/auth_test_support")
 const postgres = require("../resources/postgres_resources")
 const mysql = require('../resources/mysql_resources')
@@ -22,8 +22,6 @@ const initApp = async () => {
     }
     env.app = env.internals()
 }
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const teardownApp = async () => {
     await sleep(500)

@@ -1,8 +1,7 @@
 const { init } = require('external-db-mysql')
 const compose = require('docker-compose')
 const mysql = require('mysql')
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const { sleep } = require("test-commons")
 
 const connection = () => {
     return mysql.createPool({

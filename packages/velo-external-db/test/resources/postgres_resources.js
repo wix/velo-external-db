@@ -2,6 +2,7 @@ const compose = require('docker-compose')
 const { types, Pool} = require('pg')
 const { builtins } = require('pg-types')
 const { init } = require('external-db-postgres')
+const { sleep } = require("test-commons")
 
 // make postgres driver parse numbers
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
@@ -19,8 +20,6 @@ const connection = () => {
         connectionTimeoutMillis: 2000,
     })
 }
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const cleanup = async () => {
     const {schemaProvider, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'])
