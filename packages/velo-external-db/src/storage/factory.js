@@ -1,9 +1,10 @@
 const { createExternalDbConfigClient } = require("external-db-config")
 
-const init = async() => {
-    const type = process.env.TYPE;
+const append = (res, secretKey) => Object.assign({}, res, {secretKey: secretKey})
+
+const init = async(type) => {
     const externalDbConfigClient = createExternalDbConfigClient(type);
-    const { host, user, password, db, cloudSqlConnectionName } = await externalDbConfigClient.readConfig();
+    const { host, user, password, db, cloudSqlConnectionName, secretKey } = await externalDbConfigClient.readConfig();
     switch (type) {
         case 'aws/mysql':
         case 'azr/mysql':
@@ -11,7 +12,7 @@ const init = async() => {
         case 'sql/mysql':{
             console.log(`INIT: ${type}`)
             const { init } = require('external-db-mysql')
-            return init([host,user,password,db,cloudSqlConnectionName])
+            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey)
         }
         case 'aws/postgres':
         case 'azr/postgres':
@@ -20,7 +21,7 @@ const init = async() => {
             console.log(`INIT: ${type}`)
             const { init } = require('external-db-postgres')
 
-            return init([host,user,password,db,cloudSqlConnectionName])
+            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey)
         }
 
     }

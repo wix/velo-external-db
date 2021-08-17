@@ -12,8 +12,8 @@ let started = false
 let server, _cleanup
 
 const load = async () => {
-    const secretKey = process.env.SECRET_KEY
-    const { dataProvider, schemaProvider, cleanup, databaseOperations } = await init()
+    const adapterType = process.env.TYPE
+    const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey } = await init(adapterType)
     const operationService = new OperationService(databaseOperations)
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)
