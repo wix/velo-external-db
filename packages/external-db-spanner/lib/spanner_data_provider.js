@@ -110,6 +110,21 @@ class DataProvider {
         await this.delete(collectionName, itemIds)
     }
 
+    async aggregate(collectionName, filter, aggregation) {
+        const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
+        const {fieldsStatement, groupByColumns, havingFilter, parameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
+
+        const query = {
+            sql: `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`,
+            params: { },
+        }
+
+        Object.assign(query.params, whereParameters, parameters)
+
+        const [rows] = await this.database.run(query)
+        return recordSetToObj(rows).map( this.asEntity.bind(this) )
+    }
+
 }
 
 module.exports = DataProvider

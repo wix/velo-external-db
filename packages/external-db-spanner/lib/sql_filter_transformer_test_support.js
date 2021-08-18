@@ -47,8 +47,8 @@ const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByC
     const c = numericColumns.map(c => c.name)
     when(filterParser.parseAggregation).calledWith(having, filter)
                                        .mockReturnValue({
-                                           fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
-                                           groupByColumns: groupByColumns,
+                                           fieldsStatement: `${groupByColumns.map( patchFieldName ).map( escapeId )}, MAX(${escapeId(patchFieldName(c[0]))}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
+                                           groupByColumns: groupByColumns.map( patchFieldName ),
                                            havingFilter: '',
                                            parameters: [],
                                        })
