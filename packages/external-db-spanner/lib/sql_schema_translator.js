@@ -72,9 +72,9 @@ class SchemaColumnTranslator {
 
     dbType(type, subtype, precision) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
-            // case 'number_int':
-            //     return 'INT'
-            //
+            case 'number_int':
+                return 'INT64'
+
             // case 'number_bigint':
             //     return 'BIGINT'
             //
@@ -84,8 +84,8 @@ class SchemaColumnTranslator {
             // case 'number_double':
             //     return `DOUBLE${this.parsePrecision(precision)}`
             //
-            // case 'number_decimal':
-            //     return `DECIMAL${this.parsePrecision(precision)}`
+            case 'number_decimal':
+                return 'FLOAT64'
             //
             // case 'datetime_date':
             //     return `DATE`

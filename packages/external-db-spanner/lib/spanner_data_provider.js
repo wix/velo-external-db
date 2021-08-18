@@ -1,64 +1,49 @@
-const {Spanner} = require('@google-cloud/spanner')
-const mysql = require('mysql')
-const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
+const { escapeId } = require('mysql')
+const { recordSetToObj } = require('./spanner_utils')
+const { SystemFields } = require('velo-external-db-commons')
 
 class DataProvider {
-    constructor(projectId, instanceId, databaseId, filterParser) {
+    constructor(database, filterParser) {
         this.filterParser = filterParser
 
-        this.projectId = projectId
-        this.instanceId = instanceId
-        this.databaseId = databaseId
-
-        this.spanner = new Spanner({projectId: this.projectId})
-        this.instance = this.spanner.instance(this.instanceId);
-        this.database = this.instance.database(this.databaseId);
+        this.database = database
     }
 
     async find(collectionName, filter, sort, skip, limit) {
-        const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
-        const {sortExpr, sortColumns} = this.filterParser.orderBy(sort)
+        const {filterExpr, parameters} = this.filterParser.transform(filter)
+        const { sortExpr } = this.filterParser.orderBy(sort)
 
         const query = {
-            sql: mysql.format(`SELECT * FROM ?? ${filterExpr} ${sortExpr} LIMIT @limit OFFSET @skip`, [collectionName, ...filterColumns.map( this.patchFieldName ), ...sortColumns.map( this.patchFieldName )]),
+            sql: `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} LIMIT @limit OFFSET @skip`,
             params: {
                 skip: skip,
                 limit: limit,
             },
-        };
-
-        for (let i = 0; i < filterColumns.length; i++) {
-            query.sql = query.sql.replace('?', `@${filterColumns[i]}`)
-            query.params[filterColumns[i]] = parameters[i]
         }
+        Object.assign(query.params, parameters)
 
         const [rows] = await this.database.run(query);
-
-        return rows.map( r => r.toJSON() )
-                   .map( this.asEntity.bind(this) )
+        return recordSetToObj(rows).map( this.asEntity.bind(this) )
     }
 
     async count(collectionName, filter) {
-        const {filterExpr, filterColumns, parameters} = this.filterParser.transform(filter)
+        const {filterExpr, parameters} = this.filterParser.transform(filter)
         const query = {
-            sql: mysql.format(`SELECT COUNT(*) AS num FROM ?? ${filterExpr}`.trim(), [collectionName, ...filterColumns.map( this.patchFieldName )]),
+            sql: `SELECT COUNT(*) AS num FROM ${escapeId(collectionName)} ${filterExpr}`.trim(),
             params: { },
         };
+        Object.assign(query.params, parameters)
 
-        for (let i = 0; i < filterColumns.length; i++) {
-            query.sql = query.sql.replace('?', `@${filterColumns[i]}`)
-            query.params[filterColumns[i]] = parameters[i]
-        }
-
-        const [rows] = await this.database.run(query);
-        const objs = rows.map( r => r.toJSON() )
+        const [rows] = await this.database.run(query)
+        const objs = recordSetToObj(rows).map( this.asEntity.bind(this) )
 
         return objs[0].num;
     }
 
-    async insert(collectionName, item) {
+    async insert(collectionName, items) {
         await this.database.table(collectionName)
-                           .insert([this.asDBEntity(item)])
+                           .insert(items.map(this.asDBEntity.bind(this)))
+        return items.length
     }
 
     asDBEntity(item) {
@@ -77,61 +62,54 @@ class DataProvider {
 
     patchFieldName(f) {
         if (f.startsWith('_')) {
-            return `${f.substring(1)}_`
+            return `x${f}`
         }
         return f
     }
 
     unpatchFieldName(f) {
-        if (f.endsWith('_')) {
-            return `_${f.slice(0, -1)}`
+        if (f.startsWith('x_')) {
+            return f.slice(1)
         }
         return f
     }
 
-    async update(collectionName, item) {
-        await this.database.table(collectionName)
-                           .update([this.asDBEntity(item)])
+    async update(collectionName, items) {
+        const item = items[0]
+        const systemFieldNames = SystemFields.map(f => f.name)
+        const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
 
-        // const systemFieldNames = SystemFields.map(f => f.name)
-        // const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
-        //
-        // if (updateFields.length === 0) {
-        //     return 0
-        // }
-        //
-        // const sql = this.pool.format(`UPDATE ?? SET ${updateFields.map(() => '?? = ?')} WHERE _id = ?`, [collectionName, ...updateFields])
-        // const updatable = [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {})
-        //
-        // const resultset = await this.pool.execute(sql, this.asParamArrays( this.patchDateTime(updatable) ) )
-        // return resultset[0].changedRows
+        if (updateFields.length === 0) {
+            return 0
+        }
+
+        await this.database.table(collectionName)
+                           .update(items.map( this.asDBEntity.bind(this) ))
+        return items.length
     }
 
     async delete(collectionName, itemIds) {
         await this.database.table(collectionName)
                            .deleteRows(itemIds)
+        return itemIds.length
     }
 
-    // wildCardWith(n, char) {
-    //     return Array(n).fill(char, 0, n).join(', ')
-    // }
+    async truncate(collectionName) {
+        // todo: properly implement this
+        const query = {
+            sql: `SELECT * FROM ${escapeId(collectionName)} LIMIT @limit OFFSET @skip`,
+            params: {
+                skip: 0,
+                limit: 1000,
+            },
+        }
 
-    // patchDateTime(item) {
-    //     const obj = {}
-    //     for (const key of Object.keys(item)) {
-    //         const value = item[key]
-    //         if (value instanceof Date) {
-    //             obj[key] = moment(value).format('YYYY-MM-DD HH:mm:ss');
-    //         } else {
-    //             obj[key] = value
-    //         }
-    //     }
-    //     return obj
-    // }
-    //
-    // asParamArrays(item) {
-    //     return Object.values(item);
-    // }
+        const [rows] = await this.database.run(query);
+        const itemIds = recordSetToObj(rows).map( this.asEntity.bind(this) ).map(e => e._id)
+
+        await this.delete(collectionName, itemIds)
+    }
+
 }
 
 module.exports = DataProvider

@@ -14,8 +14,6 @@ const connection = () => {
     return { pool, cleanup: () => {}}
 }
 
-// const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const cleanup = async () => {
     // const {schemaProvider, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'])
     // const tables = await schemaProvider.list()
