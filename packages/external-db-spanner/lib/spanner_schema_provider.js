@@ -11,13 +11,6 @@ class SchemaProvider {
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
     }
 
-    reformatFields(r) {
-        return {
-            field: unpatchFieldName(r['COLUMN_NAME']),
-            type: this.sqlSchemaTranslator.translateType(r['SPANNER_TYPE']),
-        }
-    }
-
     async list() {
         const query = {
             sql: 'SELECT table_name, COLUMN_NAME, SPANNER_TYPE FROM information_schema.columns WHERE table_catalog = @tableCatalog and table_schema = @tableSchema',
@@ -98,6 +91,14 @@ class SchemaProvider {
     fixColumn(c) {
         return Object.assign({}, c, { name: patchFieldName(c.name)})
     }
+
+    reformatFields(r) {
+        return {
+            field: unpatchFieldName(r['COLUMN_NAME']),
+            type: this.sqlSchemaTranslator.translateType(r['SPANNER_TYPE']),
+        }
+    }
+
 }
 
 
