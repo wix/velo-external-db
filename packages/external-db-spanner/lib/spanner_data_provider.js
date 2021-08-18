@@ -1,5 +1,4 @@
-const { escapeId } = require('mysql')
-const { recordSetToObj } = require('./spanner_utils')
+const { recordSetToObj, escapeId } = require('./spanner_utils')
 const { SystemFields } = require('velo-external-db-commons')
 
 class DataProvider {

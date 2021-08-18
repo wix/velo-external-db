@@ -2,8 +2,7 @@ const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = requ
 const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { notThrowingTranslateErrorCodes } = require("./sql_exception_translator")
-const { escapeId } = require('mysql')
-const { recordSetToObj } = require('./spanner_utils')
+const { recordSetToObj, escapeId } = require('./spanner_utils')
 
 class SchemaProvider {
     constructor(database) {
