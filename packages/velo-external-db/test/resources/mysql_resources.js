@@ -4,7 +4,7 @@ const mysql = require('mysql')
 const { sleep } = require("test-commons")
 
 const connection = () => {
-    return mysql.createPool({
+    const pool = mysql.createPool({
         host     : 'localhost',
         user     : 'test-user',
         password : 'password',
@@ -17,6 +17,7 @@ const connection = () => {
         connectionLimit: 1,
         queueLimit: 0
     });
+    return { pool, cleanup: async () => await pool.end(() => {})}
 }
 
 const cleanup = async () => {

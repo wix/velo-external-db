@@ -1,7 +1,6 @@
 const {Spanner} = require('@google-cloud/spanner')
-// const moment = require('moment')
-const { SystemFields } = require('./spanner_schema_provider')
 const mysql = require('mysql')
+const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
 
 class DataProvider {
     constructor(projectId, instanceId, databaseId, filterParser) {
@@ -115,9 +114,9 @@ class DataProvider {
                            .deleteRows(itemIds)
     }
 
-    wildCardWith(n, char) {
-        return Array(n).fill(char, 0, n).join(', ')
-    }
+    // wildCardWith(n, char) {
+    //     return Array(n).fill(char, 0, n).join(', ')
+    // }
 
     // patchDateTime(item) {
     //     const obj = {}

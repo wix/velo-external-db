@@ -1,4 +1,10 @@
-const { SchemaProvider, SystemFields } = require('./spanner_schema_provider')
-const DataProvider = require('./spanner_data_provider')
+const SchemaProvider = require('./spanner_schema_provider')
+// const DataProvider = require('./spanner_data_provider')
+const init = require('./connection_provider')
 
-module.exports = { SchemaProvider, DataProvider, SystemFields }
+class DataProvider {
+    constructor(pool, filterParser) {
+    }
+}
+
+module.exports = { SchemaProvider, init, driver: () => ({ filterParser: null }), DataProvider }

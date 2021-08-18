@@ -8,7 +8,7 @@ const { sleep } = require("test-commons")
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
 const connection = () => {
-    return new Pool({
+    const pool = new Pool({
         host: 'localhost',
         user: 'test-user',
         password: 'password',
@@ -19,6 +19,7 @@ const connection = () => {
         idleTimeoutMillis: 1000,
         connectionTimeoutMillis: 2000,
     })
+    return { pool, cleanup: async () => await pool.end(() => {})}
 }
 
 const cleanup = async () => {

@@ -8,7 +8,6 @@ class SchemaProvider {
     constructor(pool) {
         this.pool = pool
 
-        this.systemFields = SystemFields
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
 
         this.query = promisify(this.pool.query).bind(this.pool)
@@ -24,9 +23,9 @@ class SchemaProvider {
 
 
     async create(collectionName, columns) {
-        const dbColumnsSql = [...this.systemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
+        const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                        .join(', ')
-        const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
+        const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
 
         await this.query(`CREATE TABLE IF NOT EXISTS ${escapeId(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
                          [...(columns || []).map(c => c.name)])
