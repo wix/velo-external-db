@@ -13,8 +13,6 @@ class DataProvider {
         this.spanner = new Spanner({projectId: this.projectId})
         this.instance = this.spanner.instance(this.instanceId);
         this.database = this.instance.database(this.databaseId);
-
-        this.systemFields = SystemFields
     }
 
     async find(collectionName, filter, sort, skip, limit) {
