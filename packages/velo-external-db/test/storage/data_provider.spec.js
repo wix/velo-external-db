@@ -1,7 +1,7 @@
 const { Uninitialized, gen } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance');
-const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit } = require("../resources/provider_resources")
+const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit} = require('../resources/provider_resources')
 const chance = new Chance();
 
 describe('Data API', () => {
@@ -9,6 +9,7 @@ describe('Data API', () => {
     each([
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
+        ['Spanner', spannerTestEnvInit],
     ]).describe('%s', (name, setup) => {
 
         beforeAll(async () => {

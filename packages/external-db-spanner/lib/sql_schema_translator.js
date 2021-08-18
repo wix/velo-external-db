@@ -18,7 +18,9 @@ class SchemaColumnTranslator {
             // case 'float':
             // case 'double':
             // case 'decimal':
-            //     return 'number'
+            case 'float64':
+            case 'int64':
+                return 'number'
             //
             // case 'date':
             // case 'datetime':
