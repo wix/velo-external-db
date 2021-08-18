@@ -2,7 +2,7 @@ const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = requ
 const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { notThrowingTranslateErrorCodes } = require("./sql_exception_translator")
-const { recordSetToObj, escapeId } = require('./spanner_utils')
+const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } = require('./spanner_utils')
 
 class SchemaProvider {
     constructor(database) {
@@ -13,7 +13,7 @@ class SchemaProvider {
 
     reformatFields(r) {
         return {
-            field: this.unfixColumnName(r['COLUMN_NAME']),
+            field: unpatchFieldName(r['COLUMN_NAME']),
             type: this.sqlSchemaTranslator.translateType(r['SPANNER_TYPE']),
         }
     }
@@ -40,7 +40,7 @@ class SchemaProvider {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( this.fixColumn.bind(this) )
                                                                   .map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                   .join(', ')
-        const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(this.fixColumnName(f.name))).join(', ')
+        const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(patchFieldName(f.name))).join(', ')
 
         await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (${primaryKeySql})`, CollectionAlreadyExists)
     }
@@ -82,24 +82,6 @@ class SchemaProvider {
     }
 
 
-    fixColumn(c) {
-        return Object.assign({}, c, { name: this.fixColumnName(c.name)})
-    }
-
-    fixColumnName(name) {
-        if (name.startsWith('_')) {
-            return `x${name}`
-        }
-        return name
-    }
-
-    unfixColumnName(name) {
-        if (name.startsWith('x_')) {
-            return name.slice(1)
-        }
-        return name
-    }
-
     async updateSchema(sql, catching) {
         try {
             const [operation] = await this.database.updateSchema([sql])
@@ -113,6 +95,9 @@ class SchemaProvider {
         }
     }
 
+    fixColumn(c) {
+        return Object.assign({}, c, { name: patchFieldName(c.name)})
+    }
 }
 
 

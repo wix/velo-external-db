@@ -1,4 +1,4 @@
-const { recordSetToObj, escapeId } = require('./spanner_utils')
+const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } = require('./spanner_utils')
 const { SystemFields } = require('velo-external-db-commons')
 
 class DataProvider {
@@ -48,29 +48,15 @@ class DataProvider {
     asDBEntity(item) {
         return Object.keys(item)
                      .reduce((obj, key) => {
-                         return { ...obj, [this.patchFieldName(key)]: item[key] }
+                         return { ...obj, [patchFieldName(key)]: item[key] }
                      }, {})
     }
 
     asEntity(dbEntity) {
         return Object.keys(dbEntity)
                      .reduce(function (obj, key) {
-                         return { ...obj, [this.unpatchFieldName(key)]: dbEntity[key] }
+                         return { ...obj, [unpatchFieldName(key)]: dbEntity[key] }
                      }.bind(this), {})
-    }
-
-    patchFieldName(f) {
-        if (f.startsWith('_')) {
-            return `x${f}`
-        }
-        return f
-    }
-
-    unpatchFieldName(f) {
-        if (f.startsWith('x_')) {
-            return f.slice(1)
-        }
-        return f
     }
 
     async update(collectionName, items) {
