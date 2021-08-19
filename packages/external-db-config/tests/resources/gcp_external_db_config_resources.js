@@ -1,30 +1,29 @@
-const { lowercaseObjectKeys } = require("./test_commons");
+const { lowercaseObjectKeys } = require('./test_commons')
 
-const secretMangerTestEnv = require("./external_db_config_resources");
-
+const secretMangerTestEnv = require('./external_db_config_resources')
 
 const createDriver = () => {
-    const driver = secretMangerTestEnv.createDriver();
+  const driver = secretMangerTestEnv.createDriver()
 
-    return driver;
+  return driver
 }
 
 const testHelper = () => {
-    const gcpTestHelper = secretMangerTestEnv.testHelper();
-    gcpTestHelper.serviceFormat = (secret) => {
-        secret.CLOUD_SQL_CONNECTION_NAME = secret.HOST;
-        delete secret.HOST;
-        return secret;
-    };
-    gcpTestHelper.secretClientFormat = (secret) => {
-        const formatedSecret = lowercaseObjectKeys(secret);
-        formatedSecret.cloudSqlConnectionName = formatedSecret.cloud_sql_connection_name;
-        delete formatedSecret.cloud_sql_connection_name;
-        formatedSecret.secretKey = formatedSecret.secret_key;
-        delete formatedSecret.secret_key;
-        return formatedSecret;
-    };
-    return gcpTestHelper;
+  const gcpTestHelper = secretMangerTestEnv.testHelper()
+  gcpTestHelper.serviceFormat = (secret) => {
+    secret.CLOUD_SQL_CONNECTION_NAME = secret.HOST
+    delete secret.HOST
+    return secret
+  }
+  gcpTestHelper.secretClientFormat = (secret) => {
+    const formattedSecret = lowercaseObjectKeys(secret)
+    formattedSecret.cloudSqlConnectionName = formattedSecret.cloud_sql_connection_name
+    delete formattedSecret.cloud_sql_connection_name
+    formattedSecret.secretKey = formattedSecret.secret_key
+    delete formattedSecret.secret_key
+    return formattedSecret
+  }
+  return gcpTestHelper
 }
 
 module.exports = { createDriver, testHelper }
