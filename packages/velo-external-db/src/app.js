@@ -4,53 +4,47 @@ const bodyParser = require('body-parser')
 const compression = require('compression')
 const { DataService, SchemaService, OperationService } = require('velo-external-db-core')
 const { init } = require('./storage/factory')
-const { errorMiddleware } = require('./web/error-middleware')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
-const createRouter = require('./router')
+const { createRouter, initServices } = require('./router')
+
+let started = false
+let server, _cleanup
+const vendor = process.env.CLOUD_VENDOR
 
 
 const load = async () => {
-    const { dataProvider, schemaProvider, cleanup, databaseOperations } = await init()
+    const adapterType = process.env.TYPE
+    const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey } = await init(adapterType, vendor)
     const operationService = new OperationService(databaseOperations)
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)
-    await operationService.validateConnection()
-    return { dataService, schemaService, operationService, cleanup }
+    initServices(dataService, schemaService, operationService)
+    _cleanup = cleanup
+    return { secretKey }
 }
 
 
-const main = async () => {
+load().then(({ secretKey}) => {
     const app = express()
-    const port = process.env.PORT || 8080
 
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(bodyParser.json())
-    app.use(unless(['/', '/provision'], authMiddleware({ secretKey: process.env.SECRET_KEY })));
-    app.use(errorMiddleware)
+    app.use(unless(['/', '/provision'], authMiddleware({ secretKey: secretKey })));
     app.use(compression())
     app.set('view engine', 'ejs');
 
-    try {
-        const { dataService, schemaService, operationService, cleanup } = await load();
-        const router = createRouter(dataService, schemaService, operationService)
-        app.use('/', router)
-        const server = app.listen(port)
-        return { server, cleanup, load }
-    } catch (err) {
-        app.get('/', (req, res) => {
-            res.render('error', { error: err.message });
-        })
+    const router = createRouter()
 
-        app.use('/', (req, res) => {
-            res.send(err.message)
-        })
-        app.listen(port)
-    }
-}
+    app.use('/', router)
 
-if (process.env.NODE_ENV !== 'test') {
-    main();
-}
+    const port = process.env.PORT || 8080
+    server = app.listen(port)
 
-module.exports = main;
+    started = true
+})
+
+const internals = () => ({ server: server, cleanup: _cleanup, started: started, reload: load })
+
+
+module.exports = { internals };

@@ -7,7 +7,7 @@ const DatabaseOperations = require ('./postgres_operations')
 
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
-const init = ([host, user, password, db]) => {
+const init = ([host, user, password, db, cloudSqlConnectionName]) => {
     const config = {
         host: host,
         user: user,
@@ -18,6 +18,10 @@ const init = ([host, user, password, db]) => {
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
+    }
+
+    if (cloudSqlConnectionName) {
+        config['host'] = `/cloudsql/${cloudSqlConnectionName}`
     }
 
     const filterParser = new FilterParser()

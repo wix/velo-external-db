@@ -1,4 +1,4 @@
-const translateErrorCodes = require('./sql_exception_translator')
+const { translateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeIdentifier } = require('./postgres_utils')
 const { CollectionDoesNotExists} = require('velo-external-db-commons').errors
@@ -8,7 +8,6 @@ class SchemaProvider {
     constructor(pool) {
         this.pool = pool
 
-        this.systemFields = SystemFields
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
     }
 
@@ -22,9 +21,9 @@ class SchemaProvider {
 
     async create(collectionName, _columns) {
         const columns = _columns || []
-        const dbColumnsSql = [...this.systemFields, ...columns].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
+        const dbColumnsSql = [...SystemFields, ...columns].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                .join(', ')
-        const primaryKeySql = this.systemFields.filter(f => f.isPrimary).map(f => escapeIdentifier(f.name)).join(', ')
+        const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeIdentifier(f.name)).join(', ')
 
         await this.pool.query(`CREATE TABLE IF NOT EXISTS ${escapeIdentifier(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`)
                   .catch( translateErrorCodes )

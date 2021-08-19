@@ -1,23 +1,27 @@
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist,AccessDeniedError,HostDoesNotExists,wrongDatabaseError } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, AccessDeniedError, HostDoesNotExists, wrongDatabaseError } = require('velo-external-db-commons').errors
 
-const translateErrorCodes = err => {
+const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {
         case '42703':
-            throw new FieldDoesNotExist('Collection does not contain a field with this name')
+            return new FieldDoesNotExist('Collection does not contain a field with this name')
         case '42701':
-            throw new FieldAlreadyExists('Collection already has a field with the same name')
+            return new FieldAlreadyExists('Collection already has a field with the same name')
         case '42P01':
-            throw new CollectionDoesNotExists('Collection does not exists')
+            return new CollectionDoesNotExists('Collection does not exists')
         case '28P01':
-            throw new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.sqlMessage}`)
+            return new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.message}`)
         case '3D000':
-            throw new wrongDatabaseError(`Database does not exists or you don\'t have access to it, sql message: ${err.sqlMessage}`)
+            return new wrongDatabaseError(`Database does not exists or you don\'t have access to it, sql message: ${err.message}`)
         case 'ENOTFOUND':
-            throw new HostDoesNotExists('Database host does not found.')
+            return new HostDoesNotExists('Database host does not found.')
         default :
-            console.log(err)
-            throw new Error(`default ${err.code}`)
+            return new Error(`default ${err.code}, ${err.message}`)
     }
 }
 
-module.exports = translateErrorCodes
+const translateErrorCodes = err => {
+    throw notThrowingTranslateErrorCodes(err);
+}
+
+module.exports = { notThrowingTranslateErrorCodes, translateErrorCodes }
+

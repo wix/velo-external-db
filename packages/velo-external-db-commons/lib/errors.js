@@ -17,6 +17,12 @@ class CollectionDoesNotExists extends BaseHttpError {
     }
 }
 
+class CollectionAlreadyExists extends BaseHttpError {
+    constructor(message) {
+        super(message, 400);
+    }
+}
+
 class FieldAlreadyExists extends BaseHttpError {
     constructor(message) {
         super(message, 400);
@@ -58,4 +64,4 @@ class HostDoesNotExists extends BaseHttpError {
 }
 
 module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField, InvalidQuery,
-                   AccessDeniedError, wrongDatabaseError, HostDoesNotExists }
+                   AccessDeniedError, wrongDatabaseError, HostDoesNotExists, CollectionAlreadyExists }

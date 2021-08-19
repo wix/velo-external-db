@@ -1,36 +1,19 @@
-const {Spanner} = require('@google-cloud/spanner')
-const mysql = require('mysql')
-
-const SystemFields = [
-    {
-        name: 'id_', type: 'STRING(256)', isPrimary: true
-    },
-    {
-        name: 'createdDate_', type: 'TIMESTAMP'
-    },
-    {
-        name: 'updatedDate_', type: 'TIMESTAMP'
-    },
-    {
-        name: 'owner_', type: 'STRING(256)'
-    }]
+const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
+const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
+const SchemaColumnTranslator = require('./sql_schema_translator')
+const { notThrowingTranslateErrorCodes } = require("./sql_exception_translator")
+const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } = require('./spanner_utils')
 
 class SchemaProvider {
-    constructor(projectId, instanceId, databaseId) {
-        this.projectId = projectId
-        this.instanceId = instanceId
-        this.databaseId = databaseId
+    constructor(database) {
+        this.database = database
 
-        this.spanner = new Spanner({projectId: this.projectId})
-        this.instance = this.spanner.instance(this.instanceId);
-        this.database = this.instance.database(this.databaseId);
-
-        this.systemFields = SystemFields
+        this.sqlSchemaTranslator = new SchemaColumnTranslator()
     }
 
     async list() {
         const query = {
-            sql: 'SELECT table_name FROM information_schema.tables WHERE table_catalog = @tableCatalog and table_schema = @tableSchema',
+            sql: 'SELECT table_name, COLUMN_NAME, SPANNER_TYPE FROM information_schema.columns WHERE table_catalog = @tableCatalog and table_schema = @tableSchema',
             params: {
                 tableSchema: '',
                 tableCatalog: '',
@@ -38,80 +21,38 @@ class SchemaProvider {
         };
 
         const [rows] = await this.database.run(query);
+        const res = recordSetToObj(rows)
 
-        return Promise.all(this.recordSetToObj(rows)
-                               .map(row => row['table_name'])
-                               .map( this.describeCollection.bind(this) ))
+        const tables = parseTableData(res)
+
+        return Object.entries(tables)
+                     .map(([collectionName, rs]) => asWixSchema(rs.map( this.reformatFields.bind(this) ), collectionName))
     }
 
     async create(collectionName, columns) {
-        const dbColumns = this.systemFields.concat(columns || [])
-        const dbColumnsSql = dbColumns.map( this.columnToDbColumnSql.bind(this) )
-                                      .join(', ')
+        const dbColumnsSql = [...SystemFields, ...(columns || [])].map( this.fixColumn.bind(this) )
+                                                                  .map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
+                                                                  .join(', ')
+        const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(patchFieldName(f.name))).join(', ')
 
-        const primaryKeyFieldNames = this.systemFields.filter(f => f.isPrimary).map(f => f.name)
-
-        const request = [
-            mysql.format(`CREATE TABLE ?? (${dbColumnsSql}) PRIMARY KEY (${this.wildCardWith( primaryKeyFieldNames.length, '??')})`, [collectionName, ...dbColumns.map(f => f.name), ...primaryKeyFieldNames])
-        ];
-
-        const [operation] = await this.database.updateSchema(request);
-
-        await operation.promise();
+        await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (${primaryKeySql})`, CollectionAlreadyExists)
     }
 
     async addColumn(collectionName, column) {
-        try {
-            await this.validateSystemFields(column.name)
+        await validateSystemFields(column.name)
 
-            const request = [
-                mysql.format(`ALTER TABLE ?? ADD COLUMN ${this.columnToDbColumnSql(column)}`, [collectionName, column.name])
-            ];
-            const [operation] = await this.database.updateSchema(request)
-
-            await operation.promise();
-        } catch (err) {
-            console.log(err)
-        }
-  //       /*
-  //       code: 'ER_NO_SUCH_TABLE',
-  // errno: 1146,
-  // sqlState: '42S02',
-  // sqlMessage: "Table 'test-db.ew' doesn't exist"
-  //        */
-
+        await this.updateSchema(`ALTER TABLE ${escapeId(collectionName)} ADD COLUMN ${this.sqlSchemaTranslator.columnToDbColumnSql(column)}`)
     }
 
     async removeColumn(collectionName, columnName) {
-        try {
-            await this.validateSystemFields(columnName)
+        await validateSystemFields(columnName)
 
-            const request = [
-                mysql.format(`ALTER TABLE ?? DROP COLUMN ??`, [collectionName, columnName])
-
-            ];
-            const [operation] = await this.database.updateSchema(request)
-
-            await operation.promise();
-        } catch (err) {
-            console.log(err)
-        }
-
-        /*
-        code: 'ER_CANT_DROP_FIELD_OR_KEY',
-  errno: 1091,
-  sqlState: '42000',
-  sqlMessage: "Can't DROP 'tod'; check that column/key exists"
-         */
-    }
-
-    recordSetToObj(rows) {
-        return rows.map(row => row.toJSON())
+        await this.updateSchema(`ALTER TABLE ${escapeId(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
     }
 
     async describeCollection(collectionName) {
         const query = {
-            sql: 'SELECT COLUMN_NAME, SPANNER_TYPE FROM information_schema.columns WHERE table_catalog = @tableCatalog and table_schema = @tableSchema and table_name = @tableName',
+            sql: 'SELECT table_name, COLUMN_NAME, SPANNER_TYPE FROM information_schema.columns WHERE table_catalog = @tableCatalog and table_schema = @tableSchema and table_name = @tableName',
             params: {
                 tableSchema: '',
                 tableCatalog: '',
@@ -119,58 +60,46 @@ class SchemaProvider {
             },
         };
 
-        const pkColumns = await this.primaryKeyColumnsFor(collectionName)
-
         const [rows] = await this.database.run(query);
-        const res = this.recordSetToObj(rows)
+        const res = recordSetToObj(rows)
+
+        if (res.length === 0) {
+            throw new CollectionDoesNotExists('Collection does not exists')
+        }
+
+        return asWixSchema(res.map( this.reformatFields.bind(this) ), collectionName)
+    }
+
+    async drop(collectionName) {
+        await this.updateSchema(`DROP TABLE ${escapeId(collectionName)}`)
+    }
 
 
+    async updateSchema(sql, catching) {
+        try {
+            const [operation] = await this.database.updateSchema([sql])
+
+            await operation.promise();
+        } catch (err) {
+            const e = notThrowingTranslateErrorCodes(err)
+            if (!catching || (catching && !(e instanceof catching))) {
+                throw e
+            }
+        }
+    }
+
+    fixColumn(c) {
+        return Object.assign({}, c, { name: patchFieldName(c.name)})
+    }
+
+    reformatFields(r) {
         return {
-            id: collectionName,
-            fields: res.map(r => ({ name: r['COLUMN_NAME'], type: r['SPANNER_TYPE'], isPrimary: pkColumns.includes(r['COLUMN_NAME']) }))
+            field: unpatchFieldName(r['COLUMN_NAME']),
+            type: this.sqlSchemaTranslator.translateType(r['SPANNER_TYPE']),
         }
-    }
-
-    async primaryKeyColumnsFor(collectionName) {
-        const query = {
-            sql: 'SELECT COLUMN_NAME, CONSTRAINT_NAME, CONSTRAINT_SCHEMA FROM information_schema.CONSTRAINT_COLUMN_USAGE WHERE table_catalog = @tableCatalog and table_schema = @tableSchema and table_name = @tableName',
-            params: {
-                tableSchema: '',
-                tableCatalog: '',
-                tableName: collectionName,
-            },
-        };
-
-        const [rows] = await this.database.run(query);
-        return this.recordSetToObj(rows)
-                   .filter(c => c['CONSTRAINT_NAME'].startsWith('PK_'))
-                   .map(c => c['COLUMN_NAME'])
-    }
-
-    defaultForColumnType(type) {
-        if (type === 'timestamp') {
-            return 'NOT NULL OPTIONS (allow_commit_timestamp=true)'
-        }
-        return ''
-    }
-
-    columnToDbColumnSql(f) {
-        return `?? ${f.type} ${this.defaultForColumnType(f.type)}`
-    }
-
-
-    validateSystemFields(columnName) {
-        if (SystemFields.find(f => f.name === columnName)) {
-            return Promise.reject('ERR: system field')
-        }
-        return Promise.resolve()
-    }
-
-    wildCardWith(n, char) {
-        return Array(n).fill(char, 0, n).join(', ')
     }
 
 }
 
 
-module.exports = {SchemaProvider, SystemFields}
+module.exports = SchemaProvider

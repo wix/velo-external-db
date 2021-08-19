@@ -1,8 +1,8 @@
 const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('velo-external-db-commons').errors
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen, sleep } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance');
-const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit } = require('../resources/provider_resources')
+const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit } = require('../resources/provider_resources')
 const chance = new Chance();
 const { SystemFields, asWixSchema } = require('velo-external-db-commons')
 
@@ -11,6 +11,7 @@ describe('Schema API', () => {
     each([
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
+        ['Spanner', spannerTestEnvInit],
     ]).describe('%s', (name, setup) => {
 
         beforeAll(async () => {
@@ -50,9 +51,9 @@ describe('Schema API', () => {
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
             expect(db).toEqual(asWixSchema([{ field: '_id', type: 'text'},
-                                                               { field: '_createdDate', type: 'datetime'},
-                                                               { field: '_updatedDate', type: 'datetime'},
-                                                               { field: '_owner', type: 'text'}], ctx.collectionName))
+                                                { field: '_createdDate', type: 'datetime'},
+                                                { field: '_updatedDate', type: 'datetime'},
+                                                { field: '_owner', type: 'text'}], ctx.collectionName))
         })
 
         test('drop collection', async () => {

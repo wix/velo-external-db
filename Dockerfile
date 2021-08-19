@@ -17,7 +17,7 @@ COPY packages ./packages/
 COPY lerna.json .
 
 # Install production dependencies of the homemade packages.
-RUN lerna bootstrap --hoist
+RUN lerna bootstrap -- --production  --hoist
 
 # Run velo-external-db service on container startup.
 CMD [  "npm", "--prefix", "packages/velo-external-db", "start" ]

@@ -1,11 +1,10 @@
 const { init } = require('external-db-mysql')
 const compose = require('docker-compose')
 const mysql = require('mysql')
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const { sleep } = require("test-commons")
 
 const connection = () => {
-    return mysql.createPool({
+    const pool = mysql.createPool({
         host     : 'localhost',
         user     : 'test-user',
         password : 'password',
@@ -18,6 +17,7 @@ const connection = () => {
         connectionLimit: 1,
         queueLimit: 0
     });
+    return { pool, cleanup: async () => await pool.end(() => {})}
 }
 
 const cleanup = async () => {
@@ -41,7 +41,7 @@ const shutdownEnv = async () => {
 }
 
 const setActive = () => {
-    process.env.TYPE = 'sql/mysql'
+    process.env.TYPE = 'mysql'
     process.env.HOST = 'localhost'
     process.env.USER = 'test-user'
     process.env.PASSWORD = 'password'
