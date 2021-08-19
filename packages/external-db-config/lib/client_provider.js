@@ -4,16 +4,11 @@ const createExternalDbConfigClient = (vendor) => {
     // create impl from vendor
     // read config
     switch (vendor) {
-        case 'sql/mysql':
-        case 'sql/postgres':
-        case 'azr/mysql':
-        case 'azr/postgres':
+        case 'azr':
             return new ExternalDbConfigClient();
-        case 'aws/mysql':
-        case 'aws/postgres':
+        case 'aws':
             return new ExternalDbConfigClientAWS();
-        case 'gcp/mysql':
-        case 'gcp/postgres':
+        case 'gcp':
             return new ExternalDbConfigClientGCP();
         default:
             throw new Error(`Type variable not supplied or not recognized [${vendor}].`);

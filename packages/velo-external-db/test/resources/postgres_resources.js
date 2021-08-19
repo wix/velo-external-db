@@ -40,7 +40,7 @@ const initEnv = async () => {
 }
 
 const setActive = () => {
-    process.env.TYPE = 'sql/postgres'
+    process.env.TYPE = 'postgres'
     process.env.HOST = 'localhost'
     process.env.USER = 'test-user'
     process.env.PASSWORD = 'password'

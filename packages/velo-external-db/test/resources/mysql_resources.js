@@ -41,7 +41,7 @@ const shutdownEnv = async () => {
 }
 
 const setActive = () => {
-    process.env.TYPE = 'sql/mysql'
+    process.env.TYPE = 'mysql'
     process.env.HOST = 'localhost'
     process.env.USER = 'test-user'
     process.env.PASSWORD = 'password'
