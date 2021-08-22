@@ -1,4 +1,5 @@
 const { escapeId } = require('mysql')
+const { InvalidQuery } = require('velo-external-db-commons').errors
 
 const recordSetToObj = (rows) => rows.map(row => row.toJSON())
 
@@ -16,4 +17,12 @@ const unpatchFieldName = (f) => {
     return f
 }
 
-module.exports = { recordSetToObj, escapeId, patchFieldName, unpatchFieldName }
+const testLiteral = s => /^[a-zA-Z_0-9_]+$/.test(s)
+const validateLiteral = l => {
+    if (!testLiteral(l)) {
+        throw new InvalidQuery(`Invalid literal`)
+    }
+    return `@${l}`
+}
+
+module.exports = { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, testLiteral, validateLiteral }
