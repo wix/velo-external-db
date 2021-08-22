@@ -1,7 +1,7 @@
 const OperationService = require('./operation')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/operation-provider-test-support');
-const { AccessDeniedError, wrongDatabaseError, HostDoesNotExists } = require('../../../velo-external-db-commons')
+const { AccessDeniedError, WrongDatabaseError, HostDoesNotExists } = require('../../../velo-external-db-commons')
 
 describe('Operation Service', () => {
 
@@ -21,7 +21,7 @@ describe('Operation Service', () => {
 
     const env = {
         operationService: Uninitialized,
-        errorsList: [AccessDeniedError, wrongDatabaseError, HostDoesNotExists]
+        errorsList: [AccessDeniedError, WrongDatabaseError, HostDoesNotExists]
     };
 
     beforeEach(() => {

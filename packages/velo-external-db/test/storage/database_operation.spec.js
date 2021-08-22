@@ -1,4 +1,4 @@
-const { AccessDeniedError, wrongDatabaseError, HostDoesNotExists, errors } = require('velo-external-db-commons')
+const { AccessDeniedError, WrongDatabaseError, HostDoesNotExists, errors } = require('velo-external-db-commons')
 const each = require('jest-each').default;
 const mysql = require('../drivers/mysql_db_operations_test_support')
 const postgres = require('../drivers/postgres_db_operations_test_support')
@@ -21,7 +21,7 @@ describe('Check Pool Connection', () => {
             const dbOperation = driver.dbOperationWithMisconfiguredDatabase()
             const validateConnection = await dbOperation.validateConnection()
             expect(validateConnection.valid).toBeFalsy()
-            expect(validateConnection.error).toBeInstanceOf(errors.wrongDatabaseError)
+            expect(validateConnection.error).toBeInstanceOf(errors.WrongDatabaseError)
         })
 
         test('pool connection with wrong host will throw HostDoesNotExists.', async () => {

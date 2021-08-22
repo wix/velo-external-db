@@ -52,7 +52,7 @@ class AccessDeniedError extends BaseHttpError {
         super(message, 401);
     }
 }
-class wrongDatabaseError extends BaseHttpError {
+class WrongDatabaseError extends BaseHttpError {
     constructor(message) {
         super(message, 404);
     }
@@ -64,4 +64,4 @@ class HostDoesNotExists extends BaseHttpError {
 }
 
 module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField, InvalidQuery,
-                   AccessDeniedError, wrongDatabaseError, HostDoesNotExists, CollectionAlreadyExists }
+                   AccessDeniedError, WrongDatabaseError, HostDoesNotExists, CollectionAlreadyExists }
