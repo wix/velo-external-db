@@ -1,13 +1,13 @@
 const { Uninitialized, gen } = require('test-commons')
-const { env, externalDbClientTestAzrInit,externalDbClientTestAwsInit,externalDbClientTestGcpInit,externalDbClientTestNoVendorInit } = require('./resources/resources_provider')
+const { env, externalDbConfigClientTestAzrInit,externalDbConfigClientTestAwsInit,externalDbConfigClientTestGcpInit,externalDbConfigClientTestNoVendorInit } = require('./resources/resources_provider')
 const each = require('jest-each').default
 
-describe('SECRET MANGER', () => {
+describe('External DB config client', () => {
   each([
-    ['Vendor: AZR', externalDbClientTestAzrInit],
-    ['Vendor: AWS', externalDbClientTestAwsInit],
-    ['Vendor: GCP', externalDbClientTestGcpInit],
-    ['Vendor: None', externalDbClientTestNoVendorInit],
+    ['Vendor: AZR', externalDbConfigClientTestAzrInit],
+    ['Vendor: AWS', externalDbConfigClientTestAwsInit],
+    ['Vendor: GCP', externalDbConfigClientTestGcpInit],
+    ['Vendor: None', externalDbConfigClientTestNoVendorInit],
   ]).describe('%s', (name, setup) => {
     afterEach(() => {
       env.driver.restore()

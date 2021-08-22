@@ -1,4 +1,4 @@
-const { ExternalDbConfigClient } = require('./external_db_config_clients')
+const { ExternalDbConfigClient } = require('./external_db_config_client')
 const { AwsSecretProvider } = require('./services/aws_secret_provider')
 const { GcpSecretProvider } = require('./services/gcp_secret_provider')
 const { AzrSecretsProvider } = require('./services/azr_secret_provider')

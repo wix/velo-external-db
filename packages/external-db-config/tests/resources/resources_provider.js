@@ -19,15 +19,15 @@ const externalDbConfigInit = async (vendor, testEnv) => {
 }
 
 
-const externalDbClientTestAzrInit = async () => await externalDbConfigInit('azr', externalDbConfigAzrTestEnv)
-const externalDbClientTestAwsInit = async () => await externalDbConfigInit('aws', externalDbConfigAwsTestEnv)
-const externalDbClientTestGcpInit = async () => await externalDbConfigInit('gcp', externalDbConfigGcpTestEnv)
-const externalDbClientTestNoVendorInit = async () => await externalDbConfigInit('', externalDbConfigNoVendorEnv)
+const externalDbConfigClientTestAzrInit = async () => await externalDbConfigInit('azr', externalDbConfigAzrTestEnv)
+const externalDbConfigClientTestAwsInit = async () => await externalDbConfigInit('aws', externalDbConfigAwsTestEnv)
+const externalDbConfigClientTestGcpInit = async () => await externalDbConfigInit('gcp', externalDbConfigGcpTestEnv)
+const externalDbConfigClientTestNoVendorInit = async () => await externalDbConfigInit('', externalDbConfigNoVendorEnv)
 
 module.exports = {
   env,
-  externalDbClientTestAzrInit,
-  externalDbClientTestAwsInit,
-  externalDbClientTestGcpInit,
-  externalDbClientTestNoVendorInit
+  externalDbConfigClientTestAzrInit,
+  externalDbConfigClientTestAwsInit,
+  externalDbConfigClientTestGcpInit,
+  externalDbConfigClientTestNoVendorInit
 }
