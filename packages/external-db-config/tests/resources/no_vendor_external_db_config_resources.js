@@ -1,3 +1,4 @@
+const { Uninitialized } = require('test-commons')
 
 
 const createDriver = () => {
@@ -18,11 +19,12 @@ const testHelper = {
   serviceFormat: (secret) => {},
   externalDBClientFormat: (secret) => {
     return {
-    host:undefined,
-    user: undefined,
-    password: undefined,
-    db: undefined,
-    secretKey: undefined,
+    host:Uninitialized,
+    user: Uninitialized,
+    password: Uninitialized,
+    db: Uninitialized,
+    secretKey: Uninitialized,
+    cloudSqlConnectionName: Uninitialized
     }
   }
 }
