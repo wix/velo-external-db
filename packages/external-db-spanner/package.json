@@ -21,7 +21,7 @@
     "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
   },
   "scripts": {
-    "test": ""
+    "test": "jest"
   },
   "dependencies": {
     "@google-cloud/spanner": "^5.12.0",
