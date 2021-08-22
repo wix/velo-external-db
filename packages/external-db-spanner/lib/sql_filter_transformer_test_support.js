@@ -50,7 +50,7 @@ const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByC
                                            fieldsStatement: `${groupByColumns.map( patchFieldName ).map( escapeId )}, MAX(${escapeId(patchFieldName(c[0]))}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
                                            groupByColumns: groupByColumns.map( patchFieldName ),
                                            havingFilter: '',
-                                           parameters: [],
+                                           parameters: {},
                                        })
 }
 

@@ -49,10 +49,10 @@ class SchemaColumnTranslator {
                 return 'INT64'
 
             case 'number_float':
+            case 'number_decimal':
                 return 'FLOAT64'
 
             case 'number_double':
-            case 'number_decimal':
                 return 'NUMERIC'
 
             case 'datetime_date':

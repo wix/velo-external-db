@@ -27,7 +27,7 @@ describe('Sql Schema Column Translator', () => {
             })
 
             test('decimal generic', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'decimal' }) ).toEqual(`${escapeId(ctx.fieldName)} NUMERIC`)
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'decimal' }) ).toEqual(`${escapeId(ctx.fieldName)} FLOAT64`)
             })
         })
 

@@ -9,7 +9,7 @@ describe('Data API', () => {
     each([
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
-        // ['Spanner', spannerTestEnvInit],
+        ['Spanner', spannerTestEnvInit],
     ]).describe('%s', (name, setup) => {
 
         beforeAll(async () => {
