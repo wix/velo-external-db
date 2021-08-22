@@ -32,10 +32,9 @@ const initEnv = async () => {
     await compose.upOne('spanner', { cwd: __dirname, log: true })
     // await compose.logs('spanner', { cwd: __dirname, log: true });
 
-    await sleep( 1000 )
+    await sleep( 500 )
 
     await cleanup()
-    await sleep( 1000 )
 }
 
 const setActive = () => {
