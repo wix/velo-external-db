@@ -9,14 +9,14 @@ const createDriver = () => {
   const driver = {
     stubSecret: (secret) => mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(secret) }),
     stubBrokenSecret: (secret) => {
-      const { deletedKey, newObject: newSecret } = gen.deleteRandomKeyObject(secret)
-      mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(newSecret) })
-      return { deletedKey, newSecret }
+      const { deletedKey, newObject: brokenSecret } = gen.deleteRandomKeyObject(secret)
+      mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(brokenSecret) })
+      return { deletedKey, brokenSecret }
     },
     stubSecretWithEmptyField: (secret) => {
-      const { clearedKey, newObject: newSecret } = gen.clearRandomKeyObject(secret)
-      mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(newSecret) })
-      return { clearedKey, newSecret: secret }
+      const { clearedKey, newObject: brokenSecret } = gen.clearRandomKeyObject(secret)
+      mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(brokenSecret) })
+      return { clearedKey, brokenSecret }
     },
     restore: () => {
       mockedAwsSdk.reset()
@@ -26,27 +26,25 @@ const createDriver = () => {
   return driver
 }
 
-const testHelper = () => {
-  return {
-    serviceFormat: (secret) => {
-      secret.host = secret.HOST
-      secret.username = secret.USER
-      secret.password = secret.PASSWORD
+const testHelper = {
+  serviceFormat: (secret) => {
+    secret.host = secret.HOST
+    secret.username = secret.USER
+    secret.password = secret.PASSWORD
 
-      delete secret.HOST
-      delete secret.USER
-      delete secret.PASSWORD
+    delete secret.HOST
+    delete secret.USER
+    delete secret.PASSWORD
 
-      return secret
-    },
-    secretClientFormat: (secret) => {
-      const formattedSecret = lowercaseObjectKeys(secret)
-      formattedSecret.secretKey = formattedSecret.secret_key
-      formattedSecret.user = formattedSecret.username
-      delete formattedSecret.secret_key
-      delete formattedSecret.username
-      return formattedSecret
-    }
+    return secret
+  },
+  externalDBClientFormat: (secret) => {
+    const formattedSecret = lowercaseObjectKeys(secret)
+    formattedSecret.secretKey = formattedSecret.secret_key
+    formattedSecret.user = formattedSecret.username
+    delete formattedSecret.secret_key
+    delete formattedSecret.username
+    return formattedSecret
   }
 }
 
