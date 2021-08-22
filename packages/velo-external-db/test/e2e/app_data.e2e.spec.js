@@ -12,8 +12,6 @@ const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 });
 
-//todo: Spanner.numeric('104500'),
-
 describe('Velo External DB Data REST API',  () => {
     each([
         ['MySql', mysqlTestEnvInit],

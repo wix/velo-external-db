@@ -52,10 +52,21 @@ class DataProvider {
                      }, {})
     }
 
+    fixDates(value) {
+        if (value instanceof Date) {
+            // todo: fix this hack !!!
+            const date = value.toISOString()
+            const date2 = `${date.substring(0, date.lastIndexOf('.') + 4)}${date.slice(-1)}`
+            return new Date(date2)
+        }
+        return value
+
+    }
+
     asEntity(dbEntity) {
         return Object.keys(dbEntity)
                      .reduce(function (obj, key) {
-                         return { ...obj, [unpatchFieldName(key)]: dbEntity[key] }
+                         return { ...obj, [unpatchFieldName(key)]: this.fixDates(dbEntity[key]) }
                      }.bind(this), {})
     }
 
