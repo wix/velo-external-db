@@ -1,19 +1,21 @@
-const {Pool} = require('pg')
-const { DatabaseOperations } = require('external-db-postgres')
+const mysql = require('mysql')
+const DatabaseOperations = require('./mysql_operations')
 
 const createPool = modify => {
     const config = {
-        host: 'localhost',
-        user: 'test-user',
-        password: 'password',
-        database: 'test-db',
-        port: 5432,
+        host     : 'localhost',
+        user     : 'test-user',
+        password : 'password',
+        database : 'test-db',
 
-        max: 1,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
+        waitForConnections: true,
+        namedPlaceholders: true,
+        multipleStatements: true,
+
+        connectionLimit: 1,
+        queueLimit: 0,
     }
-    return new Pool(Object.assign({}, config, modify ))
+    return mysql.createPool(Object.assign({}, config, modify ))
 }
 
 const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ))
@@ -24,8 +26,9 @@ const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool
 
 const dbOperationWithValidDB = () => {
     const connection = createPool({ } )
-    const dbOperations = new DatabaseOperations(connection)
-    return {dbOperations, cleanup: async () => await connection.end(() => {})}
+    const dbOperations = new DatabaseOperations( connection )
+
+    return { dbOperations, cleanup: async () => await connection.end(() => {})}
 }
 
 module.exports = {

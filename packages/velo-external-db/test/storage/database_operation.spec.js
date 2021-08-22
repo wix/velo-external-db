@@ -1,19 +1,22 @@
-const { AccessDeniedError, wrongDatabaseError, HostDoesNotExists, errors } = require('velo-external-db-commons')
+const { errors } = require('velo-external-db-commons')
 const each = require('jest-each').default;
-const mysql = require('../drivers/mysql_db_operations_test_support')
-const postgres = require('../drivers/postgres_db_operations_test_support')
-const spanner = require('../drivers/spanner_db_operations_test_support')
+const { env, postgresTestEnvInit, mysqlTestEnvInit, spannerTestEnvInit } = require('../resources/operations_resources')
 
 
 describe('Check Pool Connection', () => {
     each([
-        ['MySql', mysql],
-        ['Postgres', postgres],
-        // ['Spanner', spanner],
-    ]).describe('%s', (dbType, driver) => {
+        ['MySql', mysqlTestEnvInit],
+        ['Postgres', postgresTestEnvInit],
+        // ['Spanner', spannerTestEnvInit],
+    ]).describe('%s', (dbType, setup) => {
+
+        beforeAll(async () => {
+            setup()
+        })
+
 
         test('pool connection with wrong password will throw AccessDeniedError.', async () => {
-            const dbOperation = driver.dbOperationWithMisconfiguredPassword()
+            const dbOperation = env.driver.dbOperationWithMisconfiguredPassword()
 
             const validateConnection = await dbOperation.validateConnection()
 
@@ -22,7 +25,7 @@ describe('Check Pool Connection', () => {
         })
 
         test('pool connection with wrong database will throw DatabaseDoesNotExists.', async () => {
-            const dbOperation = driver.dbOperationWithMisconfiguredDatabase()
+            const dbOperation = env.driver.dbOperationWithMisconfiguredDatabase()
 
             const validateConnection = await dbOperation.validateConnection()
 
@@ -31,7 +34,7 @@ describe('Check Pool Connection', () => {
         })
 
         test('pool connection with wrong host will throw HostDoesNotExists.', async () => {
-            const dbOperation = driver.dbOperationWithMisconfiguredHost()
+            const dbOperation = env.driver.dbOperationWithMisconfiguredHost()
 
             const validateConnection = await dbOperation.validateConnection()
 
@@ -40,7 +43,7 @@ describe('Check Pool Connection', () => {
         })
 
         test('pool connection with valid DB will not throw', async () => {
-            const { dbOperations, cleanup } = driver.dbOperationWithValidDB()
+            const { dbOperations, cleanup } = env.driver.dbOperationWithValidDB()
 
             const validateConnection = await dbOperations.validateConnection()
 
