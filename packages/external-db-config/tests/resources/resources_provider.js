@@ -1,31 +1,33 @@
-const { Uninitialized } = require('test-commons');
-const { ExternalDbConfigClient, ExternalDbConfigClientAWS, ExternalDbConfigClientAzure, ExternalDbConfigClientGCP } = require('../../lib/external_db_config_clients');
-
-const secretMangerAwsTestEnv = require ("./aws_external_db_config_resources");
-const secretMangerTestEnv = require("./external_db_config_resources");
-const secretMangerGCPTestEnv = require("./gcp_external_db_config_resources");
+const { Uninitialized } = require('test-commons')
+const { createExternalDbConfigClient } = require('../../lib/client_provider')
+const externalDbConfigAwsTestEnv = require('./aws_external_db_config_resources')
+const externalDbConfigAzrTestEnv = require('./azr_external_db_config_resources')
+const externalDbConfigGcpTestEnv = require('./gcp_external_db_config_resources')
+const externalDbConfigNoVendorEnv = require('./no_vendor_external_db_config_resources');
 
 const env = {
-    secretClient: Uninitialized,
-    driver: Uninitialized,
-    testHelper: Uninitialized,
+  externalDbConfigClient: Uninitialized,
+  driver: Uninitialized,
+  testHelper: Uninitialized
 }
 
-const secretMangerInit = async (impl,testEnv) => {
-    env.secretClient = new impl();
-    env.driver = testEnv.createDriver();
-    env.testHelper = testEnv.testHelper();
+const externalDbConfigInit = async (vendor, testEnv) => {
+  env.externalDbConfigClient = createExternalDbConfigClient(vendor)
+  env.driver = testEnv.createDriver()
+  env.testHelper = testEnv.testHelper
+  process.env.TYPE = 'mysql'
 }
 
 
-const secretMangerTestEnvInit = async () => await secretMangerInit(ExternalDbConfigClient,secretMangerTestEnv);
-const secretMangerTestAWSEnvInit = async () => await secretMangerInit(ExternalDbConfigClientAWS,secretMangerAwsTestEnv);
-const secretMangerTestGCPEnvInit = async () => await secretMangerInit(ExternalDbConfigClientGCP,secretMangerGCPTestEnv);
-
+const externalDbClientTestAzrInit = async () => await externalDbConfigInit('azr', externalDbConfigAzrTestEnv)
+const externalDbClientTestAwsInit = async () => await externalDbConfigInit('aws', externalDbConfigAwsTestEnv)
+const externalDbClientTestGcpInit = async () => await externalDbConfigInit('gcp', externalDbConfigGcpTestEnv)
+const externalDbClientTestNoVendorInit = async () => await externalDbConfigInit('', externalDbConfigNoVendorEnv)
 
 module.exports = {
-    env,
-    secretMangerTestEnvInit,
-    secretMangerTestAWSEnvInit,
-    secretMangerTestGCPEnvInit,
+  env,
+  externalDbClientTestAzrInit,
+  externalDbClientTestAwsInit,
+  externalDbClientTestGcpInit,
+  externalDbClientTestNoVendorInit
 }

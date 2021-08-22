@@ -1,19 +1,22 @@
-const { ExternalDbConfigClient, ExternalDbConfigClientAWS, ExternalDbConfigClientGCP } = require('./external_db_config_clients')
+const { ExternalDbConfigClient } = require('./external_db_config_clients')
+const { AwsSecretProvider } = require('./services/aws_secret_provider')
+const { GcpSecretProvider } = require('./services/gcp_secret_provider')
+const { AzrSecretsProvider } = require('./services/azr_secret_provider')
 
 const createExternalDbConfigClient = (vendor) => {
-    // create impl from vendor
-    // read config
-    switch (vendor) {
-        case 'azr':
-            return new ExternalDbConfigClient();
-        case 'aws':
-            return new ExternalDbConfigClientAWS();
-        case 'gcp':
-            return new ExternalDbConfigClientGCP();
-        default:
-            throw new Error(`Type variable not supplied or not recognized [${vendor}].`);
-    }
+  switch (vendor) {
+    case 'aws':
+      const awsSecretProvider = new AwsSecretProvider()
+      return new ExternalDbConfigClient(awsSecretProvider)
+    case 'gcp':
+      const gcpSecretProvider = new GcpSecretProvider()
+      return new ExternalDbConfigClient(gcpSecretProvider)
+    case 'azr':
+      const azrSecretsProvider = new AzrSecretsProvider()
+      return new ExternalDbConfigClient(azrSecretsProvider)
+    default:
+      return new ExternalDbConfigClient()
+  }
 }
 
-module.exports = { createExternalDbConfigClient };
-
+module.exports = { createExternalDbConfigClient }
