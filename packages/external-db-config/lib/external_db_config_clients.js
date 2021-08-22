@@ -7,12 +7,12 @@ const createEmptyConfig = () => ({
   secretKey: undefined
 })
 class ExternalDbConfigClient {
-  constructor (vendor) {
+  constructor (secretProvider) {
     this.config = createEmptyConfig()
     this.missingRequiredSecretsKeys = []
-    this.secretsProvider = vendor
+    this.secretsProvider = secretProvider
 
-    if (!vendor) {
+    if (!secretProvider) {
       this.missingRequiredSecretsKeys = ['CLOUD_VENDOR']
     }
   }
@@ -23,7 +23,7 @@ class ExternalDbConfigClient {
     }
 
     this.config = await this.secretsProvider.getSecrets()
-    this.missingRequiredSecretsKeys  = this.secretsProvider.validateSecrets(this.config)
+    this.missingRequiredSecretsKeys = this.secretsProvider.validateSecrets()
 
     return this.config
   }
