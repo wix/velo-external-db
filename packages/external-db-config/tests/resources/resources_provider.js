@@ -15,6 +15,7 @@ const externalDbConfigInit = async (vendor, testEnv) => {
   env.externalDbConfigClient = createExternalDbConfigClient(vendor)
   env.driver = testEnv.createDriver()
   env.testHelper = testEnv.testHelper
+  process.env.TYPE = 'mysql'
 }
 
 
