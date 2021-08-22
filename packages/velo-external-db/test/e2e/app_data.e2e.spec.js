@@ -4,7 +4,7 @@ const data = require('../drivers/data_api_rest_test_support');
 const { auth } = require('../drivers/auth_test_support')
 const Chance = require('chance')
 const each = require('jest-each').default
-const { initApp, teardownApp, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit} = require('../resources/e2e_resources')
+const { initApp, teardownApp, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit} = require('../resources/e2e_resources')
 
 const chance = Chance();
 
@@ -12,10 +12,13 @@ const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 });
 
+//todo: Spanner.numeric('104500'),
+
 describe('Velo External DB Data REST API',  () => {
     each([
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
+        // ['Spanner', spannerTestEnvInit],
     ]).describe('%s', (name, setup) => {
         beforeAll(async () => {
             await setup()

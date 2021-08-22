@@ -15,7 +15,7 @@ const connection = () => {
 }
 
 const cleanup = async () => {
-    const {schemaProvider, cleanup} = init(['test-project', 'test-instance', 'test-database'])
+    const {schemaProvider, cleanup} = init(['test-instance', 'test-project', '', 'test-database'])
     const res = await schemaProvider.list()
     const tables = res.map(t => t.id)
 
@@ -32,17 +32,17 @@ const initEnv = async () => {
     await compose.upOne('spanner', { cwd: __dirname, log: true })
     // await compose.logs('spanner', { cwd: __dirname, log: true });
 
-    await sleep( 1000 )
+    await sleep( 5000 )
 
     await cleanup()
 }
 
 const setActive = () => {
-    process.env.TYPE = 'sql/spanner'
-    // process.env.HOST = 'localhost'
-    // process.env.USER = 'test-user'
-    // process.env.PASSWORD = 'password'
-    // process.env.DB = 'test-db'
+    process.env.TYPE = 'spanner'
+    process.env.HOST = 'test-instance'
+    process.env.USER = 'test-project'
+    process.env.PASSWORD = 'ignore'
+    process.env.DB = 'test-database'
 }
 
 const shutdownEnv = async () => {

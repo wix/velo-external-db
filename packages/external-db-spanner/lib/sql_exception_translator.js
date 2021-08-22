@@ -1,5 +1,7 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, AccessDeniedError, WrongDatabaseError,
     HostDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
+const { isDatabaseNotFoundError } = require('@google-cloud/spanner').SessionPool
+
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {
@@ -10,22 +12,25 @@ const notThrowingTranslateErrorCodes = err => {
                 return new CollectionAlreadyExists(err.details)
             }
         case 5:
+            console.log(isDatabaseNotFoundError)
+            console.log(err.details)
             if (err.details.includes('Column')) {
                 return new FieldDoesNotExist(err.details/*'Collection does not contain a field with this name'*/)
+            } else if (err.details.includes('Instance')) {
+
+
+                return new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.details} `)
+            } else if (err.details.includes('Database')) {
+                return new WrongDatabaseError(`Database does not exists or you don\'t have access to it, sql message: ${err.details}`)
+            } else if (err.details.includes('Table')) {
+                return new CollectionDoesNotExists(err.details)
             } else {
-                return new CollectionDoesNotExists(err.details/*'Collection does not exists'*/)
+                console.log(err)
+                return new Error(`default ${err.details}`)
             }
-            // console.log(err)
-        // case 'ER_CANT_DROP_FIELD_OR_KEY':
-        // case 'ER_DUP_FIELDNAME':
-        //     return new FieldAlreadyExists('Collection already has a field with the same name')
-        // case 'ER_NO_SUCH_TABLE':
-        // case 'ER_DBACCESS_DENIED_ERROR':
-        // case 'ER_BAD_DB_ERROR':
+
         //     return new WrongDatabaseError(`Database does not exists or you don\'t have access to it, sql message: ${err.sqlMessage}`)
-        // case 'ER_ACCESS_DENIED_ERROR':
         //     return new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.sqlMessage} `)
-        // case 'ENOTFOUND':
         //     return new HostDoesNotExists('Database host does not found.')
         default :
             console.log(err)
