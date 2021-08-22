@@ -12,13 +12,9 @@ const notThrowingTranslateErrorCodes = err => {
                 return new CollectionAlreadyExists(err.details)
             }
         case 5:
-            console.log(isDatabaseNotFoundError)
-            console.log(err.details)
             if (err.details.includes('Column')) {
-                return new FieldDoesNotExist(err.details/*'Collection does not contain a field with this name'*/)
+                return new FieldDoesNotExist(err.details)
             } else if (err.details.includes('Instance')) {
-
-
                 return new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.details} `)
             } else if (err.details.includes('Database')) {
                 return new WrongDatabaseError(`Database does not exists or you don\'t have access to it, sql message: ${err.details}`)
