@@ -1,6 +1,6 @@
 const compose = require('docker-compose')
 const { Spanner } = require('@google-cloud/spanner')
-// const { init } = require('external-db-spanner')
+const { init } = require('external-db-spanner')
 const { sleep } = require('test-commons')
 
 const connection = () => {
@@ -11,15 +11,19 @@ const connection = () => {
     const spanner = new Spanner({projectId: projectId})
     const instance = spanner.instance(instanceId);
     const pool = instance.database(databaseId);
-    return { pool, cleanup: () => {}}
+    return { pool, cleanup: async () => await pool.close()}
 }
 
 const cleanup = async () => {
-    // const {schemaProvider, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'])
-    // const tables = await schemaProvider.list()
-    // await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
-    //
-    // await cleanup();
+    const {schemaProvider, cleanup} = init(['test-project', 'test-instance', 'test-database'])
+    const res = await schemaProvider.list()
+    const tables = res.map(t => t.id)
+
+    for (const t of tables) {
+        await schemaProvider.drop(t)
+    }
+
+    await cleanup();
 }
 
 const initEnv = async () => {
@@ -30,7 +34,8 @@ const initEnv = async () => {
 
     await sleep( 1000 )
 
-    // await cleanup()
+    await cleanup()
+    await sleep( 1000 )
 }
 
 const setActive = () => {
