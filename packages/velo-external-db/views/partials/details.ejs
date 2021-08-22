@@ -1,14 +1,68 @@
-<div class="details">
-	<h3>Endpoint URL: </h3>
-	<p class="next">
-		<%= host %>
-	</p>
-	<h3>DB name: </h3>
-	<p class="next">
-		<%= database %>
-	</p>
-	<h3>Status: </h3>
-	<p class="next">
-		<%= STATUS %>
-	</p>
+<style>
+	.list-group {
+		width: auto;
+		max-width: 650px;
+		margin: 20rem auto;
+	}
+</style>
+
+
+<%
+let itemColor =  STATUS === 'Connected to database successfully' ? 'success': 'danger'
+%>
+
+
+<div class="list-group">
+	<a href="#" class="list-group-item list-group-item-action d-flex gap-3   py-3" aria-current="true">
+		<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-diagram-3"
+			viewBox="0 0 16 16">
+			<path fill-rule="evenodd"
+				d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z" />
+		</svg>
+		<div class="d-flex gap-2 w-100 justify-content-between">
+			<div>
+				<h6 class="mb-0">Database endpoint</h6>
+				<p class="mb-0 opacity-75">
+					<%= host %>
+				</p>
+			</div>
+		</div>
+	</a>
+
+	<a href="#" class="list-group-item list-group-item-action d-flex gap-3   py-3" aria-current="true">
+		<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-hdd-stack"
+			viewBox="0 0 16 16">
+			<path
+				d="M14 10a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1h12zM2 9a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2H2z" />
+			<path
+				d="M5 11.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-2 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zM14 3a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2 2a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2z" />
+			<path d="M5 4.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-2 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" />
+		</svg>
+		<div class="d-flex gap-2 w-100 justify-content-between">
+			<div>
+				<h6 class="mb-0">Database name</h6>
+				<p class="mb-0 opacity-75">
+					<%= database %>
+				</p>
+			</div>
+		</div>
+	</a>
+
+	<a href="#" class="list-group-item list-group-item-action list-group-item-<%=itemColor%>  d-flex gap-3   py-3"
+		aria-current="true">
+		<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-info-circle"
+			viewBox="0 0 16 16">
+			<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+			<path
+				d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+		</svg>
+		<div class="d-flex gap-2 w-100 justify-content-between">
+			<div>
+				<h6 class="mb-0">Connection status</h6>
+				<p class="mb-0 opacity-75">
+					<%= STATUS %>
+				</p>
+			</div>
+		</div>
+	</a>
 </div>
