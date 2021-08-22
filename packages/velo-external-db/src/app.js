@@ -1,6 +1,5 @@
 const express = require('express')
 const path = require('path')
-const bodyParser = require('body-parser')
 const compression = require('compression')
 const { DataService, SchemaService, OperationService } = require('velo-external-db-core')
 const { init } = require('./storage/factory')
@@ -29,7 +28,7 @@ load().then(({ secretKey}) => {
     const app = express()
 
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
-    app.use(bodyParser.json())
+    app.use(express.json())
     app.use(unless(['/', '/provision'], authMiddleware({ secretKey: secretKey })));
     app.use(compression())
     app.set('view engine', 'ejs');
