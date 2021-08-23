@@ -15,7 +15,7 @@ const notThrowingTranslateErrorCodes = err => {
         case 'ER_ACCESS_DENIED_ERROR':
             return new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.sqlMessage} `)
         case 'ENOTFOUND':
-            return new HostDoesNotExists('Database host does not found.')
+            return new AccessDeniedError('Database host does not found.')
         default :
             return new Error(`default ${err.sqlMessage}`)
     }

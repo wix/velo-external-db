@@ -6,17 +6,9 @@ class DatabaseOperations {
     }
 
     async validateConnection() {
-        // try {
-        //
-        //     return await this.database.run({ sql: 'SELECT 1' })
-        //                               .then(() => { return { valid: true } })
-        //                               .catch((e) => { return { valid: false, error: notThrowingTranslateErrorCodes(e) } })
-        // } catch (e) {
-        //
-        //     console.log('WTF !!!')
-        //     return { valid: false, error: notThrowingTranslateErrorCodes(e) }
-        // }
-        return { valid: true }
+        return await this.database.run({ sql: 'SELECT 1' })
+                         .then(() => { return { valid: true } })
+                         .catch((e) => { return { valid: false, error: notThrowingTranslateErrorCodes(e) } })
     }
     config() {
         // const config = Object.assign({}, this.database.options)

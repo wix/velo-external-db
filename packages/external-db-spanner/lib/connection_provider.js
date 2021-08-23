@@ -4,15 +4,17 @@ const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./spanner_operations')
 const { Spanner } = require('@google-cloud/spanner')
 
-const init = ([host,user,password,db]) => {
+const init = ([host,user,password,db], _poolOptions) => {
     const projectId = user
     const instanceId = host
     const databaseId = db
 
     const spanner = new Spanner({projectId: projectId})
     const instance = spanner.instance(instanceId)
-    // todo: investigate SessionPoolOptions
-    const database = instance.database(databaseId)
+
+    const poolOptions = _poolOptions || { }
+
+    const database = instance.database(databaseId, poolOptions)
 
     const databaseOperations = new DatabaseOperations(database)
 

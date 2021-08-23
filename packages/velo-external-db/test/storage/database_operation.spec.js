@@ -7,13 +7,12 @@ describe('Check Pool Connection', () => {
     each([
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
-        // ['Spanner', spannerTestEnvInit],
+        ['Spanner', spannerTestEnvInit],
     ]).describe('%s', (dbType, setup) => {
 
         beforeAll(async () => {
             setup()
         })
-
 
         test('pool connection with wrong password will throw AccessDeniedError.', async () => {
             const dbOperation = env.driver.dbOperationWithMisconfiguredPassword()
@@ -39,7 +38,7 @@ describe('Check Pool Connection', () => {
             const validateConnection = await dbOperation.validateConnection()
 
             expect(validateConnection.valid).toBeFalsy()
-            expect(validateConnection.error).toBeInstanceOf(errors.HostDoesNotExists)
+            expect(validateConnection.error).toBeInstanceOf(errors.AccessDeniedError)
         })
 
         test('pool connection with valid DB will not throw', async () => {
