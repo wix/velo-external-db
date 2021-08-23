@@ -31,6 +31,13 @@ class ExternalDbConfigClient {
 
     return this.config
   }
+
+  getConfig() {
+    const config = Object.assign({}, this.config)
+    if (config.password) config.password = '*********'
+    if (config.secretKey) config.secretKey = '*********'
+    return config
+  }
 }
 
 module.exports = { ExternalDbConfigClient }

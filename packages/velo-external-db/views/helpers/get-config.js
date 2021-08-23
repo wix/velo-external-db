@@ -3,7 +3,8 @@ const getConfig = async (operationService, externalDbConfigClient) => {
     const connectionStatus = await operationService.connectionStatus()
     return {
         CONFIG_STATUS: configStatus,
-        CONNECTION_STATUS: connectionStatus.error || connectionStatus.STATUS
+        CONFIG: externalDbConfigClient.getConfig(),
+        CONNECTION_STATUS: connectionStatus.error || connectionStatus.STATUS 
     }
 }
 

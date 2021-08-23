@@ -11,10 +11,15 @@
 const connectionColor =  CONNECTION_STATUS === 'Connected to database successfully' ? 'success': 'danger' 
 const configStatusColor = CONFIG_STATUS === 'External DB read successfully' ? 'success' : 'danger'
 %>
-
+<script>
+	function toggleConfigDisplay() {
+	  let config = document.getElementById("config");
+	  config.style.display === "none" ? config.style.display = "block " : config.style.display = "none";
+	}
+</script>
 
 <div class="list-group">
-	<a href="#" class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=configStatusColor%> py-3" aria-current="true">
+	<button onclick="toggleConfigDisplay()" href="#" class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=configStatusColor%> py-3" aria-current="true">
 		<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
 			<path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
 		  </svg>
@@ -26,7 +31,14 @@ const configStatusColor = CONFIG_STATUS === 'External DB read successfully' ? 's
 				</p>
 			</div>
 		</div>
-	</a>
+	</button>
+	<div id="config" aria-current="true" style="padding: 1px 15%; display:none">
+		<li>host : <%= CONFIG.host || CONFIG.cloudSqlConnectionName %></li>
+		<li>user: <%= CONFIG.user  %></li>
+		<li>password: <%= CONFIG.password %></li>
+		<li>db: <%= CONFIG.db %></li>
+		<li>secretKey: <%= CONFIG.secretKey %></li>
+	</div>
 
 	<a href="#" class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=connectionColor%> py-3" aria-current="true"> 
 		<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-hdd-stack"
