@@ -3,19 +3,24 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
 <html lang=en>
 	<%- include("partials/header.ejs") %>
+
+<%
+const img =  CONNECTION_STATUS === 'Connected to database successfully' ? '/assets/wix-logo.svg': '/assets/sad-wix.svg' 
+%>
+
 <body>
 	
 	<div class="container">
 		<div class="hero">
 			<div style="text-align:center;">
-
+				<picture>
+					<source srcset="/assets/celebration-dark.svg" 
+						media="(prefers-color-scheme: dark)">
+					<img src=<%=img%> width="427" height="231">
+				</picture>
 			</div>
-
-
 		</div>
-
 		<%- include("partials/details.ejs") %>
-
 	</div>
 </body>
 
