@@ -1,6 +1,6 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const {escapeId} = require("mysql");
+const {escapeId} = require('mysql');
 
 const filterParser = {
     transform: jest.fn(),

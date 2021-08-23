@@ -1,6 +1,6 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const { escapeIdentifier } = require('./postgres_utils')
+const { escapeIdentifier } = require('../../lib/postgres_utils')
 
 const filterParser = {
     transform: jest.fn(),
