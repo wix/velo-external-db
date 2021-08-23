@@ -9,7 +9,7 @@ const init = async(type, vendor) => {
     switch ( type ) {
         case 'mysql':{
             const { init } = require('external-db-mysql')
-            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey)
+            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey, externalDbConfigClient)
         }
         case 'postgres': {
             const { init } = require('external-db-postgres')
