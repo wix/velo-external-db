@@ -1,6 +1,6 @@
 const { createExternalDbConfigClient } = require("external-db-config")
 
-const append = (res, secretKey) => Object.assign({}, res, {secretKey: secretKey})
+const append = (res, secretKey, externalDbConfigClient) => Object.assign({}, res, {secretKey: secretKey}, {externalDbConfigClient:externalDbConfigClient})
 
 const init = async(type, vendor) => {
     const externalDbConfigClient = createExternalDbConfigClient(vendor);
@@ -14,7 +14,7 @@ const init = async(type, vendor) => {
         case 'postgres': {
             const { init } = require('external-db-postgres')
 
-            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey)
+            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey, externalDbConfigClient)
         }
         case 'spanner': {
             const { init } = require('external-db-spanner')

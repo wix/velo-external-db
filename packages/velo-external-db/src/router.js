@@ -1,12 +1,14 @@
 const express = require('express')
 const { errorMiddleware } = require('./web/error-middleware')
+const { getConfig } = require ('../views/helpers/get-config')
 
-let dataService, schemaService, operationService
+let dataService, schemaService, operationService, externalDbConfigClient
 
-const initServices = (_dataService, _schemaService, _operationService) => {
+const initServices = (_dataService, _schemaService, _operationService, _externalDbConfigClient) => {
     dataService = _dataService
     schemaService = _schemaService
     operationService = _operationService
+    externalDbConfigClient = _externalDbConfigClient
 }
 
 const createRouter = () => {
@@ -14,8 +16,8 @@ const createRouter = () => {
 
     // *************** INFO **********************
     router.get('/', async (req, res) => {
-        const connectionStatus = await operationService.connectionStatus()
-        res.render(connectionStatus.error ? 'error' : 'index', connectionStatus);
+        const connectionStatus = await getConfig(operationService, externalDbConfigClient)
+        res.render('index', connectionStatus);
     })
 
     router.post('/provision', (req, res) => {

@@ -14,11 +14,11 @@ const vendor = process.env.CLOUD_VENDOR
 
 const load = async () => {
     const adapterType = process.env.TYPE
-    const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey } = await init(adapterType, vendor)
+    const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey, externalDbConfigClient } = await init(adapterType, vendor)
     const operationService = new OperationService(databaseOperations)
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)
-    initServices(dataService, schemaService, operationService)
+    initServices(dataService, schemaService, operationService, externalDbConfigClient)
     _cleanup = cleanup
     return { secretKey }
 }
@@ -29,7 +29,7 @@ load().then(({ secretKey}) => {
 
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(express.json())
-    app.use(unless(['/', '/provision'], authMiddleware({ secretKey: secretKey })));
+    app.use(unless(['/', '/provision','/favicon.ico'], authMiddleware({ secretKey: secretKey })));
     app.use(compression())
     app.set('view engine', 'ejs');
 
