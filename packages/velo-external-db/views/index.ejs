@@ -1,25 +1,34 @@
 <!doctype html>
 <html lang=en>
-	<%- include("partials/header.ejs") %>
+<head>
+	<meta charset=utf-8>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Velo External DB</title>
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="preload" as="font">
+	<link type="image/png" href="https://www.wix.com/favicon.ico" rel="shortcut icon">
+    <link rel='stylesheet' href='/assets/stylesheets/style.css' />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+</head>
+
+
+<%
+const img =  CONNECTION_STATUS === 'Connected to database successfully' ? '/assets/wix-logo.svg': '/assets/sad-wix.svg' 
+%>
 
 <body>
+
 	<div class="container">
 		<div class="hero">
 			<div style="text-align:center;">
 				<picture>
-					<source srcset="/assets/celebration-dark.svg" alt="A group celebrating"
+					<source srcset="/assets/celebration-dark.svg" 
 						media="(prefers-color-scheme: dark)">
-					<img src="/assets/celebration.svg" alt="A group celebrating" width="427" height="231">
+					<img src=<%=img%> width="427" height="231">
 				</picture>
 			</div>
-
-			<div class="message">
-				<h1>It's running!</h1>
-			</div>
 		</div>
-
 		<%- include("partials/details.ejs") %>
-
 	</div>
 </body>
 

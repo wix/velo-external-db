@@ -31,6 +31,17 @@ class ExternalDbConfigClient {
 
     return this.config
   }
+
+  getConfig() {
+    const config = Object.assign({}, this.config)
+    if (config.password) config.password = '*********'
+    if (config.secretKey) config.secretKey = '*********'
+    return config
+  }
+
+  configStatus() {
+    return this.missingRequiredSecretsKeys.length ? `Missing props: ${this.missingRequiredSecretsKeys}` : 'External DB Config read successfully'
+  }
 }
 
 module.exports = { ExternalDbConfigClient }
