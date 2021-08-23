@@ -1,7 +1,4 @@
 const {Uninitialized} = require('test-commons');
-const postgresTestEnv = require('../resources/postgres_resources');
-const mysqlTestEnv = require('../resources/mysql_resources');
-const spannerTestEnv = require('../resources/spanner_resources');
 const mysql = require('external-db-mysql')
 const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')
