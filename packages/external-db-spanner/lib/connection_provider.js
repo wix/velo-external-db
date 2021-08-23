@@ -10,6 +10,14 @@ const init = ([host,user,password,db], _poolOptions) => {
     const databaseId = db
 
     const spanner = new Spanner({projectId: projectId})
+    /*
+    todo: fix connection issues
+    password = private_key
+    client_email = ???
+        client_email: serviceAccount.client_email,
+        private_key: serviceAccount.private_key,
+        projectId: serviceAccount.project_id,
+     */
     const instance = spanner.instance(instanceId)
 
     const poolOptions = _poolOptions || { }
