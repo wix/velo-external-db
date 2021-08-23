@@ -7,10 +7,6 @@ const init = async(type, vendor) => {
     const { host, user, password, db, cloudSqlConnectionName, secretKey } = await externalDbConfigClient.readConfig();
     console.log(`INIT: ${vendor + '/' + type}`)
     switch ( type ) {
-        case 'mysql':{
-            const { init } = require('external-db-mysql')
-            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey, externalDbConfigClient)
-        }
         case 'postgres': {
             const { init } = require('external-db-postgres')
 
@@ -19,8 +15,14 @@ const init = async(type, vendor) => {
         case 'spanner': {
             const { init } = require('external-db-spanner')
 
-            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey)
+            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey, externalDbConfigClient)
         }
+        default:
+            case 'mysql':{
+                console.log(`INIT: ${vendor + '/' + type}`)
+                const { init } = require('external-db-mysql')
+                return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey, externalDbConfigClient)
+            }
 
     }
 }
