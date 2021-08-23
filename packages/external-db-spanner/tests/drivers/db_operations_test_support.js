@@ -1,4 +1,4 @@
-const { init } = require('external-db-spanner')
+const init = require('../../lib/connection_provider')
 
 const createPool = modify => {
     const config = {
