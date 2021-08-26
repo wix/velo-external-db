@@ -6,9 +6,8 @@ services:
       - 8082:8082
 #    environment:
 #      - FIRESTORE_PROJECT_ID=demo-project-id
-    build:
-      args:
-        GCLOUD_SDK_VERSION: 354.0.0
+    environment:
+      GCLOUD_SDK_VERSION: 354.0.0
   spanner:
     image: roryq/spanner-emulator:latest
     ports:
