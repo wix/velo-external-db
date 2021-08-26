@@ -1,0 +1,38 @@
+{
+  "name": "external-db-firestore",
+  "version": "0.0.0",
+  "description": "",
+  "author": "Noam Almog <noama@wix.com>",
+  "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "http://npm.dev.wixpress.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
+  },
+  "scripts": {
+    "test": ""
+  },
+  "bugs": {
+    "url": "https://github.com/wix-private/noam-external-db-poc/issues"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^4.14.2",
+    "velo-external-db-commons": "^0.0.0"
+  },
+  "devDependencies": {
+    "jest": "^27.0.6",
+    "jest-when": "^3.3.1",
+    "test-commons": "^0.0.0",
+    "ts-jest": "^27.0.4"
+  }
+}

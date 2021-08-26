@@ -2,9 +2,11 @@ const {Uninitialized} = require('test-commons');
 const postgresTestEnv = require('../resources/postgres_resources');
 const mysqlTestEnv = require('../resources/mysql_resources');
 const spannerTestEnv = require('../resources/spanner_resources');
+const firestoreTestEnv = require('../resources/firestore_resources');
 const mysql = require('external-db-mysql')
 const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')
+const firestore = require('external-db-firestore')
 
 const env = {
     dataProvider: Uninitialized,
@@ -36,9 +38,11 @@ const dbTeardown = async () => {
 const postgresTestEnvInit = async () => await dbInit(postgresTestEnv, postgres)
 const mysqlTestEnvInit = async () => await dbInit(mysqlTestEnv, mysql)
 const spannerTestEnvInit = async () => await dbInit(spannerTestEnv, spanner)
+const firestoreTestEnvInit = async () => await dbInit(firestoreTestEnv, firestore)
 
-module.exports = { env,
-                   postgresTestEnvInit, dbTeardown,
+module.exports = { env, dbTeardown,
+                   postgresTestEnvInit,
                    mysqlTestEnvInit,
                    spannerTestEnvInit,
+                   firestoreTestEnvInit,
 }
