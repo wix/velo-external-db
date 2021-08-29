@@ -1,6 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { EMPTY_FILTER, EMPTY_SORT, isObject } = require('velo-external-db-commons')
-const { escapeId, validateLiteral } = require('./spanner_utils')
+const { escapeId, validateLiteral, patchFieldName } = require('./spanner_utils')
 
 class FilterParser {
     constructor() {
@@ -157,7 +157,8 @@ class FilterParser {
     }
 
     prepareStatementVariables(n, fieldName) {
-        return Array.from({length: n}, (_, i) => validateLiteral(`${fieldName}${i + 1}`) )
+
+        return Array.from({length: n}, (_, i) => validateLiteral(`${patchFieldName(fieldName)}${i + 1}`) )
                     .join(', ')
     }
 
@@ -228,7 +229,7 @@ class FilterParser {
         const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC';
 
         return [{
-            expr: `${escapeId(fieldName)} ${dir}`
+            expr: `${escapeId(patchFieldName(fieldName))} ${dir}`
         }]
     }
 
@@ -240,12 +241,13 @@ class FilterParser {
     }
 
     inlineVariableIfNeeded(fieldName, inlineFields) {
+
         if (inlineFields) {
             if (inlineFields[fieldName]) {
-                return inlineFields[fieldName]
+                return inlineFields[patchFieldName(fieldName)]
             }
         }
-        return escapeId(fieldName)
+        return escapeId(patchFieldName(fieldName))
     }
 }
 

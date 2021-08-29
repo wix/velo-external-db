@@ -4,10 +4,12 @@ const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./spanner_operations')
 const { Spanner } = require('@google-cloud/spanner')
 
-const init = ([host,user,password,db], _poolOptions) => {
+const init = ([host,user,password,db,cloudSqlConnectionName], _poolOptions) => {
     const projectId = user
-    const instanceId = host
+    const instanceId = cloudSqlConnectionName
     const databaseId = db
+
+    console.log(`Connecting to Spanner: ${projectId}, ${instanceId}, ${databaseId}`)
 
     const spanner = new Spanner({projectId: projectId})
     /*
