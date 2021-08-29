@@ -46,4 +46,4 @@ class ExternalDbConfigClient {
   }
 }
 
-module.exports = { ExternalDbConfigClient }
+module.exports = ExternalDbConfigClient
