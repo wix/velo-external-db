@@ -6,6 +6,8 @@ const { init } = require('./storage/factory')
 const { authMiddleware } = require('./web/auth-middleware')
 const { unless } = require('./web/middleware-support')
 const { createRouter, initServices } = require('./router')
+const config = require('external-db-config')
+
 
 let started = false
 let server, _cleanup
@@ -14,11 +16,12 @@ const vendor = process.env.CLOUD_VENDOR
 
 const load = async () => {
     const adapterType = process.env.TYPE
-    const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey, externalDbConfigClient } = await init(adapterType, vendor)
+    const configReader = config.create(vendor)
+    const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey } = await init(adapterType, vendor, configReader)
     const operationService = new OperationService(databaseOperations)
     const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider)
-    initServices(dataService, schemaService, operationService, externalDbConfigClient)
+    initServices(dataService, schemaService, operationService, configReader)
     _cleanup = cleanup
     return { secretKey }
 }

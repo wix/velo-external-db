@@ -3,11 +3,11 @@ const { Uninitialized } = require('test-commons')
 
 const createDriver = () => {
   const driver = {
-    stubSecret: (secret) => {},
-    stubBrokenSecret: (secret) => {
+    stubSecret: () => {},
+    stubBrokenSecret: () => {
       return { deletedKey : 'CLOUD_VENDOR', brokenSecret : {} }
     },
-    stubSecretWithEmptyField: (secret) => {
+    stubSecretWithEmptyField: () => {
       return { clearedKey :'CLOUD_VENDOR', brokenSecret : {}  }
     },
     restore: () => {}

@@ -1,9 +1,9 @@
 const { ExternalDbConfigClient } = require('./external_db_config_client')
-const { AwsSecretProvider } = require('./services/aws_secret_provider')
-const { GcpSecretProvider } = require('./services/gcp_secret_provider')
-const { AzrSecretsProvider } = require('./services/azr_secret_provider')
+const { AwsSecretProvider } = require('./providers/aws_secret_provider')
+const { GcpSecretProvider } = require('./providers/gcp_secret_provider')
+const { AzrSecretsProvider } = require('./providers/azr_secret_provider')
 
-const createExternalDbConfigClient = (vendor) => {
+const create = (vendor) => {
   switch (vendor) {
     case 'aws':
       const awsSecretProvider = new AwsSecretProvider()
@@ -19,4 +19,4 @@ const createExternalDbConfigClient = (vendor) => {
   }
 }
 
-module.exports = { createExternalDbConfigClient }
+module.exports = { create }

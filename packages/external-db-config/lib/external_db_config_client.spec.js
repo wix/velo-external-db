@@ -1,5 +1,5 @@
 const { Uninitialized, gen } = require('test-commons')
-const { env, externalDbConfigClientTestAzrInit,externalDbConfigClientTestAwsInit,externalDbConfigClientTestGcpInit,externalDbConfigClientTestNoVendorInit } = require('./resources/resources_provider')
+const { env, externalDbConfigClientTestAzrInit,externalDbConfigClientTestAwsInit,externalDbConfigClientTestGcpInit,externalDbConfigClientTestNoVendorInit } = require('../tests/resources/resources_provider')
 const each = require('jest-each').default
 
 describe('External DB config client', () => {

@@ -1,5 +1,5 @@
 const { Uninitialized } = require('test-commons')
-const { createExternalDbConfigClient } = require('../../lib/client_provider')
+const { create } = require('../../lib/factory')
 const externalDbConfigAwsTestEnv = require('./aws_external_db_config_resources')
 const externalDbConfigAzrTestEnv = require('./azr_external_db_config_resources')
 const externalDbConfigGcpTestEnv = require('./gcp_external_db_config_resources')
@@ -12,7 +12,7 @@ const env = {
 }
 
 const externalDbConfigInit = async (vendor, testEnv) => {
-  env.externalDbConfigClient = createExternalDbConfigClient(vendor)
+  env.externalDbConfigClient = create(vendor)
   env.driver = testEnv.createDriver()
   env.testHelper = testEnv.testHelper
   process.env.TYPE = 'mysql'

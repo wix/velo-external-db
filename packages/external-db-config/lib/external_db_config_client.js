@@ -1,3 +1,4 @@
+
 const createEmptyConfig = () => ({
   host: null,
   user: null,
@@ -6,6 +7,7 @@ const createEmptyConfig = () => ({
   cloudSqlConnectionName: null,
   secretKey: null
 })
+
 class ExternalDbConfigClient {
   constructor (secretProvider) {
     this.config = createEmptyConfig()

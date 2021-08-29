@@ -1,3 +1,3 @@
-const { createExternalDbConfigClient } = require('./client_provider')
+const { create } = require('./factory')
 
-module.exports = { createExternalDbConfigClient }
+module.exports = { create }
