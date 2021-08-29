@@ -1,8 +1,8 @@
 const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist} = require('velo-external-db-commons').errors
-const { Uninitialized, gen, sleep } = require('test-commons')
+const { Uninitialized, gen } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance');
-const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit } = require('../resources/provider_resources')
+const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit, firestoreTestEnvInit} = require('../resources/provider_resources')
 const chance = new Chance();
 const { SystemFields, asWixSchema } = require('velo-external-db-commons')
 
@@ -12,6 +12,7 @@ describe('Schema API', () => {
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
         ['Spanner', spannerTestEnvInit],
+        ['Firestore', firestoreTestEnvInit],
     ]).describe('%s', (name, setup) => {
 
         beforeAll(async () => {
@@ -36,13 +37,13 @@ describe('Schema API', () => {
 
             expect(dbs).toEqual(expect.arrayContaining([
                                     asWixSchema([{ field: '_id', type: 'text' },
-                                                                    { field: '_createdDate', type: 'datetime'},
-                                                                    { field: '_updatedDate', type: 'datetime'},
-                                                                    { field: '_owner', type: 'text'}], ctx.collectionName),
+                                                     { field: '_createdDate', type: 'datetime'},
+                                                     { field: '_updatedDate', type: 'datetime'},
+                                                     { field: '_owner', type: 'text'}], ctx.collectionName),
                                     asWixSchema([{ field: '_id', type: 'text'},
-                                                                    { field: '_createdDate', type: 'datetime'},
-                                                                    { field: '_updatedDate', type: 'datetime'},
-                                                                    { field: '_owner', type: 'text'}], ctx.anotherCollectionName),
+                                                     { field: '_createdDate', type: 'datetime'},
+                                                     { field: '_updatedDate', type: 'datetime'},
+                                                     { field: '_owner', type: 'text'}], ctx.anotherCollectionName),
             ]))
         })
 
@@ -69,9 +70,9 @@ describe('Schema API', () => {
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName.toUpperCase())
             expect(db).toEqual(asWixSchema([{ field: '_id', type: 'text'},
-                                                               { field: '_createdDate', type: 'datetime'},
-                                                               { field: '_updatedDate', type: 'datetime'},
-                                                               { field: '_owner', type: 'text'}], ctx.collectionName.toUpperCase()))
+                                                { field: '_createdDate', type: 'datetime'},
+                                                { field: '_updatedDate', type: 'datetime'},
+                                                { field: '_owner', type: 'text'}], ctx.collectionName.toUpperCase()))
         })
 
         test('retrieve collection data by collection name', async () => {
@@ -79,9 +80,9 @@ describe('Schema API', () => {
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
             expect(db).toEqual(asWixSchema([{ field: '_id', type: 'text'},
-                                                               { field: '_createdDate', type: 'datetime'},
-                                                               { field: '_updatedDate', type: 'datetime'},
-                                                               { field: '_owner', type: 'text'}], ctx.collectionName))
+                                                { field: '_createdDate', type: 'datetime'},
+                                                { field: '_updatedDate', type: 'datetime'},
+                                                { field: '_owner', type: 'text'}], ctx.collectionName))
         })
 
         test('create collection twice will do nothing', async () => {
