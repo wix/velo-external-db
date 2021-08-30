@@ -156,8 +156,10 @@ const randomSecret = () => {
     return secret
 }
 
+const randomConfig = randomObject
+
 module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject,
      randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomSecret }
+      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomSecret, randomConfig }
 
 

@@ -1,3 +1,7 @@
 const { create } = require('./factory')
+const CommonConfigReader = require('./common_config_reader')
 
-module.exports = { create }
+
+const readCommonConfig = () => new CommonConfigReader().getSecrets()
+
+module.exports = { create, readCommonConfig }

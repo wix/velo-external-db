@@ -1,54 +1,48 @@
-const { Uninitialized, gen } = require('test-commons')
-const { env, externalDbConfigClientTestAzrInit,externalDbConfigClientTestAwsInit,externalDbConfigClientTestGcpInit,externalDbConfigClientTestNoVendorInit } = require('../resources/resources_provider')
+const { Uninitialized } = require('test-commons')
+// const { env, externalDbConfigClientTestAzrInit,externalDbConfigClientTestAwsInit,externalDbConfigClientTestGcpInit,externalDbConfigClientTestNoVendorInit } = require('../resources/resources_provider')
+const { env, initEnv, reset } = require('../drivers/external_config_reader_e2e_test_support')
 const each = require('jest-each').default
 
-describe('External DB config client', () => {
-  each([
-    ['Vendor: AZR', externalDbConfigClientTestAzrInit],
-    ['Vendor: AWS', externalDbConfigClientTestAwsInit],
-    ['Vendor: GCP', externalDbConfigClientTestGcpInit],
-    ['Vendor: None', externalDbConfigClientTestNoVendorInit],
-  ]).describe('%s', (name, setup) => {
-    afterEach(() => {
-      env.driver.restore()
+each(
+[['AZR', ['mysql', 'postgres']],
+       ['AWS', ['mysql', 'postgres']],
+       ['GCP', ['mysql', 'postgres', 'spanner']]
+      ]
+).describe('Config Reader for %s', (vendor, engines) => {
+
+    each(engines).describe('Engine %s', (engine) => {
+
+        beforeAll(async () => {
+            initEnv(vendor, engine)
+        })
+
+        const ctx = {
+            config: Uninitialized
+        }
+
+        beforeEach(async () => {
+            reset()
+            ctx.config = env.driver.validConfig()
+        })
+
+
+        test('read config', async () => {
+            env.driver.defineValidConfig(ctx.config)
+
+            const actual = await env.configReader.readConfig()
+
+            expect(actual).toEqual(ctx.config)
+        })
+
+        test('validate config', async () => {
+            env.driver.defineValidConfig({})
+
+            const actual = await env.configReader.configStatus()
+
+            expect(actual).toContain('Missing props:')
+        })
+
     })
 
-    beforeAll(async () => {
-      await setup()
-    })
-
-    test('get secret with secret client', async () => {
-      const secretInSecretService = env.testHelper.serviceFormat(ctx.secret)
-      env.driver.stubSecret(secretInSecretService)
-      const result = await env.externalDbConfigClient.readConfig()
-
-      expect(result).toEqual(env.testHelper.externalDBClientFormat(secretInSecretService))
-    })
-
-    test('get secret without all the required fields', async () => {
-      const secretInSecretService = env.testHelper.serviceFormat(ctx.secret)
-      const { deletedKey, brokenSecret } = env.driver.stubBrokenSecret(secretInSecretService)
-      const config = await env.externalDbConfigClient.readConfig()
-
-      expect(config).toEqual(env.testHelper.externalDBClientFormat(brokenSecret))
-      expect(env.externalDbConfigClient.missingRequiredSecretsKeys).toEqual([deletedKey])
-    })
-
-    test('get secret with a field that is empty', async () => {
-      const secretInSecretService = env.testHelper.serviceFormat(ctx.secret)
-      const { clearedKey, brokenSecret } = env.driver.stubSecretWithEmptyField(secretInSecretService)
-      const config = await env.externalDbConfigClient.readConfig()
-
-      expect(config).toEqual(env.testHelper.externalDBClientFormat(brokenSecret))
-      expect(env.externalDbConfigClient.missingRequiredSecretsKeys).toEqual([clearedKey])
-    })
-
-    const ctx = {
-      secret: Uninitialized
-    }
-
-    beforeEach(async () => {
-      ctx.secret = gen.randomSecret()
-    })
-  })
 })
+

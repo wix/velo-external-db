@@ -1,53 +1,44 @@
 // const { unpackDates } = require('../../lib/service/transform')
-// const { when } = require('jest-when')
+const { when } = require('jest-when')
 
 const configReader = {
-//     find: jest.fn(),
-//     count: jest.fn(),
-//     insert: jest.fn(),
-//     update: jest.fn(),
-//     truncate: jest.fn(),
-//     aggregate: jest.fn(),
-//     delete: jest.fn(),
+    getSecrets: jest.fn(),
+    validate: jest.fn(),
 }
-//
-// const givenListResult = (entities, forCollectionName, filter, sort, skip, andLimit) =>
-//     when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit)
-//         .mockResolvedValue(entities.map( unpackDates ))
-//
-// const givenCountResult = (total, forCollectionName, filter) =>
-//     when(dataProvider.count).calledWith(forCollectionName, filter)
-//         .mockResolvedValue(total)
-//
-// const givenAggregateResult = (total, forCollectionName, filter, andAggregation) =>
-//     when(dataProvider.aggregate).calledWith(forCollectionName, filter, andAggregation)
-//         .mockResolvedValue(total)
-//
-// const expectInsertFor = (items, forCollectionName) =>
-//     when(dataProvider.insert).calledWith(forCollectionName, items.map(i => unpackDates(i)))
-//         .mockResolvedValue(items.length)
-//
-//
-// const expectUpdateFor = (items, forCollectionName) =>
-//     when(dataProvider.update).calledWith(forCollectionName, items.map(i => unpackDates(i)))
-//         .mockResolvedValue(items.length)
-//
-// const expectDeleteFor = (itemIds, forCollectionName) =>
-//     when(dataProvider.delete).calledWith(forCollectionName, itemIds)
-//         .mockResolvedValue(itemIds.length)
-//
-// const expectTruncateFor = (collectionName) =>
-//     when(dataProvider.truncate).calledWith(collectionName)
-//         .mockResolvedValue(1)
-//
-// const reset = () => {
-//     dataProvider.find.mockClear()
-//     dataProvider.count.mockClear()
-//     dataProvider.insert.mockClear()
-//     dataProvider.update.mockClear()
-//     dataProvider.truncate.mockClear()
-//     dataProvider.aggregate.mockClear()
-//     dataProvider.delete.mockClear()
-// }
 
-module.exports = { configReader/*givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult, expectTruncateFor, givenAggregateResult, expectDeleteFor, reset*/ }
+const commonConfigReader = {
+    validate: jest.fn(),
+}
+
+const givenConfig = (config) =>
+    when(configReader.getSecrets).calledWith()
+                                 .mockResolvedValue(config)
+
+const givenValidConfig = () =>
+    when(configReader.validate).calledWith()
+                               .mockResolvedValue({ missingRequiredSecretsKeys: [] })
+
+const givenValidCommonConfig = () =>
+    when(commonConfigReader.validate).calledWith()
+                                     .mockReturnValueOnce({ missingRequiredSecretsKeys: [] })
+
+const givenInvalidConfigWith = (missing) =>
+    when(configReader.validate).calledWith()
+                               .mockResolvedValue({ missingRequiredSecretsKeys: missing })
+
+const givenInvalidCommonConfigWith = (missing) =>
+    when(commonConfigReader.validate).calledWith()
+                                     .mockReturnValueOnce({ missingRequiredSecretsKeys: missing })
+
+
+const reset = () => {
+    configReader.getSecrets.mockClear()
+    configReader.validate.mockClear()
+
+    commonConfigReader.validate.mockClear()
+}
+
+module.exports = { configReader, commonConfigReader, reset,
+                   givenValidCommonConfig,
+                   givenConfig, givenValidConfig, givenInvalidConfigWith, givenInvalidCommonConfigWith
+}

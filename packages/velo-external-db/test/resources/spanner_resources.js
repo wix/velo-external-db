@@ -15,7 +15,7 @@ const connection = () => {
 }
 
 const cleanup = async () => {
-    const {schemaProvider, cleanup} = init(['test-instance', 'test-project', '', 'test-database'])
+    const {schemaProvider, cleanup} = init(['test-project', 'test-instance', 'test-database'])
     const res = await schemaProvider.list()
     const tables = res.map(t => t.id)
 
@@ -39,10 +39,9 @@ const initEnv = async () => {
 
 const setActive = () => {
     process.env.TYPE = 'spanner'
-    process.env.HOST = 'test-instance'
-    process.env.USER = 'test-project'
-    process.env.PASSWORD = 'ignore'
-    process.env.DB = 'test-database'
+    process.env.PROJECT_ID = 'test-project'
+    process.env.INSTANCE_ID = 'test-instance'
+    process.env.DATABASE_ID = 'test-database'
 }
 
 const shutdownEnv = async () => {

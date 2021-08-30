@@ -1,49 +1,24 @@
-
-const createEmptyConfig = () => ({
-  host: null,
-  user: null,
-  password: null,
-  db: null,
-  cloudSqlConnectionName: null,
-  secretKey: null
-})
-
 class ExternalDbConfigClient {
-  constructor (secretProvider) {
-    this.config = createEmptyConfig()
-    this.missingRequiredSecretsKeys = []
+  constructor (secretProvider, commonConfigReader) {
     this.secretsProvider = secretProvider
+    this.commonConfigReader = commonConfigReader
+  }
 
-    if (!secretProvider) {
-      this.missingRequiredSecretsKeys.push('CLOUD_VENDOR')
+  async readConfig() {
+    return await this.secretsProvider.getSecrets()
+  }
+
+  async configStatus() {
+    const { missingRequiredSecretsKeys } = await this.secretsProvider.validate()
+    const { missingRequiredSecretsKeys : missing } = this.commonConfigReader.validate()
+
+    if (missingRequiredSecretsKeys.length > 0 || (missing && missing.length > 0)) {
+      return `Missing props: ${[...missingRequiredSecretsKeys, missing].join(', ')}`
     }
+    return 'External DB Config read successfully'
   }
 
-  async readConfig () {
-    if (!this.secretsProvider) {
-      return this.config
-    }
 
-    this.config = await this.secretsProvider.getSecrets()
-    this.missingRequiredSecretsKeys = this.secretsProvider.validateSecrets()
-
-    if(!process.env.TYPE){
-      this.missingRequiredSecretsKeys.push('TYPE')
-    }
-
-    return this.config
-  }
-
-  getConfig() {
-    const config = Object.assign({}, this.config)
-    if (config.password) config.password = '*********'
-    if (config.secretKey) config.secretKey = '*********'
-    return config
-  }
-
-  configStatus() {
-    return this.missingRequiredSecretsKeys.length ? `Missing props: ${this.missingRequiredSecretsKeys}` : 'External DB Config read successfully'
-  }
 }
 
 module.exports = ExternalDbConfigClient

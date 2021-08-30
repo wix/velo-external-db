@@ -15,7 +15,7 @@ describe('Velo External DB Schema REST API',  () => {
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
         ['Spanner', spannerTestEnvInit],
-    ]).describe('%s', (name, setup, teardown) => {
+    ]).describe('%s', (name, setup) => {
         beforeAll(async () => {
             await setup()
 

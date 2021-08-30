@@ -14,6 +14,7 @@ const testHelper = {
     delete secret.HOST
     return secret
   },
+
   externalDBClientFormat: (secret) => {
     const formattedSecret = lowercaseObjectKeys(secret)
     formattedSecret.cloudSqlConnectionName = formattedSecret.cloud_sql_connection_name
