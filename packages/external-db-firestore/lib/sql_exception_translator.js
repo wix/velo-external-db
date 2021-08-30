@@ -4,6 +4,8 @@ const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, AccessDe
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {
+        case 7:
+            return new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.details} `)
         // case 9:
         //     if (err.details.includes('column')) {
         //         return new FieldAlreadyExists(err.details/*'Collection already has a field with the same name'*/)
