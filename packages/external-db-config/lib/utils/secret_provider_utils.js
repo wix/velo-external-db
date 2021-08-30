@@ -1,14 +1,6 @@
 
-const checkRequiredKeys = (obj, requiredKeys) => {
-  const missingRequiredKeys = requiredKeys.reduce((missingKeys, key) => {
-    if (!obj.hasOwnProperty(key) || obj[key] === undefined || obj[key] === '') {
-      return [...missingKeys, key]
-    } else {
-      return missingKeys
-    }
-  }, [])
+const objectDoesNotContainKey = (obj, key) => !obj.hasOwnProperty(key) || obj[key] === undefined || obj[key] === ''
 
-  return missingRequiredKeys
-}
+const checkRequiredKeys = (obj, requiredKeys) => requiredKeys.filter(key => objectDoesNotContainKey(obj, key) )
 
 module.exports = { checkRequiredKeys }
