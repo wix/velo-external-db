@@ -1,7 +1,7 @@
-const ExternalDbConfigClient = require('./service/external_db_config_client')
-const { AwsConfigReader } = require('./readers/aws_config_reader')
+const ConfigReader = require('./service/config_reader')
+const AwsConfigReader = require('./readers/aws_config_reader')
 const { GcpConfigReader, GcpSpannerConfigReader } = require('./readers/gcp_config_reader')
-const { AzureConfigReader } = require('./readers/azr_config_reader')
+const AzureConfigReader = require('./readers/azure_config_reader')
 const CommonConfigReader = require('./readers/common_config_reader')
 const StubConfigReader = require('./readers/stub_config_reader')
 
@@ -12,29 +12,29 @@ const create = () => {
 
     case 'aws':
         const awsConfigReader = new AwsConfigReader()
-        return new ExternalDbConfigClient(awsConfigReader, common)
+        return new ConfigReader(awsConfigReader, common)
 
     case 'gcp':
       switch (type) {
         case 'spanner':
           const spannerConfigReader = new GcpSpannerConfigReader()
-          return new ExternalDbConfigClient(spannerConfigReader, common)
+          return new ConfigReader(spannerConfigReader, common)
         default:
           const gcpConfigReader = new GcpConfigReader()
-          return new ExternalDbConfigClient(gcpConfigReader, common)
+          return new ConfigReader(gcpConfigReader, common)
       }
 
     case 'azr':
       switch (type) {
         case 'spanner':
           const spannerConfigReader = new GcpSpannerConfigReader()
-          return new ExternalDbConfigClient(spannerConfigReader, common)
+          return new ConfigReader(spannerConfigReader, common)
         default:
           const azrSecretsProvider = new AzureConfigReader()
-          return new ExternalDbConfigClient(azrSecretsProvider, common)
+          return new ConfigReader(azrSecretsProvider, common)
       }
     default:
-      return new ExternalDbConfigClient(new StubConfigReader, common)
+      return new ConfigReader(new StubConfigReader, common)
   }
 }
 

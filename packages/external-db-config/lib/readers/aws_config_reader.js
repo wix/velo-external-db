@@ -30,7 +30,6 @@ class AwsConfigReader {
       return { configReadError: err.message, missingRequiredSecretsKeys: [] }
     }
   }
-
 }
 
-module.exports = { AwsConfigReader }
+module.exports = AwsConfigReader

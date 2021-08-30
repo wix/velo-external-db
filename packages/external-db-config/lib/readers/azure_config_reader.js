@@ -16,4 +16,4 @@ class AzureConfigReader {
   }
 }
 
-module.exports = { AzureConfigReader }
+module.exports = AzureConfigReader

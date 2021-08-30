@@ -1,4 +1,4 @@
-const ExternalDbConfigClient = require('./external_db_config_client')
+const ConfigReader = require('./config_reader')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/external_db_config_test_support')
 const Chance = require('chance')
@@ -72,6 +72,6 @@ describe('Config Reader Client', () => {
         ctx.missingProperties = Array.from({length: 5}, () => chance.word())
         ctx.moreMissingProperties = Array.from({length: 5}, () => chance.word())
 
-        env.configReader = new ExternalDbConfigClient(driver.configReader, driver.commonConfigReader)
+        env.configReader = new ConfigReader(driver.configReader, driver.commonConfigReader)
     });
 })
