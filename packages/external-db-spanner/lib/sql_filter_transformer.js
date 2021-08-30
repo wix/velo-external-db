@@ -38,11 +38,11 @@ class FilterParser {
         const groupByColumns = []
         const filterColumnsStr = []
         if (isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(aggregation._id).map( escapeId ))
-            groupByColumns.push(...Object.values(aggregation._id))
+            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(patchFieldName(f))))
+            groupByColumns.push(...Object.values(aggregation._id).map(f => patchFieldName(f)))
         } else {
-            filterColumnsStr.push(escapeId(aggregation._id))
-            groupByColumns.push(aggregation._id)
+            filterColumnsStr.push(escapeId(patchFieldName(aggregation._id)))
+            groupByColumns.push(patchFieldName(aggregation._id))
         }
 
         const aliasToFunction = {}
@@ -51,8 +51,8 @@ class FilterParser {
               .forEach(fieldAlias => {
                   Object.entries(aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeId(field)}) AS ${escapeId(fieldAlias)}`)
-                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeId(field)})`
+                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeId(patchFieldName(field))}) AS ${escapeId(patchFieldName(fieldAlias))}`)
+                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeId(patchFieldName(field))})`
                         })
               })
 
