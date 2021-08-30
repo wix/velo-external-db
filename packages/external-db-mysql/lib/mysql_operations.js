@@ -8,12 +8,8 @@ class DatabaseOperations {
     }
 
     async validateConnection() {
-        return await this.query('SELECT 1').then((res) => { return { valid: true } }).catch((e) => { return { valid: false, error: notThrowingTranslateErrorCodes(e) } })
-    }
-    config() {
-        const config = Object.assign({}, this.pool.config.connectionConfig)
-        if (config.password) config.password = '*********'
-        return config
+        return await this.query('SELECT 1').then(() => { return { valid: true } })
+                         .catch((e) => { return { valid: false, error: notThrowingTranslateErrorCodes(e) } })
     }
 }
 

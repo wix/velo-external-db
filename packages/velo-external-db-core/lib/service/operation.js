@@ -11,17 +11,12 @@ class OperationService {
         const connectionStatus = await this.databaseOperation.validateConnection()
         if (connectionStatus.valid) {
             return {
-                STATUS: "Connected to database successfully",
-                ...this.config()
+                STATUS: "Connected to database successfully"
             }
         }
         return {
             error: connectionStatus.error.message,
         }
-    }
-
-    config() {
-        return this.databaseOperation.config();
     }
 }
 
