@@ -1,6 +1,6 @@
 const ExternalDbConfigClient = require('./external_db_config_client')
 const { Uninitialized, gen } = require('test-commons')
-const driver = require('../test/drivers/external_db_config_test_support')
+const driver = require('../../test/drivers/external_db_config_test_support')
 const Chance = require('chance')
 const chance = new Chance()
 

@@ -1,9 +1,9 @@
-const ExternalDbConfigClient = require('./external_db_config_client')
-const { AwsSecretProvider } = require('./providers/aws_secret_provider')
-const { GcpSecretProvider, GcpSpannerConfigProvider } = require('./providers/gcp_secret_provider')
-const { AzrSecretsProvider } = require('./providers/azr_secret_provider')
-const CommonConfigReader = require('./common_config_reader')
-const StubSecretProvider = require('./stub_secret_provider')
+const ExternalDbConfigClient = require('./service/external_db_config_client')
+const { AwsSecretProvider } = require('./readers/aws_secret_provider')
+const { GcpSecretProvider, GcpSpannerConfigProvider } = require('./readers/gcp_secret_provider')
+const { AzrSecretsProvider } = require('./readers/azr_secret_provider')
+const CommonConfigReader = require('./readers/common_config_reader')
+const StubSecretProvider = require('./readers/stub_secret_provider')
 
 const create = () => {
   const common = new CommonConfigReader()

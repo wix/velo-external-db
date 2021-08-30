@@ -1,4 +1,4 @@
-const { AwsSecretProvider } = require('../../lib/providers/aws_secret_provider')
+const { AwsSecretProvider } = require('../../lib/readers/aws_secret_provider')
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
 const mockClient = require('aws-sdk-client-mock')
 const mockedAwsSdk = mockClient.mockClient(SecretsManagerClient)

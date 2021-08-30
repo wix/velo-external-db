@@ -1,5 +1,5 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
-const { checkRequiredKeys } = require('./secret_provider_utils')
+const { checkRequiredKeys } = require('../utils/secret_provider_utils')
 
 const SecretId = 'VELO-EXTERNAL-DB-SECRETS'
 const EmptyAWSConfig = { host: '', username: '', password: '', DB: '', SECRET_KEY: '' }

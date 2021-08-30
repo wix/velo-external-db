@@ -1,4 +1,4 @@
-const { checkRequiredKeys } = require('./secret_provider_utils')
+const { checkRequiredKeys } = require('../utils/secret_provider_utils')
 
 class AzrSecretsProvider {
   constructor () {

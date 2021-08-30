@@ -1,4 +1,4 @@
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = new Chance()

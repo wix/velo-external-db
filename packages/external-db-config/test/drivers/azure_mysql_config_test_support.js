@@ -1,4 +1,4 @@
-const { AzrSecretsProvider } = require('../../lib/providers/azr_secret_provider')
+const { AzrSecretsProvider } = require('../../lib/readers/azr_secret_provider')
 const Chance = require('chance')
 const chance = new Chance()
 

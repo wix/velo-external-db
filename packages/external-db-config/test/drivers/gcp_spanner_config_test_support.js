@@ -1,4 +1,4 @@
-const { GcpSpannerConfigProvider } = require('../../lib/providers/gcp_secret_provider')
+const { GcpSpannerConfigProvider } = require('../../lib/readers/gcp_secret_provider')
 const Chance = require('chance')
 const chance = new Chance()
 
