@@ -24,8 +24,8 @@ class SchemaProvider {
 
     async create(collectionName, columns) {
         const coll = await this.database.collection(SystemTable)
-                           .doc(collectionName)
-                           .get()
+                                        .doc(collectionName)
+                                        .get()
         if (!coll.exists) {
             await this.database.collection(SystemTable)
                                .doc(collectionName)
