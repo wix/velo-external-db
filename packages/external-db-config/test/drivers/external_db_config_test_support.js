@@ -1,7 +1,7 @@
 const { when } = require('jest-when')
 
 const configReader = {
-    getSecrets: jest.fn(),
+    readConfig: jest.fn(),
     validate: jest.fn(),
 }
 
@@ -10,7 +10,7 @@ const commonConfigReader = {
 }
 
 const givenConfig = (config) =>
-    when(configReader.getSecrets).calledWith()
+    when(configReader.readConfig).calledWith()
                                  .mockResolvedValue(config)
 
 const givenValidConfig = () =>
@@ -31,7 +31,7 @@ const givenInvalidCommonConfigWith = (missing) =>
 
 
 const reset = () => {
-    configReader.getSecrets.mockClear()
+    configReader.readConfig.mockClear()
     configReader.validate.mockClear()
 
     commonConfigReader.validate.mockClear()

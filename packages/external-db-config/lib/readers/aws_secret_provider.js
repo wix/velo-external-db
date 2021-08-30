@@ -9,14 +9,14 @@ class AwsSecretProvider {
     this.region = region
   }
 
-  async getSecrets() {
-    const cfg = await this.readConfig()
+  async readConfig() {
+    const cfg = await this.readExternalConfig()
                           .catch(() => EmptyAWSConfig)
     const { host, username, password, DB, SECRET_KEY } = cfg
     return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY }
   }
 
-  async readConfig() {
+  async readExternalConfig() {
     const client = new SecretsManagerClient({ region: this.region })
     const data = await client.send(new GetSecretValueCommand({ SecretId }))
     return JSON.parse(data.SecretString)
@@ -24,7 +24,7 @@ class AwsSecretProvider {
 
   async validate() {
     try {
-      const cfg = await this.readConfig()
+      const cfg = await this.readExternalConfig()
       return { missingRequiredSecretsKeys: checkRequiredKeys(cfg, ['host', 'username', 'password', 'DB', 'SECRET_KEY']) }
     } catch (err) {
       return { configReadError: err.message, missingRequiredSecretsKeys: [] }

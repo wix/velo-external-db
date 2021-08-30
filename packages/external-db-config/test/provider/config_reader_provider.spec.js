@@ -28,7 +28,7 @@ describe('External DB config client', () => {
     test('read config when config is defined', async () => {
       driver.defineValidConfig(ctx.config)
 
-      const expected = await env.configReaderProvider.getSecrets()
+      const expected = await env.configReaderProvider.readConfig()
 
       expect(expected).toEqual(ctx.config)
     })
@@ -37,7 +37,7 @@ describe('External DB config client', () => {
       if (driver.hasReadErrors) {
         driver.defineErroneousConfig()
 
-        const expected = await env.configReaderProvider.getSecrets()
+        const expected = await env.configReaderProvider.readConfig()
 
         expect(expected).toEqual(driver.defaultConfig)
       }
@@ -49,7 +49,7 @@ describe('External DB config client', () => {
       delete ctx.config[p]
       driver.defineValidConfig(ctx.config)
 
-      const expected = await env.configReaderProvider.getSecrets()
+      const expected = await env.configReaderProvider.readConfig()
 
       expect(expected[p]).toBeUndefined()
     })

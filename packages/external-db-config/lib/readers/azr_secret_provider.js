@@ -4,7 +4,7 @@ class AzrSecretsProvider {
   constructor () {
   }
 
-  async getSecrets() {
+  async readConfig() {
     const { HOST, USER, PASSWORD, DB, SECRET_KEY } = process.env
     return { host: HOST , user: USER, password: PASSWORD, db: DB, secretKey: SECRET_KEY }
   }

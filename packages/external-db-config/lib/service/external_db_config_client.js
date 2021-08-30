@@ -5,7 +5,7 @@ class ExternalDbConfigClient {
   }
 
   async readConfig() {
-    return await this.secretsProvider.getSecrets()
+    return await this.secretsProvider.readConfig()
   }
 
   async configStatus() {

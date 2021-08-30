@@ -7,7 +7,7 @@ const StubSecretProvider = require('./readers/stub_secret_provider')
 
 const create = () => {
   const common = new CommonConfigReader()
-  const { vendor, type } = common.getSecrets()
+  const { vendor, type } = common.readConfig()
   switch (vendor.toLowerCase()) {
 
     case 'aws':

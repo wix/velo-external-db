@@ -3,7 +3,7 @@ class StubSecretProvider {
     constructor() {
     }
 
-    getSecrets() {
+    readConfig() {
         return {}
     }
 

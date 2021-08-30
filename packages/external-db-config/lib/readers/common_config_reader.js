@@ -3,7 +3,7 @@ const { checkRequiredKeys } = require('../utils/secret_provider_utils')
 class CommonConfigReader {
     constructor() { }
 
-    getSecrets() {
+    readConfig() {
         const { CLOUD_VENDOR, TYPE } = process.env
         return { vendor: CLOUD_VENDOR , type: TYPE }
     }
