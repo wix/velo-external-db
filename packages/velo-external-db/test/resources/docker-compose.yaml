@@ -5,6 +5,7 @@ services:
     ports:
       - 8082:8082
     build:
+      context: .
       args:
         GCLOUD_SDK_VERSION: 354.0.0
   spanner:
