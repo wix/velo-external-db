@@ -33,4 +33,20 @@ class GcpSpannerConfigReader {
 
 }
 
-module.exports = { GcpConfigReader, GcpSpannerConfigReader }
+class GcpFirestoreConfigReader {
+  constructor () { }
+
+  async readConfig() {
+    const { PROJECT_ID, SECRET_KEY } = process.env
+    return { projectId: PROJECT_ID, secretKey: SECRET_KEY }
+  }
+
+  validate() {
+    return {
+      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['PROJECT_ID', 'SECRET_KEY'])
+    }
+  }
+
+}
+
+module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader }

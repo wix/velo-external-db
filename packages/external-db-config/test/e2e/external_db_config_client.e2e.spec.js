@@ -3,9 +3,10 @@ const { env, initEnv, reset } = require('../drivers/external_config_reader_e2e_t
 const each = require('jest-each').default
 
 each(
-[['AZR', ['mysql', 'postgres']],
+[
+       ['AZR', ['mysql', 'postgres']],
        ['AWS', ['mysql', 'postgres']],
-       ['GCP', ['mysql', 'postgres', 'spanner']]
+       ['GCP', ['mysql', 'postgres', 'spanner', 'firestore']]
       ]
 ).describe('Config Reader for %s', (vendor, engines) => {
 

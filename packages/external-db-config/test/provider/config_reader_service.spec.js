@@ -4,6 +4,7 @@ const Chance = require('chance')
 const chance = new Chance()
 const gcpDriver = require('../drivers/gcp_mysql_config_test_support')
 const gcpSpannerDriver = require('../drivers/gcp_spanner_config_test_support')
+const gcpFirestoreDriver = require('../drivers/gcp_firestore_config_test_support')
 const azureDriver = require('../drivers/gcp_mysql_config_test_support')
 const awsDriver = require('../drivers/aws_mysql_config_test_support')
 const commonDriver = require('../drivers/common_config_test_support')
@@ -12,6 +13,7 @@ describe('External DB config client', () => {
   each([
     ['Vendor: GCP, DB: MySql/Postgres', gcpDriver],
     ['Vendor: GCP, DB: Spanner', gcpSpannerDriver],
+    ['Vendor: GCP, DB: Firestore', gcpFirestoreDriver],
     ['Vendor: Azure, DB: MySql/Postgres', azureDriver],
     ['Vendor: AWS, DB: MySql/Postgres', awsDriver],
     ['Vendor: All, Common Config Reader', commonDriver],

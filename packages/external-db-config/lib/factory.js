@@ -1,6 +1,6 @@
 const ConfigReader = require('./service/config_reader')
 const AwsConfigReader = require('./readers/aws_config_reader')
-const { GcpConfigReader, GcpSpannerConfigReader } = require('./readers/gcp_config_reader')
+const { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader } = require('./readers/gcp_config_reader')
 const AzureConfigReader = require('./readers/azure_config_reader')
 const CommonConfigReader = require('./readers/common_config_reader')
 const StubConfigReader = require('./readers/stub_config_reader')
@@ -8,34 +8,43 @@ const StubConfigReader = require('./readers/stub_config_reader')
 const create = () => {
   const common = new CommonConfigReader()
   const { vendor, type } = common.readConfig()
+  let internalConfigReader
   switch (vendor.toLowerCase()) {
 
     case 'aws':
-        const awsConfigReader = new AwsConfigReader()
-        return new ConfigReader(awsConfigReader, common)
+      internalConfigReader = new AwsConfigReader()
+      break;
 
     case 'gcp':
       switch (type) {
         case 'spanner':
-          const spannerConfigReader = new GcpSpannerConfigReader()
-          return new ConfigReader(spannerConfigReader, common)
-        default:
-          const gcpConfigReader = new GcpConfigReader()
-          return new ConfigReader(gcpConfigReader, common)
+          internalConfigReader = new GcpSpannerConfigReader()
+          break;
+        case 'firestore':
+          internalConfigReader = new GcpFirestoreConfigReader()
+          break;
+        case 'mysql':
+        case 'postgres':
+          internalConfigReader = new GcpConfigReader()
+          break;
       }
+      break
 
     case 'azr':
       switch (type) {
         case 'spanner':
-          const spannerConfigReader = new GcpSpannerConfigReader()
-          return new ConfigReader(spannerConfigReader, common)
-        default:
-          const azrSecretsProvider = new AzureConfigReader()
-          return new ConfigReader(azrSecretsProvider, common)
+          internalConfigReader = new GcpFirestoreConfigReader()
+          break;
+
+        case 'mysql':
+        case 'postgres':
+          internalConfigReader = new AzureConfigReader()
+          break;
       }
-    default:
-      return new ConfigReader(new StubConfigReader, common)
+      break
   }
+
+  return new ConfigReader(internalConfigReader || new StubConfigReader, common)
 }
 
 module.exports = { create }

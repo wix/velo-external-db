@@ -1,27 +1,23 @@
 const compose = require('docker-compose')
 const { init } = require('external-db-firestore')
 const { sleep } = require('test-commons')
-const Firestore = require('@google-cloud/firestore');
-
 
 const connection = () => {
-    const firestore = new Firestore({
-        projectId: 'test-project',
-    })
+    const {connection, cleanup} = init(['test-project'])
 
-    return { pool: firestore, cleanup: async () => await firestore.terminate()}
+    return { pool: connection, cleanup}
 }
 
 const cleanup = async () => {
-    // const {schemaProvider, cleanup} = init(['test-instance', 'test-project', '', 'test-database'])
-    // const res = await schemaProvider.list()
-    // const tables = res.map(t => t.id)
-    //
-    // for (const t of tables) {
-    //     await schemaProvider.drop(t)
-    // }
-    //
-    // await cleanup();
+    const {schemaProvider, cleanup} = init(['test-project'])
+    const res = await schemaProvider.list()
+    const tables = res.map(t => t.id)
+
+    for (const t of tables) {
+        await schemaProvider.drop(t)
+    }
+
+    await cleanup();
 }
 
 const initEnv = async () => {
@@ -36,11 +32,8 @@ const initEnv = async () => {
 }
 
 const setActive = () => {
-    // process.env.TYPE = 'firestore'
-    // process.env.HOST = 'test-instance'
-    // process.env.USER = 'test-project'
-    // process.env.PASSWORD = 'ignore'
-    // process.env.DB = 'test-database'
+    process.env.TYPE = 'firestore'
+    process.env.PROJECT_ID = 'test-project'
 }
 
 const shutdownEnv = async () => {

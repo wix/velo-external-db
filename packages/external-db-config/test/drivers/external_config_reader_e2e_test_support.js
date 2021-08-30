@@ -4,6 +4,7 @@ const awsMySql = require('./aws_mysql_config_test_support')
 const azureMySql = require('./azure_mysql_config_test_support')
 const gcpMySql = require('./gcp_mysql_config_test_support')
 const gcpSpanner = require('./gcp_spanner_config_test_support')
+const gcpFirestore = require('./gcp_firestore_config_test_support')
 
 const env = {
     configReader: Uninitialized,
@@ -16,11 +17,14 @@ const initDriver = (vendor, engine) => {
         case 'azr':
             return azureMySql
         case 'gcp':
-            if (engine === 'spanner') {
-                return gcpSpanner
+            switch (engine) {
+                case 'spanner':
+                    return gcpSpanner
+                case 'firestore':
+                    return gcpFirestore
+                default:
+                    return gcpMySql
             }
-            return gcpMySql
-
     }
 }
 
