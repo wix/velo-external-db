@@ -1,6 +1,6 @@
 const { checkRequiredKeys } = require('../utils/secret_provider_utils')
 
-class AzrSecretsProvider {
+class AzureConfigReader {
   constructor () {
   }
 
@@ -16,4 +16,4 @@ class AzrSecretsProvider {
   }
 }
 
-module.exports = { AzrSecretsProvider }
+module.exports = { AzureConfigReader }

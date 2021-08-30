@@ -1,6 +1,6 @@
 const { checkRequiredKeys } = require('../utils/secret_provider_utils')
 
-class GcpSecretProvider {
+class GcpConfigReader {
   constructor () {
   }
 
@@ -16,7 +16,7 @@ class GcpSecretProvider {
   }
 }
 
-class GcpSpannerConfigProvider {
+class GcpSpannerConfigReader {
   constructor () {
   }
 
@@ -33,4 +33,4 @@ class GcpSpannerConfigProvider {
 
 }
 
-module.exports = { GcpSecretProvider, GcpSpannerConfigProvider }
+module.exports = { GcpConfigReader, GcpSpannerConfigReader }

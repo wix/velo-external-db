@@ -1,15 +1,15 @@
 class ExternalDbConfigClient {
-  constructor (secretProvider, commonConfigReader) {
-    this.secretsProvider = secretProvider
+  constructor (configReader, commonConfigReader) {
+    this.configReader = configReader
     this.commonConfigReader = commonConfigReader
   }
 
   async readConfig() {
-    return await this.secretsProvider.readConfig()
+    return await this.configReader.readConfig()
   }
 
   async configStatus() {
-    const { missingRequiredSecretsKeys } = await this.secretsProvider.validate()
+    const { missingRequiredSecretsKeys } = await this.configReader.validate()
     const { missingRequiredSecretsKeys : missing } = this.commonConfigReader.validate()
 
     if (missingRequiredSecretsKeys.length > 0 || (missing && missing.length > 0)) {

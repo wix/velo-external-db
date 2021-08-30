@@ -1,4 +1,4 @@
-const { AzrSecretsProvider } = require('../../lib/readers/azr_secret_provider')
+const { AzureConfigReader } = require('../../lib/readers/azr_config_reader')
 const Chance = require('chance')
 const chance = new Chance()
 
@@ -40,6 +40,6 @@ module.exports = {
     reset,
     hasReadErrors: false,
     ExpectedProperties,
-    configReaderProvider: new AzrSecretsProvider()
+    configReaderProvider: new AzureConfigReader()
 }
 

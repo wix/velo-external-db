@@ -1,4 +1,4 @@
-const { GcpSecretProvider } = require('../../lib/readers/gcp_secret_provider')
+const { GcpConfigReader } = require('../../lib/readers/gcp_config_reader')
 const Chance = require('chance')
 const chance = new Chance()
 
@@ -41,6 +41,6 @@ module.exports = {
     validConfig,
     reset,
     hasReadErrors: false,
-    configReaderProvider: new GcpSecretProvider()
+    configReaderProvider: new GcpConfigReader()
 }
 

@@ -1,5 +1,5 @@
 
-class StubSecretProvider {
+class StubConfigReader {
     constructor() {
     }
 
@@ -12,4 +12,4 @@ class StubSecretProvider {
     }
 }
 
-module.exports = StubSecretProvider
+module.exports = StubConfigReader

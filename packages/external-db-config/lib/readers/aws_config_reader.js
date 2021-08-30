@@ -4,7 +4,7 @@ const { checkRequiredKeys } = require('../utils/secret_provider_utils')
 const SecretId = 'VELO-EXTERNAL-DB-SECRETS'
 const EmptyAWSConfig = { host: '', username: '', password: '', DB: '', SECRET_KEY: '' }
 
-class AwsSecretProvider {
+class AwsConfigReader {
   constructor (region) {
     this.region = region
   }
@@ -33,4 +33,4 @@ class AwsSecretProvider {
 
 }
 
-module.exports = { AwsSecretProvider }
+module.exports = { AwsConfigReader }
