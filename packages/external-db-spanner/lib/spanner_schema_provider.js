@@ -2,7 +2,7 @@ const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = requ
 const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { notThrowingTranslateErrorCodes } = require("./sql_exception_translator")
-const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } = require('./spanner_utils')
+const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, escapeFieldId} = require('./spanner_utils')
 
 class SchemaProvider {
     constructor(database) {
@@ -33,7 +33,7 @@ class SchemaProvider {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( this.fixColumn.bind(this) )
                                                                   .map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                   .join(', ')
-        const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(patchFieldName(f.name))).join(', ')
+        const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeFieldId(f.name)).join(', ')
 
         await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (${primaryKeySql})`, CollectionAlreadyExists)
     }

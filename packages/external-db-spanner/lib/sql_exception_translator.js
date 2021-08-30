@@ -1,7 +1,5 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, AccessDeniedError, WrongDatabaseError,
-    HostDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
-const { isDatabaseNotFoundError } = require('@google-cloud/spanner').SessionPool
-
+        CollectionAlreadyExists } = require('velo-external-db-commons').errors
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {

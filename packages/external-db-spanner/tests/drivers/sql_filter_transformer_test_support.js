@@ -1,6 +1,6 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const {escapeId} = require('mysql');
+const { escapeId, escapeFieldId } = require('../../lib/spanner_utils');
 
 const filterParser = {
     transform: jest.fn(),
@@ -34,20 +34,20 @@ const patchFieldName = (f) => {
 
 const givenOrderByFor = (column, sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeId(patchFieldName(column))} ASC` })
+                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeFieldId(column)} ASC` })
 }
 
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeId(patchFieldName('_id'))} = @_id`, parameters: { _id: id} })
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeFieldId('_id')} = @_id`, parameters: { _id: id} })
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
     const c = numericColumns.map(c => c.name)
     when(filterParser.parseAggregation).calledWith(having, filter)
                                        .mockReturnValue({
-                                           fieldsStatement: `${groupByColumns.map( patchFieldName ).map( escapeId )}, MAX(${escapeId(patchFieldName(c[0]))}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
+                                           fieldsStatement: `${groupByColumns.map( patchFieldName ).map( escapeId )}, MAX(${escapeFieldId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
                                            groupByColumns: groupByColumns.map( patchFieldName ),
                                            havingFilter: '',
                                            parameters: {},

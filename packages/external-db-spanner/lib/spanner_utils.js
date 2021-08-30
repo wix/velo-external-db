@@ -25,4 +25,6 @@ const validateLiteral = l => {
     return `@${l}`
 }
 
-module.exports = { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, testLiteral, validateLiteral }
+const escapeFieldId = f => escapeId(patchFieldName(f))
+
+module.exports = { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, testLiteral, validateLiteral, escapeFieldId }

@@ -1,7 +1,7 @@
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { Uninitialized } = require('test-commons')
 const Chance = require('chance')
-const { escapeId } = require('mysql')
+const { escapeId } = require('./spanner_utils')
 const chance = Chance();
 
 describe('Sql Schema Column Translator', () => {

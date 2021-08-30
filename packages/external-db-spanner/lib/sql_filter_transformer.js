@@ -1,6 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { EMPTY_FILTER, EMPTY_SORT, isObject } = require('velo-external-db-commons')
-const { escapeId, validateLiteral, patchFieldName } = require('./spanner_utils')
+const { escapeId, validateLiteral, patchFieldName, escapeFieldId } = require('./spanner_utils')
 
 class FilterParser {
     constructor() {
@@ -38,10 +38,10 @@ class FilterParser {
         const groupByColumns = []
         const filterColumnsStr = []
         if (isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(patchFieldName(f))))
+            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeFieldId(f)))
             groupByColumns.push(...Object.values(aggregation._id).map(f => patchFieldName(f)))
         } else {
-            filterColumnsStr.push(escapeId(patchFieldName(aggregation._id)))
+            filterColumnsStr.push(escapeFieldId(aggregation._id))
             groupByColumns.push(patchFieldName(aggregation._id))
         }
 
@@ -51,8 +51,8 @@ class FilterParser {
               .forEach(fieldAlias => {
                   Object.entries(aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeId(patchFieldName(field))}) AS ${escapeId(patchFieldName(fieldAlias))}`)
-                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeId(patchFieldName(field))})`
+                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeFieldId(field)}) AS ${escapeFieldId(fieldAlias)}`)
+                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeFieldId(field)})`
                         })
               })
 
@@ -229,7 +229,7 @@ class FilterParser {
         const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC';
 
         return [{
-            expr: `${escapeId(patchFieldName(fieldName))} ${dir}`
+            expr: `${escapeFieldId(fieldName)} ${dir}`
         }]
     }
 
@@ -247,7 +247,7 @@ class FilterParser {
                 return inlineFields[patchFieldName(fieldName)]
             }
         }
-        return escapeId(patchFieldName(fieldName))
+        return escapeFieldId(fieldName)
     }
 }
 
