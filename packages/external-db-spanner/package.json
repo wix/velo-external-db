@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@google-cloud/spanner": "^5.12.0",
-    "mysql": "^2.18.1",
+    "sqlstring": "^2.3.2",
     "test-commons": "^0.0.0",
     "velo-external-db-commons": "^0.0.0"
   },

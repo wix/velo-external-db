@@ -1,4 +1,4 @@
-const { escapeId } = require('mysql')
+const { escapeId } = require('sqlstring')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 
 const recordSetToObj = (rows) => rows.map(row => row.toJSON())
