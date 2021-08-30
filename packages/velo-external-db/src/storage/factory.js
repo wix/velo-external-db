@@ -15,6 +15,12 @@ const init = async(type, vendor, config) => {
             const { projectId, instanceId, databaseId, secretKey } = await config.readConfig()
             return append(init([projectId, instanceId, databaseId]), secretKey)
         }
+        case 'firestore': {
+            const { init } = require('external-db-firestore')
+
+            const { projectId, secretKey } = await config.readConfig()
+            return append(init([projectId]), secretKey)
+        }
         default:
             case 'mysql':{
                 console.log(`INIT: ${vendor + '/' + type}`)

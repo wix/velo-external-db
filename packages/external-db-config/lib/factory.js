@@ -33,7 +33,7 @@ const create = () => {
     case 'azr':
       switch (type) {
         case 'spanner':
-          internalConfigReader = new GcpFirestoreConfigReader()
+          internalConfigReader = new GcpSpannerConfigReader()
           break;
 
         case 'mysql':
