@@ -1,36 +1,38 @@
-const { init, keyVaultVariables, appServiceVariables } = require('./init');
+const { init, keyVaultVariables, appServiceVariables, startSpinnerWith } = require('./init');
 const { createVirtualNetwork } = require('./VirtualNetwork')
 const { createMySQL } = require('./MySql');
-const { createAppService } = require('./AppService');
+const { createAppService, loadEnviormentVariables } = require('./AppService');
 const { createKeyVault } = require('./KeyVault')
 const { DefaultAzureCredential } = require("@azure/identity");
-const { createResourceGroup } = require ('./ResourceGroup')
+const { createResourceGroup } = require('./ResourceGroup')
+const inquirer = require('inquirer');
+
 
 const main = async () => {
   try {
-    const env = init()
     const subscriptionId = process.env["AZURE_SUBSCRIPTION_ID"];
     const creds = new DefaultAzureCredential();
-    await createResourceGroup (creds, subscriptionId, env.resourceGroupName)
-    console.log("Resource group created successfully ! ");
+    const env = await init()
+    const { userName, password } = await dbLogicCredentials()
 
-    const virtualNetwork = await createVirtualNetwork(creds, subscriptionId, env.resourceGroupName, env.virtualNetworkName, env.subnetName)
-    console.log("virtualNetwork created successfully ! ");
+    await startSpinnerWith('Creating resource group', () => createResourceGroup(creds, subscriptionId, env.resourceGroupName), 'Resource group created')
 
-    await createMySQL(creds, subscriptionId, env.resourceGroupName, env.mySqlServerName, env.userName, env.password, env.dbName, virtualNetwork);
-    console.log("MySQL server, db and table created successfully ! ");
+    const virtualNetwork = await startSpinnerWith("Creating virtual network", () => createVirtualNetwork(creds, subscriptionId, env.resourceGroupName, env.virtualNetworkName, env.subnetName)
+      , "virtualNetwork created  ")
 
-    const { webAppResponse, webAppClient } = await createAppService(creds, subscriptionId, env.resourceGroupName, env.serverFarmId, env.webAppName, virtualNetwork);
+    await startSpinnerWith("Creating MySQL enviorment", () => createMySQL(creds, subscriptionId, env.resourceGroupName, env.mySqlServerName, userName, password, env.dbName, virtualNetwork),
+      "MySQL enviorment created ")
 
+    const { webAppResponse, webAppClient } = await startSpinnerWith("Creating AppService", () => createAppService(creds, subscriptionId, env.resourceGroupName, env.serverFarmId, env.webAppName, virtualNetwork, env.dockerImage),
+      "AppService created ")
 
-    await createKeyVault(creds, subscriptionId, env.resourceGroupName, env.keyVaultName, webAppResponse.identity, keyVaultVariables(env), `${virtualNetwork.id}/subnets/${env.subnetName}`,env.userObjectId)
+    await startSpinnerWith("Creating KeyVault and Loading secrets", () => createKeyVault(creds, subscriptionId, env.resourceGroupName, env.keyVaultName, webAppResponse.identity, keyVaultVariables(env, userName, password), `${virtualNetwork.id}/subnets/${env.subnetName}`, env.userObjectId),
+      "KeyVault created and loaded")
 
-    console.log('loading enviorment variables to webApp');
-    await webAppClient.updateApplicationSettings(env.resourceGroupName, env.webAppName, {
-      properties: appServiceVariables(env.keyVaultName)
-    })
+    await startSpinnerWith("Loading config into webapp", () => loadEnviormentVariables(webAppClient, env.resourceGroupName, env.webAppName,env.keyVaultName), "Config loaded")
+
     console.log('done! ');
-    console.log('adapter URL: ' ,webAppResponse.defaultHostName);
+    console.log('adapter URL: ', webAppResponse.defaultHostName);
     return;
   }
   catch (error) {
@@ -38,5 +40,20 @@ const main = async () => {
     return;
   }
 }
+
+const dbLogicCredentials = () => inquirer.prompt([
+  {
+    type: 'input',
+    message: 'DB User',
+    name: 'userName',
+    default: 'demo_admin',
+  },
+  {
+    type: 'password',
+    message: 'DB Password',
+    name: 'password',
+    default: 'veloPassword1',
+  },
+])
 
 main();

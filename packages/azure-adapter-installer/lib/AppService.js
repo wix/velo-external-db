@@ -1,34 +1,61 @@
 const { WebSiteManagementClientContext, WebApps } = require("@azure/arm-appservice");
+const { startSpinnerWith, appServiceVariables } = require('./init')
 
-const createAppService = async (creds, subscriptionId, resourceGroupName, serverFarmId, webAppName, virtualNetwork) => {
+const createAppService = async (creds, subscriptionId, resourceGroupName, serverFarmId, webAppName, virtualNetwork, dockerImage) => {
     return new Promise(async (resolve, reject) => {
         try {
             const clientContext = await new WebSiteManagementClientContext(creds, subscriptionId)
             const webAppClient = new WebApps(clientContext);
 
+            await startSpinnerWith("\tCreating webApp instance", () => createWebApp(webAppClient, resourceGroupName, webAppName, serverFarmId, dockerImage),
+                "\tWebApp instance created")
 
+            await startSpinnerWith("\tApplying Virtual network firewall rule", () => webAppClient.createOrUpdateSwiftVirtualNetworkConnectionWithCheck(resourceGroupName, webAppName, { "subnetResourceId": virtualNetwork.subnets[0].id }),
+                "\tFireWall created successfully ! ")
+            const webAppResponse = await webAppClient.get(resourceGroupName, webAppName)
+            resolve({ webAppResponse, webAppClient })
+
+        } catch (err) {
+            console.log(err);
+            reject(err)
+        }
+    })
+}
+
+const createWebApp = async (webAppClient, resourceGroupName, webAppName, serverFarmId, dockerImage) => {
+    return new Promise(async (resolve, reject) => {
+        try {
             const webApp = await webAppClient.beginCreateOrUpdate(resourceGroupName, webAppName, {
                 location: 'eastus',
                 reserved: true,
                 serverFarmId,
                 siteConfig: {
-                    linuxFxVersion: 'DOCKER|veloadapteracr.azurecr.io/velo-adapter-azure:v2.1',
+                    linuxFxVersion: dockerImage,
                 },
                 identity: {
                     "type": "SystemAssigned"
                 }
             })
             await webApp.pollUntilFinished()
-            console.log("Webapp created");
-
-            await webAppClient.createOrUpdateSwiftVirtualNetworkConnectionWithCheck(resourceGroupName, webAppName, { "subnetResourceId": virtualNetwork.subnets[0].id })
-            console.log("firewall rule created ");
-            const webAppResponse = await webAppClient.get(resourceGroupName, webAppName)
-            resolve({ webAppResponse, webAppClient })
-
-        } catch (err) {
-            reject(err)
+            resolve(webApp)
+        } catch (e) {
+            reject(e)
         }
     })
 }
-module.exports = { createAppService };
+const loadEnviormentVariables = async (webAppClient, resourceGroupName, webAppName, keyVaultName) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const result =  await webAppClient.updateApplicationSettings(resourceGroupName, webAppName, {
+                properties: appServiceVariables(keyVaultName)
+            })
+            resolve(result)
+        }
+        catch (e) {
+            console.log(e);
+            reject(e)
+        }
+
+    })
+}
+module.exports = { createAppService, loadEnviormentVariables };
