@@ -1,0 +1,23 @@
+language: node_js
+dist: trusty
+arch: arm64-graviton2
+install: true
+jobs:
+  include:
+    - stage: Build
+      name: prod_build
+      script:
+        - npm install    || travis_terminate 1;
+        - npm run build:dev    || travis_terminate 1;
+    
+    - stage: Tests 
+      workspaces:
+        use: prod_build
+      name: “Tests”
+      script:
+        - npm run test || travis_terminate 1;
+
+notifications:
+  email:
+    recipients:
+    - idokah@wix.com
