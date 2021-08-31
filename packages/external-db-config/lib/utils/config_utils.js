@@ -1,6 +1,5 @@
+const objectContainsKey = (obj, key) => typeof obj[key] === 'string' && obj[key].length > 0
 
-const objectDoesNotContainKey = (obj, key) => !obj.hasOwnProperty(key) || obj[key] === undefined || obj[key] === ''
-
-const checkRequiredKeys = (obj, requiredKeys) => requiredKeys.filter(key => objectDoesNotContainKey(obj, key) )
+const checkRequiredKeys = (obj, requiredKeys) => requiredKeys.filter(key => !objectContainsKey(obj, key) )
 
 module.exports = { checkRequiredKeys }
