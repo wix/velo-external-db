@@ -5,14 +5,15 @@ const maskSensitiveData = (cfg) => {
     return config
 }
 
-const getConfig = async (operationService, externalDbConfigClient) => {
+const getConfig = async (operationService, ConfigReaderClient) => {
     const connectionStatus = await operationService.connectionStatus()
-    const config = await externalDbConfigClient.readConfig()
+    const config = await ConfigReaderClient.readConfig()
+    const CONFIG_STATUS = await ConfigReaderClient.configStatus()
     return {
-        CONFIG_STATUS: externalDbConfigClient.configStatus(),
+        CONFIG_STATUS,
         CONFIG: maskSensitiveData(config),
         CONNECTION_STATUS: connectionStatus.error || connectionStatus.STATUS 
     }
 }
 
-module.exports = { getConfig }
+module.exports = { getConfig, maskSensitiveData }

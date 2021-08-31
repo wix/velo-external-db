@@ -145,21 +145,17 @@ const clearRandomKeyObject = (obj) => {
     return { clearedKey, newObject };
 }
 
-const randomSecret = () => {
-    const secret = {
-        HOST: chance.url(),
-        USER: chance.first(),
-        PASSWORD: chance.guid(),
-        SECRET_KEY: chance.guid(),
-        DB: chance.word(),
-    }
-    return secret
-}
 
-const randomConfig = randomObject
+const randomConfig = () => ({
+    host: chance.url(),
+    user: chance.first(),
+    password: chance.guid(),
+    secretKey: chance.guid(),
+    db: chance.word(),
+})
 
 module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject,
      randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomSecret, randomConfig }
+      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig }
 
 
