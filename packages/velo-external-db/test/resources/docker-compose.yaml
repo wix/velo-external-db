@@ -1,5 +1,12 @@
 version: "3.9"
 services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    ports:
+      - 1433:1433
+    environment:
+      SA_PASSWORD: "t9D4:EHfU6Xgccs-"
+      ACCEPT_EULA: "Y"
   firestore:
     image: groovex/firestore-emulator:latest
     ports:

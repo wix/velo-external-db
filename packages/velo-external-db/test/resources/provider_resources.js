@@ -3,10 +3,12 @@ const postgresTestEnv = require('../resources/postgres_resources');
 const mysqlTestEnv = require('../resources/mysql_resources');
 const spannerTestEnv = require('../resources/spanner_resources');
 const firestoreTestEnv = require('../resources/firestore_resources');
+const mssqlTestEnv = require('../resources/mssql_resources');
 const mysql = require('external-db-mysql')
 const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')
 const firestore = require('external-db-firestore')
+const mssql = require('external-db-mssql')
 
 const env = {
     dataProvider: Uninitialized,
@@ -18,7 +20,7 @@ const env = {
 const dbInit = async (testEnv, impl) => {
     await testEnv.cleanup()
 
-    const {pool, cleanup} = testEnv.connection()
+    const {pool, cleanup} = await testEnv.connection()
     const driver = impl.driver()
 
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
@@ -39,10 +41,12 @@ const postgresTestEnvInit = async () => await dbInit(postgresTestEnv, postgres)
 const mysqlTestEnvInit = async () => await dbInit(mysqlTestEnv, mysql)
 const spannerTestEnvInit = async () => await dbInit(spannerTestEnv, spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestoreTestEnv, firestore)
+const mssqlTestEnvInit = async () => await dbInit(mssqlTestEnv, mssql)
 
 module.exports = { env, dbTeardown,
                    postgresTestEnvInit,
                    mysqlTestEnvInit,
                    spannerTestEnvInit,
                    firestoreTestEnvInit,
+                   mssqlTestEnvInit,
 }

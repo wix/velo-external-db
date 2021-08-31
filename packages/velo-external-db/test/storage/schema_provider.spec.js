@@ -2,7 +2,7 @@ const {CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, Fie
 const { Uninitialized, gen } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance');
-const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit, firestoreTestEnvInit} = require('../resources/provider_resources')
+const { env, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit, firestoreTestEnvInit, mssqlTestEnvInit} = require('../resources/provider_resources')
 const chance = new Chance();
 const { SystemFields, asWixSchema } = require('velo-external-db-commons')
 
@@ -13,6 +13,7 @@ describe('Schema API', () => {
         ['Postgres', postgresTestEnvInit],
         ['Spanner', spannerTestEnvInit],
         ['Firestore', firestoreTestEnvInit],
+        ['msSql', mssqlTestEnvInit],
     ]).describe('%s', (name, setup) => {
 
         beforeAll(async () => {
