@@ -1,6 +1,6 @@
 const express = require('express')
 const { errorMiddleware } = require('./web/error-middleware')
-const { getConfig } = require ('../views/helpers/get_config')
+const { getConfig } = require ('../views/helpers/app_info')
 
 let dataService, schemaService, operationService, externalDbConfigClient
 
