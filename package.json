@@ -13,7 +13,7 @@
   "workspaces": {
     "packages": [
       "external-db-mysql",
-      "velo-external-db"
+      "velo-external-db" 
     ]
   }
 }
