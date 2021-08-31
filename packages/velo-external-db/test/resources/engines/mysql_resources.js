@@ -3,11 +3,11 @@ const compose = require('docker-compose')
 const mysql = require('mysql')
 
 const connection = () => {
-    const pool = mysql.createPool({
-        host     : 'localhost',
-        user     : 'test-user',
-        password : 'password',
-        database : 'test-db',
+    const config = {
+        host: 'localhost',
+        user: 'test-user',
+        password: 'password',
+        database: 'test-db',
 
         waitForConnections: true,
         namedPlaceholders: true,
@@ -15,14 +15,19 @@ const connection = () => {
 
         connectionLimit: 1,
         queueLimit: 0
-    });
-    return { pool, cleanup: async () => await pool.end(() => {})}
+    }
+    let pool = mysql.createPool(config);
+    pool.on('error', (err) => {
+        if (err.code == 'PROTOCOL_CONNECTION_LOST')
+            pool = mysql.createPool(config)
+    })
+    return { pool, cleanup: async () => await pool.end(() => { }) }
 }
 
 const cleanup = async () => {
-    const {schemaProvider, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'])
+    const { schemaProvider, cleanup } = init(['localhost', 'test-user', 'password', 'test-db'])
     const tables = await schemaProvider.list()
-    await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
+    await Promise.all(tables.map(t => t.id).map(t => schemaProvider.drop(t)))
 
     await cleanup();
 }
