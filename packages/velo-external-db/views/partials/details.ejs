@@ -8,8 +8,8 @@
 
 
 <%
-const connectionColor =  CONNECTION_STATUS === 'Connected to database successfully' ? 'success': 'danger' 
-const configStatusColor = CONFIG_STATUS === 'External DB Config read successfully' ? 'success' : 'danger'
+const connectionColor =  dbConnectionStatus === 'Connected to database successfully' ? 'success': 'danger' 
+const configStatusColor = configReaderStatus === 'External DB Config read successfully' ? 'success' : 'danger'
 %>
 <script>
 	function toggleConfigDisplay() {
@@ -27,17 +27,17 @@ const configStatusColor = CONFIG_STATUS === 'External DB Config read successfull
 			<div>
 				<h6 class="mb-0">Config Status</h6>
 				<p class="mb-0 opacity-75">
-					<%= CONFIG_STATUS %>
+					<%= configReaderStatus %>
 				</p>
 			</div>
 		</div>
 	</button>
 	<div id="config" aria-current="true" style="padding: 1px 15%; display:none">
-		<li>host : <%= CONFIG.host || CONFIG.cloudSqlConnectionName %></li>
-		<li>user: <%= CONFIG.user  %></li>
-		<li>password: <%= CONFIG.password %></li>
-		<li>db: <%= CONFIG.db %></li>
-		<li>secretKey: <%= CONFIG.secretKey %></li>
+		<li>host : <%= config.host || config.cloudSqlConnectionName %></li>
+		<li>user: <%= config.user  %></li>
+		<li>password: <%= config.password %></li>
+		<li>db: <%= config.db %></li>
+		<li>secretKey: <%= config.secretKey %></li>
 	</div>
 
 	<div class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=connectionColor%> py-3" aria-current="true"> 
@@ -53,7 +53,7 @@ const configStatusColor = CONFIG_STATUS === 'External DB Config read successfull
 			<div>
 				<h6 class="mb-0">Connection Status</h6>
 				<p class="mb-0 opacity-75">
-					<%= CONNECTION_STATUS %>
+					<%= dbConnectionStatus %>
 				</p>
 			</div>
 		</div>

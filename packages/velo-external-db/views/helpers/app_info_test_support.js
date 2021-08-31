@@ -1,3 +1,4 @@
+const { gen } = require('test-commons')
 const { when } = require('jest-when')
 
 const operationService = {
@@ -12,25 +13,41 @@ const configReaderClient = {
 
 const validConfigReaderStatus = 'External DB Config read successfully'
 const validDBConnectionStatus = 'Connected to database successfully'
+const missingRequiredConfigKeys = 'Missing props:'
+const wrongDBConnectionStatus = 'Failed to connect to database'
 
-const givenDBConnectionStatus = (connectionStatus) => {
+const defineValidOperationService = () => {
     when(operationService.connectionStatus).calledWith()
-                                           .mockReturnValue({ STATUS: connectionStatus })
+                                           .mockReturnValue({ status: validDBConnectionStatus })
 }
 
-const givenConfig = (config) => {
+const defineValidConfigReaderClient = (config) => {
     when(configReaderClient.readConfig).calledWith()
                                            .mockReturnValue(config);
     when(configReaderClient.configStatus).calledWith()
                                            .mockReturnValue(validConfigReaderStatus)
 }
 
+const defineBrokenConfigReaderClient = (config) => {
+    const {deletedKey, newObject } = gen.deleteRandomKeyObject(config);
+    when(configReaderClient.readConfig).calledWith()
+                                           .mockReturnValue(newObject);
+    when(configReaderClient.configStatus).calledWith()
+                                           .mockReturnValue(`${missingRequiredConfigKeys}: ${deletedKey}`)
+}
+
+const defineBrokenOperationService = () => {
+    when(operationService.connectionStatus).calledWith()
+                                           .mockReturnValue({ error: wrongDBConnectionStatus })
+}
+
 const reset = () => {
-    operationService.validateConnection.mockClear()
+    operationService.validateConnection.mockClear() 
     operationService.connectionStatus.mockClear()
     configReaderClient.configStatus.mockClear()
     configReaderClient.readConfig.mockClear()
 }
 
-module.exports = { operationService, configReaderClient, validConfigStatus, validDBConnectionStatus,
-    givenConfig, givenDBConnectionStatus, reset}
+module.exports = { operationService, configReaderClient, validDBConnectionStatus, validConfigReaderStatus, wrongDBConnectionStatus,
+    defineValidConfigReaderClient, defineValidOperationService, defineBrokenConfigReaderClient,defineBrokenOperationService,
+     missingRequiredConfigKeys, reset}
