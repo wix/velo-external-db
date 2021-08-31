@@ -4,6 +4,7 @@ body {
   background-size: cover;
   background-position: center;
   line-height: 1.6;
+  background-attachment: fixed;
 }
 
 h1 {
