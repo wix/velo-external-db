@@ -20,4 +20,4 @@ jobs:
 notifications:
   email:
     recipients:
-    - idokah@wix.com 
+    - idokah@wix.com
