@@ -1,6 +1,6 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const {escapeId} = require('mysql');
+const { escapeId, escapeFieldId } = require('../../lib/mssql_utils');
 
 const filterParser = {
     transform: jest.fn(),
@@ -16,7 +16,7 @@ const stubEmptyFilterAndSortFor = (filter, sort) => {
 
 const stubEmptyFilterFor = (filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: '', parameters: [] })
+                                .mockReturnValue({ filterExpr: '', parameters: {} })
 }
 
 const stubEmptyOrderByFor = (sort) => {
@@ -24,25 +24,33 @@ const stubEmptyOrderByFor = (sort) => {
                               .mockReturnValue(EMPTY_SORT)
 }
 
+const patchFieldName = (f) => {
+    if (f.startsWith('_')) {
+        return `x${f}`
+    }
+    return f
+}
+
+
 const givenOrderByFor = (column, sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeId(column)} ASC` })
+                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeFieldId(column)} ASC` })
 }
 
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeId('_id')} = ?`, parameters: [id] })
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeFieldId('_id')} = @${patchFieldName('_id')}`, parameters: { x_id: id} })
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
     const c = numericColumns.map(c => c.name)
     when(filterParser.parseAggregation).calledWith(having, filter)
                                        .mockReturnValue({
-                                           fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
+                                           fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeFieldId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
                                            groupByColumns: groupByColumns,
                                            havingFilter: '',
-                                           parameters: [],
+                                           parameters: {},
                                        })
 }
 
