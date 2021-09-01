@@ -26,9 +26,9 @@ const initEnv = async () => {
     await compose.upOne('firestore', { cwd: __dirname, log: true })
     // await compose.logs('firestore', { cwd: __dirname, log: true });
 
-    await sleep( 500 )
+    // await sleep( 500 )
 
-    await cleanup()
+    // await cleanup()
 }
 
 const setActive = () => {

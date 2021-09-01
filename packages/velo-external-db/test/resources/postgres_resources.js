@@ -34,9 +34,9 @@ const initEnv = async () => {
 
     await compose.upOne('postgres', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] } )
 
-    await sleep( 500 )
-
-    await cleanup()
+    // await sleep( 500 )
+    //
+    // await cleanup()
 }
 
 const setActive = () => {

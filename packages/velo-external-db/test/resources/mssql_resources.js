@@ -1,7 +1,7 @@
 const { init } = require('external-db-mssql')
 const compose = require('docker-compose')
 const sql = require('mssql')
-const { sleep } = require("test-commons")
+const { sleep } = require('test-commons')
 
 const connection = async () => {
     const sqlConfig = {
@@ -37,9 +37,9 @@ const cleanup = async () => {
 const initEnv = async () => {
     await compose.upOne('mssql', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] } )
 
-    await sleep( 5000 )
-
-    await cleanup()
+    // await sleep( 5000 )
+    //
+    // await cleanup()
 }
 
 const shutdownEnv = async () => {
