@@ -14,15 +14,15 @@ class SchemaProvider {
     }
 
 
-    async query(query,params) {
+    async query(query, params) {
 
         this.pool.query('SELECT 1', (err) => {
             if (err) {
-                console.log(err);
-                if (err.code == 'POOL_CLOSED'||err.code == 'PROTOCOL_CONNECTION_LOST'){
-                    console.log('~~~ new pool created ~~~');
+                console.log('~~~~~~~ ',err);
+                if (err.code == 'POOL_CLOSED' || err.code == 'PROTOCOL_CONNECTION_LOST') {
                     this.pool = require('mysql').createPool(this.poolConfig)
-                    this.pool.query('SELECT 1', (err) => {console.log('~~~~ new pool error ~~~~',err)})
+                    this.pool.query('SELECT 1', (err) => { console.log('~~~~ new pool error ~~~~', err) })
+                    console.log('~~~ new pool created ~~~');
                 }
                 else {
                     console.log("~~~ pool error ~~~", err.code);
@@ -31,7 +31,7 @@ class SchemaProvider {
             }
         })
         const promisifyQuery = promisify(this.pool.query).bind(this.pool)
-        return promisifyQuery(query,params)
+        return promisifyQuery(query, params)
     }
 
     async list() {
