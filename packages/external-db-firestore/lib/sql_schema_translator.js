@@ -1,9 +1,9 @@
 // const { escapeId } = require('mysql')
 //
-// class SchemaColumnTranslator {
-//
-//     constructor() {
-//     }
+class SchemaColumnTranslator {
+
+    constructor() {
+    }
 //
 //     translateType(dbType) {
 //         const type = dbType.toLowerCase()
@@ -97,6 +97,6 @@
 //         }
 //     }
 //
-// }
+}
 //
-// module.exports = SchemaColumnTranslator
+module.exports = SchemaColumnTranslator

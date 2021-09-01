@@ -8,22 +8,27 @@ class DataProvider {
         this.database = database
     }
 
-    // async find(collectionName, filter, sort, skip, limit) {
-    //     const {filterExpr, parameters} = this.filterParser.transform(filter)
-    //     const { sortExpr } = this.filterParser.orderBy(sort)
-    //
-    //     const query = {
-    //         sql: `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} LIMIT @limit OFFSET @skip`,
-    //         params: {
-    //             skip: skip,
-    //             limit: limit,
-    //         },
-    //     }
-    //     Object.assign(query.params, parameters)
-    //
-    //     const [rows] = await this.database.run(query);
-    //     return recordSetToObj(rows).map( this.asEntity.bind(this) )
-    // }
+/*
+                fieldName: this.inlineVariableIfNeeded(filter.fieldName, inlineFields),
+                opStr: this.veloOperatorToMySqlOperator(filter.operator, filter.value),
+                value,
+*/
+
+    async find(collectionName, filter, sort, skip, limit) {
+        const {fieldName, opStr, value} = this.filterParser.transform(filter)
+        const { sortOperations } = this.filterParser.orderBy(sort)
+        const query = this.database.collection(collectionName)
+
+        query.where(fieldName,opStr,value)
+
+        sortOperations.forEach( sortOp => query.orderBy(sortOp.fieldName,sortOp.direction))
+
+        query.limit(limit).offset(skip)
+
+        const [rows] = await query.get()
+        return rows
+        // return recordSetToObj(rows).map( this.asEntity.bind(this) )
+    }
     //
     // async count(collectionName, filter) {
     //     const {filterExpr, parameters} = this.filterParser.transform(filter)

@@ -17,12 +17,12 @@
 //     return f
 // }
 //
-// const testLiteral = s => /^[a-zA-Z_0-9_]+$/.test(s)
-// const validateLiteral = l => {
-//     if (!testLiteral(l)) {
-//         throw new InvalidQuery(`Invalid literal`)
-//     }
-//     return `@${l}`
-// }
+const testLiteral = s => /^[a-zA-Z_0-9_]+$/.test(s)
+const validateLiteral = l => {
+    if (!testLiteral(l)) {
+        throw new InvalidQuery(`Invalid literal`)
+    }
+    return `@${l}`
+}
 
-module.exports = { /*recordSetToObj, escapeId, patchFieldName, unpatchFieldName, testLiteral, validateLiteral*/ }
+module.exports = { /*recordSetToObj, escapeId, patchFieldName, unpatchFieldName,*/ testLiteral, validateLiteral }

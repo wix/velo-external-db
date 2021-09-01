@@ -1,23 +1,27 @@
-// const { InvalidQuery } = require('velo-external-db-commons').errors
-// const { EMPTY_FILTER, EMPTY_SORT, isObject } = require('velo-external-db-commons')
-// const { escapeId, validateLiteral } = require('./spanner_utils')
+const { InvalidQuery } = require('velo-external-db-commons').errors
+const { EMPTY_FILTER, isObject } = require('velo-external-db-commons')
+const { /*escapeId,*/ validateLiteral } = require('./firestore_utils')
+
+const EMPTY_SORT = {}
 
 class FilterParser {
     constructor() {
     }
 
-    // transform(filter) {
-    //     const results = this.parseFilter(filter, 1, {})
-    //
-    //     if (results.length === 0) {
-    //         return EMPTY_FILTER;
-    //     }
-    //
-    //     return {
-    //         filterExpr: `WHERE ${results[0].filterExpr}`,
-    //         parameters: results[0].parameters
-    //     };
-    // }
+    transform(filter) {
+    const results = this.parseFilter(filter)
+    
+        if (results.length === 0) {
+            return EMPTY_FILTER;
+        }
+    
+        // return {
+        //     filterExpr: `WHERE ${results[0].filterExpr}`,
+        //     parameters: results[0].parameters
+        // };
+
+        return results
+    }
     //
     // wixDataFunction2Sql(f) {
     //     switch (f) {
@@ -72,59 +76,59 @@ class FilterParser {
     //     }
     // }
     //
-    // parseFilter(filter, inlineFields) {
-    //     if (!filter || !isObject(filter)|| filter.operator === undefined) {
-    //         return []
-    //     }
-    //
-    //     switch (filter.operator) {
-    //         case '$and':
-    //         case '$or':
-    //             const res = filter.value.reduce((o, f) => {
-    //                 const res = this.parseFilter.bind(this)(f, inlineFields)
-    //                 return {
-    //                     filter: o.filter.concat( ...res ),
-    //                 }
-    //             }, { filter: []})
-    //             const op = filter.operator === '$and' ? ' AND ' : ' OR '
-    //             return [{
-    //                 filterExpr: res.filter.map(r => r.filterExpr).join( op ),
-    //                 parameters: res.filter.reduce((o, s) => Object.assign({}, o, s.parameters), {} )
-    //             }]
-    //         case '$not':
-    //             const res2 = this.parseFilter( filter.value, inlineFields )
-    //             return [{
-    //                 filterExpr: `NOT (${res2[0].filterExpr})`,
-    //                 parameters: res2[0].parameters
-    //             }]
-    //     }
-    //
-    //     if (this.isSingleFieldOperator(filter.operator)) {
-    //         const params = this.valueForOperator(filter.fieldName, filter.value, filter.operator)
-    //
-    //         return [{
-    //             filterExpr: `${this.inlineVariableIfNeeded(filter.fieldName, inlineFields)} ${this.veloOperatorToMySqlOperator(filter.operator, filter.value)} ${params.sql}`.trim(),
-    //             parameters: this.parametersFor(filter.fieldName, filter.value)
-    //         }]
-    //     }
-    //
-    //
-    //     if (this.isSingleFieldStringOperator(filter.operator)) {
-    //         return [{
-    //             filterExpr: `${this.inlineVariableIfNeeded(filter.fieldName, inlineFields)} LIKE ${validateLiteral(filter.fieldName)}`,
-    //             parameters: { [filter.fieldName]: this.valueForStringOperator(filter.operator, filter.value)}
-    //         }]
-    //     }
-    //
-    //     if (filter.operator === '$urlized') {
-    //         return [{
-    //             filterExpr: `LOWER(${escapeId(filter.fieldName)}) RLIKE ${validateLiteral(filter.fieldName)}`,
-    //             parameters: { [filter.fieldName]: filter.value.map(s => s.toLowerCase()).join('[- ]') }
-    //         }]
-    //     }
-    //
-    //     return []
-    // }
+    parseFilter(filter, inlineFields) {
+        if (!filter || !isObject(filter)|| filter.operator === undefined) {
+            return []
+        }
+    
+        // switch (filter.operator) {
+        //     case '$and':
+        //     case '$or':
+        //         const res = filter.value.reduce((o, f) => {
+        //             const res = this.parseFilter.bind(this)(f, inlineFields)
+        //             return {
+        //                 filter: o.filter.concat( ...res ),
+        //             }
+        //         }, { filter: []})
+        //         const op = filter.operator === '$and' ? ' AND ' : ' OR '
+        //         return [{
+        //             filterExpr: res.filter.map(r => r.filterExpr).join( op ),
+        //             parameters: res.filter.reduce((o, s) => Object.assign({}, o, s.parameters), {} )
+        //         }]
+        //     case '$not':
+        //         const res2 = this.parseFilter( filter.value, inlineFields )
+        //         return [{
+        //             filterExpr: `NOT (${res2[0].filterExpr})`,
+        //             parameters: res2[0].parameters
+        //         }]
+        // }
+    
+        if (this.isSingleFieldOperator(filter.operator)) {
+            const value = this.valueForOperator(filter.fieldName, filter.value, filter.operator)
+    
+            return [{
+                fieldName: this.inlineVariableIfNeeded(filter.fieldName, inlineFields),
+                opStr: this.veloOperatorToMySqlOperator(filter.operator, filter.value),
+                value,
+            }]
+        }
+    
+        // if (this.isSingleFieldStringOperator(filter.operator)) {
+        //     return [{
+        //         filterExpr: `${this.inlineVariableIfNeeded(filter.fieldName, inlineFields)} LIKE ${validateLiteral(filter.fieldName)}`,
+        //         parameters: { [filter.fieldName]: this.valueForStringOperator(filter.operator, filter.value)}
+        //     }]
+        // }
+    
+        // if (filter.operator === '$urlized') {
+        //     return [{
+        //         filterExpr: `LOWER(${escapeId(filter.fieldName)}) RLIKE ${validateLiteral(filter.fieldName)}`,
+        //         parameters: { [filter.fieldName]: filter.value.map(s => s.toLowerCase()).join('[- ]') }
+        //     }]
+        // }
+    
+        return []
+    }
     //
     // parametersFor(name, value) {
     //     if (value !== undefined) {
@@ -148,89 +152,87 @@ class FilterParser {
     //     }
     // }
     //
-    // isSingleFieldOperator(operator) {
-    //     return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq'].includes(operator)
-    // }
-    //
+    isSingleFieldOperator(operator) {
+        return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq'].includes(operator)
+    }
+    
     // isSingleFieldStringOperator(operator) {
     //     return ['$contains', '$startsWith', '$endsWith'].includes(operator)
     // }
-    //
-    // prepareStatementVariables(n, fieldName) {
-    //     return Array.from({length: n}, (_, i) => validateLiteral(`${fieldName}${i + 1}`) )
-    //                 .join(', ')
-    // }
-    //
-    //
-    // valueForOperator(fieldName, value, operator) {
-    //     if (operator === '$hasSome') {
-    //         if (value === undefined || value.length === 0) {
-    //             throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
-    //         }
-    //         return {
-    //             sql: `(${this.prepareStatementVariables(value.length, fieldName)})`,
-    //         }
-    //     } else if (operator === '$eq' && value === undefined) {
-    //         return {
-    //             sql: '',
-    //         }
-    //     }
-    //
-    //     return {
-    //         sql: validateLiteral(fieldName),
-    //     }
-    // }
-    //
-    // veloOperatorToMySqlOperator(operator, value) {
-    //     switch (operator) {
-    //         case '$eq':
-    //             if (value !== undefined) {
-    //                 return '='
-    //             }
-    //             return 'IS NULL'
-    //         case '$ne':
-    //             return '<>'
-    //         case '$lt':
-    //             return '<'
-    //         case '$lte':
-    //             return '<='
-    //         case '$gt':
-    //             return '>'
-    //         case '$gte':
-    //             return '>='
-    //         case '$hasSome':
-    //             return 'IN'
-    //     }
-    // }
-    //
-    // orderBy(sort) {
-    //     if (!Array.isArray(sort) || !sort.every(isObject)) {
-    //         return EMPTY_SORT;
-    //     }
-    //
-    //     const results = sort.flatMap( this.parseSort )
-    //
-    //     if (results.length === 0) {
-    //         return EMPTY_SORT;
-    //     }
-    //
-    //     return {
-    //         sortExpr: `ORDER BY ${results.map( s => s.expr).join(', ')}`
-    //     }
-    // }
-    //
-    // parseSort({ fieldName, direction }) {
-    //     if (typeof fieldName !== 'string') {
-    //         return []
-    //     }
-    //     const _direction = direction || 'ASC'
-    //
-    //     const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC';
-    //
-    //     return [{
-    //         expr: `${escapeId(fieldName)} ${dir}`
-    //     }]
-    // }
+    
+    // fix this function
+    prepareStatementVariables(n, fieldName) {
+        return Array.from({length: n}, (_, i) => validateLiteral(`${fieldName}${i + 1}`) )
+                    .join(', ')
+    }
+    
+    
+    valueForOperator(fieldName, value, operator) {
+        if (operator === '$hasSome') {
+            if (value === undefined || value.length === 0) {
+                throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
+            }
+            return value  
+        } else if (operator === '$eq' && value === undefined) {
+            return ''
+        }
+        
+        // return validateLiteral(fieldName)
+        return value
+    }
+    
+    veloOperatorToMySqlOperator(operator, value) {
+        switch (operator) {
+            case '$eq':
+                if (value !== undefined) {
+                    return '=='
+                }
+                // what to do with this?
+                return 'IS NULL'
+            case '$ne':
+                return '!='
+            case '$lt':
+                return '<'
+            case '$lte':
+                return '<='
+            case '$gt':
+                return '>'
+            case '$gte':
+                return '>='
+            case '$hasSome':
+                return 'in'
+        }
+    }
+    
+    orderBy(sort) {
+        if (!Array.isArray(sort) || !sort.every(isObject)) {
+            return EMPTY_SORT;
+        }
+    
+        const results = sort.flatMap( this.parseSort )
+    
+        if (results.length === 0) {
+            return EMPTY_SORT;
+        }
+
+        return {
+            sortOperations: results
+        }
+
+    }
+    
+    parseSort({ fieldName, direction }) {
+        if (typeof fieldName !== 'string') {
+            return []
+        }
+        const _direction = direction || 'asc'
+    
+        const dir = 'asc' === _direction.toLowerCase() ? 'asc' : 'desc'
+        
+        // should I escape the fieldName?
+        return [{fieldName, direction: dir}]
+
+    }
     //
     // patchTrueFalseValue(value) {
     //     if (value === true || value === false) {
@@ -239,14 +241,14 @@ class FilterParser {
     //     return value
     // }
     //
-    // inlineVariableIfNeeded(fieldName, inlineFields) {
-    //     if (inlineFields) {
-    //         if (inlineFields[fieldName]) {
-    //             return inlineFields[fieldName]
-    //         }
-    //     }
-    //     return escapeId(fieldName)
-    // }
+    inlineVariableIfNeeded(fieldName, inlineFields) {
+        if (inlineFields) {
+            if (inlineFields[fieldName]) {
+                return inlineFields[fieldName]
+            }
+        }
+        return fieldName
+    }
 }
 
 module.exports = FilterParser
