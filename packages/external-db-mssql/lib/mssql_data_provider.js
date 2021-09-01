@@ -1,4 +1,4 @@
-const { escapeId } = require('./mssql_utils')
+const { escapeId, validateLiteral, escape, patchFieldName } = require('./mssql_utils')
 const { SystemFields } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 
@@ -14,11 +14,11 @@ class DataProvider {
         const {sortExpr} = this.filterParser.orderBy(sort)
         let offsetSql = ''
         if (skip > 0) {
-            offsetSql = `OFFSET ${skip} ROWS`
+            offsetSql = `OFFSET ${escape(skip)} ROWS`
         }
         let limitSql = ''
         if (skip > 0) {
-            limitSql = `FETCH NEXT ${limit} ROWS ONLY`
+            limitSql = `FETCH NEXT ${escape(limit)} ROWS ONLY`
         }
         const sql = `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} ${offsetSql} ${limitSql}`
 
@@ -35,7 +35,7 @@ class DataProvider {
     }
 
     patch(item) {
-        return Object.entries(item).reduce((o, [k, v]) => Object.assign({}, o, {[`x${k}`]: v}), {})
+        return Object.entries(item).reduce((o, [k, v]) => Object.assign({}, o, {[patchFieldName(k)]: v}), {})
     }
 
     // todo: check if we can get schema in a safer way. should be according to schema of the table
@@ -46,7 +46,7 @@ class DataProvider {
     }
 
     insertSingle(collectionName, item) {
-        const sql = `INSERT INTO ${escapeId(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES (${Object.keys(item).map( k => escapeId(`@x${k}`) ).map( escapeId ).join(', ')})`
+        const sql = `INSERT INTO ${escapeId(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES (${Object.keys(item).map( validateLiteral ).join(', ')})`
         return this.query(sql, this.patch(item), true)
     }
 
@@ -63,15 +63,15 @@ class DataProvider {
             return 0
         }
 
-        const sql = `UPDATE ${escapeId(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = @${escapeId(`x${f}`)}`).join(', ')} WHERE _id = @x_id`
+        const sql = `UPDATE ${escapeId(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ${validateLiteral(f)}`).join(', ')} WHERE _id = ${validateLiteral('_id')}`
 
         return await this.query(sql, this.patch(item), true)
     }
 
 
     async delete(collectionName, itemIds) {
-        const sql = `DELETE FROM ${escapeId(collectionName)} WHERE _id IN (${itemIds.map((t, i) => `@x_id${i}`).join(', ')})`
-        const rs = await this.query(sql, itemIds.reduce((p, t, i) => Object.assign({}, p, { [`x_id${i}`]: t }), {}), true)
+        const sql = `DELETE FROM ${escapeId(collectionName)} WHERE _id IN (${itemIds.map((t, i) => validateLiteral(`_id${i}`)).join(', ')})`
+        const rs = await this.query(sql, itemIds.reduce((p, t, i) => Object.assign({}, p, { [patchFieldName(`_id${i}`)]: t }), {}), true)
                              .catch( translateErrorCodes )
         return rs
     }
@@ -91,7 +91,7 @@ class DataProvider {
 
     async query(sql, parameters, op) {
         const request = Object.entries(parameters)
-                              .reduce((r, [k, v]) => r.input(escapeId(k), v),
+                              .reduce((r, [k, v]) => r.input(k, v),
                                       this.sql.request())
 
         const rs = await request.query(sql)

@@ -38,11 +38,11 @@ class FilterParser {
         const groupByColumns = []
         const filterColumnsStr = []
         if (isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeFieldId(f)))
-            groupByColumns.push(...Object.values(aggregation._id).map(f => patchFieldName(f)))
+            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(f)))
+            groupByColumns.push(...Object.values(aggregation._id))
         } else {
-            filterColumnsStr.push(escapeFieldId(aggregation._id))
-            groupByColumns.push(patchFieldName(aggregation._id))
+            filterColumnsStr.push(escapeId(aggregation._id))
+            groupByColumns.push(aggregation._id)
         }
 
         const aliasToFunction = {}
@@ -51,8 +51,8 @@ class FilterParser {
               .forEach(fieldAlias => {
                   Object.entries(aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeFieldId(field)}) AS ${escapeFieldId(fieldAlias)}`)
-                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeFieldId(field)})`
+                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeId(field)}) AS ${escapeId(fieldAlias)}`)
+                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeId(field)})`
                         })
               })
 
@@ -112,14 +112,14 @@ class FilterParser {
         if (this.isSingleFieldStringOperator(filter.operator)) {
             return [{
                 filterExpr: `${this.inlineVariableIfNeeded(filter.fieldName, inlineFields)} LIKE ${validateLiteral(filter.fieldName)}`,
-                parameters: { [filter.fieldName]: this.valueForStringOperator(filter.operator, filter.value)}
+                parameters: { [patchFieldName(filter.fieldName)]: this.valueForStringOperator(filter.operator, filter.value)}
             }]
         }
 
         if (filter.operator === '$urlized') {
             return [{
-                filterExpr: `LOWER(${escapeId(filter.fieldName)}) RLIKE ${validateLiteral(filter.fieldName)}`,
-                parameters: { [filter.fieldName]: filter.value.map(s => s.toLowerCase()).join('[- ]') }
+                filterExpr: `LOWER(${escapeId(filter.fieldName)}) LIKE ${validateLiteral(filter.fieldName)}`,
+                parameters: { [patchFieldName(filter.fieldName)]: filter.value.map(s => s.toLowerCase()).join('[- ]') }
             }]
         }
 
@@ -129,9 +129,9 @@ class FilterParser {
     parametersFor(name, value) {
         if (value !== undefined) {
             if (!Array.isArray(value)) {
-                return { [name]: this.patchTrueFalseValue(value) }
+                return { [patchFieldName(name)]: this.patchTrueFalseValue(value) }
             } else {
-                return value.reduce((o, v, i) => Object.assign({}, o, { [`${name}${i + 1}`]: v}), {})
+                return value.reduce((o, v, i) => Object.assign({}, o, { [patchFieldName(`${name}${i + 1}`)]: v}), {})
             }
         }
         return { }
@@ -157,8 +157,7 @@ class FilterParser {
     }
 
     prepareStatementVariables(n, fieldName) {
-
-        return Array.from({length: n}, (_, i) => validateLiteral(`${patchFieldName(fieldName)}${i + 1}`) )
+        return Array.from({length: n}, (_, i) => validateLiteral(`${fieldName}${i + 1}`) )
                     .join(', ')
     }
 
@@ -229,7 +228,7 @@ class FilterParser {
         const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC';
 
         return [{
-            expr: `${escapeFieldId(fieldName)} ${dir}`
+            expr: `${escapeId(fieldName)} ${dir}`
         }]
     }
 
@@ -241,13 +240,12 @@ class FilterParser {
     }
 
     inlineVariableIfNeeded(fieldName, inlineFields) {
-
         if (inlineFields) {
             if (inlineFields[fieldName]) {
-                return inlineFields[patchFieldName(fieldName)]
+                return inlineFields[fieldName]
             }
         }
-        return escapeFieldId(fieldName)
+        return escapeId(fieldName)
     }
 }
 

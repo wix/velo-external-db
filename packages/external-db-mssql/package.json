@@ -26,8 +26,8 @@
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
   "dependencies": {
-    "mysql": "^2.18.1",
     "mssql": "^7.2.1",
+    "tsqlstring": "^1.0.1",
     "velo-external-db-commons": "^0.0.0"
   },
   "devDependencies": {
