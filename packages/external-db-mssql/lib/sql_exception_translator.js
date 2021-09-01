@@ -10,10 +10,7 @@ const notThrowingTranslateErrorCodes = err => {
             return new FieldDoesNotExist('Collection does not contain a field with this name')
         case 2714:
             return new CollectionAlreadyExists('Collection already exists')
-        //     return new WrongDatabaseError(`Database does not exists or you don\'t have access to it, sql message: ${err.sqlMessage}`)
-        //     return new AccessDeniedError(`Access to database denied - probably wrong credentials,sql message:  ${err.sqlMessage} `)
-        //     return new AccessDeniedError('Database host does not found.')
-        default :
+        default:
             console.log(err.number)
             console.log(err)
             return new Error(`default ${err.sqlMessage}`)

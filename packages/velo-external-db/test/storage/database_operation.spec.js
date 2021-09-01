@@ -1,6 +1,6 @@
-const { errors } = require('velo-external-db-commons')
+const { DbConnectionError } = require('velo-external-db-commons').errors
 const each = require('jest-each').default;
-const { env, postgresTestEnvInit, mysqlTestEnvInit, spannerTestEnvInit, firestoreTestEnvInit } = require('../resources/operations_resources')
+const { env, postgresTestEnvInit, mysqlTestEnvInit, spannerTestEnvInit, firestoreTestEnvInit, mssqlTestEnvInit } = require('../resources/operations_resources')
 
 
 describe('Check Pool Connection', () => {
@@ -9,6 +9,7 @@ describe('Check Pool Connection', () => {
         ['Postgres', postgresTestEnvInit],
         ['Spanner', spannerTestEnvInit],
         ['Firestore', firestoreTestEnvInit],
+        ['Sql Server', mssqlTestEnvInit],
     ]).describe('%s', (dbType, setup) => {
 
         beforeAll(async () => {
@@ -21,7 +22,8 @@ describe('Check Pool Connection', () => {
             const validateConnection = await dbOperation.validateConnection()
 
             expect(validateConnection.valid).toBeFalsy()
-            expect(validateConnection.error).toBeInstanceOf(errors.AccessDeniedError)
+            expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
+            expect(validateConnection.error.message).toContain('wrong credentials')
         })
 
         test('pool connection with wrong database will throw DatabaseDoesNotExists.', async () => {
@@ -31,7 +33,7 @@ describe('Check Pool Connection', () => {
                 const validateConnection = await dbOperation.validateConnection()
 
                 expect(validateConnection.valid).toBeFalsy()
-                expect(validateConnection.error).toBeInstanceOf(errors.WrongDatabaseError)
+                expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
             }
         })
 
@@ -42,7 +44,8 @@ describe('Check Pool Connection', () => {
                 const validateConnection = await dbOperation.validateConnection()
 
                 expect(validateConnection.valid).toBeFalsy()
-                expect(validateConnection.error).toBeInstanceOf(errors.AccessDeniedError)
+                expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
+                expect(validateConnection.error.message).toContain('host is unavailable')
             }
         })
 

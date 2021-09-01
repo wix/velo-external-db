@@ -47,21 +47,11 @@ class InvalidQuery extends BaseHttpError {
     }
 }
 
-class AccessDeniedError extends BaseHttpError {
+class DbConnectionError extends BaseHttpError {
     constructor(message) {
-        super(message, 401);
-    }
-}
-class WrongDatabaseError extends BaseHttpError {
-    constructor(message) {
-        super(message, 404);
-    }
-}
-class HostDoesNotExists extends BaseHttpError {
-    constructor(message) {
-        super(message, 404);
+        super(message, 500);
     }
 }
 
 module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField, InvalidQuery,
-                   AccessDeniedError, WrongDatabaseError, HostDoesNotExists, CollectionAlreadyExists }
+                   CollectionAlreadyExists, DbConnectionError }
