@@ -36,6 +36,7 @@ const create = () => {
           internalConfigReader = new GcpSpannerConfigReader()
           break;
 
+        case 'mssql':
         case 'mysql':
         case 'postgres':
           internalConfigReader = new AzureConfigReader()

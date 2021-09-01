@@ -13,7 +13,7 @@ describe('Schema API', () => {
         ['Postgres', postgresTestEnvInit],
         ['Spanner', spannerTestEnvInit],
         ['Firestore', firestoreTestEnvInit],
-        ['msSql', mssqlTestEnvInit],
+        ['Sql Server', mssqlTestEnvInit],
     ]).describe('%s', (name, setup) => {
 
         beforeAll(async () => {

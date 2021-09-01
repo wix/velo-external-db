@@ -4,6 +4,7 @@ const postgres = require("../resources/postgres_resources")
 const mysql = require('../resources/mysql_resources')
 const spanner = require('../resources/spanner_resources')
 const firestore = require('../resources/firestore_resources')
+const mssql = require('../resources/mssql_resources')
 const { waitUntil } = require('async-wait-until')
 
 const env = {
@@ -43,6 +44,7 @@ const postgresTestEnvInit = async () => await dbInit(postgres)
 const mysqlTestEnvInit = async () => await dbInit(mysql)
 const spannerTestEnvInit = async () => await dbInit(spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestore)
+const mssqlTestEnvInit = async () => await dbInit(mssql)
 
 
 module.exports = { env, initApp, teardownApp, dbTeardown,
@@ -50,4 +52,5 @@ module.exports = { env, initApp, teardownApp, dbTeardown,
                    mysqlTestEnvInit,
                    spannerTestEnvInit,
                    firestoreTestEnvInit,
+                   mssqlTestEnvInit,
 }

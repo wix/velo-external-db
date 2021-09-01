@@ -21,6 +21,13 @@ const init = async(type, vendor, config) => {
             const { projectId, secretKey } = await config.readConfig()
             return append(init([projectId]), secretKey)
         }
+        case 'mssql': {
+            const { init } = require('external-db-mssql')
+
+            const { host, user, password, db, secretKey } = await config.readConfig()
+            const res = await init([host, user, password, db])
+            return append(res, secretKey)
+        }
         default:
             case 'mysql':{
                 console.log(`INIT: ${vendor + '/' + type}`)
