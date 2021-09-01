@@ -1,6 +1,6 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const { escapeId, escapeFieldId } = require('../../lib/mssql_utils');
+const { escapeId, validateLiteral, patchFieldName } = require('../../lib/mssql_utils');
 
 const filterParser = {
     transform: jest.fn(),
@@ -24,30 +24,22 @@ const stubEmptyOrderByFor = (sort) => {
                               .mockReturnValue(EMPTY_SORT)
 }
 
-const patchFieldName = (f) => {
-    if (f.startsWith('_')) {
-        return `x${f}`
-    }
-    return f
-}
-
-
 const givenOrderByFor = (column, sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeFieldId(column)} ASC` })
+                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeId(column)} ASC` })
 }
 
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeFieldId('_id')} = @${patchFieldName('_id')}`, parameters: { x_id: id} })
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeId('_id')} = ${validateLiteral('_id')}`, parameters: { [patchFieldName('_id')]: id} })
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
     const c = numericColumns.map(c => c.name)
     when(filterParser.parseAggregation).calledWith(having, filter)
                                        .mockReturnValue({
-                                           fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeFieldId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
+                                           fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
                                            groupByColumns: groupByColumns,
                                            havingFilter: '',
                                            parameters: {},
