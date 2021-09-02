@@ -2,7 +2,6 @@ const compose = require('docker-compose')
 const { types, Pool} = require('pg')
 const { builtins } = require('pg-types')
 const { init } = require('external-db-postgres')
-const { sleep } = require("test-commons")
 
 // make postgres driver parse numbers
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
@@ -31,12 +30,7 @@ const cleanup = async () => {
 }
 
 const initEnv = async () => {
-
     await compose.upOne('postgres', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] } )
-
-    // await sleep( 500 )
-    //
-    // await cleanup()
 }
 
 const setActive = () => {
