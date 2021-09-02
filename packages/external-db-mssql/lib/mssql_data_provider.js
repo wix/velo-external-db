@@ -8,19 +8,12 @@ class DataProvider {
         this.sql = pool
     }
 
-
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr, parameters} = this.filterParser.transform(filter)
         const {sortExpr} = this.filterParser.orderBy(sort)
-        let offsetSql = ''
-        if (skip > 0) {
-            offsetSql = `OFFSET ${escape(skip)} ROWS`
-        }
-        let limitSql = ''
-        if (skip > 0) {
-            limitSql = `FETCH NEXT ${escape(limit)} ROWS ONLY`
-        }
-        const sql = `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} ${offsetSql} ${limitSql}`
+        const pagingQueryStr = this.pagingQueryFor(skip, limit)
+
+        const sql = `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} ${pagingQueryStr}`
 
         return await this.query(sql, parameters)
     }
@@ -102,6 +95,19 @@ class DataProvider {
         }
         return rs.recordset
     }
+
+    pagingQueryFor(skip, limit) {
+        let offsetSql = ''
+        if (skip > 0) {
+            offsetSql = `OFFSET ${escape(skip)} ROWS`
+        }
+        let limitSql = ''
+        if (skip > 0) {
+            limitSql = `FETCH NEXT ${escape(limit)} ROWS ONLY`
+        }
+        return `${offsetSql} ${limitSql}`.trim()
+    }
+
 
 }
 
