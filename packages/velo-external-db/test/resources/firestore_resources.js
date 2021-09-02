@@ -1,6 +1,7 @@
 const compose = require('docker-compose')
 const { init } = require('external-db-firestore')
-const { sleep } = require('test-commons')
+
+const setEmulatorOn = () => process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8082'
 
 const connection = () => {
     const {connection, cleanup} = init(['test-project'])
@@ -21,17 +22,13 @@ const cleanup = async () => {
 }
 
 const initEnv = async () => {
-    process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8082'
+    setEmulatorOn()
 
     await compose.upOne('firestore', { cwd: __dirname, log: true })
-    // await compose.logs('firestore', { cwd: __dirname, log: true });
-
-    // await sleep( 500 )
-
-    // await cleanup()
 }
 
 const setActive = () => {
+    setEmulatorOn()
     process.env.TYPE = 'firestore'
     process.env.PROJECT_ID = 'test-project'
 }

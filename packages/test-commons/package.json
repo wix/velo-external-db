@@ -26,6 +26,7 @@
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
   "dependencies": {
-    "velo-external-db-commons": "^0.0.0"
+    "velo-external-db-commons": "^0.0.0",
+    "chance": "^1.1.7"
   }
 }

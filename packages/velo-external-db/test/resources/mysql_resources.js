@@ -1,7 +1,6 @@
 const { init } = require('external-db-mysql')
 const compose = require('docker-compose')
 const mysql = require('mysql')
-const { sleep } = require("test-commons")
 
 const connection = () => {
     const pool = mysql.createPool({
@@ -30,10 +29,6 @@ const cleanup = async () => {
 
 const initEnv = async () => {
     await compose.upOne('mysql', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] } )
-
-    // await sleep( 500 )
-    //
-    // await cleanup()
 }
 
 const shutdownEnv = async () => {

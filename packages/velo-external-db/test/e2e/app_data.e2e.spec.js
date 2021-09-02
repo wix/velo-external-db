@@ -4,7 +4,7 @@ const data = require('../drivers/data_api_rest_test_support');
 const { auth } = require('../drivers/auth_test_support')
 const Chance = require('chance')
 const each = require('jest-each').default
-const { initApp, teardownApp, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit} = require('../resources/e2e_resources')
+const { initApp, teardownApp, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit, mssqlTestEnvInit} = require('../resources/e2e_resources')
 
 const chance = Chance();
 
@@ -17,6 +17,7 @@ describe('Velo External DB Data REST API',  () => {
         ['MySql', mysqlTestEnvInit],
         ['Postgres', postgresTestEnvInit],
         ['Spanner', spannerTestEnvInit],
+        ['Sql Server', mssqlTestEnvInit],
     ]).describe('%s', (name, setup) => {
         beforeAll(async () => {
             await setup()

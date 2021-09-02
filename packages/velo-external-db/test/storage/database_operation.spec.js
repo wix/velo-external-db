@@ -9,7 +9,7 @@ describe('Check Pool Connection', () => {
         ['Postgres', postgresTestEnvInit],
         ['Spanner', spannerTestEnvInit],
         ['Firestore', firestoreTestEnvInit],
-        ['Sql Server', mssqlTestEnvInit],
+        // ['Sql Server', mssqlTestEnvInit],
     ]).describe('%s', (dbType, setup) => {
 
         beforeAll(async () => {

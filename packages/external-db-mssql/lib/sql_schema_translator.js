@@ -12,25 +12,27 @@ class SchemaColumnTranslator {
 
         switch (type) {
             case 'int':
-            case 'integer':
             case 'bigint':
-            case 'smallint':
             case 'float':
-            case 'double':
+            case 'real':
             case 'decimal':
+            case 'numeric':
                 return 'number'
 
             case 'date':
             case 'datetime':
-            case 'timestamp':
+            case 'datetime2':
             case 'time':
-            case 'year':
+            case 'datetimeoffset':
+            case 'smalldatetime':
                 return 'datetime'
 
+            case 'nchar':
+            case 'nvarchar':
+            case 'ntext':
+            case 'char':
             case 'varchar':
             case 'text':
-            case 'mediumtext':
-            case 'longtext':
                 return 'text'
 
             case 'tinyint':
@@ -63,7 +65,7 @@ class SchemaColumnTranslator {
                 return `FLOAT${this.parsePrecision(precision)}`
 
             case 'number_double':
-                return `DOUBLE${this.parsePrecision(precision)}`
+                return `REAL${this.parsePrecision(precision)}`
 
             case 'number_decimal':
                 return `DECIMAL${this.parsePrecision(precision)}`
@@ -74,30 +76,24 @@ class SchemaColumnTranslator {
             case 'datetime_time':
                 return `TIME`
 
-            case 'datetime_year':
-                return `YEAR`
-
-            case 'datetime_datetime':
-                return `DATETIME`
-
             case 'datetime_timestamp':
-                return `DATETIME`
-                // return `TIMESTAMP DEFAULT CURRENT_TIMESTAMP`
+            case 'datetime_datetime':
+                return `DATETIME2`
+
+            case 'datetime_year':
+                return `SMALLDATETIME`
 
             case 'text_string':
                 return `VARCHAR${this.parseLength(precision)}`
 
             case 'text_small':
+            case 'text_medium':
+            case 'text_large':
                 return `TEXT`
 
-            case 'text_medium':
-                return `MEDIUMTEXT`
-
-            case 'text_large':
-                return `LONGTEXT`
 
             case 'boolean_':
-                return `BOOLEAN`
+                return `TINYINT`
 
             default:
                 throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)

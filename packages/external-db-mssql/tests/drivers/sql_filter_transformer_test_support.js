@@ -1,6 +1,6 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const {escapeId} = require('mysql');
+const { escapeId, validateLiteral, patchFieldName } = require('../../lib/mssql_utils');
 
 const filterParser = {
     transform: jest.fn(),
@@ -16,7 +16,7 @@ const stubEmptyFilterAndSortFor = (filter, sort) => {
 
 const stubEmptyFilterFor = (filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: '', parameters: [] })
+                                .mockReturnValue({ filterExpr: '', parameters: {} })
 }
 
 const stubEmptyOrderByFor = (sort) => {
@@ -32,7 +32,7 @@ const givenOrderByFor = (column, sort) => {
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeId('_id')} = ?`, parameters: [id] })
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeId('_id')} = ${validateLiteral('_id')}`, parameters: { [patchFieldName('_id')]: id} })
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
@@ -42,7 +42,7 @@ const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByC
                                            fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
                                            groupByColumns: groupByColumns,
                                            havingFilter: '',
-                                           parameters: [],
+                                           parameters: {},
                                        })
 }
 

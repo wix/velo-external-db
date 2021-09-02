@@ -12,9 +12,8 @@ services:
     ports:
       - 8082:8082
     build:
-      context: .
       args:
-        GCLOUD_SDK_VERSION: 354.0.0
+        GCLOUD_SDK_VERSION: 355.0.0
   spanner:
     image: roryq/spanner-emulator:latest
     ports:
@@ -34,7 +33,7 @@ services:
       POSTGRES_PASSWORD: 'password'
       POSTGRES_DB: 'test-db'
   mysql:
-    image: mysql:5.7
+    image: mysql:8.0
     restart: always
     environment:
       MYSQL_DATABASE: 'test-db'
