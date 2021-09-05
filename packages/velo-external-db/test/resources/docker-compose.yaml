@@ -51,3 +51,9 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - 3307:3306
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
