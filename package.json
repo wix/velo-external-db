@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build:dev" : "lerna bootstrap --hoist",
-    "test": "lerna exec --scope '{external-db-config, velo-external-db, velo-external-db-core}' \"npm test\"",
+    "test": "lerna exec --scope '{external-db-config,velo-external-db,velo-external-db-core}' \"npm test\"",
     "test:postgres": "lerna exec --scope external-db-postgres \"npm test\" && lerna exec --scope velo-external-db \"npm run test:postgres\"",
     "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
     "test:mysql": "lerna exec --scope external-db-mysql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mysql\"",
