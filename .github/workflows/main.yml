@@ -31,12 +31,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Downloading Docker images for the test
-        run: |
-          docker pull postgres
-          docker pull mysql:5.7
-          docker pull mcr.microsoft.com/mssql/server:2017-latest
-          docker pull roryq/spanner-emulator:latest
-          docker pull groovex/firestore-emulator:latest
+        run: docker-compose --file packages/velo-external-db/test/resources/docker-compose.yaml pull
       # Runs a single command using the runners shell
       - name: Installing Lerna
         run: npm install
