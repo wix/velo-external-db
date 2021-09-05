@@ -7,7 +7,7 @@ const createPool = modify => {
         databaseId: 'test-database',
     }
 
-    return init(Object.values(Object.assign({}, config, modify)), { min: 0, size: 1 })
+    return init(Object.assign({}, config, modify), { min: 0, size: 1 })
 }
 
 const dbOperationWithMisconfiguredPassword = () => createPool( { projectId: 'wrong'} ).databaseOperations
