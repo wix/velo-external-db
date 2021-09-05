@@ -1,14 +1,13 @@
-// const { Spanner } = require('@google-cloud/spanner')
 const { init } = require('external-db-spanner')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = () => {
-    const {connection, cleanup} = init(['test-project', 'test-instance', 'test-database'])
+    const {connection, cleanup} = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
     return { pool: connection, cleanup: cleanup}
 }
 
 const cleanup = async () => {
-    const {schemaProvider, cleanup} = init(['test-project', 'test-instance', 'test-database'])
+    const {schemaProvider, cleanup} = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
     const res = await schemaProvider.list()
     const tables = res.map(t => t.id)
 

@@ -12,8 +12,8 @@ const init = async(type, vendor, config) => {
         case 'spanner': {
             const { init } = require('external-db-spanner')
 
-            const { projectId, instanceId, databaseId, secretKey } = await config.readConfig()
-            return append(init([projectId, instanceId, databaseId]), secretKey)
+            const cfg = await config.readConfig()
+            return append(init(cfg), cfg.secretKey)
         }
         case 'firestore': {
             const { init } = require('external-db-firestore')
