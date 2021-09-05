@@ -1,4 +1,3 @@
-// const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } = require('./spanner_utils')
 const { Timestamp } = require('@google-cloud/firestore')
 const { SystemFields } = require('velo-external-db-commons')
 
@@ -67,7 +66,7 @@ class DataProvider {
             return 0
         }
 
-        items.forEach( async (item) => 
+        items.forEach( item => 
             batch.update(this.database.doc(`${collectionName}/${item._id}`),item));
 
         return (await batch.commit()).length
