@@ -38,7 +38,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Downloading Docker images for the test
-        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull
+        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull postgres
 
       # Runs a single command using the runners shell
       - name: Installing Lerna
