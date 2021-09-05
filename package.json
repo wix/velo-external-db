@@ -7,6 +7,7 @@
     "test:postgres": "lerna exec --scope velo-external-db \"npm run test:postgres\"",
     "test:spanner": "lerna exec --scope velo-external-db \"npm run test:spanner\"",
     "test:mysql": "lerna exec --scope velo-external-db \"npm run test:mysql\"",
+    "test:mssql": "lerna exec --scope velo-external-db \"npm run test:mssql\"",
     "release": "lerna version --no-push",
     "ci:publish": "lerna publish -y from-git"
   },
