@@ -47,4 +47,4 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Testing
-        run: npm run test
+        run: npm run test:partial
