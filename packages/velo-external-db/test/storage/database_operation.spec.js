@@ -38,8 +38,8 @@ describe('Check Pool Connection', () => {
                 const validateConnection = await dbOperation.validateConnection()
 
                 expect(validateConnection.valid).toBeFalsy()
-                expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
                 expect(validateConnection.error.message).toContain('host is unavailable')
+                expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
             }
         })
 
