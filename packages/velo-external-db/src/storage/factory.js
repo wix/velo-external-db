@@ -28,14 +28,12 @@ const init = async(type, vendor, config) => {
             const res = await init([host, user, password, db])
             return append(res, secretKey)
         }
-        default:
-            case 'mysql':{
-                console.log(`INIT: ${vendor + '/' + type}`)
-                const { init } = require('external-db-mysql')
-                const { host, user, password, db, cloudSqlConnectionName, secretKey } = await config.readConfig()
-                return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey)
-            }
+        case 'mysql':{
+            const { init } = require('external-db-mysql')
+            const cfg = await config.readConfig()
 
+            return append(init(cfg), cfg.secretKey)
+        }
     }
 }
 

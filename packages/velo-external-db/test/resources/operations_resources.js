@@ -30,11 +30,4 @@ const testSuits = () => [
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 
-module.exports = { env,
-    // postgresTestEnvInit,
-    // mysqlTestEnvInit,
-    // spannerTestEnvInit,
-    // firestoreTestEnvInit,
-    // mssqlTestEnvInit,
-    testSuits,
-}
+module.exports = { env, testSuits }
