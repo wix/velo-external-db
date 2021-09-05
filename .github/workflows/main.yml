@@ -29,9 +29,17 @@ jobs:
           node-version: 14
           cache: "npm"
 
+      - name: Downloading Docker compose V2
+        run: |
+          mkdir -p ~/.docker/cli-plugins
+          curl -sSL https://github.com/docker/compose-cli/releases/download/v2.0.0-rc.2/docker-compose-linux-amd64 -o ~/.docker/cli-plugins/docker-compose
+          chmod +x ~/.docker/cli-plugins/docker-compose
+          docker compose version
+
       # Runs a single command using the runners shell
       - name: Downloading Docker images for the test
-        run: docker-compose --file packages/velo-external-db/test/resources/docker-compose.yaml pull
+        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull
+
       # Runs a single command using the runners shell
       - name: Installing Lerna
         run: npm install
