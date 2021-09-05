@@ -1,31 +1,27 @@
-const {Pool} = require('pg')
 const DatabaseOperations = require('../../lib/postgres_operations')
+const init = require('../../lib/connection_provider')
 
 const createPool = modify => {
     const config = {
         host: 'localhost',
         user: 'test-user',
         password: 'password',
-        database: 'test-db',
-        port: 5432,
-
-        max: 1,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
+        db: 'test-db',
     }
-    return new Pool(Object.assign({}, config, modify ))
+    const { connection, cleanup } = init(Object.assign({}, config, modify ), { max: 1 })
+    return { connection, cleanup }
 }
 
-const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ))
+const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ).connection)
 
-const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { database: 'wrong'} ))
+const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { db: 'wrong'} ).connection)
 
-const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong'} ))
+const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong'} ).connection)
 
 const dbOperationWithValidDB = () => {
-    const connection = createPool({ } )
+    const { connection, cleanup } = createPool({ } )
     const dbOperations = new DatabaseOperations(connection)
-    return {dbOperations, cleanup: async () => await connection.end(() => {})}
+    return {dbOperations, cleanup: cleanup}
 }
 
 module.exports = {

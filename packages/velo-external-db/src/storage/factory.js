@@ -5,9 +5,9 @@ const init = async(type, vendor, config) => {
     switch ( type ) {
         case 'postgres': {
             const { init } = require('external-db-postgres')
-            const { host, user, password, db, cloudSqlConnectionName, secretKey } = await config.readConfig()
+            const cfg = await config.readConfig()
 
-            return append(init([host,user,password,db,cloudSqlConnectionName]), secretKey)
+            return append(init(cfg), cfg.secretKey)
         }
         case 'spanner': {
             const { init } = require('external-db-spanner')

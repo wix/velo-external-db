@@ -7,12 +7,12 @@ const DatabaseOperations = require ('./postgres_operations')
 
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
-const init = ([host, user, password, db, cloudSqlConnectionName], _poolOptions) => {
+const init = (cfg, _poolOptions) => {
     const config = {
-        host: host,
-        user: user,
-        password: password,
-        database: db,
+        host: cfg.host,
+        user: cfg.user,
+        password: cfg.password,
+        database: cfg.db,
         port: 5432,
 
         max: 10,
@@ -21,8 +21,8 @@ const init = ([host, user, password, db, cloudSqlConnectionName], _poolOptions) 
     }
     const poolOptions = _poolOptions || {}
 
-    if (cloudSqlConnectionName) {
-        config['host'] = `/cloudsql/${cloudSqlConnectionName}`
+    if (cfg.cloudSqlConnectionName) {
+        config['host'] = `/cloudsql/${cfg.cloudSqlConnectionName}`
     }
 
     const filterParser = new FilterParser()
