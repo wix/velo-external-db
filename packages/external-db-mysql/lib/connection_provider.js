@@ -11,8 +11,6 @@ const init = (cfg, _poolOptions) => {
         password : cfg.password,
         database : cfg.db,
 
-        waitForConnections: true,
-        namedPlaceholders: true,
         multipleStatements: true,
 
         connectionLimit: 10,
@@ -25,7 +23,7 @@ const init = (cfg, _poolOptions) => {
         config['socketPath'] = `/cloudsql/${cfg.cloudSqlConnectionName}`
     }
 
-    const pool = mysql.createPool(Object.assign({}, poolOptions, config))
+    const pool = mysql.createPool(Object.assign({}, config, poolOptions))
     const databaseOperations = new DatabaseOperations(pool)
 
     const filterParser = new FilterParser()

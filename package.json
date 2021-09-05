@@ -4,6 +4,7 @@
   "scripts": {
     "build:dev" : "lerna bootstrap --hoist",
     "test": "lerna exec \"npm test\"",
+    "test:partial": "lerna exec --scope velo-external-db \"npm run test:mysql\"",
     "release": "lerna version --no-push",
     "ci:publish": "lerna publish -y from-git"
   },
