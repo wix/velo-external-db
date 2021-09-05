@@ -1,6 +1,7 @@
 const compose = require('docker-compose')
 const { Spanner } = require('@google-cloud/spanner')
 const { init } = require('external-db-spanner')
+const { runImage, stopImage } = require('./docker_support')
 
 const connection = () => {
     const projectId = 'test-project'
@@ -28,7 +29,7 @@ const cleanup = async () => {
 const initEnv = async () => {
     setEmulatorOn()
 
-    await compose.upOne('spanner', { cwd: __dirname, log: true })
+    await runImage('spanner')
 }
 
 const setEmulatorOn = () => process.env.SPANNER_EMULATOR_HOST = 'localhost:9010'
@@ -42,7 +43,7 @@ const setActive = () => {
 }
 
 const shutdownEnv = async () => {
-    await compose.stopOne('spanner', { cwd: __dirname, log: true })
+    await stopImage('spanner')
 }
 
 module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }

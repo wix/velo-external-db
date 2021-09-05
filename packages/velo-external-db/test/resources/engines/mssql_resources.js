@@ -1,6 +1,6 @@
 const { init } = require('external-db-mssql')
-const compose = require('docker-compose')
 const sql = require('mssql')
+const { runImage, stopImage } = require('./docker_support')
 
 const connection = async () => {
     const sqlConfig = {
@@ -34,11 +34,11 @@ const cleanup = async () => {
 }
 
 const initEnv = async () => {
-    await compose.upOne('mssql', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] } )
+    await runImage('mssql')
 }
 
 const shutdownEnv = async () => {
-    await compose.stopOne('mssql', { cwd: __dirname })
+    await stopImage('mssql')
 }
 
 const setActive = () => {
