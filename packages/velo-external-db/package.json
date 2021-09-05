@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "test": "jest ./src && npm run test:postgres",
+    "test": "jest ./src && npm run test:postgres && npm run test:spanner",
     "test:mysql": "TEST_ENGINE=mysql jest --runInBand ./test",
     "test:spanner": "TEST_ENGINE=spanner jest --runInBand ./test",
     "test:postgres": "TEST_ENGINE=postgres jest --runInBand ./test",
