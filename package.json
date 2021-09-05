@@ -5,6 +5,7 @@
     "build:dev" : "lerna bootstrap --hoist",
     "test": "lerna exec \"npm test\"",
     "test:postgres": "lerna exec --scope velo-external-db \"npm run test:postgres\"",
+    "test:spanner": "lerna exec --scope velo-external-db \"npm run test:spanner\"",
     "release": "lerna version --no-push",
     "ci:publish": "lerna publish -y from-git"
   },
