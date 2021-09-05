@@ -13,6 +13,7 @@ const notThrowingTranslateErrorCodes = err => {
         case '3D000':
             return new DbConnectionError(`Database does not exists or you don\'t have access to it, sql message: ${err.message}`)
         case 'ENOTFOUND':
+        case 'EAI_AGAIN':
             return new DbConnectionError('Database host is unavailable.')
         default :
             return new Error(`default ${err.code}, ${err.message}`)
