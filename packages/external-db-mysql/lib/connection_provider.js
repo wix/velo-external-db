@@ -4,7 +4,7 @@ const DataProvider  = require('./mysql_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mysql_operations')
 
-const init = ([host, user, password, db, cloudSqlConnectionName]) => {
+const init = ([host, user, password, db, cloudSqlConnectionName], _poolOptions) => {
     const config = {
         host     : host,
         user     : user,
@@ -19,13 +19,15 @@ const init = ([host, user, password, db, cloudSqlConnectionName]) => {
         queueLimit: 0,
     }
 
+    const poolOptions = _poolOptions || { }
+
     if (cloudSqlConnectionName) {
         config['socketPath'] = `/cloudsql/${cloudSqlConnectionName}`
     } else {
         config['host'] = host
     }
 
-    const pool = mysql.createPool(config)
+    const pool = mysql.createPool(Object.assign({}, poolOptions, config))
     const databaseOperations = new DatabaseOperations(pool)
 
     const filterParser = new FilterParser()
