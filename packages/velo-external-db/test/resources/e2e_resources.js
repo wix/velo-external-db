@@ -1,11 +1,12 @@
 const {Uninitialized, sleep} = require('test-commons')
-const {authInit} = require("../drivers/auth_test_support")
-const postgres = require("../resources/postgres_resources")
-const mysql = require('../resources/mysql_resources')
-const spanner = require('../resources/spanner_resources')
-const firestore = require('../resources/firestore_resources')
-const mssql = require('../resources/mssql_resources')
+const {authInit} = require('../drivers/auth_test_support')
 const { waitUntil } = require('async-wait-until')
+
+const postgres = require('./engines/postgres_resources')
+const mysql = require('./engines/mysql_resources')
+const spanner = require('./engines/spanner_resources')
+const firestore = require('./engines/firestore_resources')
+const mssql = require('./engines/mssql_resources')
 
 const env = {
     secretKey: Uninitialized,
@@ -46,11 +47,13 @@ const spannerTestEnvInit = async () => await dbInit(spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestore)
 const mssqlTestEnvInit = async () => await dbInit(mssql)
 
+const testSuits = () => [
+    ['MySql', mysqlTestEnvInit],
+    ['Postgres', postgresTestEnvInit],
+    ['Spanner', spannerTestEnvInit],
+    ['Firestore', firestoreTestEnvInit],
+    ['Sql Server', mssqlTestEnvInit],
+].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
-module.exports = { env, initApp, teardownApp, dbTeardown,
-                   postgresTestEnvInit,
-                   mysqlTestEnvInit,
-                   spannerTestEnvInit,
-                   firestoreTestEnvInit,
-                   mssqlTestEnvInit,
-}
+
+module.exports = { env, initApp, teardownApp, dbTeardown, testSuits }

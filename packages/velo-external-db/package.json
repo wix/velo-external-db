@@ -4,8 +4,12 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "test": "jest --detectOpenHandles",
-    "test:one": "jest -t 'verify permission for msid param' --detectOpenHandles",
+    "test": "jest ./src && npm run test:mysql && npm run test:spanner && npm run test:postgres && npm run test:mssql && npm run test:firestore",
+    "test:mysql": "TEST_ENGINE=mysql jest --runInBand ./test",
+    "test:spanner": "TEST_ENGINE=spanner jest --runInBand ./test",
+    "test:postgres": "TEST_ENGINE=postgres jest --runInBand ./test",
+    "test:firestore": "TEST_ENGINE=firestore jest --runInBand ./test",
+    "test:mssql": "TEST_ENGINE=mssql jest --runInBand ./test",
     "test:watch": "jest --detectOpenHandles --watch",
     "start": "node src/app.js",
     "deploy": "gcloud app deploy ./app.yaml"
