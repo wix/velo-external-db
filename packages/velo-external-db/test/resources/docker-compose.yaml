@@ -33,7 +33,7 @@ services:
       POSTGRES_USER: 'test-user'
       POSTGRES_PASSWORD: 'password'
       POSTGRES_DB: 'test-db'
-  mysql:
+  mysql_80:
     image: mysql:8.0
     restart: always
     environment:
@@ -42,7 +42,7 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - 3306:3306
-  mysql_57:
+  mysql:
     image: mysql:5.7
     restart: always
     environment:
