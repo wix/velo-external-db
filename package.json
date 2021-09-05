@@ -3,11 +3,11 @@
   "private": true,
   "scripts": {
     "build:dev" : "lerna bootstrap --hoist",
-    "test": "lerna exec \"npm test\"",
-    "test:postgres": "lerna exec --scope velo-external-db \"npm run test:postgres\"",
-    "test:spanner": "lerna exec --scope velo-external-db \"npm run test:spanner\"",
-    "test:mysql": "lerna exec --scope velo-external-db \"npm run test:mysql\"",
-    "test:mssql": "lerna exec --scope velo-external-db \"npm run test:mssql\"",
+    "test": "lerna exec --scope '{external-db-config, velo-external-db, velo-external-db-core}' \"npm test\"",
+    "test:postgres": "lerna exec --scope external-db-postgres \"npm test\" && lerna exec --scope velo-external-db \"npm run test:postgres\"",
+    "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
+    "test:mysql": "lerna exec --scope external-db-mysql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mysql\"",
+    "test:mssql": "lerna exec --scope external-db-mssql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mssql\"",
     "release": "lerna version --no-push",
     "ci:publish": "lerna publish -y from-git"
   },
