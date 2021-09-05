@@ -1,16 +1,10 @@
-const { Spanner } = require('@google-cloud/spanner')
+// const { Spanner } = require('@google-cloud/spanner')
 const { init } = require('external-db-spanner')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = () => {
-    const projectId = 'test-project'
-    const instanceId = 'test-instance'
-    const databaseId = 'test-database'
-
-    const spanner = new Spanner({projectId: projectId})
-    const instance = spanner.instance(instanceId);
-    const pool = instance.database(databaseId);
-    return { pool, cleanup: async () => await pool.close()}
+    const {connection, cleanup} = init(['test-project', 'test-instance', 'test-database'])
+    return { pool: connection, cleanup: cleanup}
 }
 
 const cleanup = async () => {

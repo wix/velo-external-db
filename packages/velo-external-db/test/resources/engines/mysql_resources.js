@@ -1,22 +1,9 @@
 const { init } = require('external-db-mysql')
-const mysql = require('mysql')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = () => {
-    const pool = mysql.createPool({
-        host     : 'localhost',
-        user     : 'test-user',
-        password : 'password',
-        database : 'test-db',
-
-        waitForConnections: true,
-        namedPlaceholders: true,
-        multipleStatements: true,
-
-        connectionLimit: 1,
-        queueLimit: 0
-    });
-    return { pool, cleanup: async () => await pool.end(() => {})}
+    const {connection, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'], { connectionLimit: 1, queueLimit: 0 })
+    return { pool: connection, cleanup: cleanup}
 }
 
 const cleanup = async () => {

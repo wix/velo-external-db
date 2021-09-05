@@ -1,28 +1,13 @@
-const { types, Pool} = require('pg')
-const { builtins } = require('pg-types')
 const { init } = require('external-db-postgres')
 const { runImage, stopImage } = require('./docker_support')
 
-// make postgres driver parse numbers
-types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
-
 const connection = () => {
-    const pool = new Pool({
-        host: 'localhost',
-        user: 'test-user',
-        password: 'password',
-        database: 'test-db',
-        port: 5432,
-
-        max: 1,
-        idleTimeoutMillis: 1000,
-        connectionTimeoutMillis: 2000,
-    })
-    return { pool, cleanup: async () => await pool.end(() => {})}
+    const {connection, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'], { max: 1 })
+    return { pool: connection, cleanup: cleanup }
 }
 
 const cleanup = async () => {
-    const {schemaProvider, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'])
+    const {schemaProvider, cleanup} = init(['localhost', 'test-user', 'password', 'test-db'], { max: 1 })
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
 
