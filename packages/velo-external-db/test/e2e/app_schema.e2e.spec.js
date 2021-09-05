@@ -3,9 +3,7 @@ const schema = require('../drivers/schema_api_rest_test_support');
 const { auth } = require('../drivers/auth_test_support')
 const Chance = require('chance')
 const each = require('jest-each').default
-const { initApp, teardownApp, postgresTestEnvInit, dbTeardown, mysqlTestEnvInit, spannerTestEnvInit, firestoreTestEnvInit,
-    mssqlTestEnvInit
-} = require('../resources/e2e_resources')
+const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
 const chance = Chance();
 
 const axios = require('axios').create({
@@ -13,13 +11,7 @@ const axios = require('axios').create({
 });
 
 describe('Velo External DB Schema REST API',  () => {
-    each([
-        ['MySql', mysqlTestEnvInit],
-        ['Postgres', postgresTestEnvInit],
-        ['Spanner', spannerTestEnvInit],
-        ['Firestore', firestoreTestEnvInit],
-        ['Sql Server', mssqlTestEnvInit],
-    ]).describe('%s', (name, setup) => {
+    each(testSuits()).describe('%s', (name, setup) => {
         beforeAll(async () => {
             await setup()
 
@@ -97,7 +89,7 @@ describe('Velo External DB Schema REST API',  () => {
         anotherNumberItem: Uninitialized,
     }
 
-    afterAll(async () => await teardownApp());
+    afterAll(async () => await teardownApp())
 
     beforeEach(async () => {
         ctx.collectionName = gen.randomCollectionName()

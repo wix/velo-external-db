@@ -1,16 +1,10 @@
 const { DbConnectionError } = require('velo-external-db-commons').errors
 const each = require('jest-each').default;
-const { env, postgresTestEnvInit, mysqlTestEnvInit, spannerTestEnvInit, firestoreTestEnvInit, mssqlTestEnvInit } = require('../resources/operations_resources')
+const { env, testSuits } = require('../resources/operations_resources')
 
 
 describe('Check Pool Connection', () => {
-    each([
-        ['MySql', mysqlTestEnvInit],
-        ['Postgres', postgresTestEnvInit],
-        ['Spanner', spannerTestEnvInit],
-        ['Firestore', firestoreTestEnvInit],
-        // ['Sql Server', mssqlTestEnvInit],
-    ]).describe('%s', (dbType, setup) => {
+    each(testSuits()).describe('%s', (dbType, setup) => {
 
         beforeAll(async () => {
             setup()

@@ -1,23 +1,58 @@
-const postgres = require('../resources/postgres_resources')
-const mysql = require('../resources/mysql_resources')
-const spanner = require('../resources/spanner_resources')
-const firestore = require('../resources/firestore_resources')
-const mssql = require('../resources/mssql_resources')
+const postgres = require('../resources/engines/postgres_resources')
+const mysql = require('../resources/engines/mysql_resources')
+const spanner = require('../resources/engines/spanner_resources')
+const firestore = require('../resources/engines/firestore_resources')
+const mssql = require('../resources/engines/mssql_resources')
 const { sleep } = require('test-commons')
 
 module.exports = async () => {
-    await spanner.initEnv()
-    await mysql.initEnv()
-    await postgres.initEnv()
-    await firestore.initEnv()
-    await mssql.initEnv()
+    const testEngine = process.env.TEST_ENGINE
+
+    switch (testEngine) {
+        case 'mysql':
+            await mysql.initEnv()
+            break
+
+        case 'spanner':
+            await spanner.initEnv()
+            break
+
+        case 'postgres':
+            await postgres.initEnv()
+            break
+
+        case 'firestore':
+            await firestore.initEnv()
+            break
+
+        case 'mssql':
+            await mssql.initEnv()
+            break
+
+    }
 
     await sleep( 5000 )
 
-    await spanner.cleanup()
-    await mysql.cleanup()
-    await postgres.cleanup()
-    await firestore.cleanup()
-    await mssql.cleanup()
+    switch (testEngine) {
+        case 'mysql':
+            await mysql.cleanup()
+            break
 
+        case 'spanner':
+            await spanner.cleanup()
+            break
+
+        case 'postgres':
+            await postgres.cleanup()
+            break
+
+        case 'firestore':
+            await firestore.cleanup()
+            break
+
+        case 'mssql':
+            await mssql.cleanup()
+            break
+
+    }
 };

@@ -21,10 +21,20 @@ const spannerTestEnvInit = async () => await init(spanner)
 const firestoreTestEnvInit = async () => await init(firestore)
 const mssqlTestEnvInit = async () => await init(mssql)
 
+const testSuits = () => [
+    ['MySql', mysqlTestEnvInit],
+    ['Postgres', postgresTestEnvInit],
+    ['Spanner', spannerTestEnvInit],
+    ['Firestore', firestoreTestEnvInit],
+    // ['Sql Server', mssqlTestEnvInit],
+].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
+
+
 module.exports = { env,
-    postgresTestEnvInit,
-    mysqlTestEnvInit,
-    spannerTestEnvInit,
-    firestoreTestEnvInit,
-    mssqlTestEnvInit,
+    // postgresTestEnvInit,
+    // mysqlTestEnvInit,
+    // spannerTestEnvInit,
+    // firestoreTestEnvInit,
+    // mssqlTestEnvInit,
+    testSuits,
 }

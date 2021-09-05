@@ -1,14 +1,20 @@
 const {Uninitialized} = require('test-commons');
-const postgresTestEnv = require('../resources/postgres_resources');
-const mysqlTestEnv = require('../resources/mysql_resources');
-const spannerTestEnv = require('../resources/spanner_resources');
-const firestoreTestEnv = require('../resources/firestore_resources');
-const mssqlTestEnv = require('../resources/mssql_resources');
+
 const mysql = require('external-db-mysql')
+const mysqlTestEnv = require('./engines/mysql_resources')
+
 const spanner = require('external-db-spanner')
+const spannerTestEnv = require('./engines/spanner_resources')
+
 const postgres = require('external-db-postgres')
+const postgresTestEnv = require('./engines/postgres_resources')
+
 const firestore = require('external-db-firestore')
+const firestoreTestEnv = require('./engines/firestore_resources')
+
 const mssql = require('external-db-mssql')
+const mssqlTestEnv = require('./engines/mssql_resources')
+
 
 const env = {
     dataProvider: Uninitialized,
@@ -43,10 +49,12 @@ const spannerTestEnvInit = async () => await dbInit(spannerTestEnv, spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestoreTestEnv, firestore)
 const mssqlTestEnvInit = async () => await dbInit(mssqlTestEnv, mssql)
 
-module.exports = { env, dbTeardown,
-                   postgresTestEnvInit,
-                   mysqlTestEnvInit,
-                   spannerTestEnvInit,
-                   firestoreTestEnvInit,
-                   mssqlTestEnvInit,
-}
+const testSuits = () => [
+    ['MySql', mysqlTestEnvInit],
+    ['Postgres', postgresTestEnvInit],
+    ['Spanner', spannerTestEnvInit],
+    ['Firestore', firestoreTestEnvInit],
+    ['Sql Server', mssqlTestEnvInit],
+].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
+
+module.exports = { env, dbTeardown, testSuits }
