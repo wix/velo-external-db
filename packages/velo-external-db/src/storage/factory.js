@@ -24,9 +24,9 @@ const init = async(type, vendor, config) => {
         case 'mssql': {
             const { init } = require('external-db-mssql')
 
-            const { host, user, password, db, secretKey } = await config.readConfig()
-            const res = await init([host, user, password, db])
-            return append(res, secretKey)
+            const cfg = await config.readConfig()
+            const res = await init(cfg)
+            return append(res, cfg.secretKey)
         }
         case 'mysql':{
             const { init } = require('external-db-mysql')

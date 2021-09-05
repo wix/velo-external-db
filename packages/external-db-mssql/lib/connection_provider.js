@@ -4,25 +4,41 @@ const DataProvider  = require('./mssql_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mssql_operations')
 
-const init = async ([host, user, password, db]) => {
-    const config = {
-        user: user,
-        password: password,
-        database: db,
-        server: host,
-        port: 1433,
-        pool: {
-            max: 1,
-            min: 0,
-            idleTimeoutMillis: 30000
-        },
-        options: {
-            // encrypt: true, // for azure
-            trustServerCertificate: true // change to true for local dev / self-signed certs
+const extraOptions = () => {
+    if (process.env.NODE_ENV === 'test') {
+        return {
+            options: {
+                encrypt: false,
+                trustServerCertificate: true
+            }
+        }
+    } else {
+        return {
+            options: {
+                encrypt: true,
+                trustServerCertificate: false
+            }
         }
     }
+}
 
-    const _pool = new ConnectionPool(config)
+
+const init = async (cfg, _poolOptions) => {
+    const config = {
+        user: cfg.user,
+        password: cfg.password,
+        database: cfg.db,
+        server: cfg.host,
+        port: 1433,
+        pool: {
+            max: 10,
+            min: 1,
+            idleTimeoutMillis: 30000
+        }
+    }
+    const poolOptions = _poolOptions || {}
+
+    const _pool = new ConnectionPool(Object.assign({}, config, extraOptions(), poolOptions))
     const pool = await _pool.connect()
 
     const databaseOperations = new DatabaseOperations(pool)

@@ -1,31 +1,22 @@
 const { init } = require('external-db-mssql')
-const sql = require('mssql')
 const { runImage, stopImage } = require('./docker_support')
 
-const connection = async () => {
-    const sqlConfig = {
-        user: 'sa',
-        password: 't9D4:EHfU6Xgccs-',
-        database: 'tempdb',
-        server: 'localhost',
-        port: 1433,
-        pool: {
-            max: 1,
-            min: 0,
-            idleTimeoutMillis: 30000
-        },
-        options: {
-            // encrypt: true, // for azure
-            trustServerCertificate: true // change to true for local dev / self-signed certs
-        }
-    }
+const testEnvConfig = {
+    pool: {
+        max: 1,
+        min: 0,
+        idleTimeoutMillis: 30000
+    },
+}
 
-    const pool = await sql.connect(sqlConfig)
-    return { pool: pool, cleanup: async () => await pool.close()}
+const connection = async () => {
+    const { connection, cleanup } = await init({ host: 'localhost', user: 'sa', password: 't9D4:EHfU6Xgccs-', db: 'tempdb' }, testEnvConfig)
+
+    return { pool: connection, cleanup: cleanup }
 }
 
 const cleanup = async () => {
-    const {schemaProvider, cleanup} = await init(['localhost', 'sa', 't9D4:EHfU6Xgccs-', 'tempdb'])
+    const {schemaProvider, cleanup} = await init({ host: 'localhost', user: 'sa', password: 't9D4:EHfU6Xgccs-', db: 'tempdb' }, testEnvConfig)
 
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
