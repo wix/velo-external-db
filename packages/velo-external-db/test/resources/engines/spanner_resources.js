@@ -1,4 +1,3 @@
-const compose = require('docker-compose')
 const { Spanner } = require('@google-cloud/spanner')
 const { init } = require('external-db-spanner')
 const { runImage, stopImage } = require('./docker_support')

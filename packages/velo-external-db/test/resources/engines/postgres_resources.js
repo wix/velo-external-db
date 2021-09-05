@@ -1,4 +1,3 @@
-const compose = require('docker-compose')
 const { types, Pool} = require('pg')
 const { builtins } = require('pg-types')
 const { init } = require('external-db-postgres')
