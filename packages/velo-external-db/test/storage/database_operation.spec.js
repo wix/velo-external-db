@@ -11,7 +11,7 @@ describe('Check Pool Connection', () => {
         })
 
         test('pool connection with wrong password will throw AccessDeniedError.', async () => {
-            const dbOperation = env.driver.dbOperationWithMisconfiguredPassword()
+            const dbOperation = await env.driver.dbOperationWithMisconfiguredPassword()
 
             const validateConnection = await dbOperation.validateConnection()
 
@@ -22,7 +22,7 @@ describe('Check Pool Connection', () => {
 
         test('pool connection with wrong database will throw DatabaseDoesNotExists.', async () => {
             if (dbType !== 'Firestore') {
-                const dbOperation = env.driver.dbOperationWithMisconfiguredDatabase()
+                const dbOperation = await env.driver.dbOperationWithMisconfiguredDatabase()
 
                 const validateConnection = await dbOperation.validateConnection()
 
@@ -33,7 +33,7 @@ describe('Check Pool Connection', () => {
 
         test('pool connection with wrong host will throw HostDoesNotExists.', async () => {
             if (dbType !== 'Firestore') {
-                const dbOperation = env.driver.dbOperationWithMisconfiguredHost()
+                const dbOperation = await env.driver.dbOperationWithMisconfiguredHost()
 
                 const validateConnection = await dbOperation.validateConnection()
 
@@ -44,7 +44,7 @@ describe('Check Pool Connection', () => {
         })
 
         test('pool connection with valid DB will not throw', async () => {
-            const { dbOperations, cleanup } = env.driver.dbOperationWithValidDB()
+            const { dbOperations, cleanup } = await env.driver.dbOperationWithValidDB()
 
             const validateConnection = await dbOperations.validateConnection()
 

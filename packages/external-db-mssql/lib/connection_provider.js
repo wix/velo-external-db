@@ -1,6 +1,6 @@
 const { ConnectionPool } = require('mssql')
 const SchemaProvider = require('./mssql_schema_provider')
-const DataProvider  = require('./mssql_data_provider')
+const DataProvider = require('./mssql_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mssql_operations')
 
@@ -39,15 +39,15 @@ const init = async (cfg, _poolOptions) => {
     const poolOptions = _poolOptions || {}
 
     const _pool = new ConnectionPool(Object.assign({}, config, extraOptions(), poolOptions))
-    const pool = await _pool.connect()
 
+    const {pool, cleanup} = await _pool.connect().then((res) => {return {pool: res, cleanup: async () => await pool.close() }}).catch((e) => { return {pool:_pool, cleanup: () => { }} })
     const databaseOperations = new DatabaseOperations(pool)
 
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup: async () => await pool.close() }
+    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup }
 }
 
 module.exports = init
