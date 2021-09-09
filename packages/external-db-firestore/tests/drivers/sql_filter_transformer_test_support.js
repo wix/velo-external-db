@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
-const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-// const {escapeId} = require('mysql');
 const escapeId = x => x
+
+const EMPTY_SORT = []
 
 const filterParser = {
     transform: jest.fn(),
@@ -18,7 +18,7 @@ const stubEmptyFilterAndSortFor = (filter, sort) => {
 
 const stubEmptyFilterFor = (filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: '', parameters: [] })
+                                .mockReturnValue(EMPTY_SORT)
 }
 
 const stubEmptyOrderByFor = (sort) => {
@@ -33,16 +33,14 @@ const patchFieldName = (f) => {
     return f
 }
 
-
 const givenOrderByFor = (column, sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeId(patchFieldName(column))} ASC` })
+                              .mockReturnValue([{fieldName: column, direction: 'asc'}])
 }
-
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeId(patchFieldName('_id'))} = @_id`, parameters: { _id: id} })
+                                .mockReturnValue([{ fieldName: '_id', opStr: '==', value : id}])
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {

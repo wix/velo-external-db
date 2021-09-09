@@ -34,7 +34,10 @@ const create = () => {
       switch (type) {
         case 'spanner':
           internalConfigReader = new GcpSpannerConfigReader()
-          break;
+          break
+        case 'firestore':
+          internalConfigReader = new GcpFirestoreConfigReader()
+          break
 
         case 'mssql':
         case 'mysql':
