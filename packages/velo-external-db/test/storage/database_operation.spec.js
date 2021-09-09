@@ -20,19 +20,17 @@ describe('Check Pool Connection', () => {
             expect(validateConnection.error.message).toContain('wrong credentials')
         })
 
-        test('pool connection with wrong database will throw DatabaseDoesNotExists.', async () => {
-            if (dbType !== 'Firestore') {
+        if (dbType !== 'Firestore') {
+            test('pool connection with wrong database will throw DatabaseDoesNotExists.', async () => {
                 const dbOperation = await env.driver.dbOperationWithMisconfiguredDatabase()
 
                 const validateConnection = await dbOperation.validateConnection()
 
                 expect(validateConnection.valid).toBeFalsy()
                 expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
-            }
-        })
+            })
 
-        test('pool connection with wrong host will throw HostDoesNotExists.', async () => {
-            if (dbType !== 'Firestore') {
+            test('pool connection with wrong host will throw HostDoesNotExists.', async () => {
                 const dbOperation = await env.driver.dbOperationWithMisconfiguredHost()
 
                 const validateConnection = await dbOperation.validateConnection()
@@ -40,8 +38,8 @@ describe('Check Pool Connection', () => {
                 expect(validateConnection.valid).toBeFalsy()
                 expect(validateConnection.error.message).toContain('host is unavailable')
                 expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
-            }
-        })
+            })
+        }
 
         test('pool connection with valid DB will not throw', async () => {
             const { dbOperations, cleanup } = await env.driver.dbOperationWithValidDB()

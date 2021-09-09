@@ -148,7 +148,7 @@ describe('Data API', () => {
             expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([]);
         });
         
-        if(env.dataProvider?.aggregate){
+        if (name !== 'Firestore') {
             test('aggregate api without filter', async () => {
                 await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
                 await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
