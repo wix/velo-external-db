@@ -6,7 +6,7 @@ const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance();
 
-const EMPTY_SORT = {}
+const EMPTY_SORT = []
 
 describe('Fire Store Parser', () => {
 
@@ -41,19 +41,17 @@ describe('Fire Store Parser', () => {
         })
 
         test('process single sort with valid expression', () => {
-            expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' }]) ).toEqual({sortOperations: [{ fieldName: ctx.fieldName, direction:'asc' }]})
+            expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' }]) ).toEqual([{ fieldName: ctx.fieldName, direction:'asc' }])
         })
 
         test('process single sort with two valid expression', () => {
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
-                { fieldName: ctx.anotherFieldName, direction: 'desc' }]) ).toEqual({sortOperations: [{ fieldName: ctx.fieldName, direction:'asc' },{ fieldName: ctx.anotherFieldName, direction:'desc' }]})
+                { fieldName: ctx.anotherFieldName, direction: 'desc' }]) ).toEqual([{ fieldName: ctx.fieldName, direction:'asc' },{ fieldName: ctx.anotherFieldName, direction:'desc' }])
         })
 
         test('process single sort with one valid and one invalid expression', () => {
-            console.log(env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
-            { invalid: 'object' }]));
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
-                { invalid: 'object' }]) ).toEqual({sortOperations: [{ fieldName: ctx.fieldName, direction:'asc' }]})
+                { invalid: 'object' }]) ).toEqual([{ fieldName: ctx.fieldName, direction:'asc' }])
         })
     })
 //
@@ -75,21 +73,16 @@ describe('Fire Store Parser', () => {
             // expect( env.filterParser.parseFilter([]) ).toEqual(EMPTY_FILTER)
         })
 
-//         test('transform filter', () => {
-//             expect( env.filterParser.transform(ctx.filter) ).toEqual({
-//                 filterExpr: `WHERE ${env.filterParser.parseFilter(ctx.filter, 1)[0].filterExpr}`,
-//                 parameters: env.filterParser.parseFilter(ctx.filter, 1)[0].parameters
-//             })
+        test('transform filter', () => {
+            expect( env.filterParser.transform(ctx.filter) ).toEqual([{
+                fieldName: ctx.filter.fieldName,
+                opStr: env.filterParser.veloOperatorToFirestoreOperator(ctx.filter.operator,ctx.filter.value),
+                value: env.filterParser.valueForOperator(ctx.filter.fieldName,ctx.filter.value,ctx.filter.operator)
+            }])
+        })
+        
         })
 
-        /*
-            return [{
-                fieldName: this.inlineVariableIfNeeded(filter.fieldName, inlineFields),
-                opStr: this.veloOperatorToMySqlOperator(filter.operator, filter.value),
-                value,
-            }]
-        */
-//
         describe('handle single field operator', () => {
             each([
                 '$ne', '$lt', '$lte', '$gt', '$gte', '$eq',
@@ -102,7 +95,7 @@ describe('Fire Store Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     fieldName: ctx.fieldName,
-                    opStr: env.filterParser.veloOperatorToMySqlOperator(o, ctx.fieldValue),
+                    opStr: env.filterParser.veloOperatorToFirestoreOperator(o, ctx.fieldValue),
                     value: ctx.fieldValue,
                 }])
 
@@ -117,147 +110,127 @@ describe('Fire Store Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     fieldName: ctx.fieldName,
-                    opStr: env.filterParser.veloOperatorToMySqlOperator('$eq', ctx.fieldValue),
+                    opStr: env.filterParser.veloOperatorToFirestoreOperator('$eq', ctx.fieldValue),
                     value: 0,
                 }])
 
             })
 
         //     // todo: $hasAll ???
-        //     test(`correctly transform operator [$hasSome]`, () => {
-        //         const filter = {
-        //             // kind: 'filter',
-        //             operator: '$hasSome',
-        //             fieldName: ctx.fieldName,
-        //             value: ctx.fieldListValue
-        //         }
+            test(`correctly transform operator [$hasSome]`, () => {
+                const filter = {
+                    operator: '$hasSome',
+                    fieldName: ctx.fieldName,
+                    value: ctx.fieldListValue
+                }
 
-        //         expect( env.filterParser.parseFilter(filter) ).toEqual([{
-        //             filterExpr: `${escapeId(ctx.fieldName)} IN (@${ctx.fieldName}1, @${ctx.fieldName}2, @${ctx.fieldName}3, @${ctx.fieldName}4, @${ctx.fieldName}5)`,
-        //             parameters: {
-        //                 [`${ctx.fieldName}1`]: ctx.fieldListValue[0],
-        //                 [`${ctx.fieldName}2`]: ctx.fieldListValue[1],
-        //                 [`${ctx.fieldName}3`]: ctx.fieldListValue[2],
-        //                 [`${ctx.fieldName}4`]: ctx.fieldListValue[3],
-        //                 [`${ctx.fieldName}5`]: ctx.fieldListValue[4],
-        //             }
-        //         }])
-        //     })
+                expect( env.filterParser.parseFilter(filter) ).toEqual([
+                {
+                    fieldName: ctx.fieldName,
+                    opStr: env.filterParser.veloOperatorToFirestoreOperator('$hasSome'),
+                    value: ctx.fieldListValue,
+                }
+            
+            ])
+            })
 
-        //     test(`operator [$hasSome] with empty list of values will throw an exception`, () => {
-        //         const filter = {
-        //             // kind: 'filter',
-        //             operator: '$hasSome',
-        //             fieldName: ctx.fieldName,
-        //             value: []
-        //         }
+            test(`operator [$hasSome] with empty list of values will throw an exception`, () => {
+                const filter = {
+                    // kind: 'filter',
+                    operator: '$hasSome',
+                    fieldName: ctx.fieldName,
+                    value: []
+                }
 
-        //         expect( () => env.filterParser.parseFilter(filter) ).toThrow(InvalidQuery)
-        //     })
+                expect( () => env.filterParser.parseFilter(filter) ).toThrow(InvalidQuery)
+            })
 
-        //     test(`correctly transform operator [$eq] with null value`, () => {
-        //         const filter = {
-        //             // kind: 'filter',
-        //             operator: '$eq',
-        //             fieldName: ctx.fieldName,
-        //         }
+            test(`correctly transform operator [$eq] with null value`, () => {
+                const filter = {
+                    operator: '$eq',
+                    fieldName: ctx.fieldName,
+                }
 
-        //         expect( env.filterParser.parseFilter(filter) ).toEqual([{
-        //             filterExpr: `${escapeId(ctx.fieldName)} IS NULL`,
-        //             parameters: { }
-        //         }])
-        //     })
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    fieldName: ctx.fieldName,
+                    opStr: env.filterParser.veloOperatorToFirestoreOperator('$eq'),
+                    value: null
+                }])
+            })
 
-        //     test(`correctly transform operator [$eq] with boolean value`, () => {
-        //         const filter = {
-        //             operator: '$eq',
-        //             fieldName: ctx.fieldName,
-        //             value: chance.bool()
-        //         }
+            test(`correctly transform operator [$eq] with boolean value`, () => {
+                const filter = {
+                    operator: '$eq',
+                    fieldName: ctx.fieldName,
+                    value: chance.bool()
+                }
 
-        //         expect( env.filterParser.parseFilter(filter) ).toEqual([{
-        //             filterExpr: `${escapeId(ctx.fieldName)} = @${ctx.fieldName}`,
-        //             parameters: { [ctx.fieldName]: filter.value ? 1 : 0 }
-        //         }])
-        //     })
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    fieldName: ctx.fieldName,
+                    opStr: env.filterParser.veloOperatorToFirestoreOperator('$eq'),               
+                    value: filter.value 
+                }])
+            })
 
-        //     describe('handle string operators', () => {
-        //         test(`correctly transform operator [$contains]`, () => {
-        //             const filter = {
-        //                 // kind: 'filter',
-        //                 operator: '$contains',
-        //                 fieldName: ctx.fieldName,
-        //                 value: ctx.fieldValue
-        //             }
+            describe('handle string operators', () => {
+                each([
+                    '$contains', '$urlized',
+                ]).test(`operator [$contains] will throw an exception`, () => {
+                    const filter = {
+                        operator: '$contains',
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldValue
+                    }
 
-        //             expect( env.filterParser.parseFilter(filter) ).toEqual([{
-        //                 filterExpr: `${escapeId(ctx.fieldName)} LIKE @${ctx.fieldName}`,
-        //                 parameters: { [ctx.fieldName]: `%${ctx.fieldValue}%`}
-        //             }])
-        //         })
+                    expect(() => env.filterParser.parseFilter(filter)).toThrow(InvalidQuery)
+                })
 
-        //         test(`correctly transform operator [$startsWith]`, () => {
-        //             const filter = {
-        //                 // kind: 'filter',
-        //                 operator: '$startsWith',
-        //                 fieldName: ctx.fieldName,
-        //                 value: ctx.fieldValue
-        //             }
+                each([
+                    '$startsWith', '$endsWith',
+                ]).test(`correctly transform operator [%s]`, (o) => {
+                    const filter = {
+                        operator: o,
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldValue
+                    }
 
-        //             expect( env.filterParser.parseFilter(filter) ).toEqual([{
-        //                 filterExpr: `${escapeId(ctx.fieldName)} LIKE @${ctx.fieldName}`,
-        //                 parameters: { [ctx.fieldName]: `${ctx.fieldValue}%`}
-        //             }])
-        //         })
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                        fieldName: ctx.fieldName,
+                        opStr: env.filterParser.valueForStringOperator(o, ctx.fieldValue),
+                        value: ctx.fieldValue,
+                    }])
 
-        //         test(`correctly transform operator [$endsWith]`, () => {
-        //             const filter = {
-        //                 // kind: 'filter',
-        //                 operator: '$endsWith',
-        //                 fieldName: ctx.fieldName,
-        //                 value: ctx.fieldValue
-        //             }
+                })
 
-        //             expect( env.filterParser.parseFilter(filter) ).toEqual([{
-        //                 filterExpr: `${escapeId(ctx.fieldName)} LIKE @${ctx.fieldName}`,
-        //                 parameters: { [ctx.fieldName]: `%${ctx.fieldValue}`}
-        //             }])
-        //         })
+                test(`correctly transform operator [$urlized]`, () => {
+                    const filter = {
+                        operator: '$urlized',
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldListValue
+                    }
 
-        //         test(`correctly transform operator [$urlized]`, () => {
-        //             const filter = {
-        //                 // kind: 'filter',
-        //                 operator: '$urlized',
-        //                 fieldName: ctx.fieldName,
-        //                 value: ctx.fieldListValue
-        //             }
+                    expect(() => env.filterParser.parseFilter(filter)).toThrow(InvalidQuery)
 
-        //             expect( env.filterParser.parseFilter(filter) ).toEqual([{
-        //                 filterExpr: `LOWER(${escapeId(ctx.fieldName)}) RLIKE @${ctx.fieldName}`,
-        //                 parameters: { [ctx.fieldName]: ctx.fieldListValue.map(s => s.toLowerCase()).join('[- ]') }
-        //             }])
-        //         })
-        //     })
-        // });
+                })
+            
+        });
 
-        // describe('handle multi field operator', () => {
-        //     each([
-        //         '$and', '$or'
-        //     ]).test(`correctly transform operator [%s]`, (o) => {
-        //         const filter = {
-        //             // kind: 'filter',
-        //             operator: o,
-        //             value: [ctx.filter, ctx.anotherFilter]
-        //         }
-        //         const op = o === '$and' ? 'AND' : 'OR'
-
-        //         const filter1 = env.filterParser.parseFilter(ctx.filter)[0]
-        //         const filter2 = env.filterParser.parseFilter(ctx.anotherFilter)[0]
-        //         expect( env.filterParser.parseFilter(filter) ).toEqual([{
-        //             filterExpr: `${filter1.filterExpr} ${op} ${filter2.filterExpr}`,
-        //             parameters: Object.assign({}, filter1.parameters, filter2.parameters)
-        //         }])
-        //     })
+        describe('handle multi field operator', () => {
+            each([
+                '$and'
+            ]).test(`correctly transform operator [%s]`, (o) => {
+                const filter = {
+                    operator: o,
+                    value: [ctx.filter, ctx.anotherFilter]
+                }
+                const filter1 = env.filterParser.parseFilter(ctx.filter)[0]
+                const filter2 = env.filterParser.parseFilter(ctx.anotherFilter)[0]
+                expect( env.filterParser.parseFilter(filter) ).toEqual([
+                    filter1,
+                    filter2
+                ])
+            })
+        })
 
         //     test(`correctly transform operator [$not]`, () => {
         //         const filter = {
