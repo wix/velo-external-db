@@ -2,7 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "build:dev" : "lerna bootstrap --hoist",
+    "build:dev": "lerna bootstrap --hoist",
     "test": "lerna exec --scope '{external-db-config,velo-external-db,velo-external-db-core}' \"npm test\"",
     "test:postgres": "lerna exec --scope external-db-postgres \"npm test\" && lerna exec --scope velo-external-db \"npm run test:postgres\"",
     "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
@@ -12,12 +12,13 @@
     "ci:publish": "lerna publish -y from-git"
   },
   "devDependencies": {
+    "eslint": "^7.32.0",
     "lerna": "^4.0.0"
   },
   "workspaces": {
     "packages": [
       "external-db-mysql",
-      "velo-external-db" 
+      "velo-external-db"
     ]
   }
 }
