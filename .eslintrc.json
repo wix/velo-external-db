@@ -3,9 +3,10 @@
         "browser": true,
         "commonjs": true,
         "es2021": true,
-        "jest/globals": true
+        "node": true
     },
     "extends": "eslint:recommended",
+    "ignorePatterns": ["**/*.spec.js"],
     "parserOptions": {
         "ecmaVersion": 12
     },
