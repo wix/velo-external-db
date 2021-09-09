@@ -2,7 +2,7 @@
 FROM node:14-slim
 
 # Create and change to the app directory.
-WORKDIR /usr/src/app
+WORKDIR /usr/lib/app
 
 # Copy application dependency manifests to the container image.
 COPY package.json .
