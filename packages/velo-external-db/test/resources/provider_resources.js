@@ -15,6 +15,9 @@ const firestoreTestEnv = require('./engines/firestore_resources')
 const mssql = require('external-db-mssql')
 const mssqlTestEnv = require('./engines/mssql_resources')
 
+const mongo = require('external-db-mongo')
+const mongoTestEnv = require('./engines/mongo_resources')
+
 
 const env = {
     dataProvider: Uninitialized,
@@ -48,6 +51,7 @@ const mysqlTestEnvInit = async () => await dbInit(mysqlTestEnv, mysql)
 const spannerTestEnvInit = async () => await dbInit(spannerTestEnv, spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestoreTestEnv, firestore)
 const mssqlTestEnvInit = async () => await dbInit(mssqlTestEnv, mssql)
+const mongoTestEnvInit = async () => await dbInit(mongoTestEnv, mongo)
 
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
@@ -55,6 +59,7 @@ const testSuits = () => [
     ['Spanner', spannerTestEnvInit],
     ['Firestore', firestoreTestEnvInit],
     ['Sql Server', mssqlTestEnvInit],
+    ['Mongo', mongoTestEnvInit],
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 module.exports = { env, dbTeardown, testSuits }
