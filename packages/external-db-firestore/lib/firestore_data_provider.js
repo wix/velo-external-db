@@ -1,4 +1,4 @@
-// const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } = require('./spanner_utils')
+const { asEntity } = require('./firestore_utils')
 const { SystemFields } = require('velo-external-db-commons')
 
 class DataProvider {
@@ -8,119 +8,81 @@ class DataProvider {
         this.database = database
     }
 
-    // async find(collectionName, filter, sort, skip, limit) {
-    //     const {filterExpr, parameters} = this.filterParser.transform(filter)
-    //     const { sortExpr } = this.filterParser.orderBy(sort)
-    //
-    //     const query = {
-    //         sql: `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} LIMIT @limit OFFSET @skip`,
-    //         params: {
-    //             skip: skip,
-    //             limit: limit,
-    //         },
-    //     }
-    //     Object.assign(query.params, parameters)
-    //
-    //     const [rows] = await this.database.run(query);
-    //     return recordSetToObj(rows).map( this.asEntity.bind(this) )
-    // }
-    //
-    // async count(collectionName, filter) {
-    //     const {filterExpr, parameters} = this.filterParser.transform(filter)
-    //     const query = {
-    //         sql: `SELECT COUNT(*) AS num FROM ${escapeId(collectionName)} ${filterExpr}`.trim(),
-    //         params: { },
-    //     };
-    //     Object.assign(query.params, parameters)
-    //
-    //     const [rows] = await this.database.run(query)
-    //     const objs = recordSetToObj(rows).map( this.asEntity.bind(this) )
-    //
-    //     return objs[0].num;
-    // }
-    //
-    // async insert(collectionName, items) {
-    //     await this.database.table(collectionName)
-    //                        .insert(items.map(this.asDBEntity.bind(this)))
-    //     return items.length
-    // }
-    //
-    // asDBEntity(item) {
-    //     return Object.keys(item)
-    //                  .reduce((obj, key) => {
-    //                      return { ...obj, [patchFieldName(key)]: item[key] }
-    //                  }, {})
-    // }
-    //
-    // fixDates(value) {
-    //     if (value instanceof Date) {
-    //         // todo: fix this hack !!!
-    //         const date = value.toISOString()
-    //         const date2 = `${date.substring(0, date.lastIndexOf('.') + 4)}${date.slice(-1)}`
-    //         return new Date(date2)
-    //     }
-    //     return value
-    //
-    // }
-    //
-    // asEntity(dbEntity) {
-    //     return Object.keys(dbEntity)
-    //                  .reduce(function (obj, key) {
-    //                      return { ...obj, [unpatchFieldName(key)]: this.fixDates(dbEntity[key]) }
-    //                  }.bind(this), {})
-    // }
-    //
-    // async update(collectionName, items) {
-    //     const item = items[0]
-    //     const systemFieldNames = SystemFields.map(f => f.name)
-    //     const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
-    //
-    //     if (updateFields.length === 0) {
-    //         return 0
-    //     }
-    //
-    //     await this.database.table(collectionName)
-    //                        .update(items.map( this.asDBEntity.bind(this) ))
-    //     return items.length
-    // }
-    //
-    // async delete(collectionName, itemIds) {
-    //     await this.database.table(collectionName)
-    //                        .deleteRows(itemIds)
-    //     return itemIds.length
-    // }
-    //
-    // async truncate(collectionName) {
-    //     // todo: properly implement this
-    //     const query = {
-    //         sql: `SELECT * FROM ${escapeId(collectionName)} LIMIT @limit OFFSET @skip`,
-    //         params: {
-    //             skip: 0,
-    //             limit: 1000,
-    //         },
-    //     }
-    //
-    //     const [rows] = await this.database.run(query);
-    //     const itemIds = recordSetToObj(rows).map( this.asEntity.bind(this) ).map(e => e._id)
-    //
-    //     await this.delete(collectionName, itemIds)
-    // }
-    //
-    // async aggregate(collectionName, filter, aggregation) {
-    //     const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
-    //     const {fieldsStatement, groupByColumns, havingFilter, parameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
-    //
-    //     const query = {
-    //         sql: `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`,
-    //         params: { },
-    //     }
-    //
-    //     Object.assign(query.params, whereParameters, parameters)
-    //
-    //     const [rows] = await this.database.run(query)
-    //     return recordSetToObj(rows).map( this.asEntity.bind(this) )
-    // }
+    async find(collectionName, filter, sort, skip, limit) {
+        const filterOperations = this.filterParser.transform(filter)
+        const sortOperations = this.filterParser.orderBy(sort)
 
+        const collectionRef = filterOperations.reduce((c, { fieldName, opStr, value }) => c.where(fieldName, opStr, value), this.database.collection(collectionName))
+
+        const collectionRef2 = sortOperations.reduce((c, { fieldName, direction }) => c = c.orderBy(fieldName, direction), collectionRef)
+
+        const docs = (await collectionRef2.limit(limit).get()).docs
+
+        return docs.map(doc => asEntity(doc))
+    }
+    
+    async count(collectionName, filter) {
+        const filterOperations = this.filterParser.transform(filter)
+
+        const collectionRef = filterOperations.reduce((c, { fieldName, opStr, value }) => c.where(fieldName, opStr, value), this.database.collection(collectionName))
+
+        return (await collectionRef.get()).size
+    }
+    
+    async insert(collectionName, items) {
+        const batch = items.reduce((b, i) => b.set(this.database.doc(`${collectionName}/${i._id}`), i), this.database.batch())
+
+        return (await batch.commit()).length
+    }
+     
+    async update(collectionName, items) {
+        const item = items[0]
+        const systemFieldNames = SystemFields.map(f => f.name)
+        const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k))
+    
+        if (updateFields.length === 0) {
+            return 0
+        }
+
+        const batch = items.reduce((b, i) => b.update(this.database.doc(`${collectionName}/${i._id}`), i), this.database.batch())
+
+        return (await batch.commit()).length
+    }
+    
+    async delete(collectionName, itemIds) {
+        const batch = itemIds.reduce((b, id) => b.delete(this.database.doc(`${collectionName}/${id}`)), this.database.batch())
+
+        return (await batch.commit()).length
+    }
+
+    async truncate(collectionName) {
+        const batchSize = 100
+        const collectionRef = await this.database.collection(collectionName)
+        const query = collectionRef.orderBy('_id').limit(batchSize)
+
+        return new Promise((resolve, reject) =>{
+            this.deleteQueryBatch(query, resolve).catch(reject)
+        })
+    
+    }
+
+    async deleteQueryBatch(query, resolve) {
+        const snapshot = await query.get()
+      
+        const batchSize = snapshot.size
+        if (batchSize === 0) {
+          return resolve()
+        }
+    
+        const batch = snapshot.docs.reduce((b, doc) => b.delete(doc.ref), this.database.batch())
+    
+        await batch.commit()
+      
+        process.nextTick(() => {
+          this.deleteQueryBatch(query, resolve)
+        })
+    }
+      
 }
 
 module.exports = DataProvider

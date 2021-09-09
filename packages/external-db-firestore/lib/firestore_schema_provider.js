@@ -93,7 +93,7 @@ class SchemaProvider {
 
     async drop(collectionName) {
         // todo: drop collection https://firebase.google.com/docs/firestore/manage-data/delete-data
-        await this.database.collection(SystemTable).doc(collectionName).delete();
+        await this.database.collection(SystemTable).doc(collectionName).delete()
     }
 }
 
