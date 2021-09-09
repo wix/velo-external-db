@@ -16,7 +16,7 @@ class DataProvider {
 
         const collectionRef2 = sortOperations.reduce((c, { fieldName, direction }) => c = c.orderBy(fieldName, direction), collectionRef)
 
-        const docs = (await collectionRef2.limit(limit).get()).docs
+        const docs = (await collectionRef2.limit(limit).offset(skip).get()).docs
 
         return docs.map(doc => asEntity(doc))
     }
