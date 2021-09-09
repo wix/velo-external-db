@@ -22,6 +22,14 @@ const extraOptions = () => {
     }
 }
 
+const notConnectedPool = (pool, err) => {
+    return {
+        ...pool,
+        query: async () => { throw err },
+        request: async () => { throw err },
+        connect: async () => { return await pool.connect() }
+    }
+}
 
 const init = async (cfg, _poolOptions) => {
     const config = {
@@ -39,8 +47,14 @@ const init = async (cfg, _poolOptions) => {
     const poolOptions = _poolOptions || {}
 
     const _pool = new ConnectionPool(Object.assign({}, config, extraOptions(), poolOptions))
-
-    const {pool, cleanup} = await _pool.connect().then((res) => {return {pool: res, cleanup: async () => await pool.close() }}).catch((e) => { return {pool:_pool, cleanup: () => { }} })
+    const { pool, cleanup } = await _pool.connect().then((res) => {
+        return { pool: res, cleanup: async () => await pool.close() }
+    }).catch((e) => {
+        return {
+            pool: notConnectedPool(_pool, e),
+            cleanup: () => { }
+        }
+    })
     const databaseOperations = new DatabaseOperations(pool)
 
     const filterParser = new FilterParser()
