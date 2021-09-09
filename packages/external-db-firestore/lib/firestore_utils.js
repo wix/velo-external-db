@@ -8,23 +8,12 @@ const fixDates = (value) => {
     return value
 }
 
-const deleteQueryBatch = async(db, query, resolve) => {
-    const snapshot = await query.get()
-  
-    const batchSize = snapshot.size
-    if (batchSize === 0) {
-      return resolve()
-    }
-
-    const batch = snapshot.docs.reduce((b, doc) => b.delete(doc.ref), db.batch())
-
-    await batch.commit()
-  
-    process.nextTick(() => {
-      deleteQueryBatch(db, query, resolve)
-    })
+const asEntity = (docEntity) => {
+  const doc = docEntity.data()
+  return Object.keys(doc)
+  .reduce(function(obj, key) {
+      return { ...obj, [key]: fixDates(doc[key]) }
+  }.bind(this), {})
 }
 
-
-
-module.exports = { fixDates, deleteQueryBatch }
+module.exports = { fixDates, asEntity }

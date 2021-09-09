@@ -1,4 +1,4 @@
-const { fixDates, deleteQueryBatch } = require('./firestore_utils')
+const { asEntity } = require('./firestore_utils')
 const { SystemFields } = require('velo-external-db-commons')
 
 class DataProvider {
@@ -18,7 +18,7 @@ class DataProvider {
 
         const docs = (await collectionRef2.limit(limit).get()).docs
 
-        return docs.map(doc => this.asEntity(doc))
+        return docs.map(doc => asEntity(doc))
     }
     
     async count(collectionName, filter) {
@@ -34,15 +34,7 @@ class DataProvider {
 
         return (await batch.commit()).length
     }
- 
-    asEntity(docEntity) {
-        const doc = docEntity.data()
-        return Object.keys(doc)
-        .reduce(function(obj, key) {
-            return { ...obj, [key]: fixDates(doc[key]) }
-        }.bind(this), {})
-    }
-    
+     
     async update(collectionName, items) {
         const item = items[0]
         const systemFieldNames = SystemFields.map(f => f.name)
@@ -69,9 +61,26 @@ class DataProvider {
         const query = collectionRef.orderBy('_id').limit(batchSize)
 
         return new Promise((resolve, reject) =>{
-            deleteQueryBatch(this.database, query, resolve).catch(reject)
+            this.deleteQueryBatch(query, resolve).catch(reject)
         })
     
+    }
+
+    async deleteQueryBatch(query, resolve) {
+        const snapshot = await query.get()
+      
+        const batchSize = snapshot.size
+        if (batchSize === 0) {
+          return resolve()
+        }
+    
+        const batch = snapshot.docs.reduce((b, doc) => b.delete(doc.ref), this.database.batch())
+    
+        await batch.commit()
+      
+        process.nextTick(() => {
+          this.deleteQueryBatch(query, resolve)
+        })
     }
       
 }
