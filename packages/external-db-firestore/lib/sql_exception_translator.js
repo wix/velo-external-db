@@ -1,3 +1,4 @@
+/* eslint-disable */
 const { DbConnectionError } = require('velo-external-db-commons').errors
 
 

@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, isObject } = require('velo-external-db-commons')
+const { isObject } = require('velo-external-db-commons')
 const { /*escapeId,*/ validateLiteral } = require('./firestore_utils')
 
 
@@ -11,7 +11,7 @@ class FilterParser {
     const results = this.parseFilter(filter)
     
         if (results.length === 0) {
-            return [];
+            return []
         }
 
         return results
@@ -48,7 +48,7 @@ class FilterParser {
             const value = this.valueForOperator(filter.fieldName, filter.value, filter.operator)
             return [{
                 fieldName: this.inlineVariableIfNeeded(filter.fieldName, inlineFields),
-                opStr: this.valueForStringOperator(filter.operator, filter.value),
+                opStr: this.valueForStringOperator(filter.operator),
                 value,
             }]
         }
@@ -67,7 +67,7 @@ class FilterParser {
     //     return { }
     // }
     //
-    valueForStringOperator(operator, value) {
+    valueForStringOperator(operator) {
         switch (operator) {
             case '$startsWith':
                 return '>='
@@ -125,13 +125,13 @@ class FilterParser {
     
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return [];
+            return []
         }
     
         const results = sort.flatMap( this.parseSort )
     
         if (results.length === 0) {
-            return [];
+            return []
         }
 
         return results

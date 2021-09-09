@@ -8,7 +8,7 @@ const fixDates = (value) => {
     return value
 }
 
-const deleteQueryBatch = async (db, query, resolve) => {
+const deleteQueryBatch = async(db, query, resolve) => {
     const snapshot = await query.get()
   
     const batchSize = snapshot.size
@@ -16,7 +16,7 @@ const deleteQueryBatch = async (db, query, resolve) => {
       return resolve()
     }
 
-    const batch = snapshot.docs.reduce((b, doc) => b.delete(doc.ref),db.batch())
+    const batch = snapshot.docs.reduce((b, doc) => b.delete(doc.ref), db.batch())
 
     await batch.commit()
   

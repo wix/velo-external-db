@@ -1,4 +1,4 @@
-const { fixDates,deleteQueryBatch } = require('./firestore_utils')
+const { fixDates, deleteQueryBatch } = require('./firestore_utils')
 const { SystemFields } = require('velo-external-db-commons')
 
 class DataProvider {
@@ -14,7 +14,7 @@ class DataProvider {
 
         const collectionRef = filterOperations.reduce((c, { fieldName, opStr, value }) => c.where(fieldName, opStr, value), this.database.collection(collectionName))
 
-        const collectionRef2 = sortOperations.reduce((c,{ fieldName, direction }) => c = c.orderBy(fieldName, direction), collectionRef)
+        const collectionRef2 = sortOperations.reduce((c, { fieldName, direction }) => c = c.orderBy(fieldName, direction), collectionRef)
 
         const docs = (await collectionRef2.limit(limit).get()).docs
 
@@ -30,7 +30,7 @@ class DataProvider {
     }
     
     async insert(collectionName, items) {
-        const batch = items.reduce((b, i) => b.set(this.database.doc(`${collectionName}/${i._id}`),i),this.database.batch())
+        const batch = items.reduce((b, i) => b.set(this.database.doc(`${collectionName}/${i._id}`), i), this.database.batch())
 
         return (await batch.commit()).length
     }
@@ -38,7 +38,7 @@ class DataProvider {
     asEntity(docEntity) {
         const doc = docEntity.data()
         return Object.keys(doc)
-        .reduce(function (obj, key) {
+        .reduce(function(obj, key) {
             return { ...obj, [key]: fixDates(doc[key]) }
         }.bind(this), {})
     }
@@ -52,7 +52,7 @@ class DataProvider {
             return 0
         }
 
-        const batch = items.reduce((b, i) => b.update(this.database.doc(`${collectionName}/${i._id}`),i), this.database.batch())
+        const batch = items.reduce((b, i) => b.update(this.database.doc(`${collectionName}/${i._id}`), i), this.database.batch())
 
         return (await batch.commit()).length
     }
@@ -64,11 +64,11 @@ class DataProvider {
     }
 
     async truncate(collectionName) {
-        const batchSize = 100;
+        const batchSize = 100
         const collectionRef = await this.database.collection(collectionName)
         const query = collectionRef.orderBy('_id').limit(batchSize)
 
-        return new Promise((resolve,reject) =>{
+        return new Promise((resolve, reject) =>{
             deleteQueryBatch(this.database, query, resolve).catch(reject)
         })
     
