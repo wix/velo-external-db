@@ -3,6 +3,7 @@ const SchemaProvider = require('./mssql_schema_provider')
 const DataProvider = require('./mssql_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mssql_operations')
+const { notConnectedPool } = require ('./mssql_utils')
 
 const extraOptions = () => {
     if (process.env.NODE_ENV === 'test') {
@@ -19,15 +20,6 @@ const extraOptions = () => {
                 trustServerCertificate: false
             }
         }
-    }
-}
-
-const notConnectedPool = (pool, err) => {
-    return {
-        ...pool,
-        query: async () => { throw err },
-        request: async () => { throw err },
-        connect: async () => { return await pool.connect() }
     }
 }
 
