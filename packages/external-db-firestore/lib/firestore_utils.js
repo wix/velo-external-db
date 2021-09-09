@@ -23,7 +23,7 @@ const deleteQueryBatch = async (db, query, resolve) => {
     process.nextTick(() => {
       deleteQueryBatch(db, query, resolve)
     })
-  }
+}
 
 
 
