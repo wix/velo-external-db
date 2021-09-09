@@ -1,7 +1,13 @@
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 });
+const axiosRetry = require('axios-retry');
 
+axiosRetry(axios, {
+    retries: 3,
+    retryDelay: (retryCount) => retryCount * 2000,
+    retryCondition: (_error) => true
+});
 
 const givenCollection = async (name, columns, auth) => {
     await axios.post(`/schemas/create`, {collectionName: name}, auth)
