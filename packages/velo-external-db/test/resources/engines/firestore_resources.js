@@ -1,5 +1,5 @@
 const { init } = require('external-db-firestore')
-const {runImage, stopImage} = require("./docker_support");
+const {runImage, stopImage} = require('./docker_support')
 
 const setEmulatorOn = () => process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8082'
 
