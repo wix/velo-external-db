@@ -1,7 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { isObject } = require('velo-external-db-commons')
-const { /*escapeId,*/ validateLiteral } = require('./firestore_utils')
-
 
 class FilterParser {
     constructor() {
@@ -21,21 +19,13 @@ class FilterParser {
         if (!filter || !isObject(filter)|| filter.operator === undefined) {
             return []
         }
-    
-        switch (filter.operator) {  
-            case '$and':
-                return filter.value.reduce((o, f) => {
-                                return o.concat( this.parseFilter.bind(this)(f) )
-                            }, [])
-            case '$or':
-            case '$urlized':
-            case '$contains':
-                throw new InvalidQuery(`${filter.operator} operator cant be used in firebase`)
 
+        if(this.isUnsupportedOperator(filter.operator)){
+            throw new InvalidQuery(`${filter.operator} operator cant be used in firebase`)
         }
 
         if (this.isSingleFieldOperator(filter.operator)) {
-            const value = this.valueForOperator(filter.fieldName, filter.value, filter.operator)
+            const value = this.valueForOperator(filter.value, filter.operator)
     
             return [{
                 fieldName: this.inlineVariableIfNeeded(filter.fieldName, inlineFields),
@@ -43,58 +33,32 @@ class FilterParser {
                 value,
             }]
         }
-    
-        if (this.isSingleFieldStringOperator(filter.operator)) {
-            const value = this.valueForOperator(filter.fieldName, filter.value, filter.operator)
-            return [{
-                fieldName: this.inlineVariableIfNeeded(filter.fieldName, inlineFields),
-                opStr: this.valueForStringOperator(filter.operator),
-                value,
-            }]
+        
+        if(this.isMultipleFiledOperator(filter.operator)){
+            return filter.value.reduce((o, f) => {
+                return o.concat( this.parseFilter.bind(this)(f) )
+            }, [])
         }
         
         return []
     }
-    //
-    // parametersFor(name, value) {
-    //     if (value !== undefined) {
-    //         if (!Array.isArray(value)) {
-    //             return { [name]: this.patchTrueFalseValue(value) }
-    //         } else {
-    //             return value.reduce((o, v, i) => Object.assign({}, o, { [`${name}${i + 1}`]: v}), {})
-    //         }
-    //     }
-    //     return { }
-    // }
-    //
-    valueForStringOperator(operator) {
-        switch (operator) {
-            case '$startsWith':
-                return '>='
-            case '$endsWith':
-                return '<'
-        }
-    }
-    
+
     isSingleFieldOperator(operator) {
-        return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq'].includes(operator)
+        return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$startsWith', '$endsWith'].includes(operator)
     }
     
-    isSingleFieldStringOperator(operator) {
-        return ['$startsWith', '$endsWith'].includes(operator)
+    isUnsupportedOperator(operator){
+        return ['$or', '$urlized', '$contains', '$not'].includes(operator)
     }
     
-    // fix this function to test that not more than 10 equality 
-    prepareStatementVariables(n, fieldName) {
-        return Array.from({length: n}, (_, i) => validateLiteral(`${fieldName}${i + 1}`) )
-                    .join(', ')
+    isMultipleFiledOperator(operator){
+        return ['$and'].includes(operator)
     }
     
-    
-    valueForOperator(fieldName, value, operator) {
+    valueForOperator(value, operator) {
         if (operator === '$hasSome') {
             if (value === undefined || value.length === 0) {
-                throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
+                throw new InvalidQuery(`${operator} cannot have an empty list of arguments`)
             }
             return value  
         } else if (operator === '$eq' && value === undefined) {
@@ -120,6 +84,10 @@ class FilterParser {
                 return '>='
             case '$hasSome':
                 return 'in'
+            case '$startsWith':
+                return '>='
+            case '$endsWith':
+                return '<'
         }
     }
     
@@ -146,18 +114,10 @@ class FilterParser {
     
         const dir = 'asc' === _direction.toLowerCase() ? 'asc' : 'desc'
         
-        // should I escape the fieldName?
         return [{fieldName, direction: dir}]
 
     }
-    //
-    // patchTrueFalseValue(value) {
-    //     if (value === true || value === false) {
-    //         return value ? 1 : 0
-    //     }
-    //     return value
-    // }
-    //
+
     inlineVariableIfNeeded(fieldName, inlineFields) {
         if (inlineFields) {
             if (inlineFields[fieldName]) {

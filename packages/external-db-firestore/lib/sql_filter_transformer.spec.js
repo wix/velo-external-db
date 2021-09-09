@@ -8,6 +8,15 @@ const chance = Chance();
 
 const EMPTY_SORT = []
 
+const randomFilter = () => {
+    const op = chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$startsWith', '$endsWith'])
+    return {
+        operator: op,
+        fieldName: chance.word(),
+        value: op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
+    }
+}
+
 describe('Fire Store Parser', () => {
 
     describe('sort parser', () => {
@@ -77,7 +86,7 @@ describe('Fire Store Parser', () => {
             expect( env.filterParser.transform(ctx.filter) ).toEqual([{
                 fieldName: ctx.filter.fieldName,
                 opStr: env.filterParser.veloOperatorToFirestoreOperator(ctx.filter.operator,ctx.filter.value),
-                value: env.filterParser.valueForOperator(ctx.filter.fieldName,ctx.filter.value,ctx.filter.operator)
+                value: env.filterParser.valueForOperator(ctx.filter.value,ctx.filter.operator)
             }])
         })
         
@@ -136,7 +145,6 @@ describe('Fire Store Parser', () => {
 
             test(`operator [$hasSome] with empty list of values will throw an exception`, () => {
                 const filter = {
-                    // kind: 'filter',
                     operator: '$hasSome',
                     fieldName: ctx.fieldName,
                     value: []
@@ -196,7 +204,7 @@ describe('Fire Store Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         fieldName: ctx.fieldName,
-                        opStr: env.filterParser.valueForStringOperator(o, ctx.fieldValue),
+                        opStr: env.filterParser.veloOperatorToFirestoreOperator(o, ctx.fieldValue),
                         value: ctx.fieldValue,
                     }])
 
@@ -232,19 +240,17 @@ describe('Fire Store Parser', () => {
             })
         })
 
-        //     test(`correctly transform operator [$not]`, () => {
-        //         const filter = {
-        //             // kind: 'filter',
-        //             operator: '$not',
-        //             value: ctx.filter
-        //         }
+            // test(`correctly transform operator [$not]`, () => {
+            //     const filter = {
+            //         operator: '$not',
+            //         value: ctx.filter
+            //     }
+            //     expect( env.filterParser.parseFilter(filter) ).toEqual([{
+            //         filterExpr: `NOT (${env.filterParser.parseFilter(ctx.filter)[0].filterExpr})`,
+            //         parameters: env.filterParser.parseFilter(ctx.filter)[0].parameters
+            //     }])
+            // })
 
-        //         expect( env.filterParser.parseFilter(filter) ).toEqual([{
-        //             filterExpr: `NOT (${env.filterParser.parseFilter(ctx.filter)[0].filterExpr})`,
-        //             parameters: env.filterParser.parseFilter(ctx.filter)[0].parameters
-        //         }])
-        //     })
-        // });
 
         // describe('aggregation functions', () => {
 
@@ -345,12 +351,12 @@ describe('Fire Store Parser', () => {
         ctx.fieldValue = chance.word();
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()];
 
-        ctx.filter = gen.randomFilter();
-        ctx.anotherFilter = gen.randomFilter();
+        ctx.filter = randomFilter();
+        ctx.anotherFilter = randomFilter();
 
         ctx.offset = chance.natural({min: 2, max: 20})
     });
-//
+    
     beforeAll(function() {
         env.filterParser = new FilterParser
     });
