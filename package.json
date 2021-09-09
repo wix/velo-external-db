@@ -8,6 +8,7 @@
     "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
     "test:mysql": "lerna exec --scope external-db-mysql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mysql\"",
     "test:mssql": "lerna exec --scope external-db-mssql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mssql\"",
+    "test:firestore": "lerna exec --scope external-db-firestore \"npm test\" && lerna exec --scope velo-external-db \"npm run test:firestore\"",
     "release": "lerna version --no-push",
     "ci:publish": "lerna publish -y from-git"
   },
