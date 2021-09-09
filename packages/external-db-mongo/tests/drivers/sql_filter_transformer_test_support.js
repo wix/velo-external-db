@@ -1,6 +1,6 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const { escapeId, validateLiteral, patchFieldName } = require('../../lib/mssql_utils');
+const { escapeId, validateLiteral, patchFieldName } = require('../../lib/mongo_utils');
 
 const filterParser = {
     transform: jest.fn(),

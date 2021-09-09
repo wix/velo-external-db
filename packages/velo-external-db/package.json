@@ -10,6 +10,7 @@
     "test:postgres": "TEST_ENGINE=postgres jest --runInBand ./test",
     "test:firestore": "TEST_ENGINE=firestore jest --runInBand ./test",
     "test:mssql": "TEST_ENGINE=mssql jest --runInBand ./test",
+    "test:mongo": "TEST_ENGINE=mongo jest --runInBand ./test",
     "test:watch": "jest --detectOpenHandles --watch",
     "start": "node lib/app.js",
     "deploy": "gcloud app deploy ./app.yaml"
@@ -26,6 +27,7 @@
     "external-db-mysql": "^0.0.0",
     "external-db-postgres": "^0.0.0",
     "external-db-spanner": "^0.0.0",
+    "external-db-mongo": "^0.0.0",
     "nested-property": "^4.0.0",
     "velo-external-db-commons": "^0.0.0",
     "velo-external-db-core": "^0.0.0"

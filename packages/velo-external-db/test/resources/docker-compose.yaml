@@ -52,8 +52,13 @@ services:
     ports:
       - 3306:3306
   mongo:
-    image: mongo
-    restart: always
+    image: mongo:5
     environment:
-      MONGO_INITDB_ROOT_USERNAME: user
-      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: testdb
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./engines/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro

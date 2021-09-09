@@ -1,47 +1,15 @@
-const { ConnectionPool } = require('mssql')
-const SchemaProvider = require('./mssql_schema_provider')
-const DataProvider  = require('./mssql_data_provider')
+const { MongoClient } = require('mongodb')
+const SchemaProvider = require('./mongo_schema_provider')
+const DataProvider  = require('./mongo_data_provider')
 const FilterParser = require('./sql_filter_transformer')
-const DatabaseOperations = require('./mssql_operations')
+const DatabaseOperations = require('./mongo_operations')
 
-const extraOptions = () => {
-    if (process.env.NODE_ENV === 'test') {
-        return {
-            options: {
-                encrypt: false,
-                trustServerCertificate: true
-            }
-        }
-    } else {
-        return {
-            options: {
-                encrypt: true,
-                trustServerCertificate: false
-            }
-        }
-    }
-}
+const init = async (cfg) => {
+    const uri = `mongodb://${cfg.user}:${cfg.password}@${cfg.host}/${cfg.db}`
+    const client = new MongoClient(uri)
+    const pool = await client.connect()
 
-
-const init = async (cfg, _poolOptions) => {
-    const config = {
-        user: cfg.user,
-        password: cfg.password,
-        database: cfg.db,
-        server: cfg.host,
-        port: 1433,
-        pool: {
-            max: 10,
-            min: 1,
-            idleTimeoutMillis: 30000
-        }
-    }
-    const poolOptions = _poolOptions || {}
-
-    const _pool = new ConnectionPool(Object.assign({}, config, extraOptions(), poolOptions))
-    const pool = await _pool.connect()
-
-    const databaseOperations = new DatabaseOperations(pool)
+    const databaseOperations = new DatabaseOperations(client)
 
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)

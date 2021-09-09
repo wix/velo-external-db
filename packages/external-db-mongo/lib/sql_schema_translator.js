@@ -1,4 +1,4 @@
-const { escapeId } = require('./mssql_utils')
+const { escapeId } = require('./mongo_utils')
 
 class SchemaColumnTranslator {
 
