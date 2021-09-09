@@ -1,28 +1,30 @@
-// const { escapeId } = require('mysql')
-// const { InvalidQuery } = require('velo-external-db-commons').errors
+const { Timestamp } = require('@google-cloud/firestore')
 
-// const recordSetToObj = (rows) => rows.map(row => row.toJSON())
-//
-// const patchFieldName = (f) => {
-//     if (f.startsWith('_')) {
-//         return `x${f}`
-//     }
-//     return f
-// }
-//
-// const unpatchFieldName = (f) => {
-//     if (f.startsWith('x_')) {
-//         return f.slice(1)
-//     }
-//     return f
-// }
-//
-const testLiteral = s => /^[a-zA-Z_0-9_]+$/.test(s)
-const validateLiteral = l => {
-    if (!testLiteral(l)) {
-        throw new InvalidQuery(`Invalid literal`)
+
+const fixDates = (value) => {
+    if (value instanceof Timestamp) {
+        return value.toDate()
     }
-    return `@${l}`
+    return value
 }
 
-module.exports = { /*recordSetToObj, escapeId, patchFieldName, unpatchFieldName,*/ testLiteral, validateLiteral }
+const deleteQueryBatch = async (db, query, resolve) => {
+    const snapshot = await query.get()
+  
+    const batchSize = snapshot.size
+    if (batchSize === 0) {
+      return resolve()
+    }
+
+    const batch = snapshot.docs.reduce((b, doc) => b.delete(doc.ref),db.batch())
+
+    await batch.commit()
+  
+    process.nextTick(() => {
+      deleteQueryBatch(db, query, resolve)
+    })
+  }
+
+
+
+module.exports = { fixDates, deleteQueryBatch }
