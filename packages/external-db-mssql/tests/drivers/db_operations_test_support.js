@@ -1,7 +1,7 @@
 const { ConnectionPool } = require('mssql')
 const DatabaseOperations = require('../../lib/mssql_operations')
 
-const createPool = modify => {
+const createPool = async modify => {
     const config = {
         user: 'sa',
         password: 't9D4:EHfU6Xgccs-',
@@ -20,17 +20,18 @@ const createPool = modify => {
     }
 
     const _pool = new ConnectionPool(Object.assign({}, config, modify ))
-    return _pool.connect()
+    const pool = await _pool.connect().then((pool) => { return pool }).catch(() => { return _pool })
+    return pool
 }
 
-const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ))
+const dbOperationWithMisconfiguredPassword = async () => new DatabaseOperations(await createPool({ password: 'wrong' }))
 
-const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { database: 'wrong'} ))
+const dbOperationWithMisconfiguredDatabase = async () => new DatabaseOperations(await createPool({ database: 'wrong' }))
 
-const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { server: 'wrong'} ))
+const dbOperationWithMisconfiguredHost = async () => new DatabaseOperations(await createPool({ server: 'wrong' }))
 
-const dbOperationWithValidDB = () => {
-    const connection = createPool({ } )
+const dbOperationWithValidDB = async () => {
+    const connection = await createPool({ })
     const dbOperations = new DatabaseOperations( connection )
 
     return { dbOperations, cleanup: async () => await (await connection).close()}

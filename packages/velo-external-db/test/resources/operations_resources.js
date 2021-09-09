@@ -26,7 +26,7 @@ const testSuits = () => [
     ['Postgres', postgresTestEnvInit],
     ['Spanner', spannerTestEnvInit],
     ['Firestore', firestoreTestEnvInit],
-    // ['Sql Server', mssqlTestEnvInit],
+    ['Sql Server', mssqlTestEnvInit],
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 
