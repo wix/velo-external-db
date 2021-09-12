@@ -12,9 +12,10 @@ const init = (cfg, _poolOptions) => {
         database : cfg.db,
 
         multipleStatements: true,
-
+        
         connectionLimit: 10,
         queueLimit: 0,
+        acquireTimeout: 1000*100
     }
 
     const poolOptions = _poolOptions || { }
