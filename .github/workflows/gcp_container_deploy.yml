@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Build and deploy image to GCP registry:
+  Build&Deploy:
     runs-on: ubuntu-latest
 
     env:
