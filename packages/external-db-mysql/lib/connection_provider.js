@@ -15,7 +15,6 @@ const init = (cfg, _poolOptions) => {
         
         connectionLimit: 10,
         queueLimit: 0,
-        acquireTimeout: 1000*100
     }
 
     const poolOptions = _poolOptions || { }
