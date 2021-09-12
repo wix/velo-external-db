@@ -7,6 +7,7 @@ const mysql = require('./engines/mysql_resources')
 const spanner = require('./engines/spanner_resources')
 const firestore = require('./engines/firestore_resources')
 const mssql = require('./engines/mssql_resources')
+const mongo = require('./engines/mongo_resources')
 
 const env = {
     secretKey: Uninitialized,
@@ -46,6 +47,7 @@ const mysqlTestEnvInit = async () => await dbInit(mysql)
 const spannerTestEnvInit = async () => await dbInit(spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestore)
 const mssqlTestEnvInit = async () => await dbInit(mssql)
+const mongoTestEnvInit = async () => await dbInit(mongo)
 
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
@@ -53,6 +55,7 @@ const testSuits = () => [
     ['Spanner', spannerTestEnvInit],
     ['Firestore', firestoreTestEnvInit],
     ['Sql Server', mssqlTestEnvInit],
+    ['Mongo', mongoTestEnvInit],
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 

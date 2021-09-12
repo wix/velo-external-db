@@ -1,71 +1,87 @@
-// const { translateErrorCodes, notThrowingTranslateErrorCodes} = require('./sql_exception_translator')
-// const SchemaColumnTranslator = require('./sql_schema_translator')
-// const { escapeId } = require('./mssql_utils')
-// const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
-// const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
+const { SystemFields, validateSystemFields, asWixSchema } = require('velo-external-db-commons')
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
+
+const SystemTable = '_descriptor'
 
 class SchemaProvider {
     constructor(client) {
         this.client = client
+    }
 
-        // this.sqlSchemaTranslator = new SchemaColumnTranslator()
+    reformatFields(field) {
+        return {
+            field: field.name,
+            type: field.type,
+        }
     }
 
     async list() {
-        const res = await this.client.db().listCollections().toArray()
-        return res
+        const resp = await this.client.db().collection(SystemTable).find({})
+        const l = await resp.toArray()
+        const tables = l.reduce((o, d) => Object.assign( o, { [d._id]: { fields: d.fields } }), {})
+        return Object.entries(tables)
+                     .map(([collectionName, rs]) => asWixSchema([...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) ), collectionName))
     }
-
 
     async create(collectionName, columns) {
-        const res = await this.client.create(collectionName).listCollections().toArray()
-        return res
-    //     const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
-    //                                                                    .join(', ')
-    //     const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
-    //     await this.sql.query(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
-    //                             [...(columns || []).map(c => c.name)])
-    //                   .catch( err => {
-    //                       const e = notThrowingTranslateErrorCodes(err)
-    //                       if (!(e instanceof CollectionAlreadyExists)) {
-    //                           throw e
-    //                       } } )
+        const collection = await this.client.db().collection(SystemTable).findOne({ _id: collectionName })
+        if (!collection) {
+            await this.client.db().collection(SystemTable).insertOne( { _id: collectionName, fields: columns || [] })
+            await this.client.db().createCollection(collectionName)
+        }
     }
-    //
-    // async drop(collectionName) {
-    //     await this.sql.query(`DROP TABLE IF EXISTS ${escapeId(collectionName)}`)
-    //         .catch( translateErrorCodes )
-    // }
-    //
-    // async addColumn(collectionName, column) {
-    //     await validateSystemFields(column.name)
-    //     await this.sql.query(`ALTER TABLE ${escapeId(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
-    //                    .catch( translateErrorCodes )
-    // }
-    //
-    // async removeColumn(collectionName, columnName) {
-    //     await validateSystemFields(columnName)
-    //     return await this.sql.query(`ALTER TABLE ${escapeId(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
-    //                           .catch( translateErrorCodes )
-    // }
-    //
-    // async describeCollection(collectionName) {
-    //     const rs = await this.sql.request()
-    //                               .input('db', 'tempdb')
-    //                               .input('tableName', collectionName)
-    //                               .query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = @db AND TABLE_NAME = @tableName')
-    //
-    //     if (rs.recordset.length === 0) {
-    //         throw new CollectionDoesNotExists('Collection does not exists')
-    //     }
-    //
-    //     return asWixSchema(rs.recordset.map( this.translateDbTypes.bind(this) ), collectionName)
-    // }
-    //
-    // translateDbTypes(row) {
-    //     row.type = this.sqlSchemaTranslator.translateType(row.type)
-    //     return row
-    // }
+
+    async addColumn(collectionName, column) {
+        await validateSystemFields(column.name)
+
+        const collection = await this.client.db().collection(SystemTable).findOne({ _id: collectionName })
+        if (!collection) {
+            throw new CollectionDoesNotExists('Collection does not exists')
+        }
+        const fields = collection.fields
+
+        if (fields.find(f => f.name === column.name)) {
+            throw new FieldAlreadyExists('Collection already has a field with the same name')
+        }
+
+        await this.client.db().collection(SystemTable)
+                              .updateOne({ _id: collectionName }, { $set: { fields: [...fields, column] } })
+    }
+
+    async removeColumn(collectionName, columnName) {
+        await validateSystemFields(columnName)
+
+        const collection = await this.client.db().collection(SystemTable).findOne({ _id: collectionName })
+        if (!collection) {
+            throw new CollectionDoesNotExists('Collection does not exists')
+        }
+        const fields = collection.fields
+
+        if (!fields.find(f => f.name === columnName)) {
+            throw new FieldDoesNotExist('Collection does not contain a field with this name')
+        }
+
+        await this.client.db().collection(SystemTable)
+                              .updateOne({ _id: collectionName }, { $set: { fields: fields.filter(f => f.name !== columnName) } })
+    }
+
+    async describeCollection(collectionName) {
+        const collection = await this.client.db().collection(SystemTable).findOne({ _id: collectionName })
+        if (!collection) {
+            throw new CollectionDoesNotExists('Collection does not exists')
+        }
+
+        return asWixSchema([...SystemFields, ...collection.fields].map( this.reformatFields.bind(this) ), collectionName)
+    }
+
+    async drop(collectionName) {
+        const d = await this.client.db().collection(SystemTable).deleteOne( { _id: collectionName })
+        if (d.deletedCount === 1) {
+            await this.client.db().collection(collectionName).drop()
+                             .catch(e => console.log(e))
+        }
+    }
 }
+
 
 module.exports = SchemaProvider

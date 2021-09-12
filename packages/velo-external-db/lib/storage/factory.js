@@ -34,6 +34,12 @@ const init = async(type, vendor, config) => {
 
             return append(init(cfg), cfg.secretKey)
         }
+        case 'mongo': {
+            const { init } = require('external-db-mongo')
+            const cfg = await config.readConfig()
+
+            return append(await init(cfg), cfg.secretKey)
+        }
     }
 }
 

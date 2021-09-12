@@ -25,6 +25,7 @@ const create = () => {
           break;
         case 'mysql':
         case 'postgres':
+        case 'mongo':
           internalConfigReader = new GcpConfigReader()
           break;
       }
@@ -42,6 +43,7 @@ const create = () => {
         case 'mssql':
         case 'mysql':
         case 'postgres':
+        case 'mongo':
           internalConfigReader = new AzureConfigReader()
           break;
       }
