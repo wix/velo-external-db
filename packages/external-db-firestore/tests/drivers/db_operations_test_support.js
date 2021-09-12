@@ -10,8 +10,11 @@ const createPool = modify => {
 
 const unplugEmulator = () => delete process.env.FIRESTORE_EMULATOR_HOST
 
+const setWrongCredentials = () => process.env.GOOGLE_APPLICATION_CREDENTIALS='../../packages/external-db-firestore/tests/drivers/broken_creds.json'
+
 const dbOperationWithMisconfiguredPassword = () => {
     unplugEmulator()
+    setWrongCredentials()
     return createPool( { projectId: 'wrong'} ).databaseOperations
 }
 

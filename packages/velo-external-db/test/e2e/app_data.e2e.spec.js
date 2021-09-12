@@ -47,6 +47,7 @@ describe('Velo External DB Data REST API',  () => {
             expect((await data.expectAllDataIn(ctx.collectionName, auth)).items).toEqual(expect.arrayContaining(ctx.items));
         })
 
+        if (name !== 'Firestore') {
         test('aggregate api', async () => {
             await schema.givenCollection(ctx.collectionName, ctx.numberColumns, auth)
             await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, auth)
@@ -78,6 +79,7 @@ describe('Velo External DB Data REST API',  () => {
                 }, auth)).data).toEqual({ items: [ { _id: ctx.numberItem._id, _owner: ctx.numberItem._owner, myAvg: ctx.numberItem[ctx.numberColumns[0].name], mySum: ctx.numberItem[ctx.numberColumns[1].name] } ],
                 totalCount: 0});
         })
+    }
 
         test('delete one api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], auth)
