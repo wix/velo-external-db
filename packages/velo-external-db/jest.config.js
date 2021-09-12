@@ -7,4 +7,5 @@ module.exports = {
     testEnvironment: "node",
     globalSetup: "./test/env/env.db.setup.js",
     globalTeardown: "./test/env/env.db.teardown.js",
+    testTimeout: 20000
 };
