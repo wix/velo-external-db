@@ -1,13 +1,13 @@
 const { Uninitialized, gen } = require('test-commons')
-const { getAppInfo,maskSensitiveData } = require ('./app_info')
-const driver = require('./app_info_test_support')
+const { appInfoFor, maskSensitiveData } = require ('./app_info')
+const driver = require('../../test/drivers/app_info_test_support')
 
 describe('App info Function', () => {
     test('get app info will retrieve valid config and will create app info object', async () => {
         driver.defineValidConfigReaderClient(ctx.config)
         driver.defineValidOperationService()
 
-        const appInfo = await getAppInfo(driver.operationService, driver.configReaderClient)
+        const appInfo = await appInfoFor(driver.operationService, driver.configReaderClient)
         
         expect(appInfo).toEqual({
             configReaderStatus : driver.validConfigReaderStatus,
@@ -20,7 +20,7 @@ describe('App info Function', () => {
         driver.defineBrokenConfigReaderClient(ctx.config)
         driver.defineValidOperationService()
 
-        const appInfo = await getAppInfo(driver.operationService, driver.configReaderClient)
+        const appInfo = await appInfoFor(driver.operationService, driver.configReaderClient)
 
         expect(appInfo.configReaderStatus).toContain(driver.missingRequiredConfigKeys)
     })
@@ -29,7 +29,7 @@ describe('App info Function', () => {
         driver.defineValidConfigReaderClient(ctx.config)
         driver.defineBrokenOperationService()
 
-        const appInfo = await getAppInfo(driver.operationService, driver.configReaderClient)
+        const appInfo = await appInfoFor(driver.operationService, driver.configReaderClient)
 
         expect(appInfo.dbConnectionStatus).toContain(driver.wrongDBConnectionStatus)
     })

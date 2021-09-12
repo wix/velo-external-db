@@ -1,6 +1,6 @@
 const express = require('express')
 const { errorMiddleware } = require('./web/error-middleware')
-const { getAppInfo } = require ('../views/helpers/app_info')
+const { appInfoFor } = require ('./health/app_info')
 
 let dataService, schemaService, operationService, externalDbConfigClient
 
@@ -16,7 +16,7 @@ const createRouter = () => {
 
     // *************** INFO **********************
     router.get('/', async (req, res) => {
-        const appInfo = await getAppInfo(operationService, externalDbConfigClient)
+        const appInfo = await appInfoFor(operationService, externalDbConfigClient)
         res.render('index', appInfo);
     })
 

@@ -5,7 +5,7 @@ const maskSensitiveData = (cfg) => {
     return config
 }
 
-const getAppInfo = async (operationService, configReaderClient) => {
+const appInfoFor = async (operationService, configReaderClient) => {
     const connectionStatus = await operationService.connectionStatus()
     const config = await configReaderClient.readConfig()
     const configReaderStatus = await configReaderClient.configStatus()
@@ -16,4 +16,4 @@ const getAppInfo = async (operationService, configReaderClient) => {
     }
 }
 
-module.exports = { getAppInfo, maskSensitiveData }
+module.exports = { appInfoFor, maskSensitiveData }
