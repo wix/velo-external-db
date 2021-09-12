@@ -108,7 +108,7 @@ jobs:
 
       - name: Downloading Docker images for the test
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull mysql
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull mysql_57
 
       - name: Installing Lerna
         run: npm install
