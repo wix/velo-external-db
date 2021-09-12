@@ -99,6 +99,8 @@ const randomNumberDbEntity = (columns) => {
             entity[column.name] = chance.integer({ min: 0, max: 10000 })
         } else if (column.type === 'number' && column.subtype === 'decimal') {
             entity[column.name] = chance.floating({ min: 0, max: 10000, fixed: 2 })
+            if (entity[column.name] - parseInt(entity[column.name]) === 0 )  
+                entity[column.name] + 0.01    // todo - fix this by check if spanner and then insert as Spanner.float()
         }
     })
 
