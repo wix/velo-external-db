@@ -40,7 +40,7 @@ services:
       MYSQL_DATABASE: test-db
       MYSQL_USER: test-user
       MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     ports:
       - 3306:3306
   mysql_57:

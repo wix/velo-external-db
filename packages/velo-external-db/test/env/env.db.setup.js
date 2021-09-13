@@ -31,7 +31,7 @@ module.exports = async () => {
 
     }
 
-    await sleep( 15000 )
+    await sleep( 5000 )
 
     switch (testEngine) {
         case 'mysql':
