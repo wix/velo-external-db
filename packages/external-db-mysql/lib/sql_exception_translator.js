@@ -8,6 +8,7 @@ const notThrowingTranslateErrorCodes = err => {
             return new FieldAlreadyExists('Collection already has a field with the same name')
         case 'ER_NO_SUCH_TABLE':
             return new CollectionDoesNotExists('Collection does not exists')
+        case 'EAI_AGAIN':
         case 'ER_DBACCESS_DENIED_ERROR':
         case 'ER_BAD_DB_ERROR':
             return new DbConnectionError(`Database does not exists or you don\'t have access to it, sql message: ${err.sqlMessage}`)
