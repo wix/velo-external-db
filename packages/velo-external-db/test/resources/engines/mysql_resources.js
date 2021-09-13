@@ -15,7 +15,7 @@ const cleanup = async () => {
 }
 
 const initEnv = async () => {
-    await runImage('mysql')
+    await runImage('mysql', true)
 }
 
 const shutdownEnv = async () => {
