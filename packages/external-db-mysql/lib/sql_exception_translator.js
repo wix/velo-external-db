@@ -16,7 +16,7 @@ const notThrowingTranslateErrorCodes = err => {
         case 'ENOTFOUND':
             return new DbConnectionError(`Access to database denied - host is unavailable, sql message:  ${err.sqlMessage} `)
         default :
-            return new Error(`default ${err.sqlMessage}`)
+            return new Error(`default ${err.code} ${err.sqlMessage}`)
     }
 }
 
