@@ -48,7 +48,6 @@ const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByC
                                         }, 
                                         groupByColumns: groupByColumns,
                                         havingFilter: {},
-                                        parameters: {},
                                        })
 }
 

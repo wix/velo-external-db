@@ -52,7 +52,7 @@ class DataProvider {
     }
 
     async aggregate(collectionName, filter, aggregation) {
-        const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
+        const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
         const { filterExpr } = this.filterParser.transform(filter)
 
         return await this.pool.collection(collectionName).aggregate( [
@@ -62,9 +62,7 @@ class DataProvider {
             },
             { $match: havingFilter }
          ] ).toArray()
-        return result;
     }
-
 }
 
 
