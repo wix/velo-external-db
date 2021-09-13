@@ -5,8 +5,11 @@ services:
     ports:
       - 1433:1433
     environment:
-      SA_PASSWORD: t9D4:EHfU6Xgccs-
-      ACCEPT_EULA: Y
+      SA_PASSWORD: "t9D4:EHfU6Xgccs-"
+      ACCEPT_EULA: "Y"
+    networks:
+      - backend
+
   firestore:
     image: groovex/firestore-emulator:latest
     ports:
@@ -14,7 +17,9 @@ services:
     build:
       args:
         GCLOUD_SDK_VERSION: 355.0.0
-      context: .
+    networks:
+      - backend
+
   spanner:
     image: roryq/spanner-emulator:latest
     ports:
@@ -24,6 +29,9 @@ services:
       SPANNER_DATABASE_ID: test-database
       SPANNER_INSTANCE_ID: test-instance
       SPANNER_PROJECT_ID: test-project
+    networks:
+      - backend
+
   postgres:
     image: postgres
     restart: always
@@ -33,6 +41,7 @@ services:
       POSTGRES_USER: test-user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: test-db
+
   mysql:
     image: mysql:8
     command: --default-authentication-plugin=mysql_native_password
@@ -46,16 +55,7 @@ services:
       - 3306:3306
     networks:
       - backend
-#      MYSQL_ROOT_PASSWORD: example
-#  mysql_57:
-#    image: mysql:5.7
-#    restart: always
-#    environment:
-#      MYSQL_DATABASE: test-db
-#      MYSQL_USER: test-user
-#      MYSQL_PASSWORD: password
-#    ports:
-#      - 3306:3306
+
   mongo:
     image: mongo:5
     environment:
