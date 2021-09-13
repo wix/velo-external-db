@@ -3,13 +3,13 @@ const { runImage, stopImage } = require('./docker_support')
 const { sleep } = require('test-commons');
 
 const connection = () => {
-    const {connection, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db'}, { connectionLimit: 1, queueLimit: 0, insecureAuth: true })
+    const {connection, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db'}, { connectionLimit: 1, queueLimit: 0 })
     return { pool: connection, cleanup: cleanup}
 }
 
 const cleanup = async () => {
     await sleep( 5000 )
-    const {schemaProvider, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db'}, { connectionLimit: 1, queueLimit: 0, insecureAuth: true })
+    const {schemaProvider, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db'}, { connectionLimit: 1, queueLimit: 0 })
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
 
