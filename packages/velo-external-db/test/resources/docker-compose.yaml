@@ -36,6 +36,7 @@ services:
   mysql:
     image: mysql:8.0
     restart: always
+    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_DATABASE: test-db
       MYSQL_USER: test-user
@@ -46,7 +47,6 @@ services:
   mysql_57:
     image: mysql:5.7
     restart: always
-    command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_DATABASE: test-db
       MYSQL_USER: test-user
