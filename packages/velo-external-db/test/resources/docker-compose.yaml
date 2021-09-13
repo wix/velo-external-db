@@ -5,8 +5,8 @@ services:
     ports:
       - 1433:1433
     environment:
-      SA_PASSWORD: "t9D4:EHfU6Xgccs-"
-      ACCEPT_EULA: "Y"
+      SA_PASSWORD: t9D4:EHfU6Xgccs-
+      ACCEPT_EULA: Y
   firestore:
     image: groovex/firestore-emulator:latest
     ports:
@@ -21,38 +21,41 @@ services:
       - 9010:9010
       - 9020:9020
     environment:
-      - SPANNER_DATABASE_ID=test-database
-      - SPANNER_INSTANCE_ID=test-instance
-      - SPANNER_PROJECT_ID=test-project
+      SPANNER_DATABASE_ID: test-database
+      SPANNER_INSTANCE_ID: test-instance
+      SPANNER_PROJECT_ID: test-project
   postgres:
     image: postgres
     restart: always
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: 'test-user'
-      POSTGRES_PASSWORD: 'password'
-      POSTGRES_DB: 'test-db'
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test-db
   mysql:
-    image: mysql:8.0
-    restart: always
+    image: mysql:8
     command: --default-authentication-plugin=mysql_native_password
-    environment:
-      MYSQL_DATABASE: test-db
-      MYSQL_USER: test-user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: example
-    ports:
-      - 3306:3306
-  mysql_57:
-    image: mysql:5.7
     restart: always
     environment:
-      MYSQL_DATABASE: test-db
       MYSQL_USER: test-user
       MYSQL_PASSWORD: password
+      MYSQL_DATABASE: test-db
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
     ports:
       - 3306:3306
+    networks:
+      - backend
+#      MYSQL_ROOT_PASSWORD: example
+#  mysql_57:
+#    image: mysql:5.7
+#    restart: always
+#    environment:
+#      MYSQL_DATABASE: test-db
+#      MYSQL_USER: test-user
+#      MYSQL_PASSWORD: password
+#    ports:
+#      - 3306:3306
   mongo:
     image: mongo:5
     environment:
@@ -64,3 +67,7 @@ services:
       - 27017:27017
     volumes:
       - ./engines/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+networks:
+  backend:
+    driver: bridge
