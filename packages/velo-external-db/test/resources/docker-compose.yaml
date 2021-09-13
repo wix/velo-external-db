@@ -41,7 +41,7 @@ services:
       MYSQL_USER: test-user
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: test-db
-      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
       - 3306:3306
     networks:
