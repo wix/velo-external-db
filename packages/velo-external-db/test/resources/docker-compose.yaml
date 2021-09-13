@@ -17,6 +17,7 @@ services:
     build:
       args:
         GCLOUD_SDK_VERSION: 355.0.0
+      context: .
     networks:
       - backend
 
