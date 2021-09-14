@@ -1,4 +1,3 @@
- const { dbName } = require('./mongo_utils')
 // const { SystemFields } = require('velo-external-db-commons')
 // const { translateErrorCodes } = require('./sql_exception_translator')
 
@@ -6,7 +5,7 @@ class DataProvider {
     constructor(client, filterParser) {
         this.client = client
         this.filterParser = filterParser
-        this.pool = this.client.db(dbName(client))
+        this.pool = this.client.db()
     }
 
     async find(collectionName, filter, sort, skip, limit) {
@@ -61,11 +60,11 @@ class DataProvider {
         const { filterExpr } = this.filterParser.transform(filter)
 
         return await this.pool.collection(collectionName)
-                              .aggregate( [ { $match: filterExpr },
-                                            { $group: fieldsStatement },
-                                            { $match: havingFilter }
-                                          ] )
-                              .toArray()
+                                .aggregate( [ { $match: filterExpr },
+                                                fieldsStatement,
+                                                havingFilter
+                                            ] )
+                                .toArray()
     }
 }
 

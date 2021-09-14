@@ -42,12 +42,13 @@ const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByC
     when(filterParser.parseAggregation).calledWith(having, filter)
                                        .mockReturnValue({
                                         fieldsStatement: {
+                                            $group: {
                                             _id: '$_id',
                                             [columnAliases[0]]: { $max: `$${c[0]}`},
                                             [columnAliases[1]]: { $sum: `$${c[1]}`}
-                                        }, 
+                                        }}, 
                                         groupByColumns: groupByColumns,
-                                        havingFilter: {},
+                                        havingFilter: { $match: {}},
                                        })
 }
 
