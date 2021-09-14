@@ -1,5 +1,4 @@
-const AwsDbProvision = require('../aws/mysql_aws_installer')
-const AwsConfigWriter = require('../aws/aws_config_writer')
+const aws = require('../aws')
 const { randomCredentials, randomSecretKey } = require('../utils/password_utils')
 const { waitFor } = require('poll-until-promise')
 
@@ -8,7 +7,7 @@ const providerFor = (vendor, credentials) => {
         case 'aws':
         case 'gcp':
         case 'azure':
-            return new AwsDbProvision(credentials)
+            return aws
     }
 }
 
@@ -56,14 +55,14 @@ const provisionDb = async (provider, engine, configWriter) => {
 
 
 const main = async ({ vendor, engine, credentials }) => {
-    console.log(`main`)
     console.log(vendor, engine, credentials)
 
     const provider = providerFor(vendor, credentials)
 
-    const configWriter = new AwsConfigWriter(credentials)
+    const configWriter = new provider.AwsConfigWriter(credentials)
+    const dbProvision = new provider.AwsDbProvision(credentials)
 
-    await provisionDb(provider, engine, configWriter)
+    await provisionDb(dbProvision, engine, configWriter)
     // await provisionServer(provider, credentials)
 }
 
