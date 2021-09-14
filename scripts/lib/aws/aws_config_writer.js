@@ -2,7 +2,7 @@ const { SecretsManagerClient, CreateSecretCommand } = require('@aws-sdk/client-s
 
 const SecretId = 'VELO-EXTERNAL-DB-SECRETS'
 
-class AwsConfigWriter {
+class ConfigWriter {
     constructor(credentials) {
         this.client = new SecretsManagerClient({ region: 'us-east-2', credentials: { accessKeyId: credentials.awsAccessKeyId, secretAccessKey: credentials.awsSecretAccessKey } })
     }
@@ -13,4 +13,4 @@ class AwsConfigWriter {
     }
 }
 
-module.exports = AwsConfigWriter
+module.exports = ConfigWriter

@@ -1,6 +1,6 @@
 const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand} = require('@aws-sdk/client-rds')
 
-class AwsDbProvision {
+class DbProvision {
     constructor(credentials) {
         this.rdsClient = new RDSClient( { region: 'us-east-2',
                                           credentials: { accessKeyId: credentials.awsAccessKeyId,
@@ -45,4 +45,4 @@ class AwsDbProvision {
  */
 
 
-module.exports = AwsDbProvision
+module.exports = DbProvision

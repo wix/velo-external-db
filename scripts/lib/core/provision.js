@@ -2,7 +2,7 @@ const aws = require('../aws')
 const { randomCredentials, randomSecretKey } = require('../utils/password_utils')
 const { waitFor } = require('poll-until-promise')
 
-const providerFor = (vendor, credentials) => {
+const providerFor = (vendor) => {
     switch (vendor) {
         case 'aws':
         case 'gcp':
@@ -59,8 +59,8 @@ const main = async ({ vendor, engine, credentials }) => {
 
     const provider = providerFor(vendor, credentials)
 
-    const configWriter = new provider.AwsConfigWriter(credentials)
-    const dbProvision = new provider.AwsDbProvision(credentials)
+    const configWriter = new provider.ConfigWriter(credentials)
+    const dbProvision = new provider.DbProvision(credentials)
 
     await provisionDb(dbProvision, engine, configWriter)
     // await provisionServer(provider, credentials)
