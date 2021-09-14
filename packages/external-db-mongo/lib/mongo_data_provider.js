@@ -34,11 +34,11 @@ class DataProvider {
 
     async update(collectionName, items) {
         const result = await this.pool.collection(collectionName)
-                                    .bulkWrite(items.map((item)=>this.updateSingleExpr(item)))
+                                    .bulkWrite(items.map((item)=>this.updateSingleObj(item)))
         return result.nModified
     }
 
-    updateSingleExpr(item){
+    updateSingleObj(item){
         return { updateOne: 
                     {
                         'filter': { '_id': item._id },
