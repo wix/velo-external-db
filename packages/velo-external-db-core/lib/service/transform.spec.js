@@ -13,15 +13,15 @@ describe('Converters', () => {
     })
 
     test('unpack dates will take all properties with velo date structure and convert them to new Date', async () => {
-        const objWithVeloDates = Object.assign(ctx.obj, { [ctx.property]: ctx.veloDate, [ctx.anotherProperty]: ctx.veloDate});
+        const objWithVeloDates = { ...ctx.obj, [ctx.property]: ctx.veloDate, [ctx.anotherProperty]: ctx.veloDate }
 
-        expect(unpackDates(objWithVeloDates)).toEqual(Object.assign(ctx.obj, { [ctx.property]: new Date(ctx.veloDate.$date), [ctx.anotherProperty]: new Date(ctx.veloDate.$date)}))
+        expect(unpackDates(objWithVeloDates)).toEqual( { ...ctx.obj, [ctx.property]: new Date(ctx.veloDate.$date), [ctx.anotherProperty]: new Date(ctx.veloDate.$date)} )
     })
 
     test('pack dates will take all properties with date and convert them to velo date', async () => {
-        const objWithJsDates = Object.assign(ctx.obj, { [ctx.property]: new Date(ctx.veloDate.$date), [ctx.anotherProperty]: new Date(ctx.veloDate.$date)});
+        const objWithJsDates = { ...ctx.obj, [ctx.property]: new Date(ctx.veloDate.$date), [ctx.anotherProperty]: new Date(ctx.veloDate.$date)}
 
-        expect(asWixData(objWithJsDates)).toEqual(Object.assign(ctx.obj, { [ctx.property]: ctx.veloDate, [ctx.anotherProperty]: ctx.veloDate}))
+        expect(asWixData(objWithJsDates)).toEqual( { ...ctx.obj, [ctx.property]: ctx.veloDate, [ctx.anotherProperty]: ctx.veloDate} )
     })
 
     const ctx = {

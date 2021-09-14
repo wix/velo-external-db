@@ -17,7 +17,7 @@ const unpackDates = item => {
     return i
 }
 
-const clone = o => Object.assign({}, o)
+const clone = o => ( { ...o } )
 
 const packDates = item => {
     const i = clone(item)
