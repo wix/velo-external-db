@@ -33,16 +33,19 @@ class DataProvider {
     }
 
     async update(collectionName, items) {
-        const rss = await Promise.all(items.map(item => this.updateSingle(collectionName, item)))
-
-        return rss.map((r) => r.modifiedCount).reduce((s, rs) => s + rs)
+        const result = await this.pool.collection(collectionName)
+                                    .bulkWrite(items.map((item)=>this.updateSingleExpr(item)))
+        return result.nModified
     }
 
-    async updateSingle(collectionName, item) {
-        return await this.pool.collection(collectionName)
-                              .updateOne({ _id: item._id },
-                                         { $set: { ...item } })
+    updateSingleExpr(item){
+        return { updateOne: 
+                    {
+                        'filter': { '_id': item._id },
+                        'update': { '$set': { ...item } }
+                    }}
     }
+
 
     async delete(collectionName, itemIds) {
         const rss = await this.pool.collection(collectionName)
