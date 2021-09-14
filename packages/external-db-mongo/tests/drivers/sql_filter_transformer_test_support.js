@@ -16,7 +16,7 @@ const stubEmptyFilterAndSortFor = (filter, sort) => {
 
 const stubEmptyFilterFor = (filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: '', parameters: {} })
+                                .mockReturnValue({ filterExpr: {} })
 }
 
 const stubEmptyOrderByFor = (sort) => {
@@ -26,23 +26,28 @@ const stubEmptyOrderByFor = (sort) => {
 
 const givenOrderByFor = (column, sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeId(column)} ASC` })
+                                 .mockReturnValue({ sortExpr: { sort: column } })
 }
 
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeId('_id')} = ${validateLiteral('_id')}`, parameters: { [patchFieldName('_id')]: id} })
+                                .mockReturnValue({ filterExpr: {
+                                    '_id' : id,
+                                }})
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
     const c = numericColumns.map(c => c.name)
     when(filterParser.parseAggregation).calledWith(having, filter)
                                        .mockReturnValue({
-                                           fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
-                                           groupByColumns: groupByColumns,
-                                           havingFilter: '',
-                                           parameters: {},
+                                        fieldsStatement: {
+                                            _id: '$_id',
+                                            [columnAliases[0]]: { $max: `$${c[0]}`},
+                                            [columnAliases[1]]: { $sum: `$${c[1]}`}
+                                        }, 
+                                        groupByColumns: groupByColumns,
+                                        havingFilter: {},
                                        })
 }
 
