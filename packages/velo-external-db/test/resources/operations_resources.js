@@ -4,6 +4,7 @@ const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')
 const firestore = require('external-db-firestore')
 const mssql = require('external-db-mssql')
+const mongo = require ('external-db-mongo')
 
 const env = {
     driver: Uninitialized,
@@ -20,6 +21,7 @@ const mysqlTestEnvInit = async () => await init(mysql)
 const spannerTestEnvInit = async () => await init(spanner)
 const firestoreTestEnvInit = async () => await init(firestore)
 const mssqlTestEnvInit = async () => await init(mssql)
+const mongoTestEnvInit = async () => await init(mongo)
 
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
@@ -27,6 +29,7 @@ const testSuits = () => [
     ['Spanner', spannerTestEnvInit],
     ['Firestore', firestoreTestEnvInit],
     ['Sql Server', mssqlTestEnvInit],
+    ['Mongo', mongoTestEnvInit]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 
