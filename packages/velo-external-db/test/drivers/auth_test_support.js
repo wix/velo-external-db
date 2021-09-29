@@ -12,14 +12,22 @@ const authInit = () => {
 
 const appendSecretKeyToRequest = dataRaw => {
     const data = JSON.parse( dataRaw )
-    const newData = Object.assign({}, data, {requestContext: {settings: {secretKey: secretKey}}})
-    return JSON.stringify(newData)
+    return JSON.stringify({...data, ...{ requestContext: {settings: {secretKey: secretKey}}}})
 }
 
-const auth = { transformRequest: axios.defaults
+const appendRoleToRequest = role => dataRaw => {
+    const data = JSON.parse( dataRaw )
+    return JSON.stringify({...data, ...{ requestContext: {...data.requestContext, role: role }}})
+}
+
+const authAdmin = { transformRequest: axios.defaults
                                       .transformRequest
-                                      .concat( appendSecretKeyToRequest ) }
+                                      .concat( appendSecretKeyToRequest, appendRoleToRequest('BACKEND_CODE') ) }
+
+const authOwner = { transformRequest: axios.defaults
+                                      .transformRequest
+                                      .concat( appendSecretKeyToRequest, appendRoleToRequest('OWNER' ) ) }
 
 
-module.exports = { authInit, auth }
+module.exports = { authInit, authAdmin, authOwner }
 
