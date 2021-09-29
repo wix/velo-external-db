@@ -1,57 +1,33 @@
 const { SystemFields, validateSystemFields, asWixSchema } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./google_sheet_exception_translator')
-
+const { reformatFields } = require('./google_sheet_utils')
 
 class SchemaProvider {
-    constructor(sheet, sheetId) {
-        this.sheetId = sheetId
-        this.sheet = sheet
+    constructor(doc) {
+        this.doc = doc
     }
 
-    reformatFields(field) {
-        return {
-            field: field.name,
-            type: field.type,
-        }
+    async getSheetHeader([title, spreadSheet]) {
+        await spreadSheet.loadHeaderRow()
+        return asWixSchema(reformatFields(spreadSheet.headerValues), title)
+    }
+
+    async getSheetsHeaders() {
+        await this.doc.loadInfo()
+        return await Promise.all(Object.entries(this.doc.sheetsByTitle).map(this.getSheetHeader)) 
     }
 
     async list() {
-        const sheetsProperties = (await  this.sheet.spreadsheets.get({ spreadsheetId:this.sheetId })).data.sheets
-        const sheetsFields = await Promise.all( sheetsProperties.map( async(s) => {
-            const fields = (await  this.sheet.spreadsheets.values.get({
-                spreadsheetId:this.sheetId,
-                range: `${s.properties.title}!1:1`,
-            })).data.values
+        const sheetHeaders = await this.getSheetsHeaders()
 
-            return {id: s.properties.title, fields: fields[0].map (i => ({ name : i, type: 'text'}))}
-        }))
+        return sheetHeaders
 
-        return sheetsFields.map(({id, fields}) => {
-            return asWixSchema([...fields].map(this.reformatFields), id)
-        })
     }
 
-    async create(collectionName, columns) {
+    async create(sheetTitle, columns) {
         try{
-            await this.sheet.spreadsheets.batchUpdate({
-                spreadsheetId: this.sheetId,
-                requestBody: {
-                    requests: [{
-                        addSheet:{
-                            properties:{
-                                title: collectionName
-                            }
-                        }
-                    }]
-                }
-            })
-
-            await this.sheet.spreadsheets.values.append({
-                spreadsheetId:this.sheetId,
-                range: `${collectionName}`,
-                valueInputOption: 'USER_ENTERED',
-                resource: { values: [[...SystemFields, ...(columns || [])].map(f => f.name)]},
-            })
+            const newSheet = await this.doc.addSheet({title: sheetTitle})
+            await newSheet.setHeaderRow(SystemFields.map(i => i.name))
         } catch(err){
             translateErrorCodes(err)
         }
@@ -60,19 +36,10 @@ class SchemaProvider {
     async addColumn(collectionName, column) {
         await validateSystemFields(column.name)
         try{
-            const row = await  this.sheet.spreadsheets.values.get({
-                spreadsheetId:this.sheetId,
-                range: `${collectionName}!1:1`,
-            })
-            
-            const newRow = row.data.values[0].concat(column.name)
-
-            await  this.sheet.spreadsheets.values.update({
-                spreadsheetId:this.sheetId,
-                range: `${collectionName}!1:1`,
-                valueInputOption: 'USER_ENTERED',
-                resource: { values: [newRow] },
-            })
+            await this.doc.loadInfo()
+            const sheet = await this.doc.sheetsByTitle[collectionName]
+            await sheet.loadHeaderRow()
+            await sheet.setHeaderRow([...sheet.headerValues, column.name])
 
         } catch(err){
             translateErrorCodes(err)

@@ -16,6 +16,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
+    "google-spreadsheet": "^3.1.15",
     "googleapis": "^85.0.0",
     "velo-external-db-commons": "^0.0.0"
   }

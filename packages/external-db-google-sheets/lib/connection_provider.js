@@ -1,17 +1,16 @@
-const { google } = require('googleapis')
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 const SchemaProvider = require('./google_sheet_schema_provider')
 const DataProvider = require('./google_sheet_data_provider')
 
 const init = async(cfg) => {
-    const auth = new google.auth.GoogleAuth({
-        keyFile: cfg.keyPath,
-        scopes: 'https://www.googleapis.com/auth/spreadsheets',
+    const doc = new GoogleSpreadsheet(cfg.sheetId)
+    await doc.useServiceAccountAuth({
+        client_email: cfg.clientEmail,
+        private_key: cfg.privateKey
     })
-    const authClientObject = await auth.getClient()
-    const googleSheetsInstance = google.sheets({ version: 'v4', auth: authClientObject})
 
-    const dataProvider = new DataProvider(googleSheetsInstance, cfg.sheetId)
-    const schemaProvider = new SchemaProvider(googleSheetsInstance, cfg.sheetId)
+    const dataProvider = new DataProvider(doc)
+    const schemaProvider = new SchemaProvider(doc)
 
     return { dataProvider, schemaProvider /*, databaseOperations, connection: firestore, cleanup: async() => await firestore.terminate()*/ }
 }
