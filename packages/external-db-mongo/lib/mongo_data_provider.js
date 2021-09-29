@@ -1,6 +1,8 @@
 // const { SystemFields } = require('velo-external-db-commons')
 // const { translateErrorCodes } = require('./sql_exception_translator')
 
+const { isObject } = require('velo-external-db-commons')
+
 class DataProvider {
     constructor(client, filterParser) {
         this.client = client
@@ -19,11 +21,9 @@ class DataProvider {
     }
 
     async count(collectionName, filter) {
-        const { filterExpr } = this.filterParser.transform(filter)
-
-        const result = await this.pool.collection(collectionName)
-                                      .count(filterExpr)
-        return result
+            const { filterExpr } = this.filterParser.transform(filter)
+            return await this.pool.collection(collectionName)
+                                        .count(filterExpr)
     }
 
     async insert(collectionName, items) {
@@ -61,13 +61,21 @@ class DataProvider {
     async aggregate(collectionName, filter, aggregation) {
         const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
         const { filterExpr } = this.filterParser.transform(filter)
-
-        return await this.pool.collection(collectionName)
+        const aggregateResult = await this.pool.collection(collectionName)
                                 .aggregate( [ { $match: filterExpr },
                                                 fieldsStatement,
                                                 havingFilter
                                             ] )
                                 .toArray()
+    
+        aggregateResult.map((result)=>{
+            if (isObject(result._id)){
+                Object.assign(result,result._id)
+                if (isObject(result._id)) delete result._id
+            }
+        })
+        return aggregateResult
+
     }
 }
 

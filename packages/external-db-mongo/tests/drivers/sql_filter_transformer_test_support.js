@@ -26,7 +26,7 @@ const stubEmptyOrderByFor = (sort) => {
 
 const givenOrderByFor = (column, sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                                 .mockReturnValue({ sortExpr: { sort: column } })
+                                 .mockReturnValue({ sortExpr: { sort: [[`${column}`, 'asc']] } })
 }
 
 
