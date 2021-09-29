@@ -3,6 +3,7 @@ const mysql = require('../resources/engines/mysql_resources')
 const spanner = require('../resources/engines/spanner_resources')
 const firestore = require('../resources/engines/firestore_resources')
 const mssql = require('../resources/engines/mssql_resources')
+const mongo = require ('../resources/engines/mongo_resources')
 const { sleep } = require('test-commons')
 
 module.exports = async () => {
@@ -27,6 +28,9 @@ module.exports = async () => {
 
         case 'mssql':
             await mssql.initEnv()
+            break
+        case 'mongo':
+            await mongo.initEnv()
             break
 
     }

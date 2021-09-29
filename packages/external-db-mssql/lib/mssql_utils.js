@@ -7,8 +7,8 @@ const validateLiteral = s => `@${patchFieldName(s)}`
 const notConnectedPool = (pool, err) => {
     return {
         ...pool,
-        query: async () => { throw err },
-        request: async () => { throw err },
+        query: () => { throw err },
+        request: () => { throw err },
         connect: async () => { return await pool.connect() }
     }
 }
