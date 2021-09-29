@@ -6,7 +6,7 @@ const init = async(cfg) => {
     const doc = new GoogleSpreadsheet(cfg.sheetId)
     await doc.useServiceAccountAuth({
         client_email: cfg.clientEmail,
-        private_key: cfg.privateKey
+        private_key: cfg.apiPrivateKey
     })
 
     const dataProvider = new DataProvider(doc)

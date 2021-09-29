@@ -1,6 +1,6 @@
 const ConfigReader = require('./service/config_reader')
 const AwsConfigReader = require('./readers/aws_config_reader')
-const { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader } = require('./readers/gcp_config_reader')
+const { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader } = require('./readers/gcp_config_reader')
 const AzureConfigReader = require('./readers/azure_config_reader')
 const CommonConfigReader = require('./readers/common_config_reader')
 const StubConfigReader = require('./readers/stub_config_reader')
@@ -22,6 +22,9 @@ const create = () => {
           break;
         case 'firestore':
           internalConfigReader = new GcpFirestoreConfigReader()
+          break;
+        case 'google-sheet':
+          internalConfigReader = new GcpGoogleSheetsConfigReader()
           break;
         case 'mysql':
         case 'postgres':
