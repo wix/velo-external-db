@@ -1,7 +1,7 @@
 const { DbConnectionError } = require('velo-external-db-commons').errors
 const each = require('jest-each').default;
 const { env, testSuits } = require('../resources/operations_resources')
-
+const { Uninitialized, gen } = require('test-commons')
 
 describe('Check Pool Connection', () => {
     each(testSuits()).describe('%s', (dbType, setup) => {
@@ -10,18 +10,17 @@ describe('Check Pool Connection', () => {
             setup()
         })
 
-        test('pool connection with wrong password will throw AccessDeniedError.', async () => {
+        test('pool connection with wrong password will return DbConnectionError.', async () => {
             const dbOperation = await env.driver.dbOperationWithMisconfiguredPassword()
 
             const validateConnection = await dbOperation.validateConnection()
 
             expect(validateConnection.valid).toBeFalsy()
             expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
-            expect(validateConnection.error.message).toContain('wrong credentials')
         })
 
         if (dbType !== 'Firestore') {
-            test('pool connection with wrong database will throw DatabaseDoesNotExists.', async () => {
+            test('pool connection with wrong database will return DbConnectionError.', async () => {
                 const dbOperation = await env.driver.dbOperationWithMisconfiguredDatabase()
 
                 const validateConnection = await dbOperation.validateConnection()
@@ -30,18 +29,17 @@ describe('Check Pool Connection', () => {
                 expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
             })
 
-            test('pool connection with wrong host will throw HostDoesNotExists.', async () => {
+            test('pool connection with wrong host will return DbConnectionError.', async () => {
                 const dbOperation = await env.driver.dbOperationWithMisconfiguredHost()
 
                 const validateConnection = await dbOperation.validateConnection()
 
                 expect(validateConnection.valid).toBeFalsy()
-                expect(validateConnection.error.message).toContain('host is unavailable')
                 expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
             })
         }
 
-        test('pool connection with valid DB will not throw', async () => {
+        test('pool connection with valid DB will return object with without error', async () => {
             const { dbOperations, cleanup } = await env.driver.dbOperationWithValidDB()
 
             const validateConnection = await dbOperations.validateConnection()
@@ -51,5 +49,6 @@ describe('Check Pool Connection', () => {
             await cleanup()
         })
     })
+
 })
 
