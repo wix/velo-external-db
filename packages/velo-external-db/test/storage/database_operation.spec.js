@@ -10,30 +10,17 @@ describe('Check Pool Connection', () => {
             setup()
         })
 
-        //1
-        if (dbType === 'Mongo')
-            test('pool connection with wrong config will return object with valid equal to false and DbConnectionError.', async () => {
-                const dbOperation = (gen.randomObjectFromArray(env.driver.dbOperationWithMisconfiguredConfig))() 
-                // todo - move randomObjectFromArray to beforeEach if we keeping this and implement dbOperationWithMisconfiguredConfig for every driver.
-
-                const validateConnection = await dbOperation.validateConnection()
-
-                expect(validateConnection.valid).toBeFalsy()
-                expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
-            })
-
-        test('pool connection with wrong password will return appropriate error.', async () => {
+        test('pool connection with wrong password will return DbConnectionError.', async () => {
             const dbOperation = await env.driver.dbOperationWithMisconfiguredPassword()
 
             const validateConnection = await dbOperation.validateConnection()
 
             expect(validateConnection.valid).toBeFalsy()
             expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
-            expect(validateConnection.error.message).toMatch(/(wrong credentials|Authentication failed)/i)
         })
-
-        if (dbType !== 'Firestore' && dbType !== 'Mongo') {
-            test('pool connection with wrong database will return appropriate error.', async () => {
+        
+        if (dbType !== 'Firestore') {
+            test('pool connection with wrong database will return DbConnectionError.', async () => {
                 const dbOperation = await env.driver.dbOperationWithMisconfiguredDatabase()
 
                 const validateConnection = await dbOperation.validateConnection()
@@ -42,18 +29,16 @@ describe('Check Pool Connection', () => {
                 expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
             })
 
-            test('pool connection with wrong host will return appropriate error.', async () => {
+            test('pool connection with wrong host will return appropriate DbConnectionError.', async () => {
                 const dbOperation = await env.driver.dbOperationWithMisconfiguredHost()
 
                 const validateConnection = await dbOperation.validateConnection()
 
                 expect(validateConnection.valid).toBeFalsy()
-                expect(validateConnection.error.message).toContain('host is unavailable')
                 expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
             })
         }
 
-        //2
         test('pool connection with valid DB will return object with without error', async () => {
             const { dbOperations, cleanup } = await env.driver.dbOperationWithValidDB()
 
@@ -64,13 +49,6 @@ describe('Check Pool Connection', () => {
             await cleanup()
         })
     })
-    
-    const ctx = {
-        // dbOperationWithMisconfiguredConfig: Uninitialized
-    }
 
-    beforeEach(() => {
-        // ctx.dbOperationWithMisconfiguredConfig = gen.randomObjectFromArray(env.driver.dbOperationWithMisconfiguredConfig)
-    });
 })
 
