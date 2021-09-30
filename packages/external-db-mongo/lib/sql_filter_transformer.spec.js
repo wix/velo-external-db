@@ -186,19 +186,17 @@ describe('Sql Parser', () => {
                     }])
                 })
 
-                // //todo
-                // test.only(`correctly transform operator [$urlized]`, () => {
-                //     const filter = {
-                //         operator: '$urlized',
-                //         fieldName: ctx.fieldName,
-                //         value: ctx.fieldListValue
-                //     }
+                test(`correctly transform operator [$urlized]`, () => {
+                    const filter = {
+                        operator: '$urlized',
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldListValue
+                    }
 
-                //     expect(env.filterParser.parseFilter(filter)).toEqual([{
-                //         filterExpr: `LOWER(${(ctx.fieldName)}) LIKE ${(ctx.fieldName)}`,
-                //         parameters: { [(ctx.fieldName)]: ctx.fieldListValue.map(s => s.toLowerCase()).join('[- ]') }
-                //     }])
-                // })
+                    expect(env.filterParser.parseFilter(filter)).toEqual([{
+                        filterExpr:{ [ctx.fieldName]: { '$regex': `/${ctx.fieldListValue.map(s => s.toLowerCase()).join('.*')}/i` } }
+                    }])
+                })
             })
         });
 

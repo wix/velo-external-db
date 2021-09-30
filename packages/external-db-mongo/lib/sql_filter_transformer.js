@@ -66,6 +66,12 @@ class FilterParser {
             return [{ filterExpr: { [`${filter.fieldName}`]: { '$regex': this.valueForStringOperator(operator, filter.value) } } }]
         }
 
+        if (filter.operator === '$urlized') {
+            return [{
+                filterExpr: {[`${filter.fieldName}`]: {'$regex': `/${filter.value.map(s => s.toLowerCase()).join('.*')}/i`}}
+            }]
+        }
+
         return [{ filterExpr: { [`${filter.fieldName}`]: { [`${operator}`]: this.valueForOperator(filter.value, operator) } } }]
 
     }
