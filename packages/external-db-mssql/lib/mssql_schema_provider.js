@@ -1,6 +1,6 @@
 const { translateErrorCodes, notThrowingTranslateErrorCodes} = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { escapeId } = require('./mssql_utils')
+const { escapeId, escapeTable } = require('./mssql_utils')
 const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
 
@@ -25,7 +25,7 @@ class SchemaProvider {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                        .join(', ')
         const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
-        await this.sql.query(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
+        await this.sql.query(`CREATE TABLE ${escapeTable(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
                                 [...(columns || []).map(c => c.name)])
                       .catch( err => {
                           const e = notThrowingTranslateErrorCodes(err)
@@ -35,19 +35,19 @@ class SchemaProvider {
     }
 
     async drop(collectionName) {
-        await this.sql.query(`DROP TABLE IF EXISTS ${escapeId(collectionName)}`)
+        await this.sql.query(`DROP TABLE IF EXISTS ${escapeTable(collectionName)}`)
             .catch( translateErrorCodes )
     }
 
     async addColumn(collectionName, column) {
         await validateSystemFields(column.name)
-        await this.sql.query(`ALTER TABLE ${escapeId(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
+        await this.sql.query(`ALTER TABLE ${escapeTable(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
                        .catch( translateErrorCodes )
     }
 
     async removeColumn(collectionName, columnName) {
         await validateSystemFields(columnName)
-        return await this.sql.query(`ALTER TABLE ${escapeId(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
+        return await this.sql.query(`ALTER TABLE ${escapeTable(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
                               .catch( translateErrorCodes )
     }
 

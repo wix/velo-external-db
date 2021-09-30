@@ -1,4 +1,4 @@
-const { escapeId, validateLiteral, escape, patchFieldName } = require('./mssql_utils')
+const { escapeId, validateLiteral, escape, patchFieldName, escapeTable } = require('./mssql_utils')
 const { SystemFields } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 
@@ -13,7 +13,7 @@ class DataProvider {
         const {sortExpr} = this.filterParser.orderBy(sort)
         const pagingQueryStr = this.pagingQueryFor(skip, limit)
 
-        const sql = `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} ${pagingQueryStr}`
+        const sql = `SELECT * FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} ${pagingQueryStr}`
 
         return await this.query(sql, parameters)
     }
@@ -21,7 +21,7 @@ class DataProvider {
     async count(collectionName, filter) {
         const {filterExpr, parameters} = this.filterParser.transform(filter)
 
-        const sql = `SELECT COUNT(*) as num FROM ${escapeId(collectionName)} ${filterExpr}`
+        const sql = `SELECT COUNT(*) as num FROM ${escapeTable(collectionName)} ${filterExpr}`
         const rs = await this.query(sql, parameters)
 
         return rs[0]['num']
@@ -39,7 +39,7 @@ class DataProvider {
     }
 
     insertSingle(collectionName, item) {
-        const sql = `INSERT INTO ${escapeId(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES (${Object.keys(item).map( validateLiteral ).join(', ')})`
+        const sql = `INSERT INTO ${escapeTable(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES (${Object.keys(item).map( validateLiteral ).join(', ')})`
         return this.query(sql, this.patch(item), true)
     }
 
@@ -56,28 +56,28 @@ class DataProvider {
             return 0
         }
 
-        const sql = `UPDATE ${escapeId(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ${validateLiteral(f)}`).join(', ')} WHERE _id = ${validateLiteral('_id')}`
+        const sql = `UPDATE ${escapeTable(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ${validateLiteral(f)}`).join(', ')} WHERE _id = ${validateLiteral('_id')}`
 
         return await this.query(sql, this.patch(item), true)
     }
 
 
     async delete(collectionName, itemIds) {
-        const sql = `DELETE FROM ${escapeId(collectionName)} WHERE _id IN (${itemIds.map((t, i) => validateLiteral(`_id${i}`)).join(', ')})`
+        const sql = `DELETE FROM ${escapeTable(collectionName)} WHERE _id IN (${itemIds.map((t, i) => validateLiteral(`_id${i}`)).join(', ')})`
         const rs = await this.query(sql, itemIds.reduce((p, t, i) => Object.assign({}, p, { [patchFieldName(`_id${i}`)]: t }), {}), true)
                              .catch( translateErrorCodes )
         return rs
     }
 
     async truncate(collectionName) {
-        await this.sql.query(`TRUNCATE TABLE ${escapeId(collectionName)}`).catch( translateErrorCodes )
+        await this.sql.query(`TRUNCATE TABLE ${escapeTable(collectionName)}`).catch( translateErrorCodes )
     }
 
     async aggregate(collectionName, filter, aggregation) {
         const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
         const {fieldsStatement, groupByColumns, havingFilter, parameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
 
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
 
         return await this.query(sql, Object.assign({}, whereParameters, parameters))
     }
