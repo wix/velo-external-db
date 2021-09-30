@@ -18,7 +18,7 @@ describe('Check Pool Connection', () => {
             expect(validateConnection.valid).toBeFalsy()
             expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
         })
-        
+
         if (dbType !== 'Firestore') {
             test('pool connection with wrong database will return DbConnectionError.', async () => {
                 const dbOperation = await env.driver.dbOperationWithMisconfiguredDatabase()
@@ -29,7 +29,7 @@ describe('Check Pool Connection', () => {
                 expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
             })
 
-            test('pool connection with wrong host will return appropriate DbConnectionError.', async () => {
+            test('pool connection with wrong host will return DbConnectionError.', async () => {
                 const dbOperation = await env.driver.dbOperationWithMisconfiguredHost()
 
                 const validateConnection = await dbOperation.validateConnection()
