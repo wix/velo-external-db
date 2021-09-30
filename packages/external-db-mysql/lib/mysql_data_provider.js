@@ -1,4 +1,4 @@
-const { escapeId } = require('./mysql_utils')
+const { escapeId, escapeTable } = require('./mysql_utils')
 const { promisify } = require('util')
 const { SystemFields, asParamArrays, patchDateTime } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
@@ -15,7 +15,7 @@ class DataProvider {
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr, parameters} = this.filterParser.transform(filter)
         const {sortExpr} = this.filterParser.orderBy(sort)
-        const sql = `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
+        const sql = `SELECT * FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
         const resultset = await this.query(sql, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultset
@@ -23,7 +23,7 @@ class DataProvider {
 
     async count(collectionName, filter) {
         const {filterExpr, parameters} = this.filterParser.transform(filter)
-        const sql = `SELECT COUNT(*) AS num FROM ${escapeId(collectionName)} ${filterExpr}`
+        const sql = `SELECT COUNT(*) AS num FROM ${escapeTable(collectionName)} ${filterExpr}`
         const resultset = await this.query(sql, parameters)
                                     .catch( translateErrorCodes )
         return resultset[0]['num']
@@ -32,7 +32,7 @@ class DataProvider {
     // todo: check if we can get schema in a safer way. should be according to schema of the table
     async insert(collectionName, items) {
         const item = items[0]
-        const sql = `INSERT INTO ${escapeId(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES ?`
+        const sql = `INSERT INTO ${escapeTable(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES ?`
         
         const data = items.map(item => asParamArrays( patchDateTime(item) ) )
         const resultset = await this.query(sql, [data])
@@ -49,7 +49,7 @@ class DataProvider {
             return 0
         }
 
-        const queries = items.map(() => `UPDATE ${escapeId(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ?`).join(', ')} WHERE _id = ?` )
+        const queries = items.map(() => `UPDATE ${escapeTable(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ?`).join(', ')} WHERE _id = ?` )
                              .join(';')
         const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
                                 .map(u => asParamArrays( patchDateTime(u) ))
@@ -60,21 +60,21 @@ class DataProvider {
     }
 
     async delete(collectionName, itemIds) {
-        const sql = `DELETE FROM ${escapeId(collectionName)} WHERE _id IN (${wildCardWith(itemIds.length, '?')})`
+        const sql = `DELETE FROM ${escapeTable(collectionName)} WHERE _id IN (${wildCardWith(itemIds.length, '?')})`
         const rs = await this.query(sql, itemIds)
                              .catch( translateErrorCodes )
         return rs.affectedRows
     }
 
     async truncate(collectionName) {
-        await this.query(`TRUNCATE ${escapeId(collectionName)}`).catch( translateErrorCodes )
+        await this.query(`TRUNCATE ${escapeTable(collectionName)}`).catch( translateErrorCodes )
     }
 
     async aggregate(collectionName, filter, aggregation) {
         const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
         const {fieldsStatement, groupByColumns, havingFilter, parameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
 
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
         const resultset = await this.query(sql, [...whereParameters, ...parameters])
                                     .catch( translateErrorCodes )
         return resultset

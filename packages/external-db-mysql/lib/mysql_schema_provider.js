@@ -1,7 +1,7 @@
 const { promisify } = require('util')
 const { translateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { escapeId } = require('./mysql_utils')
+const { escapeId, escapeTable } = require('./mysql_utils')
 const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
 
 class SchemaProvider {
@@ -27,30 +27,30 @@ class SchemaProvider {
                                                                        .join(', ')
         const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
 
-        await this.query(`CREATE TABLE IF NOT EXISTS ${escapeId(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
+        await this.query(`CREATE TABLE IF NOT EXISTS ${escapeTable(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
                          [...(columns || []).map(c => c.name)])
                   .catch( translateErrorCodes )
     }
 
     async drop(collectionName) {
-        await this.query(`DROP TABLE IF EXISTS ${escapeId(collectionName)}`)
+        await this.query(`DROP TABLE IF EXISTS ${escapeTable(collectionName)}`)
                   .catch( translateErrorCodes )
     }
 
     async addColumn(collectionName, column) {
         await validateSystemFields(column.name)
-        await this.query(`ALTER TABLE ${escapeId(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
+        await this.query(`ALTER TABLE ${escapeTable(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
                   .catch( translateErrorCodes )
     }
 
     async removeColumn(collectionName, columnName) {
         await validateSystemFields(columnName)
-        return await this.query(`ALTER TABLE ${escapeId(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
+        return await this.query(`ALTER TABLE ${escapeTable(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
                          .catch( translateErrorCodes )
     }
 
     async describeCollection(collectionName) {
-        const res = await this.query(`DESCRIBE ${escapeId(collectionName)}`)
+        const res = await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
                               .catch( translateErrorCodes )
         const rows = res.map(r => ({field: r.Field, type: r.Type}))
                         .map( this.translateDbTypes.bind(this) )
