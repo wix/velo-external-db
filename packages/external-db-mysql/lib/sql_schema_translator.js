@@ -1,4 +1,4 @@
-const { escapeId } = require('mysql')
+const { escapeId } = require('./mysql_utils')
 
 class SchemaColumnTranslator {
 

@@ -1,7 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { EMPTY_FILTER, EMPTY_SORT, isObject } = require('velo-external-db-commons')
-const { escapeId } = require('mysql')
-const { wildCardWith } = require('./mysql_utils')
+const { wildCardWith, escapeId } = require('./mysql_utils')
 
 class FilterParser {
     constructor() {

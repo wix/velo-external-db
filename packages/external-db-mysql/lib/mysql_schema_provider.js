@@ -1,7 +1,7 @@
 const { promisify } = require('util')
 const { translateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { escapeId } = require('mysql')
+const { escapeId } = require('./mysql_utils')
 const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
 
 class SchemaProvider {

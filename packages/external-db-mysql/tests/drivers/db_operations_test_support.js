@@ -1,4 +1,3 @@
-const mysql = require('mysql')
 const DatabaseOperations = require('../../lib/mysql_operations')
 const init = require('../../lib/connection_provider')
 

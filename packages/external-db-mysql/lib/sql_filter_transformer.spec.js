@@ -4,7 +4,7 @@ const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
-const { escapeId } = require('mysql')
+const { escapeId } = require('./mysql_utils')
 const chance = Chance();
 
 describe('Sql Parser', () => {
