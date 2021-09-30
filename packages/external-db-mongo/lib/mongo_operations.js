@@ -1,5 +1,5 @@
 const { DbConnectionError } = require('velo-external-db-commons').errors
-
+const { isConnected } = require ('./mongo_utils')
 class DatabaseOperations {
     constructor(client) {
         this.client = client
@@ -7,12 +7,18 @@ class DatabaseOperations {
 
     async validateConnection() {
         try {
-            await this.client.connect()
-            return { valid: true }
+            if (isConnected(this.client))
+                return { valid: true }
+            else {
+                await this.client.connect()
+                return { valid: true }
+            }
         } catch (err) {
             return { valid: false, error: new DbConnectionError(err.message) }
         }
     }
 }
+
+
 
 module.exports = DatabaseOperations

@@ -4,4 +4,9 @@ const notConnectedPool = (err) => {
         db: ()=> { throw err },
     }
 }
-module.exports = { EMPTY_FILTER, notConnectedPool }
+
+const isConnected = (client) => {
+    return  client && client.topology && client.topology.isConnected()
+}
+
+module.exports = { EMPTY_FILTER, notConnectedPool, isConnected }
