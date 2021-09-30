@@ -32,9 +32,9 @@ jobs:
 
       # Tag docker image
       - name: Tag Image
-        run: docker tag velo-external-db:latest gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER
+        run: docker tag $IMAGE_NAME:latest gcr.io/wix-velo-api/velo-external-db
         
       # Push image to Google Container Registry
       - name: Push Image
-        run: docker push gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER
+        run: docker push gcr.io/wix-velo-api/velo-external-db
 
