@@ -1,7 +1,4 @@
-// const { SystemFields } = require('velo-external-db-commons')
-// const { translateErrorCodes } = require('./sql_exception_translator')
-
-const { isObject } = require('velo-external-db-commons')
+const { flatAggregation } = require('./mongo_utils')
 
 class DataProvider {
     constructor(client, filterParser) {
@@ -68,14 +65,8 @@ class DataProvider {
                                                 havingFilter
                                             ] )
                                 .toArray()
-    
-        aggregateResult.map((result)=>{
-            if (isObject(result._id)){
-                Object.assign(result,result._id)
-                if (isObject(result._id)) delete result._id
-            }
-        }) //todo - refactor this
-        return aggregateResult
+
+        return aggregateResult.map(result => flatAggregation(result) )
 
     }
 }
