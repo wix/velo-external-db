@@ -8,18 +8,19 @@ class SchemaProvider {
     constructor(pool) {
         this.sql = pool
 
+        this.dbName = pool.config.database
+
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
     }
 
     async list() {
         const rs = await this.sql.request()
-                                  .input('db', 'tempdb')
+                                  .input('db', this.dbName)
                                   .query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = @db')
         const tables = parseTableData( rs.recordset )
         return Object.entries(tables)
                      .map(([collectionName, rs]) => asWixSchema(rs.map( this.translateDbTypes.bind(this) ), collectionName))
     }
-
 
     async create(collectionName, columns) {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
@@ -53,7 +54,7 @@ class SchemaProvider {
 
     async describeCollection(collectionName) {
         const rs = await this.sql.request()
-                                  .input('db', 'tempdb')
+                                  .input('db', this.dbName)
                                   .input('tableName', collectionName)
                                   .query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = @db AND TABLE_NAME = @tableName')
 

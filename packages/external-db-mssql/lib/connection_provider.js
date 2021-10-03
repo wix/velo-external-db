@@ -39,19 +39,14 @@ const init = async (cfg, _poolOptions) => {
     const poolOptions = _poolOptions || {}
 
     const _pool = new ConnectionPool(Object.assign({}, config, extraOptions(), poolOptions))
-    const { pool, cleanup } = await _pool.connect().then((res) => {
-        return { pool: res, cleanup: async () => await pool.close() }
-    }).catch((e) => {
-        return {
-            pool: notConnectedPool(_pool, e),
-            cleanup: () => { }
-        }
-    })
+    const { pool, cleanup } = await _pool.connect()
+                                         .then((res) => ({ pool: res, cleanup: async () => await pool.close() }))
+                                         .catch(e => notConnectedPool(_pool, e) )
     const databaseOperations = new DatabaseOperations(pool)
 
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
-    const schemaProvider = new SchemaProvider(pool)
+    const schemaProvider = new SchemaProvider(pool, cfg.db)
 
     return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup }
 }
