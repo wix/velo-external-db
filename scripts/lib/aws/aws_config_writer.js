@@ -3,8 +3,8 @@ const { SecretsManagerClient, CreateSecretCommand } = require('@aws-sdk/client-s
 const SecretId = 'VELO-EXTERNAL-DB-SECRETS'
 
 class ConfigWriter {
-    constructor(credentials) {
-        this.client = new SecretsManagerClient({ region: 'us-east-2', credentials: { accessKeyId: credentials.awsAccessKeyId, secretAccessKey: credentials.awsSecretAccessKey } })
+    constructor({ awsAccessKeyId, awsSecretAccessKey}) {
+        this.client = new SecretsManagerClient({ region: 'us-east-2', credentials: { accessKeyId: awsAccessKeyId, secretAccessKey: awsSecretAccessKey } })
     }
 
     async writeConfig(dbCredentials, host, db, secretKey) {
