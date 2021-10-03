@@ -28,13 +28,13 @@ const provisionDb = async (provider, engine, configWriter) => {
     await provider.postCreateDb(dbName, status.host, dbCredentials)
 }
 
-// const provisionServer = async (provider, credentials) => {
-//     console.log('provision db')
-//
-//     await provider.createServer(credentials)
-//     await provider.waitTillServerAvailable()
-//     await provider.postCreateServer()
-// }
+const provisionAdapter = async (provider) => {
+    await provider.createAdapter()
+    await blockUntil( async () => !(await provider.adapterStatus()).available )
+    const status = await provider.adapterStatus()
+
+    console.log(status.serviceUrl)
+}
 
 
 const main = async ({ vendor, engine, credentials }) => {
@@ -44,9 +44,10 @@ const main = async ({ vendor, engine, credentials }) => {
 
     const configWriter = new provider.ConfigWriter(credentials)
     const dbProvision = new provider.DbProvision(credentials)
+    const adapterProvision = new provider.AdapterProvision(credentials)
 
     await provisionDb(dbProvision, engine, configWriter)
-    // await provisionServer(provider, credentials)
+    await provisionAdapter(adapterProvision)
 }
 
 module.exports = { main }
