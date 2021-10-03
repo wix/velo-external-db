@@ -1,6 +1,6 @@
 const aws = require('../aws')
 const { randomCredentials, randomSecretKey } = require('../utils/password_utils')
-const { waitFor } = require('poll-until-promise')
+const { blockUntil } = require('../utils/utils')
 
 const providerFor = (vendor) => {
     switch (vendor) {
@@ -9,23 +9,6 @@ const providerFor = (vendor) => {
         case 'azure':
             return aws
     }
-}
-
-const blockUntil = async f => {
-    return waitFor(
-        async () => {
-            const response = await f()
-
-            if (!response) {
-                throw new Error('try again')
-            }
-        },
-        {
-            interval: 100,
-            timeout: 10 * 60 * 1000,
-            message: "Waiting for time to pass :)",
-        }
-    );
 }
 
 const provisionDb = async (provider, engine, configWriter) => {
