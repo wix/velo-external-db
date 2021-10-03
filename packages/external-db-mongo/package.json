@@ -20,7 +20,7 @@
     "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
   },
   "scripts": {
-    "test": ""
+    "test": "jest"
   },
   "bugs": {
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"

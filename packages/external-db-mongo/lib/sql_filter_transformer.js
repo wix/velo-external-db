@@ -20,59 +20,57 @@ class FilterParser {
         const havingFilter = this.parseFilter(postFilter)
         const fieldsStatement = {}
         if (isObject(aggregation._id)) {
-            aggregation._id = Object.keys(aggregation._id).reduce((r, c) =>
-                Object.assign(r, { [aggregation._id[c]]: `$${aggregation._id[c]}` })
-                , {})
+            aggregation._id = Object.keys(aggregation._id)
+                                    .reduce((r, c) => Object.assign({}, r, { [aggregation._id[c]]: `$${aggregation._id[c]}` }), {})
             Object.assign(fieldsStatement, { _id: aggregation._id })
-        }
-        else {
+        } else {
             Object.assign(fieldsStatement, { [aggregation._id]: `$${aggregation._id}` })
         }
+
         Object.keys(aggregation)
-            .filter(f => f !== '_id')
-            .forEach(fieldAlias => {
-                Object.entries(aggregation[fieldAlias])
-                    .forEach(([func, field]) => {
-                        Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `$${field}` } })
-                    })
-            })
+              .filter(f => f !== '_id')
+              .forEach(fieldAlias => {
+                  Object.entries(aggregation[fieldAlias])
+                        .forEach(([func, field]) => {
+                            Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `$${field}` } })
+                        })
+              })
 
         const filterObj = (havingFilter.reduce(((r, c) => Object.assign(r, c)), {}))
 
         return {
-            fieldsStatement: { '$group': fieldsStatement },
-            havingFilter: { '$match': filterObj.filterExpr || {} },
+            fieldsStatement: { $group: fieldsStatement },
+            havingFilter: { $match: filterObj.filterExpr || {} },
         }
     }
 
-    parseFilter(filter, inlineFields) {
-        
+    parseFilter(filter) {
         if (!filter || !isObject(filter) || filter.operator === undefined) {
             return []
         }
         const operator = this.veloOperatorToMongoOperator(filter.operator)
 
         if (this.isMultipleFieldOperator(operator)) {
-            const res = filter.value.map(this.parseFilter.bind(this))
-            return [{ filterExpr: { [`${operator}`]: res.map(r => r[0].filterExpr) } }]
+            const res = filter.value.map( this.parseFilter.bind(this) )
+            return [{ filterExpr: { [operator]: res.map(r => r[0].filterExpr) } }]
         }
 
         if (operator === '$not') {
             const res = this.parseFilter(filter.value)
-            return [{ filterExpr: { [`${operator}`]: res[0].filterExpr } }]
+            return [{ filterExpr: { [operator]: res[0].filterExpr } }]
         }
 
         if (this.isSingleFieldStringOperator(operator)) {
-            return [{ filterExpr: { [`${filter.fieldName}`]: { '$regex': this.valueForStringOperator(operator, filter.value) } } }]
+            return [{ filterExpr: { [filter.fieldName]: { $regex: this.valueForStringOperator(operator, filter.value) } } }]
         }
 
         if (filter.operator === '$urlized') {
             return [{
-                filterExpr: {[`${filter.fieldName}`]: {'$regex': `/${filter.value.map(s => s.toLowerCase()).join('.*')}/i`}}
+                filterExpr: {[filter.fieldName]: {'$regex': `/${filter.value.map(s => s.toLowerCase()).join('.*')}/i`}}
             }]
         }
 
-        return [{ filterExpr: { [`${filter.fieldName}`]: { [`${operator}`]: this.valueForOperator(filter.value, operator) } } }]
+        return [{ filterExpr: { [filter.fieldName]: { [operator]: this.valueForOperator(filter.value, operator) } } }]
 
     }
 
@@ -83,7 +81,7 @@ class FilterParser {
     valueForStringOperator(operator, value) {
         switch (operator) {
             case '$contains':
-                return `${value}`
+                return value
             case '$startsWith':
                 return `^${value}`
             case '$endsWith':
@@ -94,7 +92,6 @@ class FilterParser {
     isSingleFieldStringOperator(operator) {
         return ['$contains', '$startsWith', '$endsWith'].includes(operator)
     }
-
 
     valueForOperator(value, operator) {
         if (operator === '$in') {
@@ -117,7 +114,6 @@ class FilterParser {
             default:
                 return operator
         }
-        //filter.operator === '$hasSome' || filter.operator === '$startsWith' || filter.operator === '$endsWith' || filter.operator === '$urlized'
     }
 
     orderBy(sort) {
@@ -143,7 +139,7 @@ class FilterParser {
         const dir = 'ASC' === _direction.toUpperCase() ? 'asc' : 'desc';
 
         return {
-            expr: [`${fieldName}`, dir]
+            expr: [fieldName, dir]
         }
     }
 

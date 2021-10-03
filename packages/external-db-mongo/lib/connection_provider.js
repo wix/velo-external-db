@@ -9,14 +9,11 @@ const init = async (cfg) => {
     const uri = `mongodb://${cfg.user}:${cfg.password}@${cfg.host}/${cfg.db}`
     const client = new MongoClient(uri)
 
-    const { pool, cleanup } = await client.connect().then((res) => {
-        return { pool: res, cleanup: async () => await pool.close() }
-    }).catch((e) => {
-        return {
-            pool: notConnectedPool(e),
-            cleanup: () => { }
-        }
-    })
+    const { pool, cleanup } = await client.connect()
+                                          .then((res) => {
+                                              return { pool: res, cleanup: async () => await pool.close() }
+                                          }).catch( notConnectedPool )
+
     const databaseOperations = new DatabaseOperations(client)
 
     const filterParser = new FilterParser()
