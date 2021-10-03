@@ -1,4 +1,4 @@
-const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { GoogleSpreadsheet } = require('google-spreadsheet')
 const SchemaProvider = require('./google_sheet_schema_provider')
 const DataProvider = require('./google_sheet_data_provider')
 const DatabaseOperations = require('./google_sheet_operations')
@@ -10,6 +10,12 @@ const init = async(cfg) => {
         client_email: cfg.clientEmail,
         private_key: cfg.apiPrivateKey
     })
+
+    try {
+        await doc.loadInfo()
+    } catch (error) {
+        console.log(error)
+    }
 
     const databaseOperations = new DatabaseOperations(doc)
     const dataProvider = new DataProvider(doc)
