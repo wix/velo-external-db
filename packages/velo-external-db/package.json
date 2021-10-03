@@ -23,11 +23,12 @@
     "express": "^4.17.1",
     "external-db-config": "^0.0.0",
     "external-db-firestore": "^0.0.0",
+    "external-db-google-sheets": "^0.0.0",
+    "external-db-mongo": "^0.0.0",
     "external-db-mssql": "^0.0.0",
     "external-db-mysql": "^0.0.0",
     "external-db-postgres": "^0.0.0",
     "external-db-spanner": "^0.0.0",
-    "external-db-mongo": "^0.0.0",
     "nested-property": "^4.0.0",
     "velo-external-db-commons": "^0.0.0",
     "velo-external-db-core": "^0.0.0"
@@ -41,7 +42,6 @@
     "jest-each": "^27.0.6",
     "jest-when": "^3.3.1",
     "test-commons": "^0.0.0",
-    "ts-jest": "^27.0.4",
-    "chance": "^1.1.7"
+    "ts-jest": "^27.0.4"
   }
 }

@@ -26,6 +26,7 @@
       "external-db-mysql",
       "external-db-postgres",
       "external-db-spanner",
+      "external-db-google-sheets",
       "velo-external-db",
       "velo-external-db-core"
     ]

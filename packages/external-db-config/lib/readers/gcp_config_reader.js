@@ -49,4 +49,20 @@ class GcpFirestoreConfigReader {
 
 }
 
-module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader }
+class GcpGoogleSheetsConfigReader {
+  constructor() { }
+
+  async readConfig() {
+    const { CLIENT_EMAIL, SHEET_ID, API_PRIVATE_KEY, SECRET_KEY } = process.env
+    return { clientEmail: CLIENT_EMAIL,apiPrivateKey: API_PRIVATE_KEY, sheetId: SHEET_ID, secretKey: SECRET_KEY }
+  }
+
+  validate() {
+    return {
+      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLIENT_EMAIL', 'SHEET_ID', 'API_PRIVATE_KEY', 'SECRET_KEY'])
+    }
+  }
+
+}
+
+module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader }

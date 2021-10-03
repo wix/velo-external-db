@@ -40,6 +40,11 @@ const init = async(type, vendor, config) => {
 
             return append(await init(cfg), cfg.secretKey)
         }
+        case 'google-sheet': {
+            const { init } = require('external-db-google-sheets')
+            const cfg = await config.readConfig()
+            return append(await init(cfg), cfg.secretKey)
+        }
     }
 }
 
