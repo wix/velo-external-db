@@ -20,12 +20,12 @@ const provisionDb = async (provider, engine, configWriter) => {
     await provider.createDb({ name: instanceName, engine: engine, credentials: dbCredentials})
     await blockUntil( async () => !(await provider.dbStatusAvailable(instanceName)).available )
     const status = await provider.dbStatusAvailable(instanceName)
-        // create db
 
-    await configWriter.writeConfig(dbCredentials, status.host, 'velo-db', secretKey)
+    const dbName = 'velo_db'
 
+    await configWriter.writeConfig(dbCredentials, status.host, dbName, secretKey)
 
-    await provider.postCreateDb()
+    await provider.postCreateDb(dbName, status.host, dbCredentials)
 }
 
 // const provisionServer = async (provider, credentials) => {

@@ -1,4 +1,5 @@
 const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand} = require('@aws-sdk/client-rds')
+const mysql = require('mysql')
 
 class DbProvision {
     constructor(credentials) {
@@ -25,24 +26,30 @@ class DbProvision {
         }
     }
 
-    async createConfig() {
-        console.log('createConfig')
+    async postCreateDb(dbName, host, credentials) {
+        await this.createDatabase(dbName, host, credentials)
     }
 
-    async postCreateDb() {
-        console.log('postCreate')
+    async createDatabase(dbName, host, credentials) {
+        let connection
+
+        try {
+            connection = mysql.createConnection({
+                host: host,
+                user: credentials.user,
+                password: credentials.passwd,
+            })
+            connection.connect()
+            connection.query(`CREATE DATABASE ${dbName}`)
+        } catch (err) {
+            console.error(err)
+        } finally {
+            if (connection) {
+                connection.end()
+            }
+        }
     }
 }
-
-
-
-
-/*
-    await provider.createDb(credentials)
-    await provider.waitTillDBAvailable()
-    await provider.postCreateDb()
-
- */
 
 
 module.exports = DbProvision
