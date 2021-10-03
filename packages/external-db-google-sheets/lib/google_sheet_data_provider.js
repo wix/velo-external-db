@@ -1,40 +1,32 @@
 const { SystemFields } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./google_sheet_exception_translator')
-class DataProvider {
-    constructor(doc) {
-        this.doc = doc
-    }
+const { formatRow, updateRow, getSheet, getSheetHeaders, findRowById } = require('./google_sheet_utils')
 
-    async findRow(id, sheet){
-        const rows = await sheet.getRows()
-        return rows.filter(r => r._id == id)[0]
+class DataProvider {
+    constructor(doc){
+        this.doc = doc
     }
 
     async find(collectionName, filter, sort, skip, limit){
         // const filterOperations = this.filterParser.transform(filter)
         // const sortOperations = this.filterParser.orderBy(sort)
 
-        await this.doc.loadInfo()
-        const sheet = await this.doc.sheetsByTitle[collectionName]
+        const sheet = await getSheet(this.doc, collectionName)
         const rows = await sheet.getRows({ offset: skip, limit })
 
-        return rows.map(i => i._rawData)
-
+        return rows.map(row => formatRow(row))
     }
 
-    async count(collectionName, filter) {
-        await this.doc.loadInfo()
-        const sheet = await this.doc.sheetsByTitle[collectionName]
-        const rows = await sheet.getRows()
-        return rows.length
+    async count(collectionName) {
+        const sheet = await getSheet(this.doc, collectionName)
+        return sheet._rawProperties.gridProperties.rowCount
     }
 
     async insert(collectionName, items) {
         const item = items[0]
 
         try{
-            await this.doc.loadInfo()
-            const sheet = await this.doc.sheetsByTitle[collectionName]
+            const sheet = await getSheet(this.doc, collectionName)
             const newRow = await sheet.addRow(item)
 
             return newRow._rawData
@@ -52,34 +44,35 @@ class DataProvider {
             return 0
         }
 
-        await this.doc.loadInfo()
-        const sheet = await this.doc.sheetsByTitle[collectionName]
-        const changedRow = await this.findRow(item._id, sheet)
+        const sheet = await getSheet(this.doc, collectionName)
+        const rowToUpdate = await findRowById(sheet, item._id)
 
-        Object.entries(item).forEach( ([key, value]) => {
-            changedRow[key] = value
-        })
+        if (rowToUpdate){
+            return await updateRow(rowToUpdate, item)
+        }
 
-        await changedRow.save()
-
+        return await this.insert(collectionName, items)
     }
 
-    async delete(collectionName, itemId) {
-        await this.doc.loadInfo()
-        const sheet = await this.doc.sheetsByTitle[collectionName]
-        const removedRow = await this.findRow(itemId, sheet)
+    async delete(collectionName, itemsId) {
+        const sheet = await getSheet(this.doc, collectionName)
+        return itemsId.map( async item => {
+            const rowToRemove = await findRowById(sheet, item._id)
 
-        await removedRow.delete()
+            if(rowToRemove){
+                await rowToRemove.delete()
+            }
+        })
     }
 
     async truncate(collectionName) {
-        await this.doc.loadInfo()
-        const sheet = await this.doc.sheetsByTitle[collectionName]
-        await sheet.loadHeaderRow()
-        const sheetHeader = sheet.headerValues
+        const sheet = await getSheet(this.doc, collectionName)
+        const sheetHeader = await getSheetHeaders(sheet)
         await sheet.clear()
-        await sheet.setHeaderRow(sheetHeader)
 
+        if (sheetHeader.length > 0){
+            await sheet.setHeaderRow(sheetHeader)
+        }
     }
     
 }
