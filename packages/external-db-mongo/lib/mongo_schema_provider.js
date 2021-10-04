@@ -16,6 +16,9 @@ class SchemaProvider {
     }
 
     async list() {
+        const systemTable = await this.client.db().listCollections({name:SystemTable}).toArray()
+        if (!systemTable.length) await initSystemTable()
+
         const resp = await this.client.db()
                                       .collection(SystemTable)
                                       .find({})
@@ -98,6 +101,11 @@ class SchemaProvider {
         return await this.client.db()
                                 .collection(SystemTable)
                                 .findOne({ _id: collectionName })
+    }
+
+    async initSystemTable() {
+        await this.client.db().createCollection(SystemTable)
+        await this.create('wix_collection', [{ name: 'a', type: 'text' }, { name: 'b', type: 'text' }])
     }
 }
 
