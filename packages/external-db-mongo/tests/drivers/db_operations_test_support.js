@@ -10,7 +10,7 @@ const createPool = modify => {
         database: 'testdb',
         host:'localhost'
     }
-    const modifiedConfig =  Object.assign({},config,modify)
+    const modifiedConfig =  {...config,...modify}
     const uri = `mongodb://${modifiedConfig.user}:${modifiedConfig.password}@${modifiedConfig.host}/${modifiedConfig.database}`
     const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 })
     return client
