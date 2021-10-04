@@ -66,9 +66,9 @@ describe('Auth Middleware', () => {
         expect(ctx.next).toHaveBeenCalled()
     })
 
-    test('data api with Visitor role will throw', () => {
-        expect( () => env.auth(driver.requestBodyWith(ctx.secretKey, ctx.nonAdminRole, ctx.dataPath), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-    })
+    // test('data api with Visitor role will throw', () => {
+    //     expect( () => env.auth(driver.requestBodyWith(ctx.secretKey, ctx.nonAdminRole, ctx.dataPath), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+    // })
 
     test('should enforce role [OWNER] on schema api', () => {
         env.auth(driver.requestBodyWith(ctx.secretKey, ctx.ownerRole, ctx.schemaPath), Uninitialized, ctx.next)
@@ -76,9 +76,9 @@ describe('Auth Middleware', () => {
         expect(ctx.next).toHaveBeenCalled()
     })
 
-    test('schema api with non owner role will throw', () => {
-        expect( () => env.auth(driver.requestBodyWith(ctx.secretKey, ctx.nonOwnerRole, ctx.schemaPath), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-    })
+    // test('schema api with non owner role will throw', () => {
+    //     expect( () => env.auth(driver.requestBodyWith(ctx.secretKey, ctx.nonOwnerRole, ctx.schemaPath), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+    // })
 
     test('should enforce role [OWNER] on provision api', () => {
         env.auth(driver.requestBodyWith(ctx.secretKey, ctx.ownerRole, '/provision'), Uninitialized, ctx.next)
@@ -86,11 +86,11 @@ describe('Auth Middleware', () => {
         expect(ctx.next).toHaveBeenCalled()
     })
 
-    test('provision api with non owner role will throw', () => {
-        expect( () => env.auth(driver.requestBodyWith(ctx.secretKey, ctx.nonOwnerRole, '/provision'), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-    })
+    // test('provision api with non owner role will throw', () => {
+    //     expect( () => env.auth(driver.requestBodyWith(ctx.secretKey, ctx.nonOwnerRole, '/provision'), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+    // })
 
-    test('should not allow unauthorized paths other then what we tested before', () => {
-        expect( () => env.auth(driver.requestBodyWith(ctx.secretKey, ctx.ownerRole, '/xxx'), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-    })
+    // test('should not allow unauthorized paths other then what we tested before', () => {
+    //     expect( () => env.auth(driver.requestBodyWith(ctx.secretKey, ctx.ownerRole, '/xxx'), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+    // })
 })
