@@ -46,7 +46,7 @@ const describeSheet = async(sheet) => {
 
 const findRowById = async(sheet, id) => {
     const rows = await sheet.getRows()
-    return rows.find(r => r._id == id)
+    return rows.find(r => r._id === id)
 }
 
 module.exports = { reformatFields, formatRow, updateRow, getSheet, getSheetHeaders, describeSheet, findRowById }

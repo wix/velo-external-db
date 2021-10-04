@@ -14,7 +14,7 @@ class DataProvider {
         const sheet = await getSheet(this.doc, collectionName)
         const rows = await sheet.getRows({ offset: skip, limit })
 
-        return rows.map(row => formatRow(row))
+        return rows.map( formatRow )
     }
 
     async count(collectionName) {
@@ -56,7 +56,7 @@ class DataProvider {
 
     async delete(collectionName, itemsId) {
         const sheet = await getSheet(this.doc, collectionName)
-        return itemsId.map( async item => {
+        return itemsId.map(async item => {
             const rowToRemove = await findRowById(sheet, item._id)
 
             if(rowToRemove){

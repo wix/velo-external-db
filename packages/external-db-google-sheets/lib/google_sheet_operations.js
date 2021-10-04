@@ -6,8 +6,8 @@ class DatabaseOperations {
 
     async validateConnection() {
         return await this.doc.loadInfo()
-        .then(() => { return { valid: true } })
-        .catch((e) => { return { valid: false, error: e } })
+                             .then(() => { return { valid: true } })
+                             .catch(e => { return { valid: false, error: e } })
     }
 
 }

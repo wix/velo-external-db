@@ -10,7 +10,8 @@ class SchemaProvider {
 
     async list() {
         await this.doc.loadInfo()
-        return await Promise.all(Object.values(this.doc.sheetsByTitle).map(describeSheet)) 
+        return await Promise.all(Object.values(this.doc.sheetsByTitle)
+                                                       .map( describeSheet ))
     }
 
     async create(collectionName) {
