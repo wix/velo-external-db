@@ -60,6 +60,10 @@ const main = async ({ vendor, engine, credentials }) => {
     blankLine()
     info('Provision Adapter')
     await provisionAdapter(adapterProvision, engine)
+
+    blankLine()
+    blankLine()
+    blankLine()
 }
 
 module.exports = { main }
