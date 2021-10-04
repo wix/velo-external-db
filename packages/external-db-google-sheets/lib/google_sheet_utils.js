@@ -1,4 +1,4 @@
-const { asWixSchema } = require('velo-external-db-commons')
+const { errors } = require('velo-external-db-commons')
 
 const reformatFields = (headerRow) => {
     return headerRow.map(h => ({
@@ -14,18 +14,13 @@ const formatRow = (sheetRow) => {
     }, {})
 }
 
-const updateRow = async(sheetRow, newItem) => {
-    Object.entries(newItem)
-          .forEach(([key, value]) => sheetRow[key] = value)
-    
-    await sheetRow.save()
-    return sheetRow
-}
-
 const sheetFor = async(sheetTitle, doc) => {
     const sheet = doc.sheetsByTitle[sheetTitle]
     if (!sheet) {
         await doc.loadInfo()
+    }
+    if (!sheet) {
+        throw new errors.CollectionDoesNotExists('Collection does not exists')
     }
     return doc.sheetsByTitle[sheetTitle]
 }
@@ -34,19 +29,9 @@ const headersFrom = async(sheet) => {
     try{
         await sheet.loadHeaderRow()
         return sheet.headerValues
-    } catch (e){
+    } catch (e) {
         return []
     }
 }
 
-const describeSheet = async(sheet) => {
-        const headers = await headersFrom(sheet)
-        return asWixSchema(reformatFields(headers), sheet._rawProperties.title)
-}
-
-const findRowById = async(sheet, id) => {
-    const rows = await sheet.getRows()
-    return rows.find(r => r._id === id)
-}
-
-module.exports = { reformatFields, formatRow, updateRow, sheetFor, headersFrom, describeSheet, findRowById }
+module.exports = { reformatFields, formatRow, sheetFor, headersFrom }

@@ -1,20 +1,27 @@
 const { SystemFields } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./google_sheet_exception_translator')
-const { formatRow, updateRow, sheetFor, headersFrom, findRowById } = require('./google_sheet_utils')
+const { sheetFor, headersFrom } = require('./google_sheet_utils')
 
 class DataProvider {
-    constructor(doc){
+    constructor(doc) {
         this.doc = doc
     }
 
-    async find(collectionName, filter, sort, skip, limit){
+    formatRow(sheetRow) {
+        return sheetRow._sheet.headerValues.reduce((obj, header, i) => {
+            obj[header] = sheetRow._rawData[i]
+            return obj
+        }, {})
+    }
+
+    async find(collectionName, filter, sort, skip, limit) {
         // const filterOperations = this.filterParser.transform(filter)
         // const sortOperations = this.filterParser.orderBy(sort)
 
         const sheet = await sheetFor(collectionName, this.doc)
         const rows = await sheet.getRows({ offset: skip, limit })
 
-        return rows.map( formatRow )
+        return rows.map( this.formatRow )
     }
 
     async count(collectionName) {
@@ -28,11 +35,22 @@ class DataProvider {
         try{
             const sheet = await sheetFor(collectionName, this.doc)
             const newRow = await sheet.addRow(item)
-
             return newRow._rawData
-        } catch(err){
+        } catch(err) {
             translateErrorCodes(err)
         }
+    }
+
+    async findRowById(sheet, id) {
+        const rows = await sheet.getRows()
+        return rows.find(r => r._id === id)
+    }
+    
+    async updateRow(row, updatedItem) {
+        Object.entries(updatedItem)
+              .forEach(([key, value]) => row[key] = value)
+        
+        return await row.save()
     }
 
     async update(collectionName, items) {
@@ -45,22 +63,23 @@ class DataProvider {
         }
 
         const sheet = await sheetFor(collectionName, this.doc)
-        const rowToUpdate = await findRowById(sheet, item._id)
+        const rowToUpdate = await this.findRowById(sheet, item._id)
 
-        if (rowToUpdate){
-            return await updateRow(rowToUpdate, item)
+        if (rowToUpdate) {
+            return await this.updateRow(rowToUpdate, item)
         }
 
         return await this.insert(collectionName, items)
     }
 
-    async delete(collectionName, itemsId) {
+    async delete(collectionName, ids) {
         const sheet = await sheetFor(collectionName, this.doc)
-        return itemsId.map(async item => {
-            const rowToRemove = await findRowById(sheet, item._id)
+        return ids.map(async id => {
+            const rowToRemove = await this.findRowById(sheet, id)
 
-            if(rowToRemove){
+            if(rowToRemove) {
                 await rowToRemove.delete()
+                return id
             }
         })
     }
@@ -70,7 +89,7 @@ class DataProvider {
         const sheetHeader = await headersFrom(sheet)
         await sheet.clear()
 
-        if (sheetHeader.length > 0){
+        if (sheetHeader.length > 0) {
             await sheet.setHeaderRow(sheetHeader)
         }
     }
