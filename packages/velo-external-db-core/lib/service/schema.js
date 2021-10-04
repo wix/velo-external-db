@@ -14,8 +14,8 @@ class SchemaService {
         return { schemas }
     }
 
-    async create(collectionName) {
-        return this.storage.create(collectionName);
+    async create(collectionName, columns) {
+        return this.storage.create(collectionName, columns);
     }
 
     async addColumn(collectionName, column) {

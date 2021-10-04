@@ -159,8 +159,8 @@ const createRouter = () => {
 
     router.post('/schemas/create', async (req, res, next) => {
         try {
-            const { collectionName } = req.body
-            const data = await schemaService.create(collectionName)
+            const { collectionName, columns } = req.body
+            const data = await schemaService.create(collectionName, columns)
             res.json(data)
         } catch (e) {
             next(e)
