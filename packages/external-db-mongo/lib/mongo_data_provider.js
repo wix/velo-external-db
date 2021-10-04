@@ -24,10 +24,10 @@ class DataProvider {
     }
 
     async insert(collectionName, items) {
-        const rss = await this.client.db()
-                                     .collection(collectionName)
-                                     .insertMany(items)
-        return rss.insertedCount
+        const result = await this.client.db()
+                                        .collection(collectionName)
+                                        .insertMany(items)
+        return result.insertedCount
     }
 
     async update(collectionName, items) {
@@ -38,10 +38,10 @@ class DataProvider {
     }
 
     async delete(collectionName, itemIds) {
-        const rss = await this.client.db()
+        const result = await this.client.db()
                                      .collection(collectionName)
                                      .remove({ _id: { $in: itemIds } })
-        return rss.deletedCount
+        return result.deletedCount
     }
 
     async truncate(collectionName) {
@@ -53,7 +53,7 @@ class DataProvider {
     async aggregate(collectionName, filter, aggregation) {
         const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
         const { filterExpr } = this.filterParser.transform(filter)
-        const rs = await this.client.db()
+        const result = await this.client.db()
                                     .collection(collectionName)
                                     .aggregate( [ { $match: filterExpr },
                                          fieldsStatement,
@@ -61,7 +61,7 @@ class DataProvider {
                                     ] )
                                     .toArray()
 
-        return rs.map( unpackIdFieldForItem )
+        return result.map( unpackIdFieldForItem )
     }
 }
 
