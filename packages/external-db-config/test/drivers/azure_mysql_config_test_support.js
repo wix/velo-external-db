@@ -1,4 +1,4 @@
-const AzureConfigReader = require('../../lib/readers/azure_config_reader')
+const { AzureConfigReader } = require('../../lib/readers/azure_config_reader')
 const Chance = require('chance')
 const chance = new Chance()
 
