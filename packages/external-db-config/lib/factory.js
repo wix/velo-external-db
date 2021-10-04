@@ -1,9 +1,9 @@
 const ConfigReader = require('./service/config_reader')
-const AwsConfigReader = require('./readers/aws_config_reader')
-const { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader } = require('./readers/gcp_config_reader')
-const AzureConfigReader = require('./readers/azure_config_reader')
 const CommonConfigReader = require('./readers/common_config_reader')
 const StubConfigReader = require('./readers/stub_config_reader')
+const aws = require('./readers/aws_config_reader')
+const gcp = require('./readers/gcp_config_reader')
+const azure = require('./readers/azure_config_reader')
 
 const create = () => {
   const common = new CommonConfigReader()
@@ -12,24 +12,24 @@ const create = () => {
   switch (vendor.toLowerCase()) {
 
     case 'aws':
-      internalConfigReader = new AwsConfigReader()
+      internalConfigReader = new aws.AwsConfigReader()
       break;
 
     case 'gcp':
       switch (type) {
         case 'spanner':
-          internalConfigReader = new GcpSpannerConfigReader()
+          internalConfigReader = new gcp.GcpSpannerConfigReader()
           break;
         case 'firestore':
-          internalConfigReader = new GcpFirestoreConfigReader()
+          internalConfigReader = new gcp.GcpFirestoreConfigReader()
           break;
         case 'google-sheet':
-          internalConfigReader = new GcpGoogleSheetsConfigReader()
+          internalConfigReader = new gcp.GcpGoogleSheetsConfigReader()
           break;
         case 'mysql':
         case 'postgres':
         case 'mongo':
-          internalConfigReader = new GcpConfigReader()
+          internalConfigReader = new gcp.GcpConfigReader()
           break;
       }
       break
@@ -37,17 +37,17 @@ const create = () => {
     case 'azr':
       switch (type) {
         case 'spanner':
-          internalConfigReader = new GcpSpannerConfigReader()
+          internalConfigReader = new gcp.GcpSpannerConfigReader()
           break
         case 'firestore':
-          internalConfigReader = new GcpFirestoreConfigReader()
+          internalConfigReader = new gcp.GcpFirestoreConfigReader()
           break
 
         case 'mssql':
         case 'mysql':
         case 'postgres':
         case 'mongo':
-          internalConfigReader = new AzureConfigReader()
+          internalConfigReader = new azure.AzureConfigReader()
           break;
       }
       break

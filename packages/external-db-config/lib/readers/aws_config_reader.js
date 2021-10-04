@@ -32,4 +32,4 @@ class AwsConfigReader {
   }
 }
 
-module.exports = AwsConfigReader
+module.exports = { AwsConfigReader }
