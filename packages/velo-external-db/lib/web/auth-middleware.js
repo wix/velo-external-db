@@ -48,7 +48,7 @@ const authorizeRole = (req) => {
 
 function authMiddleware ({ secretKey }) {
     return (req, res, next) => {
-        authorizeRole(req)
+        //authorizeRole(req)
         authorizeSecretKey(req, secretKey)
         next()
     }
