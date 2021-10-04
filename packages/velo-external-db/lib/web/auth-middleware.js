@@ -24,6 +24,10 @@ const authorizeRole = (req) => {
     let authorized = false
     const path = req.path || '/'
 
+    if (path.startsWith('/provision')) {
+        authorized = true
+    }
+
     if (path.startsWith('/data')) {
         const role = extractRole(req.body)
         if (!AdminPermission.includes(role)) {
@@ -32,7 +36,7 @@ const authorizeRole = (req) => {
         authorized = true
     }
 
-    if (path.startsWith('/schemas') || path.startsWith('/provision')) {
+    if (path.startsWith('/schemas')) {
         const role = extractRole(req.body)
         if (!OwnerPermission.includes(role)) {
             throw new UnauthorizedError('You are not authorized')
@@ -48,7 +52,7 @@ const authorizeRole = (req) => {
 
 function authMiddleware ({ secretKey }) {
     return (req, res, next) => {
-        //authorizeRole(req)
+        authorizeRole(req)
         authorizeSecretKey(req, secretKey)
         next()
     }
