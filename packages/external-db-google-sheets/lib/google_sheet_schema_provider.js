@@ -1,6 +1,6 @@
 const { SystemFields, validateSystemFields } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./google_sheet_exception_translator')
-const { getSheet, getSheetHeaders, describeSheet } = require('./google_sheet_utils')
+const { headersFrom, describeSheet, sheetFor} = require('./google_sheet_utils')
 
 
 class SchemaProvider {
@@ -24,15 +24,15 @@ class SchemaProvider {
     }
 
     async describeCollection(collectionName) {
-        const sheet = await getSheet(this.doc, collectionName)
+        const sheet = await sheetFor(collectionName, this.doc)
         return await describeSheet(sheet)
     }
 
     async addColumn(collectionName, column) {
         await validateSystemFields(column.name)
 
-        const sheet = await getSheet(this.doc, collectionName)
-        const header = await getSheetHeaders(sheet)
+        const sheet = await sheetFor(collectionName, this.doc)
+        const header = await headersFrom(sheet)
 
         await sheet.setHeaderRow([ ...header, column.name])
     }

@@ -22,15 +22,15 @@ const updateRow = async(sheetRow, newItem) => {
     return sheetRow
 }
 
-const getSheet = async(doc, sheetTitle) => {
+const sheetFor = async(sheetTitle, doc) => {
     const sheet = doc.sheetsByTitle[sheetTitle]
-    if (!sheet){
+    if (!sheet) {
         await doc.loadInfo()
     }
     return doc.sheetsByTitle[sheetTitle]
 }
 
-const getSheetHeaders = async(sheet) => {
+const headersFrom = async(sheet) => {
     try{
         await sheet.loadHeaderRow()
         return sheet.headerValues
@@ -40,7 +40,7 @@ const getSheetHeaders = async(sheet) => {
 }
 
 const describeSheet = async(sheet) => {
-        const headers = await getSheetHeaders(sheet)
+        const headers = await headersFrom(sheet)
         return asWixSchema(reformatFields(headers), sheet._rawProperties.title)
 }
 
@@ -49,4 +49,4 @@ const findRowById = async(sheet, id) => {
     return rows.find(r => r._id === id)
 }
 
-module.exports = { reformatFields, formatRow, updateRow, getSheet, getSheetHeaders, describeSheet, findRowById }
+module.exports = { reformatFields, formatRow, updateRow, sheetFor, headersFrom, describeSheet, findRowById }
