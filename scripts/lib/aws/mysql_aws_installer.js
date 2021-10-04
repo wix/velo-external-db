@@ -1,4 +1,4 @@
-const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand} = require('@aws-sdk/client-rds')
+const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand, waitUntilDBInstanceAvailable } = require('@aws-sdk/client-rds')
 const mysql = require('mysql')
 
 class DbProvision {
@@ -16,6 +16,7 @@ class DbProvision {
     }
 
     async dbStatusAvailable(name) {
+        // todo: use waitUntilDBInstanceAvailable
         const response = await this.rdsClient.send(new DescribeDBInstancesCommand({ DBInstanceIdentifier: name }))
 
         const instance = response.DBInstances[0]

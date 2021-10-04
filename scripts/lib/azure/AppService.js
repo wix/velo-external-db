@@ -1,6 +1,20 @@
 const { WebSiteManagementClientContext, WebApps } = require("@azure/arm-appservice");
 const { startSpinnerWith, appServiceVariables } = require('./init')
 
+// "@azure/arm-appservice": "^8.1.0",
+//     "@azure/arm-keyvault": "^1.3.1",
+//     "@azure/arm-mysql": "^3.4.0",
+//     "@azure/arm-network": "^25.1.0",
+//     "@azure/arm-resources": "^4.2.0",
+//     "@azure/arm-sql": "^7.1.0",
+//     "@azure/arm-subscriptions": "^3.1.1",
+//     "@azure/graph": "^5.0.3",
+//     "@azure/identity": "^1.4.0",
+//     "@azure/keyvault-secrets": "^4.2.0",
+//     "@azure/ms-rest-nodeauth": "^3.0.10",
+//     "consola": "^2.15.3",
+// "dotenv": "^10.0.0",
+
 const createAppService = async (creds, subscriptionId, resourceGroupName, serverFarmId, webAppName, virtualNetwork, dockerImage) => {
     return new Promise(async (resolve, reject) => {
         try {

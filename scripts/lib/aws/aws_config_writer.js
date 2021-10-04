@@ -1,6 +1,8 @@
 const { SecretsManagerClient, CreateSecretCommand } = require('@aws-sdk/client-secrets-manager')
 
-const SecretId = 'VELO-EXTERNAL-DB-SECRETS'
+const number = Math.floor(Math.random() * 100)
+const SecretId = `VELO-EXTERNAL-DB-SECRETS-${number}`
+// const SecretId = 'VELO-EXTERNAL-DB-SECRETS'
 
 class ConfigWriter {
     constructor({ awsAccessKeyId, awsSecretAccessKey}) {

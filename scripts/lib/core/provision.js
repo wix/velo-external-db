@@ -28,17 +28,20 @@ const provisionDb = async (provider, engine, configWriter) => {
     await provider.postCreateDb(dbName, status.host, dbCredentials)
 }
 
-const provisionAdapter = async (provider) => {
-    await provider.createAdapter()
-    await blockUntil( async () => !(await provider.adapterStatus()).available )
-    const status = await provider.adapterStatus()
+const provisionAdapter = async (provider, engine) => {
+    const number = Math.floor(Math.random() * 100)
+    const instanceName = `velo-external-db-adapter-${number}`
+
+    const { serviceId } = await provider.createAdapter(instanceName, engine)
+    await blockUntil( async () => !(await provider.adapterStatus(serviceId)).available )
+    const status = await provider.adapterStatus(serviceId)
 
     console.log(status.serviceUrl)
 }
 
 
 const main = async ({ vendor, engine, credentials }) => {
-    console.log(vendor, engine, credentials)
+    console.log(vendor, engine)
 
     const provider = providerFor(vendor, credentials)
 
@@ -47,7 +50,7 @@ const main = async ({ vendor, engine, credentials }) => {
     const adapterProvision = new provider.AdapterProvision(credentials)
 
     await provisionDb(dbProvision, engine, configWriter)
-    await provisionAdapter(adapterProvision)
+    await provisionAdapter(adapterProvision, engine)
 }
 
 module.exports = { main }
