@@ -6,8 +6,7 @@ const DatabaseOperations = require('./mongo_operations')
 const { notConnectedPool } = require('./mongo_utils')
 
 const init = async (cfg) => {
-    const uri = `mongodb://${cfg.user}:${cfg.password}@${cfg.host||cfg.cloudSqlConnectionName}/${cfg.db}` // TODO: in some cases the prefix should be mongodb+srv://
-    const client = new MongoClient(uri)
+    const client = new MongoClient(cfg.connectionUri)
 
     const { pool, cleanup } = await client.connect()
                                           .then((res) => {

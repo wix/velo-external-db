@@ -64,6 +64,21 @@ class GcpGoogleSheetsConfigReader {
   }
 }
 
+class GcpMongoConfigReader {
+  constructor () { }
+
+  async readConfig() {
+    const { URI, SECRET_KEY } = process.env
+    return { connectionUri: URI, secretKey: SECRET_KEY }
+  }
+  
+  validate() {
+    return {
+      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['URI', 'SECRET_KEY'])
+    }
+  }
+}
+
 class GcpAirtableConfigReader {
   constructor() { }
 
@@ -78,4 +93,4 @@ class GcpAirtableConfigReader {
     }
   }
 }
-module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader, GcpAirtableConfigReader }
+module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader, GcpMongoConfigReader, GcpAirtableConfigReader }
