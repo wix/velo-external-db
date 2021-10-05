@@ -5,14 +5,16 @@ const aws = require('./readers/aws_config_reader')
 const gcp = require('./readers/gcp_config_reader')
 const azure = require('./readers/azure_config_reader')
 
+const DefaultSecretId = 'VELO-EXTERNAL-DB-SECRETS'
+
 const create = () => {
   const common = new CommonConfigReader()
-  const { vendor, type } = common.readConfig()
+  const { vendor, type, secretId } = common.readConfig()
   let internalConfigReader
   switch (vendor.toLowerCase()) {
 
     case 'aws':
-      internalConfigReader = new aws.AwsConfigReader()
+      internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId)
       break;
 
     case 'gcp':

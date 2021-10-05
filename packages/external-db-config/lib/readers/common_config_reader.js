@@ -4,8 +4,8 @@ class CommonConfigReader {
     constructor() { }
 
     readConfig() {
-        const { CLOUD_VENDOR, TYPE } = process.env
-        return { vendor: CLOUD_VENDOR , type: TYPE }
+        const { CLOUD_VENDOR, TYPE, SECRET_ID_OVERRIDE } = process.env
+        return { vendor: CLOUD_VENDOR, type: TYPE, secretId: SECRET_ID_OVERRIDE }
     }
 
     validate() {
