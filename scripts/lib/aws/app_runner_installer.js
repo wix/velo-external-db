@@ -8,7 +8,7 @@ class AdapterProvision {
                                                             secretAccessKey: credentials.awsSecretAccessKey } } )
     }
 
-    async createAdapter(name, engine) {
+    async createAdapter(name, engine, secretId) {
         const response = await this.client.send(new CreateServiceCommand({ ServiceName: name,
                                                                                  AuthenticationConfiguration: {},
                                                                                  SourceConfiguration: {
@@ -19,6 +19,7 @@ class AdapterProvision {
                                                                                              RuntimeEnvironmentVariables: {
                                                                                                  'CLOUD_VENDOR': 'aws',
                                                                                                  'TYPE': engine,
+                                                                                                 'SECRET_ID_OVERRIDE': secretId,
                                                                                      } } },
                                                                                } } ) )
         return { serviceId: response.Service.ServiceArn }
