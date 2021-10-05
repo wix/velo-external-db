@@ -35,7 +35,7 @@ const provisionAdapter = async (provider, engine, secretId) => {
     const instanceName = `velo-external-db-adapter-${number}`
 
     const { serviceId } = await startSpinnerWith(`Provision Adapter`, async () => await provider.createAdapter(instanceName, engine, secretId))
-    await startSpinnerWith(`Waiting adapter server instance to start`, async () => await blockUntil( async () => !(await provider.adapterStatus(serviceId)).available ))
+    await startSpinnerWith(`Waiting adapter server instance to start`, async () => await blockUntil( async () => (await provider.adapterStatus(serviceId)).available ))
 
     const status = await provider.adapterStatus(serviceId)
 

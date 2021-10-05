@@ -20,6 +20,7 @@ class AdapterProvision {
                                                                                                  'CLOUD_VENDOR': 'aws',
                                                                                                  'TYPE': engine,
                                                                                                  'SECRET_ID_OVERRIDE': secretId,
+                                                                                                 'REGION': 'us-east-2',
                                                                                      } } },
                                                                                } } ) )
         return { serviceId: response.Service.ServiceArn }
