@@ -29,7 +29,7 @@ load().then(({ secretKey}) => {
 
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(express.json())
-    app.use(unless(['/', '/favicon.ico'], authMiddleware({ secretKey: secretKey })));
+    app.use(unless(['/','/provision', '/favicon.ico'], authMiddleware({ secretKey: secretKey })));
     app.use(compression())
     app.set('view engine', 'ejs');
 

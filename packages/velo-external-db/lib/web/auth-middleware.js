@@ -24,10 +24,6 @@ const authorizeRole = (req) => {
     let authorized = false
     const path = req.path || '/'
 
-    if (path.startsWith('/provision')) {
-        authorized = true
-    }
-
     if (path.startsWith('/data')) {
         const role = extractRole(req.body)
         if (!AdminPermission.includes(role)) {
