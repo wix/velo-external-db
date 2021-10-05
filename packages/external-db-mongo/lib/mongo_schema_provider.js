@@ -106,7 +106,6 @@ class SchemaProvider {
         const systemTable = await this.client.db().listCollections({name:SystemTable}).toArray()
         if (!systemTable.length) {
             await this.client.db().createCollection(SystemTable)
-            await this.create('wix_collection', [{ name: 'a', type: 'text' }, { name: 'b', type: 'text' }])
         }
     }
 }
