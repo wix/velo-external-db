@@ -40,14 +40,14 @@ class DataProvider {
     async delete(collectionName, itemIds) {
         const result = await this.client.db()
                                      .collection(collectionName)
-                                     .remove({ _id: { $in: itemIds } })
+                                     .deleteMany({ _id: { $in: itemIds } })
         return result.deletedCount
     }
 
     async truncate(collectionName) {
         await this.client.db()
                          .collection(collectionName)
-                         .remove({})
+                         .deleteMany({})
     }
 
     async aggregate(collectionName, filter, aggregation) {
