@@ -1,5 +1,4 @@
 const { SystemFields } = require('velo-external-db-commons')
-const { translateErrorCodes } = require('./google_sheet_exception_translator')
 const { sheetFor, headersFrom } = require('./google_sheet_utils')
 
 class DataProvider {
@@ -14,14 +13,17 @@ class DataProvider {
         }, {})
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
-        // const filterOperations = this.filterParser.transform(filter)
-        // const sortOperations = this.filterParser.orderBy(sort)
+    async findRowById(sheet, id) {
+        const rows = await sheet.getRows()
+        return rows.find(r => r._id === id)
+    }
 
+    async find(collectionName, filter, sort, skip, limit) {
+    
         const sheet = await sheetFor(collectionName, this.doc)
         const rows = await sheet.getRows({ offset: skip, limit })
 
-        return rows.map( this.formatRow )
+        return rows.map(this.formatRow)
     }
 
     async count(collectionName) {
@@ -29,28 +31,36 @@ class DataProvider {
         return sheet._rawProperties.gridProperties.rowCount
     }
 
-    async insert(collectionName, items) {
-        const item = items[0]
+    // INSERT RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////
 
-        try{
-            const sheet = await sheetFor(collectionName, this.doc)
+    async insertItemsQuery(items, sheet) {
+        return items.map(async(item) => {
             const newRow = await sheet.addRow(item)
-            return newRow._rawData
-        } catch(err) {
-            translateErrorCodes(err)
-        }
+            return this.formatRow(newRow)
+        })
     }
 
-    async findRowById(sheet, id) {
-        const rows = await sheet.getRows()
-        return rows.find(r => r._id === id)
+    async insert(collectionName, items) {
+        const sheet = await sheetFor(collectionName, this.doc)
+        return Promise.all(await this.insertItemsQuery(items, sheet))
     }
+    
+    // UPDATE RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////
     
     async updateRow(row, updatedItem) {
         Object.entries(updatedItem)
               .forEach(([key, value]) => row[key] = value)
         
-        return await row.save()
+        await row.save()
+        return this.formatRow(row)
+    }
+
+    async updateItemsQuery(items, sheet) {
+        return items.map( async(item) => {            
+            const rowToUpdate = await this.findRowById(sheet, item._id)
+            // currently content-manger using data.update to insert new items, so if the id doesn't exist it means that this is a new item
+            return rowToUpdate ? await this.updateRow(rowToUpdate, item) : await this.insert(sheet.title, [item])
+        })
     }
 
     async update(collectionName, items) {
@@ -63,14 +73,10 @@ class DataProvider {
         }
 
         const sheet = await sheetFor(collectionName, this.doc)
-        const rowToUpdate = await this.findRowById(sheet, item._id)
-
-        if (rowToUpdate) {
-            return await this.updateRow(rowToUpdate, item)
-        }
-
-        return await this.insert(collectionName, items)
+        return Promise.all(await this.updateItemsQuery(items, sheet))
     }
+
+    // DELETE RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////
 
     async delete(collectionName, ids) {
         const sheet = await sheetFor(collectionName, this.doc)
