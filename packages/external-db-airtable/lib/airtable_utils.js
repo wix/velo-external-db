@@ -1,7 +1,4 @@
-minifyRecord = (record) => {
-    return {
-        id: record.id,
-        fields: record.fields,
-    };
-};
+
+const minifyRecord = record => ( { id: record.id, fields: record.fields })
+
 module.exports = { minifyRecord }
