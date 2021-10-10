@@ -48,15 +48,14 @@ class FilterParser {
         }
 
         if (this.isSingleFieldStringOperator(filter.operator)) {
-            console.error('not implemented');
-
+           return[{
+               filterExpr: `REGEX_MATCH({${filter.fieldName}},'${this.valueForStringOperator(filter.operator,filter.value)}')`}]
         }
 
         if (filter.operator === '$urlized') {
             console.error('not implemented');
         }
         return []
-        // return [{ filterExpr: { [filter.fieldName]: { [operator]: this.valueForOperator(filter.value, operator) } } }]
     }
 
     MultipleFieldOperatorToFilterExpr (operator, values) {
@@ -152,13 +151,12 @@ class FilterParser {
             return [];
         }
 
-        const results = sort.flatMap(this.parseSort)
+        const results=  sort.flatMap(this.parseSort)
         if (results.length === 0) {
             return [];
         }
-        console.log(results);
         return {
-            sortExpr: results
+            sort: results
         }
     }
 

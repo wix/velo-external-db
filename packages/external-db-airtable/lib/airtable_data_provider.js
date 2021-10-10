@@ -9,34 +9,33 @@ class DataProvider {
 
     async find(collectionName, filter, sort, skip, limit) {
         const { filterExpr } = this.filterParser.transform(filter)
-
         const filterByFormula = {filterByFormula: filterExpr||''}
         const limitExpr = limit ? { maxRecords: limit } : {}
-        const sortExpr = this.filterParser.orderBy(sort).sortExpr
-        const skipExpr = this.filterParser.skipExpression(skip)
-        const resultsByPages = []
-        await this.pool(collectionName)
-                                 .select({...filterByFormula, ...limitExpr, ...sortExpr, ...skipExpr}) //TODO: skip
-                                 .eachPage((records,fetchNextPage)=>{
-                                    resultsByPages.push(records)
-                                    fetchNextPage()
-                                })
-                  
-        return resultsByPages.map(page => page.map(minifyRecord));
-
-
+        const sortExpr = this.filterParser.orderBy(sort)
+        const result = await this.query(collectionName, filterByFormula, limitExpr, sortExpr)
+        return result.map(minifyRecord)
     }
 
     async count(collectionName, filter) {
           const results = await this.find(collectionName,filter)
-          console.log(results);
           return results.length
     }
 
     async insert(collectionName, items) {
-        console.log(items);
-        const result = await this.pool(collectionName)
-                                    .create(items)
+        
+        const inserted = await Promise.all(items.map(async item => await this.insertSingle(collectionName, item)))
+        return inserted.filter(Boolean).length;
+
+    }
+    
+    async insertSingle(collectionName, item) {
+        try {
+            const result = await this.pool(collectionName).create(item)
+            return result
+        } catch (e) {
+            console.log(e);
+            return;
+        }
     }
 
     async update(collectionName, items) {
@@ -46,9 +45,8 @@ class DataProvider {
 
     async updateSingle(collectionName, item) {
         try{
-            const itemToUpdate = Object.assign({}, item)
-            delete itemToUpdate._id
-            const updated = await this.pool(collectionName).update(item._id,itemToUpdate)
+            const id = await this.getItemIdBy_id(collectionName,item._id)
+            const updated = await this.pool(collectionName).update(id,item)
             return updated.id
         }
         catch(e){
@@ -63,18 +61,49 @@ class DataProvider {
             return deleted.filter(Boolean).length;
         }
         
-        async deleteSingle(collectionName,itemId) {
+        async deleteSingle(collectionName,itemId) { //TODO: check if can do it more efficient
             try{
-                const deleted = await this.pool(collectionName).destroy(itemId)
-                return deleted.id
+                const id = await this.getItemIdBy_id(collectionName, itemId)
+                return await this.deleteSingleByAirtableId(collectionName, id)
             } catch(e){
                 return;
             }
         }
 
-        async truncate(collectionName) { //TODO: check if can do it more efficient 
-            const itemIds = (await this.find(collectionName)).map(item=>item.id)
-            await this.delete(collectionName,itemIds)
+        async deleteSingleByAirtableId(collectionName,itemId) {
+            try{
+                const deleted = await this.pool(collectionName).destroy(itemId)
+                return deleted.id
+            }catch(e){
+                return ;
+            }
+        }
+
+        async truncate(collectionName) { //TODO: check if can do it more efficient
+            const itemIds = (await this.query(collectionName)).map(record=>record.id)
+            await Promise.all(itemIds.map(async id => await this.deleteSingleByAirtableId(collectionName, id)))
+        }
+        
+
+        async getItemIdBy_id (collectionName, _id) {
+            const record = await this.query(collectionName, {filterByFormula: `_id = "${_id}" `})
+            return record[0].id
+        }
+
+
+        async query(collectionName,filterByFormula, limitExpr, sortExpr) {
+            try {
+                const resultsByPages = []
+                await this.pool(collectionName)
+                            .select({...filterByFormula, ...limitExpr, ...sortExpr}) //TODO: skip
+                            .eachPage((records,fetchNextPage)=>{
+                            resultsByPages.push(records)
+                            fetchNextPage()
+                })
+
+                return resultsByPages.flat();
+        } catch(e) {
+            console.log(e);}
         }
 
         // async aggregate(collectionName, filter, aggregation) { 
