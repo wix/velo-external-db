@@ -45,6 +45,11 @@ const init = async(type, vendor, config) => {
             const cfg = await config.readConfig()
             return append(await init(cfg), cfg.secretKey)
         }
+        case 'airtable': {
+            const { init } = require('external-db-airtable')
+            const cfg = await config.readConfig()
+            return append(await init(cfg), cfg.secretKey)
+        }
     }
 }
 
