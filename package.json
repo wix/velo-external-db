@@ -27,6 +27,7 @@
       "external-db-postgres",
       "external-db-spanner",
       "external-db-google-sheets",
+      "external-db-airtable",
       "velo-external-db",
       "velo-external-db-core"
     ]

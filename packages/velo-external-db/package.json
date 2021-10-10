@@ -24,6 +24,7 @@
     "external-db-config": "^0.0.0",
     "external-db-firestore": "^0.0.0",
     "external-db-google-sheets": "^0.0.0",
+    "external-db-airtable": "^0.0.0",
     "external-db-mongo": "^0.0.0",
     "external-db-mssql": "^0.0.0",
     "external-db-mysql": "^0.0.0",
