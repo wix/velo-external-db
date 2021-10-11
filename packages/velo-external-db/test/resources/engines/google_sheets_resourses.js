@@ -6,7 +6,7 @@ const connection = () => {
 }   
 
 const cleanup = async() => {
-    cleanupSheets()
+    // cleanupSheets()
 }
 
 const initEnv = async() => {
@@ -16,8 +16,6 @@ const initEnv = async() => {
 const shutdownEnv = async() => {
     _server.close()
 }
-
-initEnv()
 
 const setActive = () => {
     process.env.TYPE = 'google-sheet'

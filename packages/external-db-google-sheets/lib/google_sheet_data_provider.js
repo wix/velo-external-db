@@ -8,7 +8,7 @@ class DataProvider {
 
     formatRow(sheetRow) {
         return sheetRow._sheet.headerValues.reduce((obj, header, i) => {
-            obj[header] = sheetRow._rawData[i]
+            obj[header] = (header === '_updatedDate' || header === '_createdDate') ? new Date(sheetRow._rawData[i]) : sheetRow._rawData[i]
             return obj
         }, {})
     }
