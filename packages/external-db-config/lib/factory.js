@@ -9,12 +9,12 @@ const DefaultSecretId = 'VELO-EXTERNAL-DB-SECRETS'
 
 const create = () => {
   const common = new CommonConfigReader()
-  const { vendor, type, secretId } = common.readConfig()
+  const { vendor, type, secretId, region } = common.readConfig()
   let internalConfigReader
   switch (vendor.toLowerCase()) {
 
     case 'aws':
-      internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId)
+      internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId, region)
       break;
 
     case 'gcp':

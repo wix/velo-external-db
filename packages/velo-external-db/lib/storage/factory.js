@@ -6,6 +6,7 @@ const init = async(type, vendor, config) => {
         case 'postgres': {
             const { init } = require('external-db-postgres')
             const cfg = await config.readConfig()
+            console.log('cfg', cfg)
 
             return append(init(cfg), cfg.secretKey)
         }
