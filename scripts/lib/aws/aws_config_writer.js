@@ -1,8 +1,8 @@
 const { SecretsManagerClient, CreateSecretCommand } = require('@aws-sdk/client-secrets-manager')
 
 class ConfigWriter {
-    constructor({ awsAccessKeyId, awsSecretAccessKey}) {
-        this.client = new SecretsManagerClient({ region: 'us-east-2', credentials: { accessKeyId: awsAccessKeyId, secretAccessKey: awsSecretAccessKey } })
+    constructor({ awsAccessKeyId, awsSecretAccessKey}, region) {
+        this.client = new SecretsManagerClient({ region: region, credentials: { accessKeyId: awsAccessKeyId, secretAccessKey: awsSecretAccessKey } })
     }
 
     async writeConfig(secretId, dbCredentials, host, db, secretKey) {

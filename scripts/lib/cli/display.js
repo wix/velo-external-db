@@ -27,6 +27,7 @@ const startSpinnerWith = async (msg, f, completeMsg) => {
         spinner.stop(true)
         process.stderr.write(`\t\t ${redBright('✓')} ${grey(completeMsg || msg)}\n`)
         process.stderr.write(redBright('Process failed\n'))
+        process.stderr.write(e)
         process.exit(1)
     }
 

@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-apprunner": "^3.34.0",
-    "@aws-sdk/client-iam": "^3.34.0",
+    "@aws-sdk/client-iam": "^3.36.0",
     "@aws-sdk/client-rds": "^3.34.0",
     "@aws-sdk/client-secrets-manager": "^3.34.0",
     "chalk": "^4.1.2",

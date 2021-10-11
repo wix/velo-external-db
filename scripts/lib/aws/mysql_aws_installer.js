@@ -2,8 +2,8 @@ const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand, waitUnti
 const mysql = require('mysql')
 
 class DbProvision {
-    constructor(credentials) {
-        this.rdsClient = new RDSClient( { region: 'us-east-2',
+    constructor(credentials, region) {
+        this.rdsClient = new RDSClient( { region: region,
                                           credentials: { accessKeyId: credentials.awsAccessKeyId,
                                                          secretAccessKey: credentials.awsSecretAccessKey } } )
     }

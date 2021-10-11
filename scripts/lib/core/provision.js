@@ -41,10 +41,11 @@ const provisionAdapter = async (provider, engine, secretId) => {
 
 
 const main = async ({ vendor, engine, credentials }) => {
+    const region = 'us-east-2'
     const provider = providerFor(vendor, credentials)
-    const configWriter = new provider.ConfigWriter(credentials)
-    const dbProvision = new provider.DbProvision(credentials)
-    const adapterProvision = new provider.AdapterProvision(credentials)
+    const configWriter = new provider.ConfigWriter(credentials, region)
+    const dbProvision = new provider.DbProvision(credentials, region)
+    const adapterProvision = new provider.AdapterProvision(credentials, region)
 
     const secretId = randomWithPrefix('VELO-EXTERNAL-DB-SECRETS')
 
