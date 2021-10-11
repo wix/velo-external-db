@@ -4,17 +4,17 @@ const express = require('express')
 const GoogleSpreadsheetDoc = require('./google_sheet_doc_class')
 
 const app = express()
+const v4SpreadsheetsRouter = express.Router();
 const doc = new GoogleSpreadsheetDoc('spreadsheet-doc-id', 'spreadsheet-doc-title')
 
 app.use(express.json())
+app.use('/v4/spreadsheets/', v4SpreadsheetsRouter);
 
 // remove in the end
 app.use((req, res, next)=>{
     console.log(JSON.stringify({method: req.method, path: req.path}));
     next()
 })
-
-const v4SpreadsheetsRouter = express.Router();
 
 v4SpreadsheetsRouter.get('/:sheetId/', (_, res) =>{
     res.send(doc.docInfo())
@@ -69,5 +69,7 @@ const batchUpdateFunctions = ( request, doc ) => {
             break;
     }
 }
- 
-module.exports = app
+
+
+
+module.exports = { app, cleanupSheets : doc.cleanupSheets }

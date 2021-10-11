@@ -37,6 +37,10 @@ class GoogleSpreadsheetDoc {
         return this.sheets.find(s => sheetTitle == s.title)
     }
 
+    cleanupSheets() {
+        this.sheets = []
+    }
+
 
 }
 

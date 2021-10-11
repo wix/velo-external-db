@@ -1,23 +1,23 @@
-const { init, mockServer } = require('external-db-google-sheets')
+const { mockServer, cleanupSheets } = require('external-db-google-sheets')
 
 let _server, port = 1502
 
 const connection = () => {
-    const { changeUrl } = init({sheetId: 'test-sheet-id', clientEmail: 'client-email', apiPrivateKey: 'test-api-key'})
-    changeUrl('http://localhost:1502/v4/spreadsheets/$test-sheet-id')
 }   
 
 const cleanup = async() => {
-    // clean all the sheets (if exists)
+    cleanupSheets()
 }
 
 const initEnv = async() => {
-    _server = mockServer.listen(port,()=>console.log('google-sheet-mock-server is running'))
+    _server = mockServer.listen(port)
 }
 
 const shutdownEnv = async() => {
     _server.close()
 }
+
+initEnv()
 
 const setActive = () => {
     process.env.TYPE = 'google-sheet'
