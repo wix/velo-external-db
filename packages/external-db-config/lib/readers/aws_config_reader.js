@@ -11,7 +11,10 @@ class AwsConfigReader {
 
   async readConfig() {
     const cfg = await this.readExternalConfig()
-                          .catch(() => EmptyAWSConfig)
+                          .catch(e => {
+                            console.log(e)
+                            return EmptyAWSConfig
+                          })
     const { host, username, password, DB, SECRET_KEY } = cfg
     return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY }
   }
@@ -19,6 +22,7 @@ class AwsConfigReader {
   async readExternalConfig() {
     const client = new SecretsManagerClient({ region: this.region })
     const data = await client.send(new GetSecretValueCommand({ SecretId: this.secretId }))
+    console.log('readExternalConfig', data)
     return JSON.parse(data.SecretString)
   }
 
