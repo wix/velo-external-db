@@ -26,7 +26,7 @@ const init = (cfg, _poolOptions) => {
     }
 
     const filterParser = new FilterParser()
-    const pool = new Pool(Object.assign({}, config, poolOptions))
+    const pool = new Pool({ ...config, ...poolOptions })
 
     const databaseOperations = new DatabaseOperations(pool)
     const dataProvider = new DataProvider(pool, filterParser)
