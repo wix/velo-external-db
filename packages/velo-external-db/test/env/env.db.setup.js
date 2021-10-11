@@ -65,5 +65,8 @@ module.exports = async () => {
             await googleSheet.cleanup()
             break
 
+        case 'mongo':
+            await mongo.cleanup()
+            break;
     }
 };
