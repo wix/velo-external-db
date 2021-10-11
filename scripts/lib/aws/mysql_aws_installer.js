@@ -1,5 +1,6 @@
 const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand, waitUntilDBInstanceAvailable } = require('@aws-sdk/client-rds')
 const mysql = require('mysql')
+const { Client } = require('pg')
 
 class DbProvision {
     constructor(credentials, region) {
@@ -27,8 +28,15 @@ class DbProvision {
         }
     }
 
-    async postCreateDb(dbName, host, credentials) {
-        await this.createDatabase(dbName, host, credentials)
+    async postCreateDb(engine, dbName, host, credentials) {
+        switch (engine) {
+            case 'mysql':
+                await this.createDatabase(dbName, host, credentials)
+                break;
+            case 'postgres':
+                await this.createDatabasePg(dbName, host, credentials)
+                break;
+        }
     }
 
     async createDatabase(dbName, host, credentials) {
@@ -49,6 +57,24 @@ class DbProvision {
                 connection.end()
             }
         }
+    }
+
+    async createDatabasePg(dbName, host, credentials) {
+        console.log(host, credentials, dbName)
+        const client = new Client({
+            host,
+            user: credentials.user,
+            password: credentials.password,
+            database: 'postgres',
+            port: 5432,
+        })
+        console.log('before')
+        await client.connect()
+        console.log('after')
+        const res = await client.query(`CREATE DATABASE ${dbName}`)
+        console.log('after create')
+        console.log(res)
+        await client.end()
     }
 }
 
