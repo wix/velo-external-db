@@ -4,6 +4,7 @@ const spanner = require('../resources/engines/spanner_resources')
 const firestore = require('../resources/engines/firestore_resources')
 const mssql = require('../resources/engines/mssql_resources')
 const mongo = require ('../resources/engines/mongo_resources')
+const googleSheet = require('../resources/engines/google_sheets_resourses')
 const { sleep } = require('test-commons')
 
 module.exports = async () => {
@@ -32,6 +33,9 @@ module.exports = async () => {
         case 'mongo':
             await mongo.initEnv()
             break
+        case 'google-sheet':
+            await googleSheet.initEnv()
+            break
 
     }
 
@@ -56,6 +60,9 @@ module.exports = async () => {
 
         case 'mssql':
             await mssql.cleanup()
+            break
+        case 'google-sheet':
+            await googleSheet.cleanup()
             break
 
     }

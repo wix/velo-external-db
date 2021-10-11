@@ -10,6 +10,7 @@
     "test:mssql": "lerna exec --scope external-db-mssql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mssql\"",
     "test:firestore": "lerna exec --scope external-db-firestore \"npm test\" && lerna exec --scope velo-external-db \"npm run test:firestore\"",
     "test:mongo": "lerna exec --scope external-db-mongo \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mongo\"",
+    "test:google-sheet": "lerna exec --scope external-db-google-sheets \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mongo\"",
     "release": "lerna version --no-push",
     "ci:publish": "lerna publish -y from-git"
   },

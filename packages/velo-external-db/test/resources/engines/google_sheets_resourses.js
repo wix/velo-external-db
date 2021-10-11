@@ -1,4 +1,4 @@
-const { init, mockServer } = require('external-db-google-sheets')
+const { init } = require('external-db-google-sheets')
 
 let _server, port = 1502
 
@@ -12,11 +12,11 @@ const cleanup = async() => {
 }
 
 const initEnv = async() => {
-    _server = mockServer.listen(port)
+    // _server = mockServer.listen(port)
 }
 
 const shutdownEnv = async() => {
-    _server.close()
+    // _server.close()
 }
 
 const setActive = () => {

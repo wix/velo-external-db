@@ -1,5 +1,13 @@
 const { errors } = require('velo-external-db-commons')
 
+const loadSheets = async(doc) => {
+    try {
+        await doc.loadInfo()
+    } catch (error) {
+        // what to do in failure?
+    }
+}
+
 const reformatFields = (headerRow) => {
     return headerRow.map(h => ({
         field: h,
@@ -34,4 +42,4 @@ const headersFrom = async(sheet) => {
     }
 }
 
-module.exports = { reformatFields, formatRow, sheetFor, headersFrom }
+module.exports = { reformatFields, formatRow, sheetFor, headersFrom, loadSheets }
