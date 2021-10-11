@@ -15,24 +15,24 @@ const create = () => {
 
     case 'aws':
       internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId)
-      break;
+      break
 
     case 'gcp':
       switch (type) {
         case 'spanner':
           internalConfigReader = new gcp.GcpSpannerConfigReader()
-          break;
+          break
         case 'firestore':
           internalConfigReader = new gcp.GcpFirestoreConfigReader()
-          break;
+          break
         case 'google-sheet':
           internalConfigReader = new gcp.GcpGoogleSheetsConfigReader()
-          break;
+          break
         case 'mysql':
         case 'postgres':
         case 'mongo':
           internalConfigReader = new gcp.GcpConfigReader()
-          break;
+          break
       }
       break
 
@@ -44,13 +44,16 @@ const create = () => {
         case 'firestore':
           internalConfigReader = new gcp.GcpFirestoreConfigReader()
           break
+        case 'google-sheet':
+          internalConfigReader = new gcp.GcpGoogleSheetsConfigReader()
+          break
 
         case 'mssql':
         case 'mysql':
         case 'postgres':
         case 'mongo':
           internalConfigReader = new azure.AzureConfigReader()
-          break;
+          break
       }
       break
   }
