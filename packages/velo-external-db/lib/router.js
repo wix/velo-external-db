@@ -1,6 +1,7 @@
 const express = require('express')
 const { errorMiddleware } = require('./web/error-middleware')
 const { appInfoFor } = require ('./health/app_info')
+const { InvalidRequest } = require('velo-external-db-commons').errors
 
 let dataService, schemaService, operationService, externalDbConfigClient
 
@@ -150,6 +151,9 @@ const createRouter = () => {
     router.post('/schemas/find', async (req, res, next) => {
         try {
             const { schemaIds } = req.body
+            if (schemaIds && schemaIds.length > 10) {
+                throw new InvalidRequest()
+            }
             const data = await schemaService.find(schemaIds)
             res.json(data)
         } catch (e) {
