@@ -28,12 +28,14 @@ const create = () => {
         case 'google-sheet':
           internalConfigReader = new gcp.GcpGoogleSheetsConfigReader()
           break;
+        case 'mongo':
+          internalConfigReader = new gcp.GcpMongoConfigReader()
+          break;
         case 'airtable':
-          internalConfigReader = new gcp.GcpAirtableConfigReader()
+          internalConfigReader = new gcp.GcpAirtableConfigReader()  
           break;
         case 'mysql':
         case 'postgres':
-        case 'mongo':
           internalConfigReader = new gcp.GcpConfigReader()
           break;
       }
@@ -47,13 +49,15 @@ const create = () => {
         case 'firestore':
           internalConfigReader = new gcp.GcpFirestoreConfigReader()
           break
+        case 'mongo':
+          internalConfigReader = new gcp.GcpMongoConfigReader()
+          break;
         case 'airtable':
           internalConfigReader = new gcp.GcpAirtableConfigReader()
           break;
         case 'mssql':
         case 'mysql':
         case 'postgres':
-        case 'mongo':
           internalConfigReader = new azure.AzureConfigReader()
           break;
       }
