@@ -14,4 +14,7 @@ const blockUntil = async f => waitFor(
     }
 )
 
-module.exports = { blockUntil }
+const randomInt = () => Math.floor(Math.random() * 100)
+const randomWithPrefix = prefix => `${prefix}-${randomInt()}`
+
+module.exports = { blockUntil, randomWithPrefix }
