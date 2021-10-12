@@ -1,4 +1,4 @@
-name: Build and deploy Docker image to AWS-ECR
+name: Push to AWS ECR
 
 on:
   workflow_dispatch:
@@ -9,6 +9,7 @@ jobs:
 
     env:
       ECR_REPOSITORY: ${{ secrets.AWS_REPO_NAME }}
+      PUBLIC_ECR_URL: ${{ secrets.AWS_REPO_URL }}
       IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
       IMAGE_TAG: latest
     
@@ -37,16 +38,11 @@ jobs:
       # Tag docker image
       - name: Tag Image
         id: tag-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-
-        run: docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        run: docker tag $IMAGE_NAME:$IMAGE_TAG $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
         
       - name: Push the image to Amazon ECR
         id: push-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           echo "Pushing image to ECR..."
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker push $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
+          echo "::set-output name=image::$PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG"

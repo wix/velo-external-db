@@ -1,4 +1,4 @@
-name: Build and deploy Docker image to GCP
+name: Push to GCP Container Registry
 
 on:
   workflow_dispatch:
