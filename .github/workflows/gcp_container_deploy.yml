@@ -1,4 +1,4 @@
-name: Build and deploy Docker image
+name: Build and deploy Docker image to GCP
 
 on:
   workflow_dispatch:
@@ -10,8 +10,9 @@ jobs:
     env:
       GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      CONTAINER_REGISTRY_FOLDER: ${{ secrets.GCP_CONTAINER_REGISTRY_FOLDER }}
       IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
-      CONTAINER_REGISTRY_FOLDER: ${{ secrets.CONTAINER_REGISTRY_FOLDER }}
+      IMAGE_TAG: latest
     
     steps:
       - name: Git checkout
@@ -32,9 +33,9 @@ jobs:
 
       # Tag docker image
       - name: Tag Image
-        run: docker tag $IMAGE_NAME:latest gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER
+        run: docker tag $IMAGE_NAME:$IMAGE_TAG gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER
         
       # Push image to Google Container Registry
       - name: Push Image
-        run: docker push gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER
+        run: docker push gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:$IMAGE_TAG
 
