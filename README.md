@@ -34,14 +34,14 @@ If neither case is applicable to your case, the choice for a DB engine powering 
 
 ## Supported Public clouds
 
-Google Cloud
-Deploying connector to Cloud Run
-Deploying connector to AppEngine
-Amazon Web Services
-Deployng connector to App Runner
-Microsoft Azure
-Deploying connector to Azure App Services
-Deployng connector to Azure Container service
+* Google Cloud
+  * [Deploying connector to Cloud Run](https://support.wix.com/en/article/using-your-mysql-and-postgres-database-with-velo)
+  * Deploying connector to AppEngine
+* Amazon Web Services
+  * Deployng connector to App Runner
+* Microsoft Azure
+  * Deploying connector to Azure App Services
+  * Deployng connector to Azure Container service
 
 ## Working with on prem external database
 
