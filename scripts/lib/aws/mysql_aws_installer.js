@@ -1,4 +1,5 @@
 const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand, waitUntilDBInstanceAvailable } = require('@aws-sdk/client-rds')
+const { EC2Client, DescribeSecurityGroupsCommand, UpdateSecurityGroupRuleDescriptionsIngressCommand } = require('@aws-sdk/client-ec2')
 const mysql = require('mysql')
 const { Client } = require('pg')
 
@@ -7,6 +8,7 @@ class DbProvision {
         this.rdsClient = new RDSClient( { region: region,
                                           credentials: { accessKeyId: credentials.awsAccessKeyId,
                                                          secretAccessKey: credentials.awsSecretAccessKey } } )
+        this.ec2Client = new EC2Client({ region: region })
     }
 
     async createDb( { name, engine, credentials }) {
@@ -24,17 +26,19 @@ class DbProvision {
         return {
             host: instance.Endpoint.Address,
             port: instance.Endpoint.Port,
+            securityGroupId: instance.VpcSecurityGroups[0].VpcSecurityGroupId,
             available: instance.DBInstanceStatus === 'available'
         }
     }
 
-    async postCreateDb(engine, dbName, host, credentials) {
+    async postCreateDb(engine, dbName, status, credentials) {
+        // open vpc rule
         switch (engine) {
             case 'mysql':
-                await this.createDatabase(dbName, host, credentials)
+                await this.createDatabase(dbName, status.host, credentials)
                 break;
             case 'postgres':
-                await this.createDatabasePg(dbName, host, credentials)
+                await this.createDatabasePg(dbName, status.host, credentials)
                 break;
         }
     }
@@ -60,7 +64,6 @@ class DbProvision {
     }
 
     async createDatabasePg(dbName, host, credentials) {
-        console.log(host, credentials, dbName)
         const client = new Client({
             host,
             user: credentials.user,
@@ -68,13 +71,29 @@ class DbProvision {
             database: 'postgres',
             port: 5432,
         })
-        console.log('before')
-        await client.connect()
-        console.log('after')
-        const res = await client.query(`CREATE DATABASE ${dbName}`)
-        console.log('after create')
-        console.log(res)
-        await client.end()
+        try {
+            await client.connect()
+            await client.query(`CREATE DATABASE ${dbName}`)
+        } catch (err) {
+            console.log('failed to create db')
+        } finally {
+            await client.end()
+        }
+    }
+
+    async addSecurityRule(groupId, port) {
+        const sgs = await this.ec2Client.send(new DescribeSecurityGroupsCommand({ GroupIds: [groupId] }))
+        const sg = sgs.SecurityGroups[0]
+        if (!sg.IpPermissions.some(p => p.FromPort >= port && p.ToPort >= port)) {
+            console.log('please add rule')
+            // const rsp = await this.ec2Client.send(new UpdateSecurityGroupRuleDescriptionsIngressCommand({
+            //     GroupId: sg.GroupId,
+            //     IpPermissions: [ { FromPort: port, ToPort: port,
+            //         IpProtocol: 'tcp',
+            //         IpRanges: [ { CidrIp: '0.0.0.0/0' }
+            //         ] } ] }))
+            // console.log(rsp)
+        }
     }
 }
 
