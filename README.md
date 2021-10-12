@@ -45,6 +45,8 @@ Deployng connector to Azure Container service
 
 ## Working with on prem external database
 
-Read Only vs Read Write collections
-Datatypes mappings
-Developing or extending the Connector
+## Read Only vs Read Write collections
+
+## Datatypes mappings
+
+## Developing or extending the Connector
