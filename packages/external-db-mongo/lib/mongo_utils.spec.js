@@ -39,5 +39,13 @@ describe('Mongo Utils', () => {
         test('validateTable will not allow systemTable', () => {
             expect(() => validateTable('_descriptor')).toThrow(InvalidQuery)
         })
+
+        test('validateTable will not allow variation of systemTable', () => { 
+            expect(() => validateTable('_dEscRiptoR')).toThrow()
+        })
+
+        test('validateTable will not throw with valid table name', () => {
+            expect(() => validateTable('someTable')).not.toThrow()
+        })
     })
 })

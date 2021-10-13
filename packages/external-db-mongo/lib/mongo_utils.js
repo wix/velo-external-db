@@ -1,9 +1,8 @@
 const { isObject } = require('velo-external-db-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 
-const mongoSystemTables = ['_descriptor']
-
-const isSystemTable = collectionId => mongoSystemTables.includes(collectionId.trim().toLowerCase())
+const SystemTable = '_descriptor'
+const isSystemTable = collectionId => SystemTable === collectionId.trim().toLowerCase()
 
 const validateTable = collection => {
     if (collection && isSystemTable(collection) ) {
@@ -34,4 +33,4 @@ const unpackIdFieldForItem = item => {
     return item
 }
 
-module.exports = { EMPTY_FILTER, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor, validateTable }
+module.exports = { EMPTY_FILTER, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor, validateTable, SystemTable }

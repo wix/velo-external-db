@@ -1,7 +1,6 @@
 const { SystemFields, validateSystemFields, asWixSchema } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
-const { validateTable } = require ('./mongo_utils')
-const SystemTable = '_descriptor'
+const { validateTable, SystemTable } = require ('./mongo_utils')
 
 class SchemaProvider {
     constructor(client) {
