@@ -6,13 +6,16 @@ const mssql = require('../resources/engines/mssql_resources')
 const mongo = require ('../resources/engines/mongo_resources')
 const googleSheet = require('../resources/engines/google_sheets_resourses')
 const { sleep } = require('test-commons')
+const ci = require('./ci_utils')
 
 module.exports = async () => {
     const testEngine = process.env.TEST_ENGINE
 
     switch (testEngine) {
         case 'mysql':
-            await mysql.initEnv()
+            if (ci.LocalDev()) {
+                await mysql.initEnv()
+            }
             break
 
         case 'spanner':
@@ -65,5 +68,8 @@ module.exports = async () => {
             await googleSheet.cleanup()
             break
 
+        case 'mongo':
+            await mongo.cleanup()
+            break;
     }
 };

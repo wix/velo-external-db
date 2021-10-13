@@ -1,4 +1,4 @@
-const { unpackIdFieldForItem, updateExpressionFor } = require('./mongo_utils')
+const { unpackIdFieldForItem, updateExpressionFor, validateTable } = require('./mongo_utils')
 
 class DataProvider {
     constructor(client, filterParser) {
@@ -7,6 +7,7 @@ class DataProvider {
     }
 
     async find(collectionName, filter, sort, skip, limit) {
+        validateTable(collectionName)
         const { filterExpr } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
         return await this.client.db()
@@ -16,6 +17,7 @@ class DataProvider {
     }
 
     async count(collectionName, filter) {
+        validateTable(collectionName)
         const { filterExpr } = this.filterParser.transform(filter)
 
         return await this.client.db()
@@ -24,6 +26,7 @@ class DataProvider {
     }
 
     async insert(collectionName, items) {
+        validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)
                                         .insertMany(items)
@@ -31,6 +34,7 @@ class DataProvider {
     }
 
     async update(collectionName, items) {
+        validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)
                                         .bulkWrite( updateExpressionFor(items) )
@@ -38,6 +42,7 @@ class DataProvider {
     }
 
     async delete(collectionName, itemIds) {
+        validateTable(collectionName)
         const result = await this.client.db()
                                      .collection(collectionName)
                                      .deleteMany({ _id: { $in: itemIds } })
@@ -45,12 +50,14 @@ class DataProvider {
     }
 
     async truncate(collectionName) {
+        validateTable(collectionName)
         await this.client.db()
                          .collection(collectionName)
                          .deleteMany({})
     }
 
     async aggregate(collectionName, filter, aggregation) {
+        validateTable(collectionName)
         const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
         const { filterExpr } = this.filterParser.transform(filter)
         const result = await this.client.db()
