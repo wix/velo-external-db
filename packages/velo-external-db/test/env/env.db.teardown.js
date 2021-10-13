@@ -26,7 +26,7 @@ module.exports = async () => {
             break
 
         case 'mssql':
-            await mssql.shutdownEnv()
+            // await mssql.shutdownEnv()
             break
 
         case 'google-sheet':

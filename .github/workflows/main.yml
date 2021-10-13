@@ -110,6 +110,10 @@ jobs:
         run: |
           docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull mysql
 
+      - name: Running Docker
+        run: |
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up mysql
+
       - name: Installing Lerna
         run: npm install
 
@@ -118,6 +122,10 @@ jobs:
 
       - name: Testing
         run: npm run test:mysql
+
+      - name: Stop containers
+        if: always()
+        run: --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
   test_mssql:
     runs-on: ubuntu-latest
