@@ -5,6 +5,7 @@ const firestore = require('../resources/engines/firestore_resources')
 const mssql = require('../resources/engines/mssql_resources')
 const mongo = require ('../resources/engines/mongo_resources')
 const { sleep } = require('test-commons')
+const { waitUntil } = require('async-wait-until')
 
 module.exports = async () => {
     const testEngine = process.env.TEST_ENGINE
@@ -39,7 +40,7 @@ module.exports = async () => {
 
     switch (testEngine) {
         case 'mysql':
-            await mysql.cleanup()
+            await waitUntil(mysql.cleanup)
             break
 
         case 'spanner':

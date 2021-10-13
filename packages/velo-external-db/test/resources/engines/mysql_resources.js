@@ -1,6 +1,5 @@
 const { init } = require('external-db-mysql')
 const { runImage, stopImage } = require('./docker_support')
-const { waitUntil } = require('async-wait-until')
 
 const connection = () => {
     const {connection, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db'}, { connectionLimit: 1, queueLimit: 0 })
@@ -8,12 +7,17 @@ const connection = () => {
 }
 
 const cleanup = async () => {
-    const {schemaProvider, databaseOperations, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db'}, { connectionLimit: 1, queueLimit: 0 })
-    await waitUntil(async () => (await databaseOperations.validateConnection()).valid)
-    const tables = await schemaProvider.list()
-    await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
+    const {schemaProvider, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db'}, { connectionLimit: 1, queueLimit: 0 })
+    try {
+        const tables = await schemaProvider.list()
+        await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
+        await cleanup()
+        return true
+    } catch(e) {
+        await cleanup()
+        return false
+    }
 
-    await cleanup();
 }
 
 const initEnv = async () => {
