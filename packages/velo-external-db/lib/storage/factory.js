@@ -6,6 +6,7 @@ const init = async(type, vendor, config) => {
         case 'postgres': {
             const { init } = require('external-db-postgres')
             const cfg = await config.readConfig()
+            console.log('cfg', cfg)
 
             return append(init(cfg), cfg.secretKey)
         }
@@ -42,6 +43,11 @@ const init = async(type, vendor, config) => {
         }
         case 'google-sheet': {
             const { init } = require('external-db-google-sheets')
+            const cfg = await config.readConfig()
+            return append(await init(cfg), cfg.secretKey)
+        }
+        case 'airtable': {
+            const { init } = require('external-db-airtable')
             const cfg = await config.readConfig()
             return append(await init(cfg), cfg.secretKey)
         }

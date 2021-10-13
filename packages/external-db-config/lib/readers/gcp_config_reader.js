@@ -64,4 +64,33 @@ class GcpGoogleSheetsConfigReader {
   }
 }
 
-module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader }
+class GcpMongoConfigReader {
+  constructor () { }
+
+  async readConfig() {
+    const { URI, SECRET_KEY } = process.env
+    return { connectionUri: URI, secretKey: SECRET_KEY }
+  }
+  
+  validate() {
+    return {
+      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['URI', 'SECRET_KEY'])
+    }
+  }
+}
+
+class GcpAirtableConfigReader {
+  constructor() { }
+
+  async readConfig() {
+    const { AIRTABLE_API_KEY, BASE_ID, SECRET_KEY } = process.env
+    return { apiPrivateKey: AIRTABLE_API_KEY, baseId: BASE_ID, secretKey: SECRET_KEY }
+  }
+
+  validate() {
+    return {
+      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['AIRTABLE_API_KEY', 'BASE_ID', 'SECRET_KEY'])
+    }
+  }
+}
+module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader, GcpMongoConfigReader, GcpAirtableConfigReader }

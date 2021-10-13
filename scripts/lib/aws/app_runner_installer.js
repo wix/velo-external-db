@@ -1,16 +1,24 @@
 const { AppRunnerClient, CreateServiceCommand, DescribeServiceCommand } = require('@aws-sdk/client-apprunner')
+const { IAMClient, ListRolesCommand } = require('@aws-sdk/client-iam')
 const AdapterImageUrl = 'public.ecr.aws/p2z5s3h8/wix-velo/velo-external-db:latest'
 
 class AdapterProvision {
-    constructor(credentials) {
-        this.client = new AppRunnerClient( { region: 'us-east-2',
+    constructor(credentials, region) {
+        this.region = region
+        this.client = new AppRunnerClient( { region: region,
                                              credentials: { accessKeyId: credentials.awsAccessKeyId,
                                                             secretAccessKey: credentials.awsSecretAccessKey } } )
+
+        this.clientIAM = new IAMClient({ region: 'us-east-2' })
     }
 
     async createAdapter(name, engine, secretId) {
+        const rdsRole = await this.rdsRoleArn()
         const response = await this.client.send(new CreateServiceCommand({ ServiceName: name,
                                                                                  AuthenticationConfiguration: {},
+                                                                                 InstanceConfiguration: {
+                                                                                     InstanceRoleArn: rdsRole,
+                                                                                 },
                                                                                  SourceConfiguration: {
                                                                                      ImageRepository: {
                                                                                          ImageIdentifier: AdapterImageUrl,
@@ -20,7 +28,7 @@ class AdapterProvision {
                                                                                                  'CLOUD_VENDOR': 'aws',
                                                                                                  'TYPE': engine,
                                                                                                  'SECRET_ID_OVERRIDE': secretId,
-                                                                                                 'REGION': 'us-east-2',
+                                                                                                 'REGION': this.region,
                                                                                      } } },
                                                                                } } ) )
         return { serviceId: response.Service.ServiceArn }
@@ -32,6 +40,12 @@ class AdapterProvision {
             available: res.Service.Status === 'RUNNING',
             serviceUrl: res.Service.ServiceUrl
         }
+    }
+
+    async rdsRoleArn() {
+        const { Roles } = await this.clientIAM.send(new ListRolesCommand( { } ))
+        const roles = Roles.filter(r => r.RoleName === 'AppRunnerRDSAccessRole')
+        return roles[0].Arn
     }
 }
 

@@ -47,6 +47,12 @@ class InvalidQuery extends BaseHttpError {
     }
 }
 
+class InvalidRequest extends BaseHttpError {
+    constructor(message) {
+        super(message, 400);
+    }
+}
+
 class DbConnectionError extends BaseHttpError {
     constructor(message) {
         super(message, 500);
@@ -54,4 +60,4 @@ class DbConnectionError extends BaseHttpError {
 }
 
 module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField, InvalidQuery,
-                   CollectionAlreadyExists, DbConnectionError }
+                   CollectionAlreadyExists, DbConnectionError, InvalidRequest }

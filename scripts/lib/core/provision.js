@@ -1,6 +1,6 @@
 const aws = require('../aws')
 const { randomCredentials, randomSecretKey } = require('../utils/password_utils')
-const { blockUntil } = require('../utils/utils')
+const { blockUntil, randomWithPrefix } = require('../utils/utils')
 const { info, blankLine, startSpinnerWith } = require('../cli/display')
 
 const providerFor = (vendor) => {
@@ -12,27 +12,22 @@ const providerFor = (vendor) => {
     }
 }
 
-const provisionDb = async (provider, engine, configWriter, secretId) => {
+const provisionDb = async (provider, configWriter, { engine, secretId, secretKey, dbName }) => {
     const dbCredentials = randomCredentials()
-    const number = Math.floor(Math.random() * 100)
-    const instanceName = `velo-external-db-${number}`
-    const secretKey = randomSecretKey()
+    const instanceName = randomWithPrefix('velo-external-db')
 
     await startSpinnerWith(`Creating ${engine} DB Instance`, async () => await provider.createDb({ name: instanceName, engine: engine, credentials: dbCredentials}))
     await startSpinnerWith(`Waiting for db instance to start`, async () => await blockUntil( async () => !(await provider.dbStatusAvailable(instanceName)).available ))
 
     const status = await provider.dbStatusAvailable(instanceName)
 
-    const dbName = 'velo_db'
-
     await startSpinnerWith(`Writing db config`, async () => await configWriter.writeConfig(secretId, dbCredentials, status.host, dbName, secretKey))
 
-    await startSpinnerWith(`Provision Velo DB on db instance`, async () => await provider.postCreateDb(dbName, status.host, dbCredentials))
+    await startSpinnerWith(`Provision Velo DB on db instance`, async () => await provider.postCreateDb(engine, dbName, status.host, dbCredentials))
 }
 
 const provisionAdapter = async (provider, engine, secretId) => {
-    const number = Math.floor(Math.random() * 100)
-    const instanceName = `velo-external-db-adapter-${number}`
+    const instanceName = randomWithPrefix('velo-external-db-adapter')
 
     const { serviceId } = await startSpinnerWith(`Provision Adapter`, async () => await provider.createAdapter(instanceName, engine, secretId))
     await startSpinnerWith(`Waiting adapter server instance to start`, async () => await blockUntil( async () => (await provider.adapterStatus(serviceId)).available ))
@@ -45,19 +40,21 @@ const provisionAdapter = async (provider, engine, secretId) => {
 
 
 const main = async ({ vendor, engine, credentials }) => {
+    const region = 'us-east-2'
     const provider = providerFor(vendor, credentials)
+    const configWriter = new provider.ConfigWriter(credentials, region)
+    const dbProvision = new provider.DbProvision(credentials, region)
+    const adapterProvision = new provider.AdapterProvision(credentials, region)
 
-    const configWriter = new provider.ConfigWriter(credentials)
-    const dbProvision = new provider.DbProvision(credentials)
-    const adapterProvision = new provider.AdapterProvision(credentials)
+    const secretId = randomWithPrefix('VELO-EXTERNAL-DB-SECRETS')
 
-    const number = Math.floor(Math.random() * 100)
-    const secretId = `VELO-EXTERNAL-DB-SECRETS-${number}`
+    const secretKey = randomSecretKey()
+    const dbName = 'velo_db'
 
     blankLine()
     blankLine()
     info('Provision DB Instance')
-    await provisionDb(dbProvision, engine, configWriter, secretId)
+    await provisionDb(dbProvision, configWriter, { engine, secretId, secretKey, dbName})
 
     blankLine()
     blankLine()

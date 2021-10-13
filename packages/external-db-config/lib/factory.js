@@ -9,14 +9,14 @@ const DefaultSecretId = 'VELO-EXTERNAL-DB-SECRETS'
 
 const create = () => {
   const common = new CommonConfigReader()
-  const { vendor, type, secretId } = common.readConfig()
+  const { vendor, type, secretId, region } = common.readConfig()
   let internalConfigReader
   switch (vendor.toLowerCase()) {
 
     case 'aws':
-      internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId)
-      break
-
+      internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId, region)
+      break;
+      
     case 'gcp':
       switch (type) {
         case 'spanner':
@@ -27,10 +27,15 @@ const create = () => {
           break
         case 'google-sheet':
           internalConfigReader = new gcp.GcpGoogleSheetsConfigReader()
-          break
+          break;
+        case 'mongo':
+          internalConfigReader = new gcp.GcpMongoConfigReader()
+          break;
+        case 'airtable':
+          internalConfigReader = new gcp.GcpAirtableConfigReader()  
+          break;
         case 'mysql':
         case 'postgres':
-        case 'mongo':
           internalConfigReader = new gcp.GcpConfigReader()
           break
       }
@@ -40,18 +45,22 @@ const create = () => {
       switch (type) {
         case 'spanner':
           internalConfigReader = new gcp.GcpSpannerConfigReader()
-          break
+          break;
         case 'firestore':
           internalConfigReader = new gcp.GcpFirestoreConfigReader()
-          break
+          break;
         case 'google-sheet':
           internalConfigReader = new gcp.GcpGoogleSheetsConfigReader()
-          break
-
+          break;
+        case 'mongo':
+          internalConfigReader = new gcp.GcpMongoConfigReader()
+          break;
+        case 'airtable':
+          internalConfigReader = new gcp.GcpAirtableConfigReader()
+          break;
         case 'mssql':
         case 'mysql':
         case 'postgres':
-        case 'mongo':
           internalConfigReader = new azure.AzureConfigReader()
           break
       }

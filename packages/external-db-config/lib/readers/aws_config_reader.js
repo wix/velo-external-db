@@ -1,7 +1,7 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
 const { checkRequiredKeys } = require('../utils/config_utils')
 
-const EmptyAWSConfig = { host: '', username: '', password: '', DB: '', SECRET_KEY: '' }
+const EmptyAWSConfig = { host: '', username: '', password: '', DB: '', SECRET_KEY: '', error: true }
 
 class AwsConfigReader {
   constructor (secretId, region) {
@@ -11,7 +11,10 @@ class AwsConfigReader {
 
   async readConfig() {
     const cfg = await this.readExternalConfig()
-                          .catch(() => EmptyAWSConfig)
+                          .catch(e => {
+                            console.log(e)
+                            return EmptyAWSConfig
+                          })
     const { host, username, password, DB, SECRET_KEY } = cfg
     return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY }
   }

@@ -27,18 +27,11 @@ const startSpinnerWith = async (msg, f, completeMsg) => {
         spinner.stop(true)
         process.stderr.write(`\t\t ${redBright('✓')} ${grey(completeMsg || msg)}\n`)
         process.stderr.write(redBright('Process failed\n'))
+        console.error(e)
         process.exit(1)
     }
 
 }
-/*
-
-await startSpinnerWith(`Creating demo collection`, () => createCollection('demo_collection', secretKey, serviceUrl))
-    console.log('')
-    console.log('')
-    console.log(`${green('[INFO]:')} Provision Cloud Sql and Cloud Run instances using Wix GCP`)
-
- */
 
 const info = msg => console.log(`${green('[INFO]:')} ${msg}`)
 const blankLine = () => console.log('')

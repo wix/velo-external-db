@@ -1,0 +1,48 @@
+name: Push to AWS ECR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Build-and-Deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      ECR_REPOSITORY: ${{ secrets.AWS_REPO_NAME }}
+      PUBLIC_ECR_URL: ${{ secrets.AWS_REPO_URL }}
+      IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+      IMAGE_TAG: latest
+    
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      # Setup AWS CLI
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Login to AWS
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Build docker image
+      - name: Build Docker image
+        id: build-image
+        run:  docker build -t $IMAGE_NAME .
+
+      # Tag docker image
+      - name: Tag Image
+        id: tag-image
+        run: docker tag $IMAGE_NAME:$IMAGE_TAG $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
+        
+      - name: Push the image to Amazon ECR
+        id: push-image
+        run: |
+          echo "Pushing image to ECR..."
+          docker push $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
+          echo "::set-output name=image::$PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG"

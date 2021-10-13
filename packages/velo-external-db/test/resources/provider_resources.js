@@ -18,6 +18,8 @@ const mssqlTestEnv = require('./engines/mssql_resources')
 const mongo = require('external-db-mongo')
 const mongoTestEnv = require('./engines/mongo_resources')
 
+const airtable = require ('external-db-airtable')
+const airtableEnv = require ('./engines/mongo_resources')
 
 const env = {
     dataProvider: Uninitialized,
@@ -52,7 +54,7 @@ const spannerTestEnvInit = async () => await dbInit(spannerTestEnv, spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestoreTestEnv, firestore)
 const mssqlTestEnvInit = async () => await dbInit(mssqlTestEnv, mssql)
 const mongoTestEnvInit = async () => await dbInit(mongoTestEnv, mongo)
-
+const airTableTestEnvInit = async() => await dbInit(airtableEnv,airtable)
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
     ['Postgres', postgresTestEnvInit],
@@ -60,6 +62,7 @@ const testSuits = () => [
     ['Firestore', firestoreTestEnvInit],
     ['Sql Server', mssqlTestEnvInit],
     ['Mongo', mongoTestEnvInit],
+    ['Airtable', airTableTestEnvInit]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 module.exports = { env, dbTeardown, testSuits }

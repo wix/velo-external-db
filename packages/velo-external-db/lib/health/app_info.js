@@ -1,5 +1,5 @@
 const maskSensitiveData = (cfg) => {
-    const config = Object.assign({}, cfg)
+    const config = { ...cfg }
     if (config.password) config.password = '*********'
     if (config.secretKey) config.secretKey = '*********'
     return config
