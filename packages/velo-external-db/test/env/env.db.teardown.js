@@ -10,7 +10,7 @@ module.exports = async () => {
 
     switch (testEngine) {
         case 'mysql':
-            await mssql.shutdownEnv()
+            // await mysql.shutdownEnv()
             break
 
         case 'spanner':
@@ -26,7 +26,7 @@ module.exports = async () => {
             break
 
         case 'mssql':
-            // await mssql.shutdownEnv()
+            await mssql.shutdownEnv()
             break
 
         case 'google-sheet':
