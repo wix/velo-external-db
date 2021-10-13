@@ -2,17 +2,25 @@ const express = require('express')
 const PORT = 9000
 
 
+class AirtableError extends Error {
+    constructor(error, message, status) {
+        super(message);
+        this.error = error
+        this.status = status
+    }
+}
+
 
 const _checkParamsMiddleware = (req, res, next) => {
-    const areParamsValid =
-        req.get('authorization') === 'Bearer key123' &&
-        req.params.baseId === 'app123' &&
-        req.params.tableIdOrName === 'Table';
-    if (areParamsValid) {
-        next();
-    } else {
-        next(new Error('Bad parameters'));
-    }
+    if (req.get('authorization') !== 'Bearer key123') 
+        return next(new AirtableError('AUTHENTICATION_REQUIRED','You should provide valid api key to perform this operation','401'))
+    
+    if (req.params.baseId !== 'app123')
+        return next(new AirtableError('NOT_FOUND','Could not find what you are looking for','404'))
+
+    if (req.params.tableIdOrName !== 'Table') 
+        return next(new AirtableError('NOT_FOUND',`Could not find table ${req.params.tableIdOrName} in application ${req.params.baseId}`,'404'))
+    next()
 }
 
 
@@ -43,12 +51,26 @@ app.post('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, (req, res) => {
         const fields = req.body.typecast ? { typecasted: true } : record.fields;
         return {
             id: 'rec' + index,
-            createdTime: FAKE_CREATED_TIME,
             fields: fields,
         };
     });
     const responseBody = isCreatingJustOneRecord ? records[0] : { records: records };
     res.json(responseBody);
+})
+
+app.get('/v0/:baseId/:tableIdOrName?', _checkParamsMiddleware, (req, res) => {
+    res.json({
+        records: [
+            {
+                id: 'recordA',
+                fields: {Name: 'Rebecca'},
+            },
+            {
+                id: 'recordB',
+                fields: {Name: 'Drew'},
+            },
+        ],
+    });
 })
 
 const singleRecordUpdate = [

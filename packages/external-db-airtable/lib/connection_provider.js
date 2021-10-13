@@ -6,9 +6,10 @@ const Airtable = require('airtable')
 const init = async (cfg, _poolOptions) => {
     const options = _poolOptions || {}
     const pool = new Airtable({ apiKey: cfg.privateApiKey,...options }).base(cfg.baseId)
+    const databaseOperations = new DatabaseOperations(pool)
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
-    return { dataProvider: dataProvider, connection: pool, cleanup: async () => { } }
+    return { dataProvider: dataProvider, connection: pool, databaseOperations, cleanup: async () => { } }
 
 }
 

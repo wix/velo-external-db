@@ -8,8 +8,8 @@ const { app: mockServer, cleanup } = require('../tests/drivers/mock_air_table')
 // const DatabaseOperations = require('./mysql_operations')
 
 // const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
-// const opsDriver = () => require('../tests/drivers/db_operations_test_support')
+const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 
 
-module.exports = { init, DataProvider, FilterParser, mockServer, cleanup }
+module.exports = { init, DataProvider, FilterParser, mockServer, cleanup, opsDriver }
 // module.exports = { SchemaProvider, DataProvider, FilterParser, SchemaColumnTranslator, driver, init, opsDriver, DatabaseOperations }
