@@ -23,7 +23,7 @@ const provisionDb = async (provider, configWriter, { engine, secretId, secretKey
 
     await startSpinnerWith(`Writing db config`, async () => await configWriter.writeConfig(secretId, dbCredentials, status.host, dbName, secretKey))
 
-    await startSpinnerWith(`Provision Velo DB on db instance`, async () => await provider.postCreateDb(engine, dbName, status.host, dbCredentials))
+    await startSpinnerWith(`Provision Velo DB on db instance`, async () => await provider.postCreateDb(engine, dbName, status, dbCredentials))
 }
 
 const provisionAdapter = async (provider, engine, secretId) => {
