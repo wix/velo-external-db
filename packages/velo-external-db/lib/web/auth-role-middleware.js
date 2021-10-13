@@ -1,9 +1,6 @@
 const { UnauthorizedError } = require('velo-external-db-commons').errors
 const { property } = require('./middleware-support')
 
-const AdminPermission = ['OWNER', 'BACKEND_CODE']
-const OwnerPermission = ['OWNER']
-
 const extractRole = body => property('requestContext.role', body)
 
 const authorizeRole = (req, roles) => {
@@ -20,4 +17,4 @@ function authRoleMiddleware( { roles } ) {
     }
 }
 
-module.exports = { authRoleMiddleware, AdminPermission, OwnerPermission }
+module.exports = { authRoleMiddleware }

@@ -1,0 +1,12 @@
+{
+    "config": [
+        {
+            "path": "/data",
+            "roles": ["OWNER", "BACKEND_CODE"]
+        },
+        {
+            "path": "/schemas",
+            "roles": ["OWNER"]
+        }
+    ]
+}
