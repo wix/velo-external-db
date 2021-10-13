@@ -106,9 +106,12 @@ jobs:
           chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
 
-      - name: Start containers
+      - name: Downloading Docker images for the test
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml --detach --build up mysql
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull mysql
+#      - name: Start containers
+#        run: |
+#          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml --detach --build up mysql
 
       - name: Installing Lerna
         run: npm install
@@ -119,9 +122,9 @@ jobs:
       - name: Testing
         run: npm run test:mysql
 
-      - name: Stop containers
-        if: always()
-        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+#      - name: Stop containers
+#        if: always()
+#        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
   test_mssql:
     runs-on: ubuntu-latest

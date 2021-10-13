@@ -13,9 +13,9 @@ module.exports = async () => {
 
     switch (testEngine) {
         case 'mysql':
-            if (ci.LocalDev()) {
+            // if (ci.LocalDev()) {
                 await mysql.initEnv()
-            }
+            // }
             break
 
         case 'spanner':
