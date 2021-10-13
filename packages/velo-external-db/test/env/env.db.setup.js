@@ -5,6 +5,8 @@ const firestore = require('../resources/engines/firestore_resources')
 const mssql = require('../resources/engines/mssql_resources')
 const mongo = require ('../resources/engines/mongo_resources')
 const googleSheet = require('../resources/engines/google_sheets_resourses')
+const airtable = require ('../resources/engines/airtable_resources')
+
 const { sleep } = require('test-commons')
 const ci = require('./ci_utils')
 
@@ -33,6 +35,7 @@ module.exports = async () => {
         case 'mssql':
             await mssql.initEnv()
             break
+
         case 'mongo':
             await mongo.initEnv()
             break
@@ -40,9 +43,12 @@ module.exports = async () => {
             await googleSheet.initEnv()
             break
 
+        case 'airtable':
+            await airtable.initEnv()
+            break
     }
 
-    await sleep( 5000 )
+    await sleep(5000)
 
     switch (testEngine) {
         case 'mysql':

@@ -4,6 +4,7 @@ const spanner = require('../resources/engines/spanner_resources')
 const firestore = require('../resources/engines/firestore_resources')
 const mssql = require('../resources/engines/mssql_resources')
 const googleSheet = require('../resources/engines/google_sheets_resourses')
+const airtable = require('../resources/engines/airtable_resources')
 const ci = require('./ci_utils')
 
 module.exports = async () => {
@@ -35,6 +36,9 @@ module.exports = async () => {
         case 'google-sheet':
             await googleSheet.shutdownEnv()
             break
-
+        
+        case 'airtable':
+            await airtable.shutdownEnv()
+            break
     }
 };

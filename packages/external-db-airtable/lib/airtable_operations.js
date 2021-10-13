@@ -1,16 +1,23 @@
-// const { promisify } = require('util')
-// const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
 
-// class DatabaseOperations {
-//     constructor(pool) {
-//         this.pool = pool;
-//         this.query = promisify(this.pool.query).bind(this.pool);
-//     }
+const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
+const { DbConnectionError } = require('velo-external-db-commons').errors
 
-//     async validateConnection() {
-//         return await this.query('SELECT 1').then(() => { return { valid: true } })
-//                          .catch((e) => { return { valid: false, error: notThrowingTranslateErrorCodes(e) } })
-//     }
-// }
+class DatabaseOperations {
+    constructor(pool) {
+        this.pool = pool;
+    }
 
-// module.exports = DatabaseOperations
+    async validateConnection() {
+        try {
+            await this.pool('Table').select({}).firstPage()
+            return { valid: true }
+        } catch (e) {
+            if (e.error === 'NOT_FOUND')
+                if (e.message !== 'Could not find what you are looking for') return { valid: true }
+            return { valid: false, error: notThrowingTranslateErrorCodes(e) }
+        }
+    }
+}
+
+module.exports = DatabaseOperations
+

@@ -1,32 +1,30 @@
-// const DatabaseOperations = require('../../lib/mysql_operations')
-// const init = require('../../lib/connection_provider')
+const DatabaseOperations = require('../../lib/airtable_operations')
+const init = require('../../lib/connection_provider')
 
-// const createPool = modify => {
-//     const config = {
-//         host     : 'localhost',
-//         user     : 'test-user',
-//         password : 'password',
-//         db : 'test-db',
-//     }
+const createPool = modify => {
+    const config = {
+        privateApiKey: 'key123',
+        baseId: 'app123'
+    }
 
-//     const { connection, cleanup } = init(Object.assign({}, config, modify ), { connectionLimit: 1, queueLimit: 0 })
-//     return { connection, cleanup }
-// }
+    const { connection, cleanup } =  init(Object.assign({}, config, modify), { endpointUrl: 'http://localhost:9000', requestTimeout: 1000 })
+    return { connection, cleanup }
+}
 
-// const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool({ privateApiKey: 'wrong' }).connection)
 
-// const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { db: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool({ baseId: 'wrong' }).connection)
 
-// const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool({ privateApiKey: 'wrong' }).connection)
 
-// const dbOperationWithValidDB = () => {
-//     const { connection, cleanup } = createPool({ } )
-//     const dbOperations = new DatabaseOperations( connection )
+const dbOperationWithValidDB = () => {
+    const { connection, cleanup } = createPool({ } )
+    const dbOperations = new DatabaseOperations(connection)
 
-//     return { dbOperations, cleanup}
-// }
+    return { dbOperations, cleanup }
+}
 
-// module.exports = {
-//     dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-//     dbOperationWithMisconfiguredHost, dbOperationWithValidDB
-// }
+module.exports = {
+    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
+    dbOperationWithMisconfiguredHost, dbOperationWithValidDB
+}
