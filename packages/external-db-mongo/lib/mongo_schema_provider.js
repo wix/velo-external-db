@@ -1,7 +1,6 @@
 const { SystemFields, validateSystemFields, asWixSchema } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
-
-const SystemTable = '_descriptor'
+const { validateTable, SystemTable } = require ('./mongo_utils')
 
 class SchemaProvider {
     constructor(client) {
@@ -28,6 +27,7 @@ class SchemaProvider {
     }
 
     async create(collectionName, columns) {
+        validateTable(collectionName)
         const collection = await this.collectionDataFor(collectionName)
         if (!collection) {
             await this.client.db()
@@ -39,6 +39,7 @@ class SchemaProvider {
     }
 
     async addColumn(collectionName, column) {
+        validateTable(collectionName)
         await validateSystemFields(column.name)
 
         const collection = await this.collectionDataFor(collectionName)
@@ -58,6 +59,7 @@ class SchemaProvider {
     }
 
     async removeColumn(collectionName, columnName) {
+        validateTable(collectionName)
         await validateSystemFields(columnName)
 
         const collection = await this.collectionDataFor(collectionName)
@@ -77,6 +79,7 @@ class SchemaProvider {
     }
 
     async describeCollection(collectionName) {
+        validateTable(collectionName)
         const collection = await this.collectionDataFor(collectionName)
         if (!collection) {
             throw new CollectionDoesNotExists('Collection does not exists')
@@ -86,6 +89,7 @@ class SchemaProvider {
     }
 
     async drop(collectionName) {
+        validateTable(collectionName)
         const d = await this.client.db()
                                    .collection(SystemTable)
                                    .deleteOne( { _id: collectionName })
@@ -97,6 +101,7 @@ class SchemaProvider {
     }
 
     async collectionDataFor(collectionName) {
+        validateTable(collectionName)
         return await this.client.db()
                                 .collection(SystemTable)
                                 .findOne({ _id: collectionName })
