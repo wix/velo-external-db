@@ -8,7 +8,9 @@ const spanner = require('./engines/spanner_resources')
 const firestore = require('./engines/firestore_resources')
 const mssql = require('./engines/mssql_resources')
 const mongo = require('./engines/mongo_resources')
+const googleSheet = require('./engines/google_sheets_resourses')
 const airtable = require ('./engines/airtable_resources')
+
 
 const env = {
     secretKey: Uninitialized,
@@ -49,6 +51,7 @@ const spannerTestEnvInit = async () => await dbInit(spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestore)
 const mssqlTestEnvInit = async () => await dbInit(mssql)
 const mongoTestEnvInit = async () => await dbInit(mongo)
+const googleSheetTestEnvInit = async () => await dbInit(googleSheet)
 const airtableTestEnvInit = async() => await dbInit(airtable)
 
 const testSuits = () => [
@@ -58,6 +61,7 @@ const testSuits = () => [
     ['Firestore', firestoreTestEnvInit],
     ['Sql Server', mssqlTestEnvInit],
     ['Mongo', mongoTestEnvInit],
+    ['Google-sheet', googleSheetTestEnvInit],
     ['Airtable',airtableTestEnvInit]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 

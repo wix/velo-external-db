@@ -16,8 +16,32 @@ const create = () => {
     case 'aws':
       internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId, region)
       break;
-
+      
     case 'gcp':
+      switch (type) {
+        case 'spanner':
+          internalConfigReader = new gcp.GcpSpannerConfigReader()
+          break
+        case 'firestore':
+          internalConfigReader = new gcp.GcpFirestoreConfigReader()
+          break
+        case 'google-sheet':
+          internalConfigReader = new gcp.GcpGoogleSheetsConfigReader()
+          break;
+        case 'mongo':
+          internalConfigReader = new gcp.GcpMongoConfigReader()
+          break;
+        case 'airtable':
+          internalConfigReader = new gcp.GcpAirtableConfigReader()  
+          break;
+        case 'mysql':
+        case 'postgres':
+          internalConfigReader = new gcp.GcpConfigReader()
+          break
+      }
+      break
+
+    case 'azr':
       switch (type) {
         case 'spanner':
           internalConfigReader = new gcp.GcpSpannerConfigReader()
@@ -32,34 +56,13 @@ const create = () => {
           internalConfigReader = new gcp.GcpMongoConfigReader()
           break;
         case 'airtable':
-          internalConfigReader = new gcp.GcpAirtableConfigReader()  
-          break;
-        case 'mysql':
-        case 'postgres':
-          internalConfigReader = new gcp.GcpConfigReader()
-          break;
-      }
-      break
-
-    case 'azr':
-      switch (type) {
-        case 'spanner':
-          internalConfigReader = new gcp.GcpSpannerConfigReader()
-          break
-        case 'firestore':
-          internalConfigReader = new gcp.GcpFirestoreConfigReader()
-          break
-        case 'mongo':
-          internalConfigReader = new gcp.GcpMongoConfigReader()
-          break;
-        case 'airtable':
           internalConfigReader = new gcp.GcpAirtableConfigReader()
           break;
         case 'mssql':
         case 'mysql':
         case 'postgres':
           internalConfigReader = new azure.AzureConfigReader()
-          break;
+          break
       }
       break
   }

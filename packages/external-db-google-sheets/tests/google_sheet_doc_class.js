@@ -1,0 +1,47 @@
+
+const GoogleSpreadsheetSheet = require('./google_sheet_sheet_class')
+
+class GoogleSpreadsheetDoc {
+    constructor(spreadsheetId, title) {
+        this.spreadsheetId = spreadsheetId
+        this.properties = {
+            title: title,
+            locale: 'en_US',
+            autoRecalc: 'ON_CHANGE',
+            timeZone: 'Asia/Jerusalem',
+            defaultFormat: {},
+            spreadsheetTheme: {}
+        }
+        this.sheets = []
+        this.namedRanges = []
+        this.spreadsheetUrl = 'spreadsheet-doc-url'
+    }
+
+    docInfo() {
+        return {
+            spreadsheetId: this.spreadsheetId,
+            properties: this.properties,
+            sheets: this.sheets.map(s => s.sheetInfo()),
+            namedRanges: this.namedRanges,
+            spreadsheetUrl: this.spreadsheetUrl,
+        }
+    }
+
+    addSheet(sheetTitle) {
+        const newSheet = new GoogleSpreadsheetSheet(`sheet_${this.sheets.length}_id`, sheetTitle, this.sheets.length)
+        this.sheets.push(newSheet)
+        return newSheet
+    }
+
+    getSheet(sheetTitle) {
+        return this.sheets.find(s => sheetTitle == s.title)
+    }
+
+    cleanupSheets() {
+        this.sheets = []
+    }
+
+
+}
+
+module.exports = GoogleSpreadsheetDoc
