@@ -40,7 +40,7 @@ module.exports = async () => {
 
     switch (testEngine) {
         case 'mysql':
-            await waitUntil(mysql.cleanup)
+            await waitUntil(mysql.cleanup,{timeout: 20000 })
             break
 
         case 'spanner':
