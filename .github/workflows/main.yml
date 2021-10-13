@@ -108,7 +108,7 @@ jobs:
 
       - name: Start containers
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up mysql -d --build
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up mysql --detach --build
 
       - name: Installing Lerna
         run: npm install

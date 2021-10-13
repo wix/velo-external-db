@@ -12,7 +12,9 @@ module.exports = async () => {
 
     switch (testEngine) {
         case 'mysql':
-            // await mysql.initEnv()
+            if (process.env.NODE_ENV === 'test'){
+                await mysql.initEnv()
+            }
             break
 
         case 'spanner':
