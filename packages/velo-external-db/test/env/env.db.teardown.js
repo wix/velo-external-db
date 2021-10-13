@@ -4,13 +4,14 @@ const spanner = require('../resources/engines/spanner_resources')
 const firestore = require('../resources/engines/firestore_resources')
 const mssql = require('../resources/engines/mssql_resources')
 const googleSheet = require('../resources/engines/google_sheets_resourses')
+const ci = require('./ci_utils')
 
 module.exports = async () => {
     const testEngine = process.env.TEST_ENGINE
 
     switch (testEngine) {
         case 'mysql':
-            if (process.env.NODE_ENV === 'test') {
+            if (ci.LocalDev()) {
                 await mysql.shutdownEnv()
             }
             break
