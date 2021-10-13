@@ -9,7 +9,8 @@ class AirtableError extends Error {
         this.status = status
     }
 }
-
+let data = []
+let globalIndex = 0
 
 const _checkParamsMiddleware = (req, res, next) => {
     if (req.get('authorization') !== 'Bearer key123') 
@@ -47,12 +48,12 @@ app.post('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, (req, res) => {
     const isCreatingJustOneRecord = !!req.body.fields;
     const recordsInBody = isCreatingJustOneRecord ? [req.body] : req.body.records;
 
-    const records = recordsInBody.map(function (record, index) {
+    const records = recordsInBody.map((record, index) => {
+        globalIndex++
+        const newRecord = {id:'rec' + globalIndex, ...record}
+        data.push(newRecord)
         const fields = req.body.typecast ? { typecasted: true } : record.fields;
-        return {
-            id: 'rec' + index,
-            fields: fields,
-        };
+        return newRecord
     });
     const responseBody = isCreatingJustOneRecord ? records[0] : { records: records };
     res.json(responseBody);
@@ -60,29 +61,21 @@ app.post('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, (req, res) => {
 
 app.get('/v0/:baseId/:tableIdOrName?', _checkParamsMiddleware, (req, res) => {
     res.json({
-        records: [
-            {
-                id: 'recordA',
-                fields: {Name: 'Rebecca'},
-            },
-            {
-                id: 'recordB',
-                fields: {Name: 'Drew'},
-            },
-        ],
+        records: data
     });
 })
 
 const singleRecordUpdate = [
     _checkParamsMiddleware,
     (req, res) => {
+        const index = data.findIndex(obj=>obj.id === req.params.recordId)
+        data[index].fields = Object.assign({}, data[index].fields, req.body.fields) 
         var fields = req.body.typecast ? { typecasted: true } : req.body.fields;
-
-        res.json({
-            id: req.params.recordId,
-            createdTime: FAKE_CREATED_TIME,
-            fields: fields,
-        });
+        // res.json({
+        //     id: req.params.recordId,
+        //     fields: fields,
+        // });
+        res.json(data[index])
     },
 ];
 
@@ -94,7 +87,6 @@ const batchRecordUpdate = [
                 const fields = req.body.typecast ? { typecasted: true } : record.fields;
                 return {
                     id: record.id,
-                    createdTime: FAKE_CREATED_TIME,
                     fields: fields,
                 };
             }),
@@ -109,6 +101,7 @@ app.patch('/v0/:baseId/:tableIdOrName', batchRecordUpdate);
 app.put('/v0/:baseId/:tableIdOrName', batchRecordUpdate);
 
 app.delete('/v0/:baseId/:tableIdOrName/:recordId', _checkParamsMiddleware, function (req, res) {
+    data = data.filter ((item)=>item.id != req.params.recordId)
     res.json({
         id: req.params.recordId,
         deleted: true,
