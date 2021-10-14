@@ -39,13 +39,13 @@ jobs:
       - name: Downloading Docker compose V2
         run: |
           mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose-cli/releases/download/v2.0.0-rc.2/docker-compose-linux-amd64 -o ~/.docker/cli-plugins/docker-compose
+          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
           chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
 
-      - name: Downloading Docker images for the test
+      - name: Start containers
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull postgres
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build postgres
 
       - name: Installing Lerna
         run: npm install
@@ -55,6 +55,10 @@ jobs:
 
       - name: Testing
         run: npm run test:postgres
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
   test_spanner:
     runs-on: ubuntu-latest
@@ -71,13 +75,13 @@ jobs:
       - name: Downloading Docker compose V2
         run: |
           mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose-cli/releases/download/v2.0.0-rc.2/docker-compose-linux-amd64 -o ~/.docker/cli-plugins/docker-compose
+          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
           chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
 
-      - name: Downloading Docker images for the test
+      - name: Start containers
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull spanner
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build spanner
 
       - name: Installing Lerna
         run: npm install
@@ -87,6 +91,10 @@ jobs:
 
       - name: Testing
         run: npm run test:spanner
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
   test_mysql:
     runs-on: ubuntu-latest
@@ -102,16 +110,13 @@ jobs:
       - name: Downloading Docker compose V2
         run: |
           mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose-cli/releases/download/v2.0.0-rc.2/docker-compose-linux-amd64 -o ~/.docker/cli-plugins/docker-compose
+          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
           chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
 
-      - name: Downloading Docker images for the test
+      - name: Start containers
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull mysql
-#      - name: Start containers
-#        run: |
-#          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml --detach --build up mysql
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build mysql
 
       - name: Installing Lerna
         run: npm install
@@ -122,9 +127,9 @@ jobs:
       - name: Testing
         run: npm run test:mysql
 
-#      - name: Stop containers
-#        if: always()
-#        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+      - name: Stop containers
+        if: always()
+        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
   test_mssql:
     runs-on: ubuntu-latest
@@ -141,13 +146,13 @@ jobs:
       - name: Downloading Docker compose V2
         run: |
           mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose-cli/releases/download/v2.0.0-rc.2/docker-compose-linux-amd64 -o ~/.docker/cli-plugins/docker-compose
+          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
           chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
 
-      - name: Downloading Docker images for the test
+      - name: Start containers
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull mssql
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build mssql
 
       - name: Installing Lerna
         run: npm install
@@ -158,6 +163,9 @@ jobs:
       - name: Testing
         run: npm run test:mssql
 
+      - name: Stop containers
+        if: always()
+        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
   test_firestore:
     runs-on: ubuntu-latest
@@ -174,13 +182,17 @@ jobs:
       - name: Downloading Docker compose V2
         run: |
           mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose-cli/releases/download/v2.0.0-rc.2/docker-compose-linux-amd64 -o ~/.docker/cli-plugins/docker-compose
+          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
           chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
 
-      - name: Downloading Docker images for the test
+      - name: Downloading FireStore Image
         run: |
           docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull firestore
+
+      - name: Start containers
+        run: |
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach firestore
 
       - name: Installing Lerna
         run: npm install
@@ -191,6 +203,9 @@ jobs:
       - name: Testing
         run: npm run test:firestore
 
+      - name: Stop containers
+        if: always()
+        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
   test_mongo:
     runs-on: ubuntu-latest
@@ -207,13 +222,13 @@ jobs:
       - name: Downloading Docker compose V2
         run: |
           mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose-cli/releases/download/v2.0.0-rc.2/docker-compose-linux-amd64 -o ~/.docker/cli-plugins/docker-compose
+          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
           chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
 
-      - name: Downloading Docker images for the test
+      - name: Start containers
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull mongo
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build mongo
 
       - name: Installing Lerna
         run: npm install
@@ -224,3 +239,6 @@ jobs:
       - name: Testing
         run: npm run test:mongo
 
+      - name: Stop containers
+        if: always()
+        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down

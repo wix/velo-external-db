@@ -10,14 +10,12 @@ const airtable = require ('../resources/engines/airtable_resources')
 const { sleep } = require('test-commons')
 const ci = require('./ci_utils')
 
-module.exports = async () => {
+module.exports = async () => { if (ci.LocalDev()) {
     const testEngine = process.env.TEST_ENGINE
 
     switch (testEngine) {
         case 'mysql':
-            // if (ci.LocalDev()) {
-                await mysql.initEnv()
-            // }
+            await mysql.initEnv()
             break
 
         case 'spanner':
@@ -78,4 +76,4 @@ module.exports = async () => {
             await mongo.cleanup()
             break;
     }
-};
+} }

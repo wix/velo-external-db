@@ -7,14 +7,12 @@ const googleSheet = require('../resources/engines/google_sheets_resourses')
 const airtable = require('../resources/engines/airtable_resources')
 const ci = require('./ci_utils')
 
-module.exports = async () => {
+module.exports = async () => { if (ci.LocalDev()) {
     const testEngine = process.env.TEST_ENGINE
 
     switch (testEngine) {
         case 'mysql':
-            // if (ci.LocalDev()) {
-                await mysql.shutdownEnv()
-            // }
+            await mysql.shutdownEnv()
             break
 
         case 'spanner':
@@ -41,4 +39,4 @@ module.exports = async () => {
             await airtable.shutdownEnv()
             break
     }
-};
+} }
