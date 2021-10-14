@@ -223,9 +223,10 @@ jobs:
 
       - name: Downloading Docker compose V2
         run: |
-          mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-          chmod +x ~/.docker/cli-plugins/docker-compose
+          curl -fL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
+#          mkdir -p ~/.docker/cli-plugins
+#          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+#          chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
           docker compose pull --help
 
@@ -252,7 +253,10 @@ jobs:
         run: npm run test:firestore
 
       - name: Stop containers
-        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+        run: |
+          cd packages/velo-external-db/test/resources
+          docker compose down
+#        docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
 #  test_mongo:
 #    runs-on: ubuntu-latest
