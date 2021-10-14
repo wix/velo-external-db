@@ -231,7 +231,7 @@ jobs:
 
       - name: Downloading FireStore Image
         run: |
-          docker compose pull firestore -- --quiet --file packages/velo-external-db/test/resources/docker-compose.yaml
+          docker compose pull firestore --quiet --file packages/velo-external-db/test/resources/docker-compose.yaml
 #          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull firestore
 
       - name: Start containers
