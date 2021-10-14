@@ -16,7 +16,7 @@ services:
       - 8082:8082
     build:
       args:
-        GCLOUD_SDK_VERSION: 355.0.0
+        GCLOUD_SDK_VERSION: 360.0.0
       context: .
     networks:
       - backend
