@@ -54,6 +54,11 @@ jobs:
 #        with:
 #          install: true
 
+      - name: Temp
+        run: |
+          docker-compose --version
+          docker-compose build --help
+
       - name: Predownloading Image
         if: contains('firestore', '${{ matrix.integration }}')
         run: |
