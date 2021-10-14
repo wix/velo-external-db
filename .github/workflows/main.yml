@@ -47,10 +47,10 @@ jobs:
           docker compose version
 
       - name: Downloading Image
-#        if: contains( 'firestore', '${{ matrix.integration }}' )
         run: |
           cd packages/velo-external-db/test/resources
           docker compose pull --quiet ${{ matrix.integration }}
+#        if: contains( 'firestore', '${{ matrix.integration }}' )
 
       - name: Start containers
         run: |
