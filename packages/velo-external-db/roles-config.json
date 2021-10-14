@@ -2,7 +2,7 @@
     "config": [
         {
             "pathPrefix": "/data",
-            "roles": ["OWNER", "BACKEND_CODE"]
+            "roles": ["OWNER", "BACKEND_CODE", "MEMBER"]
         },
         {
             "pathPrefix": "/schemas/column",
@@ -14,7 +14,7 @@
         },
         {
             "pathPrefix": "/schemas",
-            "roles": ["OWNER", "BACKEND_CODE"]
+            "roles": ["OWNER", "BACKEND_CODE", "MEMBER"]
         }
     ]
 }
