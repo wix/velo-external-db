@@ -223,7 +223,7 @@ jobs:
 
       - name: Downloading Docker compose V2
         run: |
-          curl -fL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
+          curl -sfL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
           docker compose version
 #          docker compose pull --help
 #          mkdir -p ~/.docker/cli-plugins
