@@ -48,10 +48,15 @@ jobs:
           chmod +x ~/.docker/cli-plugins/docker-compose
           docker compose version
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
+
       - name: Predownloading Image
         if: contains('firestore', '${{ matrix.integration }}')
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull ${{ matrix.integration }}
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml build ${{ matrix.integration }}
 
       - name: Start containers
         run: |
@@ -67,7 +72,6 @@ jobs:
         run: npm run test:${{ matrix.integration }}
 
       - name: Stop containers
-        if: always()
         run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
 
