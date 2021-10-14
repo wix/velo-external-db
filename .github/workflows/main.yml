@@ -57,10 +57,10 @@ jobs:
           docker-compose --version
           docker-compose build --help
 
-#      - name: Predownloading Image
-#        if: contains('firestore', '${{ matrix.integration }}')
-#        run: |
-#          docker compose --file packages/velo-external-db/test/resources/docker-compose.yaml build ${{ matrix.integration }}
+      - name: Predownloading Image
+        if: contains('firestore', '${{ matrix.integration }}')
+        run: |
+          ~/.docker/cli-plugins/docker-compose --file packages/velo-external-db/test/resources/docker-compose.yaml pull ${{ matrix.integration }}
 
       - name: Start containers
         run: |
