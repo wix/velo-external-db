@@ -17,15 +17,17 @@ The external database consists of the adapter, a Node.js server that implements 
 
 ### Deployment considerations
 
-Wix provides pre-built Docker image that is ready to be deployed because of the architecture described above, it is advisable to run the adapter container as close as possible to a database. The reason behind this is to minimize roundtrips of database native protocol traffic that in many cases wouldn't be as efficient as http/2 that adapter is using to communicate with a Wix site. There are also security and firewall configuration that might be required between the connector and database. While you might run the container on any infrastructure of your choice, we provide out of the box support and scripts for deploying to the following products available on major public clouds:
+Wix maintains pre-built Docker image that is ready to be deployed because of the architecture described above, it is advisable to run the adapter container as close as possible to a database. The reason behind this is to minimize roundtrips of database native protocol traffic that in many cases wouldn't be as efficient as http/2 that adapter is using to communicate with a Wix site. There are also security and firewall configuration that might be required between the connector and database. While you might run the container on any infrastructure of your choice, we provide out of the box support and scripts for deploying to the following products available on major public clouds:
 * [Google Cloud Run](https://cloud.google.com/run) - fully managed serverless platform
 * [Amazon App Runner](https://aws.amazon.com/apprunner/) - fully managed serverless platform
 * [Microsoft Azure App Service](https://azure.microsoft.com/en-us/services/app-service/#overview) - fully managed serverless platform
 * [Knative](https://knative.dev/docs/) for self-managed or on-prem environments
 
+It is important to note a geo location of the deployed environment. Wix infrastructure has global presence and site data replicated worldwide. It allows to make sure your site visitors get the best performance around the globe with no difference where they are coming from. In case where databse is managed externally, it is vital to set up the connector and database in a correct geo region for optimal performance. Please refer to installation tutorials for recommended regions on AWS, GCP and Azure.
+
 ## Choosing right DB Engine for a site workload
 
-In most cases where data collections don't exceed 10K records, built-in database is the best choise for building a web site. It has native support for PII encryption, GDPR and other non functional concerns. But if there are requirements for data locality, regulations or data workload specific concerns, this connector enables connecting external database engines to your site. There are lot of materials on the internet for a database comparisons, benchmarks, etc, but the rule of thumbs for working with data on a web site is saying the following:
+In most cases where data collections don't exceed 10K records, built-in database is the best choise for building a web site. It is globally replicated, has native support for PII encryption, GDPR and other non functional concerns. But if there are requirements for data locality, regulations or data workload specific concerns, this connector enables connecting external database engines to your site. There are lot of materials on the internet for a database comparisons, benchmarks, etc, but the rule of thumbs for working with data on a web site is saying the following:
 
 * If the dataset is less of 10K records, don't bother, use built-in wix-data database
 * If the dataset is between 10K to 1M records and it is being used for production workloads for user facing pages rendering, use relational databases like Postgres, MySQL, Microsoft SQL Server or Google Cloud Spanner.
@@ -38,14 +40,19 @@ If neither case is applicable to your case, the choice for a DB engine powering 
 Here is the list of databases supported by the adapter:
 
 * [MySQL](https://www.mysql.com)
-  Supported versions 5.7 to 8.0. Although MySQL variants like MariaDB and Percona Server for MySQL are not tested, it should work transparently since MySQL APIs are fully compaitable. The following managed versions of MySQL tested to work with the connector:
-  * Google Cloud SQL for MySQL
-  * Amazon RDS for MySQL and MariaDB
-  * AWS Aurora for MySQL
-  * Microsoft Azure MySQL
+  Supported vanilla MySQL versions 5.7 to 8.0. Although MySQL variants like MariaDB and Percona Server for MySQL are not tested, it should work transparently since MySQL APIs are fully compaitable. The following managed versions of MySQL work with the connector:
+  * [Google Cloud SQL for MySQL](https://cloud.google.com/sql)
+  * [Amazon RDS for MySQL and MariaDB](https://aws.amazon.com/rds/mysql/)
+  * [Amazon Aurora](https://aws.amazon.com/rds/aurora/mysql-features/)
+  * [Microsoft Azure MySQL](https://azure.microsoft.com/en-us/services/mysql/#overview)
 * [Postgres](https://www.postgresql.org)
-  Supported versions 12, 13.
-* MongoDB
+  Supported versions 12, 13. Managed versions available:
+  * [Google Cloud SQL for Postgres](https://cloud.google.com/sql)
+  * [Amazon RDS for PostgreSQL](https://aws.amazon.com/rds/postgresql/)
+  * [Amazon Aurora](https://aws.amazon.com/rds/aurora)
+  * [Microsoft Azure Postgres](https://azure.microsoft.com/en-us/services/postgresql)
+* [MongoDB](https://www.mongodb.com/)
+  MongoDB can be self managed open source edition instance, or use managed [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Atlas can be hosted on Google Cloud, Amazon AWS and Microsoft Azure. There are also great MongoDB API compaitable databases like [Amazon DocumentDB](https://aws.amazon.com/documentdb/) and [Microsoft Azure Cosmos DB](https://docs.microsoft.com/en-us/azure/cosmos-db/mongodb/mongodb-introduction).
 * Microsoft SQL Server
 * Google Cloud Spanner
 * Google Cloud Firestore
