@@ -25,43 +25,12 @@ jobs:
 
       - name: Testing
         run: npm run test
-  test_postgres:
+
+  test_integrations:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-          cache: "npm"
-
-      - name: Downloading Docker compose V2
-        run: |
-          mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-          chmod +x ~/.docker/cli-plugins/docker-compose
-          docker compose version
-
-      - name: Start containers
-        run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build postgres
-
-      - name: Installing Lerna
-        run: npm install
-
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
-
-      - name: Testing
-        run: npm run test:postgres
-
-      - name: Stop containers
-        if: always()
-        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
-
-  test_spanner:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        integration: ["postgres", "spanner", "mysql", "mssql", "firestore", "mongo"]
 
     steps:
       - uses: actions/checkout@v2
@@ -81,7 +50,7 @@ jobs:
 
       - name: Start containers
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build spanner
+          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build ${{ matrix.integration }}
 
       - name: Installing Lerna
         run: npm install
@@ -90,155 +59,227 @@ jobs:
         run: npm run build:dev
 
       - name: Testing
-        run: npm run test:spanner
+        run: npm run test:${{ matrix.integration }}
 
       - name: Stop containers
         if: always()
         run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
-  test_mysql:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-          cache: "npm"
-
-      - name: Downloading Docker compose V2
-        run: |
-          mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-          chmod +x ~/.docker/cli-plugins/docker-compose
-          docker compose version
-
-      - name: Start containers
-        run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build mysql
-
-      - name: Installing Lerna
-        run: npm install
-
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
-
-      - name: Testing
-        run: npm run test:mysql
-
-      - name: Stop containers
-        if: always()
-        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
-
-  test_mssql:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-          cache: "npm"
-
-      - name: Downloading Docker compose V2
-        run: |
-          mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-          chmod +x ~/.docker/cli-plugins/docker-compose
-          docker compose version
-
-      - name: Start containers
-        run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build mssql
-
-      - name: Installing Lerna
-        run: npm install
-
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
-
-      - name: Testing
-        run: npm run test:mssql
-
-      - name: Stop containers
-        if: always()
-        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
-
-  test_firestore:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-          cache: "npm"
-
-      - name: Downloading Docker compose V2
-        run: |
-          mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-          chmod +x ~/.docker/cli-plugins/docker-compose
-          docker compose version
-
-      - name: Downloading FireStore Image
-        run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull firestore
-
-      - name: Start containers
-        run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach firestore
-
-      - name: Installing Lerna
-        run: npm install
-
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
-
-      - name: Testing
-        run: npm run test:firestore
-
-      - name: Stop containers
-        if: always()
-        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
-
-  test_mongo:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-          cache: "npm"
-
-      - name: Downloading Docker compose V2
-        run: |
-          mkdir -p ~/.docker/cli-plugins
-          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-          chmod +x ~/.docker/cli-plugins/docker-compose
-          docker compose version
-
-      - name: Start containers
-        run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build mongo
-
-      - name: Installing Lerna
-        run: npm install
-
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
-
-      - name: Testing
-        run: npm run test:mongo
-
-      - name: Stop containers
-        if: always()
-        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+#  test_postgres:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Use Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: 14
+#          cache: "npm"
+#
+#      - name: Downloading Docker compose V2
+#        run: |
+#          mkdir -p ~/.docker/cli-plugins
+#          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+#          chmod +x ~/.docker/cli-plugins/docker-compose
+#          docker compose version
+#
+#      - name: Start containers
+#        run: |
+#          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build postgres
+#
+#      - name: Installing Lerna
+#        run: npm install
+#
+#      - name: Install dependencies of the homemade packages.
+#        run: npm run build:dev
+#
+#      - name: Testing
+#        run: npm run test:postgres
+#
+#      - name: Stop containers
+#        if: always()
+#        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+#
+#  test_spanner:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Use Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: 14
+#          cache: "npm"
+#
+#      - name: Downloading Docker compose V2
+#        run: |
+#          mkdir -p ~/.docker/cli-plugins
+#          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+#          chmod +x ~/.docker/cli-plugins/docker-compose
+#          docker compose version
+#
+#      - name: Start containers
+#        run: |
+#          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build spanner
+#
+#      - name: Installing Lerna
+#        run: npm install
+#
+#      - name: Install dependencies of the homemade packages.
+#        run: npm run build:dev
+#
+#      - name: Testing
+#        run: npm run test:spanner
+#
+#      - name: Stop containers
+#        if: always()
+#        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+#
+#  test_mysql:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Use Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: 14
+#          cache: "npm"
+#
+#      - name: Downloading Docker compose V2
+#        run: |
+#          mkdir -p ~/.docker/cli-plugins
+#          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+#          chmod +x ~/.docker/cli-plugins/docker-compose
+#          docker compose version
+#
+#      - name: Start containers
+#        run: |
+#          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build mysql
+#
+#      - name: Installing Lerna
+#        run: npm install
+#
+#      - name: Install dependencies of the homemade packages.
+#        run: npm run build:dev
+#
+#      - name: Testing
+#        run: npm run test:mysql
+#
+#      - name: Stop containers
+#        if: always()
+#        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+#
+#  test_mssql:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Use Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: 14
+#          cache: "npm"
+#
+#      - name: Downloading Docker compose V2
+#        run: |
+#          mkdir -p ~/.docker/cli-plugins
+#          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+#          chmod +x ~/.docker/cli-plugins/docker-compose
+#          docker compose version
+#
+#      - name: Start containers
+#        run: |
+#          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build mssql
+#
+#      - name: Installing Lerna
+#        run: npm install
+#
+#      - name: Install dependencies of the homemade packages.
+#        run: npm run build:dev
+#
+#      - name: Testing
+#        run: npm run test:mssql
+#
+#      - name: Stop containers
+#        if: always()
+#        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+#
+#  test_firestore:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Use Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: 14
+#          cache: "npm"
+#
+#      - name: Downloading Docker compose V2
+#        run: |
+#          mkdir -p ~/.docker/cli-plugins
+#          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+#          chmod +x ~/.docker/cli-plugins/docker-compose
+#          docker compose version
+#
+#      - name: Downloading FireStore Image
+#        run: |
+#          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull firestore
+#
+#      - name: Start containers
+#        run: |
+#          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach firestore
+#
+#      - name: Installing Lerna
+#        run: npm install
+#
+#      - name: Install dependencies of the homemade packages.
+#        run: npm run build:dev
+#
+#      - name: Testing
+#        run: npm run test:firestore
+#
+#      - name: Stop containers
+#        if: always()
+#        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+#
+#  test_mongo:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Use Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: 14
+#          cache: "npm"
+#
+#      - name: Downloading Docker compose V2
+#        run: |
+#          mkdir -p ~/.docker/cli-plugins
+#          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+#          chmod +x ~/.docker/cli-plugins/docker-compose
+#          docker compose version
+#
+#      - name: Start containers
+#        run: |
+#          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build mongo
+#
+#      - name: Installing Lerna
+#        run: npm install
+#
+#      - name: Install dependencies of the homemade packages.
+#        run: npm run build:dev
+#
+#      - name: Testing
+#        run: npm run test:mongo
+#
+#      - name: Stop containers
+#        if: always()
+#        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
