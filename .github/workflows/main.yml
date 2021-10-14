@@ -56,14 +56,6 @@ jobs:
           cd packages/velo-external-db/test/resources
           docker compose up --detach ${{ matrix.integration }}
 
-      - name: restore lerna
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-
       - name: Installing Lerna
         run: npm install
 
