@@ -7,24 +7,24 @@ on:
   workflow_dispatch:
 
 jobs:
-  test_main:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-          cache: "npm"
-
-      - name: Installing Lerna
-        run: npm install
-
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
-
-      - name: Testing
-        run: npm run test
+#  test_main:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Use Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: 14
+#          cache: "npm"
+#
+#      - name: Installing Lerna
+#        run: npm install
+#
+#      - name: Install dependencies of the homemade packages.
+#        run: npm run build:dev
+#
+#      - name: Testing
+#        run: npm run test
 
 #  test_integrations:
 #    runs-on: ubuntu-latest
