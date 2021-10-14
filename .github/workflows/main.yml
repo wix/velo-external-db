@@ -9,12 +9,16 @@ on:
 jobs:
   test_main:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        integration: ["postgres", "spanner", "mysql", "mssql", "mongo", "firestore"]
+        node-version: [14, 16]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: ${{ matrix.node-version }}
           cache: "npm"
 
       - name: Installing Lerna
@@ -31,6 +35,7 @@ jobs:
     strategy:
       matrix:
         integration: ["postgres", "spanner", "mysql", "mssql", "mongo", "firestore"]
+        node-version: [14, 16]
 
     steps:
       - uses: actions/checkout@v2
@@ -38,7 +43,7 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: ${{ matrix.node-version }}
           cache: "npm"
 
       - name: Downloading Docker Compose V2
