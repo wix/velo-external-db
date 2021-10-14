@@ -232,7 +232,7 @@ jobs:
       - name: Downloading FireStore Image
         run: |
           cd packages/velo-external-db/test/resources
-          docker compose pull firestore
+          docker compose pull --quiet firestore
 #          --quiet --file packages/velo-external-db/test/resources/docker-compose.yaml
 #          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull firestore
 
