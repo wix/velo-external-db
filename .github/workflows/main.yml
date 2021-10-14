@@ -49,7 +49,7 @@ jobs:
           docker compose version
 
       - name: Predownloading Image
-        if: ${{ matrix.integration == firestore }}
+        if: contains('firestore', '${{ matrix.integration }}')
         run: |
           docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml pull ${{ matrix.integration }}
 
