@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        integration: ["postgres", "spanner", "mysql", "mssql", "firestore", "mongo"]
+        integration: ["postgres", "spanner", "mysql", "mssql", "mongo"]
 
     steps:
       - uses: actions/checkout@v2
