@@ -53,17 +53,18 @@ jobs:
       - name: Temp
         run: |
           ~/.docker/cli-plugins/docker-compose --version
+          which docker-compose
           docker-compose --version
           docker-compose build --help
 
-      - name: Predownloading Image
-        if: contains('firestore', '${{ matrix.integration }}')
-        run: |
-          docker compose --file packages/velo-external-db/test/resources/docker-compose.yaml build ${{ matrix.integration }}
+#      - name: Predownloading Image
+#        if: contains('firestore', '${{ matrix.integration }}')
+#        run: |
+#          docker compose --file packages/velo-external-db/test/resources/docker-compose.yaml build ${{ matrix.integration }}
 
       - name: Start containers
         run: |
-          docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build ${{ matrix.integration }}
+          ~/.docker/cli-plugins/docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml up --detach --build ${{ matrix.integration }}
 
       - name: Installing Lerna
         run: npm install
@@ -75,7 +76,7 @@ jobs:
         run: npm run test:${{ matrix.integration }}
 
       - name: Stop containers
-        run: docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
+        run: ~/.docker/cli-plugins/docker-compose --ansi never --file packages/velo-external-db/test/resources/docker-compose.yaml down
 
 
 #  test_postgres:
