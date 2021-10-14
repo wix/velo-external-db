@@ -5,8 +5,16 @@
             "roles": ["OWNER", "BACKEND_CODE"]
         },
         {
-            "path": "/schemas",
+            "path": "/schemas/column",
             "roles": ["OWNER"]
+        },
+        {
+            "path": "/schemas/create",
+            "roles": ["OWNER"]
+        },
+        {
+            "path": "/schemas",
+            "roles": ["OWNER", "BACKEND_CODE"]
         }
     ]
 }
