@@ -11,7 +11,7 @@
     "test:firestore": "TEST_ENGINE=firestore jest --runInBand ./test",
     "test:mssql": "TEST_ENGINE=mssql jest --runInBand ./test",
     "test:mongo": "TEST_ENGINE=mongo jest --runInBand ./test",
-    "test:google-sheet": "TEST_ENGINE=google-sheet jest  -i  packages/velo-external-db/test/e2e/app_data.e2e.spec.js  --runInBand -t 'Velo External DB Data REST API' ",
+    "test:google-sheets": "TEST_ENGINE=google-sheets jest  -i  packages/velo-external-db/test/e2e/app_data.e2e.spec.js  --runInBand -t 'Velo External DB Data REST API' ",
     "test:watch": "jest --detectOpenHandles --watch",
     "start": "node lib/app.js",
     "deploy": "gcloud app deploy ./app.yaml"

@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build:dev": "lerna bootstrap --hoist",
-    "test": "npm run test:core; npm run test:postgres; npm run test:spanner; npm run test:mysql; npm run test:mssql; npm run test:firestore; npm run test:mongo; npm run test:google-sheet",
+    "test": "npm run test:core; npm run test:postgres; npm run test:spanner; npm run test:mysql; npm run test:mssql; npm run test:firestore; npm run test:mongo; npm run test:google-sheets",
     "test:core": "lerna exec --scope '{external-db-config,velo-external-db-core,velo-external-db}' \"npm test\"",
     "test:postgres": "lerna exec --scope external-db-postgres \"npm test\" && lerna exec --scope velo-external-db \"npm run test:postgres\"",
     "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
@@ -11,7 +11,7 @@
     "test:mssql": "lerna exec --scope external-db-mssql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mssql\"",
     "test:firestore": "lerna exec --scope external-db-firestore \"npm test\" && lerna exec --scope velo-external-db \"npm run test:firestore\"",
     "test:mongo": "lerna exec --scope external-db-mongo \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mongo\"",
-    "test:google-sheet": "lerna exec --scope external-db-google-sheets \"npm test\" && lerna exec --scope velo-external-db \"npm run test:google-sheet\"",
+    "test:google-sheets": "lerna exec --scope external-db-google-sheets \"npm test\" && lerna exec --scope velo-external-db \"npm run test:google-sheets\"",
     "release": "lerna version --no-push",
     "outdated:all": "lerna exec --scope '{external-db-config,external-db-firestore,external-db-mongo,external-db-mssql,external-db-mysql,external-db-postgres,external-db-spanner,external-db-google-sheets,external-db-airtable,velo-external-db,velo-external-db-core}' \"npm outdated\"",
     "ci:publish": "lerna publish -y from-git"
