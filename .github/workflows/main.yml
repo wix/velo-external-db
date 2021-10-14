@@ -24,7 +24,7 @@ jobs:
         run: npm run build:dev
 
       - name: Testing
-        run: npm run test
+        run: npm run test:core
 
   test_integrations:
     runs-on: ubuntu-latest
