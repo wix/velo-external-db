@@ -27,6 +27,9 @@ const expectInsertFor = (items, forCollectionName) =>
     when(dataProvider.insert).calledWith(forCollectionName, items.map(i => unpackDates(i)))
                              .mockResolvedValue(items.length)
 
+const expectInsertMatchedFor = (items, forCollectionName) =>
+    when(dataProvider.insert).calledWith(forCollectionName, expect.arrayContaining(items.map( expect.objectContaining )))
+                             .mockResolvedValue(1)
 
 const expectUpdateFor = (items, forCollectionName) =>
     when(dataProvider.update).calledWith(forCollectionName, items.map(i => unpackDates(i)))
@@ -50,4 +53,4 @@ const reset = () => {
     dataProvider.delete.mockClear()
 }
 
-module.exports = { givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult, expectTruncateFor, givenAggregateResult, expectDeleteFor, reset }
+module.exports = { givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult, expectTruncateFor, givenAggregateResult, expectDeleteFor, expectInsertMatchedFor, reset }

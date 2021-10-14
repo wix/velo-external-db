@@ -39,6 +39,21 @@ describe('Data Service', () => {
         return expect( actual  ).toEqual({ item: ctx.entity });
     })
 
+    test('insert item without _id will apply random _id to item', async () => {
+        driver.expectInsertMatchedFor([ctx.entityWithoutId], ctx.collectionName)
+
+        const actual = await env.dataService.insert(ctx.collectionName, ctx.entityWithoutId)
+        return expect( actual.item  ).toHaveProperty('_id' );
+    })
+
+    test('bulk insert items without _id will apply random _id to all items', async () => {
+        driver.expectInsertMatchedFor(ctx.entitiesWithoutId, ctx.collectionName)
+
+        const actual = await env.dataService.bulkInsert(ctx.collectionName, ctx.entitiesWithoutId)
+
+        return actual.items.map(item => expect(item).toHaveProperty( '_id' ) )
+    })
+
     test('bulk insert will insert data into db', async () => {
         driver.expectInsertFor(ctx.entities, ctx.collectionName)
 
@@ -97,6 +112,8 @@ describe('Data Service', () => {
         limit: Uninitialized,
         entities: Uninitialized,
         entity: Uninitialized,
+        entityWithoutId: Uninitialized,
+        entitiesWithoutId: Uninitialized,
         itemId: Uninitialized,
         itemIds: Uninitialized,
         total: Uninitialized,
@@ -110,17 +127,22 @@ describe('Data Service', () => {
         driver.reset()
 
         ctx.collectionName = gen.randomCollectionName()
-        ctx.filter = chance.word();
-        ctx.aggregation = chance.word();
-        ctx.sort = chance.word();
-        ctx.skip = chance.word();
-        ctx.limit = chance.word();
-        ctx.itemId = chance.guid();
+        ctx.filter = chance.word()
+        ctx.aggregation = chance.word()
+        ctx.sort = chance.word()
+        ctx.skip = chance.word()
+        ctx.limit = chance.word()
+        ctx.itemId = chance.guid()
         ctx.itemIds = Array.from({length: 10}, () => chance.guid())
         ctx.total = chance.natural({min: 2, max: 20});
 
-        ctx.entities = gen.randomEntities();
-        ctx.entity = gen.randomEntity();
+        ctx.entities = gen.randomEntities()
+        ctx.entity = gen.randomEntity()
+
+        const e = gen.randomEntity()
+        delete e._id
+        ctx.entityWithoutId = e
+        ctx.entitiesWithoutId = gen.randomEntities().map(i => { delete i._id; return i })
 
         env.dataService = new DataService(driver.dataProvider)
     });

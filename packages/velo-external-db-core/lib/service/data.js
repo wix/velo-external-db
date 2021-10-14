@@ -35,9 +35,9 @@ class DataService {
     }
 
     async bulkInsert(collectionName, items) {
-        await this.storage.insert(collectionName, items.map(i => unpackDates(i))
-                                                       .map(i => generateIdsIfNeeded(i)))
-        return { items: items }
+        const itemsWithIds = items.map(i => generateIdsIfNeeded(i))
+        await this.storage.insert(collectionName, itemsWithIds.map(i => unpackDates(i)))
+        return { items: itemsWithIds }
     }
 
     async update(collectionName, item) {
