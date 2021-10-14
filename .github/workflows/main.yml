@@ -41,7 +41,7 @@ jobs:
           node-version: 14
           cache: "npm"
 
-      - name: Downloading Docker compose V2
+      - name: Downloading Docker Compose V2
         run: |
           curl -sfL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
           docker compose version
@@ -50,12 +50,19 @@ jobs:
         run: |
           cd packages/velo-external-db/test/resources
           docker compose pull --quiet ${{ matrix.integration }}
-#        if: contains( 'firestore', '${{ matrix.integration }}' )
 
-      - name: Start containers
+      - name: Start Container
         run: |
           cd packages/velo-external-db/test/resources
           docker compose up --detach ${{ matrix.integration }}
+
+      - name: restore lerna
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Installing Lerna
         run: npm install
@@ -66,7 +73,7 @@ jobs:
       - name: Testing
         run: npm run test:${{ matrix.integration }}
 
-      - name: Stop containers
+      - name: Stop Container
         run: |
           cd packages/velo-external-db/test/resources
           docker compose down
