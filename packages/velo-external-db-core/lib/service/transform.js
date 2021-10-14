@@ -1,3 +1,5 @@
+const { v4: uuidv4 } = require('uuid')
+
 const asWixData = e => packDates(e)
 
 const isObject = (o) => typeof o === 'object' && o !== null
@@ -17,6 +19,13 @@ const unpackDates = item => {
     return i
 }
 
+const generateIdsIfNeeded = item => {
+    if ('_id' in item) {
+        return item
+    }
+    return { ...item, _id: uuidv4() }
+}
+
 const clone = o => ( { ...o } )
 
 const packDates = item => {
@@ -30,4 +39,4 @@ const packDates = item => {
     return i
 }
 
-module.exports = { asWixData, unpackDates }
+module.exports = { asWixData, unpackDates, generateIdsIfNeeded }

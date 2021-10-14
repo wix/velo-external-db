@@ -1,4 +1,4 @@
-const { asWixData, unpackDates } = require('./transform')
+const { asWixData, unpackDates, generateIdsIfNeeded } = require('./transform')
 
 class DataService {
     constructor(storage) {
@@ -35,7 +35,8 @@ class DataService {
     }
 
     async bulkInsert(collectionName, items) {
-        await this.storage.insert(collectionName, items.map(i => unpackDates(i)))
+        await this.storage.insert(collectionName, items.map(i => unpackDates(i))
+                                                       .map(i => generateIdsIfNeeded(i)))
         return { items: items }
     }
 
