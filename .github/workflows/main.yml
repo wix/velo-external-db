@@ -224,11 +224,11 @@ jobs:
       - name: Downloading Docker compose V2
         run: |
           curl -fL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
+          docker compose version
+#          docker compose pull --help
 #          mkdir -p ~/.docker/cli-plugins
 #          curl -sSL https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
 #          chmod +x ~/.docker/cli-plugins/docker-compose
-          docker compose version
-          docker compose pull --help
 
       - name: Downloading FireStore Image
         run: |
