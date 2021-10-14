@@ -32,7 +32,7 @@ load().then(({ secretKey}) => {
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(express.json())
     app.use(unless(['/', '/provision', '/favicon.ico'], authMiddleware({ secretKey: secretKey })));
-    config.forEach( ( { path, roles }) => app.use(includes([path], authRoleMiddleware({ roles }))))
+    config.forEach( ( { pathPrefix, roles }) => app.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
     app.use(compression())
     app.set('view engine', 'ejs');
 

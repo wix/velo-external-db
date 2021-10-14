@@ -1,19 +1,19 @@
 {
     "config": [
         {
-            "path": "/data",
+            "pathPrefix": "/data",
             "roles": ["OWNER", "BACKEND_CODE"]
         },
         {
-            "path": "/schemas/column",
+            "pathPrefix": "/schemas/column",
             "roles": ["OWNER"]
         },
         {
-            "path": "/schemas/create",
+            "pathPrefix": "/schemas/create",
             "roles": ["OWNER"]
         },
         {
-            "path": "/schemas",
+            "pathPrefix": "/schemas",
             "roles": ["OWNER", "BACKEND_CODE"]
         }
     ]
