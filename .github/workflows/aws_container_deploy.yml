@@ -38,7 +38,7 @@ jobs:
       # Tag docker image
       - name: Tag Image
         id: tag-image
-        run: doc ker tag $IMAGE_NAME:$IMAGE_TAG $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
+        run: docker tag $IMAGE_NAME:$IMAGE_TAG $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
         
       - name: Push the image to Amazon ECR
         id: push-image
