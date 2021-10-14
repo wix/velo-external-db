@@ -10,9 +10,7 @@ const airtable = require ('../resources/engines/airtable_resources')
 const { sleep } = require('test-commons')
 const ci = require('./ci_utils')
 
-module.exports = async () => { if (ci.LocalDev()) {
-    const testEngine = process.env.TEST_ENGINE
-
+const initEnv = async (testEngine) => {
     switch (testEngine) {
         case 'mysql':
             await mysql.initEnv()
@@ -45,9 +43,9 @@ module.exports = async () => { if (ci.LocalDev()) {
             await airtable.initEnv()
             break
     }
+}
 
-    await sleep(5000)
-
+const cleanup = async (testEngine) => {
     switch (testEngine) {
         case 'mysql':
             await mysql.cleanup()
@@ -76,4 +74,15 @@ module.exports = async () => { if (ci.LocalDev()) {
             await mongo.cleanup()
             break;
     }
-} }
+}
+
+module.exports = async () => {
+    const testEngine = process.env.TEST_ENGINE
+    if (ci.LocalDev()) {
+        await initEnv(testEngine)
+
+        await sleep(5000)
+    }
+
+    await cleanup(testEngine)
+}

@@ -7,9 +7,7 @@ const googleSheet = require('../resources/engines/google_sheets_resourses')
 const airtable = require('../resources/engines/airtable_resources')
 const ci = require('./ci_utils')
 
-module.exports = async () => { if (ci.LocalDev()) {
-    const testEngine = process.env.TEST_ENGINE
-
+const shutdownEnv = async (testEngine) => {
     switch (testEngine) {
         case 'mysql':
             await mysql.shutdownEnv()
@@ -34,9 +32,16 @@ module.exports = async () => { if (ci.LocalDev()) {
         case 'google-sheet':
             await googleSheet.shutdownEnv()
             break
-        
+
         case 'airtable':
             await airtable.shutdownEnv()
             break
     }
-} }
+}
+
+module.exports = async () => {
+    const testEngine = process.env.TEST_ENGINE
+    if (ci.LocalDev()) {
+        await shutdownEnv(testEngine)
+    }
+}
