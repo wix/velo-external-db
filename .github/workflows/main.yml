@@ -26,11 +26,11 @@ jobs:
       - name: Testing
         run: npm run test:core
 
-  test_integrations:
+  test_databases:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        integration: ["postgres", "spanner", "mysql", "mssql", "mongo", "firestore"]
+        database: ["postgres", "spanner", "mysql", "mssql", "mongo", "firestore"]
 
     steps:
       - uses: actions/checkout@v2
@@ -49,12 +49,12 @@ jobs:
       - name: Downloading Image
         run: |
           cd packages/velo-external-db/test/resources
-          docker compose pull --quiet ${{ matrix.integration }}
+          docker compose pull --quiet ${{ matrix.database }}
 
       - name: Start Container
         run: |
           cd packages/velo-external-db/test/resources
-          docker compose up --detach ${{ matrix.integration }}
+          docker compose up --detach ${{ matrix.database }}
 
       - name: Installing Lerna
         run: npm install
@@ -63,7 +63,7 @@ jobs:
         run: npm run build:dev
 
       - name: Testing
-        run: npm run test:${{ matrix.integration }}
+        run: npm run test:${{ matrix.database }}
 
       - name: Stop Container
         run: |
