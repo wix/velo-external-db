@@ -53,12 +53,11 @@ Here is the list of databases supported by the adapter:
   * [Microsoft Azure Postgres](https://azure.microsoft.com/en-us/services/postgresql)
 * [MongoDB](https://www.mongodb.com/)
   MongoDB can be self managed open source edition instance, or use managed [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Atlas can be hosted on Google Cloud, Amazon AWS and Microsoft Azure. There are also great MongoDB API compaitable databases like [Amazon DocumentDB](https://aws.amazon.com/documentdb/) and [Microsoft Azure Cosmos DB](https://docs.microsoft.com/en-us/azure/cosmos-db/mongodb/mongodb-introduction).
-* Microsoft SQL Server
-* Google Cloud Spanner
-* Google Cloud Firestore
-* Amazon Aurora
-* Google Sheets and Bigsheets
-* Airtable
+* [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-2019)
+  MS SQL server can be connected both as on-prem, self managed installation or managed version available as part of [Google Cloud SQL](https://cloud.google.com/sql/docs/sqlserver/quickstart) as well as [Amazon RDS for SQL Server](https://aws.amazon.com/rds/sqlserver/) or Microsoft Azure [fully managed service](https://azure.microsoft.com/en-us/products/azure-sql/database/#overview). 
+* [Google Cloud Spanner](https://cloud.google.com/spanner) - Fully managed relational database with unlimited scale, strong consistency, and up to 99.999% availability from Google.
+* [Google Cloud Firestore](https://cloud.google.com/firestore) - Fully managed, scalable, and serverless document database by Google Firebase.
+
 
 ## Supported Public clouds
 
