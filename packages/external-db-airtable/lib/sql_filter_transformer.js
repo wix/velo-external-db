@@ -1,4 +1,4 @@
-// const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('velo-external-db-commons').errors
 const { EMPTY_SORT, isObject } = require('velo-external-db-commons')
 // const { EMPTY_FILTER } = require('./mongo_utils')
 
@@ -36,6 +36,16 @@ class FilterParser {
                 const res2 = this.parseFilter(filter.value)
                 return [{
                     filterExpr: `NOT(${res2[0].filterExpr})`
+                }]
+            case '$hasSome': //todo - refactor
+                if (filter.value === undefined || filter.value.length === 0) {
+                    throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
+                }
+
+                const ress = filter.value.map(val => { return { operator: '$eq', value: val, fieldName:filter.fieldName } })
+                const ress2 = ress.map(this.parseFilter.bind(this))
+                return [{
+                    filterExpr: this.MultipleFieldOperatorToFilterExpr('OR',ress2)
                 }]
 
         }
@@ -101,11 +111,11 @@ class FilterParser {
     }
 
     valueForOperator(value, operator) {
-        if (operator === '$in') {
+        if (operator === '$hasSome') {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
             }
-            return value
+            return this.MultipleFieldOperatorToFilterExpr('OR',value)
         }
         else if (operator === '$eq' && value === undefined) {
             return `""`
@@ -122,19 +132,6 @@ class FilterParser {
         return ['$contains', '$startsWith', '$endsWith'].includes(operator)
     }
 
-    // valueForOperator(value, operator) {
-    //     if (operator === '$in') {
-    //         if (value === undefined || value.length === 0) {
-    //             throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
-    //         }
-    //         return value
-    //     }
-    //     else if (operator === '$eq' && value === undefined) {
-    //         return null
-    //     }
-
-    //     return value
-    // }
 
     veloOperatorToAirtableOperator(operator, value) {
         switch (operator) {
@@ -150,8 +147,6 @@ class FilterParser {
                 return '>'
             case '$gte':
                 return '>='
-            // case '$hasSome':  // TODO: implement 
-            //     return 'IN'
         }
     }
 

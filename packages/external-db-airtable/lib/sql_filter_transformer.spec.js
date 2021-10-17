@@ -103,21 +103,20 @@ describe('Sql Parser', () => {
             })
 
             // todo: $hasAll ???
-            test(`correctly transform operator [$hasSome]`, () => {
+            test.only(`correctly transform operator [$hasSome]`, () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$hasSome',
                     fieldName: ctx.fieldName,
                     value: ctx.fieldListValue
                 }
-
+                
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `${escapeId(ctx.fieldName)} IN (?, ?, ?, ?, ?)`,
-                    parameters: ctx.fieldListValue
+                    filterExpr: `OR(${ctx.fieldListValue.map(val=> `${ctx.fieldName} = "${val}"`)})`
                 }])
             })
 
-            test(`operator [$hasSome] with empty list of values will throw an exception`, () => {
+            test.only(`operator [$hasSome] with empty list of values will throw an exception`, () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$hasSome',
