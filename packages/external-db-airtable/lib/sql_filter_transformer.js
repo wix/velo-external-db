@@ -43,7 +43,7 @@ class FilterParser {
 
         if (this.isSingleFieldOperator(filter.operator)) {
             return [{
-                filterExpr: `${filter.fieldName} ${this.veloOperatorToAirtableOperator(filter.operator, filter.value)} "${filter.value}" ` // TODO: value for operator?
+                filterExpr: `${filter.fieldName} ${this.veloOperatorToAirtableOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value,filter.operator)}` // TODO: value for operator?
             }]
         }
 
@@ -59,8 +59,7 @@ class FilterParser {
     }
 
     MultipleFieldOperatorToFilterExpr (operator, values) {
-        const filterExpr = `${operator}(${values.map(r[0].filterExpr).join(',')}` // with extra comma and without ) 
-        return (filterExpr.substring(0,filterExpr.length-1) + ')')
+        return `${operator}(${values.map(r=>r[0].filterExpr).join(',')})`  
     }
 
     // }
@@ -101,6 +100,20 @@ class FilterParser {
         }
     }
 
+    valueForOperator(value, operator) {
+        if (operator === '$in') {
+            if (value === undefined || value.length === 0) {
+                throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
+            }
+            return value
+        }
+        else if (operator === '$eq' && value === undefined) {
+            return `""`
+        }
+
+        return `"${value}"`
+    }
+
     isSingleFieldOperator(operator) {
         return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq'].includes(operator)
     }
@@ -126,11 +139,7 @@ class FilterParser {
     veloOperatorToAirtableOperator(operator, value) {
         switch (operator) {
             case '$eq':
-                if (value !== undefined) {
-                    return '='
-                }
-                break;
-            // return 'IS NULL'
+                return '='
             case '$ne':
                 return '!='
             case '$lt':
