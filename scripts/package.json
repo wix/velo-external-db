@@ -29,7 +29,7 @@
     "@aws-sdk/client-apprunner": "^3.34.0",
     "@aws-sdk/client-iam": "^3.36.0",
     "@aws-sdk/client-rds": "^3.34.0",
-    "@aws-sdk/client-secrets-manager": "^3.34.0",
+    "@aws-sdk/client-secrets-manager": "^3.37.0",
     "chalk": "^4.1.2",
     "cli-spinner": "^0.2.10",
     "generate-password": "^1.6.1",
