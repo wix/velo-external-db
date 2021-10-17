@@ -34,8 +34,7 @@
     "jest": "^27.2.5",
     "jest-each": "^27.2.5",
     "jest-when": "^3.4.1",
-    "test-commons": "^0.0.0",
-    "ts-jest": "^27.0.5"
+    "test-commons": "^0.0.0"
   },
   "bugs": {
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
