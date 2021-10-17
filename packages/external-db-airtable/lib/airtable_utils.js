@@ -4,4 +4,13 @@ const minifyRecord = (record) => {
     if (fields._updatedDate && typeof fields._updatedDate === 'string') fields._updatedDate = new Date(fields._updatedDate)
     return fields
 };
-module.exports = { minifyRecord }
+
+
+const bulkCreateExpr = (items) => {
+    return items.reduce((pV, cV) => {
+        pV.push({ fields: { ...cV } });
+        return pV; 
+      }, []);
+}
+
+module.exports = { minifyRecord, bulkCreateExpr }

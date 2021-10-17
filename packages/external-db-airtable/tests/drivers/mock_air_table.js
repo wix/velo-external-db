@@ -9,18 +9,19 @@ class AirtableError extends Error {
         this.status = status
     }
 }
+
 let data = []
 let globalIndex = 0
 
 const _checkParamsMiddleware = (req, res, next) => {
-    if (req.get('authorization') !== 'Bearer key123') 
-        return next(new AirtableError('AUTHENTICATION_REQUIRED','You should provide valid api key to perform this operation','401'))
-    
-    if (req.params.baseId !== 'app123')
-        return next(new AirtableError('NOT_FOUND','Could not find what you are looking for','404'))
+    if (req.get('authorization') !== 'Bearer key123')
+        return next(new AirtableError('AUTHENTICATION_REQUIRED', 'You should provide valid api key to perform this operation', '401'))
 
-    if (req.params.tableIdOrName !== 'Table') 
-        return next(new AirtableError('NOT_FOUND',`Could not find table ${req.params.tableIdOrName} in application ${req.params.baseId}`,'404'))
+    if (req.params.baseId !== 'app123')
+        return next(new AirtableError('NOT_FOUND', 'Could not find what you are looking for', '404'))
+
+    if (req.params.tableIdOrName !== 'Table')
+        return next(new AirtableError('NOT_FOUND', `Could not find table ${req.params.tableIdOrName} in application ${req.params.baseId}`, '404'))
     next()
 }
 
@@ -30,54 +31,49 @@ app.set('case sensitive routing', true);
 app.set('query parser', string => new URLSearchParams(string));
 
 app.use(express.json());
-app.use((req, res, next) => {
-    req.app.set('most recent request', req);
-    next();
-});
 
-app.use((req, res, next) => {
-    const handlerOverride = req.app.get('handler override');
-    if (handlerOverride) {
-        handlerOverride(req, res, next);
-    } else {
-        next();
-    }
-});
 
+//insert / bulk/insert 
 app.post('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, (req, res) => {
     const isCreatingJustOneRecord = !!req.body.fields;
     const recordsInBody = isCreatingJustOneRecord ? [req.body] : req.body.records;
-
     const records = recordsInBody.map((record, index) => {
         globalIndex++
-        const newRecord = {id:'rec' + globalIndex, ...record}
+        const newRecord = { id: 'rec' + globalIndex, ...record }
         data.push(newRecord)
-        const fields = req.body.typecast ? { typecasted: true } : record.fields;
         return newRecord
     });
     const responseBody = isCreatingJustOneRecord ? records[0] : { records: records };
     res.json(responseBody);
 })
 
+
+//find
 app.get('/v0/:baseId/:tableIdOrName?', _checkParamsMiddleware, (req, res) => {
+    const sortField = req.query.get('sort[0][field]')
+    const sortDir = req.query.get('sort[0][direction]') === 'desc' ? -1 : 1
+
+    //support only equal for now.
+    const filter = req.query.get('filterByFormula')
+    const params = filter ? filter.split(' ') : ''
+
+    const records = params ? data.filter(item => `"${item.fields[params[0]]}"` == params[2]) : data
+
     res.json({
-        records: data
+        records: sortField ? records.sort((a, b) => (a.fields[sortField] > b.fields[sortField]) ? sortDir : -1 * sortDir) : records
     });
 })
 
 const singleRecordUpdate = [
     _checkParamsMiddleware,
     (req, res) => {
-        const index = data.findIndex(obj=>obj.id === req.params.recordId)
-        data[index].fields = Object.assign({}, data[index].fields, req.body.fields) 
-        var fields = req.body.typecast ? { typecasted: true } : req.body.fields;
-        // res.json({
-        //     id: req.params.recordId,
-        //     fields: fields,
-        // });
+        const index = data.findIndex(obj => obj.id === req.params.recordId)
+        data[index].fields = Object.assign({}, data[index].fields, req.body.fields)
+
         res.json(data[index])
     },
 ];
+
 
 const batchRecordUpdate = [
     _checkParamsMiddleware,
@@ -100,25 +96,27 @@ app.put('/v0/:baseId/:tableIdOrName/:recordId', singleRecordUpdate);
 app.patch('/v0/:baseId/:tableIdOrName', batchRecordUpdate);
 app.put('/v0/:baseId/:tableIdOrName', batchRecordUpdate);
 
+
 app.delete('/v0/:baseId/:tableIdOrName/:recordId', _checkParamsMiddleware, function (req, res) {
-    data = data.filter ((item)=>item.id != req.params.recordId)
+
+    data = data.filter((item) => item.id != req.params.recordId)
     res.json({
         id: req.params.recordId,
         deleted: true,
     });
 });
 
-app.delete('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, function (req, res) {
-    res.json({
-        records: req.query.getAll('records[]').map(function (recordId) {
-            return {
-                id: recordId,
-                deleted: true,
-            };
-        }),
-    });
-});
 
+app.delete('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, function (req, res) {
+    const records = req.query.getAll('records[]').map((recordId) => {
+        data = data.filter((item) => item.id != recordId)
+        return {
+            id: recordId,
+            deleted: true,
+        };
+    })
+    res.json({ records })
+});
 
 app.use(function (req, res) {
     res.status(404);
