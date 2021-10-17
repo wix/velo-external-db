@@ -7,7 +7,6 @@ const notThrowingTranslateErrorCodes = err => {
         case 'NOT_FOUND':
             return new DbConnectionError(`Base does not exists: Airtable message : ${err.message}`)
         case 'AUTHENTICATION_REQUIRED':
-            console.log("here");
             return new DbConnectionError(`Authentication failed: Airtable message: ${err.message}`)
         default:
             return new DbConnectionError(err.message)

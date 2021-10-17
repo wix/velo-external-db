@@ -98,10 +98,10 @@ class FilterParser {
             return value
         }
         else if (operator === '$eq' && value === undefined) {
-            return null
+            return ""
         }
 
-        return value
+        return `"${value}"`
     }
 
     veloOperatorToMongoOperator(operator, value) {
