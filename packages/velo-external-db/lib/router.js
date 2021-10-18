@@ -1,6 +1,7 @@
 const express = require('express')
 const { errorMiddleware } = require('./web/error-middleware')
 const { appInfoFor } = require ('./health/app_info')
+const {readCommonConfig} = require("external-db-config");
 const { InvalidRequest } = require('velo-external-db-commons').errors
 
 let dataService, schemaService, operationService, externalDbConfigClient
@@ -12,8 +13,19 @@ const initServices = (_dataService, _schemaService, _operationService, _external
     externalDbConfigClient = _externalDbConfigClient
 }
 
+const retrieveProtocolVersion = () => {
+    const { protocolVersion } = readCommonConfig()
+    switch (protocolVersion) {
+        case '2':
+            return 2
+        default:
+            return 1
+    }
+}
+
 const createRouter = () => {
     const router = express.Router()
+    const apiVersion = retrieveProtocolVersion()
 
     // *************** INFO **********************
     router.get('/', async (req, res) => {
@@ -22,7 +34,7 @@ const createRouter = () => {
     })
 
     router.post('/provision', (req, res) => {
-        res.json({});
+        res.json({ protocolVersion: apiVersion });
     })
 
     // *************** Data API **********************
