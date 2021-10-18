@@ -1,11 +1,11 @@
 db.createUser(
     {
-        user: "root",
-        pwd: "pass",
+        user: 'root',
+        pwd: 'pass',
         roles: [
             {
-                role: "dbOwner",
-                db: "testdb"
+                role: 'dbOwner',
+                db: 'testdb'
             }
         ]
     }

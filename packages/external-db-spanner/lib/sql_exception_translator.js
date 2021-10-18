@@ -23,7 +23,7 @@ const notThrowingTranslateErrorCodes = err => {
             }
 
         case 7:
-            return new DbConnectionError(`Access to database denied - host is unavailable or wrong credentials", sql message:  ${err.details} `)
+            return new DbConnectionError(`Access to database denied - host is unavailable or wrong credentials, sql message:  ${err.details} `)
 
         default :
             console.log(err)

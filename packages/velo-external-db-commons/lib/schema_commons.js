@@ -20,12 +20,12 @@ const asWixSchema = (res, collectionName) => {
         id: collectionName,
         displayName: collectionName,
         allowedOperations: [
-            "get",
-            "find",
-            "count",
-            "update",
-            "insert",
-            "remove"
+            'get',
+            'find',
+            'count',
+            'update',
+            'insert',
+            'remove'
         ],
         maxPageSize: 50,
         ttl: 3600,
@@ -33,18 +33,18 @@ const asWixSchema = (res, collectionName) => {
                 displayName: r.field,
                 type: r.type,
                 queryOperators: [
-                    "eq",
-                    "lt",
-                    "gt",
-                    "hasSome",
-                    "and",
-                    "lte",
-                    "gte",
-                    "or",
-                    "not",
-                    "ne",
-                    "startsWith",
-                    "endsWith" // todo: customize this list according to type
+                    'eq',
+                    'lt',
+                    'gt',
+                    'hasSome',
+                    'and',
+                    'lte',
+                    'gte',
+                    'or',
+                    'not',
+                    'ne',
+                    'startsWith',
+                    'endsWith' // todo: customize this list according to type
                 ]
             } }), {} )
     }

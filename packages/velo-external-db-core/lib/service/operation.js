@@ -11,7 +11,7 @@ class OperationService {
         const connectionStatus = await this.databaseOperation.validateConnection()
         if (connectionStatus.valid) {
             return {
-                status: "Connected to database successfully"
+                status: 'Connected to database successfully'
             }
         }
         return {
