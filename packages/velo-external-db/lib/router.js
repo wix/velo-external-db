@@ -13,19 +13,8 @@ const initServices = (_dataService, _schemaService, _operationService, _external
     externalDbConfigClient = _externalDbConfigClient
 }
 
-const retrieveProtocolVersion = () => {
-    const { protocolVersion } = readCommonConfig()
-    switch (protocolVersion) {
-        case '2':
-            return 2
-        default:
-            return 1
-    }
-}
-
 const createRouter = () => {
     const router = express.Router()
-    const apiVersion = retrieveProtocolVersion()
 
     // *************** INFO **********************
     router.get('/', async (req, res) => {
@@ -34,7 +23,7 @@ const createRouter = () => {
     })
 
     router.post('/provision', (req, res) => {
-        res.json({ protocolVersion: apiVersion });
+        res.json({ protocolVersion: 2 });
     })
 
     // *************** Data API **********************

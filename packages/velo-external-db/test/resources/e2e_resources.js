@@ -20,7 +20,6 @@ const env = {
 
 const initApp = async () => {
     process.env.CLOUD_VENDOR = 'azr'
-    process.env.PROTOCOL_VERSION = '2'
 
     if (env.app) {
         await env.app.reload()
