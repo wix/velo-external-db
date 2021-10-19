@@ -1,6 +1,16 @@
 version: "3.9"
 services:
   mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 1433:1433
+    environment:
+      SA_PASSWORD: "t9D4:EHfU6Xgccs-"
+      ACCEPT_EULA: "Y"
+    networks:
+      - backend
+
+  mssql17:
     image: mcr.microsoft.com/mssql/server:2017-latest
     ports:
       - 1433:1433
@@ -34,7 +44,57 @@ services:
       - backend
 
   postgres:
-    image: postgres
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test-db
+
+  postgres13:
+    image: postgres:13
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test-db
+
+  postgres12:
+    image: postgres:12
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test-db
+
+  postgres11:
+    image: postgres:11
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test-db
+
+  postgres10:
+    image: postgres:10
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test-db
+
+  postgres9:
+    image: postgres:9
     restart: always
     ports:
       - 5432:5432
@@ -73,6 +133,18 @@ services:
 
   mongo:
     image: mongo:5
+    environment:
+      MONGO_INITDB_DATABASE: testdb
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./engines/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+  mongo4:
+    image: mongo:4
     environment:
       MONGO_INITDB_DATABASE: testdb
       MONGO_INITDB_ROOT_USERNAME: root
