@@ -34,7 +34,7 @@ jobs:
                    "spanner",
                    "mysql", "mysql5",
                    "mssql", "mssql17",
-                   "mongo",
+                   "mongo", "mongo4",
                    "firestore"]
 
     steps:
