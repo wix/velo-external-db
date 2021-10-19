@@ -1,4 +1,4 @@
-// const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('velo-external-db-commons').errors
 const { EMPTY_SORT, isObject } = require('velo-external-db-commons')
 // const { EMPTY_FILTER } = require('./mongo_utils')
 
@@ -37,13 +37,23 @@ class FilterParser {
                 return [{
                     filterExpr: `NOT(${res2[0].filterExpr})`
                 }]
+            case '$hasSome': //todo - refactor
+                if (filter.value === undefined || filter.value.length === 0) {
+                    throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
+                }
+
+                const ress = filter.value.map(val => { return { operator: '$eq', value: val, fieldName:filter.fieldName } })
+                const ress2 = ress.map(this.parseFilter.bind(this))
+                return [{
+                    filterExpr: this.MultipleFieldOperatorToFilterExpr('OR',ress2)
+                }]
 
         }
 
 
         if (this.isSingleFieldOperator(filter.operator)) {
             return [{
-                filterExpr: `${filter.fieldName} ${this.veloOperatorToAirtableOperator(filter.operator, filter.value)} "${filter.value}" ` // TODO: value for operator?
+                filterExpr: `${filter.fieldName} ${this.veloOperatorToAirtableOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value,filter.operator)}` // TODO: value for operator?
             }]
         }
 
@@ -59,8 +69,7 @@ class FilterParser {
     }
 
     MultipleFieldOperatorToFilterExpr (operator, values) {
-        const filterExpr = `${operator}(${values.map(r[0].filterExpr).join(',')}` // with extra comma and without ) 
-        return (filterExpr.substring(0,filterExpr.length-1) + ')')
+        return `${operator}(${values.map(r=>r[0].filterExpr).join(',')})`  
     }
 
     // }
@@ -101,6 +110,20 @@ class FilterParser {
         }
     }
 
+    valueForOperator(value, operator) {
+        if (operator === '$hasSome') {
+            if (value === undefined || value.length === 0) {
+                throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
+            }
+            return this.MultipleFieldOperatorToFilterExpr('OR',value)
+        }
+        else if (operator === '$eq' && value === undefined) {
+            return `""`
+        }
+
+        return `"${value}"`
+    }
+
     isSingleFieldOperator(operator) {
         return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq'].includes(operator)
     }
@@ -109,28 +132,11 @@ class FilterParser {
         return ['$contains', '$startsWith', '$endsWith'].includes(operator)
     }
 
-    // valueForOperator(value, operator) {
-    //     if (operator === '$in') {
-    //         if (value === undefined || value.length === 0) {
-    //             throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
-    //         }
-    //         return value
-    //     }
-    //     else if (operator === '$eq' && value === undefined) {
-    //         return null
-    //     }
-
-    //     return value
-    // }
 
     veloOperatorToAirtableOperator(operator, value) {
         switch (operator) {
             case '$eq':
-                if (value !== undefined) {
-                    return '='
-                }
-                break;
-            // return 'IS NULL'
+                return '='
             case '$ne':
                 return '!='
             case '$lt':
@@ -141,8 +147,6 @@ class FilterParser {
                 return '>'
             case '$gte':
                 return '>='
-            // case '$hasSome':  // TODO: implement 
-            //     return 'IN'
         }
     }
 
