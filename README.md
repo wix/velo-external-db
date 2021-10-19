@@ -4,37 +4,30 @@
 
 ## Overview
 
-When you [enable Velo](https://support.wix.com/en/article/enabling-velo) on your Wix site you also automatically get [Wix Data](https://support.wix.com/en/article/about-wix-data) APIs, which lets you work with Wix built-in databases on your site. If you want to work with a data that you own and manage in an external database, Velo lets you connect your site to an external database and then work with that database collection in your site just as you would with our built-in collections.
+Velo by Wix is a development platform built on top of Wix, adding a built-in database and node.js backend. The built-in database is a document based database optimized for websites and content. Depending on the specific workload, it can support 10K - 100K records, and for some workloads even more. It is globally replicated, has native support for PII encryption, GDPR, and other non-functional features. It runs on shared infrastructure and is fully managed by Wix. 
 
-You can use wix-data APIs, display data from an external collection in Editor elements, use the data to create dynamic pages, and connect it to user input elements.
+However, when there are requirements for data locality, regulations, data ownership, dedicated infrastructure, or workloads that demand specific engines, this adapter enables connecting external database engines to your site.
 
-See the [external database collections SPI](https://www.wix.com/velo/reference/spis/external-database-collections) reference that specifies how to develop external database connectors for databases that aren't supported yet by Wix.
+Velo lets you connect an “external database” and map underlying tables (of whatever the external database data structures are) as wix-data collections. Once connected you can work with that database and it’s collections in your site just as you would with our built-in database.
+
+You can use wix-data APIs, display data from an external database collection in Wix Editor elements, use the data to create dynamic pages and connect it to user input elements.
+
+This project is a reference implementation of the [wix-data SPI](https://www.wix.com/velo/reference/spis/external-database-collections), allowing the development or extension of alternative external database connectors, to connect Velo with external databases.
+
+For a detailed guide to installing and integrating this adapter on Google Cloud Platform, see the [Integrate Your Google Cloud MySQL or Postgres Database with Your Velo Site](https://support.wix.com/en/article/integrate-your-google-cloud-mysql-or-postgres-database-with-your-velo-site) article
 
 ## Architecture
 
-The external database collections adapter is a Node.js server that implements the  [external database collections SPI](https://www.wix.com/velo/reference/spis/external-database-collections). The server communicates with the database using the database's native protocol. It then translates the data into a Wix format and communicates with the Wix site using REST over HTTPS.
+The external database adapter is a Node.js server that implements the [wix-data SPI](https://www.wix.com/velo/reference/spis/external-database-collections). The adapter server communicates with the database using the database's native protocol. It then translates the data into wix-data format and communicates with the Wix site via the wix-data SPI. 
 ![Architecture diagram](https://d2x3xhvgiqkx42.cloudfront.net/12345678-1234-1234-1234-1234567890ab/11e10e4f-b84d-4136-a5a9-6109fab0b7d7/2021/02/28/2ea08bbb-fd80-4867-a96e-f1e6ace75200/3a60c87f-2a76-4070-8cd2-88061df85565.png)
+The Wix-Data SPI is a REST over HTTPS protocol in which the Wix site forwards database operations to the adapter (1), which translates them to native DB operations (2). The adapter calls the external database (3), gets the response (4), translates the response back to the wix-data protocol (5) and responds to the SPI request (6).
+  
 
 ### Deployment Considerations
 
-Wix maintains a pre-built Docker container image that is ready to be deployed. It's advisable to run the container as close as possible to a database to minimize the latency of the native DB protocol traffic between the adapter and the database. Security and firewall configurations between the adapter and database should also be considered. 
+Wix maintains a pre-built Docker container image that is ready to be deployed. It's advisable to run the container as close as possible to a database to minimize the latency of the native DB protocol traffic between the adapter and the database. Additionally, dome databases require persistent connections and are not suited to HTTP. Security and firewall configurations between the adapter and database should also be considered. 
 
-It is important to note the location of the deployed environment. The Wix infrastructure has a global presence, and site data is replicated worldwide to give your site visitors get the best performance. Where the database is managed externally, it's important to set up the connector and database in the correct region for optimal performance. Please refer to AWS, GCP, and Azure installation tutorials for regions recommendations.
-
-## How to Choose the Right DB Engine for Your Site's Workload
-
-In most cases where data collections don't exceed 10K records, the Wix Content Manager is the best choice for building a web site with data. Content Manager is globally replicated, has native support for PII encryption, GDPR, and other non-functional features. 
-
-The external database collection adapter helps address the foolling issues:
-+ Requirements for data to be hosted locality
-+ Regulatory requirements
-+ Processing workload 
-+ Data volumes
-
-Database size: 
-* The Wix Content Manager should be used for data volumes of less than 10K records
-* Relational databases like Postgres, MySQL, Microsoft SQL Server, or Google Cloud Spanner should be used if the dataset is between 10K to 1M records, it's being used for production workloads or for user-facing pages rendering. 
-* Where the dataset exceeds 1M records and is primarily used for reporting, Google BigQuery, Snowflake or other big data DB engines should be considered.
+It is important to note the location of the deployed environment. The Wix infrastructure has a global presence, and site data is replicated worldwide to give your site visitors get the best performance. Where the database is managed externally, it is important to set up the adapter and the database in the correct region for optimal performance.
 
 ## Supported Databases and Limitations
 
@@ -53,18 +46,10 @@ The following lists the databases supported by the adapter:
   * [Amazon Aurora](https://aws.amazon.com/rds/aurora)
   * [Microsoft Azure Postgres](https://azure.microsoft.com/en-us/services/postgresql)
 
-The following databases have support planned for the near future: 
-* [MongoDB](https://www.mongodb.com/)
-  MongoDB can be self managed open source edition instance, or use managed [MongoDB Atlas](https://www.mongodb.com/cloud/atlas). Atlas can be hosted on Google Cloud, Amazon AWS and Microsoft Azure. There are also great MongoDB API compaitable databases like [Amazon DocumentDB](https://aws.amazon.com/documentdb/) and [Microsoft Azure Cosmos DB](https://docs.microsoft.com/en-us/azure/cosmos-db/mongodb/mongodb-introduction).
-* [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-2019)
-  MS SQL server can be connected both as on-prem, self managed installation or managed version available as part of [Google Cloud SQL](https://cloud.google.com/sql/docs/sqlserver/quickstart) as well as [Amazon RDS for SQL Server](https://aws.amazon.com/rds/sqlserver/) or Microsoft Azure [fully managed service](https://azure.microsoft.com/en-us/products/azure-sql/database/#overview). 
-* [Google Cloud Spanner](https://cloud.google.com/spanner) - Fully managed relational database with unlimited scale, strong consistency, and up to 99.999% availability from Google.
-* [Google Cloud Firestore](https://cloud.google.com/firestore) - Fully managed, scalable, and serverless document database by Google Firebase.
 
+## Public Cloud Platforms
 
-## Supported Public Clouds
-
-As the adpter is a docker container image, it is supported on any cloud environment that supports docker containers.
+The adapter is a docker container image, It is supported by any cloud environment that supports docker containers.
 This includes:
 * Google Cloud
   * [Deploying to Cloud Run](https://support.wix.com/en/article/using-your-mysql-and-postgres-database-with-velo)
