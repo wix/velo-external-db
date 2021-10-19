@@ -12,6 +12,7 @@
     "test:postgres10": "npm run test:postgres",
     "test:postgres9": "npm run test:postgres",
     "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
+    "test:mariadb": "lerna exec --scope external-db-mariadb \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mariadb\"",
     "test:mysql": "lerna exec --scope external-db-mysql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mysql\"",
     "test:mysql5": "npm run test:mysql",
     "test:mssql": "lerna exec --scope external-db-mssql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mssql\"",

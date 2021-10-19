@@ -1,4 +1,4 @@
 
-const LocalDev = () => process.env.CI === 'false'
+const LocalDev = () => process.env.CI !== 'true'
 
 module.exports = { LocalDev }

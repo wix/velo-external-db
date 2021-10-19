@@ -10,6 +10,7 @@ const mssql = require('./engines/mssql_resources')
 const mongo = require('./engines/mongo_resources')
 const googleSheet = require('./engines/google_sheets_resourses')
 const airtable = require ('./engines/airtable_resources')
+const mariadb = require ('./engines/mariadb_resources')
 
 
 const env = {
@@ -54,6 +55,7 @@ const mssqlTestEnvInit = async () => await dbInit(mssql)
 const mongoTestEnvInit = async () => await dbInit(mongo)
 const googleSheetTestEnvInit = async () => await dbInit(googleSheet)
 const airtableTestEnvInit = async() => await dbInit(airtable)
+const mariadbTestEnvInit = async() => await dbInit(mariadb)
 
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
@@ -62,6 +64,7 @@ const testSuits = () => [
     ['Firestore', firestoreTestEnvInit],
     ['Sql Server', mssqlTestEnvInit],
     ['Mongo', mongoTestEnvInit],
+    ['MariaDB', mariadbTestEnvInit],
     ['Google-sheet', googleSheetTestEnvInit],
     ['Airtable',airtableTestEnvInit]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )

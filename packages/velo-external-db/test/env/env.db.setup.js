@@ -6,6 +6,7 @@ const mssql = require('../resources/engines/mssql_resources')
 const mongo = require ('../resources/engines/mongo_resources')
 const googleSheet = require('../resources/engines/google_sheets_resourses')
 const airtable = require ('../resources/engines/airtable_resources')
+const mariadb = require ('../resources/engines/mariadb_resources')
 
 const { sleep } = require('test-commons')
 const ci = require('./ci_utils')
@@ -42,6 +43,10 @@ const initEnv = async (testEngine) => {
         case 'airtable':
             await airtable.initEnv()
             break
+
+        case 'mariadb':
+            await mariadb.initEnv()
+            break
     }
 }
 
@@ -73,13 +78,16 @@ const cleanup = async (testEngine) => {
         case 'mongo':
             await mongo.cleanup()
             break;
+
+        case 'mariadb':
+            await mariadb.cleanup()
+            break;
     }
 }
 
 module.exports = async () => {
     const testEngine = process.env.TEST_ENGINE
     if (ci.LocalDev()) {
-        console.log('running mysql')
         await initEnv(testEngine)
 
         await sleep(5000)

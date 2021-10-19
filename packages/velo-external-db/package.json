@@ -11,6 +11,7 @@
     "test:firestore": "TEST_ENGINE=firestore jest --runInBand ./test",
     "test:mssql": "TEST_ENGINE=mssql jest --runInBand ./test",
     "test:mongo": "TEST_ENGINE=mongo jest --runInBand ./test",
+    "test:mariadb": "TEST_ENGINE=mariadb jest --runInBand ./test",
     "test:google-sheets": "TEST_ENGINE=google-sheets jest  -i  packages/velo-external-db/test/e2e/app_data.e2e.spec.js  --runInBand -t 'Velo External DB Data REST API' ",
     "test:watch": "jest --detectOpenHandles --watch",
     "start": "node lib/app.js",
@@ -31,6 +32,7 @@
     "external-db-mysql": "^0.0.0",
     "external-db-postgres": "^0.0.0",
     "external-db-spanner": "^0.0.0",
+    "external-db-mariadb": "^0.0.0",
     "nested-property": "^4.0.0",
     "velo-external-db-commons": "^0.0.0",
     "velo-external-db-core": "^0.0.0"

@@ -1,0 +1,41 @@
+{
+  "name": "external-db-mariadb",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Noam Almog <noama@wix.com>",
+  "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "http://npm.dev.wixpress.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
+  },
+  "scripts": {
+    "test": ""
+  },
+  "bugs": {
+    "url": "https://github.com/wix-private/noam-external-db-poc/issues"
+  },
+  "dependencies": {
+    "external-db-mysql": "^0.0.0",
+    "mariadb": "^2.5.4",
+    "mysql": "^2.18.1",
+    "velo-external-db-commons": "^0.0.0"
+  },
+  "devDependencies": {
+    "chance": "^1.1.7",
+    "jest": "^27.3.1",
+    "jest-when": "^3.4.1",
+    "test-commons": "^0.0.0",
+    "ts-jest": "^27.0.7"
+  }
+}

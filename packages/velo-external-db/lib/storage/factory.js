@@ -34,6 +34,12 @@ const init = async(type, vendor, config) => {
 
             return append(init(cfg), cfg.secretKey)
         }
+        case 'mariadb':{
+            const { init } = require('external-db-mariadb')
+            const cfg = await config.readConfig()
+
+            return append(init(cfg), cfg.secretKey)
+        }
         case 'mongo': {
             const { init } = require('external-db-mongo')
             const cfg = await config.readConfig()

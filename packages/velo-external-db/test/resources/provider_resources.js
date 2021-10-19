@@ -21,6 +21,9 @@ const mongoTestEnv = require('./engines/mongo_resources')
 const airtable = require ('external-db-airtable')
 const airtableEnv = require ('./engines/mongo_resources')
 
+const mariadb = require ('external-db-mariadb')
+const mariadbEnv = require ('./engines/mariadb_resources')
+
 const env = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
@@ -54,7 +57,8 @@ const spannerTestEnvInit = async () => await dbInit(spannerTestEnv, spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestoreTestEnv, firestore)
 const mssqlTestEnvInit = async () => await dbInit(mssqlTestEnv, mssql)
 const mongoTestEnvInit = async () => await dbInit(mongoTestEnv, mongo)
-const airTableTestEnvInit = async() => await dbInit(airtableEnv,airtable)
+const airTableTestEnvInit = async() => await dbInit(airtableEnv, airtable)
+const mariadbTestEnvInit = async() => await dbInit(mariadbEnv, mariadb)
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
     ['Postgres', postgresTestEnvInit],
@@ -62,6 +66,7 @@ const testSuits = () => [
     ['Firestore', firestoreTestEnvInit],
     ['Sql Server', mssqlTestEnvInit],
     ['Mongo', mongoTestEnvInit],
+    ['MariaDB', mariadbTestEnvInit],
     ['Airtable', airTableTestEnvInit]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 

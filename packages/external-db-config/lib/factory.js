@@ -34,6 +34,7 @@ const create = () => {
         case 'airtable':
           internalConfigReader = new gcp.GcpAirtableConfigReader()  
           break;
+        case 'mariadb':
         case 'mysql':
         case 'postgres':
           internalConfigReader = new gcp.GcpConfigReader()
@@ -60,6 +61,7 @@ const create = () => {
           break;
         case 'mssql':
         case 'mysql':
+        case 'mariadb':
         case 'postgres':
           internalConfigReader = new azure.AzureConfigReader()
           break
