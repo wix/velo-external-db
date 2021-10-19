@@ -30,7 +30,7 @@
     "velo-external-db-commons": "^0.0.0"
   },
   "devDependencies": {
-    "jest": "^27.2.5",
+    "jest": "^27.3.1",
     "jest-when": "^3.4.1",
     "test-commons": "^0.0.0",
     "ts-jest": "^27.0.7",
