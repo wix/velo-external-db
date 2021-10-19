@@ -1,12 +1,15 @@
 const { init } = require('external-db-spanner')
 const { runImage, stopImage } = require('./docker_support')
 
+const setEmulatorOn = () => process.env.SPANNER_EMULATOR_HOST = 'localhost:9010'
+
 const connection = () => {
     const {connection, cleanup} = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
     return { pool: connection, cleanup: cleanup}
 }
 
 const cleanup = async () => {
+    setEmulatorOn()
     const {schemaProvider, cleanup} = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
     const res = await schemaProvider.list()
     const tables = res.map(t => t.id)
@@ -19,12 +22,8 @@ const cleanup = async () => {
 }
 
 const initEnv = async () => {
-    setEmulatorOn()
-
     await runImage('spanner')
 }
-
-const setEmulatorOn = () => process.env.SPANNER_EMULATOR_HOST = 'localhost:9010'
 
 const setActive = () => {
     setEmulatorOn()
