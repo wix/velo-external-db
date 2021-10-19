@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        database: ["postgres", "spanner", "mysql", "mssql", "mongo", "firestore"]
+        database: ["postgres", "spanner", "mysql", "mysql5", "mssql", "mongo", "firestore"]
 
     steps:
       - uses: actions/checkout@v2
