@@ -27,7 +27,7 @@ The Wix-Data SPI is a REST over HTTPS protocol in which the Wix site forwards da
 
 Wix maintains a pre-built Docker container image that is ready to be deployed. It's advisable to run the container as close as possible to a database to minimize the latency of the native DB protocol traffic between the adapter and the database. Additionally, dome databases require persistent connections and are not suited to HTTP. Security and firewall configurations between the adapter and database should also be considered. 
 
-It is important to note the location of the deployed environment. The Wix infrastructure has a global presence, and site data is replicated worldwide to give your site visitors get the best performance. Where the database is managed externally, it is important to set up the adapter and the database in the correct region for optimal performance.
+It is important to note the location of the deployed environment. The Wix infrastructure has a global presence, and site data is replicated worldwide to give your site visitors the best performance. Where the database is managed externally, it is important to set up the adapter and the database in the correct region for optimal performance.
 
 ## Supported Databases and Limitations
 
