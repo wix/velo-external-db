@@ -8,6 +8,7 @@
     "test:postgres": "lerna exec --scope external-db-postgres \"npm test\" && lerna exec --scope velo-external-db \"npm run test:postgres\"",
     "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
     "test:mysql": "lerna exec --scope external-db-mysql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mysql\"",
+    "test:mysql5": "lerna exec --scope external-db-mysql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mysql\"",
     "test:mssql": "lerna exec --scope external-db-mssql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mssql\"",
     "test:firestore": "lerna exec --scope external-db-firestore \"npm test\" && lerna exec --scope velo-external-db \"npm run test:firestore\"",
     "test:mongo": "lerna exec --scope external-db-mongo \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mongo\"",

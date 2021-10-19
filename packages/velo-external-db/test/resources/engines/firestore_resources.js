@@ -10,6 +10,7 @@ const connection = () => {
 }
 
 const cleanup = async () => {
+    setEmulatorOn()
     const {schemaProvider, cleanup} = init(['test-project'])
     const res = await schemaProvider.list()
     const tables = res.map(t => t.id)
@@ -22,7 +23,6 @@ const cleanup = async () => {
 }
 
 const initEnv = async () => {
-    setEmulatorOn()
 
     await runImage('firestore')
 }
