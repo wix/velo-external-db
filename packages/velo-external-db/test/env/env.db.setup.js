@@ -81,6 +81,8 @@ module.exports = async () => {
     if (ci.LocalDev()) {
         console.log('running mysql')
         console.log(process.env.CI)
+        console.log(process.env.CI === true)
+        console.log(process.env.CI === 'true')
         await initEnv(testEngine)
 
         await sleep(5000)
