@@ -28,7 +28,7 @@ const updateExpressionFor = items => items.map( updateExpressionForItem )
 const unpackIdFieldForItem = item => {
     if (isObject(item._id)) {
         const item2 = { ...item, ...item._id }
-        if (isObject(item._id)) delete item2._id
+        if (isObject(item2._id)) delete item2._id
         return item2
     }
     return item
