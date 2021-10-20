@@ -68,7 +68,7 @@ const singleRecordUpdate = [
     _checkParamsMiddleware,
     (req, res) => {
         const index = data.findIndex(obj => obj.id === req.params.recordId)
-        data[index].fields = Object.assign({}, data[index].fields, req.body.fields)
+        data[index].fields = { ...data[index].fields, ...req.body.fields }
 
         res.json(data[index])
     },

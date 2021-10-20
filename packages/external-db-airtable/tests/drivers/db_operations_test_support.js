@@ -7,7 +7,7 @@ const createPool = modify => {
         baseId: 'app123'
     }
 
-    const { connection, cleanup } =  init(Object.assign({}, config, modify), { endpointUrl: 'http://localhost:9000', requestTimeout: 1000 })
+    const { connection, cleanup } =  init({ ...config, ...modify }, { endpointUrl: 'http://localhost:9000', requestTimeout: 1000 })
     return { connection, cleanup }
 }
 

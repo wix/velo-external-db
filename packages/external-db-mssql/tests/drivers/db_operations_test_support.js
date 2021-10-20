@@ -19,7 +19,7 @@ const createPool = async modify => {
         }
     }
 
-    const _pool = new ConnectionPool(Object.assign({}, config, modify ))
+    const _pool = new ConnectionPool({ ...config, ...modify })
     const pool = await _pool.connect().then((pool) => { return pool }).catch(() => { return _pool })
     return pool
 }

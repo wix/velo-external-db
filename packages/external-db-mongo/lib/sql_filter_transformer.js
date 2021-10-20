@@ -21,7 +21,7 @@ class FilterParser {
         const fieldsStatement = {}
         if (isObject(aggregation._id)) {
             const _id = Object.keys(aggregation._id)
-                                    .reduce((r, c) => Object.assign({}, r, { [aggregation._id[c]]: `$${aggregation._id[c]}` }), {})
+                              .reduce((r, c) => ( { ...r, [aggregation._id[c]]: `$${aggregation._id[c]}` } ), {})
             Object.assign(fieldsStatement, { _id } )
         } else {
             Object.assign(fieldsStatement, { [aggregation._id]: `$${aggregation._id}` })
@@ -34,7 +34,7 @@ class FilterParser {
                             Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `$${field}` } })
                         })
               })
-        const filterObj = (havingFilter.reduce(((r, c) => Object.assign(r, c)), {}))
+        const filterObj = havingFilter.reduce((r, c) => ( { ...r, ...c } ), {})
         return {
             fieldsStatement: { $group: fieldsStatement },
             havingFilter: { $match: filterObj.filterExpr || {} },

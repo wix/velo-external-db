@@ -8,7 +8,7 @@ const createPool = modify => {
         password: 'password',
         db: 'test-db',
     }
-    const { connection, cleanup } = init(Object.assign({}, config, modify ), { max: 1 })
+    const { connection, cleanup } = init({ ...config, ...modify }, { max: 1 })
     return { connection, cleanup }
 }
 

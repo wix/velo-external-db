@@ -163,8 +163,8 @@ describe('Velo External DB Data REST API',  () => {
         ctx.numberColumns = gen.randomNumberColumns()
         ctx.item = gen.randomEntity([ctx.column.name])
         ctx.items = Array.from({length: 10}, () => gen.randomEntity([ctx.column.name]))
-        ctx.modifiedItems = ctx.items.map(i => Object.assign({}, i, {[ctx.column.name]: chance.word()} ) )
-        ctx.modifiedItem = Object.assign({}, ctx.item, {[ctx.column.name]: chance.word()} )
+        ctx.modifiedItems = ctx.items.map(i => ( { ...i, [ctx.column.name]: chance.word() } ) )
+        ctx.modifiedItem = { ...ctx.item, [ctx.column.name]: chance.word() }
         ctx.anotherItem = gen.randomEntity([ctx.column.name])
         ctx.numberItem = gen.randomNumberDbEntity(ctx.numberColumns)
         ctx.anotherNumberItem = gen.randomNumberDbEntity(ctx.numberColumns)

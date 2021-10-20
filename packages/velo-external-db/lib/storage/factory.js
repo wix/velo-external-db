@@ -1,4 +1,4 @@
-const append = (res, secretKey) => Object.assign({}, res, {secretKey: secretKey})
+const append = (res, secretKey) => ( { ...res, secretKey: secretKey } )
 
 const init = async(type, vendor, config) => {
     console.log(`INIT: ${vendor + '/' + type}`)

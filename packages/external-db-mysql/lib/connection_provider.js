@@ -23,7 +23,7 @@ const init = (cfg, _poolOptions) => {
         config['socketPath'] = `/cloudsql/${cfg.cloudSqlConnectionName}`
     }
 
-    const pool = mysql.createPool(Object.assign({}, config, poolOptions))
+    const pool = mysql.createPool({ ...config, ...poolOptions })
     const databaseOperations = new DatabaseOperations(pool)
 
     const filterParser = new FilterParser()

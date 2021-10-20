@@ -89,7 +89,7 @@ class FilterParser {
                 const op = filter.operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.filter.map(r => r.filterExpr).join( op ),
-                    parameters: res.filter.reduce((o, s) => Object.assign({}, o, s.parameters), {} )
+                    parameters: res.filter.reduce((o, s) => ( { ...o, ...s.parameters } ), {} )
                 }]
             case '$not':
                 const res2 = this.parseFilter( filter.value, inlineFields )
@@ -131,7 +131,7 @@ class FilterParser {
             if (!Array.isArray(value)) {
                 return { [patchFieldName(name)]: this.patchTrueFalseValue(value) }
             } else {
-                return value.reduce((o, v, i) => Object.assign({}, o, { [patchFieldName(`${name}${i + 1}`)]: v}), {})
+                return value.reduce((o, v, i) => ( { ...o, [patchFieldName(`${name}${i + 1}`)]: v } ), {})
             }
         }
         return { }
