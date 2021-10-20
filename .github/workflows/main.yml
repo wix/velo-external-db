@@ -46,6 +46,14 @@ jobs:
           node-version: 14
           cache: "npm"
 
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
       - name: Downloading Docker Compose V2
         run: |
           curl -sfL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
