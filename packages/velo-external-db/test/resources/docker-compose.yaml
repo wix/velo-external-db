@@ -108,10 +108,10 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      MYSQL_USER: test-user
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: test-db
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MARIADB_USER: test-user
+      MARIADB_PASSWORD: password
+      MARIADB_DATABASE: test-db
+      MARIADB_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
       - 3306:3306
     networks:
@@ -122,10 +122,10 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      MYSQL_USER: test-user
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: test-db
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MARIADB_USER: test-user
+      MARIADB_PASSWORD: password
+      MARIADB_DATABASE: test-db
+      MARIADB_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
       - 3306:3306
     networks:
@@ -136,10 +136,10 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      MYSQL_USER: test-user
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: test-db
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MARIADB_USER: test-user
+      MARIADB_PASSWORD: password
+      MARIADB_DATABASE: test-db
+      MARIADB_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
       - 3306:3306
     networks:
