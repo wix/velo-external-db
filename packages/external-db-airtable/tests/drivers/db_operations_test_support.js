@@ -3,7 +3,8 @@ const init = require('../../lib/connection_provider')
 
 const createPool = modify => {
     const config = {
-        privateApiKey: 'key123',
+        apiPrivateKey: 'key123',
+        metaApiKey: 'meta123',
         baseId: 'app123'
     }
 
@@ -11,11 +12,11 @@ const createPool = modify => {
     return { connection, cleanup }
 }
 
-const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool({ privateApiKey: 'wrong' }).connection)
+const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool({ apiPrivateKey: 'wrong' }).connection)
 
 const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool({ baseId: 'wrong' }).connection)
 
-const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool({ privateApiKey: 'wrong' }).connection)
+const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool({ apiPrivateKey: 'wrong' }).connection)
 
 const dbOperationWithValidDB = () => {
     const { connection, cleanup } = createPool({ } )
