@@ -17,7 +17,7 @@ const dbSupportedOn = (vendor) => {
 
 const nonEmpty = input => !(!input || input.trim() === '')
 
-const Aws = require('../../.credentials.json')
+// const Aws = require('../../.credentials.json')
 
 const credentialsFor = vendor => {
     switch (vendor) {
