@@ -17,7 +17,15 @@ jobs:
           node-version: 14
           cache: "npm"
 
-      - name: Installing Lerna
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Installing Dependencies
         run: npm install
 
       - name: Install dependencies of the homemade packages.
@@ -46,6 +54,14 @@ jobs:
           node-version: 14
           cache: "npm"
 
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
       - name: Downloading Docker Compose V2
         run: |
           curl -sfL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
@@ -61,7 +77,7 @@ jobs:
           cd packages/velo-external-db/test/resources
           docker compose up --detach ${{ matrix.database }}
 
-      - name: Installing Lerna
+      - name: Installing Dependencies
         run: npm install
 
       - name: Install dependencies of the homemade packages.
