@@ -28,7 +28,7 @@ class DataProvider {
     }
 
     patch(item) {
-        return Object.entries(item).reduce((o, [k, v]) => Object.assign({}, o, {[patchFieldName(k)]: v}), {})
+        return Object.entries(item).reduce((o, [k, v]) => ( { ...o, [patchFieldName(k)]: v } ), {})
     }
 
     // todo: check if we can get schema in a safer way. should be according to schema of the table
@@ -64,7 +64,7 @@ class DataProvider {
 
     async delete(collectionName, itemIds) {
         const sql = `DELETE FROM ${escapeTable(collectionName)} WHERE _id IN (${itemIds.map((t, i) => validateLiteral(`_id${i}`)).join(', ')})`
-        const rs = await this.query(sql, itemIds.reduce((p, t, i) => Object.assign({}, p, { [patchFieldName(`_id${i}`)]: t }), {}), true)
+        const rs = await this.query(sql, itemIds.reduce((p, t, i) => ( { ...p, [patchFieldName(`_id${i}`)]: t } ), {}), true)
                              .catch( translateErrorCodes )
         return rs
     }
@@ -79,7 +79,7 @@ class DataProvider {
 
         const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
 
-        return await this.query(sql, Object.assign({}, whereParameters, parameters))
+        return await this.query(sql, { ...whereParameters, ...parameters })
     }
 
     async query(sql, parameters, op) {

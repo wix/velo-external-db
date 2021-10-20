@@ -29,7 +29,7 @@ const asWixSchema = (res, collectionName) => {
         ],
         maxPageSize: 50,
         ttl: 3600,
-        fields: res.reduce( (o, r) => Object.assign(o, { [r.field]: {
+        fields: res.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
                 queryOperators: [

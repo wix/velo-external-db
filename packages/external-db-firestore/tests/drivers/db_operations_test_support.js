@@ -5,7 +5,7 @@ const createPool = modify => {
         projectId: 'test-project',
     }
 
-    return init(Object.values(Object.assign({}, config, modify)), { min: 0, size: 1 })
+    return init(Object.values({ ...config, ...modify }), { min: 0, size: 1 })
 }
 
 const unplugEmulator = () => delete process.env.FIRESTORE_EMULATOR_HOST

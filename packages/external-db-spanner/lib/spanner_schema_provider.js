@@ -89,7 +89,7 @@ class SchemaProvider {
     }
 
     fixColumn(c) {
-        return Object.assign({}, c, { name: patchFieldName(c.name)})
+        return { ...c, name: patchFieldName(c.name) }
     }
 
     reformatFields(r) {

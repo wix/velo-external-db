@@ -223,10 +223,10 @@ describe('Data API', () => {
             ctx.limit = 10;
 
             ctx.entity = gen.randomDbEntity([ctx.column.name]);
-            ctx.modifiedEntity = Object.assign({}, ctx.entity, {[ctx.column.name]: chance.word()} )
+            ctx.modifiedEntity = { ...ctx.entity, [ctx.column.name]: chance.word() }
             ctx.anotherEntity = gen.randomDbEntity([ctx.column.name]);
             ctx.entities = gen.randomDbEntities([ctx.column.name]);
-            ctx.modifiedEntities = ctx.entities.map(e => Object.assign({}, e, {[ctx.column.name]: chance.word()} ))
+            ctx.modifiedEntities = ctx.entities.map(e => ( { ...e, [ctx.column.name]: chance.word() } ))
             ctx.numberEntity = gen.randomNumberDbEntity(ctx.numericColumns);
             ctx.anotherNumberEntity = gen.randomNumberDbEntity(ctx.numericColumns);
 

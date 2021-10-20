@@ -9,7 +9,7 @@ const createPool = modify => {
         db : 'test-db',
     }
 
-    const { connection, cleanup } = init(Object.assign({}, config, modify ), { connectionLimit: 1, queueLimit: 0 })
+    const { connection, cleanup } = init({ ...config, ...modify }, { connectionLimit: 1, queueLimit: 0 })
     return { connection, cleanup }
 }
 

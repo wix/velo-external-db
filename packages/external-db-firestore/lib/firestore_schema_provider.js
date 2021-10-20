@@ -17,7 +17,7 @@ class SchemaProvider {
 
     async list() {
         const l = await this.database.collection(SystemTable).get()
-        const tables = l.docs.reduce((o, d) => Object.assign( o, { [d.id]: d.data()}), {})
+        const tables = l.docs.reduce((o, d) => ( { ...o, [d.id]: d.data() } ), {})
         return Object.entries(tables)
                      .map(([collectionName, rs]) => asWixSchema([...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) ), collectionName))
     }

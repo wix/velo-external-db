@@ -243,7 +243,7 @@ describe('Sql Parser', () => {
                 const filter2 = env.filterParser.parseFilter(ctx.anotherFilter)[0]
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: `${filter1.filterExpr} ${op} ${filter2.filterExpr}`,
-                    parameters: Object.assign({}, filter1.parameters, filter2.parameters)
+                    parameters: { ...filter1.parameters, ...filter2.parameters }
                 }])
             })
 
