@@ -17,9 +17,9 @@ class DataProvider {
             params: {
                 skip: skip,
                 limit: limit,
+                ...parameters
             },
         }
-        Object.assign(query.params, parameters)
 
         const [rows] = await this.database.run(query);
         return recordSetToObj(rows).map( this.asEntity.bind(this) )
@@ -29,9 +29,8 @@ class DataProvider {
         const {filterExpr, parameters} = this.filterParser.transform(filter)
         const query = {
             sql: `SELECT COUNT(*) AS num FROM ${escapeId(collectionName)} ${filterExpr}`.trim(),
-            params: { },
-        };
-        Object.assign(query.params, parameters)
+            params: parameters,
+        }
 
         const [rows] = await this.database.run(query)
         const objs = recordSetToObj(rows).map( this.asEntity.bind(this) )
@@ -112,10 +111,8 @@ class DataProvider {
 
         const query = {
             sql: `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`,
-            params: { },
+            params: { ...whereParameters, ...parameters },
         }
-
-        Object.assign(query.params, whereParameters, parameters)
 
         const [rows] = await this.database.run(query)
         return recordSetToObj(rows).map( this.asEntity.bind(this) )
