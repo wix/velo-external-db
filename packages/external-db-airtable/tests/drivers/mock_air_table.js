@@ -20,10 +20,17 @@ const _checkParamsMiddleware = (req, res, next) => {
     if (req.params.baseId !== 'app123')
         return next(new AirtableError('NOT_FOUND', 'Could not find what you are looking for', '404'))
 
-    if (req.params.tableIdOrName !== 'Table')
+    if (req.params.tableIdOrName && req.params.tableIdOrName !== 'Table')
         return next(new AirtableError('NOT_FOUND', `Could not find table ${req.params.tableIdOrName} in application ${req.params.baseId}`, '404'))
+    
     next()
 }
+const _checkParamsMetaMiddleware = ( _checkParamsMiddleware, function (req,res,next) { //TODO: refactor middleware
+    console.log(req.get('X-Airtable-Client-Secret'));
+    if (req.get('X-Airtable-Client-Secret') !== 'meta123')
+        return next(new AirtableError('Unauthorized','Unauthorized','401'))
+    next()
+})
 
 
 const app = express()
@@ -117,6 +124,48 @@ app.delete('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, function (req, 
     })
     res.json({ records })
 });
+
+
+// *************** Meta API **********************
+
+app.get('/v0/meta/bases/:baseId/tables',_checkParamsMetaMiddleware, function (req, res) {
+    res.json({
+        "tables": [
+          {
+            "id": "tbltp8DGLhqbUmjK1",
+            "name": "Table",
+            "primaryFieldId": "fld1VnoyuotSTyxW1",
+            "fields": [
+              {
+                "id": "fld1VnoyuotSTyxW1",
+                "name": "Name",
+                "type": "singleLineText"
+              },
+              {
+                "id": "fldoaIqdn5szURHpw",
+                "name": "Age",
+                "type": "number"
+              },
+              {
+                "id": "fldumZe00w09RYTW6",
+                "name": "URL",
+                "type": "url",
+              }
+            ],
+            "views": [
+              {
+                "id": "viwQpsuEDqHFqegkp",
+                "name": "Grid view",
+                "type": "grid"
+              }
+            ]
+          }
+        ]
+      }
+    )
+})
+
+
 
 app.use(function (req, res) {
     res.status(404);

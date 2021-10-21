@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "airtable": "^0.11.1",
+    "axios": "^0.23.0",
     "express": "^4.17.1",
     "velo-external-db-commons": "^0.0.0"
   },
