@@ -1,7 +1,6 @@
 const express = require('express')
 const { errorMiddleware } = require('./web/error-middleware')
 const { appInfoFor } = require ('./health/app_info')
-const {readCommonConfig} = require("external-db-config");
 const { InvalidRequest } = require('velo-external-db-commons').errors
 
 let dataService, schemaService, operationService, externalDbConfigClient

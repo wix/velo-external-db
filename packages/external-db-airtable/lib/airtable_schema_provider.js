@@ -7,30 +7,32 @@ const axios = require('axios').create({
 
 
 class SchemaProvider {
-    constructor(pool, apiKey, metaApiKey, test) {
+    constructor(pool, apiKey, metaApiKey) {
         this.pool = pool
         this.apiKey = apiKey
         this.metaApiKey = metaApiKey
-        this.axios = axios
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
     }
 
     async list() {
         const baseId = this.pool.getId()
 
-        const response = await this.axios.get(`v0/meta/bases/${baseId}/tables`, {
+        const response = await axios.get(`v0/meta/bases/${baseId}/tables`, {
             headers: {
-                'Authorization': `Bearer ${this.apiKey}`,
+                Authorization: `Bearer ${this.apiKey}`,
                 'X-Airtable-Client-Secret': this.metaApiKey
             }
         })
-        const tables = response.data.tables.reduce((pV, cV) => ({
-            ...pV,
-            [cV.name]:
-                { fields: cV.fields.map(field => { return { field: field.name, type: this.translateDbTypes(field.type) } }) }
-        }), {})
+        const tables = response.data
+                               .tables
+                               .reduce((pV, cV) => ({
+                                   ...pV,
+                                   [cV.name]: { fields: cV.fields
+                                                          .map(field => ( { field: field.name, type: this.translateDbTypes(field.type) } )) }
+                               }), {})
 
-        return Object.entries(tables).map(([collectionName, rs]) => asWixSchema(rs.fields, collectionName))
+        return Object.entries(tables)
+                     .map(([collectionName, rs]) => asWixSchema(rs.fields, collectionName))
     }
 
 
