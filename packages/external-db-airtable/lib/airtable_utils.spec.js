@@ -3,8 +3,7 @@ const { Uninitialized, gen } = require('test-commons')
 
 describe('Airtable Utils', () => {
     test('bulkCreateExpr return right format of create', () => {
-
-        expect(bulkCreateExpr([ctx.item, ctx.anotherItem])).toEqual([{ fields: { ...ctx.item } }, { fields: { ...ctx.anotherItem } }])
+        expect(bulkCreateExpr([ctx.item, ctx.anotherItem])).toEqual([{ fields: ctx.item }, { fields: ctx.anotherItem }])
     })
 
     const ctx = {
