@@ -130,14 +130,14 @@ describe('Data API', () => {
             expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual(expect.arrayContaining(ctx.modifiedEntities));
         });
 
-        test('if update does not have and updatable fields, do nothing', async () => {
-            await givenCollectionWith([ctx.entity], ctx.collectionName)
-            delete ctx.modifiedEntity[ctx.column.name]
-
-            expect( await env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).toEqual(0)
-
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
-        });
+        // test('if update does not have and updatable fields, do nothing', async () => {
+        //     await givenCollectionWith([ctx.entity], ctx.collectionName)
+        //     delete ctx.modifiedEntity[ctx.column.name]
+        //
+        //     expect( await env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).toEqual(0)
+        //
+        //     expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
+        // });
 
         test('truncate will remove all data from collection', async () => {
             await givenCollectionWith([ctx.entity], ctx.collectionName)
