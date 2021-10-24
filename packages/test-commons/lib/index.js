@@ -1,4 +1,4 @@
-const { Uninitialized, sleep } = require('./test-commons')
+const testCommons = require('./test-commons')
 const gen = require('./gen')
 
-module.exports = { Uninitialized, gen, sleep }
+module.exports = { ...testCommons, gen }
