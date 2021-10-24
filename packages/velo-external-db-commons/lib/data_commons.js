@@ -33,9 +33,10 @@ const asParamArrays = item => Object.values(item)
 const isObject = (o) => typeof o === 'object' && o !== null
 
 const updateFieldsFor = item => {
-    const systemFieldNames = SystemFields.map(f => f.name)
-    const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
-    return updateFields
+    // const systemFieldNames = SystemFields.map(f => f.name)
+    // return Object.keys(item)
+    //              .filter( k => !systemFieldNames.includes(k) )
+    return Object.keys(item)
 }
 
 
