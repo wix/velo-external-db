@@ -35,7 +35,7 @@ const updateFieldsFor = item => {
     // const systemFieldNames = SystemFields.map(f => f.name)
     // return Object.keys(item)
     //              .filter( k => !systemFieldNames.includes(k) )
-    return Object.keys(item)
+    return Object.keys(item).filter(f => f !== '_id')
 }
 
 
