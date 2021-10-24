@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { SystemFields } = require("velo-external-db-commons");
 
 const EMPTY_SORT = {
     sortExpr: '',
@@ -31,4 +32,11 @@ const asParamArrays = item => Object.values(item)
 
 const isObject = (o) => typeof o === 'object' && o !== null
 
-module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject }
+const updateFieldsFor = item => {
+    const systemFieldNames = SystemFields.map(f => f.name)
+    const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
+    return updateFields
+}
+
+
+module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor }

@@ -1,5 +1,5 @@
 const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } = require('./spanner_utils')
-const { SystemFields } = require('velo-external-db-commons')
+const { SystemFields, updateFieldsFor} = require('velo-external-db-commons')
 
 class DataProvider {
     constructor(database, filterParser) {
@@ -70,14 +70,6 @@ class DataProvider {
     }
 
     async update(collectionName, items) {
-        const item = items[0]
-        const systemFieldNames = SystemFields.map(f => f.name)
-        const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
-
-        if (updateFields.length === 0) {
-            return 0
-        }
-
         await this.database.table(collectionName)
                            .update(items.map( this.asDBEntity.bind(this) ))
         return items.length

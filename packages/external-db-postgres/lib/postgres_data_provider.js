@@ -1,5 +1,5 @@
 const { escapeIdentifier, prepareStatementVariables  } = require('./postgres_utils')
-const { SystemFields, asParamArrays, patchDateTime } = require('velo-external-db-commons')
+const { asParamArrays, patchDateTime, updateFieldsFor } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 
 class DataProvider {
@@ -40,14 +40,7 @@ class DataProvider {
     }
 
     async update(collectionName, items) {
-        const item = items[0]
-        const systemFieldNames = SystemFields.map(f => f.name)
-        const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
-
-        if (updateFields.length === 0) {
-            return 0
-        }
-
+        const updateFields = updateFieldsFor(items[0])
         const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
                                 .map(u => asParamArrays( patchDateTime(u) ))
 
