@@ -83,8 +83,8 @@ class GcpAirtableConfigReader {
   constructor() { }
 
   async readConfig() {
-    const { AIRTABLE_API_KEY, META_API_KEY, BASE_ID, SECRET_KEY } = process.env
-    return { apiPrivateKey: AIRTABLE_API_KEY,metaApiKey: META_API_KEY, baseId: BASE_ID, secretKey: SECRET_KEY }
+    const { AIRTABLE_API_KEY, META_API_KEY, BASE_ID, SECRET_KEY, BASE_URL } = process.env
+    return { apiPrivateKey: AIRTABLE_API_KEY,metaApiKey: META_API_KEY, baseId: BASE_ID, secretKey: SECRET_KEY, baseUrl: BASE_URL }
   }
 
   validate() {

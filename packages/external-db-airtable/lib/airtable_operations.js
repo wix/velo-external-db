@@ -9,7 +9,9 @@ class DatabaseOperations {
 
     async validateConnection() {
         try {
-            await this.pool('Table').select({}).firstPage()
+            await this.pool('Table')
+                      .select({})
+                      .firstPage()
             return { valid: true }
         } catch (e) {
             if (e.error === 'NOT_FOUND')

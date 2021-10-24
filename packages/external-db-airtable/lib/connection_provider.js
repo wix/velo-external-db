@@ -9,9 +9,7 @@ const init = async (cfg, _poolOptions) => {
     const databaseOperations = new DatabaseOperations(pool)
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
-    const schemaProvider = new SchemaProvider(pool, cfg.apiPrivateKey, cfg.metaApiKey)
-    if (process.env.NODE_ENV === 'test')
-        schemaProvider.axios.defaults.baseURL = `http://localhost:9000/`
+    const schemaProvider = new SchemaProvider(pool, cfg.apiPrivateKey, cfg.metaApiKey, cfg.baseUrl)
     return { dataProvider, schemaProvider, connection: pool, databaseOperations, cleanup: async () => { } }
 
 }

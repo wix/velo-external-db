@@ -1,6 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_SORT, isObject } = require('velo-external-db-commons')
-// const { EMPTY_FILTER } = require('./mongo_utils')
+const { isObject } = require('velo-external-db-commons')
 
 class FilterParser {
     constructor() {
@@ -29,7 +28,7 @@ class FilterParser {
                 const res = filter.value.map(this.parseFilter.bind(this))
                 const op = filter.operator === '$and' ? 'AND' : 'OR' 
                 return [{
-                    filterExpr: this.MultipleFieldOperatorToFilterExpr(op,res)
+                    filterExpr: this.multipleFieldOperatorToFilterExpr(op,res)
                 }]
 
             case '$not':
@@ -45,7 +44,7 @@ class FilterParser {
                 const ress = filter.value.map(val => { return { operator: '$eq', value: val, fieldName:filter.fieldName } })
                 const ress2 = ress.map(this.parseFilter.bind(this))
                 return [{
-                    filterExpr: this.MultipleFieldOperatorToFilterExpr('OR',ress2)
+                    filterExpr: this.multipleFieldOperatorToFilterExpr('OR',ress2)
                 }]
 
         }
@@ -68,36 +67,10 @@ class FilterParser {
         return []
     }
 
-    MultipleFieldOperatorToFilterExpr (operator, values) {
-        return `${operator}(${values.map(r=>r[0].filterExpr).join(',')})`  
+    multipleFieldOperatorToFilterExpr(operator, values) {
+        // todo: ido: check what happens if filter parse return an empty array
+        return `${operator}(${values.map(r => r[0].filterExpr).join(',')})`
     }
-
-    // }
-    // parseAggregation(aggregation, postFilter) {
-    //     const havingFilter = this.parseFilter(postFilter)
-    //     const fieldsStatement = {}
-    //     if (isObject(aggregation._id)) {
-    //         const _id = Object.keys(aggregation._id)
-    //                                 .reduce((r, c) => Object.assign({}, r, { [aggregation._id[c]]: `$${aggregation._id[c]}` }), {})
-    //         Object.assign(fieldsStatement, { _id } )
-    //     } else {
-    //         Object.assign(fieldsStatement, { [aggregation._id]: `$${aggregation._id}` })
-    //     }
-    //     Object.keys(aggregation)
-    //           .filter(f => f !== '_id')
-    //           .forEach(fieldAlias => {
-    //               Object.entries(aggregation[fieldAlias])
-    //                     .forEach(([func, field]) => {
-    //                         Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `$${field}` } })
-    //                     })
-    //           })
-    //     const filterObj = (havingFilter.reduce(((r, c) => Object.assign(r, c)), {}))
-    //     return {
-    //         fieldsStatement: { $group: fieldsStatement },
-    //         havingFilter: { $match: filterObj.filterExpr || {} },
-    //     }
-    // }
-
 
     valueForStringOperator(operator, value) {
         switch (operator) {
@@ -115,7 +88,7 @@ class FilterParser {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
             }
-            return this.MultipleFieldOperatorToFilterExpr('OR',value)
+            return this.multipleFieldOperatorToFilterExpr('OR',value)
         }
         else if (operator === '$eq' && value === undefined) {
             return `""`
@@ -131,7 +104,6 @@ class FilterParser {
     isSingleFieldStringOperator(operator) {
         return ['$contains', '$startsWith', '$endsWith'].includes(operator)
     }
-
 
     veloOperatorToAirtableOperator(operator, value) {
         switch (operator) {
@@ -164,13 +136,13 @@ class FilterParser {
         }
     }
 
-    skipExpression(skip) {
-        if (!skip) return {}
-        return {
-            pageSize: 1,
-            offset: skip
-        }
-    }
+    // skipExpression(skip) {
+    //     if (!skip) return {}
+    //     return {
+    //         pageSize: 1,
+    //         offset: skip
+    //     }
+    // }
 
     parseSort({ fieldName, direction }) {
         if (typeof fieldName !== 'string') {

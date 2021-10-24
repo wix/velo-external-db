@@ -19,7 +19,7 @@ const mongo = require('external-db-mongo')
 const mongoTestEnv = require('./engines/mongo_resources')
 
 const airtable = require ('external-db-airtable')
-const airtableEnv = require ('./engines/mongo_resources')
+const airtableEnv = require ('./engines/airtable_resources')
 
 const env = {
     dataProvider: Uninitialized,

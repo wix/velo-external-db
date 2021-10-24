@@ -1,6 +1,4 @@
 const { init, mockServer, cleanup: cleanupAirtable } = require('external-db-airtable')
-const { runImage, stopImage } = require('./docker_support')
-const axios = require('axios')
 
 let _server
 const PORT = 9000
@@ -14,7 +12,6 @@ const connection = async () => {
 
 const cleanup = async () => {
     cleanupAirtable()
-    // await axios.post(`/data/truncate`, {collectionName: 'Table1' }, authAdmin)
 }
 
 const initEnv = async () => {
