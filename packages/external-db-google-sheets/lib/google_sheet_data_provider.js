@@ -17,9 +17,9 @@ class DataProvider {
         const rows = await sheet.getRows()
         return rows.find(r => r._id === id)
     }
-
-    async find(collectionName, filter, sort, skip, limit) {
     
+    async find(collectionName, filter, sort, skip, limit) {
+   
         const sheet = await sheetFor(collectionName, this.doc)
         const rows = await sheet.getRows({ offset: skip, limit })
 
@@ -28,39 +28,26 @@ class DataProvider {
 
     async count(collectionName) {
         const sheet = await sheetFor(collectionName, this.doc)
-        return sheet._rawProperties.gridProperties.rowCount
+        const rows = await sheet.getRows()
+        return rows.length
     }
 
     // INSERT RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////
 
-    async insertItemsQuery(items, sheet) {
-        return items.map(async(item) => {
-            const newRow = await sheet.addRow(item)
-            return this.formatRow(newRow)
-        })
-    }
-
     async insert(collectionName, items) {
         const sheet = await sheetFor(collectionName, this.doc)
-        return Promise.all(await this.insertItemsQuery(items, sheet))
+        const row = await sheet.addRow(items[0])
+        return this.formatRow(row)
     }
     
     // UPDATE RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////
-    
+
     async updateRow(row, updatedItem) {
         Object.entries(updatedItem)
               .forEach(([key, value]) => row[key] = value)
         
         await row.save()
         return this.formatRow(row)
-    }
-
-    async updateItemsQuery(items, sheet) {
-        return items.map( async(item) => {            
-            const rowToUpdate = await this.findRowById(sheet, item._id)
-            // currently content-manger using data.update to insert new items, so if the id doesn't exist it means that this is a new item
-            return rowToUpdate ? await this.updateRow(rowToUpdate, item) : await this.insert(sheet.title, [item])
-        })
     }
 
     async update(collectionName, items) {
@@ -73,21 +60,25 @@ class DataProvider {
         }
 
         const sheet = await sheetFor(collectionName, this.doc)
-        return Promise.all(await this.updateItemsQuery(items, sheet))
+        return await Promise.all(items.slice(0, 3).map(async item => {
+            const rowToUpdate = await this.findRowById(sheet, item._id)
+            
+            // currently content-manger using data.update to insert new items, so if the id doesn't exist it means that this is a new item
+            return rowToUpdate ? await this.updateRow(rowToUpdate, item) : await this.insert(collectionName, [item])
+        }))
     }
 
     // DELETE RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////
-
+    
     async delete(collectionName, ids) {
         const sheet = await sheetFor(collectionName, this.doc)
-        return ids.map(async id => {
-            const rowToRemove = await this.findRowById(sheet, id)
+        await Promise.all(ids.slice(0, 3).map(async id => this.deleteRow(sheet, id)))
+        return {}
+    }
 
-            if(rowToRemove) {
-                await rowToRemove.delete()
-                return id
-            }
-        })
+    async deleteRow(sheet, id) {
+        const rowToDelete = await this.findRowById(sheet, id)
+        await rowToDelete.delete()
     }
 
     async truncate(collectionName) {
