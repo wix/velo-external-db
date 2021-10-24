@@ -66,6 +66,7 @@ const cleanup = async (testEngine) => {
         case 'mssql':
             await mssql.cleanup()
             break
+
         case 'google-sheet':
             await googleSheet.cleanup()
             break
@@ -78,8 +79,8 @@ const cleanup = async (testEngine) => {
 
 module.exports = async () => {
     const testEngine = process.env.TEST_ENGINE
+
     if (ci.LocalDev()) {
-        console.log('running mysql')
         await initEnv(testEngine)
 
         await sleep(5000)

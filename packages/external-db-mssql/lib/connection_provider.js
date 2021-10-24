@@ -5,8 +5,8 @@ const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mssql_operations')
 const { notConnectedPool } = require ('./mssql_utils')
 
-const extraOptions = () => {
-    if (process.env.NODE_ENV === 'test') {
+const extraOptions = cfg => {
+    if (cfg.unsecuredEnv === 'true') {
         return {
             options: {
                 encrypt: false,
@@ -38,7 +38,7 @@ const init = async (cfg, _poolOptions) => {
     }
     const poolOptions = _poolOptions || {}
 
-    const _pool = new ConnectionPool({ ...config, ...extraOptions(), ...poolOptions })
+    const _pool = new ConnectionPool({ ...config, ...extraOptions(cfg), ...poolOptions })
     const { pool, cleanup } = await _pool.connect()
                                          .then((res) => ({ pool: res, cleanup: async () => await pool.close() }))
                                          .catch(e => notConnectedPool(_pool, e) )

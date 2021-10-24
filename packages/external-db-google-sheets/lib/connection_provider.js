@@ -7,7 +7,7 @@ const DatabaseOperations = require('./google_sheet_operations')
 const init = async(cfg) => {
     const doc = new GoogleSpreadsheet(cfg.sheetId)
 
-    if (process.env.NODE_ENV == 'test') {
+    if (process.env.NODE_ENV === 'test') {
         doc.axios.defaults.baseURL = `http://localhost:1502/v4/spreadsheets/${cfg.sheetId}`
         doc.useRawAccessToken('mockup-token')
     } else {

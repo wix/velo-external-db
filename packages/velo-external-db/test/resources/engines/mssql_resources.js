@@ -2,6 +2,14 @@ const { init } = require('external-db-mssql')
 const { runImage, stopImage } = require('./docker_support')
 
 const testEnvConfig = {
+    host: 'localhost',
+    user: 'sa',
+    password: 't9D4:EHfU6Xgccs-',
+    db: 'tempdb',
+    unsecuredEnv: 'true',
+}
+
+const extraOptions = {
     pool: {
         max: 1,
         min: 0,
@@ -10,13 +18,13 @@ const testEnvConfig = {
 }
 
 const connection = async () => {
-    const { connection, cleanup } = await init({ host: 'localhost', user: 'sa', password: 't9D4:EHfU6Xgccs-', db: 'tempdb' }, testEnvConfig)
+    const { connection, cleanup } = await init(testEnvConfig, extraOptions)
 
     return { pool: connection, cleanup: cleanup }
 }
 
 const cleanup = async () => {
-    const {schemaProvider, cleanup} = await init({ host: 'localhost', user: 'sa', password: 't9D4:EHfU6Xgccs-', db: 'tempdb' }, testEnvConfig)
+    const {schemaProvider, cleanup} = await init(testEnvConfig, extraOptions)
 
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
@@ -25,6 +33,7 @@ const cleanup = async () => {
 }
 
 const initEnv = async () => {
+
     await runImage('mssql')
 }
 
@@ -38,6 +47,7 @@ const setActive = () => {
     process.env.USER = 'sa'
     process.env.PASSWORD = 't9D4:EHfU6Xgccs-'
     process.env.DB = 'tempdb'
+    process.env.UNSECURED_ENV = 'true'
 }
 
 
