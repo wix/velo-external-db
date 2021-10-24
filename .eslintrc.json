@@ -37,6 +37,10 @@
         "space-before-blocks": [
             "error",
             "always"
+        ],
+        "eqeqeq": [
+            "error",
+            "always"
         ]
     }
 }
