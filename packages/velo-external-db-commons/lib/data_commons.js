@@ -1,5 +1,4 @@
 const moment = require('moment')
-const { SystemFields } = require("velo-external-db-commons");
 
 const EMPTY_SORT = {
     sortExpr: '',
