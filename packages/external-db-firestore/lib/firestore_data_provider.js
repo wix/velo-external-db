@@ -36,14 +36,6 @@ class DataProvider {
     }
      
     async update(collectionName, items) {
-        const item = items[0]
-        const systemFieldNames = SystemFields.map(f => f.name)
-        const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k))
-    
-        if (updateFields.length === 0) {
-            return 0
-        }
-
         const batch = items.reduce((b, i) => b.update(this.database.doc(`${collectionName}/${i._id}`), i), this.database.batch())
 
         return (await batch.commit()).length

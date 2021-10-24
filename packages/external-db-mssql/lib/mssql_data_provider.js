@@ -1,5 +1,5 @@
 const { escapeId, validateLiteral, escape, patchFieldName, escapeTable } = require('./mssql_utils')
-const { SystemFields } = require('velo-external-db-commons')
+const { updateFieldsFor } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 
 class DataProvider {
@@ -49,13 +49,7 @@ class DataProvider {
     }
 
     async updateSingle(collectionName, item) {
-        const systemFieldNames = SystemFields.map(f => f.name)
-        const updateFields = Object.keys(item).filter( k => !systemFieldNames.includes(k) )
-
-        if (updateFields.length === 0) {
-            return 0
-        }
-
+        const updateFields = updateFieldsFor(item)
         const sql = `UPDATE ${escapeTable(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ${validateLiteral(f)}`).join(', ')} WHERE _id = ${validateLiteral('_id')}`
 
         return await this.query(sql, this.patch(item), true)
