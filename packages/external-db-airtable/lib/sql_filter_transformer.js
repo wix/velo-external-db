@@ -68,8 +68,7 @@ class FilterParser {
     }
 
     multipleFieldOperatorToFilterExpr(operator, values) {
-        // todo: ido: check what happens if filter parse return an empty array
-        return `${operator}(${values.map(r => r[0].filterExpr).join(',')})`
+        return `${operator}(${values.map(r => r[0]?.filterExpr).join(',')})`
     }
 
     valueForStringOperator(operator, value) {
