@@ -47,7 +47,7 @@ describe('Velo External DB Data REST API',  () => {
             expect((await data.expectAllDataIn(ctx.collectionName, authAdmin)).items).toEqual(expect.arrayContaining(ctx.items));
         })
 
-        if (name !== 'Firestore') {
+        if (name !== 'Firestore' && name !== 'Airtable') {
         test('aggregate api', async () => {
             await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
             await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)

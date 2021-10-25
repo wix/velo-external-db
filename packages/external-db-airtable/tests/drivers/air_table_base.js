@@ -16,15 +16,18 @@ class AirtableBase {
 
     getTable(tableName) {
         return this.tables.find(table => table.name === tableName)
-        
+
     }
 
     createTable(tableName, columns) {
         this.tables.push(new AirtableTable(`tbl${chance.word({ length: 14 })}`, tableName))
         const table = this.getTable(tableName)
         columns.forEach(column => {
-            table.addColumn(column.name,column.type)
+            table.addColumn(column.name, column.type)
         });
+    }
+    deleteTable(tableName) {
+        this.tables = this.tables.filter(table => table.name !== tableName)
     }
 }
 module.exports = { AirtableBase }

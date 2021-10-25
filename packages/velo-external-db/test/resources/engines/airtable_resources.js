@@ -4,14 +4,20 @@ let _server
 const PORT = 9000
 
 const connection = async () => {
-    const { connection, cleanup } = await init({ apiPrivateKey: process.env.AIRTABLE_API_KEY, baseId: process.env.BASE_ID },
+    const { connection, cleanup } = await init({ apiPrivateKey: 'key123', baseId: 'app123' },
                                                 {endpointUrl: 'http://localhost:'+PORT, requestTimeout: 1000})
 
     return { pool: connection, cleanup: cleanup }
 }
 
 const cleanup = async () => {
-    cleanupAirtable()
+    const { schemaProvider, cleanup } = await init({ apiPrivateKey: 'key123', baseId: 'app123' },
+                                                {endpointUrl: 'http://localhost:'+PORT, requestTimeout: 1000})
+
+    const tables = await schemaProvider.list()
+    await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
+
+    await cleanup();
 }
 
 const initEnv = async () => {
@@ -27,6 +33,7 @@ const setActive = () => {
     process.env.META_API_KEY = 'meta123'
     process.env.TYPE = 'airtable'
     process.env.BASE_ID = 'app123'
+    process.env.BASE_URL = 'http://localhost:9000'
 }
 
 

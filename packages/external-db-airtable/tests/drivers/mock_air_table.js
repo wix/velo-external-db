@@ -8,7 +8,7 @@ const app = express()
 app.set('case sensitive routing', true);
 app.set('query parser', string => new URLSearchParams(string));
 
-app.use(express.json()); 
+app.use(express.json());
 
 
 //insert / bulk/insert 
@@ -31,7 +31,7 @@ app.get('/v0/:baseId/:tableIdOrName?', _checkParamsMiddleware, (req, res) => {
     const filter = req.query.get('filterByFormula')
     const params = filter ? filter.split(' ') : ''
     const table = base.getTable(req.params.tableIdOrName)
-    const records = params ? table.data.filter(item=> `"${item.fields[params[0]]}"` == params[2] ) : table.getAllRows()
+    const records = params ? table.data.filter(item=> `"${item.fields[params[0]]}"` == params[2]) : table.getAllRows()
     res.json({
         records: sortField ? records.sort((a, b) => (a.fields[sortField] > b.fields[sortField]) ? sortDir : -1 * sortDir) : records
     });
@@ -100,14 +100,18 @@ app.get('/v0/meta/bases/:baseId/tables', _checkParamsMetaMiddleware, function (r
 })
 
 app.post('/v0/meta/bases/:baseId/table', _checkParamsMetaMiddleware, async (req, res) => {
-    base.createTable(req.body.collectionName,req.body.columns)
+    base.createTable(req.body.collectionName, req.body.columns)
     res.json({})
 })
 
+app.post('/v0/meta/bases/:baseId/table/drop', _checkParamsMetaMiddleware, async (req, res) => {
+    base.deleteTable(req.body.collectionName)
+    res.json({})
+})
 
 app.post('/v0/meta/bases/:baseId/tables/:tableIdOrName/addColumn', (req, res) => {
     const table = base.getTable(req.params.tableIdOrName)
-    const column = req.body.column 
+    const column = req.body.column
     table.addColumn(column.name, column.type)
     res.json({})
 })
@@ -117,7 +121,7 @@ app.post('/v0/meta/bases/:baseId/tables/:tableIdOrName/removeColumn', (req, res)
     table.removeColumn(req.body.column)
     res.json({})
 })
- 
+
 
 app.use(function (req, res) {
     res.status(404);
@@ -125,13 +129,9 @@ app.use(function (req, res) {
 });
 
 app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500);
+    res.status(err.status);
     res.json({
-        error: {
-            type: 'TEST_ERROR',
-            message: err.message,
-        },
+        err
     });
 });
 
@@ -141,4 +141,4 @@ app.use((err, req, res, next) => {
 
 
 
-module.exports = { app, cleanup: () => {} }
+module.exports = { app, cleanup: () => { base.tables = [] } }
