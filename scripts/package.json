@@ -37,6 +37,7 @@
     "@azure/arm-network": "^25.2.0",
     "@azure/arm-resources": "^4.2.2",
     "@azure/arm-subscriptions": "^3.1.2",
+    "@azure/identity": "^1.5.2",
     "@azure/keyvault-secrets": "^4.3.0",
     "chalk": "^4.1.2",
     "cli-spinner": "^0.2.10",
