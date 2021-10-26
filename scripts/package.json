@@ -42,6 +42,7 @@
     "inquirer": "^8.1.2",
     "mysql": "^2.18.1",
     "pg": "^8.7.1",
-    "poll-until-promise": "^3.6.1"
+    "poll-until-promise": "^3.6.1",
+    "public-ip": "^4.0.4"
   }
 }
