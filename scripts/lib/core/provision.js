@@ -1,4 +1,5 @@
 const aws = require('../aws')
+const gcp = require('../gcp')
 const { randomCredentials, randomSecretKey } = require('../utils/password_utils')
 const { blockUntil, randomWithPrefix } = require('../utils/utils')
 const { info, blankLine, startSpinnerWith } = require('../cli/display')
@@ -7,6 +8,7 @@ const providerFor = (vendor) => {
     switch (vendor) {
         case 'aws':
         case 'gcp':
+            return gcp
         case 'azure':
             return aws
     }
@@ -14,7 +16,7 @@ const providerFor = (vendor) => {
 
 const provisionDb = async (provider, configWriter, { engine, secretId, secretKey, dbName }) => {
     const dbCredentials = randomCredentials()
-    const instanceName = randomWithPrefix('velo-external-db')
+    const instanceName = randomWithPrefix('velo-external-db') 
 
     await startSpinnerWith(`Creating ${engine} DB Instance`, async () => await provider.createDb({ name: instanceName, engine: engine, credentials: dbCredentials}))
     await startSpinnerWith(`Waiting for db instance to start`, async () => await blockUntil( async () => (await provider.dbStatusAvailable(instanceName)).available ))

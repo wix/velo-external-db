@@ -31,15 +31,18 @@
     "@aws-sdk/client-iam": "^3.37.0",
     "@aws-sdk/client-rds": "^3.37.0",
     "@aws-sdk/client-secrets-manager": "^3.38.0",
+    "@google-cloud/secret-manager": "^3.10.1",
     "axios": "^0.23.0",
     "chalk": "^4.1.2",
     "chance": "^1.1.8",
     "cli-progress": "^3.9.1",
     "cli-spinner": "^0.2.10",
     "generate-password": "^1.6.1",
+    "google-auth-library": "^7.10.1",
     "inquirer": "^8.1.2",
     "mysql": "^2.18.1",
     "pg": "^8.7.1",
-    "poll-until-promise": "^3.6.1"
+    "poll-until-promise": "^3.6.1",
+    "public-ip": "^4.0.4"
   }
 }
