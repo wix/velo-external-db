@@ -86,6 +86,7 @@ const connectMySqlServer = (serverName, userName, password, database) => {
         }
     });
 }
+
 const openMySqlForAll = async (mySqlClient, resourceGroupName, serverName) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -98,6 +99,7 @@ const openMySqlForAll = async (mySqlClient, resourceGroupName, serverName) => {
         }
     })
 }
+
 const createDB = async (resourceGroupName, serverName, databaseName, contextClient) => {
     return new Promise(async (resolve, reject) => {
         try {

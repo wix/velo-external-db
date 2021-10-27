@@ -27,12 +27,13 @@ const init = async () => {
         virtualNetworkName: `virtual-network-${randomPart}`, 
         subnetName: `subnet-${randomPart}`, 
         keyVaultName: `keyvault-${randomPart}`, 
+        newAppServicePlanName: `veloappservice-${randomPart}`,
         serverFarmId: process.env.SERVER_FARM_ID, //try to figure out how to get it
         type: 'sql', 
         cloudVendor: 'azr',
         secretKey: randomStr, 
         userObjectId: process.env.USER_OBJECT_ID, //need to figure out how to get it on runtime. 
-        dockerImage:'DOCKER|veloex/velo-external-db:1.0'
+        dockerImage:'DOCKER|veloex/velo-external-db:latest'
     }
 }
 

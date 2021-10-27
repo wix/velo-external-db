@@ -18,4 +18,4 @@ const randomInt = () => Math.floor(Math.random() * 10000)
 const randomWithPrefix = prefix => `${prefix}-${randomInt()}`
 
 
-module.exports = { blockUntil, randomWithPrefix }
+module.exports = { blockUntil, randomWithPrefix, randomInt }
