@@ -5,7 +5,7 @@
   "keywords": [
     "installer"
   ],
-  "author": "Max Polsky <maxim.polski@gmail.com>",
+  "author": "",
   "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
   "license": "ISC",
   "main": "lib/index.js ",
@@ -42,7 +42,6 @@
     "inquirer": "^8.1.2",
     "mysql": "^2.18.1",
     "pg": "^8.7.1",
-    "poll-until-promise": "^3.6.1",
-    "public-ip": "^4.0.4"
+    "poll-until-promise": "^3.6.1"
   }
 }

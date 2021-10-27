@@ -1,8 +1,4 @@
 const {GoogleAuth} = require('google-auth-library')
-const publicIp = require('public-ip')
-const factory = require('../aws/db/factory')
-const { dateTo3339Format, xHoursFromNow } = require('../utils/utils')
-
 class DbProvision {
     constructor({ gcpClientEmail, gcpPrivateKey }) {
         this.authClient = new GoogleAuth({
@@ -24,19 +20,11 @@ class DbProvision {
         const client = await this.authClient.getClient()
         const projectId = await this.authClient.getProjectId()
         const apiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances`
-        const ip = await publicIp.v4()
 
         const dbInstanceProperties = {
             databaseVersion: this.asGcp(engine),
             name,
-            settings: { 
-                tier: 'db-f1-micro',
-                ipConfiguration: {
-                    authorizedNetworks: [
-                        { name: 'velo-script', value: ip, expirationTime: dateTo3339Format(xHoursFromNow(1)) }
-                    ]
-                }
-            },
+            settings: { tier: 'db-f1-micro' },
             rootPassword: credentials.passwd
         }
 
@@ -53,6 +41,7 @@ class DbProvision {
         const instance = response.data.items.find(i => i.name === name)
 
         return {
+            instanceName: name,
             available: instance.state === 'RUNNABLE',
             host: instance.ipAddresses.find(i => i.type === 'PRIMARY').ipAddress,
             connectionName: instance.connectionName,
@@ -61,8 +50,11 @@ class DbProvision {
     }
 
     async postCreateDb(engine, dbName, status, credentials) {
-        await factory.clientFor(engine)
-            .createDatabase(dbName, status.host, { ...credentials, user: 'root' })
+        const client = await this.authClient.getClient()
+        const projectId = await this.authClient.getProjectId()
+        const apiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${status.instanceName}/databases`
+
+        await client.request({ url: apiUrl, method:'POST', data: { name:  dbName } })
     }
 }
 
