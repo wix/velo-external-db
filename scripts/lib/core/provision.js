@@ -17,7 +17,7 @@ const provisionDb = async (provider, configWriter, { engine, secretId, secretKey
     const instanceName = randomWithPrefix('velo-external-db')
 
     await startSpinnerWith(`Creating ${engine} DB Instance`, async () => await provider.createDb({ name: instanceName, engine: engine, credentials: dbCredentials}))
-    await startSpinnerWith(`Waiting for db instance to start`, async () => await blockUntil( async () => !(await provider.dbStatusAvailable(instanceName)).available ))
+    await startSpinnerWith(`Waiting for db instance to start`, async () => await blockUntil( async () => (await provider.dbStatusAvailable(instanceName)).available ))
 
     const status = await provider.dbStatusAvailable(instanceName)
 

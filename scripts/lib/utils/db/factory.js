@@ -1,9 +1,9 @@
 const clientFor = engine => {
     switch (engine) {
         case 'mysql':
-            return require('./db/mysql_support')
+            return require('./mysql_support')
         case 'postgres':
-            return require('./db/postgres_support')
+            return require('./postgres_support')
     }
 }
 
