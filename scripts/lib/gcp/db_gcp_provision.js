@@ -20,6 +20,10 @@ class DbProvision {
         const client = await this.authClient.getClient()
         const projectId = await this.authClient.getProjectId()
         const apiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances`
+<<<<<<< HEAD
+=======
+        const ip = await publicIp.v4()
+>>>>>>> 18a739d (db-provision refactor)
 
         const dbInstanceProperties = {
             databaseVersion: this.asGcp(engine),
@@ -41,7 +45,10 @@ class DbProvision {
         const instance = response.data.items.find(i => i.name === name)
 
         return {
+<<<<<<< HEAD
             instanceName: name,
+=======
+>>>>>>> 18a739d (db-provision refactor)
             available: instance.state === 'RUNNABLE',
             host: instance.ipAddresses.find(i => i.type === 'PRIMARY').ipAddress,
             connectionName: instance.connectionName,
@@ -50,11 +57,16 @@ class DbProvision {
     }
 
     async postCreateDb(engine, dbName, status, credentials) {
+<<<<<<< HEAD
         const client = await this.authClient.getClient()
         const projectId = await this.authClient.getProjectId()
         const apiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${status.instanceName}/databases`
 
         await client.request({ url: apiUrl, method:'POST', data: { name:  dbName } })
+=======
+        await factory.clientFor(engine)
+            .createDatabase(dbName, status.host, { ...credentials, user: 'root' })
+>>>>>>> 18a739d (db-provision refactor)
     }
 }
 
