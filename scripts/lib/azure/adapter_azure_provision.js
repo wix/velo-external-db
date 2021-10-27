@@ -1,16 +1,23 @@
 const { WebSiteManagementClientContext, WebApps, AppServicePlans } = require("@azure/arm-appservice");
+const { DefaultAzureCredential } = require('@azure/identity')
+const { refFromKeyVault } = require('./utils')
+const { NetworkManagementClient } = require('@azure/arm-network');
 
 class AdapterProvision {
-    constructor(credentials, subscriptionId) {
-        this.contextClient = new WebSiteManagementClientContext(credentials, subscriptionId)
+    constructor(credentials) {
+        this.azureCreds = new DefaultAzureCredential();
+        this.credentials = credentials
+        this.contextClient = new WebSiteManagementClientContext(this.azureCreds, credentials.subscriptionId)
         this.webAppClient = new WebApps(this.contextClient)
     }
 
-    async createAdapter(name, resourceGroupName, region) {
-        const serverFarm = await createAppServicePlan(resourceGroupName)
+    async createAdapter(name, engine, secretId, provisionVariables) {
+        const { resourceGroupName, virtualNetworkName, appServicePlanName} = provisionVariables 
+
+        const serverFarm = await this.createAppServicePlan(resourceGroupName, appServicePlanName)
 
         const webApp = await this.webAppClient.beginCreateOrUpdate(resourceGroupName, name, {
-            location: region, //'eastus'
+            location: 'eastus', //region
             reserved: true,
             serverFarmId: serverFarm.id,
             siteConfig: {
@@ -20,12 +27,20 @@ class AdapterProvision {
                 "type": "SystemAssigned"
             }
         })
-        await webApp.pollUntilFinished()
-        return (webApp)
+        await webApp.pollUntilFinished() //wait here or in adapterStatus?
+        await connectToVirtualNetwork(resourceGroupName, name, virtualNetworkName)
+        return { webApp }
     }
 
-    async adapterStatus(webAppName, adapterCredentials) {
-        const webAppResponse = await this.webAppClient.get(adapterCredentials.resourceGroupName, webAppName)
+    async connectToVirtualNetwork(resourceGroupName, webAppName, virtualNetworkName){
+        const networkClient = new NetworkManagementClient(this.azureCreds, this.credentials.subscriptionId)
+        const virtualNetwork = await networkClient.virtualNetworks.get(resourceGroupName, virtualNetworkName)
+        const res = await this.webAppClient.createOrUpdateSwiftVirtualNetworkConnectionWithCheck(resourceGroupName, webAppName, { "subnetResourceId": virtualNetwork.subnets[0].id })
+        return res
+    }
+
+    async adapterStatus(webAppName, provisionVariables) {
+        const webAppResponse = await this.webAppClient.get(provisionVariables.resourceGroupName, webAppName)
 
         return {
             available: webAppResponse.state === 'Running',
@@ -34,33 +49,26 @@ class AdapterProvision {
         }
     }
 
-    async preCreateAdapter() {
+    async postCreateAdapter(webAppName, provisionVariables) {
+        const { keyVaultName, resourceGroupName } = provisionVariables
 
+        await this.loadEnviormentVariables(resourceGroupName, webAppName, keyVaultName)
     }
-    async postCreateAdapter(webAppName, adapterCredentials, keyVaultName, environmentVariables) {
 
-        const status = await this.adapterStatus(webAppName, adapterCredentials)
-
-        await createKeyVault(credentials, subscriptionId, adapterCredentials, keyVaultName, status.identity, environmentVariables)
-
-        await loadEnviormentVariables(this.webAppClient, env.resourceGroupName, env.webAppName, env.keyVaultName)
-
-    }
     async loadEnviormentVariables(resourceGroupName, webAppName, keyVaultName) {
-        const result = await webAppClient.updateApplicationSettings(resourceGroupName, webAppName, {
+        const result = await this.webAppClient.updateApplicationSettings(resourceGroupName, webAppName, {
             properties: appServiceVariables(keyVaultName)
         })
-        resolve(result)
+        return result
     }
 
-    async createAppServicePlan(resourceGroupName) {
-        const SERVICE_NAME = 'veloappserviceplan'
+    async createAppServicePlan(resourceGroupName, appServicePlanName) {
         const appServicePlansClient = new AppServicePlans(this.contextClient)
-        await appServicePlansClient.beginCreateOrUpdate(resourceGroupName, SERVICE_NAME, {
+        await appServicePlansClient.beginCreateOrUpdate(resourceGroupName, appServicePlanName, {
             location: 'eastus', kind: 'linux', type: 'Microsoft.Web/serverfarms', reserved: true,
             sku: { name: 'P1V2', tier: 'PremiumV2', size: 'P1V2', family: 'Pv2', capacity: 1 }
         })
-        return (await appServicePlansClient.get(resourceGroupName, SERVICE_NAME))
+        return (await appServicePlansClient.get(resourceGroupName, appServicePlanName))
 
     }
 }

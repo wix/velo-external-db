@@ -18,7 +18,7 @@ const dbSupportedOn = (vendor) => {
 const nonEmpty = input => !(!input || input.trim() === '')
 
 // const Aws = require('../../.credentials.json')
-
+// const Azr = require ('../../credentials.json')
 const credentialsFor = vendor => {
     switch (vendor) {
         case 'aws':
@@ -52,8 +52,16 @@ const credentialsFor = vendor => {
                     type: 'input',
                     name: 'subscriptionId',
                     message: 'Subscription Id',
-                    validate: nonEmpty
+                    validate: nonEmpty,
+                    default: Azr.SUBSCRIPTION_ID
                 },
+                {
+                    type: 'input',
+                    name: 'userObjectId',
+                    message: 'User Object Id',
+                    validate: nonEmpty,
+                    default: Azr.ID
+                }
             ])
     }
 }

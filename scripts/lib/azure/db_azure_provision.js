@@ -1,27 +1,32 @@
-const { ResourceManagementClientContext, ResourceGroups } = require("@azure/arm-resources");
-const { NetworkManagementClient } = require("@azure/arm-network");
-
+const { ResourceManagementClientContext, ResourceGroups } = require('@azure/arm-resources');
+const { DefaultAzureCredential } = require('@azure/identity')
+const VirtualNetwork = require ('./azure_vnet')
+const factory = require('./db/factory')
 
 class DbProvision {
-    constructor(credentials, subscriptionId, engine) {
-        this.engine = engine
-        this.managementClient = new engine.managementClient(credentials, subscriptionId)
-        this.contextClient = new engine.contextClient(credentials, subscriptionId)
+    constructor(credentials, region, engine) { //todo : get here region and transfer it to azure region
+        this.azureCreds = new DefaultAzureCredential();
+        this.credentials = credentials
+        this.engine = factory.clientFor(engine)
+        this.managementClient = this.engine.managementClient(this.azureCreds, this.credentials.subscriptionId)
+        this.contextClient = this.engine.contextClient(this.azureCreds, this.credentials.subscriptionId)
+        this.serversClient = this.engine.serversClient(this.contextClient)
+        this.VirtualNetworkService = new VirtualNetwork(credentials, this.engine)
     }
 
 
-    async createDb({ name, dbCredentials }) {
+    async createDb({ name, credentials, resourceGroupName }) {
         try {
-            const servers = new this.engine.serversClient(this.contextClient)
-            const response = await servers.beginCreate(dbCredentials.resourceGroupName, dbCredentials.serverName, {
+            const response = await this.serversClient.beginCreate(resourceGroupName, name, {
                 properties:
                 {
-                    createMode: "Default", administratorLogin: dbCredentials.administratorLogin,
-                    administratorLoginPassword: dbCredentials.administratorLoginPassword, sslEnforcement: 'Disabled'
+                    createMode: 'Default', administratorLogin: credentials.user,
+                    administratorLoginPassword: credentials.passwd, sslEnforcement: 'Disabled'
                 },
-                location: "eastus", sku: { tier: "GeneralPurpose", name: "GP_Gen5_4" }
+                location: 'eastus', sku: { tier: 'GeneralPurpose', name: 'GP_Gen5_4' }
             })
-            await response.pollUntilFinished()
+
+            response.pollUntilFinished() // wait here or in dbStatusAvailable?
             return true;
         }
         catch (e) {
@@ -30,66 +35,42 @@ class DbProvision {
         }
     }
 
-    async dbStatusAvailable(dbCredentials, name) {
-        const instance = await this.engine.dbStatus(this.contextClient, dbCredentials, name)
-
-        return {
-            host: instance.fullyQualifiedDomainName,
-            available: instance.userVisibleState === 'Ready'
+    async dbStatusAvailable(name, provisionVariables) {
+        try {
+            const instance = await this.serversClient.get(provisionVariables.resourceGroupName, name)
+            return {
+                instanceName: name,
+                host: instance.fullyQualifiedDomainName,
+                available: instance.userVisibleState === 'Ready'
+            }
+        } catch (e) {
+            return { available: false }
         }
     }
 
-    async addSecurityRule(serverName, dbCredentials, virtualNetwork, from, to) {
-        if (virtualNetwork)
-            await this.engine.createVirtualNetworkRule(this.contextClient, serverName, virtualNetwork, dbCredentials)
-        else
-            await this.engine.createFirewallRule(this.contextClient, serverName, dbCredentials, from, to)
-        return;
+
+    async preCreateDb(provisionVariables) {
+        const { resourceGroupName, virtualNetworkName, subnetName } = provisionVariables
+        await this.createResourceGroup(resourceGroupName)
+        await this.VirtualNetworkService.createVirtualNetwork(resourceGroupName, virtualNetworkName, subnetName)
     }
 
 
-    async preCreateDb(credentials, subscriptionId, resourceGroupName) {
-        //create resourceGroup, virtualNetwork
-        const resourceGroup = await createResourceGroup(credentials, subscriptionId, resourceGroupName)
-        const virtualNetwork = await createVirtualNetwork(credentials, subscriptionId, resourceGroupName, virtualNetworkName, subnetName)
+    async postCreateDb(engine, dbName, status, dbCredentials, provisionVariables, instanceName) {
+        await this.engine.createInitDb(resourceGroupName,serverName,dbName,this.contextClient)
+        await this.createVirtualNetworkRule(instanceName, provisionVariables.resourceGroupName)
     }
 
-
-    async postCreateDb(engine, serverName, dbName, dbCredentials) {
-        //create DB, table?
-        await this.engine.createDb(dbCredentials, serverName, dbName, this.contextClient)
-    }
-
-    async createResourceGroup(credentials, subscriptionId, resourceGroupName) {
-        const resourceGroupsClient = new ResourceGroups(new ResourceManagementClientContext(credentials, subscriptionId));
-        const resourceGroup = await resourceGroupsClient.createOrUpdate(resourceGroupName, { "location": "eastus" })
+    async createResourceGroup(resourceGroupName) {
+        const resourceGroupsClient = new ResourceGroups(new ResourceManagementClientContext(this.azureCreds, this.credentials.subscriptionId));
+        const resourceGroup = await resourceGroupsClient.createOrUpdate(resourceGroupName, { location: 'eastus' })
         return resourceGroup;
     }
 
-    async createVirtualNetwork(credentials, subscriptionId, resourceGroupName, virtualNetworkName, subnetName) {
-        const networkClient = new NetworkManagementClient(credentials, subscriptionId)
-        await createVirtualNetworkInstance(networkClient, resourceGroupName, virtualNetworkName)
-        await createSubnet(networkClient, resourceGroupName, virtualNetworkName, subnetName)
-        return await networkClient.virtualNetworks.get(resourceGroupName, virtualNetworkName)
-    }
-
-    async createVirtualNetworkInstance(networkClient, resourceGroupName, virtualNetworkName) {
-        const virtualNetwork = await networkClient.virtualNetworks.beginCreateOrUpdate(resourceGroupName, virtualNetworkName, { "location": "eastus", "addressSpace": { "addressPrefixes": ["10.0.0.0/16"] } });
-        await virtualNetwork.pollUntilFinished();
-        return virtualNetwork
-    }
-
-    async createSubnet(networkClient, resourceGroupName, virtualNetworkName, subnetName) {
-        const subnet = await networkClient.subnets.beginCreateOrUpdate(resourceGroupName, virtualNetworkName, subnetName, {
-            'serviceEndpoints':
-                [{ "service": "Microsoft.Sql", "locations": ["eastus"] },
-                { "service": "Microsoft.KeyVault", "locations": ["eastus"] }],
-            'delegations':
-                [{ 'serviceName': 'Microsoft.Web/serverFarms', 'name': 'Microsoft.Web/serverFarms' }],
-            'addressPrefix': '10.0.0.0/24'
-        })
-        await subnet.pollUntilFinished();
-        return subnet
+    async createVirtualNetworkRule(serverName, resourceGroupName) {
+        const virtualNetwork = this.VirtualNetworkService
+                                   .getVirtualNetwork(resourceGroupName, virtualNetworkName)
+        this.engine.createVirtualNetworkRule(serverName, resourceGroupName, virtualNetwork)
     }
 }
 module.exports = DbProvision
