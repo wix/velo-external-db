@@ -16,7 +16,7 @@ const createInitDb = async (resourceGroupName, serverName, databaseName, context
 const subnetService = () => 'Microsoft.Sql'
 
 const createVirtualNetworkRule = async (serverName, resourceGroupName, virtualNetwork) => {
-    const virtualNetworkRulesClient = new VirtualNetworkRules(this.contextClient);
+    const virtualNetworkRulesClient = new VirtualNetworkRules(contextClient);
     const virtualNetworkRule = await virtualNetworkRulesClient.beginCreateOrUpdate(resourceGroupName, serverName, virtualNetwork.name, { "virtualNetworkSubnetId": virtualNetwork.subnets[0].id })
     await virtualNetworkRule.pollUntilFinished()
 }

@@ -26,7 +26,7 @@ class DbProvision {
                 location: 'eastus', sku: { tier: 'GeneralPurpose', name: 'GP_Gen5_4' }
             })
 
-            response.pollUntilFinished() // wait here or in dbStatusAvailable?
+            // response.pollUntilFinished() // wait here or in dbStatusAvailable?
             return true;
         }
         catch (e) {
@@ -57,7 +57,7 @@ class DbProvision {
 
 
     async postCreateDb(engine, dbName, status, dbCredentials, provisionVariables, instanceName) {
-        await this.engine.createInitDb(resourceGroupName,serverName,dbName,this.contextClient)
+        await this.engine.createInitDb(provisionVariables.resourceGroupName, instanceName,dbName,this.contextClient)
         await this.createVirtualNetworkRule(instanceName, provisionVariables.resourceGroupName)
     }
 

@@ -23,7 +23,7 @@ const provisionDb = async (provider, configWriter, { engine, secretId, secretKey
     await startSpinnerWith(`Preparing ${engine} - running preCreate `, async () => await provider.preCreateDb(provisionVariables))
     
     await startSpinnerWith(`Creating ${engine} DB Instance`, async () => await provider.createDb({ name: instanceName, engine: engine, credentials: dbCredentials, ...provisionVariables}))
-    await startSpinnerWith(`Waiting for db instance to start`, async () => await blockUntil( async () => (await provider.dbStatusAvailable(instanceName)).available ))
+    await startSpinnerWith(`Waiting for db instance to start`, async () => await blockUntil( async () => (await provider.dbStatusAvailable(instanceName, provisionVariables)).available ))
 
     const status = await provider.dbStatusAvailable(instanceName, provisionVariables)
 

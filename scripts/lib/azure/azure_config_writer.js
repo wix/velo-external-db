@@ -29,8 +29,8 @@ class ConfigWriter {
             USER: `${dbCredentials.user}@${instanceName}`,
             PASSWORD: dbCredentials.passwd,
             DB: dbName,
-            TYPE: 'mysql', //todo:replace,
-            CLOUDVENDOR: 'azr',
+            TYPE: 'mysql', //todo:replace to engine or load it not as secret,
+            CLOUDVENDOR: 'azr', //load it as secrert?
             SECRETKEY:secretKey,            
         }
 

@@ -45,8 +45,6 @@ class VirtualNetwork {
                                                             addressPrefix: '10.0.0.0/24'
                                                         }
                                                      )
-        await subnet.pollUntilFinished();
-        return subnet
     }
 
     async getVirtualNetwork(resourceGroupName, virtualNetworkName) {
