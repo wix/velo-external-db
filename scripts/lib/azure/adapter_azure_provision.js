@@ -1,7 +1,7 @@
-const { WebSiteManagementClientContext, WebApps, AppServicePlans } = require("@azure/arm-appservice");
+const { WebSiteManagementClientContext, WebApps, AppServicePlans } = require("@azure/arm-appservice")
 const { DefaultAzureCredential } = require('@azure/identity')
 const { refFromKeyVault } = require('./utils')
-const { NetworkManagementClient } = require('@azure/arm-network');
+const { NetworkManagementClient } = require('@azure/arm-network')
 
 class AdapterProvision {
     constructor(credentials) {
@@ -9,34 +9,32 @@ class AdapterProvision {
         this.credentials = credentials
         this.contextClient = new WebSiteManagementClientContext(this.azureCreds, credentials.subscriptionId)
         this.webAppClient = new WebApps(this.contextClient)
+        this.networkClient = new NetworkManagementClient(this.azureCreds, this.credentials.subscriptionId)
     }
 
-    async createAdapter(name, engine, secretId, secrets, provisionVariables) {
-        const { resourceGroupName, virtualNetworkName, appServicePlanName} = provisionVariables 
-
+    async createAdapter(name, engine, secretId, secrets, { resourceGroupName, virtualNetworkName, appServicePlanName}) {
         const serverFarm = await this.createAppServicePlan(resourceGroupName, appServicePlanName)
 
-        const webApp = await this.webAppClient.beginCreateOrUpdate(resourceGroupName, name, {
-            location: 'eastus', //region
-            reserved: true,
-            serverFarmId: serverFarm.id,
-            siteConfig: {
-                linuxFxVersion: 'DOCKER|veloex/velo-external-db:latest',
-            },
-            identity: {
-                "type": "SystemAssigned"
-            }
+        const webApp = await this.webAppClient.beginCreateOrUpdate(resourceGroupName, name,
+                                                                   {
+                                                                       location: 'eastus', //region
+                                                                       reserved: true,
+                                                                       serverFarmId: serverFarm.id,
+                                                                       siteConfig: {
+                                                                           linuxFxVersion: 'DOCKER|veloex/velo-external-db:latest',
+                                                                       },
+                                                                       identity: {
+                                                                           type: 'SystemAssigned'
+                                                                       }
         })
         await webApp.pollUntilFinished() //wait here or in adapterStatus?
-        await connectToVirtualNetwork(resourceGroupName, name, virtualNetworkName)
+        await this.connectToVirtualNetwork(resourceGroupName, name, virtualNetworkName)
         return { webApp }
     }
 
     async connectToVirtualNetwork(resourceGroupName, webAppName, virtualNetworkName){
-        const networkClient = new NetworkManagementClient(this.azureCreds, this.credentials.subscriptionId)
-        const virtualNetwork = await networkClient.virtualNetworks.get(resourceGroupName, virtualNetworkName)
-        const res = await this.webAppClient.createOrUpdateSwiftVirtualNetworkConnectionWithCheck(resourceGroupName, webAppName, { "subnetResourceId": virtualNetwork.subnets[0].id })
-        return res
+        const virtualNetwork = await this.networkClient.virtualNetworks.get(resourceGroupName, virtualNetworkName)
+        return await this.webAppClient.createOrUpdateSwiftVirtualNetworkConnectionWithCheck(resourceGroupName, webAppName, { subnetResourceId: virtualNetwork.subnets[0].id })
     }
 
     async adapterStatus(webAppName, provisionVariables) {

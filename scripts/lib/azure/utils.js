@@ -10,9 +10,7 @@ const provisionVariables = {
     keyVaultName:`key-vault-${random}`
 }
 
-const refFromKeyVault = (keyVaultName, secretName) => {
-    return `@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${secretName})`
-}
+const refFromKeyVault = (keyVaultName, secretName) => `@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${secretName})`
 
 
 module.exports = { provisionVariables, refFromKeyVault }
