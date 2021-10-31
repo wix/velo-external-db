@@ -4,7 +4,8 @@ const schema = require('./schema/provision')
 const gen = require('./generator/schema')
 const process = require('./core/process')
 
-const main = async (userInputs) => {
+const main = async () => {
+    const userInputs = await askForUserInput()
     const axios = axiosFor(userInputs)
     await schema.createCollection(userInputs.collectionName, axios)
     const generatedColumns = gen.generateColumns(userInputs.columnCount)
@@ -12,9 +13,4 @@ const main = async (userInputs) => {
     await process.insertItems(userInputs.rowCount, generatedColumns, userInputs.collectionName, axios)
 }
 
-const process = async () => {
-    const userInputs = await askForUserInput()
-    await main(userInputs)
-}
-
-process()
+main()
