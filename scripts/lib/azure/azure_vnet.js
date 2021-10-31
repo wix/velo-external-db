@@ -9,9 +9,7 @@ class VirtualNetwork {
 
     async createVirtualNetwork(resourceGroupName, virtualNetworkName, subnetName) {
         await this.createVirtualNetworkInstance(resourceGroupName, virtualNetworkName)
-        console.log("createVirtualNetworkInstance");
         await this.createSubnet(resourceGroupName, virtualNetworkName, subnetName)
-        console.log("createSubnet");
     }
 
     async createVirtualNetworkInstance(resourceGroupName, virtualNetworkName) {
