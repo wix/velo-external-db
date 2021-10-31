@@ -1,13 +1,11 @@
 const inquirer = require('inquirer')
+const { isNumber, nonEmpty } = require('../utils/utils')
 
 const defaultSettings = {
     collectionName: 'myCollection',
     additionalColumnsCount: 3,
     generatedRows: 10000
 }
-
-const nonEmpty = input => !(!input || input.trim() === '')
-const isNumber = input => Number.isInteger(parseInt(input))
 
 const askForAdaptorDetails = async() => {
     return await inquirer.prompt([
