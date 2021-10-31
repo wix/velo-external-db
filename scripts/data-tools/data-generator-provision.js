@@ -51,7 +51,7 @@ const createAxiosClient = ({adaptorUrl, adaptorSecretKey, role}) => {
 
 const createCollection = async(collectionName, axiosClient) => {
     console.log('Creating new collection ...')
-    try{
+    try {
         await axiosClient.post('/schemas/create', { collectionName })
         console.log('The collection was created successfully')
     } catch (error) {
