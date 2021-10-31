@@ -60,16 +60,14 @@ class AdapterProvision {
         }
 
         const authData = {
-            'policy': {
-              'bindings': [
+            policy: {
+              bindings: [
                 {
-                  'members': [
-                    'allUsers'
-                  ],
-                  'role': 'roles/run.invoker'
+                  members: [ 'allUsers' ],
+                  role: 'roles/run.invoker'
                 }
               ],
-              'etag': 'ACAB'
+              etag: 'ACAB'
             }
           }
 
