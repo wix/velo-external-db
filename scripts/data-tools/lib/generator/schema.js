@@ -1,6 +1,3 @@
-const Chance = require('chance')
-const chance = Chance()
-
-const generateColumns = columnsCount => [...Array(parseInt(columnsCount))].map(() => ({name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false}))
+const generateColumns = columnsCount => [...Array(parseInt(columnsCount))].map((e, i) => ({name: `column_${i}`, type: 'text', subtype: 'string', precision: '256', isPrimary: false}))
 
 module.exports = { generateColumns }

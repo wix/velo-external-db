@@ -41,6 +41,12 @@ const askForAdvancedSettings = async() => {
             message: 'Number of Rows: ',
             validate: isNumber,
             default: defaultSettings.rowCount
+        },
+        {
+            name: 'truncate',
+            type: 'confirm',
+            message: 'Truncate table before insert? ',
+            default: false
         }
     ])
 }

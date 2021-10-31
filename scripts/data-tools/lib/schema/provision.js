@@ -5,4 +5,6 @@ const createCollection = async (collectionName, axios) => await create(collectio
 const addColumn = (collectionName, column, axios) => axios.post('/schemas/column/add', { collectionName, column })
 const addColumnsToCollection = async(collectionName, newColumns, axios) => await Promise.all(newColumns.map(column => addColumn(collectionName, column, axios)))
 
-module.exports = { addColumnsToCollection, createCollection }
+const truncate = (collectionName, axios) => axios.post('/data/truncate', { collectionName })
+
+module.exports = { addColumnsToCollection, createCollection, truncate }

@@ -21,6 +21,10 @@ const main = async () => {
     const extraColumns = gen.generateColumns(userInputs.columnCount)
     await startSpinnerWith('Adding new columns to the collection', async () => await schema.addColumnsToCollection(userInputs.collectionName, extraColumns, axios), 'The columns were added successfully')
 
+    if (userInputs.truncate) {
+        await startSpinnerWith('Truncating collection', async () => await schema.truncate(userInputs.collectionName, axios), 'Collection truncated successfully')
+    }
+
     blankLine()
     blankLine()
     info('Loading sample data')
