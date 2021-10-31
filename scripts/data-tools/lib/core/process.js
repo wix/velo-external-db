@@ -7,20 +7,20 @@ const insert = async (items, axios) => {
                .catch(error => console.log(`Error adding chunk ${i+1}: ${error.message}`))
 }
 
-const insertItems = async(generatedRowCount, generatedColumns, collectionName, axios) => {
-    console.log(`Adding ${generatedRowCount} new items to the collection ...`)
+const insertItems = async(rowCount, generatedColumns, collectionName, axios) => {
+    console.log(`Adding ${rowCount} new items to the collection ...`)
     const bar = new cliProgress.SingleBar({}, cliProgress.Presets.rect)
     const itemsPerChunk = 100
 
-    bar.start(generatedRowCount, 0)
+    bar.start(rowCount, 0)
 
-    for (let i = 0; i < generatedRowCount; i+= itemsPerChunk) {
+    for (let i = 0; i < rowCount; i+= itemsPerChunk) {
         const items = [...Array(itemsPerChunk)].map(() => (randomEntity(generatedColumns)))
         await insert(items, axios)
         bar.update(itemsPerChunk + i)
     }
     bar.stop()
-    console.log(chalk.green(`${generatedRowCount} items were added successfully`))
+    console.log(chalk.green(`${rowCount} items were added successfully`))
 }
 
 

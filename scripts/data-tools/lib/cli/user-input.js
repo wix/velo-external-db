@@ -3,8 +3,8 @@ const { isNumber, nonEmpty } = require('../utils/utils')
 
 const defaultSettings = {
     collectionName: 'myCollection',
-    additionalColumnsCount: 3,
-    generatedRows: 10000
+    columnCount: 3,
+    rowCount: 10000
 }
 
 const askForAdapterDetails = async() => {
@@ -16,7 +16,7 @@ const askForAdapterDetails = async() => {
         },
         {
             name: 'secretKey',
-            message: 'Secret key',
+            message: 'Secret key: ',
             validate: nonEmpty,
         }
     ])
@@ -31,28 +31,25 @@ const askForAdvancedSettings = async() => {
             default: defaultSettings.collectionName
         },
         {
-            name: 'additionalColumnsCount',
-            message: 'How many columns to generate',
+            name: 'columnCount',
+            message: 'How many columns to generate ? ',
             validate: isNumber,
-            default: defaultSettings.additionalColumnsCount
+            default: defaultSettings.columnCount
         },
         {
-            name: 'generatedRowCount',
-            message: 'How many rows to generate',
+            name: 'rowCount',
+            message: 'Number of Rows: ',
             validate: isNumber,
-            default: defaultSettings.generatedRows
+            default: defaultSettings.rowCount
         }
     ])
 }
 
 const askForUserInput = async() => {
-    const { adapterUrl, secretKey } = await askForAdapterDetails()
-    const { collectionName, additionalColumnsCount, generatedRowCount } = await askForAdvancedSettings()
+    const adapter = await askForAdapterDetails()
+    const moreInput = await askForAdvancedSettings()
 
-    return {
-        adapterUrl, secretKey,
-        collectionName, additionalColumnsCount, generatedRowCount
-    }
+    return { ...adapter, ...moreInput }
 }
 
 
