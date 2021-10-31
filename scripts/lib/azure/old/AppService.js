@@ -1,4 +1,4 @@
-const { WebSiteManagementClientContext, WebApps } = require("@azure/arm-appservice");
+const { WebSiteManagementClientContext, WebApps, AppServicePlans } = require("@azure/arm-appservice");
 const { startSpinnerWith, appServiceVariables } = require('./init')
 
 // "@azure/arm-appservice": "^8.1.0",
@@ -20,6 +20,8 @@ const createAppService = async (creds, subscriptionId, resourceGroupName, server
         try {
             const clientContext = await new WebSiteManagementClientContext(creds, subscriptionId)
             const webAppClient = new WebApps(clientContext);
+            const _serverFarmId = serverFarmId ? serverFarmId : createAppServicePlan(clientContext)
+
 
             await startSpinnerWith("\tCreating webApp instance", () => createWebApp(webAppClient, resourceGroupName, webAppName, serverFarmId, dockerImage),
                 "\tWebApp instance created")
@@ -71,5 +73,10 @@ const loadEnviormentVariables = async (webAppClient, resourceGroupName, webAppNa
         }
 
     })
+}
+
+const createAppServicePlan = (clientContext) => {
+    const appServicePlansClient = new AppServicePlans(clientContext)
+    appServicePlansClient.beginCreateOrUpdate()
 }
 module.exports = { createAppService, loadEnviormentVariables };

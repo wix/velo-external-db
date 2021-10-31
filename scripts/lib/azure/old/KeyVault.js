@@ -15,7 +15,7 @@ const createKeyVault = async (creds, subscriptionId, resourceGroupName, keyVault
 
             const KVUri = "https://" + keyVaultName + ".vault.azure.net";
             const secretClient = new SecretClient(KVUri, creds);
-
+            
             await startSpinnerWith("Loading secrets", () => loadSecrets(secretClient, environmentVariables), "Secrets loaded into KeyVault")
             resolve(keyVault)
         } catch (e) {
@@ -66,7 +66,8 @@ const loadSecrets = (secretClient, environmentVariables) => {
     return new Promise(async (resolve, reject) => {
         try {
             Object.keys(environmentVariables).forEach(async (secretName) => {
-                await secretClient.setSecret(secretName, environmentVariables[secretName])
+                const secret = await secretClient.setSecret(secretName, environmentVariables[secretName])
+                
             })
             sleep(15000)
             resolve("loaded successfully")
