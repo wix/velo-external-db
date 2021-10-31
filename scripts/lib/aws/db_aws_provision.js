@@ -1,5 +1,5 @@
 const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand, waitUntilDBInstanceAvailable } = require('@aws-sdk/client-rds')
-const factory = require('../utils/db/factory')
+const factory = require('./db/factory')
 
 class DbProvision {
     constructor(credentials, region) {
