@@ -7,19 +7,9 @@ class DbProvision {
         })
     }
 
-    asGcp(engine) {
-        switch (engine) {
-            case 'mysql':
-                return 'MYSQL_5_7'
-            default:
-                break
-        }
-    }
-
     async createDb( { name, engine, credentials }) {
-        const client = await this.authClient.getClient()
-        const projectId = await this.authClient.getProjectId()
-        const apiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances`
+        const { client, projectId } = await this.credentialsFor()
+        const CreateDbInstanceRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances`
 
         const dbInstanceProperties = {
             databaseVersion: this.asGcp(engine),
@@ -28,16 +18,16 @@ class DbProvision {
             rootPassword: credentials.passwd
         }
 
-        const response = await client.request({ url: apiUrl, method: 'POST', data: dbInstanceProperties})
+        const response = await client.request({ url: CreateDbInstanceRestUrl, method: 'POST', data: dbInstanceProperties})
         return response.operationType === 'CREATE' && response.status === 'PENDING'
     }
 
-    async dbStatusAvailable(name) {
-        const client = await this.authClient.getClient()
-        const projectId = await this.authClient.getProjectId()
-        const apiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${name}`
 
-        const response = await client.request({ url: apiUrl })
+    async dbStatusAvailable(name) {
+        const { client, projectId } = await this.credentialsFor()
+        const StatusRestApiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${name}`
+
+        const response = await client.request({ url: StatusRestApiUrl })
         const instance = response.data.items.find(i => i.name === name)
 
         return {
@@ -49,12 +39,27 @@ class DbProvision {
         }
     }
 
-    async postCreateDb(engine, dbName, status, credentials) {
+    async postCreateDb(engine, dbName, status) {
         const client = await this.authClient.getClient()
         const projectId = await this.authClient.getProjectId()
-        const apiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${status.instanceName}/databases`
+        const CreateDbRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${status.instanceName}/databases`
 
-        await client.request({ url: apiUrl, method:'POST', data: { name:  dbName } })
+        await client.request({ url: CreateDbRestUrl, method:'POST', data: { name:  dbName } })
+    }
+
+    asGcp(engine) {
+        switch (engine) {
+            case 'mysql':
+                return 'MYSQL_5_7'
+            default:
+                break
+        }
+    }
+
+    async credentialsFor() {
+        const client = await this.authClient.getClient()
+        const projectId = await this.authClient.getProjectId()
+        return { client, projectId }
     }
 }
 
