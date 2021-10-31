@@ -29,7 +29,7 @@ const main = async () => {
     blankLine()
     info('Loading sample data')
     const chunkSize = 100
-    await startProgress('insert', userInputs.rowCount / chunkSize, async () => await process.insertChunk(chunkSize, extraColumns, userInputs.collectionName, axios))
+    await startProgress('progress', userInputs.rowCount / chunkSize, async () => await process.insertChunk(chunkSize, extraColumns, userInputs.collectionName, axios))
 
 
 }
