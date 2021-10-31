@@ -40,8 +40,7 @@ class DbProvision {
     }
 
     async postCreateDb(engine, dbName, status) {
-        const client = await this.authClient.getClient()
-        const projectId = await this.authClient.getProjectId()
+        const { client, projectId } = await this.credentialsFor()
         const CreateDbRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${status.instanceName}/databases`
 
         await client.request({ url: CreateDbRestUrl, method:'POST', data: { name:  dbName } })
@@ -51,6 +50,8 @@ class DbProvision {
         switch (engine) {
             case 'mysql':
                 return 'MYSQL_5_7'
+            case 'postgres':
+                return 'POSTGRES_13'
             default:
                 break
         }

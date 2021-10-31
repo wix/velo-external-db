@@ -23,8 +23,7 @@ class AdapterProvision {
     }
 
     async createAdapter(name, engine, secrets, connectionName) {
-        const client = await this.authClient.getClient()
-        const projectId = await this.authClient.getProjectId()
+        const { client, projectId } = await this.credentialsFor()
         const apiUrl = `https://${this.region}-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/${projectId}/services/`
         const authApiUrl = `https://run.googleapis.com/v1/projects/${projectId}/locations/us-central1/services/${name}:setIamPolicy`
 
@@ -81,6 +80,12 @@ class AdapterProvision {
     }
 
     async rdsRoleArn() {
+    }
+
+    async credentialsFor() {
+        const client = await this.authClient.getClient()
+        const projectId = await this.authClient.getProjectId()
+        return { client, projectId }
     }
 }
 
