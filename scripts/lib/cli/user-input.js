@@ -17,7 +17,8 @@ const dbSupportedOn = (vendor) => {
 
 const nonEmpty = input => !(!input || input.trim() === '')
 
-const Aws = require('../../.credentials.json')
+const Aws = { accessKeyId: '', secretAccessKey: '' } 
+const GCP = { gcpClientEmail: '', gcpPrivateKey: '', gcpProjectId: '' } 
 
 const credentialsFor = vendor => {
     switch (vendor) {
@@ -42,9 +43,25 @@ const credentialsFor = vendor => {
             return inquirer.prompt([
                 {
                     type: 'input',
-                    name: 'whatever',
-                    message: 'gcp credentials todo',
+                    name: 'gcpClientEmail',
+                    message: 'GCP Client email',
+                    validate: nonEmpty,
+                    default: GCP.gcpClientEmail
                 },
+                {
+                    type: 'input',
+                    name: 'gcpPrivateKey',
+                    message: 'GCP Private Key',
+                    validate: nonEmpty,
+                    default: GCP.gcpPrivateKey
+                },
+                {
+                    type: 'input',
+                    name: 'gcpProjectId',
+                    message: 'GCP project id',
+                    validate: nonEmpty,
+                    default: GCP.gcpProjectId
+                }
             ])
         case 'azure':
             return inquirer.prompt([
