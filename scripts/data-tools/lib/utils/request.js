@@ -8,11 +8,11 @@ const appendSecretKeyRoleToRequest = (data, secretKey) => ({
     }
 })
 
-const axiosFor = ({ adaptorUrl, adaptorSecretKey }) => {
+const axiosFor = ({ adapterUrl, secretKey }) => {
     return axios.create({
-        baseURL: adaptorUrl,
+        baseURL: adapterUrl,
         transformRequest: [
-            (data, headers) => appendSecretKeyRoleToRequest(data, adaptorSecretKey),
+            (data, headers) => appendSecretKeyRoleToRequest(data, secretKey),
             ...axios.defaults.transformRequest]
     })
 }

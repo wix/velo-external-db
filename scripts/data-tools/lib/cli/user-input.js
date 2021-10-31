@@ -7,16 +7,16 @@ const defaultSettings = {
     generatedRows: 10000
 }
 
-const askForAdaptorDetails = async() => {
+const askForAdapterDetails = async() => {
     return await inquirer.prompt([
         {
-            name: 'adaptorUrl',
-            message: 'Adaptor service\'s URL',
+            name: 'adapterUrl',
+            message: 'Adapter Url:',
             validate: nonEmpty,
         },
         {
-            name: 'adaptorSecretKey',
-            message: 'Adaptor\'s secret key',
+            name: 'secretKey',
+            message: 'Secret key',
             validate: nonEmpty,
         }
     ])
@@ -46,11 +46,11 @@ const askForAdvancedSettings = async() => {
 }
 
 const askForUserInput = async() => {
-    const { adaptorUrl, adaptorSecretKey } = await askForAdaptorDetails()
+    const { adapterUrl, secretKey } = await askForAdapterDetails()
     const { collectionName, additionalColumnsCount, generatedRowCount } = await askForAdvancedSettings()
 
     return {
-        adaptorUrl, adaptorSecretKey,
+        adapterUrl, secretKey,
         collectionName, additionalColumnsCount, generatedRowCount
     }
 }
