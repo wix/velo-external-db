@@ -2,7 +2,7 @@ const inquirer = require('inquirer')
 const { isNumber, nonEmpty } = require('../utils/utils')
 
 const defaultSettings = {
-    collectionName: 'myCollection',
+    collectionName: 'my_collection',
     columnCount: 3,
     rowCount: 10000
 }

@@ -2,9 +2,9 @@ const chalk = require('chalk')
 const cliProgress = require('cli-progress')
 const { randomEntity } = require('../generator/data')
 
-const insert = async (items, axios) => {
+const insert = async (items, collectionName, chunk, axios) => {
     await axios.post('/data/insert/bulk', { collectionName, items })
-               .catch(error => console.log(`Error adding chunk ${i+1}: ${error.message}`))
+               .catch(error => console.log(`Error adding chunk ${chunk + 1}: ${error.message}`))
 }
 
 const insertItems = async(rowCount, generatedColumns, collectionName, axios) => {
@@ -16,7 +16,7 @@ const insertItems = async(rowCount, generatedColumns, collectionName, axios) => 
 
     for (let i = 0; i < rowCount; i+= itemsPerChunk) {
         const items = [...Array(itemsPerChunk)].map(() => (randomEntity(generatedColumns)))
-        await insert(items, axios)
+        await insert(items, collectionName, i, axios)
         bar.update(itemsPerChunk + i)
     }
     bar.stop()
