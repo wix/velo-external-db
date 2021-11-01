@@ -39,8 +39,7 @@ const provisionAdapter = async(provider, engine, secretId, secrets, connectionNa
 }
 
 
-const main = async({ vendor, engine, credentials }) => {
-    const region = 'eastus'
+const main = async({ vendor, engine, credentials, region }) => {
     const provider = providerFor(vendor, credentials)
     const configWriter = new provider.ConfigWriter(credentials, region)
     const dbProvision = new provider.DbProvision(credentials, region, engine)

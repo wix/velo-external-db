@@ -77,8 +77,9 @@ const askForUserInput = async () => {
         // }
     ]).then(async answers => {
         const credentials = await providerFor(answers.vendor).credentials
+        const { region } = await providerFor(answers.vendor).region
 
-        return { ...answers, credentials: credentials }
+        return { ...answers, credentials: credentials, region: region }
     })
 }
 
