@@ -1,4 +1,5 @@
 const inquirer = require('inquirer')
+const { providerFor } = require('../cloud-providers/factory')
 
 const dbSupportedOn = (vendor) => {
     const aws = [ 'mysql', 'postgres', 'mongo']
@@ -15,71 +16,6 @@ const dbSupportedOn = (vendor) => {
     }
 }
 
-const nonEmpty = input => !(!input || input.trim() === '')
-
-const Aws = { accessKeyId: '', secretAccessKey: '' } 
-const GCP = { gcpClientEmail: '', gcpPrivateKey: '', gcpProjectId: '' } 
-
-const credentialsFor = vendor => {
-    switch (vendor) {
-        case 'aws':
-            return inquirer.prompt([
-                {
-                    type: 'input',
-                    name: 'awsAccessKeyId',
-                    message: 'Access Key Id',
-                    validate: nonEmpty,
-                    default: Aws.accessKeyId
-                },
-                {
-                    type: 'password',
-                    name: 'awsSecretAccessKey',
-                    message: 'Access Key',
-                    validate: nonEmpty,
-                    default: Aws.secretAccessKey
-                }
-            ])
-        case 'gcp':
-            return inquirer.prompt([
-                {
-                    type: 'input',
-                    name: 'gcpClientEmail',
-                    message: 'GCP Client email',
-                    validate: nonEmpty,
-                    default: GCP.gcpClientEmail
-                },
-                {
-                    type: 'input',
-                    name: 'gcpPrivateKey',
-                    message: 'GCP Private Key',
-                    validate: nonEmpty,
-                    default: GCP.gcpPrivateKey
-                },
-                {
-                    type: 'input',
-                    name: 'gcpProjectId',
-                    message: 'GCP project id',
-                    validate: nonEmpty,
-                    default: GCP.gcpProjectId
-                }
-            ])
-        case 'azure':
-            return inquirer.prompt([
-                {
-                    type: 'input',
-                    name: 'subscriptionId',
-                    message: 'Subscription Id',
-                    validate: nonEmpty
-                },
-                {
-                    type: 'input',
-                    name: 'userObjectId',
-                    message: 'User Object Id',
-                    validate: nonEmpty
-                }
-            ])
-    }
-}
 
 const askForUserInput = async () => {
     return await inquirer.prompt([
@@ -140,7 +76,7 @@ const askForUserInput = async () => {
         //     default: 'Y',
         // }
     ]).then(async answers => {
-        const credentials = await credentialsFor( answers.vendor )
+        const credentials = await providerFor(answers.vendor).credentials
 
         return { ...answers, credentials: credentials }
     })

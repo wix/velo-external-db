@@ -1,20 +1,7 @@
-const aws = require('../cloud-providers/aws')
-const gcp = require('../cloud-providers/gcp')
-const azr = require ('../cloud-providers/azure')
 const { randomCredentials, randomSecretKey } = require('../utils/password_utils')
 const { blockUntil, randomWithPrefix } = require('../utils/utils')
 const { info, blankLine, startSpinnerWith } = require('../cli/display')
-
-const providerFor = (vendor) => {
-    switch (vendor) {
-        case 'gcp':
-            return gcp
-        case 'aws':
-            return aws
-        case 'azure':
-            return azr
-    }
-}
+const { providerFor } = require('../cloud-providers/factory')
 
 const provisionDb = async(provider, configWriter, { engine, secretId, secretKey, dbName, provisionVariables }) => {
     const dbCredentials = randomCredentials()
