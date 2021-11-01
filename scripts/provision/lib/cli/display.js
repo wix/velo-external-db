@@ -1,5 +1,6 @@
 const Spinner = require('cli-spinner').Spinner
 const { green, grey, greenBright, redBright } = require('chalk')
+const showBanner = require('node-banner')
 
 const startSpinnerWith = async (msg, f, completeMsg) => {
     const spinner = new Spinner({
@@ -36,4 +37,12 @@ const startSpinnerWith = async (msg, f, completeMsg) => {
 const info = msg => console.log(`${green('[INFO]:')} ${msg}`)
 const blankLine = () => console.log('')
 
-module.exports = { startSpinnerWith, info, blankLine }
+const header = async () => {
+    blankLine()
+    await showBanner('Velo External DB', 'Adapter and DB Provision', 'blue', 'magenta')
+    blankLine()
+    blankLine()
+}
+
+
+module.exports = { startSpinnerWith, info, blankLine, header }
