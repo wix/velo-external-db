@@ -1,7 +1,7 @@
 const inquirer = require('inquirer')
 const { nonEmpty } = require('../../cli/validators')
 
-const credentials = inquirer.prompt([
+const credentials = async () => inquirer.prompt([
     {
         type: 'input',
         name: 'subscriptionId',

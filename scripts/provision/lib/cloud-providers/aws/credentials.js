@@ -3,7 +3,7 @@ const { nonEmpty } = require('../../cli/validators')
 
 const Aws = { accessKeyId: '', secretAccessKey: '' }
 
-const credentials = inquirer.prompt([
+const credentials = async () => inquirer.prompt([
     {
         type: 'input',
         name: 'awsAccessKeyId',
@@ -19,7 +19,7 @@ const credentials = inquirer.prompt([
     }
 ])
 
-const region = inquirer.prompt([
+const region = async () => inquirer.prompt([
     {
         type: 'list',
         name: 'region',

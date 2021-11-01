@@ -3,10 +3,7 @@ const { blockUntil, randomWithPrefix } = require('../utils/utils')
 const { info, blankLine, startSpinnerWith } = require('../cli/display')
 const { providerFor } = require('../cloud-providers/factory')
 
-const provisionDb = async(provider, configWriter, { engine, secretId, secretKey, dbName, provisionVariables }) => {
-    const dbCredentials = randomCredentials()
-    const instanceName = randomWithPrefix('velo-external-db') 
-
+const provisionDb = async(provider, configWriter, { engine, secretId, secretKey, dbName, provisionVariables, dbCredentials, instanceName }) => {
     await startSpinnerWith(`Preparing ${engine} - running preCreate `, async() => await provider.preCreateDb(provisionVariables))
     
     await startSpinnerWith(`Creating ${engine} DB Instance`, async() => await provider.createDb({ name: instanceName, engine: engine, credentials: dbCredentials, ...provisionVariables}))
@@ -21,9 +18,7 @@ const provisionDb = async(provider, configWriter, { engine, secretId, secretKey,
     return { status, secrets }
 }
 
-const provisionAdapter = async(provider, engine, secretId, secrets, connectionName, configWriter, provisionVariables) => {
-    const instanceName = randomWithPrefix('velo-external-db-adapter')
-
+const provisionAdapter = async(provider, engine, secretId, secrets, connectionName, configWriter, provisionVariables, instanceName) => {
     const { serviceId } = await startSpinnerWith('Provision Adapter', async() => await provider.createAdapter(instanceName, engine, secretId, secrets, provisionVariables))
     
     await startSpinnerWith('Waiting adapter server instance to start', async() => await blockUntil( async() => (await provider.adapterStatus(serviceId, provisionVariables, instanceName)).available ))
@@ -40,25 +35,30 @@ const provisionAdapter = async(provider, engine, secretId, secrets, connectionNa
 
 
 const main = async({ vendor, engine, credentials, region }) => {
+    const dbCredentials = randomCredentials()
+    const instanceName = randomWithPrefix('velo-external-db')
+    const adapterInstanceName = randomWithPrefix('velo-external-db-adapter')
+    const secretId = randomWithPrefix('VELO-EXTERNAL-DB-SECRETS')
+    const secretKey = randomSecretKey()
+    const dbName = 'velo_db'
+
     const provider = providerFor(vendor, credentials)
     const configWriter = new provider.ConfigWriter(credentials, region)
     const dbProvision = new provider.DbProvision(credentials, region, engine)
     const adapterProvision = new provider.AdapterProvision(credentials, region)
-    
-    const secretId = randomWithPrefix('VELO-EXTERNAL-DB-SECRETS')
-    const secretKey = randomSecretKey()
-    const dbName = 'velo_db'
+
 
     const provisionVariables = provider.provisionVariables
     blankLine()
     blankLine()
     info('Provision DB Instance')
-    const {status, secrets} = await provisionDb(dbProvision, configWriter, { engine, secretId, secretKey, dbName, provisionVariables})
+
+    const {status, secrets} = await provisionDb(dbProvision, configWriter, { engine, secretId, secretKey, dbName, provisionVariables, dbCredentials, instanceName })
 
     blankLine()
     blankLine()
     info('Provision Adapter')
-    await provisionAdapter(adapterProvision, engine, secretId, secrets, status.connectionName, configWriter, provisionVariables)
+    await provisionAdapter(adapterProvision, engine, secretId, secrets, status.connectionName, configWriter, provisionVariables, adapterInstanceName)
 
     blankLine()
     blankLine()

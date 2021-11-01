@@ -3,7 +3,7 @@ const { nonEmpty } = require('../../cli/validators')
 
 const GCP = { gcpClientEmail: '', gcpPrivateKey: '', gcpProjectId: '' }
 
-const credentials = inquirer.prompt([
+const credentials = async () => inquirer.prompt([
     {
         type: 'input',
         name: 'gcpClientEmail',
