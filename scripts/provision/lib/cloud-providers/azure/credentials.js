@@ -1,7 +1,9 @@
 const inquirer = require('inquirer')
 const { nonEmpty } = require('../../cli/validators')
+const { SubscriptionClient } = require('@azure/arm-subscriptions')
+const { DefaultAzureCredential } = require('@azure/identity')
 
-const credentials = async () => inquirer.prompt([
+const credentials = async() => inquirer.prompt([
     {
         type: 'input',
         name: 'subscriptionId',
@@ -16,4 +18,20 @@ const credentials = async () => inquirer.prompt([
     }
 ])
 
-module.exports = { credentials }
+const region = async(credentials) => inquirer.prompt([
+    {
+        type: 'list',
+        name: 'region',
+        message: 'Region availability',
+        choices: async() => await regionList(credentials.subscriptionId)
+    }
+])
+
+
+const regionList =async(subscriptionId) => {
+    const client = new SubscriptionClient(new DefaultAzureCredential())
+    const regions =  await client.subscriptions.listLocations(subscriptionId)
+    return regions.map(region => ({ name: region.displayName, value: region.value }))
+}
+
+module.exports = { credentials, region }
