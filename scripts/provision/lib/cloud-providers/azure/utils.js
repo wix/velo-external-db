@@ -1,4 +1,4 @@
-const { randomInt } = require('../utils/utils')
+const { randomInt } = require('../../utils/utils')
 
 const random = randomInt()
 

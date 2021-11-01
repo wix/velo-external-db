@@ -1,5 +1,5 @@
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager')
-const { randomWithPrefix } = require('../utils/utils')
+const { randomWithPrefix } = require('../../utils/utils')
 
 
 class ConfigWriter {

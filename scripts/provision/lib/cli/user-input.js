@@ -69,15 +69,13 @@ const credentialsFor = vendor => {
                     type: 'input',
                     name: 'subscriptionId',
                     message: 'Subscription Id',
-                    validate: nonEmpty,
-                    default: Azr.SUBSCRIPTION_ID
+                    validate: nonEmpty
                 },
                 {
                     type: 'input',
                     name: 'userObjectId',
                     message: 'User Object Id',
-                    validate: nonEmpty,
-                    default: Azr.ID
+                    validate: nonEmpty
                 }
             ])
     }
