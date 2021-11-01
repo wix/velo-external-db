@@ -1,6 +1,7 @@
 const Spinner = require('cli-spinner').Spinner
 const { green, grey, greenBright, redBright } = require('chalk')
 const cliProgress = require('cli-progress')
+const showBanner = require('node-banner')
 
 const startSpinnerWith = async (msg, f, completeMsg) => {
     const spinner = new Spinner({
@@ -48,4 +49,11 @@ const startProgress = async (msg, iterations, f) => {
 const info = msg => console.log(`${green('[INFO]:')} ${msg}`)
 const blankLine = () => console.log('')
 
-module.exports = { startSpinnerWith, info, blankLine, startProgress }
+const header = async () => {
+    blankLine()
+    await showBanner('Velo External DB', 'Data Generator', 'blue', 'magenta')
+    blankLine()
+    blankLine()
+}
+
+module.exports = { startSpinnerWith, info, blankLine, startProgress, header }
