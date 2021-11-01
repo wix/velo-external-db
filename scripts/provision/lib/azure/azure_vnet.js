@@ -1,10 +1,11 @@
-const { NetworkManagementClient } = require('@azure/arm-network');
+const { NetworkManagementClient } = require('@azure/arm-network')
 const { DefaultAzureCredential } = require('@azure/identity')
 
 class VirtualNetwork {
-    constructor(credentials, engine) {
+    constructor(credentials, engineClient, region) {
         this.networkClient = new NetworkManagementClient(new DefaultAzureCredential(), credentials.subscriptionId)
-        this.engine = engine
+        this.engineClient = engineClient
+        this.region = region
     }
 
     async createVirtualNetwork(resourceGroupName, virtualNetworkName, subnetName) {
@@ -16,10 +17,10 @@ class VirtualNetwork {
         const virtualNetwork = await this.networkClient.virtualNetworks
                                                        .beginCreateOrUpdate(resourceGroupName, virtualNetworkName,
                                                                             {
-                                                                                location: 'eastus',
+                                                                                location: this.region,
                                                                                 addressSpace: { addressPrefixes: ['10.0.0.0/16'] }
                                                                             } )
-        await virtualNetwork.pollUntilFinished();
+        await virtualNetwork.pollUntilFinished()
     }
 
     async createSubnet(resourceGroupName, virtualNetworkName, subnetName) {
@@ -27,10 +28,10 @@ class VirtualNetwork {
                                 .beginCreateOrUpdate(resourceGroupName, virtualNetworkName, subnetName,
                                                      {
                                                          serviceEndpoints: [ {
-                                                                                 service: this.engine.subnetService(),
-                                                                                 locations: ['eastus']
+                                                                                 service: this.engineClient.subnetService(),
+                                                                                 locations: [this.region]
                                                                              }, {
-                                                                                 service: 'Microsoft.KeyVault', locations: ['eastus']
+                                                                                 service: 'Microsoft.KeyVault', locations: [this.region]
                                                                            } ],
                                                          delegations: [{
                                                              serviceName: 'Microsoft.Web/serverFarms',
