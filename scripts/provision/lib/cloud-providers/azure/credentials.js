@@ -31,7 +31,7 @@ const region = async(credentials) => inquirer.prompt([
 const regionList =async(subscriptionId) => {
     const client = new SubscriptionClient(new DefaultAzureCredential())
     const regions =  await client.subscriptions.listLocations(subscriptionId)
-    return regions.map(region => ({ name: region.displayName, value: region.value }))
+    return regions.map(region => ({ name: region.displayName, value: region.name }))
 }
 
 module.exports = { credentials, region }
