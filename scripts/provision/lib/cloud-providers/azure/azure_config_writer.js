@@ -9,7 +9,7 @@ class ConfigWriter {
         this.credentials = credentials
         this.azureCreds = new DefaultAzureCredential()
         this.keyVaultManagementClient = new KeyVaultManagementClient(this.azureCreds, credentials.subscriptionId)
-        this.networkManagementClient = new NetworkManagementClient(this.azureCreds, credentials.subscriptionId)
+        this.networkClient = new NetworkManagementClient(this.azureCreds, credentials.subscriptionId)
         this.subscriptionClient = new SubscriptionClient(this.azureCreds)
         this.userObjectId = credentials.userObjectId
         this.region = region
