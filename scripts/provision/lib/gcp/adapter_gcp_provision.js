@@ -10,6 +10,21 @@ class AdapterProvision {
         this.region = region
     }
 
+    async createAdapter(name, engine, secrets, connectionName) {
+        const { client, projectId } = await this.credentialsFor()
+        await this.createCloudRunInstance(name, engine, secrets, connectionName, client, projectId)
+        await this.allowIncomingRequests(name, client, projectId)        
+    }
+
+    async adapterStatus(serviceName) {
+        const { client, projectId } = await this.credentialsFor()
+        const StatusCloudRunRestUrl = `https://${this.region}-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/${projectId}/services/${serviceName}`
+        const res = await client.request({ url: StatusCloudRunRestUrl})
+        const readyStatus = res.data.status.conditions.find(i => i.type === 'Ready')
+        return readyStatus.status === 'True'
+    }
+
+    
     secretsToEnvs(secrets) { 
         return Object.entries(secrets).map(([envVariable, secretName])=> {
             return {
@@ -21,12 +36,10 @@ class AdapterProvision {
 
         })
     }
-
-    async createAdapter(name, engine, secrets, connectionName) {
-        const { client, projectId } = await this.credentialsFor()
-        const apiUrl = `https://${this.region}-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/${projectId}/services/`
-        const authApiUrl = `https://run.googleapis.com/v1/projects/${projectId}/locations/us-central1/services/${name}:setIamPolicy`
-
+    
+    async createCloudRunInstance(name, engine, secrets, connectionName, client, projectId) {
+        const CreateCloudRunRestUrl = `https://${this.region}-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/${projectId}/services/`
+        
         const env = [
             { name: 'CLOUD_VENDOR', value: 'gcp' },
             { name: 'TYPE', value: engine },
@@ -34,7 +47,6 @@ class AdapterProvision {
         ]
 
         const adapterInstanceProperties = {
-
             apiVersion: 'serving.knative.dev/v1',
             kind: 'Service',
             metadata: {
@@ -58,30 +70,26 @@ class AdapterProvision {
             }
         }
 
+        await client.request({ url: CreateCloudRunRestUrl, method: 'POST', data: adapterInstanceProperties })
+    }
+
+    async allowIncomingRequests(instanceName, client, projectId) {
+        const AuthenticationRestUrl = `https://run.googleapis.com/v1/projects/${projectId}/locations/us-central1/services/${instanceName}:setIamPolicy`
         const authData = {
             policy: {
-              bindings: [
-                {
-                  members: [ 'allUsers' ],
-                  role: 'roles/run.invoker'
-                }
-              ],
-              etag: 'ACAB'
+                bindings: [
+                    {
+                        members: [ 'allUsers' ],
+                        role: 'roles/run.invoker'
+                    }
+                ],
+                etag: 'ACAB'
             }
-          }
+        }
 
-        await client.request({ url: apiUrl, method: 'POST', data: adapterInstanceProperties })
-
-        await client.request({ url: authApiUrl, method: 'POST', data: authData })
-
+        await client.request({ url: AuthenticationRestUrl, method: 'POST', data: authData })
     }
-
-    async adapterStatus(serviceId) {
-    }
-
-    async rdsRoleArn() {
-    }
-
+    
     async credentialsFor() {
         const client = await this.authClient.getClient()
         const projectId = await this.authClient.getProjectId()
