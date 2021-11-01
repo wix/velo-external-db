@@ -24,6 +24,7 @@ const region = inquirer.prompt([
         type: 'list',
         name: 'region',
         message: 'Region availability',
+        default: 'us-east-1',
         choices: [
             {
                 name: 'US East (Ohio)',
