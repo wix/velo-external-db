@@ -1,12 +1,16 @@
 const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand, waitUntilDBInstanceAvailable } = require('@aws-sdk/client-rds')
 const factory = require('./db/factory')
+const NetworkProvision = require('./aws_network_provision')
 
 class DbProvision {
     constructor(credentials, region) {
         this.rdsClient = new RDSClient( { region: region,
                                           credentials: { accessKeyId: credentials.awsAccessKeyId,
                                                          secretAccessKey: credentials.awsSecretAccessKey } } )
+        this.networkClient = new NetworkProvision(credentials, region)
     }
+
+    async preCreateDb() { }
 
     async createDb( { name, engine, credentials }) {
         const response = await this.rdsClient.send(new CreateDBInstanceCommand({ Engine: engine, DBInstanceClass: 'db.t3.micro', AllocatedStorage: 20,
@@ -29,8 +33,10 @@ class DbProvision {
     }
 
     async postCreateDb(engine, dbName, status, credentials) {
+        const securityGroupRuleIds = await this.networkClient.addSecurityRule(status.securityGroupId, factory.portFor(engine))
         await factory.clientFor(engine)
                      .createDatabase(dbName, status.host, credentials)
+        await this.networkClient.removeSecurityRule(status.securityGroupId, securityGroupRuleIds)
     }
 }
 

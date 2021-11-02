@@ -7,4 +7,13 @@ const clientFor = engine => {
     }
 }
 
-module.exports = { clientFor }
+const portFor = engine => {
+    switch (engine) {
+        case 'mysql':
+            return 3306
+        case 'postgres':
+            return 5432
+    }
+}
+
+module.exports = { clientFor, portFor }
