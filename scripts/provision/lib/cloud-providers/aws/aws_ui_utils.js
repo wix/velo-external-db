@@ -2,6 +2,7 @@ const inquirer = require('inquirer')
 const { nonEmpty } = require('../../cli/validators')
 
 const Aws = { accessKeyId: '', secretAccessKey: '' }
+// const Aws = require('../../../.credentials.json')
 
 const credentials = async () => inquirer.prompt([
     {
@@ -98,14 +99,6 @@ const region = async () => inquirer.prompt([
             }
         ],
     },
-
-    {
-        type: 'input',
-        name: 'awsSecretAccessKey',
-        message: 'Access Key',
-        validate: nonEmpty,
-        default: Aws.secretAccessKey
-    }
 ])
 
 module.exports = { credentials, region }
