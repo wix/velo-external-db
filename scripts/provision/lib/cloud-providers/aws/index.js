@@ -1,6 +1,6 @@
-const DbProvision = require('./db_aws_provision')
+const DbProvision = require('./aws_db_provision')
 const ConfigWriter = require('./aws_config_writer')
-const AdapterProvision = require('./adapter_aws_provision')
+const AdapterProvision = require('./aws_adapter_provision')
 const NetworkProvision = require('./aws_network_provision')
 const credentials = require('./credentials')
 

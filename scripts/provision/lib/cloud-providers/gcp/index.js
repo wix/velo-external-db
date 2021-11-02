@@ -1,6 +1,6 @@
-const DbProvision = require('./db_gcp_provision')
+const DbProvision = require('./gcp_db_provision')
 const ConfigWriter = require('./gcp_config_writer')
-const AdapterProvision = require('./adapter_gcp_provision')
+const AdapterProvision = require('./gcp_adapter_provision')
 const NetworkProvision = require('./gcp_network_provision')
 const { credentials } = require('./credentials')
 
