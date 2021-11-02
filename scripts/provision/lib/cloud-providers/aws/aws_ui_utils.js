@@ -100,7 +100,7 @@ const region = async () => inquirer.prompt([
     },
 
     {
-        type: 'list',
+        type: 'input',
         name: 'awsSecretAccessKey',
         message: 'Access Key',
         validate: nonEmpty,
