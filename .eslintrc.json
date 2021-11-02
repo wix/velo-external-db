@@ -41,6 +41,10 @@
         "eqeqeq": [
             "error",
             "always"
+        ],
+        "quote-props": [
+            "error",
+            "as-needed"
         ]
     }
 }
