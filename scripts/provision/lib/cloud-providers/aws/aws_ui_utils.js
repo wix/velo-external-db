@@ -1,8 +1,6 @@
 const inquirer = require('inquirer')
 const { nonEmpty } = require('../../cli/validators')
-
-const Aws = { accessKeyId: '', secretAccessKey: '' }
-// const Aws = require('../../../.credentials.json')
+const { credentialsFor } = require('../../auth/default_credentials')
 
 const credentials = async () => inquirer.prompt([
     {
@@ -10,13 +8,13 @@ const credentials = async () => inquirer.prompt([
         name: 'awsAccessKeyId',
         message: 'Access Key Id',
         validate: nonEmpty,
-        default: Aws.accessKeyId
+        default: credentialsFor('aws').accessKeyId
     }, {
         type: 'password',
         name: 'awsSecretAccessKey',
         message: 'Access Key',
         validate: nonEmpty,
-        default: Aws.secretAccessKey
+        default: credentialsFor('aws').secretAccessKey
     }
 ])
 
