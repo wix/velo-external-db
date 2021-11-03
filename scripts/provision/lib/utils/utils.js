@@ -9,7 +9,7 @@ const blockUntil = async f => waitFor(
         }
     }, {
         interval: 100,
-        timeout: 10 * 60 * 1000,
+        timeout: 20 * 60 * 1000,
         message: 'Waiting for time to pass :)',
     }
 )

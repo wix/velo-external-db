@@ -1,10 +1,11 @@
 const {GoogleAuth} = require('google-auth-library')
 class DbProvision {
-    constructor({ gcpClientEmail, gcpPrivateKey }) {
+    constructor({ gcpClientEmail, gcpPrivateKey, gcpProjectId }) {
         this.authClient = new GoogleAuth({
             credentials : { client_email: gcpClientEmail, private_key: gcpPrivateKey },
             scopes: 'https://www.googleapis.com/auth/cloud-platform'
         })
+        this.projectId = gcpProjectId
     }
 
     async preCreateDb() {
@@ -12,8 +13,8 @@ class DbProvision {
     }
 
     async createDb( { name, engine, credentials }) {
-        const { client, projectId } = await this.credentialsFor()
-        const CreateDbInstanceRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances`
+        const client = await this.credentialsFor()
+        const CreateDbInstanceRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances`
 
         const dbInstanceProperties = {
             databaseVersion: this.asGcp(engine),
@@ -28,8 +29,8 @@ class DbProvision {
 
 
     async dbStatusAvailable(name) {
-        const { client, projectId } = await this.credentialsFor()
-        const StatusRestApiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${name}`
+        const client = await this.credentialsFor()
+        const StatusRestApiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances/${name}`
 
         const response = await client.request({ url: StatusRestApiUrl })
         const instance = response.data
@@ -44,8 +45,8 @@ class DbProvision {
     }
 
     async postCreateDb(engine, dbName, status) {
-        const { client, projectId } = await this.credentialsFor()
-        const CreateDbRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${status.instanceName}/databases`
+        const client = await this.credentialsFor()
+        const CreateDbRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances/${status.instanceName}/databases`
 
         await client.request({ url: CreateDbRestUrl, method:'POST', data: { name:  dbName } })
     }
@@ -62,9 +63,7 @@ class DbProvision {
     }
 
     async credentialsFor() {
-        const client = await this.authClient.getClient()
-        const projectId = await this.authClient.getProjectId()
-        return { client, projectId }
+        return await this.authClient.getClient()
     }
 }
 

@@ -1,20 +1,18 @@
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager')
-const { randomWithPrefix } = require('../../utils/utils')
-
-
 class ConfigWriter {
-    constructor({ gcpClientEmail, gcpPrivateKey }) {
+    constructor({ gcpClientEmail, gcpPrivateKey, gcpProjectId }) {
         this.client = new SecretManagerServiceClient({ credentials : { client_email: gcpClientEmail, private_key: gcpPrivateKey }})
+        this.projectId = gcpProjectId
     }
 
     extractSecretName(secretName) {
         return secretName.split('/').splice(-1)[0]
     }
 
-     async createSecret(secretKey, secretValue, projectId) {
+     async createSecret(secretKey, secretValue) {
         const [secret] = await this.client.createSecret({
-            parent: `projects/${projectId}`,
-            secretId: randomWithPrefix(`VELO-EXTERNAL-DB-${secretKey}`),
+            parent: `projects/${this.projectId}`,
+            secretId: secretKey,
             secret: { replication: { automatic: {} } }
         })
 
@@ -26,13 +24,12 @@ class ConfigWriter {
         return this.extractSecretName(secret.name)
      }
 
-    async writeConfig( { dbCredentials, connectionName, db, secretKey }) {
+    async writeConfig( { secretId, dbCredentials, connectionName, db, secretKey }) {
         const config = { USER: 'root', PASSWORD: dbCredentials.passwd, CLOUD_SQL_CONNECTION_NAME: connectionName, DB: db, SECRET_KEY: secretKey }
-        const projectId = await this.client.getProjectId()
         const secrets = {}
 
         for (const [secretKey, secretValue] of Object.entries(config)) {
-            const secretName = await this.createSecret(secretKey, secretValue, projectId)
+            const secretName = await this.createSecret(`${secretId}-${secretKey}`, secretValue, this.projectId)
             secrets[secretKey] = secretName
         }
 
