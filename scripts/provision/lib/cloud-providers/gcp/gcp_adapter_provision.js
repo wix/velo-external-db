@@ -11,29 +11,10 @@ class AdapterProvision {
         this.region = region
     }
 
-    async createServiceAccount(client, projectId) {
-        const CreateServiceAccountRestUrl = `https://iam.googleapis.com/v1/projects/${projectId}/serviceAccounts`
-        const accountId = randomWithPrefix('velo-adapter-account')
-        const res = await client.request({ url: CreateServiceAccountRestUrl, method: 'POST', data: { accountId } })
-        return res.data.email
-    }
-    
-    async grantSecretsPermission(secrets, serviceAccountEmail, client, projectId) {
-        const grantPermissionRequest = {
-            policy: { bindings:[ { role: 'roles/secretmanager.secretAccessor', members: [`serviceAccount:${serviceAccountEmail}`] } ] }
-        }
-
-        await Promise.all(Object.values(secrets).map(async s => {
-            const ServiceAccountsRestUrl = `https://secretmanager.googleapis.com/v1/projects/${projectId}/secrets/${s}:setIamPolicy`
-            await client.request({ url: ServiceAccountsRestUrl, method: 'POST', data: grantPermissionRequest })
-        }))
-
-    }
-
     async preCreateAdapter(secrets) {
         const { client, projectId } = await this.credentialsFor()
         const serviceAccountEmail = await this.createServiceAccount(client, projectId)
-        await this.grantSecretsPermission(secrets, serviceAccountEmail, client, projectId)
+        await this.grantReadSecretsPermission(secrets, serviceAccountEmail, client, projectId)
         return serviceAccountEmail
     }
     async createAdapter(name, engine, _, secrets, __, serviceAccountEmail) {
@@ -50,13 +31,30 @@ class AdapterProvision {
         return readyStatus.status === 'True'
     }
 
+    async createServiceAccount(client, projectId) {
+        const CreateServiceAccountRestUrl = `https://iam.googleapis.com/v1/projects/${projectId}/serviceAccounts`
+        const accountId = randomWithPrefix('velo-adapter-account')
+        const res = await client.request({ url: CreateServiceAccountRestUrl, method: 'POST', data: { accountId } })
+        return res.data.email
+    }
+    
+    async grantReadSecretsPermission(secrets, serviceAccountEmail, client, projectId) {
+        const grantPermissionRequest = {
+            policy: { bindings:[ { role: 'roles/secretmanager.secretAccessor', members: [`serviceAccount:${serviceAccountEmail}`] } ] }
+        }
+
+        await Promise.all(Object.values(secrets).map(async s => {
+            const ServiceAccountsRestUrl = `https://secretmanager.googleapis.com/v1/projects/${projectId}/secrets/${s}:setIamPolicy`
+            await client.request({ url: ServiceAccountsRestUrl, method: 'POST', data: grantPermissionRequest })
+        }))
+
+    }
+
     secretsToEnvs(secrets) { 
         return Object.entries(secrets).map(([envVariable, secretName])=> {
             return {
                 name: envVariable,
-                valueFrom: {
-                    secretKeyRef: { key: 'latest', name: secretName }
-                }
+                valueFrom: { secretKeyRef: { key: 'latest', name: secretName } }
             } 
 
         })
@@ -85,7 +83,7 @@ class AdapterProvision {
             spec: {
                 template: {
                     metadata: {
-                        annotations: { 'run.googleapis.com/cloudsql-instances': `${projectId}:${this.region}:${connectionName}`}
+                        annotations: { 'run.googleapis.com/cloudsql-instances': connectionName }
                 },
                 spec: {
                     serviceAccountName: serviceAccountEmail,

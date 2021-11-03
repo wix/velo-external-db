@@ -7,6 +7,10 @@ class DbProvision {
         })
     }
 
+    async preCreateDb() {
+
+    }
+
     async createDb( { name, engine, credentials }) {
         const { client, projectId } = await this.credentialsFor()
         const CreateDbInstanceRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances`
@@ -28,7 +32,7 @@ class DbProvision {
         const StatusRestApiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${projectId}/instances/${name}`
 
         const response = await client.request({ url: StatusRestApiUrl })
-        const instance = response.data.items.find(i => i.name === name)
+        const instance = response.data
 
         return {
             instanceName: name,
