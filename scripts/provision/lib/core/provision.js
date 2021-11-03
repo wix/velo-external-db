@@ -25,7 +25,7 @@ const provisionAdapter = async(provider, engine, secretId, secrets, connectionNa
 
     const status = await provider.adapterStatus(serviceId, provisionVariables, instanceName)
 
-    await startSpinnerWith('Giving adapter access to config', async() => await configWriter.updateAccessPolicy(status, provisionVariables))
+    await startSpinnerWith('Giving adapter access to config', async() => await configWriter.updateAccessPolicy?.(status, provisionVariables))
 
     await startSpinnerWith('Post create instance', async() => provider.postCreateAdapter(instanceName, provisionVariables))
 
