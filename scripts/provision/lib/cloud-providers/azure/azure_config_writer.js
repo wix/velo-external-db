@@ -15,7 +15,7 @@ class ConfigWriter {
         this.region = region
     }
 
-    async writeConfig(secretId, dbCredentials, host, connectionName, dbName, secretKey, provisionVariables, instanceName) {
+    async writeConfig( { dbCredentials, host, dbName, secretKey, provisionVariables, instanceName }) {
         const { resourceGroupName, keyVaultName, subnetName, virtualNetworkName } = provisionVariables
         await this.createKeyVaultInstance(resourceGroupName, keyVaultName, virtualNetworkName, subnetName, this.userObjectId)
 

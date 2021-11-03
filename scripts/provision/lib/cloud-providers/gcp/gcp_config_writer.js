@@ -26,7 +26,7 @@ class ConfigWriter {
         return this.extractSecretName(secret.name)
      }
 
-    async writeConfig(secretId, dbCredentials, host, connectionName, db, secretKey) {
+    async writeConfig( { dbCredentials, connectionName, db, secretKey }) {
         const config = { USER: 'root', PASSWORD: dbCredentials.passwd, CLOUD_SQL_CONNECTION_NAME: connectionName, DB: db, SECRET_KEY: secretKey }
         const projectId = await this.client.getProjectId()
         const secrets = {}

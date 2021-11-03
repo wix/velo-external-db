@@ -11,7 +11,7 @@ const provisionDb = async(provider, configWriter, { engine, secretId, secretKey,
 
     const status = await provider.dbStatusAvailable(instanceName, provisionVariables)
 
-    const secrets = await startSpinnerWith('Writing db config', async() => await configWriter.writeConfig(secretId, dbCredentials, status.host, status.connectionName, dbName, secretKey, provisionVariables, instanceName))
+    const secrets = await startSpinnerWith('Writing db config', async() => await configWriter.writeConfig( { secretId, dbCredentials, host: status.host, dbName, secretKey, provisionVariables, instanceName, connectionName: status.connectionName }))
 
     await startSpinnerWith('Provision Velo DB on db instance', async() => await provider.postCreateDb(engine, dbName, status, dbCredentials, provisionVariables, instanceName))
 
