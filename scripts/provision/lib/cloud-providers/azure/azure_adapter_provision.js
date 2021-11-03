@@ -58,16 +58,21 @@ class AdapterProvision {
                                       .catch(() => ({ available: false }))
     }
 
-    async postCreateAdapter(webAppName, provisionVariables) {
+    async postCreateAdapter(webAppName, provisionVariables, engine) {
         const { keyVaultName, resourceGroupName } = provisionVariables
 
-        await this.loadEnviormentVariables(resourceGroupName, webAppName, keyVaultName)
+        await this.loadEnviormentVariables(resourceGroupName, webAppName, keyVaultName, engine)
     }
 
-    async loadEnviormentVariables(resourceGroupName, webAppName, keyVaultName) {
+    async loadEnviormentVariables(resourceGroupName, webAppName, keyVaultName, engine) {
         const result = await this.webAppClient
                                  .updateApplicationSettings(resourceGroupName, webAppName, {
-                                                                properties: appServiceVariables(keyVaultName)
+                                                                properties: 
+                                                                { 
+                                                                    CLOUD_VENDOR: 'azr',
+                                                                    TYPE: engine,
+                                                                    ...appServiceVariables(keyVaultName)
+                                                                }
                                                             })
         return result
     }
@@ -88,8 +93,6 @@ const appServiceVariables = (keyVaultName) => {
         DB: refFromKeyVault(keyVaultName, 'DB'),
         HOST: refFromKeyVault(keyVaultName, 'HOST'),
         PASSWORD: refFromKeyVault(keyVaultName, 'PASSWORD'),
-        TYPE: refFromKeyVault(keyVaultName, 'TYPE'),
-        CLOUD_VENDOR: refFromKeyVault(keyVaultName, 'CLOUDVENDOR'),
         SECRET_KEY: refFromKeyVault(keyVaultName, 'SECRETKEY'),
         USER: refFromKeyVault(keyVaultName, 'USER'),
         PORT: refFromKeyVault(keyVaultName, 'PORT'),
