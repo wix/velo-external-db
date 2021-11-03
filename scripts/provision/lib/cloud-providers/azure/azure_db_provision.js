@@ -1,6 +1,6 @@
 const { ResourceManagementClientContext, ResourceGroups } = require('@azure/arm-resources')
 const { DefaultAzureCredential } = require('@azure/identity')
-const VirtualNetwork = require ('./azure_vnet')
+const VirtualNetwork = require ('./azure_network')
 const factory = require('./db/factory')
 
 class DbProvision {
