@@ -50,6 +50,7 @@
     "generate-password": "^1.6.1",
     "google-auth-library": "^7.10.1",
     "inquirer": "^8.1.2",
+    "mssql": "^7.2.1",
     "mysql": "^2.18.1",
     "node-banner": "^1.4.0",
     "pg": "^8.7.1",

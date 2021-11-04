@@ -2,7 +2,7 @@ const inquirer = require('inquirer')
 const { providerFor } = require('../cloud-providers/factory')
 
 const dbSupportedOn = (vendor) => {
-    const aws = [ 'mysql', 'postgres', 'mongo']
+    const aws = [ 'mysql', 'postgres', 'mssql']
     const gcp = [ 'mysql', 'postgres', 'mongo', 'spanner', 'firestore']
     const azure = [ 'mysql', 'postgres', 'mongo', 'mssql' ]
 

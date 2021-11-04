@@ -15,7 +15,7 @@ class DbProvision {
     async createDb( { name, engine, credentials }) {
         const response = await this.rdsClient.send(new CreateDBInstanceCommand({ Engine: engine, DBInstanceClass: 'db.t3.micro', AllocatedStorage: 20,
                                                                                        DBInstanceIdentifier: name,
-                                                                                       MasterUsername: credentials.user, MasterUserPassword: credentials.passwd }))
+                                                                                       MasterUsername: credentials.user, MasterUserPassword: credentials.passwd, ...factory.createCmdPatchFor(engine) }))
         return response['$metadata']['httpStatusCode'] === 200
     }
 
