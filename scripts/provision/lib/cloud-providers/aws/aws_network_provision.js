@@ -22,9 +22,9 @@ class NetworkProvision {
 
     async removeSecurityRule(groupId, securityGroupRuleIds) {
         if (securityGroupRuleIds.length > 0) {
-            const rsp = await this.ec2Client.send(new RevokeSecurityGroupIngressCommand({
+            await this.ec2Client.send(new RevokeSecurityGroupIngressCommand({
                 GroupId: groupId,
-                SecurityGroupRuleIds: [securityGroupRuleId],
+                SecurityGroupRuleIds: securityGroupRuleIds,
             }))
         }
     }
