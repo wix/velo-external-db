@@ -3,9 +3,9 @@ const { Client } = require('pg')
 
 const createDatabase = async (dbName, host, credentials) => {
     const client = new Client({
-        host,
+        host: host,
         user: credentials.user,
-        password: credentials.password,
+        password: credentials.passwd,
         database: 'postgres',
         port: 5432,
     })
