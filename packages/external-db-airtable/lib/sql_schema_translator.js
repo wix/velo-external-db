@@ -45,8 +45,8 @@ class SchemaColumnTranslator {
                 throw Error(type)
         }
     }
-    wixColumnToAirtableColumn(column){
-        return {name: column.name, type:this.dbTypeFor(column.type,column.subtype)}
+    wixColumnToAirtableColumn(column) {
+        return {name: column.name, type:this.dbTypeFor(column.type, column.subtype)}
     }
     dbTypeFor(type, subtype) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
@@ -61,7 +61,7 @@ class SchemaColumnTranslator {
                 return 'number'
 
             case 'datetime_date':
-                return `date`
+                return 'date'
             case 'datetime_time':
             case 'datetime_datetime':
             case 'datetime_timestamp':
@@ -70,13 +70,13 @@ class SchemaColumnTranslator {
             case 'text_string':
             case 'text_medium':
             case 'text_large':
-                return `multiLineText`
+                return 'multiLineText'
 
             case 'text_small':
-                return `singleLineText`
+                return 'singleLineText'
 
             case 'boolean_':
-                return `checkbox`
+                return 'checkbox'
 
         }
 

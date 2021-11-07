@@ -1,10 +1,9 @@
 
 const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
-const { DbConnectionError } = require('velo-external-db-commons').errors
 
 class DatabaseOperations {
     constructor(base) {
-        this.base = base;
+        this.base = base
         this.baseId = base.getId()
     }
 

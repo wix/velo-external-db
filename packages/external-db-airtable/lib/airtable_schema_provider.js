@@ -13,8 +13,8 @@ class SchemaProvider {
         this.axios = axios.create({
             baseURL: baseUrl || 'https://api.airtable.com',
             headers: {
-                Authorization: `Bearer ${apiKey || 'key123'}`,
-                'X-Airtable-Client-Secret': metaApiKey || 'meta123'
+                Authorization: `Bearer ${apiKey}`,
+                'X-Airtable-Client-Secret': metaApiKey
             }
         })
     }
@@ -53,7 +53,7 @@ class SchemaProvider {
         const collection = await this.describeCollection(collectionName)
         if (!collection)
             throw new CollectionDoesNotExists('Collection does not exists')
-        if (!this.columnExists(collection,columnName))
+        if (!this.columnExists(collection, columnName))
             throw new FieldDoesNotExist('Collection does not contain a field with this name')
 
         await this.axios.post(`v0/meta/bases/${this.baseId}/tables/${collectionName}/removeColumn`,
