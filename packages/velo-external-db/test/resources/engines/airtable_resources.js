@@ -19,6 +19,7 @@ const cleanup = async () => {
 }
 
 const initEnv = async () => {
+    console.log('~~~~ listen')
     _server = mockServer.listen(PORT)
 }
 
@@ -38,10 +39,10 @@ const schemaProviderTestVariables = () => (
     {
         apiKey: 'key123',
         metaApiKey: 'meta123',
-        baseUrl: 'http://localhost:9000'
+        baseUrl: `http://localhost:${PORT}`
     }
 )
 
-const connectionConfig = () => ({ apiPrivateKey: 'key123', baseId: 'app123', metaApiKey:'meta123',  baseUrl:'http://localhost:' + PORT })
+const connectionConfig = () => ({ apiPrivateKey: 'key123', baseId: 'app123', metaApiKey:'meta123',  baseUrl:`http://localhost:${PORT}` })
 
 module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaProviderTestVariables }
