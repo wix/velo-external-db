@@ -90,3 +90,23 @@ jobs:
         run: |
           cd packages/velo-external-db/test/resources
           docker compose down
+
+  test_airtable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          cache: "npm"
+
+      - name: Installing Lerna
+        run: npm install
+
+      - name: Install dependencies of the homemade packages.
+        run: npm run build:dev
+
+      - name: Testing
+        run: npm run test:airtable
