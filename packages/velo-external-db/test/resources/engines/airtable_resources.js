@@ -19,7 +19,6 @@ const cleanup = async () => {
 }
 
 const initEnv = async () => {
-    console.log('~~~~ listen')
     _server = mockServer.listen(PORT)
 }
 
