@@ -9,8 +9,8 @@ const createPool =  modify => {
         baseId: 'app123',
         baseUrl: 'http://localhost:9000'
     }
-
-    const airtableBase = new Airtable({ apiKey: config.apiPrivateKey, endpointUrl: config.baseUrl }).base(config.baseId)
+    const _config = {...config, ...modify}
+    const airtableBase = new Airtable({ apiKey: _config.apiPrivateKey, endpointUrl: _config.baseUrl }).base(_config.baseId)
     return airtableBase
 }
 
