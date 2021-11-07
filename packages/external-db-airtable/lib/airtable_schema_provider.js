@@ -5,7 +5,7 @@ const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist} = requir
 const axios = require('axios')
 
 class SchemaProvider {
-    constructor(base, apiKey, metaApiKey, baseUrl) {
+    constructor(base, {apiKey, metaApiKey, baseUrl}) {
         this.base = base
         this.baseId = base.getId()
         this.sqlSchemaTranslator = new SchemaColumnTranslator()

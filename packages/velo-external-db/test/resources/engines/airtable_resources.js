@@ -3,26 +3,26 @@ const { init, mockServer } = require('external-db-airtable')
 let _server
 const PORT = 9000
 
-const connection = async() => {
-    const { connection, cleanup } = await init({ apiPrivateKey: 'key123', baseId: 'app123' },
-                                                {endpointUrl: 'http://localhost:'+PORT, requestTimeout: 1000})
+const connection = async () => {
+    const { connection, cleanup } = await init(connectionConfig(),
+        { requestTimeout: 1000 })
 
     return { pool: connection, cleanup: cleanup }
 }
 
 const cleanup = async () => {
-    const { schemaProvider, cleanup } = await init({ apiPrivateKey: 'key123', baseId: 'app123' },
-                                                {endpointUrl: 'http://localhost:'+PORT, requestTimeout: 1000})
+    const { schemaProvider, cleanup } = await init(connectionConfig(),
+        { requestTimeout: 1000 })
     const tables = await schemaProvider.list()
-    await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
+    await Promise.all(tables.map(t => t.id).map(t => schemaProvider.drop(t)))
     await cleanup()
 }
 
-const initEnv = async() => {
+const initEnv = async () => {
     _server = mockServer.listen(PORT)
 }
 
-const shutdownEnv = async() => {
+const shutdownEnv = async () => {
     _server.close()
 }
 
@@ -34,6 +34,14 @@ const setActive = () => {
     process.env.BASE_URL = 'http://localhost:9000'
 }
 
+const schemaProviderTestVariables = () => (
+    {
+        apiKey: 'key123',
+        metaApiKey: 'meta123',
+        baseUrl: 'http://localhost:9000'
+    }
+)
 
+const connectionConfig = () => ({ apiPrivateKey: 'key123', baseId: 'app123', metaApiKey:'meta123',  baseUrl:'http://localhost:' + PORT })
 
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaProviderTestVariables }
