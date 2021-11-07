@@ -15,9 +15,13 @@ class DatabaseOperations {
                       .firstPage()
             return { valid: true }
         } catch (e) {
-            if (e.message === `Could not find table Table in application ${this.baseId}`)  return { valid: true}
+            if (this.connectionSucceedTableDoesNotExist(e)) return {valid: true}
             return { valid: false, error: notThrowingTranslateErrorCodes(e) }
         }
+    }
+
+    connectionSucceedTableDoesNotExist(e) {
+        return  e.message === `Could not find table Table in application ${this.baseId}`
     }
 }
 

@@ -16,10 +16,8 @@ const _checkParamsMiddleware = (req, res, next) => {
 
     if (req.params.baseId !== 'app123')
         return next(new AirtableError('NOT_FOUND', 'Could not find what you are looking for', '404'))
-
-    if (req.params.tableIdOrName && base.getTable(req.params.tableIdOrName) == undefined )
+    if (req.params.tableIdOrName && !base.getTable(req.params.tableIdOrName) )
         return next(new AirtableError('NOT_FOUND', `Could not find table ${req.params.tableIdOrName} in application ${req.params.baseId}`, '404'))
-
     next()
 }
 

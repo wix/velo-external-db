@@ -1,9 +1,9 @@
-const { init, mockServer, cleanup: cleanupAirtable } = require('external-db-airtable')
+const { init, mockServer } = require('external-db-airtable')
 
 let _server
 const PORT = 9000
 
-const connection = async () => {
+const connection = async() => {
     const { connection, cleanup } = await init({ apiPrivateKey: 'key123', baseId: 'app123' },
                                                 {endpointUrl: 'http://localhost:'+PORT, requestTimeout: 1000})
 
@@ -13,18 +13,16 @@ const connection = async () => {
 const cleanup = async () => {
     const { schemaProvider, cleanup } = await init({ apiPrivateKey: 'key123', baseId: 'app123' },
                                                 {endpointUrl: 'http://localhost:'+PORT, requestTimeout: 1000})
-
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
-
-    await cleanup();
+    await cleanup()
 }
 
-const initEnv = async () => {
+const initEnv = async() => {
     _server = mockServer.listen(PORT)
 }
 
-const shutdownEnv = async () => {
+const shutdownEnv = async() => {
     _server.close()
 }
 

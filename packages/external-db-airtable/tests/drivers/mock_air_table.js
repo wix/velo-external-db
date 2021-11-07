@@ -1,24 +1,22 @@
 const express = require('express')
-const PORT = 9000
-const chance = require('chance')()
 const { base, _checkParamsMiddleware, _checkParamsMetaMiddleware } = require('./air_table_mock_utils')
 
 const app = express()
 
-app.set('case sensitive routing', true);
-app.set('query parser', string => new URLSearchParams(string));
+app.set('case sensitive routing', true)
+app.set('query parser', string => new URLSearchParams(string))
 
-app.use(express.json());
+app.use(express.json())
 
 
 //insert / bulk/insert 
 app.post('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, (req, res) => {
-    const isCreatingJustOneRecord = !!req.body.fields;
-    const recordsInBody = isCreatingJustOneRecord ? [req.body] : req.body.records;
+    const isCreatingJustOneRecord = !!req.body.fields
+    const recordsInBody = isCreatingJustOneRecord ? [req.body] : req.body.records
     const table = base.getTable(req.params.tableIdOrName)
 
     const newRecords = table.insert(recordsInBody)
-    res.json({records: newRecords});
+    res.json({ records: newRecords })
 })
 
 
@@ -31,10 +29,10 @@ app.get('/v0/:baseId/:tableIdOrName?', _checkParamsMiddleware, (req, res) => {
     const filter = req.query.get('filterByFormula')
     const params = filter ? filter.split(' ') : ''
     const table = base.getTable(req.params.tableIdOrName)
-    const records = params ? table.data.filter(item=> `"${item.fields[params[0]]}"` == params[2]) : table.getAllRows()
+    const records = params ? table.data.filter(item => `"${item.fields[params[0]]}"` == params[2]) : table.getAllRows()
     res.json({
         records: sortField ? records.sort((a, b) => (a.fields[sortField] > b.fields[sortField]) ? sortDir : -1 * sortDir) : records
-    });
+    })
 })
 
 const singleRecordUpdate = [
@@ -46,7 +44,7 @@ const singleRecordUpdate = [
 
         res.json(table.data[index])
     },
-];
+]
 
 
 const batchRecordUpdate = [
@@ -54,21 +52,21 @@ const batchRecordUpdate = [
     (req, res) => {
         res.json({
             records: req.body.records.map(function (record) {
-                const fields = req.body.typecast ? { typecasted: true } : record.fields;
+                const fields = req.body.typecast ? { typecasted: true } : record.fields
                 return {
                     id: record.id,
                     fields: fields,
-                };
+                }
             }),
-        });
+        })
     },
-];
+]
 
-app.patch('/v0/:baseId/:tableIdOrName/:recordId', singleRecordUpdate);
-app.put('/v0/:baseId/:tableIdOrName/:recordId', singleRecordUpdate);
+app.patch('/v0/:baseId/:tableIdOrName/:recordId', singleRecordUpdate)
+app.put('/v0/:baseId/:tableIdOrName/:recordId', singleRecordUpdate)
 
-app.patch('/v0/:baseId/:tableIdOrName', batchRecordUpdate);
-app.put('/v0/:baseId/:tableIdOrName', batchRecordUpdate);
+app.patch('/v0/:baseId/:tableIdOrName', batchRecordUpdate)
+app.put('/v0/:baseId/:tableIdOrName', batchRecordUpdate)
 
 
 app.delete('/v0/:baseId/:tableIdOrName/:recordId', _checkParamsMiddleware, function (req, res) {
@@ -77,8 +75,8 @@ app.delete('/v0/:baseId/:tableIdOrName/:recordId', _checkParamsMiddleware, funct
     res.json({
         id: req.params.recordId,
         deleted
-    });
-});
+    })
+})
 
 
 app.delete('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, function (req, res) {
@@ -87,10 +85,10 @@ app.delete('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, function (req, 
         return {
             id: recordId,
             deleted: table.delete(recordId),
-        };
+        }
     })
     res.json({ records })
-});
+})
 
 
 // *************** Meta API **********************
@@ -124,16 +122,20 @@ app.post('/v0/meta/bases/:baseId/tables/:tableIdOrName/removeColumn', (req, res)
 
 
 app.use(function (req, res) {
-    res.status(404);
-    res.json({ error: 'NOT_FOUND' });
-});
+    res.status(404)
+    res.json({ error: 'NOT_FOUND' })
+})
 
 app.use((err, req, res, next) => {
-    res.status(err.status);
+    res.status(err.status)
     res.json({
-        err
-    });
-});
+        error:{
+            message: err.message,
+            status:err.status,
+            error:err.error
+        }
+    })
+})
 
 
 

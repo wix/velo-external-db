@@ -3,7 +3,7 @@ const DataProvider = require('./airtable_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const init = require('./connection_provider')
-const { app: mockServer, cleanup } = require('../tests/drivers/mock_air_table')
+const { app: mockServer } = require('../tests/drivers/mock_air_table')
 
 const DatabaseOperations = require('./airtable_operations')
 

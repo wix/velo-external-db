@@ -11,7 +11,7 @@ class SchemaProvider {
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
 
         this.axios = axios.create({
-            baseURL: 'http://localhost:9000',//baseUrl || 'https://api.airtable.com',
+            baseURL: baseUrl || 'https://api.airtable.com',
             headers: {
                 Authorization: `Bearer ${apiKey || 'key123'}`,
                 'X-Airtable-Client-Secret': metaApiKey || 'meta123'
@@ -85,7 +85,7 @@ class SchemaProvider {
 
     }
 
-    columnExists(collection, columnName){
+    columnExists(collection, columnName) {
         return Object.keys(collection.fields).find(f => f === columnName)
     }
 
