@@ -11,7 +11,7 @@ class DataProvider {
         const filterByFormula = this.filterToFilterByFormula(filter)
         const limitExpr = limit ? { maxRecords: limit } : {}
         const sortExpr = this.filterParser.orderBy(sort)
-        const result = await this.query({ collectionName, filterByFormula, limitExpr, sortExpr })
+        const result = await this.query({ collectionName, filterByFormula, limitExpr, sortExpr, skip })
         return result.map(minifyAndFixDates)
     }
 
@@ -56,17 +56,17 @@ class DataProvider {
     }
 
 
-    async query({ collectionName, filterByFormula, limitExpr, sortExpr, idsOnly}) {
+    async query({ collectionName, filterByFormula, limitExpr, sortExpr, idsOnly, skip}) {
         const resultsByPages = []
         const limit = limitExpr?.maxRecords ? limitExpr : { maxRecords: DEFAULT_MAX_RECORDS }
         await this.base(collectionName)
-        .select({ ...filterByFormula, ...limitExpr, ...sortExpr }) //TODO: skip
+        .select({ ...filterByFormula, ...limitExpr, ...sortExpr })
                   .eachPage((records, fetchNextPage) => {
                       const recordsToReturn = idsOnly ? records.map(record=>record.id) : records 
                       resultsByPages.push(recordsToReturn)
                       fetchNextPage()
                   })
-        return resultsByPages.flat();
+        return resultsByPages.flat().slice(skip); //TODO: find other solution for skip! at least don't load everything to memory.
     }
 
 

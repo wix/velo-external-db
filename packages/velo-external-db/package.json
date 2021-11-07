@@ -12,7 +12,7 @@
     "test:mssql": "TEST_ENGINE=mssql jest --runInBand ./test",
     "test:mongo": "TEST_ENGINE=mongo jest --runInBand ./test",
     "test:google-sheets": "TEST_ENGINE=google-sheet jest  -i  packages/velo-external-db/test/e2e/app_data.e2e.spec.js  --runInBand -t 'Velo External DB Data REST API' ",
-    "test:airtable": "TEST_ENGINE=airtable jest --runInBand ./test --silent",
+    "test:airtable": "TEST_ENGINE=airtable jest --runInBand ./test ",
     "test:watch": "jest --detectOpenHandles --watch",
     "start": "node lib/app.js",
     "deploy": "gcloud app deploy ./app.yaml"
