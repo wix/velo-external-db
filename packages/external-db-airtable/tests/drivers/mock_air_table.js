@@ -1,57 +1,22 @@
 const express = require('express')
-const PORT = 9000
-
-
-class AirtableError extends Error {
-    constructor(error, message, status) {
-        super(message);
-        this.error = error
-        this.status = status
-    }
-}
-
-let data = []
-let globalIndex = 0
-
-const _checkParamsMiddleware = (req, res, next) => {
-    if (req.get('authorization') !== 'Bearer key123')
-        return next(new AirtableError('AUTHENTICATION_REQUIRED', 'You should provide valid api key to perform this operation', '401'))
-
-    if (req.params.baseId !== 'app123')
-        return next(new AirtableError('NOT_FOUND', 'Could not find what you are looking for', '404'))
-
-    if (req.params.tableIdOrName && req.params.tableIdOrName !== 'Table')
-        return next(new AirtableError('NOT_FOUND', `Could not find table ${req.params.tableIdOrName} in application ${req.params.baseId}`, '404'))
-    
-    next()
-}
-const _checkParamsMetaMiddleware = ( _checkParamsMiddleware, function (req,res,next) { //TODO: refactor middleware
-    console.log(req.get('X-Airtable-Client-Secret'));
-    if (req.get('X-Airtable-Client-Secret') !== 'meta123')
-        return next(new AirtableError('Unauthorized','Unauthorized','401'))
-    next()
-})
-
+const { base, _checkParamsMiddleware, _checkParamsMetaMiddleware } = require('./air_table_mock_utils')
 
 const app = express()
-app.set('case sensitive routing', true);
-app.set('query parser', string => new URLSearchParams(string));
 
-app.use(express.json());
+app.set('case sensitive routing', true)
+app.set('query parser', string => new URLSearchParams(string))
+
+app.use(express.json())
 
 
 //insert / bulk/insert 
 app.post('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, (req, res) => {
-    const isCreatingJustOneRecord = !!req.body.fields;
-    const recordsInBody = isCreatingJustOneRecord ? [req.body] : req.body.records;
-    const records = recordsInBody.map((record, index) => {
-        globalIndex++
-        const newRecord = { id: 'rec' + globalIndex, ...record }
-        data.push(newRecord)
-        return newRecord
-    });
-    const responseBody = isCreatingJustOneRecord ? records[0] : { records: records };
-    res.json(responseBody);
+    const isCreatingJustOneRecord = !!req.body.fields
+    const recordsInBody = isCreatingJustOneRecord ? [req.body] : req.body.records
+    const table = base.getTable(req.params.tableIdOrName)
+
+    const newRecords = table.insert(recordsInBody)
+    res.json({ records: newRecords })
 })
 
 
@@ -63,23 +28,23 @@ app.get('/v0/:baseId/:tableIdOrName?', _checkParamsMiddleware, (req, res) => {
     //support only equal for now.
     const filter = req.query.get('filterByFormula')
     const params = filter ? filter.split(' ') : ''
-
-    const records = params ? data.filter(item => `"${item.fields[params[0]]}"` == params[2]) : data
-
+    const table = base.getTable(req.params.tableIdOrName)
+    const records = params ? table.data.filter(item => `"${item.fields[params[0]]}"` == params[2]) : table.getAllRows()
     res.json({
         records: sortField ? records.sort((a, b) => (a.fields[sortField] > b.fields[sortField]) ? sortDir : -1 * sortDir) : records
-    });
+    })
 })
 
 const singleRecordUpdate = [
     _checkParamsMiddleware,
     (req, res) => {
-        const index = data.findIndex(obj => obj.id === req.params.recordId)
-        data[index].fields = { ...data[index].fields, ...req.body.fields }
+        const table = base.getTable(req.params.tableIdOrName)
+        const index = table.data.findIndex(obj => obj.id === req.params.recordId)
+        table.data[index].fields = { ...table.data[index].fields, ...req.body.fields }
 
-        res.json(data[index])
+        res.json(table.data[index])
     },
-];
+]
 
 
 const batchRecordUpdate = [
@@ -87,101 +52,95 @@ const batchRecordUpdate = [
     (req, res) => {
         res.json({
             records: req.body.records.map(function (record) {
-                const fields = req.body.typecast ? { typecasted: true } : record.fields;
+                const fields = req.body.typecast ? { typecasted: true } : record.fields
                 return {
                     id: record.id,
                     fields: fields,
-                };
+                }
             }),
-        });
+        })
     },
-];
+]
 
-app.patch('/v0/:baseId/:tableIdOrName/:recordId', singleRecordUpdate);
-app.put('/v0/:baseId/:tableIdOrName/:recordId', singleRecordUpdate);
+app.patch('/v0/:baseId/:tableIdOrName/:recordId', singleRecordUpdate)
+app.put('/v0/:baseId/:tableIdOrName/:recordId', singleRecordUpdate)
 
-app.patch('/v0/:baseId/:tableIdOrName', batchRecordUpdate);
-app.put('/v0/:baseId/:tableIdOrName', batchRecordUpdate);
+app.patch('/v0/:baseId/:tableIdOrName', batchRecordUpdate)
+app.put('/v0/:baseId/:tableIdOrName', batchRecordUpdate)
 
 
 app.delete('/v0/:baseId/:tableIdOrName/:recordId', _checkParamsMiddleware, function (req, res) {
-
-    data = data.filter((item) => item.id != req.params.recordId)
+    const table = base.getTable(req.params.tableIdOrName)
+    const deleted = table.deleteSingle(req.params.recordId)
     res.json({
         id: req.params.recordId,
-        deleted: true,
-    });
-});
+        deleted
+    })
+})
 
 
 app.delete('/v0/:baseId/:tableIdOrName', _checkParamsMiddleware, function (req, res) {
+    const table = base.getTable(req.params.tableIdOrName)
     const records = req.query.getAll('records[]').map((recordId) => {
-        data = data.filter((item) => item.id != recordId)
         return {
             id: recordId,
-            deleted: true,
-        };
+            deleted: table.delete(recordId),
+        }
     })
     res.json({ records })
-});
+})
 
 
 // *************** Meta API **********************
 
-app.get('/v0/meta/bases/:baseId/tables',_checkParamsMetaMiddleware, function (req, res) {
+app.get('/v0/meta/bases/:baseId/tables', _checkParamsMetaMiddleware, function (req, res) {
+    res.json(base.tablesList())
+})
+
+app.post('/v0/meta/bases/:baseId/table', _checkParamsMetaMiddleware, async (req, res) => {
+    base.createTable(req.body.collectionName, req.body.columns)
+    res.json({})
+})
+
+app.post('/v0/meta/bases/:baseId/table/drop', _checkParamsMetaMiddleware, async (req, res) => {
+    base.deleteTable(req.body.collectionName)
+    res.json({})
+})
+
+app.post('/v0/meta/bases/:baseId/tables/:tableIdOrName/addColumn', (req, res) => {
+    const table = base.getTable(req.params.tableIdOrName)
+    const column = req.body.column
+    table.addColumn(column.name, column.type)
+    res.json({})
+})
+
+app.post('/v0/meta/bases/:baseId/tables/:tableIdOrName/removeColumn', (req, res) => {
+    const table = base.getTable(req.params.tableIdOrName)
+    table.removeColumn(req.body.column)
+    res.json({})
+})
+
+
+app.use(function (req, res) {
+    res.status(404)
+    res.json({ error: 'NOT_FOUND' })
+})
+
+app.use((err, req, res, next) => {
+    res.status(err.status)
     res.json({
-        "tables": [
-          {
-            "id": "tbltp8DGLhqbUmjK1",
-            "name": "Table",
-            "primaryFieldId": "fld1VnoyuotSTyxW1",
-            "fields": [
-              {
-                "id": "fld1VnoyuotSTyxW1",
-                "name": "Name",
-                "type": "singleLineText"
-              },
-              {
-                "id": "fldoaIqdn5szURHpw",
-                "name": "Age",
-                "type": "number"
-              },
-              {
-                "id": "fldumZe00w09RYTW6",
-                "name": "URL",
-                "type": "url",
-              }
-            ],
-            "views": [
-              {
-                "id": "viwQpsuEDqHFqegkp",
-                "name": "Grid view",
-                "type": "grid"
-              }
-            ]
-          }
-        ]
-      }
-    )
+        error:{
+            message: err.message,
+            status:err.status,
+            error:err.error
+        }
+    })
 })
 
 
 
-app.use(function (req, res) {
-    res.status(404);
-    res.json({ error: 'NOT_FOUND' });
-});
-
-app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500);
-    res.json({
-        error: {
-            type: 'TEST_ERROR',
-            message: err.message,
-        },
-    });
-});
 
 
-module.exports = { app, cleanup: () => { } }
+
+
+module.exports = { app, cleanup: () => { base.tables = [] } }

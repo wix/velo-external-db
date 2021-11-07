@@ -1,23 +1,26 @@
 
 const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
-const { DbConnectionError } = require('velo-external-db-commons').errors
 
 class DatabaseOperations {
-    constructor(pool) {
-        this.pool = pool;
+    constructor(base) {
+        this.base = base
+        this.baseId = base.getId()
     }
 
     async validateConnection() {
         try {
-            await this.pool('Table')
+            await this.base('Table')
                       .select({})
                       .firstPage()
             return { valid: true }
         } catch (e) {
-            if (e.error === 'NOT_FOUND')
-                if (e.message !== 'Could not find what you are looking for') return { valid: true }
+            if (this.connectionSucceedTableDoesNotExist(e)) return {valid: true}
             return { valid: false, error: notThrowingTranslateErrorCodes(e) }
         }
+    }
+
+    connectionSucceedTableDoesNotExist(e) {
+        return  e.message === `Could not find table Table in application ${this.baseId}`
     }
 }
 

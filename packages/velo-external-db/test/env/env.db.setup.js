@@ -77,14 +77,14 @@ const cleanup = async (testEngine) => {
     }
 }
 
-module.exports = async () => {
+module.exports = async() => {
     const testEngine = process.env.TEST_ENGINE
-
-    if (ci.LocalDev()) {
+    if (ci.LocalDev() || ci.engineWithoutDocker(testEngine)) {
         await initEnv(testEngine)
 
         await sleep(5000)
     }
+
 
     await cleanup(testEngine)
 }

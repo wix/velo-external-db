@@ -1,29 +1,34 @@
-const { minifyRecord, bulkCreateExpr } = require('./airtable_utils')
+const { minifyAndFixDates, DEFAULT_MAX_RECORDS } = require('./airtable_utils')
 
 class DataProvider {
-    constructor(pool, filterParser) {
+    constructor(base, filterParser) {
         this.filterParser = filterParser
-        this.pool = pool
+        this.base = base
     }
 
 
     async find(collectionName, filter, sort, skip, limit) {
-        const { filterExpr } = this.filterParser.transform(filter)
-        const filterByFormula = { filterByFormula: filterExpr || '' }
+        const filterByFormula = this.filterToFilterByFormula(filter)
         const limitExpr = limit ? { maxRecords: limit } : {}
         const sortExpr = this.filterParser.orderBy(sort)
-        const result = await this.query(collectionName, filterByFormula, limitExpr, sortExpr)
-        return result.map(minifyRecord)
+        const result = await this.query({ collectionName, filterByFormula, limitExpr, sortExpr, skip })
+        return result.map(minifyAndFixDates)
     }
 
     async count(collectionName, filter) {
-        const results = await this.find(collectionName, filter)
-        return results.length
+        let count = 0
+        await this.base(collectionName)
+                  .select(this.filterToFilterByFormula(filter))
+                  .eachPage((records, fetchNextPage) => {
+                    count += records.length
+                    fetchNextPage()
+                  })
+        return count
     }
 
     async insert(collectionName, items) {
-        const createExpr = bulkCreateExpr(items)
-        const inserted = await this.pool(collectionName)
+        const createExpr = this.bulkCreateExpr(items)
+        const inserted = await this.base(collectionName)
                                    .create(createExpr)
         return inserted.length;
     }
@@ -35,42 +40,58 @@ class DataProvider {
 
     async delete(collectionName, itemIds) {
         const ids = await Promise.all(itemIds.map(async id => await this.wixDataIdToAirtableId(collectionName, id)))
-        const deleted = await this.pool(collectionName)
+        const deleted = await this.base(collectionName)
                                   .destroy(ids)
         return deleted.length
     }
 
     async truncate(collectionName) {
-        // todo: ido, query only id's
-        // todo: add paging
-        const itemIds = (await this.query(collectionName)).map(record => record.id)
-        await this.delete(collectionName, itemIds)
-    }
-
-
-    async query(collectionName, filterByFormula, limitExpr, sortExpr) {
-        const resultsByPages = []
-        await this.pool(collectionName)
-                  .select({ ...filterByFormula, ...limitExpr, ...sortExpr }) //TODO: skip
-                  .eachPage((records, fetchNextPage) => {
-                      resultsByPages.push(records)
+        await this.base(collectionName)
+                  .select()
+                  .eachPage(async (records, fetchNextPage) => {
+                      await this.base(collectionName)
+                                .destroy(records.map(record => record.id))
                       fetchNextPage()
                   })
-
-        return resultsByPages.flat();
     }
 
 
+    async query({ collectionName, filterByFormula, limitExpr, sortExpr, idsOnly, skip}) {
+        const resultsByPages = []
+        const limit = limitExpr?.maxRecords ? limitExpr : { maxRecords: DEFAULT_MAX_RECORDS }
+        await this.base(collectionName)
+        .select({ ...filterByFormula, ...limitExpr, ...sortExpr })
+                  .eachPage((records, fetchNextPage) => {
+                      const recordsToReturn = idsOnly ? records.map(record=>record.id) : records 
+                      resultsByPages.push(recordsToReturn)
+                      fetchNextPage()
+                  })
+        return resultsByPages.flat().slice(skip); //TODO: find other solution for skip! at least don't load everything to memory.
+    }
+
+
+    filterToFilterByFormula(filter){
+        const { filterExpr } = this.filterParser.transform(filter)
+        return { filterByFormula: filterExpr || '' }
+    }
+
     async wixDataIdToAirtableId(collectionName, _id) {
-        const record = await this.query(collectionName, { filterByFormula: `_id = "${_id}" ` })
-        return record[0]?.id
+        const record = await this.query({collectionName, filterByFormula: { filterByFormula: `_id = "${_id}" ` }, idsOnly: true})
+        return record[0]
     }
 
     async updateSingle(collectionName, item) {
         const id = await this.wixDataIdToAirtableId(collectionName, item._id)
-        const updated = await this.pool(collectionName)
+        const updated = await this.base(collectionName)
                                   .update(id, item)
         return updated.id
+    }
+    
+    bulkCreateExpr = (items) => {
+        return items.reduce((pV, cV) => {
+                                pV.push({ fields: { ...cV } })
+                                return pV
+          }, [])
     }
 }
 

@@ -1,5 +1,5 @@
-// const { EMPTY_SORT } = require('velo-external-db-commons')
-// const { when } = require('jest-when')
+const { EMPTY_SORT } = require('velo-external-db-commons')
+const { when } = require('jest-when')
 // const { escapeId } = require('../../lib/mysql_utils');
 
 const filterParser = {
@@ -9,53 +9,42 @@ const filterParser = {
     parseAggregation: jest.fn(),
 }
 
-// const stubEmptyFilterAndSortFor = (filter, sort) => {
-//     stubEmptyFilterFor(filter)
-//     stubEmptyOrderByFor(sort)
-// }
+const stubEmptyFilterAndSortFor = (filter, sort) => {
+    stubEmptyFilterFor(filter)
+    stubEmptyOrderByFor(sort)
+}
 
-// const stubEmptyFilterFor = (filter) => {
-//     when(filterParser.transform).calledWith(filter)
-//                                 .mockReturnValue({ filterExpr: '', parameters: [] })
-// }
+const stubEmptyFilterFor = (filter) => {
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: '', parameters: [] })
+}
 
-// const stubEmptyOrderByFor = (sort) => {
-//     when(filterParser.orderBy).calledWith(sort)
-//                               .mockReturnValue(EMPTY_SORT)
-// }
+const stubEmptyOrderByFor = (sort) => {
+    when(filterParser.orderBy).calledWith(sort)
+                              .mockReturnValue(EMPTY_SORT)
+}
 
-// const givenOrderByFor = (column, sort) => {
-//     when(filterParser.orderBy).calledWith(sort)
-//                               .mockReturnValue({ sortExpr: `ORDER BY ${escapeId(column)} ASC` })
-// }
+const givenOrderByFor = (column, sort) => {
+    when(filterParser.orderBy).calledWith(sort)
+                              .mockReturnValue({  sort: [ { field: column, direction: 'asc' } ] })
+
+}
 
 
-// const givenFilterByIdWith = (id, filter) => {
-//     when(filterParser.transform).calledWith(filter)
-//                                 .mockReturnValue({ filterExpr: `WHERE ${escapeId('_id')} = ?`, parameters: [id] })
-// }
-
-// const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
-//     const c = numericColumns.map(c => c.name)
-//     when(filterParser.parseAggregation).calledWith(having, filter)
-//                                        .mockReturnValue({
-//                                            fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
-//                                            groupByColumns: groupByColumns,
-//                                            havingFilter: '',
-//                                            parameters: [],
-//                                        })
-// }
+const givenFilterByIdWith = (id, filter) => {
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: `_id = "${id}"` })
+}
 
 
 
-// const reset = () => {
-//     filterParser.transform.mockClear()
-//     filterParser.orderBy.mockClear()
-//     filterParser.parseAggregation.mockClear()
-//     filterParser.parseFilter.mockClear()
-// }
+const reset = () => {
+    filterParser.transform.mockClear()
+    filterParser.orderBy.mockClear()
+    filterParser.parseAggregation.mockClear()
+    filterParser.parseFilter.mockClear()
+}
 
-// module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
-//                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-//                    filterParser, reset
-// }
+module.exports = { stubEmptyOrderByFor, stubEmptyFilterFor,givenFilterByIdWith, givenOrderByFor, stubEmptyFilterAndSortFor,
+    
+     filterParser, reset }

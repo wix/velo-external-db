@@ -8,11 +8,11 @@ class FilterParser {
     transform(filter) {
         const results = this.parseFilter(filter)
         if (results.length === 0) {
-            return [];
+            return []
         }
         return {
             filterExpr: results[0].filterExpr
-        };
+        }
     }
 
 
@@ -28,7 +28,7 @@ class FilterParser {
                 const res = filter.value.map(this.parseFilter.bind(this))
                 const op = filter.operator === '$and' ? 'AND' : 'OR' 
                 return [{
-                    filterExpr: this.multipleFieldOperatorToFilterExpr(op,res)
+                    filterExpr: this.multipleFieldOperatorToFilterExpr(op, res)
                 }]
 
             case '$not':
@@ -44,7 +44,7 @@ class FilterParser {
                 const ress = filter.value.map(val => { return { operator: '$eq', value: val, fieldName:filter.fieldName } })
                 const ress2 = ress.map(this.parseFilter.bind(this))
                 return [{
-                    filterExpr: this.multipleFieldOperatorToFilterExpr('OR',ress2)
+                    filterExpr: this.multipleFieldOperatorToFilterExpr('OR', ress2)
                 }]
 
         }
@@ -52,24 +52,23 @@ class FilterParser {
 
         if (this.isSingleFieldOperator(filter.operator)) {
             return [{
-                filterExpr: `${filter.fieldName} ${this.veloOperatorToAirtableOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value,filter.operator)}` // TODO: value for operator?
+                filterExpr: `${filter.fieldName} ${this.veloOperatorToAirtableOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value, filter.operator)}` // TODO: value for operator?
             }]
         }
 
         if (this.isSingleFieldStringOperator(filter.operator)) {
            return[{
-               filterExpr: `REGEX_MATCH({${filter.fieldName}},'${this.valueForStringOperator(filter.operator,filter.value)}')`}]
+               filterExpr: `REGEX_MATCH({${filter.fieldName}},'${this.valueForStringOperator(filter.operator, filter.value)}')`}]
         }
 
         if (filter.operator === '$urlized') {
-            console.error('not implemented');
+            console.error('not implemented')
         }
         return []
     }
 
     multipleFieldOperatorToFilterExpr(operator, values) {
-        // todo: ido: check what happens if filter parse return an empty array
-        return `${operator}(${values.map(r => r[0].filterExpr).join(',')})`
+        return `${operator}(${values.map(r => r[0]?.filterExpr).join(',')})`
     }
 
     valueForStringOperator(operator, value) {
@@ -88,10 +87,10 @@ class FilterParser {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
             }
-            return this.multipleFieldOperatorToFilterExpr('OR',value)
+            return this.multipleFieldOperatorToFilterExpr('OR', value)
         }
         else if (operator === '$eq' && value === undefined) {
-            return `""`
+            return '""'
         }
 
         return `"${value}"`
@@ -124,12 +123,12 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return [];
+            return []
         }
 
         const results=  sort.flatMap(this.parseSort)
         if (results.length === 0) {
-            return [];
+            return []
         }
         return {
             sort: results
@@ -150,7 +149,7 @@ class FilterParser {
         }
         const _direction = direction || 'ASC'
 
-        const dir = 'ASC' === _direction.toUpperCase() ? 'asc' : 'desc';
+        const dir = 'ASC' === _direction.toUpperCase() ? 'asc' : 'desc'
 
         return { field: fieldName, direction: dir }
 

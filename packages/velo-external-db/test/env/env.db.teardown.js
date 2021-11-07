@@ -41,7 +41,7 @@ const shutdownEnv = async (testEngine) => {
 
 module.exports = async () => {
     const testEngine = process.env.TEST_ENGINE
-    if (ci.LocalDev()) {
+    if (ci.LocalDev() || ci.engineWithoutDocker(testEngine)) {
         await shutdownEnv(testEngine)
     }
 }

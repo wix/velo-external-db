@@ -1,4 +1,8 @@
 
 const LocalDev = () => process.env.CI === undefined || process.env.CI === 'false'
 
-module.exports = { LocalDev }
+const engineWithoutDocker = (engine) => (enginesWithoutDocker.includes(engine))
+
+const enginesWithoutDocker = ['airtable']
+
+module.exports = { LocalDev, engineWithoutDocker }

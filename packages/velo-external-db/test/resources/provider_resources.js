@@ -35,7 +35,7 @@ const dbInit = async (testEnv, impl) => {
     const driver = impl.driver()
 
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
-    env.schemaProvider = new impl.SchemaProvider(pool)
+    env.schemaProvider = new impl.SchemaProvider(pool, testEnv.schemaProviderTestVariables?.() )
     env.driver = driver
     env.cleanup = cleanup
 }

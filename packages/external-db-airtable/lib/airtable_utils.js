@@ -1,17 +1,10 @@
 
-// todo: ido, rename
-const minifyRecord = record => {
+const minifyAndFixDates = record => {
     const fields = record.fields
     if (fields._createdDate && typeof fields._createdDate === 'string') fields._createdDate = new Date(fields._createdDate)
     if (fields._updatedDate && typeof fields._updatedDate === 'string') fields._updatedDate = new Date(fields._updatedDate)
     return fields
-};
-
-const bulkCreateExpr = (items) => {
-    return items.reduce((pV, cV) => {
-                            pV.push({ fields: { ...cV } })
-                            return pV
-      }, [])
 }
+const DEFAULT_MAX_RECORDS = 100
 
-module.exports = { minifyRecord, bulkCreateExpr }
+module.exports = { minifyAndFixDates, DEFAULT_MAX_RECORDS }
