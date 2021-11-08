@@ -59,6 +59,7 @@ class DataProvider {
     async query({ collectionName, filterByFormula, limitExpr, sortExpr, idsOnly, skip}) {
         const resultsByPages = []
         const limit = limitExpr?.maxRecords ? limitExpr : { maxRecords: DEFAULT_MAX_RECORDS }
+        limit.maxRecords += skip 
         await this.base(collectionName)
         .select({ ...filterByFormula, ...limitExpr, ...sortExpr })
                   .eachPage((records, fetchNextPage) => {
