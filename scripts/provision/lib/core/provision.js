@@ -36,7 +36,8 @@ const provisionAdapter = async(provider, engine, secretId, secrets, connectionNa
     await startSpinnerWith('Post create instance', async() => provider.postCreateAdapter?.(instanceName, provisionVariables, engine))
 
     blankLine()
-    info(`Adapter available at ${status.serviceUrl}`)
+    return {serviceUrl: status.serviceUrl}
+
 }
 
 
@@ -70,7 +71,9 @@ const main = async({ vendor, engine, credentials, region }) => {
     blankLine()
     blankLine()
     info('Provision Adapter')
-    await provisionAdapter(adapterProvision, engine, secretId, secrets, status.connectionName, configWriter, provisionVariables, adapterInstanceName, serviceAccount)
+    const { serviceUrl } = await provisionAdapter(adapterProvision, engine, secretId, secrets, status.connectionName, configWriter, provisionVariables, adapterInstanceName, serviceAccount)
+
+    info(`Adapter available at ${serviceUrl} secretKey: ${secretKey}`)
 
     blankLine()
     blankLine()
