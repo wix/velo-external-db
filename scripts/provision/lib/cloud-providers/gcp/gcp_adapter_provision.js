@@ -1,5 +1,4 @@
 const {GoogleAuth} = require('google-auth-library')
-const { randomWithPrefix } = require('../../utils/utils')
 const AdapterImageUrl = 'gcr.io/wix-velo-api/velo-external-db'
 
 class AdapterProvision {
@@ -12,13 +11,6 @@ class AdapterProvision {
         this.projectId = gcpProjectId
     }
 
-    async preCreateAdapter(secrets) {
-        const client = await this.credentialsFor()
-        const serviceAccountEmail = await this.createServiceAccount(client)
-        await this.grantReadSecretsPermission(secrets, serviceAccountEmail, client)
-        return serviceAccountEmail
-    }
-
     async createAdapter(name, engine, secretId, secrets, provisionVariables, connectionName, serviceAccount) {
         const client = await this.credentialsFor()
         const instanceName = await this.createCloudRunInstance(name, engine, connectionName, secrets, serviceAccount, client)
@@ -27,7 +19,6 @@ class AdapterProvision {
     }
 
     async postCreateAdapter() {
-
     }
 
     async adapterStatus(serviceId, provisionVariables, instanceName) {
@@ -35,35 +26,10 @@ class AdapterProvision {
         const StatusCloudRunRestUrl = `https://${this.region}-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/${this.projectId}/services/${instanceName}`
         const res = await client.request({ url: StatusCloudRunRestUrl})
         const readyStatus = res.data.status.conditions.find(i => i.type === 'Ready')
-        return readyStatus.status === 'True'
-    }
-
-    async createServiceAccount(client) {
-        const CreateServiceAccountRestUrl = `https://iam.googleapis.com/v1/projects/${this.projectId}/serviceAccounts`
-        const accountId = randomWithPrefix('velo-adapter-account')
-        const res = await client.request({ url: CreateServiceAccountRestUrl, method: 'POST', data: { accountId } })
-        return res.data.email
-    }
-    
-    async grantReadSecretsPermission(secrets, serviceAccountEmail, client) {
-        const grantPermissionRequest = {
-            policy: { bindings:[ { role: 'roles/secretmanager.secretAccessor', members: [`serviceAccount:${serviceAccountEmail}`] } ] }
-        }
-
-        await Promise.all(Object.values(secrets).map(async s => {
-            const ServiceAccountsRestUrl = `https://secretmanager.googleapis.com/v1/projects/${this.projectId}/secrets/${s}:setIamPolicy`
-            await client.request({ url: ServiceAccountsRestUrl, method: 'POST', data: grantPermissionRequest })
-        }))
-
-    }
-
-    async grantSqlPermission(instanceName, serviceAccountEmail, client) {
-        const grantPermissionRequest = {
-            policy: { bindings:[ { role: 'roles/roles/cloudsql.editor', members: [`serviceAccount:${serviceAccountEmail}`] } ] }
-        }
-
-        const SqlRestApiUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances/${instanceName}:setIamPolicy`
-        await client.request({ url: SqlRestApiUrl, method: 'POST', data: grantPermissionRequest})
+        return { 
+            available: readyStatus.status === 'True',
+            serviceUrl: res.data.status?.url
+         }
     }
 
     secretsToEnvs(secrets) { 

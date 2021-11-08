@@ -11,15 +11,21 @@ const provisionDb = async(provider, configWriter, { engine, secretId, secretKey,
 
     const status = await provider.dbStatusAvailable(instanceName, provisionVariables)
 
-    const secrets = await startSpinnerWith('Writing db config', async() => await configWriter.writeConfig( { secretId: secretId, dbCredentials: dbCredentials, host: status.host, db: dbName, secretKey: secretKey, provisionVariables: provisionVariables, instanceName: instanceName, connectionName: status.connectionName }))
+    const secrets = await startSpinnerWith('Writing db config', async() => await configWriter.writeConfig({ secretId: secretId, dbCredentials: dbCredentials, host: status.host, db: dbName, secretKey: secretKey, provisionVariables: provisionVariables, instanceName: instanceName, connectionName: status.connectionName }))
 
     await startSpinnerWith('Provision Velo DB on db instance', async() => await provider.postCreateDb(engine, dbName, status, dbCredentials, provisionVariables, instanceName))
 
     return { status, secrets }
 }
 
-const provisionAdapter = async(provider, engine, secretId, secrets, connectionName, configWriter, provisionVariables, instanceName) => {
-    const { serviceId } = await startSpinnerWith('Provision Adapter', async() => await provider.createAdapter(instanceName, engine, secretId, secrets, provisionVariables))
+const provisionPermissions = async(provider, instanceName) => {
+    const serviceAccount = await startSpinnerWith('Creating account for the adapter instance', async() => await provider?.createServiceAccount({ instanceName }))
+    await startSpinnerWith('Granting SQL and secret manger permissions to the account', async() => await provider?.grantPermission({ serviceAccount }))
+    return serviceAccount
+}
+
+const provisionAdapter = async(provider, engine, secretId, secrets, connectionName, configWriter, provisionVariables, instanceName, serviceAccount) => {
+    const { serviceId } = await startSpinnerWith('Provision Adapter', async() => await provider.createAdapter(instanceName, engine, secretId, secrets, provisionVariables, connectionName, serviceAccount))
     
     await startSpinnerWith('Waiting adapter server instance to start', async() => await blockUntil( async() => (await provider.adapterStatus(serviceId, provisionVariables, instanceName)).available ))
 
@@ -46,9 +52,10 @@ const main = async({ vendor, engine, credentials, region }) => {
     const configWriter = new provider.ConfigWriter(credentials, region)
     const dbProvision = new provider.DbProvision(credentials, region, engine)
     const adapterProvision = new provider.AdapterProvision(credentials, region)
-
+    const permissionsProvision = new provider.PermissionsProvision(credentials, region)
 
     const provisionVariables = provider.provisionVariables
+
     blankLine()
     blankLine()
     info('Provision DB Instance')
@@ -57,8 +64,13 @@ const main = async({ vendor, engine, credentials, region }) => {
 
     blankLine()
     blankLine()
+    info('Granting Permissions')
+    const serviceAccount = await provisionPermissions(permissionsProvision, instanceName)
+
+    blankLine()
+    blankLine()
     info('Provision Adapter')
-    await provisionAdapter(adapterProvision, engine, secretId, secrets, status.connectionName, configWriter, provisionVariables, adapterInstanceName)
+    await provisionAdapter(adapterProvision, engine, secretId, secrets, status.connectionName, configWriter, provisionVariables, adapterInstanceName, serviceAccount)
 
     blankLine()
     blankLine()
