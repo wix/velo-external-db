@@ -25,7 +25,13 @@ class ConfigWriter {
      }
 
     async writeConfig( { secretId, dbCredentials, connectionName, db, secretKey }) {
-        const config = { USER: 'root', PASSWORD: dbCredentials.passwd, CLOUD_SQL_CONNECTION_NAME: connectionName, DB: db, SECRET_KEY: secretKey }
+        const config = {
+            USER: dbCredentials.user,
+            PASSWORD: dbCredentials.passwd,
+            CLOUD_SQL_CONNECTION_NAME: connectionName,
+            DB: db,
+            SECRET_KEY: secretKey
+        }
         const secrets = {}
 
         for (const [secretKey, secretValue] of Object.entries(config)) {

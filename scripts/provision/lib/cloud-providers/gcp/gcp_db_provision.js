@@ -17,7 +17,7 @@ class DbProvision {
         const CreateDbInstanceRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances`
 
         const dbInstanceProperties = {
-            databaseVersion: this.asGcp(engine),
+            databaseVersion: this.databaseVersionFor(engine),
             name,
             settings: { tier: 'db-f1-micro' },
             rootPassword: credentials.passwd
@@ -44,14 +44,12 @@ class DbProvision {
         }
     }
 
-    async postCreateDb(engine, dbName, status) {
-        const client = await this.credentialsFor()
-        const CreateDbRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances/${status.instanceName}/databases`
-
-        await client.request({ url: CreateDbRestUrl, method:'POST', data: { name:  dbName } })
+    async postCreateDb(engine, dbName, status, dbCredentials) {
+        await this.createNewDbUser(status.instanceName, dbCredentials.user, dbCredentials.passwd)
+        await this.createDatabase(status.instanceName, dbName)
     }
 
-    asGcp(engine) {
+    databaseVersionFor(engine) {
         switch (engine) {
             case 'mysql':
                 return 'MYSQL_5_7'
@@ -63,7 +61,22 @@ class DbProvision {
     }
 
     async credentialsFor() {
+        
         return await this.authClient.getClient()
+    }
+
+    async createNewDbUser(instanceName, userName, password) {
+        const client = await this.credentialsFor()
+        const CreateNewUserRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances/${instanceName}/users`
+
+        await client.request({ url: CreateNewUserRestUrl, method:'POST', data: { name:  userName, password: password }})
+    }
+
+    async createDatabase(instanceName, dbName) {
+        const client = await this.credentialsFor()
+        const CreateDbRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances/${instanceName}/databases`
+        
+        await client.request({ url: CreateDbRestUrl, method:'POST', data: { name:  dbName } })
     }
 }
 
