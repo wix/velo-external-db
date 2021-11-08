@@ -1,4 +1,3 @@
-const { SystemFields } = require('velo-external-db-commons')
 const { sheetFor, headersFrom } = require('./google_sheet_utils')
 
 class DataProvider {
@@ -19,7 +18,6 @@ class DataProvider {
     }
     
     async find(collectionName, filter, sort, skip, limit) {
-   
         const sheet = await sheetFor(collectionName, this.doc)
         const rows = await sheet.getRows({ offset: skip, limit })
 
@@ -36,8 +34,8 @@ class DataProvider {
 
     async insert(collectionName, items) {
         const sheet = await sheetFor(collectionName, this.doc)
-        const row = await sheet.addRow(items[0])
-        return this.formatRow(row)
+        const rows = await sheet.addRows(items)
+        return rows.map(this.formatRow) 
     }
     
     // UPDATE RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////
@@ -58,6 +56,10 @@ class DataProvider {
             // currently content-manger using data.update to insert new items, so if the id doesn't exist it means that this is a new item
             return rowToUpdate ? await this.updateRow(rowToUpdate, item) : await this.insert(collectionName, [item])
         }))
+    }
+
+    async bulkUpdate(collectionName, items) {
+        await this.update(collectionName, items)
     }
 
     // DELETE RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////

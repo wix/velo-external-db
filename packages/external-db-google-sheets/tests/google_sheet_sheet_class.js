@@ -32,6 +32,12 @@ class GoogleSpreadsheetSheet {
         return {range, majorDimension: 'ROWS', values: [this.sheetHeader]}
     }
 
+    /*
+    * values - is an array with the values to be insert 
+    * 1:1 - update the sheet header
+    * A1 - append new row
+    */
+
     addRows(values, range) {
         switch (range) {
             case '1:1':
@@ -39,9 +45,9 @@ class GoogleSpreadsheetSheet {
                 this.values[0] = this.sheetHeader 
                 return {updatedData: { values: [this.sheetHeader]}}
             case 'A1':
-                this.values.push(values)
-                const startIndex = `A${this.values.length}`
-                const endIndex = `${numToColumnLetter(values.length)}${this.values.length}`
+                const startIndex = `A${this.values.length + 1}`
+                this.values.push(...values)
+                const endIndex = `${numToColumnLetter(values[0].length)}${this.values.length + 1}`
                 return { 
                     updatedRange: `${this.title}!${startIndex}:${endIndex}`,
                     updatedData: { values: [this.sheetHeader]}
@@ -55,6 +61,23 @@ class GoogleSpreadsheetSheet {
     getRows(offset, limit) {
         const rows = this.values.slice(offset-1, limit-1)
         return  { values: rows}
+    }
+
+    deleteRows(startRowIndex, endRowIndex) {
+        const part1 = this.values.slice(0, startRowIndex)
+        const part2 = this.values.slice(startRowIndex, endRowIndex)
+        const part3 = this.values.slice(endRowIndex)
+        this.values = part1.concat(part3)
+        return part2
+    }
+
+    updateRows(startRowIndex, endRowIndex, values) {
+        console.log({before: this.values})
+        this.values[startRowIndex-1] = values[0]
+        console.log({after: this.values})
+        return {
+            updatedData: { values }
+        }
     }
 
 }

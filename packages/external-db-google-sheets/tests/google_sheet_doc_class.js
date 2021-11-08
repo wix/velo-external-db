@@ -34,7 +34,11 @@ class GoogleSpreadsheetDoc {
     }
 
     getSheet(sheetTitle) {
-        return this.sheets.find(s => sheetTitle == s.title)
+        return this.sheets.find(s => sheetTitle === s.title)
+    }
+
+    getSheetById(sheetId) {
+        return this.sheets.find(s => s.sheetId === sheetId)
     }
 
     cleanupSheets() {

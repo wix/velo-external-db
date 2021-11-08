@@ -1,8 +1,7 @@
-const { SystemFields, validateSystemFields } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, errors } = require('velo-external-db-commons')
 const { asWixSchema } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./google_sheet_exception_translator')
 const { headersFrom, sheetFor, reformatFields } = require('./google_sheet_utils')
-
 
 class SchemaProvider {
     constructor(doc) {
@@ -39,6 +38,10 @@ class SchemaProvider {
         const sheet = await sheetFor(collectionName, this.doc)
         const header = await headersFrom(sheet)
         await sheet.setHeaderRow([ ...header, column.name])
+    }
+
+    async removeColumn() {
+        throw new errors.InvalidRequest('Columns in Google Sheets cannot be deleted')
     }
 }
 

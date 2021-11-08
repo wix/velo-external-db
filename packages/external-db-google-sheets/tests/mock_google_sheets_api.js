@@ -10,12 +10,6 @@ const doc = new GoogleSpreadsheetDoc('spreadsheet-doc-id', 'spreadsheet-doc-titl
 app.use(express.json())
 app.use('/v4/spreadsheets/', v4SpreadsheetsRouter);
 
-// remove in the end
-app.use((req, res, next)=>{
-    console.log(JSON.stringify({method: req.method, path: req.path}));
-    next()
-})
-
 v4SpreadsheetsRouter.get('/:sheetId/', (_, res) =>{
     res.send(doc.docInfo())
 })
@@ -40,23 +34,31 @@ v4SpreadsheetsRouter.post('/:sheetId/:requestType',(req,res) => {
             replies = req.body.requests.map(r => batchUpdateFunctions(r, doc) )
             break;
     }
-    res.send({'updatedSpreadsheet': doc.docInfo(), replies })
+    res.send({updatedSpreadsheet: doc.docInfo(), replies })
 })
 
 v4SpreadsheetsRouter.post('/:sheetId/values/:sheet_range_requestType', (req, res) => {
     const [sheetTitle_range, requestType] = req.params.sheet_range_requestType.split(':')
     const [sheetTitle, range] = sheetTitle_range.split('!')
     const sheet = doc.getSheet(sheetTitle.replace(/^'/, '').replace(/'$/, ''))
-    const addRowsRes = sheet.addRows(req.body.values[0], range )
+    const addRowsRes = sheet.addRows(req.body.values, range )
     
     res.send({updates: addRowsRes})
 })
 
 v4SpreadsheetsRouter.put('/:sheetId/values/:requestType', (req, res) => {
-    const [sheetTitle, range] = req.body.range.split('!')
+    const [sheetTitle, fullRange] = req.body.range.split('!')
     const sheet = doc.getSheet(sheetTitle.replace(/^'/, '').replace(/'$/, ''))
-    const addRowsRes = sheet.addRows(req.body.values[0], range )
-    res.send(addRowsRes)
+
+    if (fullRange === '1:1') {
+        const addRowsRes = sheet.addRows(req.body.values[0], fullRange )
+        res.send(addRowsRes)   
+    } else {
+        const [startRow, endRow] = fullRange.replace(/[^\d:]/g, '').split(':')
+        const updateRow = sheet.updateRows(startRow, endRow, req.body.values)
+        res.send(updateRow)
+    }
+
 })
 
 const batchUpdateFunctions = ( request, doc ) => {
@@ -64,7 +66,11 @@ const batchUpdateFunctions = ( request, doc ) => {
     switch (requestType) {
         case 'addSheet':
             const newSheet = doc.addSheet(request.addSheet.properties.title)
-            return {'addSheet': newSheet.sheetInfo() }
+            return {addSheet: newSheet.sheetInfo() }
+        case 'deleteRange':
+            const {sheetId, startRowIndex, endRowIndex } = request.deleteRange.range
+            const sheet = doc.getSheetById(sheetId)
+            return sheet.deleteRows(startRowIndex, endRowIndex)
         default:
             break;
     }
