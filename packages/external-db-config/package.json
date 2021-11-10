@@ -23,16 +23,15 @@
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
   "devDependencies": {
-    "aws-sdk-client-mock": "^0.5.5",
+    "aws-sdk-client-mock": "^0.5.6",
     "jest": "^27.3.1",
     "jest-each": "^27.3.1",
     "jest-when": "^3.4.2",
-    "sinon": "^11.1.2",
     "test-commons": "^0.0.0",
     "ts-jest": "^27.0.7",
     "chance": "^1.1.7"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.39.0"
+    "@aws-sdk/client-secrets-manager": "^3.40.0"
   }
 }
