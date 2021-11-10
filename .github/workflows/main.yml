@@ -26,9 +26,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Installing Dependencies
-        run: |
-          npm config set package-lock true
-          npm install
+        run: npm install
 
       - name: Install dependencies of the homemade packages.
         run: npm run build:dev
@@ -56,6 +54,7 @@ jobs:
         with:
           node-version: 14
           cache: "npm"
+          cache-dependency-path: package-lock.json
 
       - name: Restore Dependencies
         uses: actions/cache@v2
