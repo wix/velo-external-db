@@ -26,7 +26,9 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Installing Dependencies
-        run: npm install
+        run: |
+          npm config set package-lock true
+          npm install
 
       - name: Install dependencies of the homemade packages.
         run: npm run build:dev
