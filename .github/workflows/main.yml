@@ -22,7 +22,7 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
       - name: Installing Dependencies
         run: npm install
@@ -52,7 +52,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
-          cache-dependency-path: package-lock.json
+#          cache-dependency-path: package-lock.json
 
       - name: Restore Dependencies
         uses: actions/cache@v2
@@ -60,7 +60,7 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
       - name: Downloading Docker Compose V2
         run: |
