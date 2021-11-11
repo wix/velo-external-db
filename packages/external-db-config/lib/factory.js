@@ -40,6 +40,9 @@ const create = () => {
         case 'airtable':
           internalConfigReader = new gcp.GcpAirtableConfigReader()  
           break;
+        case 'bigquery':
+          internalConfigReader = new gcp.GcpBigQueryConfigReader()
+          break;
         case 'mysql':
         case 'postgres':
           internalConfigReader = new gcp.GcpConfigReader()
