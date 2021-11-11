@@ -7,11 +7,12 @@ const mongo = require ('../resources/engines/mongo_resources')
 const googleSheet = require('../resources/engines/google_sheets_resourses')
 const airtable = require ('../resources/engines/airtable_resources')
 const dynamoDb = require ('../resources/engines/dynamodb_resources')
+const bigquery = require ('../resources/engines/bigquery_resources')
 
 const { sleep } = require('test-commons')
 const ci = require('./ci_utils')
 
-const initEnv = async (testEngine) => {
+const initEnv = async(testEngine) => {
     switch (testEngine) {
         case 'mysql':
             await mysql.initEnv()
@@ -47,10 +48,14 @@ const initEnv = async (testEngine) => {
         case 'dynamodb':
             await dynamoDb.initEnv()
             break
+
+        case 'bigquery':
+            await bigquery.initEnv()
+            break
     }
 }
 
-const cleanup = async (testEngine) => {
+const cleanup = async(testEngine) => {
     switch (testEngine) {
         case 'mysql':
             await mysql.cleanup()
@@ -82,6 +87,10 @@ const cleanup = async (testEngine) => {
         
         case 'dynamodb':
             await dynamoDb.cleanup()
+            break
+
+        case 'bigquery':
+            await bigquery.cleanup()
             break
     }
 }

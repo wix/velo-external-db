@@ -1,4 +1,4 @@
-const {Uninitialized} = require('test-commons');
+const {Uninitialized} = require('test-commons')
 
 const mysql = require('external-db-mysql')
 const mysqlTestEnv = require('./engines/mysql_resources')
@@ -24,6 +24,9 @@ const airtableEnv = require ('./engines/airtable_resources')
 const dynamo = require ('external-db-dynamodb')
 const dynamoTestEnv = require ('./engines/dynamodb_resources.js')
 
+const bigquery = require('external-db-bigquery')
+const bigqueryTestEnv = require('./engines/bigquery_resources')
+
 const env = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
@@ -31,7 +34,7 @@ const env = {
     driver: Uninitialized,
 }
 
-const dbInit = async (testEnv, impl) => {
+const dbInit = async(testEnv, impl) => {
     await testEnv.cleanup()
 
     const {pool, cleanup} = await testEnv.connection()
@@ -43,7 +46,7 @@ const dbInit = async (testEnv, impl) => {
     env.cleanup = cleanup
 }
 
-const dbTeardown = async () => {
+const dbTeardown = async() => {
     await env.cleanup()
     env.dataProvider = Uninitialized
     env.schemaProvider = Uninitialized
@@ -59,6 +62,9 @@ const mssqlTestEnvInit = async () => await dbInit(mssqlTestEnv, mssql)
 const mongoTestEnvInit = async () => await dbInit(mongoTestEnv, mongo)
 const airTableTestEnvInit = async() => await dbInit(airtableEnv, airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamoTestEnv, dynamo)
+const bigqueryTestEnvInit = async() => await dbInit(bigqueryTestEnv, bigquery)
+
+
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
     ['Postgres', postgresTestEnvInit],
@@ -67,7 +73,8 @@ const testSuits = () => [
     ['Sql Server', mssqlTestEnvInit],
     ['Mongo', mongoTestEnvInit],
     ['Airtable', airTableTestEnvInit],
-    ['DynamoDb', dynamoTestEnvInit]
+    ['DynamoDb', dynamoTestEnvInit],
+    ['BigQuery', bigqueryTestEnvInit],
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 module.exports = { env, dbTeardown, testSuits }
