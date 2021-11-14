@@ -21,6 +21,9 @@ const mongoTestEnv = require('./engines/mongo_resources')
 const airtable = require ('external-db-airtable')
 const airtableEnv = require ('./engines/airtable_resources')
 
+const dynamo = require ('external-db-dynamo')
+const dynamoTestEnv = require ('./engines/dynamo_resources.js')
+
 const env = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
@@ -54,7 +57,8 @@ const spannerTestEnvInit = async () => await dbInit(spannerTestEnv, spanner)
 const firestoreTestEnvInit = async () => await dbInit(firestoreTestEnv, firestore)
 const mssqlTestEnvInit = async () => await dbInit(mssqlTestEnv, mssql)
 const mongoTestEnvInit = async () => await dbInit(mongoTestEnv, mongo)
-const airTableTestEnvInit = async() => await dbInit(airtableEnv,airtable)
+const airTableTestEnvInit = async() => await dbInit(airtableEnv, airtable)
+const dynamoTestEnvInit = async() => await dbInit(dynamoTestEnv, dynamo)
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
     ['Postgres', postgresTestEnvInit],
@@ -62,7 +66,8 @@ const testSuits = () => [
     ['Firestore', firestoreTestEnvInit],
     ['Sql Server', mssqlTestEnvInit],
     ['Mongo', mongoTestEnvInit],
-    ['Airtable', airTableTestEnvInit]
+    ['Airtable', airTableTestEnvInit],
+    ['Dynamo', dynamoTestEnvInit]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 module.exports = { env, dbTeardown, testSuits }

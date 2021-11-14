@@ -40,6 +40,7 @@
       "external-db-spanner",
       "external-db-google-sheets",
       "external-db-airtable",
+      "external-db-dynamo",
       "velo-external-db",
       "velo-external-db-core"
     ]
