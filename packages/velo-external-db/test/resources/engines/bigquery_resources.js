@@ -1,12 +1,14 @@
 const { init } = require('external-db-bigquery')
 
+const databaseId = 'testDB'
+
 const connection = () => {
-    // const {connection, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
-    return { pool: {}, cleanup: () => {} }
+    const { connection, cleanup } = init({ databaseId })
+    return { pool: connection, cleanup }
 }
 
 const cleanup = async() => {
-    const { schemaProvider } = init({ databaseId: 'testDB'})
+    const { schemaProvider } = init({ databaseId })
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
 }
@@ -17,7 +19,7 @@ const initEnv = async() => {
 
 const setActive = () => {
     process.env.TYPE = 'bigquery'
-    process.env.DATABASE_ID = 'testDB'
+    process.env.DATABASE_ID = databaseId
 }
 
 const shutdownEnv = async() => {
