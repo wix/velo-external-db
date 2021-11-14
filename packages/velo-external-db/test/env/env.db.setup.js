@@ -6,6 +6,7 @@ const mssql = require('../resources/engines/mssql_resources')
 const mongo = require ('../resources/engines/mongo_resources')
 const googleSheet = require('../resources/engines/google_sheets_resourses')
 const airtable = require ('../resources/engines/airtable_resources')
+const dynamo = require ('../resources/engines/dynamo_resources')
 
 const { sleep } = require('test-commons')
 const ci = require('./ci_utils')
@@ -42,6 +43,10 @@ const initEnv = async (testEngine) => {
         case 'airtable':
             await airtable.initEnv()
             break
+        
+        case 'dynamo':
+            await dynamo.initEnv()
+            break
     }
 }
 
@@ -73,7 +78,11 @@ const cleanup = async (testEngine) => {
 
         case 'mongo':
             await mongo.cleanup()
-            break;
+            break
+        
+        case 'dynamo':
+            await dynamo.cleanup()
+            break
     }
 }
 

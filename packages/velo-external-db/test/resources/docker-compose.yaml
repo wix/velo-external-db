@@ -165,6 +165,20 @@ services:
     volumes:
       - ./engines/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 
+  dynamodb:
+    image:  amazon/dynamodb-local
+    container_name: my-dynamodb
+    hostname: dynamodb
+    restart: always
+    volumes:
+      -  ./my-dynamodb-data:/home/dynamodblocal/data
+    ports:
+      - 8000:8000
+    environment:
+      AWS_ACCESS_KEY_ID: 'VELOKEYID'
+      AWS_SECRET_ACCESS_KEY: 'VELOACCESSKEY'
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/"
+
 networks:
   backend:
     driver: bridge

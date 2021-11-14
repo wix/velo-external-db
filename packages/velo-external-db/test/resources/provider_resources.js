@@ -35,11 +35,11 @@ const dbInit = async (testEnv, impl) => {
     await testEnv.cleanup()
 
     const {pool, cleanup} = await testEnv.connection()
-    const driver = impl.driver()
+    // const driver = impl.driver()
 
-    env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
+    // env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
     env.schemaProvider = new impl.SchemaProvider(pool, testEnv.schemaProviderTestVariables?.() )
-    env.driver = driver
+    // env.driver = driver
     env.cleanup = cleanup
 }
 
