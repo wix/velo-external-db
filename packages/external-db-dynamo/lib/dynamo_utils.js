@@ -13,9 +13,16 @@ const validateTable = collection => {
 }
 
 const patchFixDates = record => {
-    if (record._createdDate && typeof record._createdDate === 'string') record._createdDate = new Date(record._createdDate)
-    if (record._updatedDate && typeof record._updatedDate === 'string') record._updatedDate = new Date(record._updatedDate)
-    return record
+    const dateRegex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}/
+    const fixedRecord = {}
+    Object.keys(record).map(key=> {
+        const value = record[key]
+        if (dateRegex.test(value))
+            fixedRecord[key] = new Date (value)
+        else
+            fixedRecord[key] = value
+    })
+    return fixedRecord
 }
 
 
