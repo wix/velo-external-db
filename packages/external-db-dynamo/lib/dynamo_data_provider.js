@@ -27,25 +27,28 @@ class DataProvider {
                                 ...filterExpr,
                                 Select: 'COUNT'
                                 })
-        return response.ScannedCount
+        return response.Count
     }
 
     async insert(collectionName, items) {
         validateTable()
         await this.docClient
                   .batchWrite(this.batchPutItemsExpression(collectionName, items.map(patchDateTime)))
+        return items.length //check if there is a way to figure how many deleted/inserted with batchWrite
     }
 
     async update(collectionName, items) {
         await this.docClient.transactWrite({
             TransactItems:items.map(item=>this.updateSingleItemExpression(collectionName, patchDateTime(item)))
         })
+        return items.length
     }
 
     async delete(collectionName, itemIds) {
         validateTable()
         await this.docClient
                   .batchWrite(this.batchDeleteItemsExpression(collectionName, itemIds))
+        return itemIds.length 
     }
 
     async truncate(collectionName) {
@@ -111,7 +114,7 @@ class DataProvider {
         const updateFields = updateFieldsFor(item)
         const updateExpression = `SET ${updateFields.map(f => `#${f} = :${f}`).join(', ')}`
         const expressionAttributeNames = updateFields.reduce((pv, cv)=> ({ ...pv, [`#${cv}`]: cv }), {})
-        const expressionAttributeValues = updateFields.reduce((pv, cv)=> ({...pv, [`:${cv}`]: item[cv]}), {})
+        const expressionAttributeValues = updateFields.reduce((pv, cv)=> ({ ...pv, [`:${cv}`]: item[cv]}), {})
 
         return {
             Update: {

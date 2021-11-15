@@ -18,61 +18,60 @@ class FilterParser {
         }
     }
 
-    wixDataFunction2Sql(f) {
-        switch (f) {
-            case '$avg':
-                return 'AVG'
-            case '$max':
-                return 'MAX'
-            case '$min':
-                return 'MIN'
-            case '$sum':
-                return 'SUM'
-            default:
-                throw new InvalidQuery(`Unrecognized function ${f}`)
-        }
-    }
+    // wixDataFunction2Sql(f) {
+    //     switch (f) {
+    //         case '$avg':
+    //             return 'AVG'
+    //         case '$max':
+    //             return 'MAX'
+    //         case '$min':
+    //             return 'MIN'
+    //         case '$sum':
+    //             return 'SUM'
+    //         default:
+    //             throw new InvalidQuery(`Unrecognized function ${f}`)
+    //     }
+    // }
 
-    parseAggregation(aggregation, postFilter) {
-        const groupByColumns = []
-        const filterColumnsStr = []
-        if (isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(f) ))
-            groupByColumns.push(...Object.values(aggregation._id))
-        } else {
-            filterColumnsStr.push(escapeId(aggregation._id))
-            groupByColumns.push(aggregation._id)
-        }
+    // parseAggregation(aggregation, postFilter) {
+    //     const groupByColumns = []
+    //     const filterColumnsStr = []
+    //     if (isObject(aggregation._id)) {
+    //         filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(f) ))
+    //         groupByColumns.push(...Object.values(aggregation._id))
+    //     } else {
+    //         filterColumnsStr.push(aggregation._id)
+    //         groupByColumns.push(aggregation._id)
+    //     }
 
-        Object.keys(aggregation)
-              .filter(f => f !== '_id')
-              .forEach(fieldAlias => {
-                  Object.entries(aggregation[fieldAlias])
-                        .forEach(([func, field]) => {
-                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeId(field)}) AS ${escapeId(fieldAlias)}`)
-                        })
-              })
+    //     Object.keys(aggregation)
+    //           .filter(f => f !== '_id')
+    //           .forEach(fieldAlias => {
+    //               Object.entries(aggregation[fieldAlias])
+    //                     .forEach(([func, field]) => {
+    //                         filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeId(field)}) AS ${escapeId(fieldAlias)}`)
+    //                     })
+    //           })
 
-        const havingFilter = this.parseFilter(postFilter)
-        const {filterExpr, parameters} =
-            havingFilter.map(({filterExpr, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                              parameters: parameters}))
-                        .concat(EMPTY_FILTER)[0]
+    //     const havingFilter = this.parseFilter(postFilter)
+    //     const {filterExpr, parameters} =
+    //         havingFilter.map(({filterExpr, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+    //                                                           parameters: parameters}))
+    //                     .concat(EMPTY_FILTER)[0]
 
 
-        return {
-            fieldsStatement: filterColumnsStr.join(', '),
-            groupByColumns,
-            havingFilter: filterExpr,
-            parameters: parameters,
-        }
-    }
+    //     return {
+    //         fieldsStatement: filterColumnsStr.join(', '),
+    //         groupByColumns,
+    //         havingFilter: filterExpr,
+    //         parameters: parameters,
+    //     }
+    // }
 
     parseFilter(filter) {
         if (!filter || !isObject(filter)|| filter.operator === undefined) {
             return []
         }
-
         // switch (filter.operator) {
         //     case '$and':
         //     case '$or':
@@ -90,16 +89,55 @@ class FilterParser {
         //         }]
         // }
 
+        const fieldName = filter.fieldName 
+        const value = filter.value
+        if (filter.operator === '$hasSome') {
+            
+            if (filter.operator === '$hasSome' && (value === undefined || value.length === 0))
+                throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
+
+            const filterExpressionVariables = {...value}
+
+            return [{
+                filterExpr: {
+                    FilterExpression: `#${fieldName} IN (${Object.keys(filterExpressionVariables).map(f => `:${f}`).join(', ')})`,
+                    ExpressionAttributeNames: {
+                        [`#${fieldName}`] : fieldName
+                    },
+                    ExpressionAttributeValues: {
+                        ...filterExpressionVariables
+                    }
+                }
+            }] 
+
+        }
+        
         if (this.isSingleFieldOperator(filter.operator)) {
             return [{
-                filterExpr: `${filter.fieldName} ${this.veloOperatorToDynamoOperator(filter.operator, filter.value)} ${filter.fieldName}`,
-                parameters: filter.value !== undefined ? [].concat( this.patchTrueFalseValue(filter.value) ) : []
+                filterExpr: {
+                    FilterExpression: `#${fieldName} ${this.veloOperatorToDynamoOperator(filter.operator)} :${fieldName}`,
+                    ExpressionAttributeNames: {
+                        [`#${fieldName}`]: fieldName
+                    },
+                    ExpressionAttributeValues: {
+                        [`:${fieldName}`]: this.valueForOperator(filter.value, filter.operator)
+                    }
+                }
             }]
         }
 
         if (this.isSingleFieldStringOperator(filter.operator)) {
             return [{
-                filterExpr: `${filter.fieldName} ${this.veloOperatorToDynamoOperator(filter.operator, filter.value)} ${filter.value}` // TODO: value for operator?
+                filterExpr: {
+                    FilterExpression: ,
+                    ExpressionAttributeNames: {
+                        [`#${fieldName}`] : fieldName
+                    },
+                    ExpressionAttributeValues: {
+                        [`:${fieldName}`] : filter.value
+                    }
+                }
+                // `${filter.fieldName} ${this.veloOperatorToDynamoOperator(filter.operator, filter.value)} ${filter.value}` // TODO: value for operator?
             }]
         }
 
@@ -125,7 +163,7 @@ class FilterParser {
     }
 
     isSingleFieldOperator(operator) {
-        return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq'].includes(operator)
+        return ['$ne', '$lt', '$lte', '$gt', '$gte', '$eq'].includes(operator)
     }
 
     isSingleFieldStringOperator(operator) {
@@ -133,26 +171,20 @@ class FilterParser {
     }
 
     valueForOperator(value, operator) {
-        if (operator === '$hasSome') {
-            if (value === undefined || value.length === 0) {
-                throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
-            }
-            return `(${wildCardWith(value.length, '?')})`
-        } else if (operator === '$eq' && value === undefined) {
-            return ''
-        // } else if (operator === '$eq' && (value === true || value === true)) {
+        if (operator === '$hasSome' && (value === undefined || value.length === 0)) {
+            throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
+        }
+        if (operator === '$eq' && value === undefined) {
+            return null
         }
 
-        return '?'
+        return value
     }
 
-    veloOperatorToDynamoOperator(operator, value) {
+    veloOperatorToDynamoOperator(operator) {
         switch (operator) {
             case '$eq':
-                if (value !== undefined) {
-                    return '='
-                }
-                return 'IS NULL'
+                return '='
             case '$ne':
                 return '<>'
             case '$lt':
@@ -165,6 +197,12 @@ class FilterParser {
                 return '>='
             case '$hasSome':
                 return 'IN'
+            case '$contains':
+                return 'contains'
+            case '$startsWith':
+                return 'begins_with'
+            case '$endsWith':
+                return ''
         }
     }
 
@@ -176,7 +214,7 @@ class FilterParser {
         const results = sort.flatMap( this.parseSort )
 
         if (results.length === 0) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         return {
