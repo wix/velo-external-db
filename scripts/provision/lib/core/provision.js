@@ -19,8 +19,8 @@ const provisionDb = async(provider, configWriter, { engine, secretId, secretKey,
 }
 
 const provisionPermissions = async(provider, instanceName) => {
-    const serviceAccount = await startSpinnerWith('Creating account for the adapter instance', async() => await provider.createServiceAccount({ instanceName }))
-    await startSpinnerWith('Granting SQL and secret manger permissions to the account', async() => await provider.grantPermission({ serviceAccount }))
+    const serviceAccount = await startSpinnerWith('Creating account for the adapter instance', async() => await provider.createServiceAccount?.({ instanceName }))
+    await startSpinnerWith('Granting SQL and secret manger permissions to the account', async() => await provider.grantPermission?.({ serviceAccount }))
     return serviceAccount
 }
 

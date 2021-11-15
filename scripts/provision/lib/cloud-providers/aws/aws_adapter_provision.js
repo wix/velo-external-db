@@ -25,10 +25,10 @@ class AdapterProvision {
                                                                                          ImageRepositoryType: 'ECR_PUBLIC',
                                                                                          ImageConfiguration: {
                                                                                              RuntimeEnvironmentVariables: {
-                                                                                                 'CLOUD_VENDOR': 'aws',
-                                                                                                 'TYPE': engine,
-                                                                                                 'SECRET_ID_OVERRIDE': secretId,
-                                                                                                 'REGION': this.region,
+                                                                                                 CLOUD_VENDOR: 'aws',
+                                                                                                 TYPE: engine,
+                                                                                                 SECRET_ID_OVERRIDE: secretId,
+                                                                                                 REGION: this.region,
                                                                                      } } },
                                                                                } } ) )
         return { serviceId: response.Service.ServiceArn }
