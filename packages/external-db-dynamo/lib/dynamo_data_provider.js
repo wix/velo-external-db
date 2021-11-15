@@ -1,8 +1,4 @@
-// const { escapeId, escapeTable } = require('./dynamo_utils')
-// const { promisify } = require('util')
-const { asParamArrays, patchDateTime, updateFieldsFor } = require('velo-external-db-commons')
-// const { translateErrorCodes } = require('./sql_exception_translator')
-// const { wildCardWith } = require('./dynamo_utils')
+const { patchDateTime, updateFieldsFor } = require('velo-external-db-commons')
 const { DynamoDBDocument }  = require ('@aws-sdk/lib-dynamodb')
 const { validateTable, patchFixDates } = require('./dynamo_utils')
 
@@ -41,20 +37,9 @@ class DataProvider {
     }
 
     async update(collectionName, items) {
-        const result = await this.docClient.transactWrite({
+        await this.docClient.transactWrite({
             TransactItems:items.map(item=>this.updateSingleItemExpression(collectionName, patchDateTime(item)))
         })
-        console.log(result)
-        return result
-//         const updateFields = updateFieldsFor(items[0])
-//         const queries = items.map(() => `UPDATE ${escapeTable(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ?`).join(', ')} WHERE _id = ?` )
-//                              .join(';')
-//         const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
-//                                 .map(u => asParamArrays( patchDateTime(u) ))
-//         const resultset = await this.query(queries, [].concat(...updatables))
-//                                     .catch( translateErrorCodes )
-
-//         return Array.isArray(resultset) ? resultset.reduce((s, r) => s + r.changedRows, 0) : resultset.changedRows
     }
 
     async delete(collectionName, itemIds) {
@@ -93,7 +78,7 @@ class DataProvider {
               }
         }
     }
-    //rename like mongo
+
     putSingleItemExpression(item) {
         return {
             PutRequest: {
@@ -111,7 +96,7 @@ class DataProvider {
               }
         }
     }
-    //rename like mongo
+
     deleteSingleItemExpression(id) {
         return {
             DeleteRequest: {
@@ -123,15 +108,10 @@ class DataProvider {
     }
 
     updateSingleItemExpression(collectionName, item) {
-        let updateExpression = 'set'
-        let ExpressionAttributeNames = {}
-        let ExpressionAttributeValues = {}
-        for (const property in item) {
-          updateExpression += ` #${property} = :${property} ,`
-          ExpressionAttributeNames['#'+property] = property 
-          ExpressionAttributeValues[':'+property] = item[property]
-        }
-        updateExpression= updateExpression.slice(0, -1)
+        const updateFields = updateFieldsFor(item)
+        const updateExpression = `SET ${updateFields.map(f => `#${f} = :${f}`).join(', ')}`
+        const expressionAttributeNames = updateFields.reduce((pv, cv)=> ({ ...pv, [`#${cv}`]: cv }), {})
+        const expressionAttributeValues = updateFields.reduce((pv, cv)=> ({...pv, [`:${cv}`]: item[cv]}), {})
 
         return {
             Update: {
@@ -139,9 +119,9 @@ class DataProvider {
                 Key: {
                     _id: item._id
                 },
-                updateExpression,
-                ExpressionAttributeNames,
-                ExpressionAttributeValues
+                UpdateExpression: updateExpression,
+                ExpressionAttributeNames: expressionAttributeNames,
+                ExpressionAttributeValues: expressionAttributeValues
             }
         }
     }

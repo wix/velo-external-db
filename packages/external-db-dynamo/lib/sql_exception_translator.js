@@ -10,7 +10,7 @@ const notThrowingTranslateErrorCodes = err => {
 }
 
 const translateErrorCodes = err => {
-    throw notThrowingTranslateErrorCodes(err);
+    throw notThrowingTranslateErrorCodes(err)
 }
 
 module.exports = { translateErrorCodes, notThrowingTranslateErrorCodes }
