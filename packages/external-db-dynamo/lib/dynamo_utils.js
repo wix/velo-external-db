@@ -2,7 +2,7 @@ const { InvalidQuery } = require('velo-external-db-commons').errors
 
 const SystemTable = '_descriptor'
 
-const EMPTY_FILTER = {filterExpr:{}}
+const EMPTY_FILTER = { filterExpr: {} }
 
 const isSystemTable = collectionId => SystemTable === collectionId.trim().toLowerCase()
 

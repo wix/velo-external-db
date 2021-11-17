@@ -1,6 +1,5 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-// const { escapeId } = require('../../lib/mysql_utils');
 
 const filterParser = {
     transform: jest.fn(),
@@ -24,16 +23,10 @@ const stubEmptyOrderByFor = (sort) => {
                               .mockReturnValue(EMPTY_SORT)
 }
 
-const givenOrderByFor = (column, sort) => {
-    when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue({ sortExpr: `ORDER BY ${escapeId(column)} ASC` })
-}
-
-
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: {
-                                    FilterExpression: `#_id = :_id`,
+                                    FilterExpression: '#_id = :_id',
                                     ExpressionAttributeNames: {
                                         '#_id' : '_id'
                                     },
@@ -43,18 +36,6 @@ const givenFilterByIdWith = (id, filter) => {
                                 }})
 }
 
-const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
-    const c = numericColumns.map(c => c.name)
-    when(filterParser.parseAggregation).calledWith(having, filter)
-                                       .mockReturnValue({
-                                           fieldsStatement: `${groupByColumns.map( escapeId )}, MAX(${escapeId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
-                                           groupByColumns: groupByColumns,
-                                           havingFilter: '',
-                                           parameters: [],
-                                       })
-}
-
-
 
 const reset = () => {
     filterParser.transform.mockClear()
@@ -63,7 +44,6 @@ const reset = () => {
     filterParser.parseFilter.mockClear()
 }
 
-module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
-                   stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                   filterParser, reset
+module.exports = { stubEmptyFilterAndSortFor, stubEmptyOrderByFor, stubEmptyFilterFor,
+                   givenFilterByIdWith, filterParser, reset
 }
