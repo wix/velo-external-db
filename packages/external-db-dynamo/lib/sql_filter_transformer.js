@@ -1,4 +1,3 @@
-/* eslint-disable no-case-declarations */
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { isObject } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require('./dynamo_utils')

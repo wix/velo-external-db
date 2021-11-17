@@ -175,8 +175,9 @@ services:
     ports:
       - 8000:8000
     environment:
-      AWS_ACCESS_KEY_ID: 'VELOKEYID'
-      AWS_SECRET_ACCESS_KEY: 'VELOACCESSKEY'
+      AWS_REGION: "us-west-2"
+      AWS_ACCESS_KEY_ID: VELOKEYID
+      AWS_SECRET_ACCESS_KEY: VELOACCESSKEY
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/"
 
 networks:

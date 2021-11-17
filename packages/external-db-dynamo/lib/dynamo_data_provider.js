@@ -63,17 +63,6 @@ class DataProvider {
                   .batchWrite(this.batchDeleteItemsExpression(collectionName, rows.Items.map(item=>item._id)))
     }
 
-//     async aggregate(collectionName, filter, aggregation) {
-//         const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
-//         const {fieldsStatement, groupByColumns, havingFilter, parameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
-
-//         const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
-//         const resultset = await this.query(sql, [...whereParameters, ...parameters])
-//                                     .catch( translateErrorCodes )
-//         return resultset
-//     }
-
-
     batchPutItemsExpression(collectionName, items) {
         return {
             RequestItems: {

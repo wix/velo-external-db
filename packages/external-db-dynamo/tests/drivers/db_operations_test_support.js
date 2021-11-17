@@ -1,32 +1,46 @@
-// const DatabaseOperations = require('../../lib/mysql_operations')
-// const init = require('../../lib/connection_provider')
+const DatabaseOperations = require('../../lib/dynamo_operations')
+const init = require('../../lib/connection_provider')
 
-// const createPool = modify => {
-//     const config = {
-//         host     : 'localhost',
-//         user     : 'test-user',
-//         password : 'password',
-//         db : 'test-db',
-//     }
+const config = () => ({
+    region: 'us-west-2',
+    endpoint: 'http://localhost:8000',
+})
 
-//     const { connection, cleanup } = init({ ...config, ...modify }, { connectionLimit: 1, queueLimit: 0 })
-//     return { connection, cleanup }
-// }
+const createConnection = (_config) => {
+    const { connection, cleanup } = init({ ..._config })
+    return { connection, cleanup }
+}
 
-// const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredPassword = () => {
+    delete process.env.AWS_ACCESS_KEY_ID
+    return new DatabaseOperations(createConnection(config()).connection)
+}
 
-// const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { db: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredDatabase = () => {
+    delete process.env.AWS_SECRET_ACCESS_KEY
+    return new DatabaseOperations(createConnection(config()).connection)
+} 
 
-// const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredHost = () => { 
+    const _config = config()
+    delete _config.region
+    return new DatabaseOperations(createConnection(_config).connection)
+}
 
-// const dbOperationWithValidDB = () => {
-//     const { connection, cleanup } = createPool({ } )
-//     const dbOperations = new DatabaseOperations( connection )
+const dbOperationWithValidDB = () => {
+    const { connection, cleanup } = createConnection(config())
+    const dbOperations = new DatabaseOperations( connection )
 
-//     return { dbOperations, cleanup}
-// }
+    return { dbOperations, cleanup}
+}
 
-// module.exports = {
-//     dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-//     dbOperationWithMisconfiguredHost, dbOperationWithValidDB
-// }
+const resetEnv = () => {
+    process.env.AWS_SECRET_ACCESS_KEY = 'VELOACCESSKEY'
+    process.env.AWS_ACCESS_KEY_ID = 'VELOKEYID'
+}
+
+
+module.exports = {
+    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
+    dbOperationWithMisconfiguredHost, dbOperationWithValidDB, resetEnv
+}
