@@ -28,7 +28,7 @@ describe('Velo External DB Data REST API',  () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
             expect((await axios.post(`/data/find`, {collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authAdmin)).data).toEqual({ items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
-                totalCount: 0});
+                totalCount: 2});
         })
 
         test('insert api', async () => {
@@ -36,7 +36,7 @@ describe('Velo External DB Data REST API',  () => {
 
             await axios.post(`/data/insert`, {collectionName: ctx.collectionName, item: ctx.item }, authAdmin)
 
-            expect(await data.expectAllDataIn(ctx.collectionName, authAdmin)).toEqual({ items: [ctx.item], totalCount: 0});
+            expect(await data.expectAllDataIn(ctx.collectionName, authAdmin)).toEqual({ items: [ctx.item], totalCount: 1});
         })
 
         test('bulk insert api', async () => {
@@ -112,7 +112,7 @@ describe('Velo External DB Data REST API',  () => {
 
             await axios.post(`/data/update`, {collectionName: ctx.collectionName, item: ctx.modifiedItem }, authAdmin)
 
-            expect(await data.expectAllDataIn(ctx.collectionName, authAdmin)).toEqual({ items: [ctx.modifiedItem], totalCount: 0});
+            expect(await data.expectAllDataIn(ctx.collectionName, authAdmin)).toEqual({ items: [ctx.modifiedItem], totalCount: 1});
         })
 
         test('bulk update api', async () => {
