@@ -10,7 +10,7 @@ describe('Data Service', () => {
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
         const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-        expect( actual ).toEqual({ items: ctx.entities, totalCount: 0 });
+        expect( actual ).toEqual({ items: ctx.entities, totalCount: ctx.entities.length });
     })
 
     test('count data from collection', async () => {
