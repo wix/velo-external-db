@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "start": "lerna exec --scope velo-external-db \"npm run start\"",
     "build:dev": "lerna bootstrap --hoist",
     "test": "npm run test:core; npm run test:postgres; npm run test:spanner; npm run test:mysql; npm run test:mssql; npm run test:firestore; npm run test:mongo; npm run test:google-sheets",
     "test:core": "lerna exec --scope '{external-db-config,velo-external-db-core,velo-external-db}' \"npm test\"",
