@@ -1,4 +1,3 @@
-
 class SchemaColumnTranslator {
 
     constructor() {
@@ -10,7 +9,7 @@ class SchemaColumnTranslator {
             case 'INTEGER':
             case 'BIGNUMERIC':
             case 'FLOAT64':
-            case 'INT65':
+            case 'INT64':
                 return 'number'
 
             case 'TIMESTAMP':
