@@ -57,7 +57,7 @@ This includes:
   * [Deploying to Cloud Run](https://support.wix.com/en/article/using-your-mysql-and-postgres-database-with-velo)
   * Deploying to AppEngine
 * Amazon Web Services
-  * Deploying to App Runner
+  * [Deploying to App Runner](https://support.wix.com/en/article/integrate-your-aws-mysql-database-with-your-velo-site)
 * Microsoft Azure
   * Deploying to Azure App Services
   * Deploying to Azure Container service
