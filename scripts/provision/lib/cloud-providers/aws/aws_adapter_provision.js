@@ -27,7 +27,7 @@ class AdapterProvision {
                                                                                              RuntimeEnvironmentVariables: {
                                                                                                  CLOUD_VENDOR: 'aws',
                                                                                                  TYPE: engine,
-                                                                                                 SECRET_ID_OVERRIDE: secretId,
+                                                                                                 SECRET_NAME: secretId,
                                                                                                  REGION: this.region,
                                                                                      } } },
                                                                                } } ) )
