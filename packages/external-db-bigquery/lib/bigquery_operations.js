@@ -5,7 +5,7 @@ class DatabaseOperations {
     }
 
     async validateConnection() {
-        return await this.pool.query('SELECT 1').then(() => ({ valid: true }))
+        return await this.pool.getMetadata().then(() => ({ valid: true }))
                               .catch((e) => ({ valid: false, error: e.message }))
     }
 }
