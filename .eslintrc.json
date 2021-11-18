@@ -45,6 +45,9 @@
         "quote-props": [
             "error",
             "as-needed"
+        ],
+        "no-case-declarations": [
+            "off"
         ]
     }
 }
