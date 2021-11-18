@@ -14,7 +14,7 @@ You can use wix-data APIs, display data from an external database collection in 
 
 This project is a reference implementation of the [wix-data SPI](https://www.wix.com/velo/reference/spis/external-database-collections), allowing the development or extension of alternative external database adapters, to connect Velo with external databases.
 
-For a detailed guide to installing and integrating this adapter on Google Cloud Platform, see the [Integrate Your Google Cloud MySQL or Postgres Database with Your Velo Site](https://support.wix.com/en/article/integrate-your-google-cloud-mysql-or-postgres-database-with-your-velo-site) article
+For a detailed guide to installing and integrating this adapter on Google Cloud Platform, see the [Integrate Your Google Cloud MySQL or Postgres Database with Your Velo Site](https://support.wix.com/en/article/integrate-your-google-cloud-mysql-or-postgres-database-with-your-velo-site) article. If deploying to Amazon AWS, please follow [Integrate Your AWS RDS Database with Your Velo Site](https://support.wix.com/en/article/integrate-your-aws-mysql-database-with-your-velo-site)
 
 ## Architecture
 
