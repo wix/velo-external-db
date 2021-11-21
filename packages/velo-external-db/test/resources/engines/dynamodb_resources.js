@@ -1,4 +1,4 @@
-const { init } = require('external-db-dynamo')
+const { init } = require('external-db-dynamodb')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = async() => {

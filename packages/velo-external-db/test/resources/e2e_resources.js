@@ -10,7 +10,7 @@ const mssql = require('./engines/mssql_resources')
 const mongo = require('./engines/mongo_resources')
 const googleSheet = require('./engines/google_sheets_resourses')
 const airtable = require ('./engines/airtable_resources')
-const dynamo = require ('./engines/dynamo_resources')
+const dynamo = require ('./engines/dynamodb_resources')
 
 
 const env = {
@@ -66,7 +66,7 @@ const testSuits = () => [
     ['Mongo', mongoTestEnvInit],
     ['Google-sheet', googleSheetTestEnvInit],
     ['Airtable',airtableTestEnvInit],
-    ['Dynamo', dynamoTestEnvInit],
+    ['DynamoDb', dynamoTestEnvInit],
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 

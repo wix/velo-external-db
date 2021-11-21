@@ -1,5 +1,5 @@
 {
-  "name": "external-db-dynamo",
+  "name": "external-db-dynamodb",
   "version": "0.0.0",
   "description": "> TODO: description",
   "author": "Noam Almog <noama@wix.com>",
