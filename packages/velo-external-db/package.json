@@ -13,6 +13,7 @@
     "test:mongo": "TEST_ENGINE=mongo jest --runInBand ./test",
     "test:google-sheets": "TEST_ENGINE=google-sheet jest  -i  packages/velo-external-db/test/e2e/app_data.e2e.spec.js  --runInBand -t 'Velo External DB Data REST API' ",
     "test:airtable": "TEST_ENGINE=airtable jest --runInBand ./test ",
+    "test:dynamo": "TEST_ENGINE=dynamo jest --runInBand ./test ",
     "test:watch": "jest --detectOpenHandles --watch",
     "start": "node lib/app.js",
     "deploy": "gcloud app deploy ./app.yaml"
@@ -32,6 +33,7 @@
     "external-db-mysql": "^0.0.0",
     "external-db-postgres": "^0.0.0",
     "external-db-spanner": "^0.0.0",
+    "external-db-dynamo": "^0.0.0",
     "nested-property": "^4.0.0",
     "velo-external-db-commons": "^0.0.0",
     "velo-external-db-core": "^0.0.0"

@@ -48,6 +48,10 @@ describe('Check Pool Connection', () => {
             expect(validateConnection.error).not.toBeDefined()
             await cleanup()
         })
+
+        afterEach(() => {
+            env.driver.resetEnv?.()
+        })
     })
 
 })

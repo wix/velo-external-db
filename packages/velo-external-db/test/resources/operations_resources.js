@@ -6,6 +6,7 @@ const firestore = require('external-db-firestore')
 const mssql = require('external-db-mssql')
 const mongo = require ('external-db-mongo')
 const airtable = require ('external-db-airtable')
+const dynamo = require ('external-db-dynamo')
 
 const env = {
     driver: Uninitialized,
@@ -24,6 +25,7 @@ const firestoreTestEnvInit = async () => await init(firestore)
 const mssqlTestEnvInit = async () => await init(mssql)
 const mongoTestEnvInit = async () => await init(mongo)
 const airtableTestEnvInit = async () => await init(airtable)
+const dynamoTestEnvInit = async () => await init(dynamo)
 
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
@@ -32,7 +34,8 @@ const testSuits = () => [
     ['Firestore', firestoreTestEnvInit],
     ['Sql Server', mssqlTestEnvInit],
     ['Mongo', mongoTestEnvInit],
-    ['Airtable', airtableTestEnvInit]
+    ['Airtable', airtableTestEnvInit],
+    ['Dynamo', dynamoTestEnvInit]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 

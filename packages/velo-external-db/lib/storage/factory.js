@@ -28,7 +28,7 @@ const init = async(type, vendor, config) => {
             const res = await init(cfg)
             return append(res, cfg.secretKey)
         }
-        case 'mysql':{
+        case 'mysql': {
             const { init } = require('external-db-mysql')
             const cfg = await config.readConfig()
 
@@ -47,6 +47,11 @@ const init = async(type, vendor, config) => {
         }
         case 'airtable': {
             const { init } = require('external-db-airtable')
+            const cfg = await config.readConfig()
+            return append(await init(cfg), cfg.secretKey)
+        }
+        case 'dynamo': {
+            const { init } = require('external-db-dynamo')
             const cfg = await config.readConfig()
             return append(await init(cfg), cfg.secretKey)
         }

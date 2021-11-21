@@ -14,8 +14,14 @@ const create = () => {
   switch (vendor.toLowerCase()) {
 
     case 'aws':
-      internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId, region)
-      break;
+      switch(type) {
+        case 'dynamo':
+          internalConfigReader = new aws.AwsDynamoConfigReader(region) 
+          break
+        default:
+          internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId, region)
+      }
+      break
       
     case 'gcp':
       switch (type) {
@@ -58,6 +64,9 @@ const create = () => {
         case 'airtable':
           internalConfigReader = new gcp.GcpAirtableConfigReader()
           break;
+        case 'dynamo':
+          internalConfigReader = new aws.AwsDynamoConfigReader(region) 
+          break
         case 'mssql':
         case 'mysql':
         case 'postgres':
