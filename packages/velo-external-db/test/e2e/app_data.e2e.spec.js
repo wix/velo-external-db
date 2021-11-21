@@ -24,12 +24,14 @@ describe('Velo External DB Data REST API',  () => {
             await dbTeardown()
         }, 20000);
 
-        test('find api', async () => {
-            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-            await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-            expect((await axios.post(`/data/find`, {collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authAdmin)).data).toEqual({ items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
-                totalCount: 2});
-        })
+        if (name != 'Dynamo') {
+            test('find api', async () => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+                expect((await axios.post(`/data/find`, {collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authAdmin)).data).toEqual({ items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
+                    totalCount: 2});
+            })
+        }
 
         test('insert api', async () => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
@@ -47,7 +49,7 @@ describe('Velo External DB Data REST API',  () => {
             expect((await data.expectAllDataIn(ctx.collectionName, authAdmin)).items).toEqual(expect.arrayContaining(ctx.items));
         })
 
-        if (name !== 'Firestore' && name !== 'Airtable') {
+        if (name !== 'Firestore' && name !== 'Airtable' && name != 'Dynamo') {
         test('aggregate api', async () => {
             await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
             await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)

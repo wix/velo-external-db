@@ -26,4 +26,11 @@ const patchFixDates = record => {
 }
 
 
-module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates }
+const reformatFields = (field) => {
+    return {
+        field: field.name,
+        type: field.type,
+    }
+}
+
+module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates, reformatFields }

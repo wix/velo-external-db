@@ -1,6 +1,7 @@
-const { patchDateTime, updateFieldsFor } = require('velo-external-db-commons')
+const { patchDateTime } = require('velo-external-db-commons')
 const { DynamoDBDocument }  = require ('@aws-sdk/lib-dynamodb')
 const { validateTable, patchFixDates } = require('./dynamo_utils')
+const dynamoRequests = require ('./dynamo_data_requests_utils')
 
 class DataProvider {
     constructor(client, filterParser) {
@@ -13,33 +14,27 @@ class DataProvider {
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr} = this.filterParser.transform(filter)
         const { Items } = await this.docClient
-                                   .scan({TableName: collectionName, 
-                                          ...filterExpr,
-                                          Limit:limit
-                                          })
+                                   .scan(dynamoRequests.findExpression(collectionName, filterExpr, limit))
         return Items.map(patchFixDates)
     }
 
     async count(collectionName, filter) {
         const {filterExpr} = this.filterParser.transform(filter)
         const { Count } = await this.docClient
-                         .scan({TableName: collectionName, 
-                                ...filterExpr,
-                                Select: 'COUNT'
-                                })
+                                    .scan(dynamoRequests.countExpression(collectionName, filterExpr))            
         return Count
     }
 
     async insert(collectionName, items) {
         validateTable()
         await this.docClient
-                  .batchWrite(this.batchPutItemsExpression(collectionName, items.map(patchDateTime)))
+                  .batchWrite(dynamoRequests.batchPutItemsExpression(collectionName, items.map(patchDateTime)))
         return items.length //check if there is a way to figure how many deleted/inserted with batchWrite
     }
 
     async update(collectionName, items) {
         await this.docClient.transactWrite({
-            TransactItems: items.map(item => this.updateSingleItemExpression(collectionName, patchDateTime(item)))
+            TransactItems: items.map(item => dynamoRequests.updateSingleItemExpression(collectionName, patchDateTime(item)))
         })
         return items.length
     }
@@ -47,73 +42,17 @@ class DataProvider {
     async delete(collectionName, itemIds) {
         validateTable()
         await this.docClient
-                  .batchWrite(this.batchDeleteItemsExpression(collectionName, itemIds))
+                  .batchWrite(dynamoRequests.batchDeleteItemsExpression(collectionName, itemIds))
         return itemIds.length 
     }
 
     async truncate(collectionName) {
         validateTable(collectionName)
         const rows = await this.docClient
-                               .scan( {
-                                        TableName: collectionName,
-                                        AttributesToGet: ['_id']
-                                      } )
+                               .scan(dynamoRequests.getAllIdsExpression(collectionName))
 
         await this.docClient
-                  .batchWrite(this.batchDeleteItemsExpression(collectionName, rows.Items.map(item=>item._id)))
-    }
-
-    batchPutItemsExpression(collectionName, items) {
-        return {
-            RequestItems: {
-                [collectionName]: items.map(this.putSingleItemExpression)
-              }
-        }
-    }
-
-    putSingleItemExpression(item) {
-        return {
-            PutRequest: {
-                Item: item
-            }
-        }
-    }
-
-    batchDeleteItemsExpression(collectionName, itemIds) {
-        return {
-            RequestItems: {
-                [collectionName]: itemIds.map(this.deleteSingleItemExpression)
-              }
-        }
-    }
-
-    deleteSingleItemExpression(id) {
-        return {
-            DeleteRequest: {
-                Key: {
-                    _id : id
-                }
-            }
-        }
-    }
-
-    updateSingleItemExpression(collectionName, item) {
-        const updateFields = updateFieldsFor(item)
-        const updateExpression = `SET ${updateFields.map(f => `#${f} = :${f}`).join(', ')}`
-        const expressionAttributeNames = updateFields.reduce((pv, cv)=> ({ ...pv, [`#${cv}`]: cv }), {})
-        const expressionAttributeValues = updateFields.reduce((pv, cv)=> ({ ...pv, [`:${cv}`]: item[cv]}), {})
-
-        return {
-            Update: {
-                TableName: collectionName,
-                Key: {
-                    _id: item._id
-                },
-                UpdateExpression: updateExpression,
-                ExpressionAttributeNames: expressionAttributeNames,
-                ExpressionAttributeValues: expressionAttributeValues
-            }
-        }
+                  .batchWrite(dynamoRequests.batchDeleteItemsExpression(collectionName, rows.Items.map(item=>item._id)))
     }
 
 }
