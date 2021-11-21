@@ -15,7 +15,7 @@ const create = () => {
 
     case 'aws':
       switch(type) {
-        case 'dynamo':
+        case 'dynamodb':
           internalConfigReader = new aws.AwsDynamoConfigReader(region) 
           break
         default:
@@ -64,7 +64,7 @@ const create = () => {
         case 'airtable':
           internalConfigReader = new gcp.GcpAirtableConfigReader()
           break;
-        case 'dynamo':
+        case 'dynamodb':
           internalConfigReader = new aws.AwsDynamoConfigReader(region) 
           break
         case 'mssql':

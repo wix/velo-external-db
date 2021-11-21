@@ -23,10 +23,10 @@ const shutdownEnv = async() => {
 }
 
 const setActive = () => {
-    process.env.TYPE = 'dynamo'
+    process.env.TYPE = 'dynamodb'
     process.env.REGION = 'us-west-2'
-    process.env.AWS_SECRET_ACCESS_KEY = 'VELOACCESSKEY'
-    process.env.AWS_ACCESS_KEY_ID = 'VELOKEYID'
+    process.env.AWS_SECRET_ACCESS_KEY = 'TEST_SECRET_ACCESS_KEY'
+    process.env.AWS_ACCESS_KEY_ID = 'TEST_ACCESS_KEY_ID'
     process.env.ENDPOINT_URL = 'http://localhost:8000'
 }
 
@@ -34,7 +34,7 @@ const connectionConfig = () => ({ endpoint: 'http://localhost:8000',
                                   region: 'us-west-2',
                                })
 const accessOptions = () => ({
-                                credentials: { accessKeyId: 'VELOKEYID', secretAccessKey: 'VELOACCESSKEY' }
+                                credentials: { accessKeyId: 'TEST_ACCESS_KEY_ID', secretAccessKey: 'TEST_SECRET_ACCESS_KEY' }
                             })
 
 module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }

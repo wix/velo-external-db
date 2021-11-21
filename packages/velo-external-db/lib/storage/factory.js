@@ -50,7 +50,7 @@ const init = async(type, vendor, config) => {
             const cfg = await config.readConfig()
             return append(await init(cfg), cfg.secretKey)
         }
-        case 'dynamo': {
+        case 'dynamodb': {
             const { init } = require('external-db-dynamodb')
             const cfg = await config.readConfig()
             return append(await init(cfg), cfg.secretKey)

@@ -35,8 +35,8 @@ const dbOperationWithValidDB = () => {
 }
 
 const resetEnv = () => {
-    process.env.AWS_SECRET_ACCESS_KEY = 'VELOACCESSKEY'
-    process.env.AWS_ACCESS_KEY_ID = 'VELOKEYID'
+    process.env.AWS_SECRET_ACCESS_KEY = 'TEST_SECRET_ACCESS_KEY'
+    process.env.AWS_ACCESS_KEY_ID = 'TEST_ACCESS_KEY_ID'
 }
 
 
