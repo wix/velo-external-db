@@ -178,19 +178,14 @@ services:
       - ./engines/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 
   dynamodb:
-    image:  amazon/dynamodb-local
-    container_name: my-dynamodb
-    hostname: dynamodb
+    image:  amazon/dynamodb-local:latest
     restart: always
-    volumes:
-      -  ./my-dynamodb-data:/home/dynamodblocal/data
     ports:
       - 8000:8000
     environment:
-      AWS_REGION: "us-west-2"
+      AWS_REGION: us-west-2
       AWS_ACCESS_KEY_ID: VELOKEYID
       AWS_SECRET_ACCESS_KEY: VELOACCESSKEY
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/"
 
 networks:
   backend:
