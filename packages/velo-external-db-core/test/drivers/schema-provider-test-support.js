@@ -9,7 +9,7 @@ const schemaProvider = {
 }
 
 const givenListResult = (dbs) =>
-    schemaProvider.list.mockResolvedValue(dbs)
+    when(schemaProvider.list).mockResolvedValue(dbs)
 
 const givenFindResults = (dbs) =>
     dbs.forEach(db => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db) )
