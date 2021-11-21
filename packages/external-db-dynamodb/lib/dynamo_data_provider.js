@@ -12,22 +12,22 @@ class DataProvider {
 
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr} = this.filterParser.transform(filter)
-        const response = await this.docClient
-                                   .scan({ TableName: collectionName,
-                                           ...filterExpr,
-                                           Limit: limit
+        const { Items } = await this.docClient
+                                   .scan({TableName: collectionName, 
+                                          ...filterExpr,
+                                          Limit:limit
                                           })
-        return response.Items.map(patchFixDates)
+        return Items.map(patchFixDates)
     }
 
     async count(collectionName, filter) {
         const {filterExpr} = this.filterParser.transform(filter)
-        const response = await this.docClient
-                         .scan({ TableName: collectionName,
-                                 ...filterExpr,
-                                 Select: 'COUNT'
-                               })
-        return response.Count
+        const { Count } = await this.docClient
+                         .scan({TableName: collectionName, 
+                                ...filterExpr,
+                                Select: 'COUNT'
+                                })
+        return Count
     }
 
     async insert(collectionName, items) {
