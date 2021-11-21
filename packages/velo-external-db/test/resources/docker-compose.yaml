@@ -13,23 +13,8 @@ services:
       - /bin/bash
       - -c
       - |
-        /opt/mssql/bin/sqlservr &
-        pid=$$!
-        echo "Waiting for MS SQL to be available ⏳"
-        /opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -h-1 -V1 -U sa -P $$SA_PASSWORD -Q "SET NOCOUNT ON SELECT \"YAY WE ARE UP\" , @@servername"
-        is_up=$$?
-        while [ $$is_up -ne 0 ] ; do
-          echo -e $$(date)
-          /opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -h-1 -V1 -U sa -P $$SA_PASSWORD -Q "SET NOCOUNT ON SELECT \"YAY WE ARE UP\" , @@servername"
-          is_up=$$?
-          sleep 5
-        done
-        for foo in /scripts/*.sql
-          do /opt/mssql-tools/bin/sqlcmd -U sa -P $$SA_PASSWORD -l 30 -e -i $$foo
-        done
-        echo "All scripts have been executed. Waiting for MS SQL(pid $$pid) to terminate."
-        wait $$pid
-
+        /opt/mssql/bin/sqlservr
+        curl -s https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh | bash /dev/stdin localhost:1433
 
   airtable:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -54,22 +39,8 @@ services:
       - /bin/bash
       - -c
       - |
-        /opt/mssql/bin/sqlservr &
-        pid=$$!
-        echo "Waiting for MS SQL to be available ⏳"
-        /opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -h-1 -V1 -U sa -P $$SA_PASSWORD -Q "SET NOCOUNT ON SELECT \"YAY WE ARE UP\" , @@servername"
-        is_up=$$?
-        while [ $$is_up -ne 0 ] ; do
-          echo -e $$(date)
-          /opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -h-1 -V1 -U sa -P $$SA_PASSWORD -Q "SET NOCOUNT ON SELECT \"YAY WE ARE UP\" , @@servername"
-          is_up=$$?
-          sleep 5
-        done
-        for foo in /scripts/*.sql
-          do /opt/mssql-tools/bin/sqlcmd -U sa -P $$SA_PASSWORD -l 30 -e -i $$foo
-        done
-        echo "All scripts have been executed. Waiting for MS SQL(pid $$pid) to terminate."
-        wait $$pid
+        /opt/mssql/bin/sqlservr
+        curl -s https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh | bash /dev/stdin localhost:1433
 
   firestore:
     image: groovex/firestore-emulator:latest
