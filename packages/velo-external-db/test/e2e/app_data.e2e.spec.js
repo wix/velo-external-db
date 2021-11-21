@@ -24,7 +24,7 @@ describe('Velo External DB Data REST API',  () => {
             await dbTeardown()
         }, 20000);
 
-        if (name != 'Dynamo') {
+        if (name != 'DynamoDb') {
             test('find api', async () => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
@@ -49,7 +49,7 @@ describe('Velo External DB Data REST API',  () => {
             expect((await data.expectAllDataIn(ctx.collectionName, authAdmin)).items).toEqual(expect.arrayContaining(ctx.items));
         })
 
-        if (name !== 'Firestore' && name !== 'Airtable' && name != 'Dynamo') {
+        if (name !== 'Firestore' && name !== 'Airtable' && name != 'DynamoDb') {
         test('aggregate api', async () => {
             await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
             await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)

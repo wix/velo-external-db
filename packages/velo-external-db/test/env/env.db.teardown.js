@@ -5,7 +5,7 @@ const firestore = require('../resources/engines/firestore_resources')
 const mssql = require('../resources/engines/mssql_resources')
 const googleSheet = require('../resources/engines/google_sheets_resourses')
 const airtable = require('../resources/engines/airtable_resources')
-const dynamo = require('../resources/engines/dynamo_resources')
+const dynamo = require('../resources/engines/dynamodb_resources')
 const ci = require('./ci_utils')
 
 const shutdownEnv = async (testEngine) => {
@@ -38,7 +38,7 @@ const shutdownEnv = async (testEngine) => {
             await airtable.shutdownEnv()
             break
         
-        case 'dynamo':
+        case 'dynamodb':
             await dynamo.shutdownEnv()
             break
     }

@@ -30,7 +30,7 @@ describe('Data API', () => {
             expect( res ).toEqual([]);
         });
 
-        if (name != 'Dynamo') {
+        if (name != 'DynamoDb') {
             test('search with non empty filter will return data', async () => {
                 await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
                 env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
@@ -150,7 +150,7 @@ describe('Data API', () => {
             expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([]);
         });
         
-        if (name !== 'Firestore' && name != 'Airtable' && name != 'Dynamo') {
+        if (name !== 'Firestore' && name != 'Airtable' && name != 'DynamoDb') {
             test('aggregate api without filter', async () => {
                 await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
                 await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
