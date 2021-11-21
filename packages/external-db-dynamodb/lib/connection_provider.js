@@ -9,7 +9,7 @@ const extraOptions  = (cfg) => {
         return { endpoint: cfg.endpoint }
 }
 
-const init = async(cfg, _cfgOptions) => { 
+const init = (cfg, _cfgOptions) => { 
     const options = _cfgOptions || {}
     const client = new DynamoDB({region:cfg.region, ...extraOptions(cfg), ...options})
     const databaseOperations = new DatabaseOperations(client)

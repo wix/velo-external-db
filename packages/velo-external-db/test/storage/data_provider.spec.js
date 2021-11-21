@@ -30,35 +30,37 @@ describe('Data API', () => {
             expect( res ).toEqual([]);
         });
 
-        test('search with non empty filter will return data', async () => {
-            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
-            env.driver.stubEmptyOrderByFor(ctx.sort)
+        if (name != 'DynamoDb') {
+            test('search with non empty filter will return data', async () => {
+                await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
+                env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
+                env.driver.stubEmptyOrderByFor(ctx.sort)
 
-            const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+                const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
-            expect( res ).toEqual(expect.arrayContaining([ctx.entity]));
-        });
+                expect( res ).toEqual(expect.arrayContaining([ctx.entity]));
+            });
+        
+            test('search with non empty order by will return sorted data', async () => {
+                await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
+                env.driver.stubEmptyFilterFor(ctx.filter)
+                env.driver.givenOrderByFor('_owner', ctx.sort)
 
-        test('search with non empty order by will return sorted data', async () => {
-            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            env.driver.stubEmptyFilterFor(ctx.filter)
-            env.driver.givenOrderByFor('_owner', ctx.sort)
+                const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
 
-            const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+                expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner > b._owner) ? 1 : -1));
+            });
 
-            expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner > b._owner) ? 1 : -1));
-        });
+            test('search with empty order and filter but with limit and skip', async () => {
+                await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
+                env.driver.stubEmptyFilterFor(ctx.filter)
+                env.driver.givenOrderByFor('_owner', ctx.sort)
 
-        test('search with empty order and filter but with limit and skip', async () => {
-            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
-            env.driver.stubEmptyFilterFor(ctx.filter)
-            env.driver.givenOrderByFor('_owner', ctx.sort)
+                const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1)
 
-            const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1)
-
-            expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1));
-        });
+                expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1));
+            });
+        }
 
         test('count will run query', async () => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
@@ -148,7 +150,7 @@ describe('Data API', () => {
             expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([]);
         });
         
-        if (name !== 'Firestore' && name != 'Airtable') {
+        if (name !== 'Firestore' && name != 'Airtable' && name != 'DynamoDb') {
             test('aggregate api without filter', async () => {
                 await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
                 await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
