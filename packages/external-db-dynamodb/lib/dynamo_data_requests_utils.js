@@ -1,10 +1,14 @@
 const { updateFieldsFor } = require('velo-external-db-commons') 
 
-const findExpression = (collectionName, filter, limit) => ({
-     TableName: collectionName, 
-     ...filter,
-     Limit:limit
-})
+const findExpression = (collectionName, filter, limit, query) => {
+    if (query) 
+        delete Object.assign(filter, {['KeyConditionExpression']: filter['FilterExpression'] })['FilterExpression']
+    return {
+        TableName: collectionName, 
+        ...filter,
+        Limit:limit
+    }
+}
 
 const countExpression = (collectionName, filter) => ({
     TableName: collectionName, 
@@ -16,6 +20,7 @@ const getAllIdsExpression = (collectionName) => ({
     TableName: collectionName,
     AttributesToGet: ['_id']
 })
+
 const batchPutItemsExpression = (collectionName, items) => ({
     RequestItems: {
         [collectionName]: items.map(putSingleItemExpression)

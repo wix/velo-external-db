@@ -33,4 +33,6 @@ const reformatFields = (field) => {
     }
 }
 
-module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates, reformatFields }
+const patchCollectionKeys = () => (['_id'])
+
+module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates, reformatFields, patchCollectionKeys }

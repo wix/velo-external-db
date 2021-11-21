@@ -36,6 +36,7 @@ const givenFilterByIdWith = (id, filter) => {
                                 }})
 }
 
+const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {}
 
 const reset = () => {
     filterParser.transform.mockClear()
