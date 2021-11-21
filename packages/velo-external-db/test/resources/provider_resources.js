@@ -67,7 +67,7 @@ const testSuits = () => [
     ['Sql Server', mssqlTestEnvInit],
     ['Mongo', mongoTestEnvInit],
     ['Airtable', airTableTestEnvInit],
-    ['Dynamo', dynamoTestEnvInit]
+    ['DynamoDb', dynamoTestEnvInit]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 module.exports = { env, dbTeardown, testSuits }
