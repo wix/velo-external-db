@@ -13,9 +13,9 @@ class DataProvider {
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr} = this.filterParser.transform(filter)
         const response = await this.docClient
-                                   .scan({TableName: collectionName, 
-                                          ...filterExpr,
-                                          Limit:limit
+                                   .scan({ TableName: collectionName,
+                                           ...filterExpr,
+                                           Limit: limit
                                           })
         return response.Items.map(patchFixDates)
     }
@@ -23,10 +23,10 @@ class DataProvider {
     async count(collectionName, filter) {
         const {filterExpr} = this.filterParser.transform(filter)
         const response = await this.docClient
-                         .scan({TableName: collectionName, 
-                                ...filterExpr,
-                                Select: 'COUNT'
-                                })
+                         .scan({ TableName: collectionName,
+                                 ...filterExpr,
+                                 Select: 'COUNT'
+                               })
         return response.Count
     }
 
@@ -39,7 +39,7 @@ class DataProvider {
 
     async update(collectionName, items) {
         await this.docClient.transactWrite({
-            TransactItems:items.map(item=>this.updateSingleItemExpression(collectionName, patchDateTime(item)))
+            TransactItems: items.map(item => this.updateSingleItemExpression(collectionName, patchDateTime(item)))
         })
         return items.length
     }
@@ -54,10 +54,10 @@ class DataProvider {
     async truncate(collectionName) {
         validateTable(collectionName)
         const rows = await this.docClient
-                               .scan({
-                                    TableName: collectionName,
-                                    AttributesToGet: ['_id']
-                                })
+                               .scan( {
+                                        TableName: collectionName,
+                                        AttributesToGet: ['_id']
+                                      } )
 
         await this.docClient
                   .batchWrite(this.batchDeleteItemsExpression(collectionName, rows.Items.map(item=>item._id)))
@@ -74,9 +74,7 @@ class DataProvider {
     putSingleItemExpression(item) {
         return {
             PutRequest: {
-                Item: {
-                    ...item
-                }
+                Item: item
             }
         }
     }

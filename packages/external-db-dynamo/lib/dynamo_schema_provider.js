@@ -10,25 +10,19 @@ class SchemaProvider {
         this.docClient = DynamoDBDocument.from(client)
     }
 
-
-
     async list() {
         await this.ensureSystemTableExists()
 
-        const tables = await this.docClient
-                                 .scan({ TableName: SystemTable })
-        return tables.Items
-                     .map(table => asWixSchema([...SystemFields, ...table.fields || []]
-                     .map(this.reformatFields)
-                     , table.tableName))
+        const { Items } = await this.docClient
+                                    .scan({ TableName: SystemTable })
+        return Items.map(table => asWixSchema([...SystemFields, ...table.fields || []].map(this.reformatFields), table.tableName))
     }
-
 
     async create(collectionName, columns) {
         validateTable(collectionName)
 
         const collection = await this.collectionDataFor(collectionName)
-        if(!collection) {
+        if (!collection) {
             await this.insertToSystemTable(collectionName, columns)
             
             await this.client
@@ -148,14 +142,14 @@ class SchemaProvider {
                          .catch(() =>false)
     }
 
-    putItemParamsForSystemTable(collectionName, fields) {
-        const item = { tableName: {S: collectionName} }
-        Object.assign(item, fields && fields.length ? { fields: { SS: fields } } : {})
-        return {
-            TableName: SystemTable,
-            Item: item
-        }
-    }
+    // putItemParamsForSystemTable(collectionName, fields) {
+    //     const item = { tableName: {S: collectionName} }
+    //     Object.assign(item, fields && fields.length ? { fields: { SS: fields } } : {})
+    //     return {
+    //         TableName: SystemTable,
+    //         Item: item
+    //     }
+    // }
     
     addColumnParams(collectionName, column) {
         return {
