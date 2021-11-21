@@ -45,10 +45,8 @@ class SchemaProvider {
         validateTable(collectionName)
         await validateSystemFields(column.name)
         
-        const collection = await this.collectionDataFor(collectionName)
-
-        const fields = collection.fields
-        if (fields && fields.find(f => f.name === column.name)) {
+        const { fields } = await this.collectionDataFor(collectionName)
+        if (fields.find(f => f.name === column.name)) {
             throw new FieldAlreadyExists('Collection already has a field with the same name')
         }
 
@@ -60,9 +58,8 @@ class SchemaProvider {
         validateTable(collectionName)
         await validateSystemFields(columnName)
 
-        const collection = await this.collectionDataFor(collectionName)
+        const { fields } = await this.collectionDataFor(collectionName)
 
-        const fields = collection.fields
         if (!fields.some(f => f.name === columnName)) {
             throw new FieldDoesNotExist('Collection does not contain a field with this name')
         }
@@ -80,14 +77,14 @@ class SchemaProvider {
     }
 
     async ensureSystemTableExists() {
-        if (! (await this.systemTableExists()) ) {
+        if (!(await this.systemTableExists()) ) {
             await this.createSystemTable()
         }
     }
 
     async createSystemTable() {
         await this.client
-            .createTable(dynamoRequests.createSystemTableExpression())
+                  .createTable(dynamoRequests.createSystemTableExpression())
     }
 
     async insertToSystemTable(collectionName, fields) {        
@@ -113,7 +110,7 @@ class SchemaProvider {
         return await this.client
                          .describeTable({TableName: SystemTable})
                          .then(() => true)
-                         .catch(() =>false)
+                         .catch(() => false)
     }
 }
 
