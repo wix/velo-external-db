@@ -1,6 +1,6 @@
 const { patchDateTime } = require('velo-external-db-commons')
 const { DynamoDBDocument }  = require ('@aws-sdk/lib-dynamodb')
-const { validateTable, patchFixDates, patchCollectionKeys } = require('./dynamo_utils')
+const { validateTable, patchFixDates, patchCollectionKeys, canQuery } = require('./dynamo_utils')
 const dynamoRequests = require ('./dynamo_data_requests_utils')
 
 class DataProvider {
@@ -14,7 +14,7 @@ class DataProvider {
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr} = this.filterParser.transform(filter)
         let response        
-        if (await this.canQuery(filterExpr, patchCollectionKeys()))
+        if (canQuery(filterExpr, patchCollectionKeys()))
             response = await this.docClient
                                  .query(dynamoRequests.findExpression(collectionName, filterExpr, limit, true))
         else 
@@ -59,13 +59,6 @@ class DataProvider {
 
         await this.docClient
                   .batchWrite(dynamoRequests.batchDeleteItemsExpression(collectionName, rows.Items.map(item=>item._id)))
-    }
-    
-    async canQuery(filterExpr, collectionKeys) {
-        if (!filterExpr) return false
-
-        const filterAttributes = Object.values(filterExpr.ExpressionAttributeNames) 
-        return filterAttributes.every(v=> collectionKeys.includes(v))
     }
 }
 
