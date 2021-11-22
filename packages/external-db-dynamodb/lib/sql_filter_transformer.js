@@ -6,15 +6,18 @@ class FilterParser {
     constructor() {
     }
 
-    transform(filter) {
+    transform(filter, fields) {
+        
         const results = this.parseFilter(filter)
-
         if (results.length === 0) {
-            return { EMPTY_FILTER }
+            return { EMPTY_FILTER, queryable: false }
         }
 
+        const { filterExpr, queryable } = this.filterExprToQueryIfPossible(results[0].filterExpr, fields)
+        
         return {
-            filterExpr: results[0].filterExpr
+            filterExpr,
+            queryable
         }
     }
 
@@ -150,6 +153,30 @@ class FilterParser {
 
         }
     }
+
+    filterExprToQueryIfPossible(filterExpr, fields) {
+        const queryable = this.canQuery(filterExpr, fields)
+        if (queryable) 
+            filterExpr = this.filterExprToQueryExpr(filterExpr)
+        
+        return { filterExpr, queryable}     
+    }
+
+    filterExprToQueryExpr(filter) {
+        delete Object.assign(filter, {['KeyConditionExpression']: filter['FilterExpression'] })['FilterExpression']
+        return filter
+    }
+
+    canQuery(filterExpr, fields) {
+        // const collectionKeys = fields.filter(f=>f.isPrimary).map(f=>f.name)
+        const collectionKeys = ['_id']
+
+        if (!filterExpr) return false
+
+        const filterAttributes = Object.values(filterExpr.ExpressionAttributeNames) 
+        return filterAttributes.every(v=> collectionKeys.includes(v))
+    }
+
 }
 
 module.exports = FilterParser

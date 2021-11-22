@@ -1,18 +1,14 @@
 const { updateFieldsFor } = require('velo-external-db-commons') 
 
-const findExpression = (collectionName, filter, limit, query) => {
-    if (query) 
-        filter = filterToQueryFilter(filter)
+const findCommand = (collectionName, filter, limit) => {
     return {
         TableName: collectionName, 
         ...filter,
-        Limit:limit
+        Limit: limit
     }
 }
 
-const countExpression = (collectionName, filter, query) => {
-    if (query) 
-        filter = filterToQueryFilter(filter)
+const countCommand = (collectionName, filter) => {
     return {
         TableName: collectionName, 
         ...filter,
@@ -20,38 +16,38 @@ const countExpression = (collectionName, filter, query) => {
     }
 }
 
-const getAllIdsExpression = (collectionName) => ({
+const getAllIdsCommand = (collectionName) => ({
     TableName: collectionName,
     AttributesToGet: ['_id']
 })
 
-const batchPutItemsExpression = (collectionName, items) => ({
+const batchPutItemsCommand = (collectionName, items) => ({
     RequestItems: {
-        [collectionName]: items.map(putSingleItemExpression)
+        [collectionName]: items.map(putSingleItemCommand)
     }
 })
 
-const putSingleItemExpression = (item) => ({
+const putSingleItemCommand = (item) => ({
     PutRequest: {
         Item: item
     }
 })
 
-const batchDeleteItemsExpression = (collectionName, itemIds) => ({
+const batchDeleteItemsCommand = (collectionName, itemIds) => ({
     RequestItems: {
-        [collectionName]: itemIds.map(deleteSingleItemExpression)
+        [collectionName]: itemIds.map(deleteSingleItemCommand)
         }
 })
 
-const deleteSingleItemExpression = (id) => ({
+const deleteSingleItemCommand = (id) => ({
     DeleteRequest: {
         Key: {
-            _id : id
+            _id: id
         }
     }
 })
 
-const updateSingleItemExpression = (collectionName, item) =>  {
+const updateSingleItemCommand = (collectionName, item) =>  {
     const updateFields = updateFieldsFor(item)
     const updateExpression = `SET ${updateFields.map(f => `#${f} = :${f}`).join(', ')}`
     const expressionAttributeNames = updateFields.reduce((pv, cv)=> ({ ...pv, [`#${cv}`]: cv }), {})
@@ -70,12 +66,7 @@ const updateSingleItemExpression = (collectionName, item) =>  {
     }
 }
 
-const filterToQueryFilter = (filter) => {
-    delete Object.assign(filter, {['KeyConditionExpression']: filter['FilterExpression'] })['FilterExpression']
-    return filter
-}
-
-module.exports = { findExpression, countExpression, getAllIdsExpression,
-                   batchPutItemsExpression, putSingleItemExpression, batchDeleteItemsExpression,
-                   deleteSingleItemExpression, updateSingleItemExpression
+module.exports = { findCommand, countCommand, getAllIdsCommand,
+                   batchPutItemsCommand, putSingleItemCommand, batchDeleteItemsCommand,
+                   deleteSingleItemCommand, updateSingleItemCommand
                  }

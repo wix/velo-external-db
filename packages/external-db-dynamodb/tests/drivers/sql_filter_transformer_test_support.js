@@ -15,7 +15,7 @@ const stubEmptyFilterAndSortFor = (filter, sort) => {
 
 const stubEmptyFilterFor = (filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: '' })
+                                .mockReturnValue({ filterExpr: '', queryable: false })
 }
 
 const stubEmptyOrderByFor = (sort) => {
@@ -26,14 +26,15 @@ const stubEmptyOrderByFor = (sort) => {
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: {
-                                    FilterExpression: '#_id = :_id',
+                                    KeyConditionExpression: '#_id = :_id',
                                     ExpressionAttributeNames: {
-                                        '#_id' : '_id'
+                                        '#_id': '_id'
                                     },
                                     ExpressionAttributeValues: {
-                                        ':_id' : id
+                                        ':_id': id
                                     }
-                                }})
+                                }, queryable: true
+                            })
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {}
@@ -46,5 +47,5 @@ const reset = () => {
 }
 
 module.exports = { stubEmptyFilterAndSortFor, stubEmptyOrderByFor, stubEmptyFilterFor,
-                   givenFilterByIdWith, filterParser, reset
+                   givenFilterByIdWith, filterParser, reset, givenAggregateQueryWith
 }

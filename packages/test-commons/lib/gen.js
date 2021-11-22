@@ -107,10 +107,8 @@ const randomNumberDbEntity = (columns) => {
     return entity;
 }
 
-
-
 const randomFilter = () => {
-    const op = chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith'])
+    const op = randomOperator()
     return {
         // kind: 'filter',
         operator: op,
@@ -118,6 +116,17 @@ const randomFilter = () => {
         value: op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     }
 }
+
+const idFilter = () => {
+    const op = randomOperator()
+    return {
+        operator: randomOperator(),
+        fieldName: '_id',
+        value: op === '$hasSome' ? [chance.guid(), chance.guid(), chance.guid(), chance.guid(), chance.guid()] : chance.guid()
+    }
+}
+
+const randomOperator = () => (chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith']))
 
 const veloDate = () => ( { $date: newDate().toISOString() } )
 
@@ -156,7 +165,7 @@ const randomConfig = () => ({
     db: chance.word(),
 })
 
-module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, veloDate, randomObject,
+module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject,
      randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
       randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig }
 

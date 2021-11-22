@@ -10,7 +10,7 @@ describe('Sql Parser', () => {
 
     describe('filter parser', () => {
 
-        test.only('handles undefined filter', () => {
+        test('handles undefined filter', () => {
             expect( env.filterParser.parseFilter('') ).toEqual([])
             expect( env.filterParser.parseFilter(undefined) ).toEqual([])
             expect( env.filterParser.parseFilter(null) ).toEqual([])
@@ -18,20 +18,34 @@ describe('Sql Parser', () => {
             expect( env.filterParser.parseFilter([5555]) ).toEqual([])
         })
 
-        test.only('transform filter', () => {
+        test('transform filter', () => {
+            const filterExpr = env.filterParser.parseFilter(ctx.filter)[0].filterExpr
             expect( env.filterParser.transform(ctx.filter) ).toEqual({
                 filterExpr:{
-                    FilterExpression: {...env.filterParser.parseFilter(ctx.filter)[0].filterExpr}.FilterExpression,
-                    ExpressionAttributeNames: {...env.filterParser.parseFilter(ctx.filter)[0].filterExpr}.ExpressionAttributeNames,
-                    ExpressionAttributeValues: {...env.filterParser.parseFilter(ctx.filter)[0].filterExpr}.ExpressionAttributeValues
-                }
+                    FilterExpression: filterExpr.FilterExpression,
+                    ExpressionAttributeNames: filterExpr.ExpressionAttributeNames,
+                    ExpressionAttributeValues: filterExpr.ExpressionAttributeValues
+                },
+                    queryable: false
+            })
+        })
+
+        test('transform filter on id to query command', () => {
+            const filterExpr = env.filterParser.parseFilter(ctx.idFilter)[0].filterExpr
+            expect( env.filterParser.transform(ctx.idFilter) ).toEqual({
+                filterExpr:{
+                    KeyConditionExpression: filterExpr.FilterExpression,
+                    ExpressionAttributeNames: filterExpr.ExpressionAttributeNames,
+                    ExpressionAttributeValues: filterExpr.ExpressionAttributeValues
+                },
+                    queryable: true
             })
         })
 
         describe('handle single field operator', () => {
             each([
                 '$ne', '$lt', '$lte', '$gt', '$gte', '$eq',
-            ]).test.only(`correctly transform operator [%s]`, (o) => {
+            ]).test(`correctly transform operator [%s]`, (o) => {
                 const filter = {
                     // kind: 'filter',
                     operator: o,
@@ -49,7 +63,7 @@ describe('Sql Parser', () => {
 
             })
 
-            test.only(`correctly extract filter value if value is 0`, () => {
+            test(`correctly extract filter value if value is 0`, () => {
                 const filter = {
                     operator: '$eq',
                     fieldName: ctx.fieldName,
@@ -69,7 +83,7 @@ describe('Sql Parser', () => {
             })
 
             // todo: $hasAll ???
-            test.only(`correctly transform operator [$hasSome]`, () => {
+            test(`correctly transform operator [$hasSome]`, () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$hasSome',
@@ -86,7 +100,7 @@ describe('Sql Parser', () => {
                 }])
             })
 
-            test.only(`operator [$hasSome] with empty list of values will throw an exception`, () => {
+            test(`operator [$hasSome] with empty list of values will throw an exception`, () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$hasSome',
@@ -97,7 +111,7 @@ describe('Sql Parser', () => {
                 expect( () => env.filterParser.parseFilter(filter) ).toThrow(InvalidQuery)
             })
 
-            test.only(`correctly transform operator [$eq] with null value`, () => {
+            test(`correctly transform operator [$eq] with null value`, () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$eq',
@@ -114,7 +128,7 @@ describe('Sql Parser', () => {
 
             })
 
-            test.only(`correctly transform operator [$eq] with boolean value`, () => {
+            test(`correctly transform operator [$eq] with boolean value`, () => {
                 const filter = {
                     operator: '$eq',
                     fieldName: ctx.fieldName,
@@ -133,7 +147,7 @@ describe('Sql Parser', () => {
 
             describe('handle string operators', () => {
                 //'$contains', '', ''
-                test.only(`correctly transform operator [$contains]`, () => {
+                test(`correctly transform operator [$contains]`, () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$contains',
@@ -151,7 +165,7 @@ describe('Sql Parser', () => {
 
                 })
 
-                test.only(`correctly transform operator [$startsWith]`, () => {
+                test(`correctly transform operator [$startsWith]`, () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$startsWith',
@@ -173,7 +187,7 @@ describe('Sql Parser', () => {
         describe('handle multi field operator', () => {
             each([
                 '$and', '$or'
-            ]).test.only(`correctly transform operator [%s]`, (o) => {
+            ]).test(`correctly transform operator [%s]`, (o) => {
                 const filter = {
                     // kind: 'filter',
                     operator: o,
@@ -198,7 +212,7 @@ describe('Sql Parser', () => {
                 }])
             })
 
-            test.only(`correctly transform operator [$not]`, () => {
+            test(`correctly transform operator [$not]`, () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$not',
@@ -226,6 +240,7 @@ describe('Sql Parser', () => {
         anotherFieldName: Uninitialized,
         moreFieldName: Uninitialized,
         filter: Uninitialized,
+        idFilter: Uninitialized,
         anotherFilter: Uninitialized,
     };
 
@@ -242,6 +257,7 @@ describe('Sql Parser', () => {
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()];
 
         ctx.filter = gen.randomFilter();
+        ctx.idFilter = gen.idFilter();
         ctx.anotherFilter = gen.randomFilter();
     });
 

@@ -16,23 +16,4 @@ describe('Dynamo Utils', () => {
         })
     })
 
-    describe('Can Query', () => {
-        test('return true when ExpressionAttributeNames include only _id', () => {
-            const filterExpr = {
-                FilterExpression: '#_id = :_id',
-                ExpressionAttributeNames: { '#_id': '_id' },
-                ExpressionAttributeValues: { ':_id': 'some-id' }
-            }
-            expect(canQuery(filterExpr, patchCollectionKeys())).toBeTruthy()
-        })
-
-        test('return false when ExpressionAttributeNames include another attributes but keys', () => {
-            const filterExpr = {
-                FilterExpression: '#_id = :_id, #attr = :attr',
-                ExpressionAttributeNames: { '#_id': '_id', '#attr': 'attr' },
-                ExpressionAttributeValues: { ':_id': 'some-id', ':attr': 'value' }
-            }
-            expect(canQuery(filterExpr, patchCollectionKeys())).toBeFalsy()
-        })
-    })
 })
