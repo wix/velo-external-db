@@ -49,9 +49,13 @@
         "no-case-declarations": [
             "off"
         ],
-        "key-spacing" : [
+        "key-spacing": [
             "error",
             { "afterColon": true }
+        ],
+        "object-curly-spacing": [
+            "error",
+            "always"
         ]
     }
 }
