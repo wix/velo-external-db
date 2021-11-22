@@ -48,6 +48,10 @@
         ],
         "no-case-declarations": [
             "off"
+        ],
+        "key-spacing" : [
+            "error",
+            { "afterColon": true }
         ]
     }
 }
