@@ -26,9 +26,14 @@ class DataProvider {
 
     async count(collectionName, filter) {
         const {filterExpr} = this.filterParser.transform(filter)
-        const { Count } = await this.docClient
-                                    .scan(dynamoRequests.countExpression(collectionName, filterExpr))            
-        return Count
+        let response
+        if (canQuery(filterExpr, patchCollectionKeys()))
+            response = await this.docClient
+                                 .query(dynamoRequests.countExpression(collectionName, filterExpr, true)) 
+        else
+            response = await this.docClient
+                                 .scan(dynamoRequests.countExpression(collectionName, filterExpr)) 
+        return response.Count
     }
 
     async insert(collectionName, items) {
