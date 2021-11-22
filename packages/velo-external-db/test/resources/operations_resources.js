@@ -1,4 +1,4 @@
-const {Uninitialized} = require('test-commons');
+const { Uninitialized } = require('test-commons')
 const mysql = require('external-db-mysql')
 const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')
@@ -7,6 +7,7 @@ const mssql = require('external-db-mssql')
 const mongo = require ('external-db-mongo')
 const airtable = require ('external-db-airtable')
 const dynamo = require ('external-db-dynamodb')
+const bigquery = require ('external-db-bigquery')
 
 const env = {
     driver: Uninitialized,
@@ -18,14 +19,15 @@ const init = async impl => {
     env.driver = driver
 }
 
-const postgresTestEnvInit = async () => await init(postgres)
-const mysqlTestEnvInit = async () => await init(mysql)
-const spannerTestEnvInit = async () => await init(spanner)
-const firestoreTestEnvInit = async () => await init(firestore)
-const mssqlTestEnvInit = async () => await init(mssql)
-const mongoTestEnvInit = async () => await init(mongo)
-const airtableTestEnvInit = async () => await init(airtable)
-const dynamoTestEnvInit = async () => await init(dynamo)
+const postgresTestEnvInit = async() => await init(postgres)
+const mysqlTestEnvInit = async() => await init(mysql)
+const spannerTestEnvInit = async() => await init(spanner)
+const firestoreTestEnvInit = async() => await init(firestore)
+const mssqlTestEnvInit = async() => await init(mssql)
+const mongoTestEnvInit = async() => await init(mongo)
+const airtableTestEnvInit = async() => await init(airtable)
+const dynamoTestEnvInit = async() => await init(dynamo)
+const bigqueryTestEnvInit = async() => await init(bigquery)
 
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit],
@@ -35,7 +37,8 @@ const testSuits = () => [
     ['Sql Server', mssqlTestEnvInit],
     ['Mongo', mongoTestEnvInit],
     ['Airtable', airtableTestEnvInit],
-    ['DynamoDb', dynamoTestEnvInit]
+    ['DynamoDb', dynamoTestEnvInit],
+    ['Bigquery', bigqueryTestEnvInit]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 

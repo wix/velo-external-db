@@ -2,8 +2,7 @@ const inquirer = require('inquirer')
 const { nonEmpty } = require('../../cli/validators')
 const {GoogleAuth} = require('google-auth-library')
 
-
-const GCP = { gcpClientEmail: '', gcpPrivateKey: '', gcpProjectId: '' }
+const GCP = { gcpProjectId: '', gcpClientEmail: '', gcpPrivateKey: '' }
 
 const credentials = async () => inquirer.prompt([
     {

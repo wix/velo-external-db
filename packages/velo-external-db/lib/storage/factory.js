@@ -2,7 +2,7 @@ const append = (res, secretKey) => ( { ...res, secretKey: secretKey } )
 
 const init = async(type, vendor, config) => {
     console.log(`INIT: ${vendor + '/' + type}`)
-    switch ( type ) {
+    switch ( type.toLowerCase() ) {
         case 'postgres': {
             const { init } = require('external-db-postgres')
             const cfg = await config.readConfig()
@@ -52,6 +52,11 @@ const init = async(type, vendor, config) => {
         }
         case 'dynamodb': {
             const { init } = require('external-db-dynamodb')
+            const cfg = await config.readConfig()
+            return append(await init(cfg), cfg.secretKey)
+        }
+        case 'bigquery': {
+            const { init } = require('external-db-bigquery')
             const cfg = await config.readConfig()
             return append(await init(cfg), cfg.secretKey)
         }
