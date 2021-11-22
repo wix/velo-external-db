@@ -33,4 +33,13 @@ const reformatFields = (field) => {
     }
 }
 
-module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates, reformatFields }
+const patchCollectionKeys = () => (['_id'])
+
+const canQuery = (filterExpr, collectionKeys) => {
+    if (!filterExpr) return false
+
+    const filterAttributes = Object.values(filterExpr.ExpressionAttributeNames) 
+    return filterAttributes.every(v=> collectionKeys.includes(v))
+}
+
+module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates, reformatFields, patchCollectionKeys, canQuery }

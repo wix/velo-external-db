@@ -1,6 +1,6 @@
 const { patchDateTime } = require('velo-external-db-commons')
 const { DynamoDBDocument }  = require ('@aws-sdk/lib-dynamodb')
-const { validateTable, patchFixDates } = require('./dynamo_utils')
+const { validateTable, patchFixDates, patchCollectionKeys, canQuery } = require('./dynamo_utils')
 const dynamoRequests = require ('./dynamo_data_requests_utils')
 
 class DataProvider {
@@ -13,23 +13,34 @@ class DataProvider {
 
     async find(collectionName, filter, sort, skip, limit) {
         const {filterExpr} = this.filterParser.transform(filter)
-        const { Items } = await this.docClient
-                                   .scan(dynamoRequests.findExpression(collectionName, filterExpr, limit))
-        return Items.map(patchFixDates)
+        let response        
+        if (canQuery(filterExpr, patchCollectionKeys()))
+            response = await this.docClient
+                                 .query(dynamoRequests.findExpression(collectionName, filterExpr, limit, true))
+        else 
+            response =  await this.docClient
+                                  .scan(dynamoRequests.findExpression(collectionName, filterExpr, limit))
+        
+        return response.Items.map(patchFixDates)
     }
 
     async count(collectionName, filter) {
         const {filterExpr} = this.filterParser.transform(filter)
-        const { Count } = await this.docClient
-                                    .scan(dynamoRequests.countExpression(collectionName, filterExpr))            
-        return Count
+        let response
+        if (canQuery(filterExpr, patchCollectionKeys()))
+            response = await this.docClient
+                                 .query(dynamoRequests.countExpression(collectionName, filterExpr, true)) 
+        else
+            response = await this.docClient
+                                 .scan(dynamoRequests.countExpression(collectionName, filterExpr)) 
+        return response.Count
     }
 
     async insert(collectionName, items) {
         validateTable()
         await this.docClient
                   .batchWrite(dynamoRequests.batchPutItemsExpression(collectionName, items.map(patchDateTime)))
-        return items.length //check if there is a way to figure how many deleted/inserted with batchWrite
+        return items.length
     }
 
     async update(collectionName, items) {
@@ -54,7 +65,6 @@ class DataProvider {
         await this.docClient
                   .batchWrite(dynamoRequests.batchDeleteItemsExpression(collectionName, rows.Items.map(item=>item._id)))
     }
-
 }
 
 module.exports = DataProvider
