@@ -31,14 +31,14 @@ class SchemaColumnTranslator {
     }
 
     columnToDbColumnSql(f) {
-        return {name : f.name, type: this.dbTypeFor(f), mode: f.isPrimary ? 'REQUIRED' : '' }
+        return { name: f.name, type: this.dbTypeFor(f), mode: f.isPrimary ? 'REQUIRED' : '' }
     }
 
     dbTypeFor(f) {
         return this.dbType(f.type, f.subtype, f.precision)
     }
 
-    dbType(type, subtype, precision) {
+    dbType(type, subtype) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
             case 'number_int':
                 return 'INTEGER'

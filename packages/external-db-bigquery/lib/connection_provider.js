@@ -1,4 +1,4 @@
-const {BigQuery} = require('@google-cloud/bigquery')
+const { BigQuery } = require('@google-cloud/bigquery')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require ('./bigquery_operations')
 const SchemaProvider = require('./bigquery_schema_provider')
