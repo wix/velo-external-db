@@ -93,4 +93,23 @@ class GcpAirtableConfigReader {
     }
   }
 }
-module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader, GcpMongoConfigReader, GcpAirtableConfigReader }
+
+class GcpBigQueryConfigReader {
+  constructor() {
+  }
+
+  async readConfig() {
+    const { DATABASE_ID, SECRET_KEY } = process.env
+    return { databaseId: DATABASE_ID, secretKey: SECRET_KEY }
+  }
+
+  validate() {
+    return {
+      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['DATABASE_ID', 'SECRET_KEY'])
+    }
+  }
+
+}
+
+
+module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader, GcpMongoConfigReader, GcpAirtableConfigReader, GcpBigQueryConfigReader }

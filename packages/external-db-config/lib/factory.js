@@ -33,13 +33,16 @@ const create = () => {
           break
         case 'google-sheet':
           internalConfigReader = new gcp.GcpGoogleSheetsConfigReader()
-          break;
+          break
         case 'mongo':
           internalConfigReader = new gcp.GcpMongoConfigReader()
-          break;
+          break
         case 'airtable':
           internalConfigReader = new gcp.GcpAirtableConfigReader()  
-          break;
+          break
+        case 'bigquery':
+          internalConfigReader = new gcp.GcpBigQueryConfigReader()
+          break
         case 'mysql':
         case 'postgres':
           internalConfigReader = new gcp.GcpConfigReader()
@@ -51,21 +54,24 @@ const create = () => {
       switch (type) {
         case 'spanner':
           internalConfigReader = new gcp.GcpSpannerConfigReader()
-          break;
+          break
         case 'firestore':
           internalConfigReader = new gcp.GcpFirestoreConfigReader()
-          break;
+          break
         case 'google-sheet':
           internalConfigReader = new gcp.GcpGoogleSheetsConfigReader()
-          break;
+          break
         case 'mongo':
           internalConfigReader = new gcp.GcpMongoConfigReader()
-          break;
+          break
         case 'airtable':
           internalConfigReader = new gcp.GcpAirtableConfigReader()
-          break;
+          break
         case 'dynamodb':
           internalConfigReader = new aws.AwsDynamoConfigReader(region) 
+          break
+        case 'bigquery':
+          internalConfigReader = new gcp.GcpBigQueryConfigReader()
           break
         case 'mssql':
         case 'mysql':
