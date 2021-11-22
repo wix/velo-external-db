@@ -1,5 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { isObject } = require('velo-external-db-commons')
+const { EMPTY_SORT } = require ('./airtable_utils')
 
 class FilterParser {
     constructor() {
@@ -123,12 +124,12 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return []
+            return EMPTY_SORT
         }
 
         const results=  sort.flatMap(this.parseSort)
         if (results.length === 0) {
-            return []
+            return EMPTY_SORT
         }
         return {
             sort: results

@@ -1,4 +1,4 @@
-const { minifyAndFixDates, DEFAULT_MAX_RECORDS } = require('./airtable_utils')
+const { minifyAndFixDates, DEFAULT_MAX_RECORDS, EMPTY_SORT } = require('./airtable_utils')
 
 class DataProvider {
     constructor(base, filterParser) {
@@ -30,12 +30,12 @@ class DataProvider {
         const createExpr = this.bulkCreateExpr(items)
         const inserted = await this.base(collectionName)
                                    .create(createExpr)
-        return inserted.length;
+        return inserted.length
     }
 
     async update(collectionName, items) {
         const updated = await Promise.all( items.map(async item => await this.updateSingle(collectionName, item)) )
-        return updated.length;
+        return updated.length
     }
 
     async delete(collectionName, itemIds) {
@@ -48,7 +48,7 @@ class DataProvider {
     async truncate(collectionName) {
         await this.base(collectionName)
                   .select()
-                  .eachPage(async (records, fetchNextPage) => {
+                  .eachPage(async(records, fetchNextPage) => {
                       await this.base(collectionName)
                                 .destroy(records.map(record => record.id))
                       fetchNextPage()
@@ -58,20 +58,25 @@ class DataProvider {
 
     async query({ collectionName, filterByFormula, limitExpr, sortExpr, idsOnly, skip}) {
         const resultsByPages = []
+        
         const limit = limitExpr?.maxRecords ? limitExpr : { maxRecords: DEFAULT_MAX_RECORDS }
         limit.maxRecords += skip 
+
+        const sort = EMPTY_SORT
+        if (sortExpr && sortExpr.sort) Object.assign (sort, sortExpr)
+
         await this.base(collectionName)
-        .select({ ...filterByFormula, ...limitExpr, ...sortExpr })
+                  .select({ ...filterByFormula, ...limitExpr, ...sort })
                   .eachPage((records, fetchNextPage) => {
                       const recordsToReturn = idsOnly ? records.map(record=>record.id) : records 
                       resultsByPages.push(recordsToReturn)
                       fetchNextPage()
                   })
-        return resultsByPages.flat().slice(skip); //TODO: find other solution for skip! at least don't load everything to memory.
+        return resultsByPages.flat().slice(skip) //TODO: find other solution for skip! at least don't load everything to memory.    
     }
 
 
-    filterToFilterByFormula(filter){
+    filterToFilterByFormula(filter) {
         const { filterExpr } = this.filterParser.transform(filter)
         return { filterByFormula: filterExpr || '' }
     }
@@ -88,7 +93,7 @@ class DataProvider {
         return updated.id
     }
     
-    bulkCreateExpr = (items) => {
+    bulkCreateExpr(items) {
         return items.reduce((pV, cV) => {
                                 pV.push({ fields: { ...cV } })
                                 return pV

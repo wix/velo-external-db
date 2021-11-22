@@ -1,4 +1,5 @@
 const FilterParser = require('./sql_filter_transformer')
+const { EMPTY_SORT } = require ('./airtable_utils')
 const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
@@ -11,18 +12,18 @@ describe('Sql Parser', () => {
 
         // todo: should we even check for valid input or should we let the validation library to handle this ?
         test('handles undefined sort', () => {
-            expect( env.filterParser.orderBy('') ).toEqual([])
-            expect( env.filterParser.orderBy('    ') ).toEqual([])
-            expect( env.filterParser.orderBy(undefined) ).toEqual([])
-            expect( env.filterParser.orderBy(null) ).toEqual([])
-            expect( env.filterParser.orderBy({invalid: 'object'}) ).toEqual([])
-            expect( env.filterParser.orderBy(555) ).toEqual([])
-            expect( env.filterParser.orderBy([5555]) ).toEqual([])
-            expect( env.filterParser.orderBy(['sdfsdf']) ).toEqual([])
-            expect( env.filterParser.orderBy([null]) ).toEqual([])
-            expect( env.filterParser.orderBy([undefined]) ).toEqual([])
-            expect( env.filterParser.orderBy([{invalid: 'object'}]) ).toEqual([])
-            expect( env.filterParser.orderBy([]) ).toEqual([])
+            expect( env.filterParser.orderBy('') ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy('    ') ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy(undefined) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy(null) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy({invalid: 'object'}) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy(555) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([5555]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy(['sdfsdf']) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([null]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([undefined]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([{invalid: 'object'}]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([]) ).toEqual(EMPTY_SORT)
         })
 
         test('process single sort expression invalid sort will return empty result', () => {

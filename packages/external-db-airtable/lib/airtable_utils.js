@@ -7,4 +7,6 @@ const minifyAndFixDates = record => {
 }
 const DEFAULT_MAX_RECORDS = 100
 
-module.exports = { minifyAndFixDates, DEFAULT_MAX_RECORDS }
+const EMPTY_SORT = { sort: [] }
+
+module.exports = { minifyAndFixDates, DEFAULT_MAX_RECORDS, EMPTY_SORT }
