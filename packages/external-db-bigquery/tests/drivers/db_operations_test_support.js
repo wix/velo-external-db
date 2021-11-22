@@ -1,30 +1,21 @@
-const DatabaseOperations = require('../../lib/postgres_operations')
+const DatabaseOperations = require('../../lib/bigquery_operations')
 const init = require('../../lib/connection_provider')
 
 const createPool = modify => {
-    const config = {
-        host: 'localhost',
-        user: 'test-user',
-        password: 'password',
-        db: 'test-db',
-    }
-    const { connection, cleanup } = init({ ...config, ...modify }, { max: 1 })
+    const config = {}
+    const { connection, cleanup } = init({ ...config, ...modify })
     return { connection, cleanup }
 }
 
-const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ).connection)
-
-const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { db: 'wrong'} ).connection)
-
-const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool({ databaseId: 'wrong' }).connection)
 
 const dbOperationWithValidDB = () => {
-    const { connection, cleanup } = createPool({ } )
+    const { connection, cleanup } = createPool({ databaseId: 'testDB' })
     const dbOperations = new DatabaseOperations(connection)
-    return {dbOperations, cleanup: cleanup}
+    return { dbOperations, cleanup: cleanup }
 }
 
 module.exports = {
-    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-    dbOperationWithMisconfiguredHost, dbOperationWithValidDB
+    dbOperationWithMisconfiguredDatabase,
+    dbOperationWithValidDB
 }
