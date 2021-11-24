@@ -23,6 +23,7 @@
     "test:google-sheets": "lerna exec --scope external-db-google-sheets \"npm test\" && lerna exec --scope velo-external-db \"npm run test:google-sheets\"",
     "test:airtable": "lerna exec --scope external-db-airtable \"npm test\" && lerna exec --scope velo-external-db \"npm run test:airtable\"",
     "test:dynamodb": "lerna exec --scope external-db-dynamodb \"npm test\" && lerna exec --scope velo-external-db \"npm run test:dynamodb\"",
+    "test:bigquery": "lerna exec --scope external-db-bigquery \"npm test\" && lerna exec --scope velo-external-db \"npm run test:bigquery\"",
     "release": "lerna version --no-push",
     "outdated:all": "lerna exec --scope '{external-db-config,external-db-firestore,external-db-mongo,external-db-mssql,external-db-mysql,external-db-postgres,external-db-spanner,external-db-google-sheets,external-db-airtable,external-db-dynamodb,velo-external-db,velo-external-db-core}' \"npm outdated\"",
     "ci:publish": "lerna publish -y from-git"
@@ -43,6 +44,7 @@
       "external-db-google-sheets",
       "external-db-airtable",
       "external-db-dynamodb",
+      "external-db-bigquery",
       "velo-external-db",
       "velo-external-db-core"
     ]
