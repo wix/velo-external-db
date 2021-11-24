@@ -1,9 +1,6 @@
 {
   "name": "external-db-bigquery",
   "version": "0.0.0",
-  "description": "> TODO: description",
-  "author": "Max Polsky <maxim.polski@gmail.com>",
-  "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
   "license": "ISC",
   "main": "lib/index.js",
   "directories": {
@@ -17,7 +14,7 @@
     "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "jest"
   },
   "bugs": {
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
