@@ -1,4 +1,4 @@
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen, shouldNotRunOn} = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance');
 const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
@@ -30,7 +30,8 @@ describe('Data API', () => {
             expect( res ).toEqual([]);
         });
 
-        if (name != 'DynamoDb') {
+
+        if (shouldNotRunOn(['DynamoDb'], name)) {
             test('search with non empty filter will return data', async () => {
                 await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
                 env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
@@ -149,8 +150,8 @@ describe('Data API', () => {
 
             expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([]);
         });
-        
-        if (name !== 'Firestore' && name != 'Airtable' && name != 'DynamoDb') {
+
+        if (shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb'], name)) {
             test('aggregate api without filter', async () => {
                 await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
                 await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)

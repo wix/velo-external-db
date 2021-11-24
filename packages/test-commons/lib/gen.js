@@ -165,8 +165,10 @@ const randomConfig = () => ({
     db: chance.word(),
 })
 
+const shouldNotRunOn = (impl, current) => !impl.includes(current)
+
 module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject,
      randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig }
+      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, shouldNotRunOn }
 
 
