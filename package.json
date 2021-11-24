@@ -48,8 +48,8 @@
       "velo-external-db",
       "velo-external-db-core"
     ]
+  },
+  "dependencies": {
+    "eslint-plugin-jest": "^25.3.0"
   }
 }
-
-
-
