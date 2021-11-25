@@ -1,7 +1,7 @@
 const express = require('express')
 const { errorMiddleware } = require('./web/error-middleware')
 const { appInfoFor } = require ('./health/app_info')
-const { InvalidRequest } = require('velo-external-db-commons').errors
+const { InvalidRequest, ItemNotFound } = require('velo-external-db-commons').errors
 
 let dataService, schemaService, operationService, externalDbConfigClient
 
@@ -70,6 +70,9 @@ const createRouter = () => {
         try {
             const { collectionName, itemId } = req.body
             const data = await dataService.getById(collectionName, itemId)
+            if (!data.item) {
+                throw new ItemNotFound('Item not found')
+            }
             res.json(data)
         } catch (e) {
             next(e)
