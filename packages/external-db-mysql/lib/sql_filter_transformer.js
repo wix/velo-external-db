@@ -70,24 +70,30 @@ class FilterParser {
     }
 
     parseFilter(filter) {
-        const filedNameOrOperator = Object.keys(filter)[0]
-
-        if (!filter || !isObject(filter) || filter.filedNameOrOperator === undefined ) {
+        if (!filter || !isObject(filter)) {
             return []
         }
 
+        const filedNameOrOperator = Object.keys(filter)[0]
+
+        if (filter[filedNameOrOperator] === undefined) {
+            return []
+        }
 
         switch (filedNameOrOperator) {
             case '$and':
             case '$or':
-                const res = filter.value.map( this.parseFilter.bind(this) )
-                const op = filter.operator === '$and' ? ' AND ' : ' OR '
+                const operator = filedNameOrOperator
+                const values = filter[filedNameOrOperator]
+                const res = values.map( this.parseFilter.bind(this) )
+                const op = operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.map(r => r[0].filterExpr).join( op ),
                     parameters: res.map( s => s[0].parameters ).flat()
                 }]
             case '$not':
-                const res2 = this.parseFilter( filter.value )
+                const value = filter[filedNameOrOperator]
+                const res2 = this.parseFilter( value )
                 return [{
                     filterExpr: `NOT (${res2[0].filterExpr})`,
                     parameters: res2[0].parameters
@@ -112,7 +118,7 @@ class FilterParser {
             }]
         }
 
-        if (filter.operator === '$urlized') {
+        if (operator === '$urlized') {
             return [{
                 filterExpr: `LOWER(${escapeId(fieldName)}) RLIKE ?`,
                 parameters: [value.map(s => s.toLowerCase()).join('[- ]')]
