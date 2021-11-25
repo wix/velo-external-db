@@ -1,6 +1,6 @@
 const { Uninitialized, gen } = require('test-commons')
 const SchemaInformation = require('./schema_information')
-const driver = require('../../test/drivers/schema-provider-test-support')
+const driver = require('../../test/drivers/schema_provider_test_support')
 const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
 
 describe('Schema Information Service', () => {
