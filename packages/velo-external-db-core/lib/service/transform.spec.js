@@ -1,6 +1,6 @@
 const rewire = require('rewire')
 const transform = rewire('./transform')
-const { asWixData, unpackDates, generateIdsIfNeeded, removeUnneededFields, defaultValueFor, isDate } = transform
+const { asWixData, unpackDates, generateIdsIfNeeded, prepareForInsert, defaultValueFor, isDate, prepareForUpdate } = transform
 const { Uninitialized, gen } = require('test-commons')
 const Chance = require('chance')
 const chance = Chance()
@@ -23,9 +23,11 @@ fdescribe('Converters', () => {
     })
 
     test('pack dates will take all properties with date and convert them to velo date', async () => {
-        const objWithJsDates = { ...ctx.obj, [ctx.property]: dateTimeProvider.currentDateTime(), [ctx.anotherProperty]: dateTimeProvider.currentDateTime()}
+        const objWithJsDates = { ...ctx.obj, [ctx.property]: dateTimeProvider.currentDateTime(),
+                                             [ctx.anotherProperty]: dateTimeProvider.currentDateTime()}
 
-        expect(asWixData(objWithJsDates)).toEqual( { ...ctx.obj, [ctx.property]: { $date: dateTimeProvider.currentDateTime().toISOString() }, [ctx.anotherProperty]: { $date: dateTimeProvider.currentDateTime().toISOString() }} )
+        expect(asWixData(objWithJsDates)).toEqual( { ...ctx.obj, [ctx.property]: { $date: dateTimeProvider.currentDateTime().toISOString() },
+                                                                          [ctx.anotherProperty]: { $date: dateTimeProvider.currentDateTime().toISOString() }} )
     })
 
     test('if _id field exists do nothing', async () => {
@@ -37,15 +39,15 @@ fdescribe('Converters', () => {
     })
 
     test('if item has all fields like in schema fields, item should stay the same', async () => {
-        expect(removeUnneededFields(ctx.obj, Object.keys(ctx.obj).map(f => ({ name: f, type: 'text' })))).toEqual( ctx.obj )
+        expect(prepareForInsert(ctx.obj, ctx.objSchemaFields)).toEqual( ctx.obj )
     })
 
     test('if item contain properties that does not exists in the schema, remove it', async () => {
-        expect(removeUnneededFields({ ...ctx.obj, [ctx.property]: chance.word() }, Object.keys(ctx.obj).map(f => ({ name: f, type: 'text' })))).toEqual( ctx.obj )
+        expect(prepareForInsert({ ...ctx.obj, [ctx.property]: chance.word() }, ctx.objSchemaFields)).toEqual( ctx.obj )
     })
 
     test('if item does not contain properties that exists in the schema, add default value for them', async () => {
-        expect(removeUnneededFields({ }, [{ name: ctx.property, type: 'text' }] )).toEqual({ [ctx.property]: '' } )
+        expect(prepareForInsert({ }, [{ name: ctx.property, type: 'text' }] )).toEqual({ [ctx.property]: '' } )
     })
 
     test('default value for non primary key text field is empty string', async () => {
@@ -84,8 +86,13 @@ fdescribe('Converters', () => {
         expect(defaultValueFor( { type: 'datetime' } )).toEqual(dateTimeProvider.currentDateTime())
     })
 
+    test('prepare for update will remove non existing fields', async () => {
+        expect(prepareForUpdate({ ...ctx.obj, someProp: 'whatever' }, ctx.objSchemaFields)).toEqual( ctx.obj )
+    })
+
     const ctx = {
         obj: Uninitialized,
+        objSchemaFields: Uninitialized,
         property: Uninitialized,
         anotherProperty: Uninitialized,
         veloDate: Uninitialized,
@@ -93,6 +100,7 @@ fdescribe('Converters', () => {
 
     beforeEach(() => {
         ctx.obj = gen.randomObject()
+        ctx.objSchemaFields = Object.keys(ctx.obj).reduce((s, f) => ({ ...s, [f]: { type: 'text' } }), { })
         ctx.property = chance.word()
         ctx.anotherProperty = chance.word()
         ctx.veloDate = gen.veloDate()

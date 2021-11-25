@@ -1,6 +1,7 @@
 const SchemaService = require('./schema')
 const { Uninitialized, gen } = require('test-commons')
-const driver = require('../../test/drivers/schema-provider-test-support');
+const driver = require('../../test/drivers/schema-provider-test-support')
+const schema = require('../../test/drivers/schema_information_test_support')
 
 describe('Schema Service', () => {
 
@@ -20,18 +21,21 @@ describe('Schema Service', () => {
 
     test('create collection name', async () => {
         driver.expectCreateOf(ctx.collectionName)
+        schema.expectSchemaRefresh()
 
         await env.schemaService.create(ctx.collectionName)
     })
 
     test('add column for collection name', async () => {
         driver.expectCreateColumnOf(ctx.column, ctx.collectionName)
+        schema.expectSchemaRefresh()
 
         await env.schemaService.addColumn(ctx.collectionName, ctx.column)
     })
 
     test('remove column from collection name', async () => {
         driver.expectRemoveColumnOf(ctx.column, ctx.collectionName)
+        schema.expectSchemaRefresh()
 
         await env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)
     })
@@ -48,11 +52,12 @@ describe('Schema Service', () => {
 
     beforeEach(() => {
         driver.reset()
+        schema.reset()
 
         ctx.dbs = gen.randomDbs()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
 
-        env.schemaService = new SchemaService(driver.schemaProvider)
+        env.schemaService = new SchemaService(driver.schemaProvider, schema.schemaInformation)
     });
 })

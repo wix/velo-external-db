@@ -1,6 +1,7 @@
 class SchemaService {
-    constructor(storage) {
+    constructor(storage, schemaInformation) {
         this.storage = storage
+        this.schemaInformation = schemaInformation
     }
 
     async list() {
@@ -15,16 +16,18 @@ class SchemaService {
     }
 
     async create(collectionName) {
-        return this.storage.create(collectionName);
+        await this.storage.create(collectionName)
+        await this.schemaInformation.refresh()
     }
 
     async addColumn(collectionName, column) {
-        return await this.storage.addColumn(collectionName, column)
+        await this.storage.addColumn(collectionName, column)
+        await this.schemaInformation.refresh()
     }
 
     async removeColumn(collectionName, columnName) {
-        return await this.storage.removeColumn(collectionName, columnName)
-
+        await this.storage.removeColumn(collectionName, columnName)
+        await this.schemaInformation.refresh()
     }
 }
 
