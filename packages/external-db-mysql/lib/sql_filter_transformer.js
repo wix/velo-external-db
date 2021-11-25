@@ -10,13 +10,13 @@ class FilterParser {
         const results = this.parseFilter(filter)
 
         if (results.length === 0) {
-            return EMPTY_FILTER;
+            return EMPTY_FILTER
         }
 
         return {
             filterExpr: `WHERE ${results[0].filterExpr}`,
             parameters: results[0].parameters
-        };
+        }
     }
 
     wixDataFunction2Sql(f) {
@@ -55,9 +55,9 @@ class FilterParser {
               })
 
         const havingFilter = this.parseFilter(postFilter)
-        const {filterExpr, parameters} =
-            havingFilter.map(({filterExpr, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                              parameters: parameters}))
+        const { filterExpr, parameters } =
+            havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+                                                              parameters: parameters }))
                         .concat(EMPTY_FILTER)[0]
 
 
@@ -70,11 +70,14 @@ class FilterParser {
     }
 
     parseFilter(filter) {
-        if (!filter || !isObject(filter)|| filter.operator === undefined) {
-            return [];
+        const filedNameOrOperator = Object.keys(filter)[0]
+
+        if (!filter || !isObject(filter) || filter.filedNameOrOperator === undefined ) {
+            return []
         }
 
-        switch (filter.operator) {
+
+        switch (filedNameOrOperator) {
             case '$and':
             case '$or':
                 const res = filter.value.map( this.parseFilter.bind(this) )
@@ -91,24 +94,28 @@ class FilterParser {
                 }]
         }
 
-        if (this.isSingleFieldOperator(filter.operator)) {
+        const fieldName = filedNameOrOperator
+        const operator = Object.keys(filter[fieldName])[0]
+        const value = filter[fieldName][operator]
+
+        if (this.isSingleFieldOperator(operator)) {
             return [{
-                filterExpr: `${escapeId(filter.fieldName)} ${this.veloOperatorToMySqlOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value, filter.operator)}`.trim(),
-                parameters: filter.value !== undefined ? [].concat( this.patchTrueFalseValue(filter.value) ) : []
+                filterExpr: `${escapeId(fieldName)} ${this.veloOperatorToMySqlOperator(operator, value)} ${this.valueForOperator(value, operator)}`.trim(),
+                parameters: value !== undefined ? [].concat( this.patchTrueFalseValue(value) ) : []
             }]
         }
 
-        if (this.isSingleFieldStringOperator(filter.operator)) {
+        if (this.isSingleFieldStringOperator(operator)) {
             return [{
-                filterExpr: `${escapeId(filter.fieldName)} LIKE ?`,
-                parameters: [this.valueForStringOperator(filter.operator, filter.value)]
+                filterExpr: `${escapeId(fieldName)} LIKE ?`,
+                parameters: [this.valueForStringOperator(operator, value)]
             }]
         }
 
         if (filter.operator === '$urlized') {
             return [{
-                filterExpr: `LOWER(${escapeId(filter.fieldName)}) RLIKE ?`,
-                parameters: [filter.value.map(s => s.toLowerCase()).join('[- ]')]
+                filterExpr: `LOWER(${escapeId(fieldName)}) RLIKE ?`,
+                parameters: [value.map(s => s.toLowerCase()).join('[- ]')]
             }]
         }
 
@@ -172,13 +179,13 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         const results = sort.flatMap( this.parseSort )
 
         if (results.length === 0) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         return {
@@ -192,7 +199,7 @@ class FilterParser {
         }
         const _direction = direction || 'ASC'
 
-        const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC';
+        const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC'
 
         return [{
             expr: `${escapeId(fieldName)} ${dir}`,
