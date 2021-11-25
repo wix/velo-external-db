@@ -48,8 +48,10 @@ const defaultValueFor = (f) => {
     }
 }
 
-const removeUnneededFields = (item, fields) => fields.reduce((pv, f)=> ({ ...pv, [f.name]: item[f.name] || defaultValueFor(f) }), {})
+const parseFields = fields => Object.entries(fields).map(([k, v]) => ({ name: k, ...v }))
 
+const prepareForInsert = (item, fields) => parseFields(fields).reduce((pv, f) => ({ ...pv, [f.name]: item[f.name] || defaultValueFor(f) }), {})
+const prepareForUpdate = (item, fields) => parseFields(fields).reduce((pv, f) => f.name in item ? ({ ...pv, [f.name]: item[f.name] }) : pv, {})
 
 const clone = o => ( { ...o } )
 
@@ -61,4 +63,4 @@ const isDate = d => {
 const packDates = item => Object.entries(item)
                                 .reduce((o, [k, v]) => ( { ...o, [k]: isDate(v) ? { $date: v.toISOString() } : v } ), { } )
 
-module.exports = { asWixData, unpackDates, generateIdsIfNeeded, removeUnneededFields, defaultValueFor, isDate }
+module.exports = { asWixData, unpackDates, generateIdsIfNeeded, defaultValueFor, isDate, prepareForInsert, prepareForUpdate }

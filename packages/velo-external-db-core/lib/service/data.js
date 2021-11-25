@@ -1,8 +1,9 @@
-const { asWixData, unpackDates, generateIdsIfNeeded } = require('./transform')
+const { asWixData, unpackDates, prepareForInsert, prepareForUpdate } = require('./transform')
 
 class DataService {
-    constructor(storage) {
+    constructor(storage, schemaInformation) {
         this.storage = storage
+        this.schemaInformation = schemaInformation
     }
 
     async find(collectionName, filter, sort, skip, limit) {
@@ -35,9 +36,10 @@ class DataService {
     }
 
     async bulkInsert(collectionName, items) {
-        const itemsWithIds = items.map(i => generateIdsIfNeeded(i))
-        await this.storage.insert(collectionName, itemsWithIds.map(i => unpackDates(i)))
-        return { items: itemsWithIds }
+        const info = await this.schemaInformation.schemaFor(collectionName)
+        const prepared = items.map(i => prepareForInsert(i, Object.entries(info.fields).map(([k, v]) => ({ name: k, ...v }))))
+        await this.storage.insert(collectionName, prepared.map(i => unpackDates(i)))
+        return { items: prepared }
     }
 
     async update(collectionName, item) {
@@ -46,8 +48,10 @@ class DataService {
     }
 
     async bulkUpdate(collectionName, items) {
-        await this.storage.update(collectionName, items.map(i => unpackDates(i)))
-        return { items: items }
+        const info = await this.schemaInformation.schemaFor(collectionName)
+        const prepared = items.map(i => prepareForUpdate(i, Object.entries(info.fields).map(([k, v]) => ({ name: k, ...v }))))
+        await this.storage.update(collectionName, prepared.map(i => unpackDates(i)))
+        return { items: prepared }
     }
 
     async delete(collectionName, itemId) {
