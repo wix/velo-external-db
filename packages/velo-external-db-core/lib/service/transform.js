@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
+let dateTimeProvider = require('./date_time_provider')
 
 const asWixData = e => packDates(e)
 
@@ -26,17 +27,38 @@ const generateIdsIfNeeded = item => {
     return { ...item, _id: uuidv4() }
 }
 
-const clone = o => ( { ...o } )
-
-const packDates = item => {
-    const i = clone(item)
-    Object.keys(i)
-          .forEach(key => {
-              if (i[key] instanceof Date) {
-                  i[key] = { $date: i[key].toISOString() }
-              }
-          })
-    return i
+const defaultValueFor = (f) => {
+    switch (f.type) {
+        case 'number':
+            switch (f.subtype) {
+                case 'int':
+                case 'bigint':
+                    return 0
+                case 'float':
+                case 'double':
+                case 'decimal':
+                    return 0.0
+            }
+        case 'text':
+            return f.isPrimary ? uuidv4() : ''
+        case 'datetime':
+            return dateTimeProvider.currentDateTime()
+        case 'boolean':
+            return false
+    }
 }
 
-module.exports = { asWixData, unpackDates, generateIdsIfNeeded }
+const removeUnneededFields = (item, fields) => fields.reduce((pv, f)=> ({ ...pv, [f.name]: item[f.name] || defaultValueFor(f) }), {})
+
+
+const clone = o => ( { ...o } )
+
+const isDate = d => {
+    const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
+    return d instanceof Date || Object.prototype.toString.call(d) === '[object Date]' || (typeof d === 'string' && reISO.test(d))
+}
+
+const packDates = item => Object.entries(item)
+                                .reduce((o, [k, v]) => ( { ...o, [k]: isDate(v) ? { $date: v.toISOString() } : v } ), { } )
+
+module.exports = { asWixData, unpackDates, generateIdsIfNeeded, removeUnneededFields, defaultValueFor, isDate }

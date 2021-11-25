@@ -33,8 +33,10 @@
     "jest": "^27.3.1",
     "jest-each": "^27.3.1",
     "jest-when": "^3.4.2",
+    "rewire": "^5.0.0",
     "test-commons": "^0.0.0",
-    "ts-jest": "^27.0.7"
+    "ts-jest": "^27.0.7",
+    "uuid-validate": "^0.0.3"
   },
   "bugs": {
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
