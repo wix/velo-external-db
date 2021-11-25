@@ -1,6 +1,6 @@
 const DataService = require('./data')
 const { Uninitialized, gen } = require('test-commons')
-const driver = require('../../test/drivers/data-provider-test-support')
+const driver = require('../../test/drivers/data_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
 const Chance = require('chance')
 const chance = new Chance()

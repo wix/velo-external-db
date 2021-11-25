@@ -1,6 +1,6 @@
 const OperationService = require('./operation')
 const { Uninitialized, gen } = require('test-commons')
-const driver = require('../../test/drivers/operation-provider-test-support')
+const driver = require('../../test/drivers/operation_provider_test_support')
 const { DbConnectionError } = require('velo-external-db-commons').errors
 
 describe('Operation Service', () => {
