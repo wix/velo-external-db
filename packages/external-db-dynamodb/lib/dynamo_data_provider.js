@@ -28,13 +28,14 @@ class DataProvider {
     }
 
     async insert(collectionName, items) {
-        validateTable()
+        validateTable(collectionName)
         await this.docClient
                   .batchWrite(dynamoRequests.batchPutItemsCommand(collectionName, items.map(patchDateTime)))
         return items.length
     }
 
     async update(collectionName, items) {
+        validateTable(collectionName)
         await this.docClient.transactWrite({
             TransactItems: items.map(item => dynamoRequests.updateSingleItemCommand(collectionName, patchDateTime(item)))
         })
@@ -42,7 +43,7 @@ class DataProvider {
     }
 
     async delete(collectionName, itemIds) {
-        validateTable()
+        validateTable(collectionName)
         await this.docClient
                   .batchWrite(dynamoRequests.batchDeleteItemsCommand(collectionName, itemIds))
         return itemIds.length 
