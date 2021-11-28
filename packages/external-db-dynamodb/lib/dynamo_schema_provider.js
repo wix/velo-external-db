@@ -20,6 +20,7 @@ class SchemaProvider {
     }
 
     async create(collectionName, columns) {
+        await this.ensureSystemTableExists()
         validateTable(collectionName)
 
         const collection = await this.collectionDataFor(collectionName, true)
@@ -32,6 +33,7 @@ class SchemaProvider {
     }
 
     async drop(collectionName) {
+        await this.ensureSystemTableExists()
         validateTable(collectionName)
         
         await this.deleteTableFromSystemTable(collectionName)
@@ -42,6 +44,7 @@ class SchemaProvider {
     }
 
     async addColumn(collectionName, column) {
+        await this.ensureSystemTableExists()
         validateTable(collectionName)
         await validateSystemFields(column.name)
         
@@ -55,6 +58,7 @@ class SchemaProvider {
     }
 
     async removeColumn(collectionName, columnName) {
+        await this.ensureSystemTableExists()
         validateTable(collectionName)
         await validateSystemFields(columnName)
 
@@ -69,6 +73,7 @@ class SchemaProvider {
     }
 
     async describeCollection(collectionName) {
+        await this.ensureSystemTableExists()
         validateTable(collectionName)
         
         const collection = await this.collectionDataFor(collectionName)
