@@ -5,12 +5,12 @@ const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mongo_operations')
 const { notConnectedPool } = require('./mongo_utils')
 
-const init = async (cfg) => {
+const init = async(cfg) => {
     const client = new MongoClient(cfg.connectionUri)
 
     const { pool, cleanup } = await client.connect()
                                           .then((res) => {
-                                              return { pool: res, cleanup: async () => await pool.close() }
+                                              return { pool: res, cleanup: async() => await pool.close() }
                                           }).catch( notConnectedPool )
 
     const databaseOperations = new DatabaseOperations(client)
