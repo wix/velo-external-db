@@ -2,19 +2,19 @@ const { init } = require('external-db-postgres')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = () => {
-    const {connection, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
+    const { connection, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
     return { pool: connection, cleanup: cleanup }
 }
 
-const cleanup = async () => {
-    const {schemaProvider, cleanup} = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
+const cleanup = async() => {
+    const { schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
 
-    await cleanup();
+    await cleanup()
 }
 
-const initEnv = async () => {
+const initEnv = async() => {
     await runImage('postgres')
 }
 
@@ -26,7 +26,7 @@ const setActive = () => {
     process.env.DB = 'test-db'
 }
 
-const shutdownEnv = async () => {
+const shutdownEnv = async() => {
     await stopImage('postgres')
 }
 

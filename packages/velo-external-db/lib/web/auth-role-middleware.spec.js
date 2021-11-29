@@ -1,9 +1,9 @@
 const { Uninitialized } = require('test-commons')
-const { authRoleMiddleware } = require('./auth-role-middleware');
-const driver = require('../../test/drivers/auth_middleware_test_support');
+const { authRoleMiddleware } = require('./auth-role-middleware')
+const driver = require('../../test/drivers/auth_middleware_test_support')
 const { UnauthorizedError } = require('velo-external-db-commons').errors
 const Chance = require('chance')
-const chance = Chance();
+const chance = Chance()
 
 describe('Auth Role Middleware', () => {
 
@@ -12,29 +12,29 @@ describe('Auth Role Middleware', () => {
         permittedRole: Uninitialized,
         notPermittedRole: Uninitialized,
         next: Uninitialized,
-    };
+    }
 
     const env = {
         auth: Uninitialized,
-    };
+    }
 
     beforeEach(() => {
-        ctx.permittedRoles = Array.from({length: 5}, () => chance.word())
+        ctx.permittedRoles = Array.from({ length: 5 }, () => chance.word())
         ctx.permittedRole = chance.pickone(ctx.permittedRoles)
         ctx.notPermittedRole = chance.word()
         ctx.next = jest.fn().mockName('next')
 
         env.auth = authRoleMiddleware({ roles: ctx.permittedRoles })
-    });
+    })
 
     test('should throw when request does not contain role', () => {
-        expect( () => env.auth({body: { } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: {} } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: '' } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: [] } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { role: '' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { role: [] } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { role: {} } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: {} } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: '' } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: [] } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: { role: '' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: { role: [] } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: { role: {} } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
     })
 
     test('should allow request with permitted role on request', () => {

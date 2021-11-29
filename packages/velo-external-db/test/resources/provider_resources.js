@@ -1,4 +1,4 @@
-const {Uninitialized} = require('test-commons')
+const { Uninitialized } = require('test-commons')
 
 const mysql = require('external-db-mysql')
 const mysqlTestEnv = require('./engines/mysql_resources')
@@ -37,7 +37,7 @@ const env = {
 const dbInit = async(testEnv, impl) => {
     await testEnv.cleanup()
 
-    const {pool, cleanup} = await testEnv.connection()
+    const { pool, cleanup } = await testEnv.connection()
     const driver = impl.driver()
 
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
@@ -54,12 +54,12 @@ const dbTeardown = async() => {
     env.schemaColumnTranslator = Uninitialized
 }
 
-const postgresTestEnvInit = async () => await dbInit(postgresTestEnv, postgres)
-const mysqlTestEnvInit = async () => await dbInit(mysqlTestEnv, mysql)
-const spannerTestEnvInit = async () => await dbInit(spannerTestEnv, spanner)
-const firestoreTestEnvInit = async () => await dbInit(firestoreTestEnv, firestore)
-const mssqlTestEnvInit = async () => await dbInit(mssqlTestEnv, mssql)
-const mongoTestEnvInit = async () => await dbInit(mongoTestEnv, mongo)
+const postgresTestEnvInit = async() => await dbInit(postgresTestEnv, postgres)
+const mysqlTestEnvInit = async() => await dbInit(mysqlTestEnv, mysql)
+const spannerTestEnvInit = async() => await dbInit(spannerTestEnv, spanner)
+const firestoreTestEnvInit = async() => await dbInit(firestoreTestEnv, firestore)
+const mssqlTestEnvInit = async() => await dbInit(mssqlTestEnv, mssql)
+const mongoTestEnvInit = async() => await dbInit(mongoTestEnv, mongo)
 const airTableTestEnvInit = async() => await dbInit(airtableEnv, airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamoTestEnv, dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigqueryTestEnv, bigquery)

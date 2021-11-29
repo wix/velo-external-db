@@ -8,7 +8,7 @@ const airtable = require('../resources/engines/airtable_resources')
 const dynamo = require('../resources/engines/dynamodb_resources')
 const ci = require('./ci_utils')
 
-const shutdownEnv = async (testEngine) => {
+const shutdownEnv = async(testEngine) => {
     switch (testEngine) {
         case 'mysql':
             await mysql.shutdownEnv()
@@ -44,7 +44,7 @@ const shutdownEnv = async (testEngine) => {
     }
 }
 
-module.exports = async () => {
+module.exports = async() => {
     const testEngine = process.env.TEST_ENGINE
     if (ci.LocalDev() || ci.engineWithoutDocker(testEngine)) {
         await shutdownEnv(testEngine)

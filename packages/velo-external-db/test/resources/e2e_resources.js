@@ -1,5 +1,5 @@
-const {Uninitialized, sleep} = require('test-commons')
-const {authInit} = require('../drivers/auth_test_support')
+const { Uninitialized, sleep } = require('test-commons')
+const { authInit } = require('../drivers/auth_test_support')
 const { waitUntil } = require('async-wait-until')
 
 const postgres = require('./engines/postgres_resources')

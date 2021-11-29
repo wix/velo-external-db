@@ -9,7 +9,7 @@ const authorizeSecretKey = (req, secretKey) => {
     }
 }
 
-function authMiddleware ({ secretKey }) {
+function authMiddleware({ secretKey }) {
     return (req, res, next) => {
         authorizeSecretKey(req, secretKey)
         next()

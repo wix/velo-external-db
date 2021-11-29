@@ -16,17 +16,17 @@ const createRouter = () => {
     const router = express.Router()
 
     // *************** INFO **********************
-    router.get('/', async (req, res) => {
+    router.get('/', async(req, res) => {
         const appInfo = await appInfoFor(operationService, externalDbConfigClient)
-        res.render('index', appInfo);
+        res.render('index', appInfo)
     })
 
     router.post('/provision', (req, res) => {
-        res.json({ protocolVersion: 2 });
+        res.json({ protocolVersion: 2 })
     })
 
     // *************** Data API **********************
-    router.post('/data/find', async (req, res, next) => {
+    router.post('/data/find', async(req, res, next) => {
         try {
             const { collectionName, filter, sort, skip, limit } = req.body
             const data = await dataService.find(collectionName, filter, sort, skip, limit)
@@ -36,7 +36,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/aggregate', async (req, res, next) => {
+    router.post('/data/aggregate', async(req, res, next) => {
         try {
             const { collectionName, filter, aggregation } = req.body
             const data = await dataService.aggregate(collectionName, filter, aggregation)
@@ -46,7 +46,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/insert', async (req, res, next) => {
+    router.post('/data/insert', async(req, res, next) => {
         try {
             const { collectionName, item } = req.body
             const data = await dataService.insert(collectionName, item)
@@ -56,7 +56,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/insert/bulk', async (req, res, next) => {
+    router.post('/data/insert/bulk', async(req, res, next) => {
         try {
             const { collectionName, items } = req.body
             const data = await dataService.bulkInsert(collectionName, items)
@@ -66,7 +66,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/get', async (req, res, next) => {
+    router.post('/data/get', async(req, res, next) => {
         try {
             const { collectionName, itemId } = req.body
             const data = await dataService.getById(collectionName, itemId)
@@ -79,7 +79,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/update', async (req, res, next) => {
+    router.post('/data/update', async(req, res, next) => {
         try {
             const { collectionName, item } = req.body
             const data = await dataService.update(collectionName, item)
@@ -89,7 +89,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/update/bulk', async (req, res, next) => {
+    router.post('/data/update/bulk', async(req, res, next) => {
         try {
             const { collectionName, items } = req.body
             const data = await dataService.bulkUpdate(collectionName, items)
@@ -99,7 +99,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/remove', async (req, res, next) => {
+    router.post('/data/remove', async(req, res, next) => {
         try {
             const { collectionName, itemId } = req.body
             const data = await dataService.delete(collectionName, itemId)
@@ -109,7 +109,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/remove/bulk', async (req, res, next) => {
+    router.post('/data/remove/bulk', async(req, res, next) => {
         try {
             const { collectionName, itemIds } = req.body
             const data = await dataService.bulkDelete(collectionName, itemIds)
@@ -119,7 +119,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/count', async (req, res, next) => {
+    router.post('/data/count', async(req, res, next) => {
         try {
             const { collectionName, filter } = req.body
             const data = await dataService.count(collectionName, filter)
@@ -129,7 +129,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/data/truncate', async (req, res, next) => {
+    router.post('/data/truncate', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const data = await dataService.truncate(collectionName)
@@ -142,7 +142,7 @@ const createRouter = () => {
 
 
     // *************** Schema API **********************
-    router.post('/schemas/list', async (req, res, next) => {
+    router.post('/schemas/list', async(req, res, next) => {
         try {
             const data = await schemaService.list()
             res.json(data)
@@ -151,7 +151,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/schemas/find', async (req, res, next) => {
+    router.post('/schemas/find', async(req, res, next) => {
         try {
             const { schemaIds } = req.body
             if (schemaIds && schemaIds.length > 10) {
@@ -164,7 +164,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/schemas/create', async (req, res, next) => {
+    router.post('/schemas/create', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const data = await schemaService.create(collectionName)
@@ -174,7 +174,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/schemas/column/add', async (req, res, next) => {
+    router.post('/schemas/column/add', async(req, res, next) => {
         try {
             const { collectionName, column } = req.body
             const data = await schemaService.addColumn(collectionName, column)
@@ -184,7 +184,7 @@ const createRouter = () => {
         }
     })
 
-    router.post('/schemas/column/remove', async (req, res, next) => {
+    router.post('/schemas/column/remove', async(req, res, next) => {
         try {
             const { collectionName, columnName } = req.body
             const data = await schemaService.removeColumn(collectionName, columnName)
