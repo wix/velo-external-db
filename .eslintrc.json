@@ -5,6 +5,11 @@
         "es2021": true,
         "node": true
     },
+    "settings": {
+        "jest": {
+          "version": "latest"
+        }
+    },
     "extends": ["eslint:recommended", "plugin:jest/recommended"],
     "ignorePatterns": ["**/*.spec.js"],
     "parserOptions": {
@@ -58,5 +63,9 @@
             "error",
             "always"
         ],
+        "arrow-spacing": [
+            "error",
+            { "before": true, "after": true }
+        ]
     }
 }
