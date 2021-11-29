@@ -1,4 +1,4 @@
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, HostDoesNotExists, WrongDatabaseError } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError } = require('velo-external-db-commons').errors
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {
@@ -11,7 +11,7 @@ const notThrowingTranslateErrorCodes = err => {
         case '28P01':
             return new DbConnectionError(`Access to database denied - probably wrong credentials,sql message:  ${err.message}`)
         case '3D000':
-            return new DbConnectionError(`Database does not exists or you don\'t have access to it, sql message: ${err.message}`)
+            return new DbConnectionError(`Database does not exists or you don't have access to it, sql message: ${err.message}`)
         case 'ENOTFOUND':
         case 'EAI_AGAIN':
             return new DbConnectionError('Database host is unavailable.')

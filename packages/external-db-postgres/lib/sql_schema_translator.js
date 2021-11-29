@@ -21,7 +21,6 @@ class SchemaColumnTranslator {
             case 'serial':
             case 'smallserial':
             case 'bigserial':
-
             case 'decimal':
             case 'numeric':
             case 'real':
