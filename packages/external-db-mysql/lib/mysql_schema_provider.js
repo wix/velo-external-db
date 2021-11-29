@@ -52,7 +52,7 @@ class SchemaProvider {
     async describeCollection(collectionName) {
         const res = await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
                               .catch( translateErrorCodes )
-        const rows = res.map(r => ({field: r.Field, type: r.Type}))
+        const rows = res.map(r => ({ field: r.Field, type: r.Type }))
                         .map( this.translateDbTypes.bind(this) )
         return asWixSchema(rows, collectionName)
     }

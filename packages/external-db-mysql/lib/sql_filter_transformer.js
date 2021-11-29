@@ -10,13 +10,13 @@ class FilterParser {
         const results = this.parseFilter(filter)
 
         if (results.length === 0) {
-            return EMPTY_FILTER;
+            return EMPTY_FILTER
         }
 
         return {
             filterExpr: `WHERE ${results[0].filterExpr}`,
             parameters: results[0].parameters
-        };
+        }
     }
 
     wixDataFunction2Sql(f) {
@@ -55,9 +55,9 @@ class FilterParser {
               })
 
         const havingFilter = this.parseFilter(postFilter)
-        const {filterExpr, parameters} =
-            havingFilter.map(({filterExpr, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                              parameters: parameters}))
+        const { filterExpr, parameters } =
+            havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+                                                              parameters: parameters }))
                         .concat(EMPTY_FILTER)[0]
 
 
@@ -71,7 +71,7 @@ class FilterParser {
 
     parseFilter(filter) {
         if (!filter || !isObject(filter)|| filter.operator === undefined) {
-            return [];
+            return []
         }
 
         switch (filter.operator) {
@@ -172,13 +172,13 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         const results = sort.flatMap( this.parseSort )
 
         if (results.length === 0) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         return {
@@ -192,7 +192,7 @@ class FilterParser {
         }
         const _direction = direction || 'ASC'
 
-        const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC';
+        const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC'
 
         return [{
             expr: `${escapeId(fieldName)} ${dir}`,
