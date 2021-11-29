@@ -55,7 +55,7 @@ class DataProvider {
                                .scan(dynamoRequests.getAllIdsCommand(collectionName))
 
         await this.docClient
-                  .batchWrite(dynamoRequests.batchDeleteItemsCommand(collectionName, rows.Items.map(item=>item._id)))
+                  .batchWrite(dynamoRequests.batchDeleteItemsCommand(collectionName, rows.Items.map(item => item._id)))
     }
 }
 

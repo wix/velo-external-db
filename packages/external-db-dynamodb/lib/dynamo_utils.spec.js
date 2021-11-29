@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { validateTable, canQuery, patchCollectionKeys } = require('./dynamo_utils')
+const { validateTable } = require('./dynamo_utils')
 
 describe('Dynamo Utils', () => {
     describe('validateTable', () => {

@@ -40,14 +40,14 @@ class FilterParser {
                 return [{
                     filterExpr: {
                         FilterExpression: res.map(r => r[0].filterExpr.FilterExpression).join( op ),
-                        ExpressionAttributeNames: Object.assign ({}, ...res.map(r=>r[0].filterExpr.ExpressionAttributeNames) ),
-                        ExpressionAttributeValues: Object.assign({}, ...res.map(r=>r[0].filterExpr.ExpressionAttributeValues) )
+                        ExpressionAttributeNames: Object.assign ({}, ...res.map(r => r[0].filterExpr.ExpressionAttributeNames) ),
+                        ExpressionAttributeValues: Object.assign({}, ...res.map(r => r[0].filterExpr.ExpressionAttributeValues) )
                     }
                 }]
             case '$not':
                 const res2 = this.parseFilter( filter.value )
                 return [{
-                    filterExpr:{
+                    filterExpr: {
                         FilterExpression: `NOT (${res2[0].filterExpr.FilterExpression})`,
                         ExpressionAttributeNames: res2[0].filterExpr.ExpressionAttributeNames,
                         ExpressionAttributeValues: res2[0].filterExpr.ExpressionAttributeValues
@@ -74,10 +74,10 @@ class FilterParser {
                 filterExpr: {
                     FilterExpression: `${this.veloOperatorToDynamoOperator(filter.operator)} (#${fieldName}, :${fieldName})`,
                     ExpressionAttributeNames: {
-                        [`#${fieldName}`] : fieldName
+                        [`#${fieldName}`]: fieldName
                     },
                     ExpressionAttributeValues: {
-                        [`:${fieldName}`] : filter.value
+                        [`:${fieldName}`]: filter.value
                     }
                 }
             }]
@@ -89,13 +89,13 @@ class FilterParser {
             if (filter.operator === '$hasSome' && (value === undefined || value.length === 0))
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
 
-            const filterExpressionVariables = {...value}
+            const filterExpressionVariables = { ...value }
 
             return [{
                 filterExpr: {
                     FilterExpression: `#${fieldName} IN (${Object.keys(filterExpressionVariables).map(f => `:${f}`).join(', ')})`,
                     ExpressionAttributeNames: {
-                        [`#${fieldName}`] : fieldName
+                        [`#${fieldName}`]: fieldName
                     },
                     ExpressionAttributeValues: {
                         ...filterExpressionVariables
@@ -159,11 +159,11 @@ class FilterParser {
         if (queryable) 
             filterExpr = this.filterExprToQueryExpr(filterExpr)
         
-        return { filterExpr, queryable}     
+        return { filterExpr, queryable }     
     }
 
     filterExprToQueryExpr(filter) {
-        delete Object.assign(filter, {['KeyConditionExpression']: filter['FilterExpression'] })['FilterExpression']
+        delete Object.assign(filter, { ['KeyConditionExpression']: filter['FilterExpression'] })['FilterExpression']
         return filter
     }
 
@@ -174,7 +174,7 @@ class FilterParser {
         if (!filterExpr) return false
 
         const filterAttributes = Object.values(filterExpr.ExpressionAttributeNames) 
-        return filterAttributes.every(v=> collectionKeys.includes(v))
+        return filterAttributes.every(v => collectionKeys.includes(v))
     }
 
 }

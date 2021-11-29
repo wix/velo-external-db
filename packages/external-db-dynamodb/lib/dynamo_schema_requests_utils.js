@@ -2,31 +2,31 @@
 const { SystemTable } = require('./dynamo_utils')
 
 const removeColumnExpression = (collectionName, columns) => ({
-    TableName : SystemTable,
+    TableName: SystemTable,
     Key: {
         tableName: collectionName
     },
-    UpdateExpression:'SET #attrName = :attrValue',
-    ExpressionAttributeNames : {
-        '#attrName' : 'fields'
+    UpdateExpression: 'SET #attrName = :attrValue',
+    ExpressionAttributeNames: {
+        '#attrName': 'fields'
     },
-    ExpressionAttributeValues : {
-        ':attrValue' : columns 
+    ExpressionAttributeValues: {
+        ':attrValue': columns 
     },
     ReturnValues: 'UPDATED_NEW'
 })
 
 const addColumnExpression = (collectionName, column) => ({
-        TableName : SystemTable,
+        TableName: SystemTable,
         Key: {
             tableName: collectionName
         },
-        UpdateExpression:'SET #attrName = list_append(#attrName,:attrValue)',
-        ExpressionAttributeNames : {
-            '#attrName' : 'fields'
+        UpdateExpression: 'SET #attrName = list_append(#attrName,:attrValue)',
+        ExpressionAttributeNames: {
+            '#attrName': 'fields'
         },
-        ExpressionAttributeValues : {
-            ':attrValue' : [column]
+        ExpressionAttributeValues: {
+            ':attrValue': [column]
         },
         ReturnValues: 'UPDATED_NEW'
 })
@@ -46,7 +46,7 @@ const createSystemTableExpression = () => ({
 })
 
 const insertToSystemTableExpression = (collectionName, fields) => ({
-    TableName:SystemTable, 
+    TableName: SystemTable, 
     Item: {
     tableName: collectionName,
     fields: fields || [] 

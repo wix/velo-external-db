@@ -31,7 +31,7 @@ const dbOperationWithValidDB = () => {
     const { connection, cleanup } = createConnection(config())
     const dbOperations = new DatabaseOperations( connection )
 
-    return { dbOperations, cleanup}
+    return { dbOperations, cleanup }
 }
 
 const resetEnv = () => {
