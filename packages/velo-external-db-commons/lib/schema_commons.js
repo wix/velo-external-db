@@ -1,4 +1,4 @@
-const {CannotModifySystemField} = require('./errors')
+const { CannotModifySystemField } = require('./errors')
 
 const SystemFields = [
     {
