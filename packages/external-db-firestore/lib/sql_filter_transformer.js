@@ -20,7 +20,7 @@ class FilterParser {
             return []
         }
 
-        if(this.isUnsupportedOperator(filter.operator)){
+        if(this.isUnsupportedOperator(filter.operator)) {
             throw new InvalidQuery(`${filter.operator} operator cant be used in firebase`)
         }
 
@@ -34,7 +34,7 @@ class FilterParser {
             }]
         }
         
-        if(this.isMultipleFiledOperator(filter.operator)){
+        if(this.isMultipleFiledOperator(filter.operator)) {
             return filter.value.reduce((o, f) => {
                 return o.concat( this.parseFilter.bind(this)(f) )
             }, [])
@@ -47,11 +47,11 @@ class FilterParser {
         return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$startsWith', '$endsWith'].includes(operator)
     }
     
-    isUnsupportedOperator(operator){
+    isUnsupportedOperator(operator) {
         return ['$or', '$urlized', '$contains', '$not'].includes(operator)
     }
     
-    isMultipleFiledOperator(operator){
+    isMultipleFiledOperator(operator) {
         return ['$and'].includes(operator)
     }
     
@@ -114,7 +114,7 @@ class FilterParser {
     
         const dir = 'asc' === _direction.toLowerCase() ? 'asc' : 'desc'
         
-        return [{fieldName, direction: dir}]
+        return [{ fieldName, direction: dir }]
 
     }
 
