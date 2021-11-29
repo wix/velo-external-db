@@ -19,7 +19,7 @@ describe('External DB config client', () => {
     ['Vendor: All, Common Config Reader', commonDriver],
   ]).describe('%s', (name, driver) => {
 
-    beforeAll(async () => {
+    beforeAll(async() => {
       env.configReaderProvider = driver.configReaderProvider
     })
 
@@ -27,7 +27,7 @@ describe('External DB config client', () => {
       driver.reset()
     })
 
-    test('read config when config is defined', async () => {
+    test('read config when config is defined', async() => {
       driver.defineValidConfig(ctx.config)
 
       const expected = await env.configReaderProvider.readConfig()
@@ -35,7 +35,7 @@ describe('External DB config client', () => {
       expect(expected).toEqual(ctx.config)
     })
 
-    test('read empty/default config when config is broken', async () => {
+    test('read empty/default config when config is broken', async() => {
       if (driver.hasReadErrors) {
         driver.defineErroneousConfig()
 
@@ -47,7 +47,7 @@ describe('External DB config client', () => {
 
     each(
         Object.keys(driver.validConfig())
-    ).test('config will handle missing property [%s], by not returning it', async (p) => {
+    ).test('config will handle missing property [%s], by not returning it', async(p) => {
       delete ctx.config[p]
       driver.defineValidConfig(ctx.config)
 
@@ -59,7 +59,7 @@ describe('External DB config client', () => {
     each(
         Object.keys(driver.validConfig())
               .map((v, i) => [driver.ExpectedProperties[i], v])
-    ).test('validate will detect missing property [%s]', async (s, p) => {
+    ).test('validate will detect missing property [%s]', async(s, p) => {
       delete ctx.config[p]
       driver.defineValidConfig(ctx.config)
 
@@ -68,13 +68,13 @@ describe('External DB config client', () => {
       expect(expected).toEqual({ missingRequiredSecretsKeys: [s] })
     })
 
-    test('validate will detect config read errors', async () => {
+    test('validate will detect config read errors', async() => {
       if (driver.hasReadErrors) {
         driver.defineErroneousConfig(ctx.error)
 
         const expected = await env.configReaderProvider.validate()
 
-        expect(expected).toEqual({ configReadError: ctx.error, missingRequiredSecretsKeys: []})
+        expect(expected).toEqual({ configReadError: ctx.error, missingRequiredSecretsKeys: [] })
       }
     })
 
@@ -87,7 +87,7 @@ describe('External DB config client', () => {
       configReaderProvider: Uninitialized
     }
 
-    beforeEach(async () => {
+    beforeEach(async() => {
       ctx.config = driver.validConfig()
       ctx.error = chance.word()
     })

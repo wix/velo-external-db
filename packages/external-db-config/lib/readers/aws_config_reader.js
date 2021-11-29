@@ -48,7 +48,7 @@ class AwsConfigReader {
 
     async readConfig() {
       if (process.env.NODE_ENV === 'test') {
-        return { region:this.region, secretKey: process.env.SECRET_KEY, endpoint: process.env.ENDPOINT_URL }
+        return { region: this.region, secretKey: process.env.SECRET_KEY, endpoint: process.env.ENDPOINT_URL }
       }
       const cfg = await this.readExternalConfig()
                             .catch(e => {
@@ -57,7 +57,7 @@ class AwsConfigReader {
                             })
   
       const { SECRET_KEY } = cfg
-      return { region:this.region, secretKey: SECRET_KEY }
+      return { region: this.region, secretKey: SECRET_KEY }
     }
 
     validate() {

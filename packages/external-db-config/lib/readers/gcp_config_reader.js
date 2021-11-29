@@ -1,7 +1,7 @@
 const { checkRequiredKeys } = require('../utils/config_utils')
 
 class GcpConfigReader {
-  constructor () {
+  constructor() {
   }
 
   async readConfig() {
@@ -17,7 +17,7 @@ class GcpConfigReader {
 }
 
 class GcpSpannerConfigReader {
-  constructor () {
+  constructor() {
   }
 
   async readConfig() {
@@ -34,7 +34,7 @@ class GcpSpannerConfigReader {
 }
 
 class GcpFirestoreConfigReader {
-  constructor () { }
+  constructor() { }
 
   async readConfig() {
     const { PROJECT_ID, SECRET_KEY } = process.env
@@ -65,7 +65,7 @@ class GcpGoogleSheetsConfigReader {
 }
 
 class GcpMongoConfigReader {
-  constructor () { }
+  constructor() { }
 
   async readConfig() {
     const { URI, SECRET_KEY } = process.env
@@ -84,7 +84,7 @@ class GcpAirtableConfigReader {
 
   async readConfig() {
     const { AIRTABLE_API_KEY, META_API_KEY, BASE_ID, SECRET_KEY, BASE_URL } = process.env
-    return { apiPrivateKey: AIRTABLE_API_KEY,metaApiKey: META_API_KEY, baseId: BASE_ID, secretKey: SECRET_KEY, baseUrl: BASE_URL }
+    return { apiPrivateKey: AIRTABLE_API_KEY, metaApiKey: META_API_KEY, baseId: BASE_ID, secretKey: SECRET_KEY, baseUrl: BASE_URL }
   }
 
   validate() {

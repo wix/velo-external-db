@@ -12,7 +12,7 @@ each(
 
     each(engines).describe('Engine %s', (engine) => {
 
-        beforeAll(async () => {
+        beforeAll(async() => {
             initEnv(vendor, engine)
         })
 
@@ -20,13 +20,13 @@ each(
             config: Uninitialized
         }
 
-        beforeEach(async () => {
+        beforeEach(async() => {
             reset()
             ctx.config = env.driver.validConfig()
         })
 
 
-        test('read config', async () => {
+        test('read config', async() => {
             env.driver.defineValidConfig(ctx.config)
 
             const actual = await env.configReader.readConfig()
@@ -34,7 +34,7 @@ each(
             expect(actual).toEqual(ctx.config)
         })
 
-        test('validate config', async () => {
+        test('validate config', async() => {
             env.driver.defineValidConfig({})
 
             const actual = await env.configReader.configStatus()
