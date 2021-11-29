@@ -1,7 +1,7 @@
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { Uninitialized } = require('test-commons')
 const Chance = require('chance')
-const chance = Chance();
+const chance = Chance()
 
 describe('Sql Schema Column Translator', () => {
 
@@ -9,7 +9,7 @@ describe('Sql Schema Column Translator', () => {
         describe('numeric fields', () => {
 
             test('integer', () => {
-                ['Autonumber', 'Count', 'Duration', 'Number','Rating','Percent'].forEach(t => {
+                ['Autonumber', 'Count', 'Duration', 'Number', 'Rating', 'Percent'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual('number')
                 })
             })
@@ -23,8 +23,8 @@ describe('Sql Schema Column Translator', () => {
 
         describe('string fields', () => {
             test('string', () => {
-                ['Email', 'Longtext', 'Phonenumber', 'Rollup', 'Singlelinetext','Singleselect','URL',
-                 'multilinetext','linkedrecord','multiplerecordlinks','multipleattachment'].forEach(t => {
+                ['Email', 'Longtext', 'Phonenumber', 'Rollup', 'Singlelinetext', 'Singleselect', 'URL',
+                 'multilinetext', 'linkedrecord', 'multiplerecordlinks', 'multipleattachment'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual('text')
                 })
             })
@@ -32,7 +32,7 @@ describe('Sql Schema Column Translator', () => {
 
         describe('date time fields', () => {
             test('date', () => {
-                ['Createdtime','Date','datetime'].forEach(t => {
+                ['Createdtime', 'Date', 'datetime'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
                 })
             })
@@ -49,17 +49,17 @@ describe('Sql Schema Column Translator', () => {
 
     const ctx = {
         fieldName: Uninitialized,
-    };
+    }
 
     const env = {
         schemaTranslator: Uninitialized,
-    };
+    }
 
     beforeEach(() => {
-        ctx.fieldName = chance.word();
-    });
+        ctx.fieldName = chance.word()
+    })
 
     beforeAll(function() {
         env.schemaTranslator = new SchemaColumnTranslator()
-    });
+    })
 })

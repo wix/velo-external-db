@@ -1,11 +1,11 @@
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { asWixSchema, SystemFields, validateSystemFields } = require('velo-external-db-commons')
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist} = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 
 const axios = require('axios')
 
 class SchemaProvider {
-    constructor(base, {apiKey, metaApiKey, baseUrl}) {
+    constructor(base, { apiKey, metaApiKey, baseUrl }) {
         this.base = base
         this.baseId = base.getId()
         this.sqlSchemaTranslator = new SchemaColumnTranslator()

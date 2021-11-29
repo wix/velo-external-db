@@ -1,5 +1,4 @@
 const DatabaseOperations = require('../../lib/airtable_operations')
-const init = require('../../lib/connection_provider')
 const Airtable = require('airtable')
 
 const createPool =  modify => {
@@ -9,7 +8,7 @@ const createPool =  modify => {
         baseId: 'app123',
         baseUrl: 'http://localhost:9000'
     }
-    const _config = {...config, ...modify}
+    const _config = { ...config, ...modify }
     const airtableBase = new Airtable({ apiKey: _config.apiPrivateKey, endpointUrl: _config.baseUrl }).base(_config.baseId)
     return airtableBase
 }

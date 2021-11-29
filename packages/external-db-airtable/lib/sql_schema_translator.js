@@ -46,7 +46,7 @@ class SchemaColumnTranslator {
         }
     }
     wixColumnToAirtableColumn(column) {
-        return {name: column.name, type:this.dbTypeFor(column.type, column.subtype)}
+        return { name: column.name, type: this.dbTypeFor(column.type, column.subtype) }
     }
     dbTypeFor(type, subtype) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
