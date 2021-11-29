@@ -2,7 +2,7 @@ const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
 
 class DatabaseOperations {
     constructor(pool) {
-        this.pool = pool;
+        this.pool = pool
     }
 
     async validateConnection() {
