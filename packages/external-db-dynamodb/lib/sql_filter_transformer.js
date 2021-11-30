@@ -167,6 +167,7 @@ class FilterParser {
         return filter
     }
 
+    // eslint-disable-next-line no-unused-vars
     canQuery(filterExpr, fields) {
         // const collectionKeys = fields.filter(f=>f.isPrimary).map(f=>f.name)
         const collectionKeys = ['_id']

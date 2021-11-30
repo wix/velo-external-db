@@ -15,12 +15,14 @@ class DataProvider {
         return queryable ? await this.docClient.query(command) : await this.docClient.scan(command)
     }
 
+    // eslint-disable-next-line no-unused-vars
     async find(collectionName, filter, sort, skip, limit, fields) {
         const { filterExpr, queryable } = this.filterParser.transform(filter) //,fields)
         const { Items } = await this.query(dynamoRequests.findCommand(collectionName, filterExpr, limit), queryable)
         return Items.map(patchFixDates)
     }
-
+    
+    // eslint-disable-next-line no-unused-vars
     async count(collectionName, filter, fields) {
         const { filterExpr, queryable } = this.filterParser.transform(filter) //,fields)
         const { Count } = await this.query(dynamoRequests.countCommand(collectionName, filterExpr), queryable)
