@@ -23,7 +23,7 @@ const extraOptions = cfg => {
     }
 }
 
-const init = async (cfg, _poolOptions) => {
+const init = async(cfg, _poolOptions) => {
     const config = {
         user: cfg.user,
         password: cfg.password,
@@ -40,7 +40,7 @@ const init = async (cfg, _poolOptions) => {
 
     const _pool = new ConnectionPool({ ...config, ...extraOptions(cfg), ...poolOptions })
     const { pool, cleanup } = await _pool.connect()
-                                         .then((res) => ({ pool: res, cleanup: async () => await pool.close() }))
+                                         .then((res) => ({ pool: res, cleanup: async() => await pool.close() }))
                                          .catch(e => notConnectedPool(_pool, e) )
     const databaseOperations = new DatabaseOperations(pool)
 

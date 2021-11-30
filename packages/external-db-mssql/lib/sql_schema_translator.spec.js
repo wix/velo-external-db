@@ -2,7 +2,7 @@ const SchemaColumnTranslator = require('./sql_schema_translator')
 const { Uninitialized } = require('test-commons')
 const Chance = require('chance')
 const { escapeId } = require('./mssql_utils')
-const chance = Chance();
+const chance = Chance()
 
 describe('Sql Schema Column Translator', () => {
 
@@ -23,7 +23,7 @@ describe('Sql Schema Column Translator', () => {
             })
 
             test('decimal float with precision', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float', precision: '7, 3'}) ).toEqual(`${escapeId(ctx.fieldName)} FLOAT(7,3)`)
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float', precision: '7, 3' }) ).toEqual(`${escapeId(ctx.fieldName)} FLOAT(7,3)`)
             })
 
             test('decimal double', () => {
@@ -143,17 +143,17 @@ describe('Sql Schema Column Translator', () => {
 
     const ctx = {
         fieldName: Uninitialized,
-    };
+    }
 
     const env = {
         schemaTranslator: Uninitialized,
-    };
+    }
 
     beforeEach(() => {
-        ctx.fieldName = chance.word();
-    });
+        ctx.fieldName = chance.word()
+    })
 
     beforeAll(function() {
         env.schemaTranslator = new SchemaColumnTranslator()
-    });
+    })
 })

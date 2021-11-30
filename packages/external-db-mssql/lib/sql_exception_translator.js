@@ -1,4 +1,4 @@
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CollectionAlreadyExists,DbConnectionError } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CollectionAlreadyExists, DbConnectionError } = require('velo-external-db-commons').errors
 
 const notThrowingTranslateErrorCodes = err => {
     if (err.number) {
@@ -18,7 +18,7 @@ const notThrowingTranslateErrorCodes = err => {
         }
     }
     else {
-        switch (err.code){
+        switch (err.code) {
             case 'ELOGIN':
                 return new DbConnectionError(`Access to database denied - probably wrong credentials, sql message: ${err.message}`) 
             case 'ESOCKET':
@@ -30,7 +30,7 @@ const notThrowingTranslateErrorCodes = err => {
 }
 
 const translateErrorCodes = err => {
-    throw notThrowingTranslateErrorCodes(err);
+    throw notThrowingTranslateErrorCodes(err)
 }
 
 module.exports = { translateErrorCodes, notThrowingTranslateErrorCodes }

@@ -9,8 +9,8 @@ class DataProvider {
     }
 
     async find(collectionName, filter, sort, skip, limit) {
-        const {filterExpr, parameters} = this.filterParser.transform(filter)
-        const {sortExpr} = this.filterParser.orderBy(sort)
+        const { filterExpr, parameters } = this.filterParser.transform(filter)
+        const { sortExpr } = this.filterParser.orderBy(sort)
         const pagingQueryStr = this.pagingQueryFor(skip, limit)
 
         const sql = `SELECT * FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} ${pagingQueryStr}`
@@ -19,7 +19,7 @@ class DataProvider {
     }
 
     async count(collectionName, filter) {
-        const {filterExpr, parameters} = this.filterParser.transform(filter)
+        const { filterExpr, parameters } = this.filterParser.transform(filter)
 
         const sql = `SELECT COUNT(*) as num FROM ${escapeTable(collectionName)} ${filterExpr}`
         const rs = await this.query(sql, parameters)
@@ -68,8 +68,8 @@ class DataProvider {
     }
 
     async aggregate(collectionName, filter, aggregation) {
-        const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
-        const {fieldsStatement, groupByColumns, havingFilter, parameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
+        const { filterExpr: whereFilterExpr, parameters: whereParameters } = this.filterParser.transform(filter)
+        const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
 
         const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
 

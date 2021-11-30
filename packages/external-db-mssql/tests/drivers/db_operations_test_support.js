@@ -24,17 +24,17 @@ const createPool = async modify => {
     return pool
 }
 
-const dbOperationWithMisconfiguredPassword = async () => new DatabaseOperations(await createPool({ password: 'wrong' }))
+const dbOperationWithMisconfiguredPassword = async() => new DatabaseOperations(await createPool({ password: 'wrong' }))
 
-const dbOperationWithMisconfiguredDatabase = async () => new DatabaseOperations(await createPool({ database: 'wrong' }))
+const dbOperationWithMisconfiguredDatabase = async() => new DatabaseOperations(await createPool({ database: 'wrong' }))
 
-const dbOperationWithMisconfiguredHost = async () => new DatabaseOperations(await createPool({ server: 'wrong' }))
+const dbOperationWithMisconfiguredHost = async() => new DatabaseOperations(await createPool({ server: 'wrong' }))
 
-const dbOperationWithValidDB = async () => {
+const dbOperationWithValidDB = async() => {
     const connection = await createPool({ })
     const dbOperations = new DatabaseOperations( connection )
 
-    return { dbOperations, cleanup: async () => await (await connection).close()}
+    return { dbOperations, cleanup: async() => await (await connection).close() }
 }
 
 module.exports = {
