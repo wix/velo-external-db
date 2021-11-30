@@ -11,9 +11,9 @@ const unpackDates = item => {
 
     Object.keys(i)
           .forEach(key => {
-              const value = item[key];
+              const value = item[key]
               if (isObject(value) && '$date' in value) {
-                  i[key] = new Date(value['$date']);
+                  i[key] = new Date(value['$date'])
               }
           })
 
@@ -39,6 +39,7 @@ const defaultValueFor = (f) => {
                 case 'decimal':
                     return 0.0
             }
+            return 0  // default for number is 0 
         case 'text':
             return f.isPrimary ? uuidv4() : ''
         case 'datetime':
@@ -53,7 +54,7 @@ const parseFields = fields => Object.entries(fields).map(([k, v]) => ({ name: k,
 const prepareForInsert = (item, fields) => parseFields(fields).reduce((pv, f) => ({ ...pv, [f.name]: item[f.name] || defaultValueFor(f) }), {})
 const prepareForUpdate = (item, fields) => parseFields(fields).reduce((pv, f) => f.name in item ? ({ ...pv, [f.name]: item[f.name] }) : pv, {})
 
-const clone = o => ( { ...o } )
+const clone = o => ({ ...o })
 
 const isDate = d => {
     const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/

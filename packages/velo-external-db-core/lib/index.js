@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const DataService = require('./service/data')
 const CacheableSchemaInformation = require('./service/schema_information')

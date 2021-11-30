@@ -1,6 +1,6 @@
 class OperationService {
     constructor(databaseOperation) {
-        this.databaseOperation = databaseOperation;
+        this.databaseOperation = databaseOperation
     }
 
     async validateConnection() {

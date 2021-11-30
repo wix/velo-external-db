@@ -20,7 +20,7 @@ class CacheableSchemaInformation {
 
     async schema() {
         const schema = this.cache.get(CacheKey)
-        if ( schema === undefined ){
+        if ( schema === undefined ) {
             await this.refresh()
             return this.cache.get(CacheKey) || []
         }
