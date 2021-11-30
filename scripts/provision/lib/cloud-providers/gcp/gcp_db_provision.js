@@ -1,8 +1,8 @@
-const {GoogleAuth} = require('google-auth-library')
+const { GoogleAuth } = require('google-auth-library')
 class DbProvision {
     constructor({ gcpClientEmail, gcpPrivateKey, gcpProjectId }) {
         this.authClient = new GoogleAuth({
-            credentials : { client_email: gcpClientEmail, private_key: gcpPrivateKey },
+            credentials: { client_email: gcpClientEmail, private_key: gcpPrivateKey },
             scopes: 'https://www.googleapis.com/auth/cloud-platform'
         })
         this.projectId = gcpProjectId
@@ -23,7 +23,7 @@ class DbProvision {
             rootPassword: credentials.passwd
         }
 
-        const response = await client.request({ url: CreateDbInstanceRestUrl, method: 'POST', data: dbInstanceProperties})
+        const response = await client.request({ url: CreateDbInstanceRestUrl, method: 'POST', data: dbInstanceProperties })
         return response.operationType === 'CREATE' && response.status === 'PENDING'
     }
 
@@ -69,14 +69,14 @@ class DbProvision {
         const client = await this.credentialsFor()
         const CreateNewUserRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances/${instanceName}/users`
 
-        await client.request({ url: CreateNewUserRestUrl, method:'POST', data: { name:  userName, password: password }})
+        await client.request({ url: CreateNewUserRestUrl, method: 'POST', data: { name: userName, password: password } })
     }
 
     async createDatabase(instanceName, dbName) {
         const client = await this.credentialsFor()
         const CreateDbRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances/${instanceName}/databases`
         
-        await client.request({ url: CreateDbRestUrl, method:'POST', data: { name:  dbName } })
+        await client.request({ url: CreateDbRestUrl, method: 'POST', data: { name: dbName } })
     }
 }
 

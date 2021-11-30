@@ -1,10 +1,9 @@
 
-
 class NetworkProvision {
-    constructor(credentials, region) {
+    constructor() {
     }
 
-    async addSecurityRule(groupId, port) {
+    async addSecurityRule() {
     }
 
 }

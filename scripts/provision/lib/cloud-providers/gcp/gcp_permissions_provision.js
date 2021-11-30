@@ -1,17 +1,17 @@
-const {GoogleAuth} = require('google-auth-library')
+const { GoogleAuth } = require('google-auth-library')
 
 const neededRoles = ['roles/secretmanager.secretAccessor', 'roles/cloudsql.editor']
 
 class PermissionsProvision {
     constructor({ gcpClientEmail, gcpPrivateKey, gcpProjectId }) {
         this.authClient = new GoogleAuth({
-            credentials : { client_email: gcpClientEmail, private_key: gcpPrivateKey },
+            credentials: { client_email: gcpClientEmail, private_key: gcpPrivateKey },
             scopes: ['https://www.googleapis.com/auth/cloud-platform', 'https://www.googleapis.com/auth/cloudplatformprojects']
         })
         this.projectId = gcpProjectId
     }
 
-    async createServiceAccount({instanceName}) {
+    async createServiceAccount({ instanceName }) {
         const client = await this.credentialsFor()
         const CreateServiceAccountRestUrl = `https://iam.googleapis.com/v1/projects/${this.projectId}/serviceAccounts`
         const res = await client.request({ url: CreateServiceAccountRestUrl, method: 'POST', data: { accountId: instanceName } })

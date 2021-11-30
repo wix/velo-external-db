@@ -1,7 +1,7 @@
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager')
 class ConfigWriter {
     constructor({ gcpClientEmail, gcpPrivateKey, gcpProjectId }) {
-        this.client = new SecretManagerServiceClient({ credentials : { client_email: gcpClientEmail, private_key: gcpPrivateKey }})
+        this.client = new SecretManagerServiceClient({ credentials: { client_email: gcpClientEmail, private_key: gcpPrivateKey } })
         this.projectId = gcpProjectId
     }
 

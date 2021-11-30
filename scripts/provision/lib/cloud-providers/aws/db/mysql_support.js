@@ -1,7 +1,7 @@
 const mysql = require('mysql')
 
 
-const createDatabase = async (dbName, host, credentials) => {
+const createDatabase = async(dbName, host, credentials) => {
     let connection
 
     try {

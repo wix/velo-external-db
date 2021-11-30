@@ -1,7 +1,7 @@
 const { waitFor } = require('poll-until-promise')
 
 const blockUntil = async f => waitFor(
-    async () => {
+    async() => {
         const response = await f()
 
         if (!response) {
