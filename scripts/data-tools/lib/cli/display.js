@@ -3,13 +3,13 @@ const { green, grey, greenBright, redBright } = require('chalk')
 const cliProgress = require('cli-progress')
 const showBanner = require('node-banner')
 
-const startSpinnerWith = async (msg, f, completeMsg) => {
+const startSpinnerWith = async(msg, f, completeMsg) => {
     const spinner = new Spinner({
         text: `\t\t %s ${msg}`,
         stream: process.stderr,
-        onTick: function(msg){
-            this.clearLine(this.stream);
-            this.stream.write(msg);
+        onTick: function(msg) {
+            this.clearLine(this.stream)
+            this.stream.write(msg)
         }
     })
 
@@ -34,7 +34,7 @@ const startSpinnerWith = async (msg, f, completeMsg) => {
     }
 }
 
-const startProgress = async (msg, iterations, f) => {
+const startProgress = async(msg, iterations, f) => {
     const bar = new cliProgress.SingleBar({ format: `\t\t ${msg} [{bar}] {percentage}% | ETA: {eta}s | {value}/{total}` }, cliProgress.Presets.rect)
     bar.start(iterations, 0)
 
@@ -49,7 +49,7 @@ const startProgress = async (msg, iterations, f) => {
 const info = msg => console.log(`${green('[INFO]:')} ${msg}`)
 const blankLine = () => console.log('')
 
-const header = async () => {
+const header = async() => {
     blankLine()
     await showBanner('Velo External DB', 'Data Generator', 'blue', 'magenta')
     blankLine()
