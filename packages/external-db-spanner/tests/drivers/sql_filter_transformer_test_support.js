@@ -1,6 +1,6 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const { escapeId, escapeFieldId } = require('../../lib/spanner_utils');
+const { escapeId, escapeFieldId } = require('../../lib/spanner_utils')
 
 const filterParser = {
     transform: jest.fn(),
@@ -40,7 +40,7 @@ const givenOrderByFor = (column, sort) => {
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeFieldId('_id')} = @_id`, parameters: { _id: id} })
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeFieldId('_id')} = @_id`, parameters: { _id: id } })
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {

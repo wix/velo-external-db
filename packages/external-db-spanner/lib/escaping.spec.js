@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 const { testLiteral, validateLiteral } = require('./spanner_utils')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
@@ -25,8 +26,8 @@ describe('escape literal', () => {
     })
 
     each([
-        ...`~! @#$%^&*()+-=[]\{}|;:'",./<>?`
-    ]).test(`does not allow special characters [%s]`, (ch) => {
+        ...'~! @#$%^&*()+-=[]\{}|;:\'",./<>?'
+    ]).test('does not allow special characters [%s]', (ch) => {
         expect(testLiteral(`${ch}`)).toBeFalsy()
     })
 
@@ -36,6 +37,6 @@ describe('escape literal', () => {
     })
 
     test('validateLiteral will throw for invalid literal', () => {
-        expect(() => validateLiteral(`~! @#$%^&*()+-=[]\{}|;:'",./<>?`)).toThrow(InvalidQuery)
+        expect(() => validateLiteral('~! @#$%^&*()+-=[]\{}|;:\'",./<>?')).toThrow(InvalidQuery)
     })
 })

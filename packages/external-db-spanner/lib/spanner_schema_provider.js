@@ -2,7 +2,7 @@ const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = requ
 const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
-const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, escapeFieldId} = require('./spanner_utils')
+const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, escapeFieldId } = require('./spanner_utils')
 
 class SchemaProvider {
     constructor(database) {
@@ -18,9 +18,9 @@ class SchemaProvider {
                 tableSchema: '',
                 tableCatalog: '',
             },
-        };
+        }
 
-        const [rows] = await this.database.run(query);
+        const [rows] = await this.database.run(query)
         const res = recordSetToObj(rows)
 
         const tables = parseTableData(res)
@@ -58,9 +58,9 @@ class SchemaProvider {
                 tableCatalog: '',
                 tableName: collectionName,
             },
-        };
+        }
 
-        const [rows] = await this.database.run(query);
+        const [rows] = await this.database.run(query)
         const res = recordSetToObj(rows)
 
         if (res.length === 0) {
@@ -79,7 +79,7 @@ class SchemaProvider {
         try {
             const [operation] = await this.database.updateSchema([sql])
 
-            await operation.promise();
+            await operation.promise()
         } catch (err) {
             const e = notThrowingTranslateErrorCodes(err)
             if (!catching || (catching && !(e instanceof catching))) {

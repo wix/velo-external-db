@@ -20,7 +20,7 @@ const unpatchFieldName = (f) => {
 const testLiteral = s => /^[a-zA-Z_0-9_]+$/.test(s)
 const validateLiteral = l => {
     if (!testLiteral(l)) {
-        throw new InvalidQuery(`Invalid literal`)
+        throw new InvalidQuery('Invalid literal')
     }
     return `@${l}`
 }
