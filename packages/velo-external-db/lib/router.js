@@ -22,7 +22,7 @@ const createRouter = () => {
     })
 
     router.post('/provision', (req, res) => {
-        res.json({ protocolVersion: 2 });
+        res.json({});
     })
 
     // *************** Data API **********************
