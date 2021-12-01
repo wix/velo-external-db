@@ -5,7 +5,7 @@ const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
-const chance = Chance();
+const chance = Chance()
 
 describe('Sql Parser', () => {
 
@@ -17,13 +17,13 @@ describe('Sql Parser', () => {
             expect( env.filterParser.orderBy('    ') ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy(undefined) ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy(null) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy({invalid: 'object'}) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy({ invalid: 'object' }) ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy(555) ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy([5555]) ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy(['sdfsdf']) ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy([null]) ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy([undefined]) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy([{invalid: 'object'}]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy([{ invalid: 'object' }]) ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy([]) ).toEqual(EMPTY_SORT)
         })
 
@@ -40,17 +40,17 @@ describe('Sql Parser', () => {
         })
 
         test('process single sort with valid expression', () => {
-            expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' }]) ).toEqual({sortExpr: `ORDER BY ${escapeId(ctx.fieldName)} ASC`})
+            expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' }]) ).toEqual({ sortExpr: `ORDER BY ${escapeId(ctx.fieldName)} ASC` })
         })
 
         test('process single sort with two valid expression', () => {
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
-                { fieldName: ctx.anotherFieldName, direction: 'desc' }]) ).toEqual({sortExpr: `ORDER BY ${escapeId(ctx.fieldName)} ASC, ${escapeId(ctx.anotherFieldName)} DESC`})
+                { fieldName: ctx.anotherFieldName, direction: 'desc' }]) ).toEqual({ sortExpr: `ORDER BY ${escapeId(ctx.fieldName)} ASC, ${escapeId(ctx.anotherFieldName)} DESC` })
         })
 
         test('process single sort with one valid and one invalid expression', () => {
             expect( env.filterParser.orderBy([{ fieldName: ctx.fieldName, direction: 'asc' },
-                { invalid: 'object' }]) ).toEqual({sortExpr: `ORDER BY ${escapeId(ctx.fieldName)} ASC` })
+                { invalid: 'object' }]) ).toEqual({ sortExpr: `ORDER BY ${escapeId(ctx.fieldName)} ASC` })
         })
     })
 
@@ -82,7 +82,7 @@ describe('Sql Parser', () => {
         describe('handle single field operator', () => {
             each([
                 '$ne', '$lt', '$lte', '$gt', '$gte', '$eq',
-            ]).test(`correctly transform operator [%s]`, (o) => {
+            ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
                     // kind: 'filter',
                     operator: o,
@@ -93,12 +93,12 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: `${escapeId(ctx.fieldName)} ${env.filterParser.veloOperatorToMySqlOperator(o, ctx.fieldValue)} ${validateLiteral(ctx.fieldName)}`,
-                    parameters: {[patchFieldName(ctx.fieldName)]: ctx.fieldValue}
+                    parameters: { [patchFieldName(ctx.fieldName)]: ctx.fieldValue }
                 }])
 
             })
 
-            test(`correctly extract filter value if value is 0`, () => {
+            test('correctly extract filter value if value is 0', () => {
                 const filter = {
                     operator: '$eq',
                     fieldName: ctx.fieldName,
@@ -113,7 +113,7 @@ describe('Sql Parser', () => {
             })
 
             // todo: $hasAll ???
-            test(`correctly transform operator [$hasSome]`, () => {
+            test('correctly transform operator [$hasSome]', () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$hasSome',
@@ -133,7 +133,7 @@ describe('Sql Parser', () => {
                 }])
             })
 
-            test(`operator [$hasSome] with empty list of values will throw an exception`, () => {
+            test('operator [$hasSome] with empty list of values will throw an exception', () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$hasSome',
@@ -144,7 +144,7 @@ describe('Sql Parser', () => {
                 expect( () => env.filterParser.parseFilter(filter) ).toThrow(InvalidQuery)
             })
 
-            test(`correctly transform operator [$eq] with null value`, () => {
+            test('correctly transform operator [$eq] with null value', () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$eq',
@@ -157,7 +157,7 @@ describe('Sql Parser', () => {
                 }])
             })
 
-            test(`correctly transform operator [$eq] with boolean value`, () => {
+            test('correctly transform operator [$eq] with boolean value', () => {
                 const filter = {
                     operator: '$eq',
                     fieldName: ctx.fieldName,
@@ -171,7 +171,7 @@ describe('Sql Parser', () => {
             })
 
             describe('handle string operators', () => {
-                test(`correctly transform operator [$contains]`, () => {
+                test('correctly transform operator [$contains]', () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$contains',
@@ -181,11 +181,11 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `${escapeId(ctx.fieldName)} LIKE ${validateLiteral(ctx.fieldName)}`,
-                        parameters: { [patchFieldName(ctx.fieldName)]: `%${ctx.fieldValue}%`}
+                        parameters: { [patchFieldName(ctx.fieldName)]: `%${ctx.fieldValue}%` }
                     }])
                 })
 
-                test(`correctly transform operator [$startsWith]`, () => {
+                test('correctly transform operator [$startsWith]', () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$startsWith',
@@ -195,11 +195,11 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `${escapeId(ctx.fieldName)} LIKE ${validateLiteral(ctx.fieldName)}`,
-                        parameters: { [patchFieldName(ctx.fieldName)]: `${ctx.fieldValue}%`}
+                        parameters: { [patchFieldName(ctx.fieldName)]: `${ctx.fieldValue}%` }
                     }])
                 })
 
-                test(`correctly transform operator [$endsWith]`, () => {
+                test('correctly transform operator [$endsWith]', () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$endsWith',
@@ -209,11 +209,11 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `${escapeId(ctx.fieldName)} LIKE ${validateLiteral(ctx.fieldName)}`,
-                        parameters: { [patchFieldName(ctx.fieldName)]: `%${ctx.fieldValue}`}
+                        parameters: { [patchFieldName(ctx.fieldName)]: `%${ctx.fieldValue}` }
                     }])
                 })
 
-                test(`correctly transform operator [$urlized]`, () => {
+                test('correctly transform operator [$urlized]', () => {
                     const filter = {
                         // kind: 'filter',
                         operator: '$urlized',
@@ -227,12 +227,12 @@ describe('Sql Parser', () => {
                     }])
                 })
             })
-        });
+        })
 
         describe('handle multi field operator', () => {
             each([
                 '$and', '$or'
-            ]).test(`correctly transform operator [%s]`, (o) => {
+            ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
                     // kind: 'filter',
                     operator: o,
@@ -248,7 +248,7 @@ describe('Sql Parser', () => {
                 }])
             })
 
-            test(`correctly transform operator [$not]`, () => {
+            test('correctly transform operator [$not]', () => {
                 const filter = {
                     // kind: 'filter',
                     operator: '$not',
@@ -260,12 +260,12 @@ describe('Sql Parser', () => {
                     parameters: env.filterParser.parseFilter(ctx.filter)[0].parameters
                 }])
             })
-        });
+        })
 
         describe('aggregation functions', () => {
 
             describe('transform select fields', () => {
-                test(`single id field`, () => {
+                test('single id field', () => {
                     const aggregation = {
                         _id: ctx.fieldName
                     }
@@ -278,7 +278,7 @@ describe('Sql Parser', () => {
                     })
                 })
 
-                test(`multiple id fields`, () => {
+                test('multiple id fields', () => {
                     const aggregation = {
                         _id: {
                             field1: ctx.fieldName,
@@ -294,15 +294,15 @@ describe('Sql Parser', () => {
                     })
                 })
 
-                test(`process having filter`, () => {
+                test('process having filter', () => {
                     const aggregation = {
                         _id: ctx.fieldName,
                         [ctx.moreFieldName]: {
-                            '$avg': ctx.anotherFieldName
+                            $avg: ctx.anotherFieldName
                         }
                     }
 
-                    const havingFilter = { operator: '$gt', fieldName: ctx.moreFieldName, value: ctx.fieldValue}
+                    const havingFilter = { operator: '$gt', fieldName: ctx.moreFieldName, value: ctx.fieldValue }
 
                     expect( env.filterParser.parseAggregation(aggregation, havingFilter) ).toEqual({
                         fieldsStatement: `${escapeId(ctx.fieldName)}, AVG(${escapeId(ctx.anotherFieldName)}) AS ${escapeId(ctx.moreFieldName)}`,
@@ -317,7 +317,7 @@ describe('Sql Parser', () => {
                     ['MIN', '$min'],
                     ['MAX', '$max'],
                     ['SUM', '$sum'],
-                ]).test(`translate %s function`, (mySqlFunction, wixDataFunction) => {
+                ]).test('translate %s function', (mySqlFunction, wixDataFunction) => {
                     const aggregation = {
                         _id: ctx.fieldName,
                         [ctx.moreFieldName]: {
@@ -347,29 +347,29 @@ describe('Sql Parser', () => {
         filter: Uninitialized,
         anotherFilter: Uninitialized,
         offset: Uninitialized,
-    };
+    }
 
     const env = {
         filterParser: Uninitialized,
-    };
+    }
 
     beforeEach(() => {
-        ctx.fieldName = chance.word();
-        ctx.anotherFieldName = chance.word();
-        ctx.moreFieldName = chance.word();
+        ctx.fieldName = chance.word()
+        ctx.anotherFieldName = chance.word()
+        ctx.moreFieldName = chance.word()
 
-        ctx.fieldValue = chance.word();
-        ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()];
+        ctx.fieldValue = chance.word()
+        ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
-        ctx.filter = gen.randomFilter();
-        ctx.anotherFilter = gen.randomFilter();
+        ctx.filter = gen.randomFilter()
+        ctx.anotherFilter = gen.randomFilter()
 
-        ctx.offset = chance.natural({min: 2, max: 20})
-    });
+        ctx.offset = chance.natural({ min: 2, max: 20 })
+    })
 
     beforeAll(function() {
         env.filterParser = new FilterParser
-    });
+    })
 
 
 })

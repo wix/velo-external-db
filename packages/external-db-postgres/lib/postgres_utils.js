@@ -3,7 +3,7 @@
 const escapeIdentifier = (str) => `"${(str || '').replace(/"/g, '""')}"`
 
 const prepareStatementVariables = (n) => {
-    return Array.from({length: n}, (_, i) => i + 1)
+    return Array.from({ length: n }, (_, i) => i + 1)
         .map(i => `$${i}`)
         .join(', ')
 }

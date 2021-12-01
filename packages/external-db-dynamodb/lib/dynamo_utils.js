@@ -15,7 +15,7 @@ const validateTable = collection => {
 const patchFixDates = record => {
     const dateRegex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}/
     const fixedRecord = {}
-    Object.keys(record).map(key=> {
+    Object.keys(record).map(key => {
         const value = record[key]
         if (dateRegex.test(value))
             fixedRecord[key] = new Date (value)
@@ -39,7 +39,7 @@ const canQuery = (filterExpr, collectionKeys) => {
     if (!filterExpr) return false
 
     const filterAttributes = Object.values(filterExpr.ExpressionAttributeNames) 
-    return filterAttributes.every(v=> collectionKeys.includes(v))
+    return filterAttributes.every(v => collectionKeys.includes(v))
 }
 
 module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates, reformatFields, patchCollectionKeys, canQuery }

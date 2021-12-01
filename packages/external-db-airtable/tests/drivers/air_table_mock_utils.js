@@ -2,7 +2,7 @@ const { AirtableBase } = require('./air_table_base')
 
 class AirtableError extends Error {
     constructor(error, message, status) {
-        super(message);
+        super(message)
         this.error = error
         this.status = status
     }
@@ -21,7 +21,7 @@ const _checkParamsMiddleware = (req, res, next) => {
     next()
 }
 
-const _checkParamsMetaMiddleware = (_checkParamsMiddleware, function (req, res, next) { //TODO: refactor middleware
+const _checkParamsMetaMiddleware = (_checkParamsMiddleware, function(req, res, next) { //TODO: refactor middleware
     if (req.get('X-Airtable-Client-Secret') !== 'meta123')
         return next(new AirtableError('Unauthorized', 'Unauthorized', '401'))
     next()

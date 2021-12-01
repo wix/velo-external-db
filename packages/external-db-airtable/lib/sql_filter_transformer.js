@@ -42,7 +42,7 @@ class FilterParser {
                     throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
                 }
 
-                const ress = filter.value.map(val => { return { operator: '$eq', value: val, fieldName:filter.fieldName } })
+                const ress = filter.value.map(val => { return { operator: '$eq', value: val, fieldName: filter.fieldName } })
                 const ress2 = ress.map(this.parseFilter.bind(this))
                 return [{
                     filterExpr: this.multipleFieldOperatorToFilterExpr('OR', ress2)
@@ -59,7 +59,7 @@ class FilterParser {
 
         if (this.isSingleFieldStringOperator(filter.operator)) {
            return[{
-               filterExpr: `REGEX_MATCH({${filter.fieldName}},'${this.valueForStringOperator(filter.operator, filter.value)}')`}]
+               filterExpr: `REGEX_MATCH({${filter.fieldName}},'${this.valueForStringOperator(filter.operator, filter.value)}')` }]
         }
 
         if (filter.operator === '$urlized') {
@@ -105,7 +105,7 @@ class FilterParser {
         return ['$contains', '$startsWith', '$endsWith'].includes(operator)
     }
 
-    veloOperatorToAirtableOperator(operator, value) {
+    veloOperatorToAirtableOperator(operator) {
         switch (operator) {
             case '$eq':
                 return '='

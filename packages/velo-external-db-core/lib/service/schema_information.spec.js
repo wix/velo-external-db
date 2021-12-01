@@ -5,19 +5,19 @@ const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
 
 describe('Schema Information Service', () => {
 
-    test('will automatically refresh and return schema for collection when queried', async () => {
+    test('will automatically refresh and return schema for collection when queried', async() => {
         driver.givenListResult(ctx.dbs)
 
         await expect( env.schemaInformation.schemaFor(ctx.dbs[0].id) ).resolves.toEqual(ctx.dbs[0])
     })
 
-    test('retrieve collection if it does not exists, throw an exception', async () => {
+    test('retrieve collection if it does not exists, throw an exception', async() => {
         driver.givenListResult([])
 
         await expect( env.schemaInformation.schemaFor(ctx.collectionName) ).rejects.toThrow(CollectionDoesNotExists)
     })
 
-    test('force refresh will invalidate cache', async () => {
+    test('force refresh will invalidate cache', async() => {
         driver.givenListResult([])
         await env.schemaInformation.refresh()
         driver.givenListResult(ctx.dbs)

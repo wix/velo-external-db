@@ -35,12 +35,12 @@ const patchFieldName = (f) => {
 
 const givenOrderByFor = (column, sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue([{fieldName: column, direction: 'asc'}])
+                              .mockReturnValue([{ fieldName: column, direction: 'asc' }])
 }
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue([{ fieldName: '_id', opStr: '==', value : id}])
+                                .mockReturnValue([{ fieldName: '_id', opStr: '==', value: id }])
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {

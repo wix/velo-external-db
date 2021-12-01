@@ -13,7 +13,7 @@ class AdapterProvision {
         this.region = region
     }
 
-    async createAdapter(name, engine, secretId, secrets, { resourceGroupName, virtualNetworkName, appServicePlanName}) {
+    async createAdapter(name, engine, secretId, secrets, { resourceGroupName, virtualNetworkName, appServicePlanName }) {
         const serverFarm = await this.createAppServicePlan(resourceGroupName, appServicePlanName)
 
         const webAppResponse = await this.webAppClient
@@ -48,7 +48,7 @@ class AdapterProvision {
                                                                              })
     }
 
-    async adapterStatus(serviceId, {resourceGroupName}, instanceName) {
+    async adapterStatus(serviceId, { resourceGroupName }, instanceName) {
         return await this.webAppClient.get(resourceGroupName, instanceName)
                                       .then(instance => ({
                                         available: instance.state === 'Running',

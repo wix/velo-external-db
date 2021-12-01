@@ -15,7 +15,7 @@ const setWrongCredentials = () => process.env.GOOGLE_APPLICATION_CREDENTIALS='..
 const dbOperationWithMisconfiguredPassword = () => {
     unplugEmulator()
     setWrongCredentials()
-    return createPool( { projectId: 'wrong'} ).databaseOperations
+    return createPool( { projectId: 'wrong' } ).databaseOperations
 }
 
 const unsupported = () => { throw new Error('not supported') }
@@ -25,8 +25,8 @@ const dbOperationWithMisconfiguredHost = () => unsupported()
 
 const dbOperationWithValidDB = () => {
     process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8082'
-    const {databaseOperations, cleanup} = createPool({ } )
-    return {dbOperations: databaseOperations, cleanup}
+    const { databaseOperations, cleanup } = createPool({ } )
+    return { dbOperations: databaseOperations, cleanup }
 }
 
 module.exports = {

@@ -1,5 +1,5 @@
 const Chance = require('chance')
-const chance = Chance();
+const chance = Chance()
 const { checkRequiredKeys } = require('../utils/config_utils')
 const { gen } = require('test-commons')
 

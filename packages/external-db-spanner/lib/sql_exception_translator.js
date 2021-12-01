@@ -4,7 +4,7 @@ const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {
         case 9:
             if (err.details.includes('column')) {
-                return new FieldAlreadyExists(err.details/*'Collection already has a field with the same name'*/)
+                return new FieldAlreadyExists(err.details)
             } else {
                 return new CollectionAlreadyExists(err.details)
             }
@@ -14,7 +14,7 @@ const notThrowingTranslateErrorCodes = err => {
             } else if (err.details.includes('Instance')) {
                 return new DbConnectionError(`Access to database denied - wrong credentials or host is unavailable, sql message:  ${err.details} `)
             } else if (err.details.includes('Database')) {
-                return new DbConnectionError(`Database does not exists or you don\'t have access to it, sql message: ${err.details}`)
+                return new DbConnectionError(`Database does not exists or you don't have access to it, sql message: ${err.details}`)
             } else if (err.details.includes('Table')) {
                 return new CollectionDoesNotExists(err.details)
             } else {
@@ -32,7 +32,7 @@ const notThrowingTranslateErrorCodes = err => {
 }
 
 const translateErrorCodes = err => {
-    throw notThrowingTranslateErrorCodes(err);
+    throw notThrowingTranslateErrorCodes(err)
 }
 
 module.exports = { translateErrorCodes, notThrowingTranslateErrorCodes }

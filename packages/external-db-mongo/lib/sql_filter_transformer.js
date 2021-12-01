@@ -9,11 +9,11 @@ class FilterParser {
     transform(filter) {
         const results = this.parseFilter(filter)
         if (results.length === 0) {
-            return EMPTY_FILTER;
+            return EMPTY_FILTER
         }
         return {
             filterExpr: results[0].filterExpr
-        };
+        }
     }
 
     parseAggregation(aggregation, postFilter) {
@@ -63,7 +63,7 @@ class FilterParser {
 
         if (filter.operator === '$urlized') {
             return [{
-                filterExpr: {[filter.fieldName]: {'$regex': `/${filter.value.map(s => s.toLowerCase()).join('.*')}/i`}}
+                filterExpr: { [filter.fieldName]: { $regex: `/${filter.value.map(s => s.toLowerCase()).join('.*')}/i` } }
             }]
         }
 
@@ -104,7 +104,7 @@ class FilterParser {
         return value
     }
 
-    veloOperatorToMongoOperator(operator, value) {
+    veloOperatorToMongoOperator(operator) {
         switch (operator) {
             case '$hasSome':
                 return '$in'
@@ -115,12 +115,12 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         const results = sort.flatMap(this.parseSort)
         if (results.length === 0) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
         return {
             sortExpr: { sort: results.map(result => result.expr) }
@@ -133,7 +133,7 @@ class FilterParser {
         }
         const _direction = direction || 'ASC'
 
-        const dir = 'ASC' === _direction.toUpperCase() ? 'asc' : 'desc';
+        const dir = 'ASC' === _direction.toUpperCase() ? 'asc' : 'desc'
 
         return {
             expr: [fieldName, dir]

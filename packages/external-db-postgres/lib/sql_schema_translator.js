@@ -21,7 +21,6 @@ class SchemaColumnTranslator {
             case 'serial':
             case 'smallserial':
             case 'bigserial':
-
             case 'decimal':
             case 'numeric':
             case 'real':
@@ -73,23 +72,23 @@ class SchemaColumnTranslator {
                 return 'bigint'
 
             case 'number_float':
-                return `decimal`
+                return 'decimal'
 
             case 'number_double':
-                return `double precision`
+                return 'double precision'
 
             case 'number_decimal':
-                return `real`
+                return 'real'
 
             case 'datetime_date':
-                return `date`
+                return 'date'
 
             case 'datetime_time':
-                return `time`
+                return 'time'
 
             case 'datetime_timestamp':
             case 'datetime_datetime':
-                return `timestamp`
+                return 'timestamp'
 
             case 'text_string':
                 return `varchar${this.parseLength(precision)}`
@@ -97,10 +96,10 @@ class SchemaColumnTranslator {
             case 'text_small':
             case 'text_medium':
             case 'text_large':
-                return `text`
+                return 'text'
 
             case 'boolean_':
-                return `boolean`
+                return 'boolean'
 
             default:
                 throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)

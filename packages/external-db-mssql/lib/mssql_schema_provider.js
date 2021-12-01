@@ -1,4 +1,4 @@
-const { translateErrorCodes, notThrowingTranslateErrorCodes} = require('./sql_exception_translator')
+const { translateErrorCodes, notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeId, escapeTable } = require('./mssql_utils')
 const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')

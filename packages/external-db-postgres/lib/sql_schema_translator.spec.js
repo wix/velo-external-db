@@ -1,8 +1,9 @@
+/* eslint-disable jest/no-commented-out-tests */
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeIdentifier } = require('./postgres_utils')
 const { Uninitialized } = require('test-commons')
 const Chance = require('chance')
-const chance = Chance();
+const chance = Chance()
 
 describe('Sql Schema Column Translator', () => {
 
@@ -141,17 +142,17 @@ describe('Sql Schema Column Translator', () => {
 
     const ctx = {
         fieldName: Uninitialized,
-    };
+    }
 
     const env = {
         schemaTranslator: Uninitialized,
-    };
+    }
 
     beforeEach(() => {
-        ctx.fieldName = chance.word();
-    });
+        ctx.fieldName = chance.word()
+    })
 
     beforeAll(function() {
         env.schemaTranslator = new SchemaColumnTranslator()
-    });
+    })
 })

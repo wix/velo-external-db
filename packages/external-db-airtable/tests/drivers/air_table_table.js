@@ -22,7 +22,7 @@ class AirtableTable {
     insert(records) {
         const newRecords = records.map(record => { return { id: `rec${this.index++}`, ...record } })
         newRecords.forEach(element => this.data.push(element))
-        return newRecords;
+        return newRecords
     }
 
     addColumn(name, type) {
@@ -30,11 +30,11 @@ class AirtableTable {
     }
 
     removeColumn(name) {
-        this.fields = this.fields.filter(field => field.name != name)
+        this.fields = this.fields.filter(field => field.name !== name)
     }
 
     findById(id) {
-        return records.find(r => r.id === id)
+        return this.data.find(r => r.id === id)
     }
 
     getAllRows() {
@@ -42,8 +42,8 @@ class AirtableTable {
     }
 
     delete(recordId) {
-        const deleted = this.data.find(item => item.id == recordId)
-        this.data = this.data.filter(item => item.id != recordId)
+        const deleted = this.data.find(item => item.id === recordId)
+        this.data = this.data.filter(item => item.id !== recordId)
         return deleted ? true : false
     }
 }

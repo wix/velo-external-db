@@ -23,15 +23,15 @@ const defineValidOperationService = () => {
 
 const defineValidConfigReaderClient = (config) => {
     when(configReaderClient.readConfig).calledWith()
-                                           .mockReturnValue(config);
+                                           .mockReturnValue(config)
     when(configReaderClient.configStatus).calledWith()
                                            .mockReturnValue(validConfigReaderStatus)
 }
 
 const defineBrokenConfigReaderClient = (config) => {
-    const {deletedKey, newObject } = gen.deleteRandomKeyObject(config);
+    const { deletedKey, newObject } = gen.deleteRandomKeyObject(config)
     when(configReaderClient.readConfig).calledWith()
-                                           .mockReturnValue(newObject);
+                                           .mockReturnValue(newObject)
     when(configReaderClient.configStatus).calledWith()
                                            .mockReturnValue(`${missingRequiredConfigKeys}: ${deletedKey}`)
 }
@@ -49,5 +49,5 @@ const reset = () => {
 }
 
 module.exports = { operationService, configReaderClient, validDBConnectionStatus, validConfigReaderStatus, wrongDBConnectionStatus,
-    defineValidConfigReaderClient, defineValidOperationService, defineBrokenConfigReaderClient,defineBrokenOperationService,
-     missingRequiredConfigKeys, reset}
+    defineValidConfigReaderClient, defineValidOperationService, defineBrokenConfigReaderClient, defineBrokenOperationService,
+     missingRequiredConfigKeys, reset }

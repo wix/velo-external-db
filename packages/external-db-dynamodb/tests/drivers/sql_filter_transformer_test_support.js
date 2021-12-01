@@ -37,6 +37,7 @@ const givenFilterByIdWith = (id, filter) => {
                             })
 }
 
+// eslint-disable-next-line no-unused-vars
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {}
 
 const reset = () => {

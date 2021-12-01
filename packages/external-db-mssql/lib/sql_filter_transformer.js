@@ -1,6 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { EMPTY_FILTER, EMPTY_SORT, isObject } = require('velo-external-db-commons')
-const { escapeId, validateLiteral, patchFieldName, escapeFieldId } = require('./mssql_utils')
+const { escapeId, validateLiteral, patchFieldName } = require('./mssql_utils')
 
 class FilterParser {
     constructor() {
@@ -10,13 +10,13 @@ class FilterParser {
         const results = this.parseFilter(filter, 1, {})
 
         if (results.length === 0) {
-            return EMPTY_FILTER;
+            return EMPTY_FILTER
         }
 
         return {
             filterExpr: `WHERE ${results[0].filterExpr}`,
             parameters: results[0].parameters
-        };
+        }
     }
 
     wixDataFunction2Sql(f) {
@@ -58,10 +58,10 @@ class FilterParser {
 
         const havingFilter = this.parseFilter(postFilter, aliasToFunction)
 
-        const {filterExpr, parameters} =
-            havingFilter.map(({filterExpr, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                              parameters: parameters}))
-                        .concat({ filterExpr: '', parameters: {}})[0]
+        const { filterExpr, parameters } =
+            havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+                                                              parameters: parameters }))
+                        .concat({ filterExpr: '', parameters: {} })[0]
 
 
         return {
@@ -85,7 +85,7 @@ class FilterParser {
                     return {
                         filter: o.filter.concat( ...res ),
                     }
-                }, { filter: []})
+                }, { filter: [] })
                 const op = filter.operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.filter.map(r => r.filterExpr).join( op ),
@@ -112,7 +112,7 @@ class FilterParser {
         if (this.isSingleFieldStringOperator(filter.operator)) {
             return [{
                 filterExpr: `${this.inlineVariableIfNeeded(filter.fieldName, inlineFields)} LIKE ${validateLiteral(filter.fieldName)}`,
-                parameters: { [patchFieldName(filter.fieldName)]: this.valueForStringOperator(filter.operator, filter.value)}
+                parameters: { [patchFieldName(filter.fieldName)]: this.valueForStringOperator(filter.operator, filter.value) }
             }]
         }
 
@@ -157,7 +157,7 @@ class FilterParser {
     }
 
     prepareStatementVariables(n, fieldName) {
-        return Array.from({length: n}, (_, i) => validateLiteral(`${fieldName}${i + 1}`) )
+        return Array.from({ length: n }, (_, i) => validateLiteral(`${fieldName}${i + 1}`) )
                     .join(', ')
     }
 
@@ -205,13 +205,13 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         const results = sort.flatMap( this.parseSort )
 
         if (results.length === 0) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         return {
@@ -225,7 +225,7 @@ class FilterParser {
         }
         const _direction = direction || 'ASC'
 
-        const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC';
+        const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC'
 
         return [{
             expr: `${escapeId(fieldName)} ${dir}`

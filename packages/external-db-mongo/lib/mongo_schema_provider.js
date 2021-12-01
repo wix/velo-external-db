@@ -108,7 +108,7 @@ class SchemaProvider {
     }
 
     async ensureSystemTableExists() {
-        const systemTable = await this.client.db().listCollections({name:SystemTable}).toArray()
+        const systemTable = await this.client.db().listCollections({ name: SystemTable }).toArray()
         if (!systemTable.length) {
             await this.client.db().createCollection(SystemTable)
         }

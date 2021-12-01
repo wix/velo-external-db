@@ -1,4 +1,4 @@
-const passwdGen = require('generate-password');
+const passwdGen = require('generate-password')
 
 const shuffle = array => array.sort(() => Math.random() - 0.5)
 
@@ -14,6 +14,6 @@ const randomSecretKey = () => {
 }
 
 
-const randomCredentials = () => ({ user: 'velo_user', passwd: randomPassword()})
+const randomCredentials = () => ({ user: 'velo_user', passwd: randomPassword() })
 
 module.exports = { randomCredentials, randomSecretKey }

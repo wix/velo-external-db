@@ -13,7 +13,7 @@ const { create, readCommonConfig } = require('external-db-config')
 let started = false
 let server, _cleanup
 
-const load = async () => {
+const load = async() => {
     const { vendor, type: adapterType } = readCommonConfig()
     const configReader = create()
     const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey } = await init(adapterType, vendor, configReader)
@@ -27,15 +27,15 @@ const load = async () => {
 }
 
 
-load().then(({ secretKey}) => {
+load().then(({ secretKey }) => {
     const app = express()
 
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(express.json())
-    app.use(unless(['/', '/provision', '/favicon.ico'], authMiddleware({ secretKey: secretKey })));
+    app.use(unless(['/', '/provision', '/favicon.ico'], authMiddleware({ secretKey: secretKey })))
     config.forEach( ( { pathPrefix, roles }) => app.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
     app.use(compression())
-    app.set('view engine', 'ejs');
+    app.set('view engine', 'ejs')
 
     const router = createRouter()
 
@@ -50,4 +50,4 @@ load().then(({ secretKey}) => {
 const internals = () => ({ server: server, cleanup: _cleanup, started: started, reload: load })
 
 
-module.exports = { internals };
+module.exports = { internals }

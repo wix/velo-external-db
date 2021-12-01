@@ -17,27 +17,27 @@ const extraOptions = {
     },
 }
 
-const connection = async () => {
+const connection = async() => {
     const { connection, cleanup } = await init(testEnvConfig, extraOptions)
 
     return { pool: connection, cleanup: cleanup }
 }
 
-const cleanup = async () => {
-    const {schemaProvider, cleanup} = await init(testEnvConfig, extraOptions)
+const cleanup = async() => {
+    const { schemaProvider, cleanup } = await init(testEnvConfig, extraOptions)
 
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
 
-    await cleanup();
+    await cleanup()
 }
 
-const initEnv = async () => {
+const initEnv = async() => {
 
     await runImage('mssql')
 }
 
-const shutdownEnv = async () => {
+const shutdownEnv = async() => {
     await stopImage('mssql')
 }
 

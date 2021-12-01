@@ -16,7 +16,7 @@ const subnetService = () => 'Microsoft.Sql'
 
 const createVirtualNetworkRule = async(serverName, resourceGroupName, virtualNetwork, contextClient) => {
     const virtualNetworkRulesClient = new VirtualNetworkRules(contextClient)
-    await virtualNetworkRulesClient.beginCreateOrUpdate(resourceGroupName, serverName, virtualNetwork.name, { 'virtualNetworkSubnetId': virtualNetwork.subnets[0].id })
+    await virtualNetworkRulesClient.beginCreateOrUpdate(resourceGroupName, serverName, virtualNetwork.name, { virtualNetworkSubnetId: virtualNetwork.subnets[0].id })
 }
 
 module.exports = {

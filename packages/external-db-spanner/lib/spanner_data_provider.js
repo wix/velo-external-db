@@ -1,5 +1,4 @@
 const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } = require('./spanner_utils')
-const { SystemFields, updateFieldsFor} = require('velo-external-db-commons')
 
 class DataProvider {
     constructor(database, filterParser) {
@@ -9,7 +8,7 @@ class DataProvider {
     }
 
     async find(collectionName, filter, sort, skip, limit) {
-        const {filterExpr, parameters} = this.filterParser.transform(filter)
+        const { filterExpr, parameters } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
 
         const query = {
@@ -21,12 +20,12 @@ class DataProvider {
             },
         }
 
-        const [rows] = await this.database.run(query);
+        const [rows] = await this.database.run(query)
         return recordSetToObj(rows).map( this.asEntity.bind(this) )
     }
 
     async count(collectionName, filter) {
-        const {filterExpr, parameters} = this.filterParser.transform(filter)
+        const { filterExpr, parameters } = this.filterParser.transform(filter)
         const query = {
             sql: `SELECT COUNT(*) AS num FROM ${escapeId(collectionName)} ${filterExpr}`.trim(),
             params: parameters,
@@ -35,7 +34,7 @@ class DataProvider {
         const [rows] = await this.database.run(query)
         const objs = recordSetToObj(rows).map( this.asEntity.bind(this) )
 
-        return objs[0].num;
+        return objs[0].num
     }
 
     async insert(collectionName, items) {
@@ -64,7 +63,7 @@ class DataProvider {
 
     asEntity(dbEntity) {
         return Object.keys(dbEntity)
-                     .reduce(function (obj, key) {
+                     .reduce(function(obj, key) {
                          return { ...obj, [unpatchFieldName(key)]: this.fixDates(dbEntity[key]) }
                      }.bind(this), {})
     }
@@ -91,15 +90,15 @@ class DataProvider {
             },
         }
 
-        const [rows] = await this.database.run(query);
+        const [rows] = await this.database.run(query)
         const itemIds = recordSetToObj(rows).map( this.asEntity.bind(this) ).map(e => e._id)
 
         await this.delete(collectionName, itemIds)
     }
 
     async aggregate(collectionName, filter, aggregation) {
-        const {filterExpr: whereFilterExpr, parameters: whereParameters} = this.filterParser.transform(filter)
-        const {fieldsStatement, groupByColumns, havingFilter, parameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
+        const { filterExpr: whereFilterExpr, parameters: whereParameters } = this.filterParser.transform(filter)
+        const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
 
         const query = {
             sql: `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`,

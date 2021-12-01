@@ -15,8 +15,8 @@ const init = async(cfg, _cfgOptions) => {
     const databaseOperations = new DatabaseOperations(airtableBase)
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(airtableBase, filterParser)
-    const schemaProvider = new SchemaProvider(airtableBase, {apiKey: cfg.apiPrivateKey, metaApiKey: cfg.metaApiKey, baseUrl: cfg.baseUrl})
-    return { dataProvider, schemaProvider, connection: airtableBase, databaseOperations, cleanup: async () => { } }
+    const schemaProvider = new SchemaProvider(airtableBase, { apiKey: cfg.apiPrivateKey, metaApiKey: cfg.metaApiKey, baseUrl: cfg.baseUrl })
+    return { dataProvider, schemaProvider, connection: airtableBase, databaseOperations, cleanup: async() => { } }
 }
 
 module.exports = init

@@ -10,7 +10,7 @@ class FilterParser {
         const results = this.parseFilter(filter, 1, {})
 
         if (results.length === 0) {
-            return EMPTY_FILTER;
+            return EMPTY_FILTER
         }
 
         return {
@@ -18,7 +18,7 @@ class FilterParser {
             filterColumns: results[0].filterColumns,
             offset: results[0].offset,
             parameters: results[0].parameters
-        };
+        }
     }
 
     wixDataFunction2Sql(f) {
@@ -60,9 +60,9 @@ class FilterParser {
 
         const havingFilter = this.parseFilter(postFilter, offset, aliasToFunction)
 
-        const {filterExpr, parameters} =
-            havingFilter.map(({filterExpr, parameters}) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                              parameters: parameters}))
+        const { filterExpr, parameters } =
+            havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+                                                              parameters: parameters }))
                         .concat(EMPTY_FILTER)[0]
 
 
@@ -77,7 +77,7 @@ class FilterParser {
     parseFilter(filter, offset, inlineFields) {
         // console.log('parseFilter', inlineFields)
         if (!filter || !isObject(filter)|| filter.operator === undefined) {
-            return [];
+            return []
         }
 
         switch (filter.operator) {
@@ -89,7 +89,7 @@ class FilterParser {
                         filter: o.filter.concat( ...res ),
                         offset: res.length === 1 ? res[0].offset : o.offset
                     }
-                }, { filter: [], offset: offset})
+                }, { filter: [], offset: offset })
                 const op = filter.operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.filter.map(r => r.filterExpr).join( op ),
@@ -160,7 +160,7 @@ class FilterParser {
     }
 
     prepareStatementVariables(n, offset) {
-        return Array.from({length: n}, (_, i) => `$${offset + i}`)
+        return Array.from({ length: n }, (_, i) => `$${offset + i}`)
                     .join(', ')
     }
 
@@ -211,13 +211,13 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         const results = sort.flatMap( this.parseSort )
 
         if (results.length === 0) {
-            return EMPTY_SORT;
+            return EMPTY_SORT
         }
 
         return {
@@ -231,7 +231,7 @@ class FilterParser {
         }
         const _direction = direction || 'ASC'
 
-        const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC';
+        const dir = 'ASC' === _direction.toUpperCase() ? 'ASC' : 'DESC'
 
         return [{
             expr: `${escapeIdentifier(fieldName)} ${dir}`

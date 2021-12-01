@@ -69,34 +69,34 @@ class SchemaColumnTranslator {
                 return `DECIMAL${this.parsePrecision(precision)}`
 
             case 'datetime_date':
-                return `DATE`
+                return 'DATE'
 
             case 'datetime_time':
-                return `TIME`
+                return 'TIME'
 
             case 'datetime_year':
-                return `YEAR`
+                return 'YEAR'
 
             case 'datetime_datetime':
-                return `DATETIME`
+                return 'DATETIME'
 
             case 'datetime_timestamp':
-                return `TIMESTAMP DEFAULT CURRENT_TIMESTAMP`
+                return 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
 
             case 'text_string':
                 return `VARCHAR${this.parseLength(precision)}`
 
             case 'text_small':
-                return `TEXT`
+                return 'TEXT'
 
             case 'text_medium':
-                return `MEDIUMTEXT`
+                return 'MEDIUMTEXT'
 
             case 'text_large':
-                return `LONGTEXT`
+                return 'LONGTEXT'
 
             case 'boolean_':
-                return `BOOLEAN`
+                return 'BOOLEAN'
 
             default:
                 throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)

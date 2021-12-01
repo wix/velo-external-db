@@ -2,7 +2,7 @@ const inquirer = require('inquirer')
 const { nonEmpty } = require('../../cli/validators')
 const { credentialsFor } = require('../../auth/default_credentials')
 
-const credentials = async () => inquirer.prompt([
+const credentials = async() => inquirer.prompt([
     {
         type: 'input',
         name: 'awsAccessKeyId',
@@ -18,7 +18,7 @@ const credentials = async () => inquirer.prompt([
     }
 ])
 
-const region = async () => inquirer.prompt([
+const region = async() => inquirer.prompt([
     {
         type: 'list',
         name: 'region',

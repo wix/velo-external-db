@@ -1,8 +1,8 @@
 const Chance = require('chance')
-const chance = Chance();
+const chance = Chance()
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080',
-});
+})
 
 const secretKey = chance.word()
 
@@ -12,12 +12,12 @@ const authInit = () => {
 
 const appendSecretKeyToRequest = dataRaw => {
     const data = JSON.parse( dataRaw )
-    return JSON.stringify({...data, ...{ requestContext: {settings: {secretKey: secretKey}}}})
+    return JSON.stringify({ ...data, ...{ requestContext: { settings: { secretKey: secretKey } } } })
 }
 
 const appendRoleToRequest = role => dataRaw => {
     const data = JSON.parse( dataRaw )
-    return JSON.stringify({...data, ...{ requestContext: {...data.requestContext, role: role }}})
+    return JSON.stringify({ ...data, ...{ requestContext: { ...data.requestContext, role: role } } })
 }
 
 const authAdmin = { transformRequest: axios.defaults

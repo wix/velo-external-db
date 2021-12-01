@@ -5,7 +5,7 @@ const DatabaseOperations = require('./spanner_operations')
 const { Spanner } = require('@google-cloud/spanner')
 
 const init = (cfg, _poolOptions) => {
-    const spanner = new Spanner({projectId: cfg.projectId})
+    const spanner = new Spanner({ projectId: cfg.projectId })
     const instance = spanner.instance(cfg.instanceId)
 
     const poolOptions = _poolOptions || { }
@@ -18,7 +18,7 @@ const init = (cfg, _poolOptions) => {
     const dataProvider = new DataProvider(database, filterParser)
     const schemaProvider = new SchemaProvider(database)
 
-    return { dataProvider, schemaProvider, databaseOperations, connection: database, cleanup: async () => await database.close() }
+    return { dataProvider, schemaProvider, databaseOperations, connection: database, cleanup: async() => await database.close() }
 }
 
 module.exports = init

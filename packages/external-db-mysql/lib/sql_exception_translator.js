@@ -10,7 +10,7 @@ const notThrowingTranslateErrorCodes = err => {
             return new CollectionDoesNotExists('Collection does not exists')
         case 'ER_DBACCESS_DENIED_ERROR':
         case 'ER_BAD_DB_ERROR':
-            return new DbConnectionError(`Database does not exists or you don\'t have access to it, sql message: ${err.sqlMessage}`)
+            return new DbConnectionError(`Database does not exists or you don't have access to it, sql message: ${err.sqlMessage}`)
         case 'ER_ACCESS_DENIED_ERROR':
             return new DbConnectionError(`Access to database denied - probably wrong credentials, sql message:  ${err.sqlMessage} `)
         case 'EAI_AGAIN':
@@ -22,7 +22,7 @@ const notThrowingTranslateErrorCodes = err => {
 }
 
 const translateErrorCodes = err => {
-    throw notThrowingTranslateErrorCodes(err);
+    throw notThrowingTranslateErrorCodes(err)
 }
 
 module.exports = { translateErrorCodes, notThrowingTranslateErrorCodes }

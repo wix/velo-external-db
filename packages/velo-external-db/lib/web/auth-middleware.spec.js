@@ -1,9 +1,9 @@
 const { Uninitialized } = require('test-commons')
-const { authMiddleware } = require('./auth-middleware');
-const driver = require('../../test/drivers/auth_middleware_test_support');
+const { authMiddleware } = require('./auth-middleware')
+const driver = require('../../test/drivers/auth_middleware_test_support')
 const { UnauthorizedError } = require('velo-external-db-commons').errors
 const Chance = require('chance')
-const chance = Chance();
+const chance = Chance()
 
 describe('Auth Middleware', () => {
 
@@ -11,11 +11,11 @@ describe('Auth Middleware', () => {
         secretKey: Uninitialized,
         anotherSecretKey: Uninitialized,
         next: Uninitialized,
-    };
+    }
 
     const env = {
         auth: Uninitialized,
-    };
+    }
 
     beforeEach(() => {
         ctx.secretKey = chance.word()
@@ -23,19 +23,19 @@ describe('Auth Middleware', () => {
         ctx.next = jest.fn().mockName('next')
 
         env.auth = authMiddleware({ secretKey: ctx.secretKey })
-    });
+    })
 
     test('should throw when request does not contain auth', () => {
-        expect( () => env.auth({body: { } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: {} } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: '' } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { settings: {} } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { settings: '' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: [] } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { settings: 'x' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { role: '', settings: 'x' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { role: [], settings: 'x' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
-        expect( () => env.auth({body: { requestContext: { role: {}, settings: 'x' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: {} } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: '' } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: { settings: {} } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: { settings: '' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: [] } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: { settings: 'x' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: { role: '', settings: 'x' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: { role: [], settings: 'x' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth({ body: { requestContext: { role: {}, settings: 'x' } } }, Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
     })
 
     test('should throw when secret key does not match', () => {

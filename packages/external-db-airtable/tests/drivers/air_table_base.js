@@ -24,7 +24,7 @@ class AirtableBase {
         const table = this.getTable(tableName)
         columns.forEach(column => {
             table.addColumn(column.name, column.type)
-        });
+        })
     }
     deleteTable(tableName) {
         this.tables = this.tables.filter(table => table.name !== tableName)

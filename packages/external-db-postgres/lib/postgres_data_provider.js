@@ -9,8 +9,8 @@ class DataProvider {
     }
 
     async find(collectionName, filter, sort, skip, limit) {
-        const {filterExpr, parameters, offset} = this.filterParser.transform(filter)
-        const {sortExpr} = this.filterParser.orderBy(sort)
+        const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
+        const { sortExpr } = this.filterParser.orderBy(sort)
 
         const resultset = await this.pool.query(`SELECT * FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
@@ -18,7 +18,7 @@ class DataProvider {
     }
 
     async count(collectionName, filter) {
-        const {filterExpr, parameters} = this.filterParser.transform(filter)
+        const { filterExpr, parameters } = this.filterParser.transform(filter)
         const resultset = await this.pool.query(`SELECT COUNT(*) AS num FROM ${escapeIdentifier(collectionName)} ${filterExpr}`, parameters)
                                          .catch( translateErrorCodes )
         return parseInt(resultset.rows[0]['num'], 10)
@@ -64,8 +64,8 @@ class DataProvider {
     }
 
     async aggregate(collectionName, filter, aggregation) {
-        const {filterExpr: whereFilterExpr, parameters: whereParameters, offset} = this.filterParser.transform(filter)
-        const {fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters} = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep, offset)
+        const { filterExpr: whereFilterExpr, parameters: whereParameters, offset } = this.filterParser.transform(filter)
+        const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep, offset)
 
         const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr}`
         const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters])

@@ -56,7 +56,7 @@ class DataProvider {
     }
 
 
-    async query({ collectionName, filterByFormula, limitExpr, sortExpr, idsOnly, skip}) {
+    async query({ collectionName, filterByFormula, limitExpr, sortExpr, idsOnly, skip }) {
         const resultsByPages = []
         
         const limit = limitExpr?.maxRecords ? limitExpr : { maxRecords: DEFAULT_MAX_RECORDS }
@@ -68,7 +68,7 @@ class DataProvider {
         await this.base(collectionName)
                   .select({ ...filterByFormula, ...limitExpr, ...sort })
                   .eachPage((records, fetchNextPage) => {
-                      const recordsToReturn = idsOnly ? records.map(record=>record.id) : records 
+                      const recordsToReturn = idsOnly ? records.map(record => record.id) : records 
                       resultsByPages.push(recordsToReturn)
                       fetchNextPage()
                   })
@@ -82,7 +82,7 @@ class DataProvider {
     }
 
     async wixDataIdToAirtableId(collectionName, _id) {
-        const record = await this.query({collectionName, filterByFormula: { filterByFormula: `_id = "${_id}" ` }, idsOnly: true})
+        const record = await this.query({ collectionName, filterByFormula: { filterByFormula: `_id = "${_id}" ` }, idsOnly: true })
         return record[0]
     }
 

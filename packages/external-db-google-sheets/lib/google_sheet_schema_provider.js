@@ -21,7 +21,7 @@ class SchemaProvider {
 
     async create(collectionName) {
         try{
-            const newSheet = await this.doc.addSheet({title: collectionName})
+            const newSheet = await this.doc.addSheet({ title: collectionName })
             await newSheet.setHeaderRow(SystemFields.map(i => i.name))
         } catch(err) {
             translateErrorCodes(err)

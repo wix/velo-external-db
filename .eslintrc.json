@@ -5,8 +5,13 @@
         "es2021": true,
         "node": true
     },
+    "settings": {
+        "jest": {
+          "version": "latest"
+        }
+    },
     "extends": ["eslint:recommended", "plugin:jest/recommended"],
-    "ignorePatterns": ["**/*.spec.js"],
+    "ignorePatterns": [""],
     "parserOptions": {
         "ecmaVersion": 12
     },
@@ -58,5 +63,16 @@
             "error",
             "always"
         ],
-    }
+        "arrow-spacing": [
+            "error",
+            { "before": true, "after": true }
+        ],
+        "jest/no-standalone-expect": [
+            "error",
+            { "additionalTestBlockFunctions": ["each.test"] }
+        ],
+        "jest/no-conditional-expect": [
+            "off"
+        ]
+        }
 }

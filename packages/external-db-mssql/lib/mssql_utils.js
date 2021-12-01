@@ -27,9 +27,9 @@ const notConnectedPool = (pool, err) => {
     return {
         pool: {
             ...pool,
-            query: async () => { throw err },
-            request: async () => { throw err },
-            connect: async () => { return await pool.connect() }
+            query: async() => { throw err },
+            request: async() => { throw err },
+            connect: async() => { return await pool.connect() }
         },
         cleanup: () => { }
     }

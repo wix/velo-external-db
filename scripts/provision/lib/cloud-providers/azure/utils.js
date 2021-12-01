@@ -7,7 +7,7 @@ const provisionVariables = {
     virtualNetworkName: `velo-vnet-${random}`,
     subnetName: `velo-subnet-${random}`,
     appServicePlanName: `plan${random}`,
-    keyVaultName:`key-vault-${random}`
+    keyVaultName: `key-vault-${random}`
 }
 
 const refFromKeyVault = (keyVaultName, secretName) => `@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${secretName})`
