@@ -26,11 +26,15 @@
     "test:bigquery": "lerna exec --scope external-db-bigquery \"npm test\" && lerna exec --scope velo-external-db \"npm run test:bigquery\"",
     "release": "lerna version --no-push",
     "outdated:all": "lerna exec --scope '{external-db-config,external-db-firestore,external-db-mongo,external-db-mssql,external-db-mysql,external-db-postgres,external-db-spanner,external-db-google-sheets,external-db-airtable,external-db-dynamodb,velo-external-db,velo-external-db-core}' \"npm outdated\"",
-    "ci:publish": "lerna publish -y from-git"
+    "ci:publish": "lerna publish -y from-git",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
-    "lerna": "^4.0.0"
+    "eslint-plugin-jest": "^25.3.0",
+    "husky": "^7.0.4",
+    "lerna": "^4.0.0",
+    "lint-staged": "^12.1.2"
   },
   "workspaces": {
     "packages": [
@@ -49,7 +53,7 @@
       "velo-external-db-core"
     ]
   },
-  "dependencies": {
-    "eslint-plugin-jest": "^25.3.0"
+  "lint-staged": {
+    "*.js": "eslint --cache --fix"
   }
 }

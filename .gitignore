@@ -8,3 +8,4 @@ schemas.json
 .vscode
 packages/.DS_Store
 .DS_Store
+.eslintcache
