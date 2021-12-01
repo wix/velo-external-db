@@ -21,7 +21,7 @@ describe('Velo External DB',  () => {
         })
 
         test('answer provision with stub response', async () => {
-            expect((await axios.post(`/provision`, { }, authOwner)).data).toEqual({ protocolVersion: 2 });
+            expect((await axios.post(`/provision`, { }, authOwner)).data).toEqual({});
         })
     })
 
