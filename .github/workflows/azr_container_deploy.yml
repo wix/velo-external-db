@@ -10,7 +10,7 @@ jobs:
     env:
       DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
       IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
-      IMAGE_TAG: 1.1
+      IMAGE_TAG: latest
     
     steps:
       - name: Git checkout
@@ -19,7 +19,6 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
-          # registry: docker.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
