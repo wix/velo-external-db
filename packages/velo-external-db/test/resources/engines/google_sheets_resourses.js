@@ -1,4 +1,4 @@
-const { mockServer, cleanupSheets } = require('external-db-google-sheets')
+const { mockServer } = require('external-db-google-sheets')
 
 let _server, port = 1502
 

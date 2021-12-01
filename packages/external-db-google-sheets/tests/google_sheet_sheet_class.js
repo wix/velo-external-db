@@ -1,4 +1,3 @@
-/* eslint-disable no-case-declarations */
 const { numToColumnLetter } = require('./google_sheets_test_utils')
 
 class GoogleSpreadsheetSheet {
@@ -15,8 +14,8 @@ class GoogleSpreadsheetSheet {
 
     sheetInfo() {
         return {
-            properties : {
-                sheetId : this.sheetId,
+            properties: {
+                sheetId: this.sheetId,
                 title: this.title,
                 index: this.index,
                 sheetType: this.sheetType,
@@ -29,7 +28,7 @@ class GoogleSpreadsheetSheet {
 
     getSheetHeader() {
         const range = `${this.title}!A1:${numToColumnLetter(this.sheetHeader.length + 1)}1`
-        return {range, majorDimension: 'ROWS', values: [this.sheetHeader]}
+        return { range, majorDimension: 'ROWS', values: [this.sheetHeader] }
     }
 
     /*
@@ -43,24 +42,24 @@ class GoogleSpreadsheetSheet {
             case '1:1':
                 this.sheetHeader = values.filter(v => v)
                 this.values[0] = this.sheetHeader 
-                return {updatedData: { values: [this.sheetHeader]}}
+                return { updatedData: { values: [this.sheetHeader] } }
             case 'A1':
                 const startIndex = `A${this.values.length + 1}`
                 this.values.push(...values)
                 const endIndex = `${numToColumnLetter(values[0].length)}${this.values.length + 1}`
                 return { 
                     updatedRange: `${this.title}!${startIndex}:${endIndex}`,
-                    updatedData: { values: [this.sheetHeader]}
+                    updatedData: { values: [this.sheetHeader] }
                 }
             default:
-                break;
+                break
         }
 
     }
 
     getRows(offset, limit) {
         const rows = this.values.slice(offset-1, limit-1)
-        return  { values: rows}
+        return  { values: rows }
     }
 
     deleteRows(startRowIndex, endRowIndex) {
@@ -72,9 +71,9 @@ class GoogleSpreadsheetSheet {
     }
 
     updateRows(startRowIndex, endRowIndex, values) {
-        console.log({before: this.values})
+        console.log({ before: this.values })
         this.values[startRowIndex-1] = values[0]
-        console.log({after: this.values})
+        console.log({ after: this.values })
         return {
             updatedData: { values }
         }

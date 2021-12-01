@@ -47,7 +47,7 @@ class DbProvision {
                   .createVirtualNetwork(resourceGroupName, virtualNetworkName, subnetName)
     }
 
-    async postCreateDb(engine, dbName, status, dbCredentials, {resourceGroupName, virtualNetworkName}, instanceName) {
+    async postCreateDb(engine, dbName, status, dbCredentials, { resourceGroupName, virtualNetworkName }, instanceName) {
         await this.engineClient
                   .createInitDb(resourceGroupName, instanceName, dbName, this.contextClient)
         await this.createVirtualNetworkRule(instanceName, resourceGroupName, virtualNetworkName)

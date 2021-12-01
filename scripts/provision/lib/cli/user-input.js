@@ -17,7 +17,7 @@ const dbSupportedOn = (vendor) => {
 }
 
 
-const askForUserInput = async () => {
+const askForUserInput = async() => {
     return await inquirer.prompt([
         {
             type: 'list',

@@ -1,6 +1,6 @@
 const { randomEntity } = require('../generator/data')
 
-const insert = async (items, collectionName, axios) => {
+const insert = async(items, collectionName, axios) => {
     await axios.post('/data/insert/bulk', { collectionName, items })
                .catch(error => console.log(`Error adding chunk: ${error.message}`))
 }

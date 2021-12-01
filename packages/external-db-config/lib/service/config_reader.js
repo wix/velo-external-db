@@ -1,5 +1,5 @@
 class ConfigReader {
-  constructor (externalConfigReader, commonConfigReader) {
+  constructor(externalConfigReader, commonConfigReader) {
     this.externalConfigReader = externalConfigReader
     this.commonConfigReader = commonConfigReader
   }
@@ -10,7 +10,7 @@ class ConfigReader {
 
   async configStatus() {
     const { missingRequiredSecretsKeys } = await this.externalConfigReader.validate()
-    const { missingRequiredSecretsKeys : missing } = this.commonConfigReader.validate()
+    const { missingRequiredSecretsKeys: missing } = this.commonConfigReader.validate()
 
     if (missingRequiredSecretsKeys.length > 0 || (missing && missing.length > 0)) {
       return `Missing props: ${[...missingRequiredSecretsKeys, missing].join(', ')}`

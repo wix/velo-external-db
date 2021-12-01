@@ -6,7 +6,7 @@ const { providerFor } = require('../cloud-providers/factory')
 const provisionDb = async(provider, configWriter, { engine, secretId, secretKey, dbName, provisionVariables, dbCredentials, instanceName }) => {
     await startSpinnerWith(`Preparing ${engine} - running preCreate `, async() => await provider.preCreateDb(provisionVariables))
     
-    await startSpinnerWith(`Creating ${engine} DB Instance`, async() => await provider.createDb({ name: instanceName, engine: engine, credentials: dbCredentials, ...provisionVariables}))
+    await startSpinnerWith(`Creating ${engine} DB Instance`, async() => await provider.createDb({ name: instanceName, engine: engine, credentials: dbCredentials, ...provisionVariables }))
     await startSpinnerWith('Waiting for db instance to start', async() => await blockUntil( async() => (await provider.dbStatusAvailable(instanceName, provisionVariables)).available ))
 
     const status = await provider.dbStatusAvailable(instanceName, provisionVariables)
@@ -36,7 +36,7 @@ const provisionAdapter = async(provider, engine, secretId, secrets, connectionNa
     await startSpinnerWith('Post create instance', async() => provider.postCreateAdapter?.(instanceName, provisionVariables, engine))
 
     blankLine()
-    return {serviceUrl: status.serviceUrl}
+    return { serviceUrl: status.serviceUrl }
 
 }
 
@@ -61,7 +61,7 @@ const main = async({ vendor, engine, credentials, region }) => {
     blankLine()
     info('Provision DB Instance')
 
-    const {status, secrets} = await provisionDb(dbProvision, configWriter, { engine, secretId, secretKey, dbName, provisionVariables, dbCredentials, instanceName })
+    const { status, secrets } = await provisionDb(dbProvision, configWriter, { engine, secretId, secretKey, dbName, provisionVariables, dbCredentials, instanceName })
 
     blankLine()
     blankLine()

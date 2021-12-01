@@ -1,5 +1,4 @@
 const { asEntity } = require('./firestore_utils')
-const { SystemFields } = require('velo-external-db-commons')
 
 class DataProvider {
     constructor(database, filterParser) {
@@ -52,7 +51,7 @@ class DataProvider {
         const collectionRef = await this.database.collection(collectionName)
         const query = collectionRef.orderBy('_id').limit(batchSize)
 
-        return new Promise((resolve, reject) =>{
+        return new Promise((resolve, reject) => {
             this.deleteQueryBatch(query, resolve).catch(reject)
         })
     

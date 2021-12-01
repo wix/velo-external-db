@@ -50,8 +50,8 @@ const deleteSingleItemCommand = (id) => ({
 const updateSingleItemCommand = (collectionName, item) =>  {
     const updateFields = updateFieldsFor(item)
     const updateExpression = `SET ${updateFields.map(f => `#${f} = :${f}`).join(', ')}`
-    const expressionAttributeNames = updateFields.reduce((pv, cv)=> ({ ...pv, [`#${cv}`]: cv }), {})
-    const expressionAttributeValues = updateFields.reduce((pv, cv)=> ({ ...pv, [`:${cv}`]: item[cv]}), {})
+    const expressionAttributeNames = updateFields.reduce((pv, cv) => ({ ...pv, [`#${cv}`]: cv }), {})
+    const expressionAttributeValues = updateFields.reduce((pv, cv) => ({ ...pv, [`:${cv}`]: item[cv] }), {})
 
     return {
         Update: {

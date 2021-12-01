@@ -14,7 +14,7 @@ class DatabaseOperations {
                       .firstPage()
             return { valid: true }
         } catch (e) {
-            if (this.connectionSucceedTableDoesNotExist(e)) return {valid: true}
+            if (this.connectionSucceedTableDoesNotExist(e)) return { valid: true }
             return { valid: false, error: notThrowingTranslateErrorCodes(e) }
         }
     }

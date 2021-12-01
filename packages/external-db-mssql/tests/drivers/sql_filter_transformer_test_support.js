@@ -1,6 +1,6 @@
 const { EMPTY_SORT } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const { escapeId, validateLiteral, patchFieldName } = require('../../lib/mssql_utils');
+const { escapeId, validateLiteral, patchFieldName } = require('../../lib/mssql_utils')
 
 const filterParser = {
     transform: jest.fn(),
@@ -32,7 +32,7 @@ const givenOrderByFor = (column, sort) => {
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeId('_id')} = ${validateLiteral('_id')}`, parameters: { [patchFieldName('_id')]: id} })
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeId('_id')} = ${validateLiteral('_id')}`, parameters: { [patchFieldName('_id')]: id } })
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {

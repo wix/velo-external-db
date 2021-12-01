@@ -1,56 +1,56 @@
 const Chance = require('chance')
-const chance = Chance();
+const chance = Chance()
 
 const randomObject = () => {
-    const obj = {};
-    const num = chance.natural({min: 2, max: 20});
+    const obj = {}
+    const num = chance.natural({ min: 2, max: 20 })
     for (let i = 0; i < num; i++) {
-        Object.assign(obj, {[chance.word()]: chance.sentence()});
+        Object.assign(obj, { [chance.word()]: chance.sentence() })
     }
-    return obj;
-};
+    return obj
+}
 
 const randomEntities = (columns) => {
-    const num = chance.natural({min: 2, max: 20});
-    const arr = [];
+    const num = chance.natural({ min: 2, max: 20 })
+    const arr = []
     for (let i = 0; i < num; i++) {
         arr.push(randomEntity(columns))
     }
-    return arr;
+    return arr
 }
 
 const randomDbEntities = (columns) => {
-    const num = chance.natural({min: 2, max: 20});
-    const arr = [];
+    const num = chance.natural({ min: 2, max: 20 })
+    const arr = []
     for (let i = 0; i < num; i++) {
         arr.push(randomDbEntity(columns))
     }
-    return arr;
+    return arr
 }
 
 const newDate = () => {
     const d = new Date()
     d.setMilliseconds(0)
-    return d;
+    return d
 }
 
 const randomArrayOf = (gen) => {
-    const arr = [];
-    const num = chance.natural({min: 2, max: 20});
+    const arr = []
+    const num = chance.natural({ min: 2, max: 20 })
     for (let i = 0; i < num; i++) {
         arr.push(gen())
     }
-    return arr;
+    return arr
 }
 
 const randomCollectionName = () => chance.word({ length: 5 })
-const randomDbField = () => ( {name: chance.word(), type: chance.word(), isPrimary: chance.bool()} )
+const randomDbField = () => ( { name: chance.word(), type: chance.word(), isPrimary: chance.bool() } )
 const randomDbFields = () => randomArrayOf( randomDbField )
 
-const randomColumn = () => ( {name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false} )
+const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 const randomNumberColumns = () => {
-    return [ {name: chance.word(), type: 'number', subtype: 'int', isPrimary: false},
-             {name: chance.word(), type: 'number', subtype: 'decimal', precision: '10,2', isPrimary: false} ]
+    return [ { name: chance.word(), type: 'number', subtype: 'int', isPrimary: false },
+             { name: chance.word(), type: 'number', subtype: 'decimal', precision: '10,2', isPrimary: false } ]
 }
 
 const randomEntity = (columns) => {
@@ -66,7 +66,7 @@ const randomEntity = (columns) => {
     for (const column of _columns) {
         entity[column] = chance.word()
     }
-    return entity;
+    return entity
 }
 
 const randomDbEntity = (columns) => {
@@ -81,7 +81,7 @@ const randomDbEntity = (columns) => {
 
     _columns.forEach(column => entity[column] = chance.word())
 
-    return entity;
+    return entity
 }
 
 const randomNumberDbEntity = (columns) => {
@@ -104,7 +104,7 @@ const randomNumberDbEntity = (columns) => {
         }
     })
 
-    return entity;
+    return entity
 }
 
 const randomFilter = () => {
@@ -135,25 +135,25 @@ const randomDb = () => ( { id: randomCollectionName(),
 
 const randomDbs = () => randomArrayOf( randomDb )
 
-const randomObjectFromArray = (array) => randomItem = array[chance.integer({ min: 0, max: array.length - 1 })];
+const randomObjectFromArray = (array) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
 const randomKeyObject = (obj) => {
-    objectKeys = Object.keys(obj)
-    selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
+    const objectKeys = Object.keys(obj)
+    const selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
     return selectedKey
 }
 
 const deleteRandomKeyObject = (obj) => {
     const deletedKey = randomKeyObject(obj)
     delete obj[deletedKey]
-    return { deletedKey, newObject:obj }
+    return { deletedKey, newObject: obj }
 }
 
 const clearRandomKeyObject = (obj) => {
-    const newObject = {...obj}
-    const clearedKey = randomKeyObject(newObject);
-    newObject[clearedKey] = '';
-    return { clearedKey, newObject };
+    const newObject = { ...obj }
+    const clearedKey = randomKeyObject(newObject)
+    newObject[clearedKey] = ''
+    return { clearedKey, newObject }
 }
 
 

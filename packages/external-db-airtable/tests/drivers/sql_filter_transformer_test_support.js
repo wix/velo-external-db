@@ -45,6 +45,6 @@ const reset = () => {
     filterParser.parseFilter.mockClear()
 }
 
-module.exports = { stubEmptyOrderByFor, stubEmptyFilterFor,givenFilterByIdWith, givenOrderByFor, stubEmptyFilterAndSortFor,
+module.exports = { stubEmptyOrderByFor, stubEmptyFilterFor, givenFilterByIdWith, givenOrderByFor, stubEmptyFilterAndSortFor,
     
      filterParser, reset }

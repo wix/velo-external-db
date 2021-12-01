@@ -40,8 +40,8 @@ class ConfigWriter {
         )
     }
     
-    async updateAccessPolicy({identity}, provisionVariables) {
-        const {resourceGroupName, keyVaultName} = provisionVariables
+    async updateAccessPolicy({ identity }, provisionVariables) {
+        const { resourceGroupName, keyVaultName } = provisionVariables
         await this.keyVaultManagementClient
                   .vaults
                   .updateAccessPolicy(resourceGroupName, keyVaultName, 'add', {
@@ -50,7 +50,7 @@ class ConfigWriter {
                             accessPolicies: [{
                                 objectId: identity.principalId,
                                 tenantId: identity.tenantId,
-                                permissions: {secrets: ['get']}
+                                permissions: { secrets: ['get'] }
                             }]
                         }
                   })

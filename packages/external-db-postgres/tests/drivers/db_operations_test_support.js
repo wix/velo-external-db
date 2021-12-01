@@ -12,16 +12,16 @@ const createPool = modify => {
     return { connection, cleanup }
 }
 
-const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong' } ).connection)
 
-const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { db: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { db: 'wrong' } ).connection)
 
-const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong'} ).connection)
+const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong' } ).connection)
 
 const dbOperationWithValidDB = () => {
     const { connection, cleanup } = createPool({ } )
     const dbOperations = new DatabaseOperations(connection)
-    return {dbOperations, cleanup: cleanup}
+    return { dbOperations, cleanup: cleanup }
 }
 
 module.exports = {

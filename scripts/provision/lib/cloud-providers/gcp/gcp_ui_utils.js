@@ -1,10 +1,10 @@
 const inquirer = require('inquirer')
 const { nonEmpty } = require('../../cli/validators')
-const {GoogleAuth} = require('google-auth-library')
+const { GoogleAuth } = require('google-auth-library')
 
 const GCP = { gcpProjectId: '', gcpClientEmail: '', gcpPrivateKey: '' }
 
-const credentials = async () => inquirer.prompt([
+const credentials = async() => inquirer.prompt([
     {
         type: 'input',
         name: 'gcpClientEmail',
@@ -40,7 +40,7 @@ const region = async(credentials) => inquirer.prompt([
 
 const regionList =async({ gcpClientEmail, gcpPrivateKey, gcpProjectId }) => {
     const authClient = new GoogleAuth({
-        credentials : { client_email: gcpClientEmail, private_key: gcpPrivateKey },
+        credentials: { client_email: gcpClientEmail, private_key: gcpPrivateKey },
         scopes: 'https://www.googleapis.com/auth/cloud-platform'
     })
     const RegionApiUrl = `https://compute.googleapis.com/compute/v1/projects/${gcpProjectId}/regions`

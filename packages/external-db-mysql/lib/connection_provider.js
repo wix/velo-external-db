@@ -6,10 +6,10 @@ const DatabaseOperations = require('./mysql_operations')
 
 const init = (cfg, _poolOptions) => {
     const config = {
-        host     : cfg.host,
-        user     : cfg.user,
-        password : cfg.password,
-        database : cfg.db,
+        host: cfg.host,
+        user: cfg.user,
+        password: cfg.password,
+        database: cfg.db,
 
         multipleStatements: true,
 
@@ -30,7 +30,7 @@ const init = (cfg, _poolOptions) => {
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations: databaseOperations, connection: pool, cleanup: async () => await pool.end() }
+    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations: databaseOperations, connection: pool, cleanup: async() => await pool.end() }
 }
 
 module.exports = init

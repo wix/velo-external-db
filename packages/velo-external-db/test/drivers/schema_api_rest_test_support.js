@@ -1,17 +1,17 @@
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
-});
+})
 
 
-const givenCollection = async (name, columns, auth) => {
-    await axios.post(`/schemas/create`, {collectionName: name}, auth)
+const givenCollection = async(name, columns, auth) => {
+    await axios.post('/schemas/create', { collectionName: name }, auth)
     for (const column of columns) {
-        await axios.post(`/schemas/column/add`, {collectionName: name, column: column}, auth)
+        await axios.post('/schemas/column/add', { collectionName: name, column: column }, auth)
     }
 }
 
-const expectColumnInCollection = async (columnName, collectionName, auth) => {
-    const dbs = (await axios.post(`/schemas/list`, {}, auth)).data.schemas
+const expectColumnInCollection = async(columnName, collectionName, auth) => {
+    const dbs = (await axios.post('/schemas/list', {}, auth)).data.schemas
     const field = dbs.find(e => e.id === collectionName)
                      .fields[columnName]
     return field
@@ -104,7 +104,7 @@ const expectDefaultCollectionWith = (collectionName, res) => {
                     ]
                 },
             }
-        }]})
+        }] })
 
 }
 

@@ -8,25 +8,25 @@ const createPool = modify => {
         user: 'root',
         password: 'pass',
         database: 'testdb',
-        host:'localhost'
+        host: 'localhost'
     }
-    const modifiedConfig =  {...config,...modify}
+    const modifiedConfig =  { ...config, ...modify }
     const uri = `mongodb://${modifiedConfig.user}:${modifiedConfig.password}@${modifiedConfig.host}/${modifiedConfig.database}`
     const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 })
     return client
 
 }
-const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong'} ))
+const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong' } ))
 
-const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { database: 'wrong'} ))
+const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { database: 'wrong' } ))
 
-const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong'} ))
+const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong' } ))
 
 const dbOperationWithValidDB = () => {
     const connection = createPool({ } )
     const dbOperations = new DatabaseOperations( connection )
 
-    return { dbOperations, cleanup: async () => await connection.close()}
+    return { dbOperations, cleanup: async() => await connection.close() }
 }
 
 const dbOperationWithMisconfiguredConfig = [() => dbOperationWithMisconfiguredPassword(),

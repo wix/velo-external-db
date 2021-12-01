@@ -39,7 +39,7 @@ class SchemaProvider {
         await this.deleteTableFromSystemTable(collectionName)
 
         await this.client
-                  .deleteTable({ TableName: collectionName})
+                  .deleteTable({ TableName: collectionName })
                   .catch(translateErrorCodes)
     }
 
@@ -113,7 +113,7 @@ class SchemaProvider {
 
     async systemTableExists() {
         return await this.client
-                         .describeTable({TableName: SystemTable})
+                         .describeTable({ TableName: SystemTable })
                          .then(() => true)
                          .catch(() => false)
     }

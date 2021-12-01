@@ -57,12 +57,12 @@ class SchemaColumnTranslator {
 
             case 'datetime_date':
             case 'datetime_year':
-                return `DATE`
+                return 'DATE'
 
             case 'datetime_time':
             case 'datetime_datetime':
             case 'datetime_timestamp':
-                return `TIMESTAMP`
+                return 'TIMESTAMP'
 
             case 'text_string':
                 return `STRING${this.parseLength(precision)}`
@@ -77,7 +77,7 @@ class SchemaColumnTranslator {
                 return `STRING${this.parseLength(2 ** 32)}`
 
             case 'boolean_':
-                return `BOOL`
+                return 'BOOL'
 
             default:
                 throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)

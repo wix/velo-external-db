@@ -10,9 +10,9 @@ const validateTable = collection => {
     }
 }
 
-const EMPTY_FILTER = {filterExpr:{}}
+const EMPTY_FILTER = { filterExpr: {} }
 const notConnectedPool = err => ( {
-        pool: { db: ()=> { throw err } },
+        pool: { db: () => { throw err } },
         cleanup: () => { }
     } )
 

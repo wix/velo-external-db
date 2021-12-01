@@ -1,4 +1,4 @@
-const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand, waitUntilDBInstanceAvailable } = require('@aws-sdk/client-rds')
+const { RDSClient, CreateDBInstanceCommand, DescribeDBInstancesCommand, /*waitUntilDBInstanceAvailable*/ } = require('@aws-sdk/client-rds')
 const factory = require('./db/factory')
 const NetworkProvision = require('./aws_network_provision')
 

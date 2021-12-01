@@ -4,27 +4,27 @@ const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
-});
+})
 
 describe('Velo External DB',  () => {
     each(testSuits()).describe('%s', (name, setup) => {
-        beforeAll(async () => {
+        beforeAll(async() => {
             await setup()
 
             await initApp()
-        }, 20000);
+        }, 20000)
 
-        afterAll(async () => await dbTeardown(), 20000);
+        afterAll(async() => await dbTeardown(), 20000)
 
-        test('answer default page with a welcoming response', async () => {
-            expect((await axios.get(`/`)).data).toContain('<!doctype html>');
+        test('answer default page with a welcoming response', async() => {
+            expect((await axios.get('/')).data).toContain('<!doctype html>')
         })
 
-        test('answer provision with stub response', async () => {
-            expect((await axios.post(`/provision`, { }, authOwner)).data).toEqual({ protocolVersion: 2 });
+        test('answer provision with stub response', async() => {
+            expect((await axios.post('/provision', { }, authOwner)).data).toEqual({ protocolVersion: 2 })
         })
     })
 
-    afterAll(async () => await teardownApp())
+    afterAll(async() => await teardownApp())
 
 })

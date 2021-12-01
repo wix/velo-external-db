@@ -1,6 +1,6 @@
 const sql = require('mssql')
 
-const createDatabase = async (dbName, host, credentials) => {
+const createDatabase = async(dbName, host, credentials) => {
     const config = {
         user: credentials.user,
         password: credentials.password,

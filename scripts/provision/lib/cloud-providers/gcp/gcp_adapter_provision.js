@@ -1,10 +1,10 @@
-const {GoogleAuth} = require('google-auth-library')
+const { GoogleAuth } = require('google-auth-library')
 const AdapterImageUrl = 'gcr.io/wix-velo-api/velo-external-db'
 
 class AdapterProvision {
-    constructor({gcpClientEmail, gcpPrivateKey, gcpProjectId}, region) {
+    constructor({ gcpClientEmail, gcpPrivateKey, gcpProjectId }, region) {
         this.authClient = new GoogleAuth({
-            credentials : { client_email: gcpClientEmail, private_key: gcpPrivateKey },
+            credentials: { client_email: gcpClientEmail, private_key: gcpPrivateKey },
             scopes: ['https://www.googleapis.com/auth/cloud-platform', 'https://www.googleapis.com/auth/service.management']
         })
         this.region = region
@@ -24,7 +24,7 @@ class AdapterProvision {
     async adapterStatus(serviceId, provisionVariables, instanceName) {
         const client = await this.credentialsFor()
         const StatusCloudRunRestUrl = `https://${this.region}-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/${this.projectId}/services/${instanceName}`
-        const res = await client.request({ url: StatusCloudRunRestUrl})
+        const res = await client.request({ url: StatusCloudRunRestUrl })
         const readyStatus = res.data.status.conditions.find(i => i.type === 'Ready')
         return { 
             available: readyStatus.status === 'True',
@@ -33,7 +33,7 @@ class AdapterProvision {
     }
 
     secretsToEnvs(secrets) { 
-        return Object.entries(secrets).map(([envVariable, secretName])=> {
+        return Object.entries(secrets).map(([envVariable, secretName]) => {
             return {
                 name: envVariable,
                 valueFrom: { secretKeyRef: { key: 'latest', name: secretName } }
@@ -56,7 +56,7 @@ class AdapterProvision {
             kind: 'Service',
             metadata: {
               annotations: {
-                  'run.googleapis.com/launch-stage' : 'BETA'
+                  'run.googleapis.com/launch-stage': 'BETA'
               },
               name: name,
               namespace: this.projectId

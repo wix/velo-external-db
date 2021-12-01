@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 db.createUser(
     {
         user: 'root',
@@ -9,4 +10,4 @@ db.createUser(
             }
         ]
     }
-);
+)

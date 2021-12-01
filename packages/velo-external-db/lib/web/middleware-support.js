@@ -4,9 +4,9 @@ const { has, get } = require('nested-property')
 const unless = function(path, middleware) {
     return function(req, res, next) {
         if (path.includes(req.path)) {
-            return next();
+            return next()
         } else {
-            return middleware(req, res, next);
+            return middleware(req, res, next)
         }
     }
 }
@@ -14,9 +14,9 @@ const unless = function(path, middleware) {
 const includes = function(path, middleware) {
     return function(req, res, next) {
         if (path.some(p => req.path.startsWith(p))) {
-            return middleware(req, res, next);
+            return middleware(req, res, next)
         } else {
-            return next();
+            return next()
         }
     }
 }

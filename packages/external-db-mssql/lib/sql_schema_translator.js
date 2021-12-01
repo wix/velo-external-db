@@ -71,17 +71,17 @@ class SchemaColumnTranslator {
                 return `DECIMAL${this.parsePrecision(precision)}`
 
             case 'datetime_date':
-                return `DATE`
+                return 'DATE'
 
             case 'datetime_time':
-                return `TIME`
+                return 'TIME'
 
             case 'datetime_timestamp':
             case 'datetime_datetime':
-                return `DATETIME2`
+                return 'DATETIME2'
 
             case 'datetime_year':
-                return `SMALLDATETIME`
+                return 'SMALLDATETIME'
 
             case 'text_string':
                 return `VARCHAR${this.parseLength(precision)}`
@@ -89,11 +89,11 @@ class SchemaColumnTranslator {
             case 'text_small':
             case 'text_medium':
             case 'text_large':
-                return `TEXT`
+                return 'TEXT'
 
 
             case 'boolean_':
-                return `TINYINT`
+                return 'TINYINT'
 
             default:
                 throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)

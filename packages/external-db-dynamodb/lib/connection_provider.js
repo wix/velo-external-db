@@ -11,14 +11,14 @@ const extraOptions  = (cfg) => {
 
 const init = (cfg, _cfgOptions) => { 
     const options = _cfgOptions || {}
-    const client = new DynamoDB({region:cfg.region, ...extraOptions(cfg), ...options})
+    const client = new DynamoDB({ region: cfg.region, ...extraOptions(cfg), ...options })
     const databaseOperations = new DatabaseOperations(client)
 
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(client, filterParser)
     const schemaProvider = new SchemaProvider(client)
 
-    return { dataProvider, schemaProvider, databaseOperations, connection: client, cleanup: () => {}}
+    return { dataProvider, schemaProvider, databaseOperations, connection: client, cleanup: () => {} }
 }
 
 module.exports = init

@@ -4,13 +4,13 @@ const { runImage, stopImage } = require('./docker_support')
 const setEmulatorOn = () => process.env.SPANNER_EMULATOR_HOST = 'localhost:9010'
 
 const connection = () => {
-    const {connection, cleanup} = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
-    return { pool: connection, cleanup: cleanup}
+    const { connection, cleanup } = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
+    return { pool: connection, cleanup: cleanup }
 }
 
-const cleanup = async () => {
+const cleanup = async() => {
     setEmulatorOn()
-    const {schemaProvider, cleanup} = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
+    const { schemaProvider, cleanup } = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
     const res = await schemaProvider.list()
     const tables = res.map(t => t.id)
 
@@ -18,10 +18,10 @@ const cleanup = async () => {
         await schemaProvider.drop(t)
     }
 
-    await cleanup();
+    await cleanup()
 }
 
-const initEnv = async () => {
+const initEnv = async() => {
     await runImage('spanner')
 }
 
@@ -33,7 +33,7 @@ const setActive = () => {
     process.env.DATABASE_ID = 'test-database'
 }
 
-const shutdownEnv = async () => {
+const shutdownEnv = async() => {
     await stopImage('spanner')
 }
 
