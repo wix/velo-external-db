@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, getFilterObject } = require('velo-external-db-commons')
 const { escapeIdentifier } = require('./postgres_utils')
 
 class FilterParser {
@@ -83,7 +83,7 @@ class FilterParser {
             return []
         }
         
-        const filterObj = this.getFilterObject(filter)
+        const filterObj = getFilterObject(filter)
         
         switch (filterObj.operator) {
             case '$and':
@@ -258,31 +258,6 @@ class FilterParser {
             }
         }
         return escapeIdentifier(fieldName)
-    }
-
-    getFilterObject(filter) {
-        if(this.isMultipleFieldOperator(filter)) {
-            const operator = Object.keys(filter)[0]
-            const value = filter[operator]
-            return {
-                operator,
-                value
-            }
-        }
-
-        const fieldName = Object.keys(filter)[0]
-        const operator = Object.keys(filter[fieldName])[0]
-        const value = filter[fieldName][operator]
-
-        return {
-            operator,
-            fieldName,
-            value
-        }
-    }
-    
-    isMultipleFieldOperator(filter) { 
-        return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
     }
 }
 
