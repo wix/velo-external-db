@@ -104,3 +104,40 @@ jobs:
         run: |
           cd packages/velo-external-db/test/resources
           docker compose down
+
+  test_bigquery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+
+      - id: auth
+        uses: google-github-actions/auth@v0.4.0
+        with:
+          credentials_json: ${{ secrets.ACTIONS_GCP_CREDENTIALS }}
+          
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.1
+
+      - name: Use gcloud CLI
+        run: gcloud info  
+      
+      - name: Installing Dependencies
+        run: npm install
+        
+      - name: Install dependencies of the homemade packages.
+        run: npm run build:dev
+
+      - name: Testing
+        run: npm run test:bigquery
