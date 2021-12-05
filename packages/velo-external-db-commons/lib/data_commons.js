@@ -38,5 +38,30 @@ const updateFieldsFor = item => {
     return Object.keys(item).filter(f => f !== '_id')
 }
 
+const getFilterObject = (filter) => {
+    if(isMultipleFieldOperator(filter)) {
+        const operator = Object.keys(filter)[0]
+        const value = filter[operator]
+        return {
+            operator,
+            value
+        }
+    }
 
-module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor }
+    const fieldName = Object.keys(filter)[0]
+    const operator = Object.keys(filter[fieldName])[0]
+    const value = filter[fieldName][operator]
+
+    return {
+        operator,
+        fieldName,
+        value
+    }
+}
+
+const isMultipleFieldOperator = (filter) => { 
+    return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
+}
+
+
+module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor, getFilterObject }
