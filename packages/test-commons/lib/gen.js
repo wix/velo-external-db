@@ -135,6 +135,14 @@ const idFilter = () => {
     }
 }
 
+const idV2Filter = () => {
+    const op = randomOperator()
+    const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
+    return {
+        _id: { [op]: value}
+    }
+}
+
 const randomOperator = () => (chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith']))
 
 const veloDate = () => ( { $date: newDate().toISOString() } )
@@ -176,6 +184,6 @@ const randomConfig = () => ({
 
 module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject,
      randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, randomV2Filter }
+      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, randomV2Filter, idV2Filter }
 
 

@@ -247,7 +247,7 @@ describe('Sql Parser', () => {
 
             test('correctly transform operator [$not]', () => {
                 const filter = {
-                    '$not' : [ ctx.filter ]
+                    $not: [ ctx.filter ]
                     /*
                     operator: '$not',
                     value: ctx.filter
