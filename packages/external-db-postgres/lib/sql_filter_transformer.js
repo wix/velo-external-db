@@ -77,10 +77,7 @@ class FilterParser {
 
     parseFilter(filter, offset, inlineFields) {
 
-        if (!filter || !isObject(filter)) {
-            return []
-        }
-        if (Object.keys(filter)[0] === undefined) {
+        if (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined) {
             return []
         }
         

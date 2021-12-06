@@ -76,10 +76,7 @@ describe('Sql Parser', () => {
                 '$ne', '$lt', '$lte', '$gt', '$gte', '$eq',
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
-                    // kind: 'filter',
-                    operator: o,
-                    fieldName: ctx.fieldName,
-                    value: ctx.fieldValue
+                    [ctx.fieldName]: { [o]: ctx.fieldValue }
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -90,14 +87,11 @@ describe('Sql Parser', () => {
 
             test('correctly extract filter value if value is 0', () => {
                 const filter = {
-                    operator: '$eq',
-                    fieldName: ctx.fieldName,
-                    value: 0
+                    [ctx.fieldName]: { $eq: 0 }
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `${ctx.fieldName} = "${filter.value}"`
-                    // parameters: [0]
+                    filterExpr: `${ctx.fieldName} = "0"`
                 }])
 
             })
@@ -105,10 +99,7 @@ describe('Sql Parser', () => {
             // todo: $hasAll ???
             test('correctly transform operator [$hasSome]', () => {
                 const filter = {
-                    // kind: 'filter',
-                    operator: '$hasSome',
-                    fieldName: ctx.fieldName,
-                    value: ctx.fieldListValue
+                    [ctx.fieldName]: { $hasSome: ctx.fieldListValue }
                 }
                 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -118,10 +109,7 @@ describe('Sql Parser', () => {
 
             test('operator [$hasSome] with empty list of values will throw an exception', () => {
                 const filter = {
-                    // kind: 'filter',
-                    operator: '$hasSome',
-                    fieldName: ctx.fieldName,
-                    value: []
+                    [ctx.fieldName]: { $hasSome: [] }
                 }
 
                 expect( () => env.filterParser.parseFilter(filter) ).toThrow(InvalidQuery)
@@ -129,9 +117,7 @@ describe('Sql Parser', () => {
 
             test('correctly transform operator [$eq] with null value', () => {
                 const filter = {
-                    // kind: 'filter',
-                    operator: '$eq',
-                    fieldName: ctx.fieldName,
+                    [ctx.fieldName]: { $eq: undefined } 
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -141,14 +127,14 @@ describe('Sql Parser', () => {
             })
 
             test('correctly transform operator [$eq] with boolean value', () => {
+                const value = chance.bool()
+                const operator = '$eq'
                 const filter = {
-                    operator: '$eq',
-                    fieldName: ctx.fieldName,
-                    value: chance.bool()
+                    [ctx.fieldName]: { [operator]: value } 
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `${ctx.fieldName} = ${env.filterParser.valueForOperator(filter.value, filter.operator)}`
+                    filterExpr: `${ctx.fieldName} = ${env.filterParser.valueForOperator(value, operator)}`
                 }])
 
             })
@@ -156,10 +142,7 @@ describe('Sql Parser', () => {
             describe('handle string operators', () => {
                 test('correctly transform operator [$contains]', () => {
                     const filter = {
-                        // kind: 'filter',
-                        operator: '$contains',
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldValue
+                        [ctx.fieldName]: { $contains: ctx.fieldValue }
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -170,10 +153,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [$startsWith]', () => {
                     const filter = {
-                        // kind: 'filter',
-                        operator: '$startsWith',
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldValue
+                        [ctx.fieldName]: { $startsWith: ctx.fieldValue }
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -184,10 +164,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [$endsWith]', () => {
                     const filter = {
-                        // kind: 'filter',
-                        operator: '$endsWith',
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldValue
+                        [ctx.fieldName]: { $endsWith: ctx.fieldValue }
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -201,9 +178,7 @@ describe('Sql Parser', () => {
                 '$and', '$or'
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
-                    // kind: 'filter',
-                    operator: o,
-                    value: [ctx.filter, ctx.anotherFilter]
+                    [o]: [ctx.filter, ctx.anotherFilter]
                 }
                 const op = o === '$and' ? 'AND' : 'OR'
 
@@ -216,9 +191,7 @@ describe('Sql Parser', () => {
 
             test('correctly transform operator [$not]', () => {
                 const filter = {
-                    // kind: 'filter',
-                    operator: '$not',
-                    value: ctx.filter
+                    $not: [ ctx.filter ]
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -251,8 +224,8 @@ describe('Sql Parser', () => {
         ctx.fieldValue = chance.word()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
-        ctx.filter = gen.randomFilter()
-        ctx.anotherFilter = gen.randomFilter()
+        ctx.filter = gen.randomV2Filter()
+        ctx.anotherFilter = gen.randomV2Filter()
     })
 
     beforeAll(function() {
