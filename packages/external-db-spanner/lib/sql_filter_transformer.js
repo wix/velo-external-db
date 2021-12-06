@@ -76,51 +76,51 @@ class FilterParser {
         if (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined) {
             return []
         }
-        const filterObj = getFilterObject(filter)
+        const { operator, fieldName, value } = getFilterObject(filter)
 
-        switch (filterObj.operator) {
+        switch (operator) {
             case '$and':
             case '$or':
-                const res = filterObj.value.reduce((o, f) => {
+                const res = value.reduce((o, f) => {
                     const res = this.parseFilter.bind(this)(f, inlineFields)
                     return {
                         filter: o.filter.concat( ...res ),
                     }
                 }, { filter: [] })
-                const op = filterObj.operator === '$and' ? ' AND ' : ' OR '
+                const op = operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.filter.map(r => r.filterExpr).join( op ),
                     parameters: res.filter.reduce((o, s) => ( { ...o, ...s.parameters } ), {} )
                 }]
             case '$not':
-                const res2 = this.parseFilter( filterObj.value[0], inlineFields )
+                const res2 = this.parseFilter( value[0], inlineFields )
                 return [{
                     filterExpr: `NOT (${res2[0].filterExpr})`,
                     parameters: res2[0].parameters
                 }]
         }
 
-        if (this.isSingleFieldOperator(filterObj.operator)) {
-            const params = this.valueForOperator(filterObj.fieldName, filterObj.value, filterObj.operator)
+        if (this.isSingleFieldOperator(operator)) {
+            const params = this.valueForOperator(fieldName, value, operator)
 
             return [{
-                filterExpr: `${this.inlineVariableIfNeeded(filterObj.fieldName, inlineFields)} ${this.veloOperatorToMySqlOperator(filterObj.operator, filterObj.value)} ${params.sql}`.trim(),
-                parameters: this.parametersFor(filterObj.fieldName, filterObj.value)
+                filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} ${this.veloOperatorToMySqlOperator(operator, value)} ${params.sql}`.trim(),
+                parameters: this.parametersFor(fieldName, value)
             }]
         }
 
 
-        if (this.isSingleFieldStringOperator(filterObj.operator)) {
+        if (this.isSingleFieldStringOperator(operator)) {
             return [{
-                filterExpr: `${this.inlineVariableIfNeeded(filterObj.fieldName, inlineFields)} LIKE ${validateLiteral(filterObj.fieldName)}`,
-                parameters: { [filterObj.fieldName]: this.valueForStringOperator(filterObj.operator, filterObj.value) }
+                filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} LIKE ${validateLiteral(fieldName)}`,
+                parameters: { [fieldName]: this.valueForStringOperator(operator, value) }
             }]
         }
 
-        if (filterObj.operator === '$urlized') {
+        if (operator === '$urlized') {
             return [{
-                filterExpr: `LOWER(${escapeId(filterObj.fieldName)}) RLIKE ${validateLiteral(filterObj.fieldName)}`,
-                parameters: { [filterObj.fieldName]: filterObj.value.map(s => s.toLowerCase()).join('[- ]') }
+                filterExpr: `LOWER(${escapeId(fieldName)}) RLIKE ${validateLiteral(fieldName)}`,
+                parameters: { [fieldName]: value.map(s => s.toLowerCase()).join('[- ]') }
             }]
         }
 

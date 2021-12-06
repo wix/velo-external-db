@@ -26,7 +26,7 @@ class FilterParser {
         } else {
             Object.assign(fieldsStatement, { [aggregation._id.substring(1)]: `${aggregation._id}` })
         }
-
+        
         Object.keys(aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
@@ -46,29 +46,29 @@ class FilterParser {
         if (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined ) {
             return []
         }
-        const filterObj = getFilterObject(filter)
-        const operator = this.veloOperatorToMongoOperator(filterObj.operator)
+        const { operator, fieldName, value } = getFilterObject(filter)
+        const mongoOp = this.veloOperatorToMongoOperator(operator)
 
-        if (this.isMultipleFieldOperator(operator)) {
-            const res = filterObj.value.map( this.parseFilter.bind(this) )
-            return [{ filterExpr: { [operator]: res.map(r => r[0].filterExpr) } }]
+        if (this.isMultipleFieldOperator(mongoOp)) {
+            const res = value.map( this.parseFilter.bind(this) )
+            return [{ filterExpr: { [mongoOp]: res.map(r => r[0].filterExpr) } }]
         }
 
-        if (operator === '$not') {
-            const res = this.parseFilter(filterObj.value[0])
-            return [{ filterExpr: { [operator]: res[0].filterExpr } }]
+        if (mongoOp === '$not') {
+            const res = this.parseFilter(value[0])
+            return [{ filterExpr: { [mongoOp]: res[0].filterExpr } }]
         }
 
-        if (this.isSingleFieldStringOperator(operator)) {
-            return [{ filterExpr: { [filterObj.fieldName]: { $regex: this.valueForStringOperator(operator, filterObj.value) } } }]
+        if (this.isSingleFieldStringOperator(mongoOp)) {
+            return [{ filterExpr: { [fieldName]: { $regex: this.valueForStringOperator(mongoOp, value) } } }]
         }
 
-        if (operator === '$urlized') {
+        if (mongoOp === '$urlized') {
             return [{
-                filterExpr: { [filterObj.fieldName]: { $regex: `/${filterObj.value.map(s => s.toLowerCase()).join('.*')}/i` } }
+                filterExpr: { [fieldName]: { $regex: `/${value.map(s => s.toLowerCase()).join('.*')}/i` } }
             }]
         }
-        return [{ filterExpr: { [filterObj.fieldName]: { [operator]: this.valueForOperator(filterObj.value, operator) } } }]
+        return [{ filterExpr: { [fieldName]: { [mongoOp]: this.valueForOperator(value, mongoOp) } } }]
 
     }
 
