@@ -106,32 +106,38 @@ describe('Data API', () => {
             expect( await env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50) ).toEqual([ctx.numberEntity])
         })
 
-        test('delete data from collection', async() => {
-            await givenCollectionWith(ctx.entities, ctx.collectionName)
-            env.driver.stubEmptyFilterAndSortFor('', '')
+        if (shouldNotRunOn(['BigQuery'], name)) {
+            test('delete data from collection', async() => {
+                await givenCollectionWith(ctx.entities, ctx.collectionName)
+                env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).toEqual(ctx.entities.length)
+                expect( await env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).toEqual(ctx.entities.length)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([])
-        })
+                expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([])
+            })
+        }
 
-        test('allow update for single entity', async() => {
-            await givenCollectionWith([ctx.entity], ctx.collectionName)
-            env.driver.stubEmptyFilterAndSortFor('', '')
+        if (shouldNotRunOn(['BigQuery'], name)) {
+            test('allow update for single entity', async() => {
+                await givenCollectionWith([ctx.entity], ctx.collectionName)
+                env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).toEqual(1)
+                expect( await env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).toEqual(1)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.modifiedEntity])
-        })
+                expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.modifiedEntity])
+            })
+        }
 
-        test('allow update for multiple entities', async() => {
-            await givenCollectionWith(ctx.entities, ctx.collectionName)
-            env.driver.stubEmptyFilterAndSortFor('', '')
+        if (shouldNotRunOn(['BigQuery'], name)) {
+            test('allow update for multiple entities', async() => {
+                await givenCollectionWith(ctx.entities, ctx.collectionName)
+                env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntities) ).toEqual(ctx.modifiedEntities.length)
+                expect( await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntities) ).toEqual(ctx.modifiedEntities.length)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
-        })
+                expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
+            })
+        }
 
         // testt('if update does not have and updatable fields, do nothing', async () => {
         //     await givenCollectionWith([ctx.entity], ctx.collectionName)
