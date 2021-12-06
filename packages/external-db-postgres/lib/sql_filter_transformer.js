@@ -53,8 +53,9 @@ class FilterParser {
               .forEach(fieldAlias => {
                   Object.entries(aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field.substring(1))}) AS ${escapeIdentifier(fieldAlias)}`)
-                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field.substring(1))})`
+                            field = field.substring(1)
+                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)}) AS ${escapeIdentifier(fieldAlias)}`)
+                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)})`
                         })
               })
 

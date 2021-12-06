@@ -26,6 +26,7 @@ class FilterParser {
         } else {
             Object.assign(fieldsStatement, { [aggregation._id.substring(1)]: `${aggregation._id}` })
         }
+
         Object.keys(aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
