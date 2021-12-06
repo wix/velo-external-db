@@ -109,6 +109,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
       - id: auth
+        if: ${{ (1 == 1)  }}
         uses: google-github-actions/auth@v0.4.0
         with:
           credentials_json: ${{ secrets.ACTIONS_GCP_CREDENTIALS }}
