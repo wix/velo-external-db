@@ -1,5 +1,5 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('velo-external-db-commons').errors
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
@@ -81,11 +81,13 @@ describe('Schema API', () => {
                                                 { field: '_owner', type: 'text' }], ctx.collectionName))
         })
 
-        // eslint-disable-next-line jest/expect-expect
-        test('create collection twice will do nothing', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-            await env.schemaProvider.create(ctx.collectionName, [])
-        })
+        if (shouldNotRunOn(['BigQuery'], name)) {
+            // eslint-disable-next-line jest/expect-expect
+            test('create collection twice will do nothing', async() => {
+                await env.schemaProvider.create(ctx.collectionName, [])
+                await env.schemaProvider.create(ctx.collectionName, [])
+            })
+        }
 
         test('add column on a non existing collection will fail', async() => {
             await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(CollectionDoesNotExists)
@@ -115,13 +117,15 @@ describe('Schema API', () => {
                                                                                 ] })
         })
 
-        test('add duplicate column will fail', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
+        if (shouldNotRunOn(['BigQuery'], name)) {
+            test('add duplicate column will fail', async() => {
+                await env.schemaProvider.create(ctx.collectionName, [])
 
-            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+                await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
 
-            await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(FieldAlreadyExists)
-        })
+                await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(FieldAlreadyExists)
+            })
+        }
 
         test('add system column will fail', async() => {
             await env.schemaProvider.create(ctx.collectionName, [])
@@ -141,20 +145,24 @@ describe('Schema API', () => {
             expect((await env.schemaProvider.describeCollection(ctx.collectionName)).fields).not.toHaveProperty(ctx.columnName)
         })
 
-        test('drop column on a a non existing collection', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
+        if (shouldNotRunOn(['BigQuery'], name)) {
+            test('drop column on a a non existing collection', async() => {
+                await env.schemaProvider.create(ctx.collectionName, [])
 
-            await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
-        })
+                await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
+            })
+        }
 
-        test('drop system column will fail', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
+        if (shouldNotRunOn(['BigQuery'], name)) {
+            test('drop system column will fail', async() => {
+                await env.schemaProvider.create(ctx.collectionName, [])
 
-            SystemFields.map(f => f.name)
-                        .forEach(async f => {
-                            await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
-                        })
-        })
+                SystemFields.map(f => f.name)
+                            .forEach(async f => {
+                                await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
+                            })
+            })
+        }
 
         const ctx = {
             collectionName: Uninitialized,

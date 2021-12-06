@@ -33,11 +33,11 @@ const givenOrderByFor = (column, sort) => {
 
 const givenFilterByIdWith = (id, filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeIdentifier('_id')} = $1`, parameters: [id], offset: 2 })
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeIdentifier('_id')} = ?`, parameters: [id], offset: 2 })
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter, offest) => {
-    when(filterParser.parseAggregation).calledWith(having, filter, offest)
+    when(filterParser.parseAggregation).calledWith(having, filter)
                                        .mockReturnValue({
                                            fieldsStatement: `${groupByColumns.map( escapeIdentifier ).join(', ')}, MAX(${escapeIdentifier(numericColumns[0].name)}) AS ${escapeIdentifier(columnAliases[0])}, SUM(${escapeIdentifier(numericColumns[1].name)}) AS ${escapeIdentifier(columnAliases[1])}`,
                                            groupByColumns: groupByColumns,
