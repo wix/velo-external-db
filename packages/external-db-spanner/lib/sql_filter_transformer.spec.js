@@ -158,7 +158,7 @@ describe('Sql Parser', () => {
                 }])
             })
 
-            test.only('correctly transform operator [$eq] with boolean value', () => {
+            test('correctly transform operator [$eq] with boolean value', () => {
                 const value = chance.bool()
                 const filter = {
                     [ctx.fieldName]: { $eq: value } 
