@@ -158,7 +158,7 @@ describe('Sql Parser', () => {
                 }])
             })
 
-            test('correctly transform operator [$eq] with boolean value', () => {
+            test.only('correctly transform operator [$eq] with boolean value', () => {
                 const value = chance.bool()
                 const filter = {
                     [ctx.fieldName]: { $eq: value } 
@@ -251,7 +251,8 @@ describe('Sql Parser', () => {
                     /*
                     operator: o,
                     value: [ctx.filter, ctx.anotherFilter]
-                    */                }
+                    */                
+                }
                 const op = o === '$and' ? 'AND' : 'OR'
 
                 const filter1 = env.filterParser.parseFilter(ctx.filter)[0]
@@ -264,7 +265,7 @@ describe('Sql Parser', () => {
 
             test('correctly transform operator [$not]', () => {
                 const filter = {
-                    $not : [ ctx.filter ]
+                    $not: [ ctx.filter ]
                     /*
                     operator: '$not',
                     value: ctx.filter
