@@ -44,7 +44,7 @@ jobs:
                    "mongo", "mongo4",
                    "firestore",
                    "airtable",
-                   "dynamodb"]
+                   "dynamodb","bigquery"]
 
     steps:
       - uses: actions/checkout@v2
@@ -53,57 +53,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16
-
-      - name: Restore Dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
-
-      - name: Downloading Docker Compose V2
-        run: |
-          curl -sfL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
-          docker compose version
-
-      - name: Downloading Image
-        run: |
-          cd packages/velo-external-db/test/resources
-          docker compose pull --quiet ${{ matrix.database }}
-
-      - name: Start Container
-        run: |
-          cd packages/velo-external-db/test/resources
-          docker compose up --detach ${{ matrix.database }}
-
-      - name: Installing Dependencies
-        run: npm install
-
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
-
-      - name: Testing
-        run: npm run test:${{ matrix.database }}
-
-      - name: Stop Container
-        run: |
-          cd packages/velo-external-db/test/resources
-          docker compose down
-
-  test_bigquery:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        database: ["BigQuery"]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Use Node.js 14
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
 
       - name: Restore Dependencies
         uses: actions/cache@v2
@@ -140,7 +89,7 @@ jobs:
       - name: Set up Cloud SDK
         if: ${{ ( matrix.database == 'bigquery') }}
         uses: google-github-actions/setup-gcloud@v0.2.1
-    
+
       - name: Installing Dependencies
         run: npm install
 
@@ -155,4 +104,3 @@ jobs:
         run: |
           cd packages/velo-external-db/test/resources
           docker compose down
-
