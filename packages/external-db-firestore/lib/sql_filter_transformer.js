@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject } = require('velo-external-db-commons')
+const { isObject, getFilterObject } = require('velo-external-db-commons')
 
 class FilterParser {
     constructor() {
@@ -16,26 +16,28 @@ class FilterParser {
     }
 
     parseFilter(filter, inlineFields) {
-        if (!filter || !isObject(filter)|| filter.operator === undefined) {
+        if (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined) {
             return []
         }
 
-        if(this.isUnsupportedOperator(filter.operator)) {
-            throw new InvalidQuery(`${filter.operator} operator cant be used in firebase`)
+        const { operator, fieldName, value } =  getFilterObject(filter)
+
+        if(this.isUnsupportedOperator(operator)) {
+            throw new InvalidQuery(`${operator} operator cant be used in firebase`)
         }
 
-        if (this.isSingleFieldOperator(filter.operator)) {
-            const value = this.valueForOperator(filter.value, filter.operator)
+        if (this.isSingleFieldOperator(operator)) {
+            const _value = this.valueForOperator(value, operator)
     
             return [{
-                fieldName: this.inlineVariableIfNeeded(filter.fieldName, inlineFields),
-                opStr: this.veloOperatorToFirestoreOperator(filter.operator),
-                value,
+                fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
+                opStr: this.veloOperatorToFirestoreOperator(operator),
+                value: _value,
             }]
         }
         
-        if(this.isMultipleFiledOperator(filter.operator)) {
-            return filter.value.reduce((o, f) => {
+        if(this.isMultipleFiledOperator(operator)) {
+            return value.reduce((o, f) => {
                 return o.concat( this.parseFilter.bind(this)(f) )
             }, [])
         }
