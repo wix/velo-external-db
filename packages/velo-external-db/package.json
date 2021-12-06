@@ -11,10 +11,10 @@
     "test:firestore": "TEST_ENGINE=firestore jest --runInBand ./test",
     "test:mssql": "TEST_ENGINE=mssql jest --runInBand ./test",
     "test:mongo": "TEST_ENGINE=mongo jest --runInBand ./test",
-    "test:google-sheets": "TEST_ENGINE=google-sheet jest  -i  packages/velo-external-db/test/e2e/app_data.e2e.spec.js  --runInBand -t 'Velo External DB Data REST API' ",
+    "test:google-sheets": "TEST_ENGINE=google-sheet jest  -i  packages/velo-external-db/test/e2e/app_data.e2e.spec.js  --runInBand -t 'Schema API' ",
     "test:airtable": "TEST_ENGINE=airtable jest --runInBand ./test ",
     "test:dynamodb": "TEST_ENGINE=dynamodb jest --runInBand ./test ",
-    "test:bigquery": "TEST_ENGINE=bigquery jest --runInBand -i packages/velo-external-db/test/e2e/app_schema.e2e.spec.js -t 'Velo External DB Schema REST API' ",
+    "test:bigquery": "TEST_ENGINE=bigquery jest --runInBand ./test",
     "test:watch": "jest --detectOpenHandles --watch",
     "start": "node lib/app.js",
     "deploy": "gcloud app deploy ./app.yaml"

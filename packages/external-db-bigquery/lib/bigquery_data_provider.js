@@ -34,6 +34,7 @@ class DataProvider {
     }
 
     async insert(collectionName, items) {
+
         // const patchedItems = items.map(patchDateTime)
         // const itemsArr = patchedItems.map( item => `(${Object.values(item).map(i => typeof(i) === 'number' ? i : `"${i}"`).join(', ')})` ).join(', ')
         // const sql = `INSERT INTO \`${collectionName}\` (${Object.keys(items[0]).join(', ')}) VALUES ${itemsArr}`
@@ -41,9 +42,9 @@ class DataProvider {
         // const res = await this.pool.query(sql).catch( translateErrorCodes )
 
         const table = await this.pool.table(collectionName)
-        const res = await table.insert(items)
-    
-        return res
+        await table.insert(items)
+
+        return items.length
     }
 
     async update(collectionName, items) {
@@ -82,7 +83,7 @@ class DataProvider {
         const resultSet = await this.pool.query({ query: sql, params: [...whereParameters, ...parameters] })
                                     .catch( translateErrorCodes )
 
-        return resultSet[0]
+        return resultSet[0].map( unPatchDateTime )
     }
 }
 

@@ -87,15 +87,19 @@ describe('Velo External DB Data REST API',  () => {
         })
     }
 
-        test('delete one api', async() => {
-            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-            await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
-            await axios.post('/data/remove', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin)
+    if (shouldNotRunOn(['BigQuery'], name)) {    
+        test('delete one api', async() => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+
+                await axios.post('/data/remove', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin)
 
             await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
         })
+    }
 
+    if (shouldNotRunOn(['BigQuery'], name)) {
         test('bulk delete api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
@@ -104,31 +108,38 @@ describe('Velo External DB Data REST API',  () => {
 
             await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
         })
+    }
 
+    if (shouldNotRunOn(['BigQuery'], name)) {
         test('get by id api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
             await expect( axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin) ).resolves.toEqual(matchers.responseWith({ item: ctx.item }))
         })
+    }
+        
+        if (shouldNotRunOn(['BigQuery'], name)) {
+            test('update api', async() => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
-        test('update api', async() => {
-            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-            await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
-
-            await axios.post('/data/update', { collectionName: ctx.collectionName, item: ctx.modifiedItem }, authAdmin)
+                await axios.post('/data/update', { collectionName: ctx.collectionName, item: ctx.modifiedItem }, authAdmin)
 
             await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ctx.modifiedItem], totalCount: 1 })
-        })
+            })
+        }
 
-        test('bulk update api', async() => {
-            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-            await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
+        if (shouldNotRunOn(['BigQuery'], name)) {
+            test('bulk update api', async() => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 
-            await axios.post('/data/update/bulk', { collectionName: ctx.collectionName, items: ctx.modifiedItems }, authAdmin)
+                await axios.post('/data/update/bulk', { collectionName: ctx.collectionName, items: ctx.modifiedItems }, authAdmin)
 
             await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual( { items: expect.arrayContaining(ctx.modifiedItems), totalCount: ctx.modifiedItems.length })
-        })
+            })
+        }
 
         test('count api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)

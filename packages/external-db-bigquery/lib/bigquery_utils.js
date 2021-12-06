@@ -24,7 +24,7 @@ const unPatchDateTime = (item) => {
         if (reISO.test(value)) {
             obj[key] = new Date(value)
         } else {
-            obj[key] = item[key]
+            obj[key] = item[key].toNumber ? item[key].toNumber() : item[key]
         }
     }
 
