@@ -114,31 +114,31 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
       - name: Downloading Docker Compose V2
-        if: ${{ ( matrix.database != 'BigQuery') }}
+        if: ${{ ( matrix.database != 'bigquery') }}
         run: |
           curl -sfL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
           docker compose version
 
       - name: Downloading Image
-        if: ${{ ( matrix.database != 'BigQuery') }}
+        if: ${{ ( matrix.database != 'bigquery') }}
         run: |
           cd packages/velo-external-db/test/resources
           docker compose pull --quiet ${{ matrix.database }}
 
       - name: Start Container
-        if: ${{ ( matrix.database != 'BigQuery') }}
+        if: ${{ ( matrix.database != 'bigquery') }}
         run: |
           cd packages/velo-external-db/test/resources
           docker compose up --detach ${{ matrix.database }}
 
       - id: auth
-        if: ${{ ( matrix.database == 'BigQuery') }}
+        if: ${{ ( matrix.database == 'bigquery') }}
         uses: google-github-actions/auth@v0.4.0
         with:
           credentials_json: ${{ secrets.ACTIONS_GCP_CREDENTIALS }}
 
       - name: Set up Cloud SDK
-        if: ${{ ( matrix.database == 'BigQuery') }}
+        if: ${{ ( matrix.database == 'bigquery') }}
         uses: google-github-actions/setup-gcloud@v0.2.1
     
       - name: Installing Dependencies
@@ -151,7 +151,7 @@ jobs:
         run: npm run test:${{ matrix.database }}
 
       - name: Stop Container
-        if: ${{ ( matrix.database != 'BigQuery') }}
+        if: ${{ ( matrix.database != 'bigquery') }}
         run: |
           cd packages/velo-external-db/test/resources
           docker compose down
