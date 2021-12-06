@@ -154,7 +154,7 @@ jobs:
       - name: Set up Cloud SDK
         if: ${{ ( matrix.database == 'bigquery') }}
         uses: google-github-actions/setup-gcloud@v0.2.1
-    
+
       - name: Installing Dependencies
         run: npm install
 
@@ -169,4 +169,3 @@ jobs:
         run: |
           cd packages/velo-external-db/test/resources
           docker compose down
-
