@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, getFilterObject } = require('velo-external-db-commons')
 const { wildCardWith, escapeId } = require('./mysql_utils')
 
 class FilterParser {
@@ -38,11 +38,11 @@ class FilterParser {
         const groupByColumns = []
         const filterColumnsStr = []
         if (isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(f) ))
-            groupByColumns.push(...Object.values(aggregation._id))
+            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(f.substring(1)) ))
+            groupByColumns.push(...Object.values(aggregation._id).map(f=>f.substring(1)))
         } else {
-            filterColumnsStr.push(escapeId(aggregation._id))
-            groupByColumns.push(aggregation._id)
+            filterColumnsStr.push(escapeId(aggregation._id.substring(1)))
+            groupByColumns.push(aggregation._id.substring(1))
         }
 
         Object.keys(aggregation)
@@ -50,6 +50,7 @@ class FilterParser {
               .forEach(fieldAlias => {
                   Object.entries(aggregation[fieldAlias])
                         .forEach(([func, field]) => {
+                            field = field.substring(1)
                             filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeId(field)}) AS ${escapeId(fieldAlias)}`)
                         })
               })
@@ -70,45 +71,47 @@ class FilterParser {
     }
 
     parseFilter(filter) {
-        if (!filter || !isObject(filter)|| filter.operator === undefined) {
+        if (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined) {
             return []
         }
+        
+        const { operator, fieldName, value } =  getFilterObject(filter)
 
-        switch (filter.operator) {
+        switch (operator) {
             case '$and':
             case '$or':
-                const res = filter.value.map( this.parseFilter.bind(this) )
-                const op = filter.operator === '$and' ? ' AND ' : ' OR '
+                const res = value.map( this.parseFilter.bind(this) )
+                const op = operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.map(r => r[0].filterExpr).join( op ),
                     parameters: res.map( s => s[0].parameters ).flat()
                 }]
             case '$not':
-                const res2 = this.parseFilter( filter.value )
+                const res2 = this.parseFilter( value[0] )
                 return [{
                     filterExpr: `NOT (${res2[0].filterExpr})`,
                     parameters: res2[0].parameters
                 }]
         }
 
-        if (this.isSingleFieldOperator(filter.operator)) {
+        if (this.isSingleFieldOperator(operator)) {
             return [{
-                filterExpr: `${escapeId(filter.fieldName)} ${this.veloOperatorToMySqlOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value, filter.operator)}`.trim(),
-                parameters: filter.value !== undefined ? [].concat( this.patchTrueFalseValue(filter.value) ) : []
+                filterExpr: `${escapeId(fieldName)} ${this.veloOperatorToMySqlOperator(operator, value)} ${this.valueForOperator(value, operator)}`.trim(),
+                parameters: value !== undefined ? [].concat( this.patchTrueFalseValue(value) ) : []
             }]
         }
 
-        if (this.isSingleFieldStringOperator(filter.operator)) {
+        if (this.isSingleFieldStringOperator(operator)) {
             return [{
-                filterExpr: `${escapeId(filter.fieldName)} LIKE ?`,
-                parameters: [this.valueForStringOperator(filter.operator, filter.value)]
+                filterExpr: `${escapeId(fieldName)} LIKE ?`,
+                parameters: [this.valueForStringOperator(operator, value)]
             }]
         }
 
-        if (filter.operator === '$urlized') {
+        if (operator === '$urlized') {
             return [{
-                filterExpr: `LOWER(${escapeId(filter.fieldName)}) RLIKE ?`,
-                parameters: [filter.value.map(s => s.toLowerCase()).join('[- ]')]
+                filterExpr: `LOWER(${escapeId(fieldName)}) RLIKE ?`,
+                parameters: [value.map(s => s.toLowerCase()).join('[- ]')]
             }]
         }
 
