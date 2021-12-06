@@ -38,8 +38,8 @@ const createRouter = () => {
 
     router.post('/data/aggregate', async(req, res, next) => {
         try {
-            const { collectionName, filter, aggregation } = req.body
-            const data = await dataService.aggregate(collectionName, filter, aggregation)
+            const { collectionName, filter, processingStep, postFilteringStep } = req.body
+            const data = await dataService.aggregate(collectionName, filter, { processingStep, postFilteringStep })
             res.json(data)
         } catch (e) {
             next(e)

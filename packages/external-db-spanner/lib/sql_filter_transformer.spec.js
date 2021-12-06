@@ -194,7 +194,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [$startsWith]', () => {
                     const filter = {
-                        [ctx.fieldName]: { '$startsWith': ctx.fieldValue }
+                        [ctx.fieldName]: { $startsWith: ctx.fieldValue }
                         /*
                         operator: '$startsWith',
                         fieldName: ctx.fieldName,
