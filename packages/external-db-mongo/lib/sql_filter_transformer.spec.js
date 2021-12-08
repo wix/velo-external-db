@@ -10,7 +10,6 @@ describe('Sql Parser', () => {
 
     describe('sort parser', () => {
 
-        // todo: should we even check for valid input or should we let the validation library to handle this ?
         test('handles undefined sort', () => {
             expect( env.filterParser.orderBy('') ).toEqual(EMPTY_SORT)
             expect( env.filterParser.orderBy('    ') ).toEqual(EMPTY_SORT)
@@ -75,9 +74,6 @@ describe('Sql Parser', () => {
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
                     [ctx.fieldName]: { [o]: ctx.fieldValue }
-                    /*operator: o,
-                    fieldName: ctx.fieldName,
-                    value: ctx.fieldValue*/
                 }
 
 
@@ -91,11 +87,6 @@ describe('Sql Parser', () => {
             test('correctly extract filter value if value is 0', () => {
                 const filter = {
                     [ctx.fieldName]: { $eq: 0 }
-                    /*
-                    operator: '$eq',
-                    fieldName: ctx.fieldName,
-                    value: 0
-                    */
                 }
 
                 expect(env.filterParser.parseFilter(filter)).toEqual([{
@@ -108,11 +99,6 @@ describe('Sql Parser', () => {
             test('correctly transform operator [$hasSome]', () => {
                 const filter = {
                     [ctx.fieldName]: { '$hasSome': ctx.fieldListValue }
-                    /*
-                    operator: '$hasSome',
-                    fieldName: ctx.fieldName,
-                    value: ctx.fieldListValue
-                    */
                 }
 
                 expect(env.filterParser.parseFilter(filter)).toEqual([{
@@ -123,11 +109,6 @@ describe('Sql Parser', () => {
             test('operator [$hasSome] with empty list of values will throw an exception', () => {
                 const filter = {
                     [ctx.fieldName]: { $hasSome: [] }
-                    /*
-                    operator: '$hasSome',
-                    fieldName: ctx.fieldName,
-                    value: []
-                    */
                 }
 
                 expect(() => env.filterParser.parseFilter(filter)).toThrow(InvalidQuery)
@@ -136,10 +117,6 @@ describe('Sql Parser', () => {
             test('correctly transform operator [$eq] with null value', () => {
                 const filter = {
                     [ctx.fieldName]: { $eq: undefined } 
-                    /*
-                    operator: '$eq',
-                    fieldName: ctx.fieldName,
-                    */
                 }
 
                 expect(env.filterParser.parseFilter(filter)).toEqual([{
@@ -151,11 +128,6 @@ describe('Sql Parser', () => {
                 const value = chance.bool()
                 const filter = {
                     [ctx.fieldName]: { $eq: value } 
-                    /*
-                    operator: '$eq',
-                    fieldName: ctx.fieldName,
-                    value: chance.bool()
-                    */
                 }
 
                 expect(env.filterParser.parseFilter(filter)).toEqual([{
@@ -167,11 +139,6 @@ describe('Sql Parser', () => {
                 test('correctly transform operator [$contains]', () => {
                     const filter = {
                         [ctx.fieldName]: { $contains: ctx.fieldValue }
-                        /*
-                        operator: '$contains',
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldValue
-                        */
                     }
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
                         filterExpr: { [ctx.fieldName]: { $regex: ctx.fieldValue } }
@@ -180,12 +147,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [$startsWith]', () => {
                     const filter = {
-                        [ctx.fieldName]: { $startsWith: ctx.fieldValue }
-                        /*
-                        operator: '$startsWith',
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldValue
-                        */                    
+                        [ctx.fieldName]: { $startsWith: ctx.fieldValue }                  
                     }
 
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
@@ -196,11 +158,6 @@ describe('Sql Parser', () => {
                 test('correctly transform operator [$endsWith]', () => {
                     const filter = {
                         [ctx.fieldName]: { $endsWith: ctx.fieldValue }
-                        /*
-                        operator: '$endsWith',
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldValue
-                        */
                     }
 
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
@@ -211,11 +168,6 @@ describe('Sql Parser', () => {
                 test('correctly transform operator [$urlized]', () => {
                     const filter = {
                         [ctx.fieldName]: { $urlized: ctx.fieldListValue } 
-                        /*
-                        operator: '$urlized',
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldListValue
-                        */
                     }
 
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
@@ -231,10 +183,6 @@ describe('Sql Parser', () => {
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
                     [o]: [ctx.filter, ctx.anotherFilter]
-                    /*
-                    operator: o,
-                    value: [ctx.filter, ctx.anotherFilter]
-                    */
                 }
 
                 const filter1 = env.filterParser.parseFilter(ctx.filter)[0]
@@ -248,10 +196,6 @@ describe('Sql Parser', () => {
             test('correctly transform operator [$not]', () => {
                 const filter = {
                     $not: [ ctx.filter ]
-                    /*
-                    operator: '$not',
-                    value: ctx.filter
-                    */
                 }
 
                 expect(env.filterParser.parseFilter(filter)).toEqual([{
@@ -306,14 +250,12 @@ describe('Sql Parser', () => {
                     const havingFilter = {  [ctx.moreFieldName]: { $gt: ctx.fieldValue } }
 
                     expect(env.filterParser.parseAggregation(aggregation, havingFilter)).toEqual({
-                        // fieldsStatement: `${(ctx.fieldName)}, AVG(${(ctx.anotherFieldName)}) AS ${(ctx.moreFieldName)}`,
                         fieldsStatement: {
                             $group: {
                                 [ctx.fieldName]: `$${(ctx.fieldName)}`,
                                 [ctx.moreFieldName]: { $avg: `$${ctx.anotherFieldName}` }
                             }
                         },
-                        // havingFilter: `HAVING AVG(${(ctx.anotherFieldName)}) > ${(ctx.moreFieldName)}`,
                         havingFilter: { $match: { [ctx.moreFieldName]: { $gt: ctx.fieldValue } } },
 
                     })
