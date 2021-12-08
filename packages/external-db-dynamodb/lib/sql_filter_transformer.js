@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject } = require('velo-external-db-commons')
+const { isObject, getFilterObject } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require('./dynamo_utils')
 
 class FilterParser {
@@ -24,19 +24,17 @@ class FilterParser {
 
     
     parseFilter(filter) {
-        if (!filter || !isObject(filter)|| filter.operator === undefined) {
+        if (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined ) {
             return []
         }
 
-        const fieldName = filter.fieldName 
-        const value = filter.value
-
+        const { operator, fieldName, value } =  getFilterObject(filter)
         
-        switch (filter.operator) {
+        switch (operator) {
             case '$and':
             case '$or':
                 const res = value.map( this.parseFilter.bind(this) )
-                const op = filter.operator === '$and' ? ' AND ' : ' OR '
+                const op = operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: {
                         FilterExpression: res.map(r => r[0].filterExpr.FilterExpression).join( op ),
@@ -45,7 +43,7 @@ class FilterParser {
                     }
                 }]
             case '$not':
-                const res2 = this.parseFilter( filter.value )
+                const res2 = this.parseFilter( value[0] )
                 return [{
                     filterExpr: {
                         FilterExpression: `NOT (${res2[0].filterExpr.FilterExpression})`,
@@ -55,38 +53,38 @@ class FilterParser {
                 }]
         }
         
-        if (this.isSingleFieldOperator(filter.operator)) {
+        if (this.isSingleFieldOperator(operator)) {
             return [{
                 filterExpr: {
-                    FilterExpression: `#${fieldName} ${this.veloOperatorToDynamoOperator(filter.operator)} :${fieldName}`,
+                    FilterExpression: `#${fieldName} ${this.veloOperatorToDynamoOperator(operator)} :${fieldName}`,
                     ExpressionAttributeNames: {
                         [`#${fieldName}`]: fieldName
                     },
                     ExpressionAttributeValues: {
-                        [`:${fieldName}`]: this.valueForOperator(value, filter.operator)
+                        [`:${fieldName}`]: this.valueForOperator(value, operator)
                     }
                 }
             }]
         }
 
-        if (this.isSingleFieldStringOperator(filter.operator)) {
+        if (this.isSingleFieldStringOperator(operator)) {
             return [{
                 filterExpr: {
-                    FilterExpression: `${this.veloOperatorToDynamoOperator(filter.operator)} (#${fieldName}, :${fieldName})`,
+                    FilterExpression: `${this.veloOperatorToDynamoOperator(operator)} (#${fieldName}, :${fieldName})`,
                     ExpressionAttributeNames: {
                         [`#${fieldName}`]: fieldName
                     },
                     ExpressionAttributeValues: {
-                        [`:${fieldName}`]: filter.value
+                        [`:${fieldName}`]: value
                     }
                 }
             }]
         }
 
 
-        if (filter.operator === '$hasSome') {
+        if (operator === '$hasSome') {
             
-            if (filter.operator === '$hasSome' && (value === undefined || value.length === 0))
+            if (operator === '$hasSome' && (value === undefined || value.length === 0))
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
 
             const filterExpressionVariables = { ...value }

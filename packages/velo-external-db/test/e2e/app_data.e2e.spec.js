@@ -57,29 +57,27 @@ describe('Velo External DB Data REST API',  () => {
             await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
 
             expect((await axios.post('/data/aggregate',
-                { collectionName: ctx.collectionName,
-                    filter: { operator: '$eq', fieldName: '_id', value: ctx.numberItem._id },
-                    aggregation: {
-                        processingStep: {
-                            _id: {
-                                field1: '_id',
-                                field2: '_owner',
-                            },
-                            myAvg: {
-                                $avg: ctx.numberColumns[0].name
-                            },
-                            mySum: {
-                                $sum: ctx.numberColumns[1].name
-                            }
+                { 
+                    collectionName: ctx.collectionName,
+                    filter: { _id: { $eq: ctx.numberItem._id }},
+                    processingStep: {
+                        _id: {
+                            field1: '$_id',
+                            field2: '$_owner',
                         },
-                        postFilteringStep: {
-                            operator: '$and', value: [
-                                { operator: '$gt', fieldName: 'myAvg', value: 0 },
-                                { operator: '$gt', fieldName: 'mySum', value: 0 }
-
-                            ],
+                        myAvg: {
+                            $avg: `$${ctx.numberColumns[0].name}`
                         },
-                    }
+                        mySum: {
+                            $sum: `$${ctx.numberColumns[1].name}`
+                        }
+                    },
+                    postFilteringStep: {
+                        $and: [
+                            { myAvg: { $gt: 0 }},
+                            { mySum: { $gt: 0 }}
+                        ],
+                    },
                 }, authAdmin)).data).toEqual({ items: [ { _id: ctx.numberItem._id, _owner: ctx.numberItem._owner, myAvg: ctx.numberItem[ctx.numberColumns[0].name], mySum: ctx.numberItem[ctx.numberColumns[1].name] } ],
                 totalCount: 0 })
         })
