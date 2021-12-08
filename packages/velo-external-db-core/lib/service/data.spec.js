@@ -23,11 +23,7 @@ describe('Data Service', () => {
 
     test('get by id will issue a call to find and transform the result', async() => {
         driver.givenListResult([ctx.entity], ctx.collectionName,
-                        { kind: 'filter',
-                               operator: '$eq',
-                               fieldName: '_id',
-                               value: ctx.itemId
-                              }, '', 0, 1)
+                        { _id: { $eq: ctx.itemId } }, '', 0, 1)
 
         const actual = await env.dataService.getById(ctx.collectionName, ctx.itemId)
         expect( actual ).toEqual({ item: ctx.entity })

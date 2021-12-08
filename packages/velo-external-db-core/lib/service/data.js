@@ -16,10 +16,7 @@ class DataService {
 
     async getById(collectionName, itemId) {
         const result = await this.find(collectionName, {
-            kind: 'filter',
-            operator: '$eq',
-            fieldName: '_id',
-            value: itemId
+            _id: { $eq: itemId }
         }, '', 0, 1)
 
         return { item: result.items[0] }

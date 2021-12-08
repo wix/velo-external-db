@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_SORT, isObject } = require('velo-external-db-commons')
+const { EMPTY_SORT, isObject, getFilterObject } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require('./mongo_utils')
 
 class FilterParser {
@@ -21,17 +21,18 @@ class FilterParser {
         const fieldsStatement = {}
         if (isObject(aggregation._id)) {
             const _id = Object.keys(aggregation._id)
-                              .reduce((r, c) => ( { ...r, [aggregation._id[c]]: `$${aggregation._id[c]}` } ), {})
+                              .reduce((r, c) => ( { ...r, [aggregation._id[c].substring(1)]: `${aggregation._id[c]}` } ), {})
             Object.assign(fieldsStatement, { _id } )
         } else {
-            Object.assign(fieldsStatement, { [aggregation._id]: `$${aggregation._id}` })
+            Object.assign(fieldsStatement, { [aggregation._id.substring(1)]: `${aggregation._id}` })
         }
+        
         Object.keys(aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
                   Object.entries(aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `$${field}` } })
+                            Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `${field}` } })
                         })
               })
         const filterObj = havingFilter.reduce((r, c) => ( { ...r, ...c } ), {})
@@ -42,32 +43,32 @@ class FilterParser {
     }
 
     parseFilter(filter) {
-        if (!filter || !isObject(filter) || filter.operator === undefined) {
+        if (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined ) {
             return []
         }
-        const operator = this.veloOperatorToMongoOperator(filter.operator)
+        const { operator, fieldName, value } = getFilterObject(filter)
+        const mongoOp = this.veloOperatorToMongoOperator(operator)
 
-        if (this.isMultipleFieldOperator(operator)) {
-            const res = filter.value.map( this.parseFilter.bind(this) )
-            return [{ filterExpr: { [operator]: res.map(r => r[0].filterExpr) } }]
+        if (this.isMultipleFieldOperator(mongoOp)) {
+            const res = value.map( this.parseFilter.bind(this) )
+            return [{ filterExpr: { [mongoOp]: res.map(r => r[0].filterExpr) } }]
         }
 
-        if (operator === '$not') {
-            const res = this.parseFilter(filter.value)
-            return [{ filterExpr: { [operator]: res[0].filterExpr } }]
+        if (mongoOp === '$not') {
+            const res = this.parseFilter(value[0])
+            return [{ filterExpr: { [mongoOp]: res[0].filterExpr } }]
         }
 
-        if (this.isSingleFieldStringOperator(operator)) {
-            return [{ filterExpr: { [filter.fieldName]: { $regex: this.valueForStringOperator(operator, filter.value) } } }]
+        if (this.isSingleFieldStringOperator(mongoOp)) {
+            return [{ filterExpr: { [fieldName]: { $regex: this.valueForStringOperator(mongoOp, value) } } }]
         }
 
-        if (filter.operator === '$urlized') {
+        if (mongoOp === '$urlized') {
             return [{
-                filterExpr: { [filter.fieldName]: { $regex: `/${filter.value.map(s => s.toLowerCase()).join('.*')}/i` } }
+                filterExpr: { [fieldName]: { $regex: `/${value.map(s => s.toLowerCase()).join('.*')}/i` } }
             }]
         }
-
-        return [{ filterExpr: { [filter.fieldName]: { [operator]: this.valueForOperator(filter.value, operator) } } }]
+        return [{ filterExpr: { [fieldName]: { [mongoOp]: this.valueForOperator(value, mongoOp) } } }]
 
     }
 

@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject } = require('velo-external-db-commons')
+const { isObject, getFilterObject } = require('velo-external-db-commons')
 const { EMPTY_SORT } = require ('./airtable_utils')
 
 class FilterParser {
@@ -18,31 +18,32 @@ class FilterParser {
 
 
     parseFilter(filter) {
-        if (!filter || !isObject(filter) || filter.operator === undefined) {
+        if (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined) {
             return []
         }
 
+        const { operator, fieldName, value } =  getFilterObject(filter)
 
-        switch (filter.operator) {
+        switch (operator) {
             case '$and':
             case '$or':
-                const res = filter.value.map(this.parseFilter.bind(this))
-                const op = filter.operator === '$and' ? 'AND' : 'OR' 
+                const res = value.map(this.parseFilter.bind(this))
+                const op = operator === '$and' ? 'AND' : 'OR' 
                 return [{
                     filterExpr: this.multipleFieldOperatorToFilterExpr(op, res)
                 }]
 
             case '$not':
-                const res2 = this.parseFilter(filter.value)
+                const res2 = this.parseFilter(value[0])
                 return [{
                     filterExpr: `NOT(${res2[0].filterExpr})`
                 }]
             case '$hasSome': //todo - refactor
-                if (filter.value === undefined || filter.value.length === 0) {
+                if (value === undefined || value.length === 0) {
                     throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
                 }
 
-                const ress = filter.value.map(val => { return { operator: '$eq', value: val, fieldName: filter.fieldName } })
+                const ress = value.map(val => { return { [fieldName]: { $eq: val }} })
                 const ress2 = ress.map(this.parseFilter.bind(this))
                 return [{
                     filterExpr: this.multipleFieldOperatorToFilterExpr('OR', ress2)
@@ -51,18 +52,18 @@ class FilterParser {
         }
 
 
-        if (this.isSingleFieldOperator(filter.operator)) {
+        if (this.isSingleFieldOperator(operator)) {
             return [{
-                filterExpr: `${filter.fieldName} ${this.veloOperatorToAirtableOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value, filter.operator)}` // TODO: value for operator?
+                filterExpr: `${fieldName} ${this.veloOperatorToAirtableOperator(operator, value)} ${this.valueForOperator(value, operator)}` // TODO: value for operator?
             }]
         }
 
-        if (this.isSingleFieldStringOperator(filter.operator)) {
+        if (this.isSingleFieldStringOperator(operator)) {
            return[{
-               filterExpr: `REGEX_MATCH({${filter.fieldName}},'${this.valueForStringOperator(filter.operator, filter.value)}')` }]
+               filterExpr: `REGEX_MATCH({${fieldName}},'${this.valueForStringOperator(operator, value)}')` }]
         }
 
-        if (filter.operator === '$urlized') {
+        if (operator === '$urlized') {
             console.error('not implemented')
         }
         return []

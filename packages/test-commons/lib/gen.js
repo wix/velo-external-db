@@ -117,12 +117,29 @@ const randomFilter = () => {
     }
 }
 
+const randomV2Filter = () => {
+    const op = randomOperator()
+    const fieldName = chance.word()
+    const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
+    return {
+        [fieldName]: { [op]: value } 
+    }
+}
+
 const idFilter = () => {
     const op = randomOperator()
     return {
         operator: randomOperator(),
         fieldName: '_id',
         value: op === '$hasSome' ? [chance.guid(), chance.guid(), chance.guid(), chance.guid(), chance.guid()] : chance.guid()
+    }
+}
+
+const idV2Filter = () => {
+    const op = randomOperator()
+    const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
+    return {
+        _id: { [op]: value}
     }
 }
 
@@ -167,6 +184,6 @@ const randomConfig = () => ({
 
 module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject,
      randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig }
+      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, randomV2Filter, idV2Filter }
 
 
