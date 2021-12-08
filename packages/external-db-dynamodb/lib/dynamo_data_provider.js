@@ -8,23 +8,20 @@ class DataProvider {
         this.filterParser = filterParser
         this.client = client
         this.docClient = DynamoDBDocument.from(client)
-
     }
 
     async query(command, queryable) {
         return queryable ? await this.docClient.query(command) : await this.docClient.scan(command)
     }
 
-    // eslint-disable-next-line no-unused-vars
-    async find(collectionName, filter, sort, skip, limit, fields) {
-        const { filterExpr, queryable } = this.filterParser.transform(filter) //,fields)
+    async find(collectionName, filter, sort, skip, limit) {
+        const { filterExpr, queryable } = this.filterParser.transform(filter)
         const { Items } = await this.query(dynamoRequests.findCommand(collectionName, filterExpr, limit), queryable)
         return Items.map(patchFixDates)
     }
     
-    // eslint-disable-next-line no-unused-vars
-    async count(collectionName, filter, fields) {
-        const { filterExpr, queryable } = this.filterParser.transform(filter) //,fields)
+    async count(collectionName, filter) {
+        const { filterExpr, queryable } = this.filterParser.transform(filter)
         const { Count } = await this.query(dynamoRequests.countCommand(collectionName, filterExpr), queryable)
         return Count
     }
