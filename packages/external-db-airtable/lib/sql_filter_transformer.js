@@ -43,7 +43,7 @@ class FilterParser {
                     throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
                 }
 
-                const ress = value.map(val => { return { [fieldName]: { $eq: val }} })
+                const ress = value.map(val => { return { [fieldName]: { $eq: val } } })
                 const ress2 = ress.map(this.parseFilter.bind(this))
                 return [{
                     filterExpr: this.multipleFieldOperatorToFilterExpr('OR', ress2)

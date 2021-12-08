@@ -59,7 +59,7 @@ describe('Velo External DB Data REST API',  () => {
             expect((await axios.post('/data/aggregate',
                 { 
                     collectionName: ctx.collectionName,
-                    filter: { _id: { $eq: ctx.numberItem._id }},
+                    filter: { _id: { $eq: ctx.numberItem._id } },
                     processingStep: {
                         _id: {
                             field1: '$_id',
@@ -74,8 +74,8 @@ describe('Velo External DB Data REST API',  () => {
                     },
                     postFilteringStep: {
                         $and: [
-                            { myAvg: { $gt: 0 }},
-                            { mySum: { $gt: 0 }}
+                            { myAvg: { $gt: 0 } },
+                            { mySum: { $gt: 0 } }
                         ],
                     },
                 }, authAdmin)).data).toEqual({ items: [ { _id: ctx.numberItem._id, _owner: ctx.numberItem._owner, myAvg: ctx.numberItem[ctx.numberColumns[0].name], mySum: ctx.numberItem[ctx.numberColumns[1].name] } ],

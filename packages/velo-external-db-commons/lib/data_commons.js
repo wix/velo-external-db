@@ -61,7 +61,7 @@ const patchAggregationObject = (aggregation) => {
     if (isObject(aggregation._id)) {
         Object.entries(aggregation._id)
               .forEach(([alias, fieldName]) => {
-                  newAggregationObject._id = { ...newAggregationObject._id, ... {[alias]: fieldName.substring(1)}}
+                  newAggregationObject._id = { ...newAggregationObject._id, ... { [alias]: fieldName.substring(1) } }
               })
     } else {
         newAggregationObject._id = aggregation._id.substring(1)
@@ -71,8 +71,8 @@ const patchAggregationObject = (aggregation) => {
           .filter(f => f !== '_id')
           .forEach(fieldAlias => {
               Object.entries(aggregation[fieldAlias])
-                    .forEach(([func,field]) => {
-                        newAggregationObject[fieldAlias] = {...newAggregationObject[fieldAlias], ...{[func]: field.substring(1)}}
+                    .forEach(([func, field]) => {
+                        newAggregationObject[fieldAlias] = { ...newAggregationObject[fieldAlias], ...{ [func]: field.substring(1) } }
                     })
         })
     return newAggregationObject

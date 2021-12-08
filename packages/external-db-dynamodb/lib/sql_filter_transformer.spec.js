@@ -75,7 +75,7 @@ describe('Sql Parser', () => {
 
             test('correctly transform operator [$hasSome]', () => {
                 const filter = {
-                    [ctx.fieldName]: { '$hasSome': ctx.fieldListValue }
+                    [ctx.fieldName]: { $hasSome: ctx.fieldListValue }
             }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{

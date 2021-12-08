@@ -92,7 +92,7 @@ describe('Sql Parser', () => {
 
             test('correctly extract filter value if value is 0', () => {
                 const filter = {
-                    [ctx.fieldName]: { '$eq': 0 }
+                    [ctx.fieldName]: { $eq: 0 }
                 }
 
                 expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -107,7 +107,7 @@ describe('Sql Parser', () => {
             // todo: $hasAll ???
             test('correctly transform operator [$hasSome]', () => {
                 const filter = {
-                    [ctx.fieldName]: { '$hasSome': ctx.fieldListValue }
+                    [ctx.fieldName]: { $hasSome: ctx.fieldListValue }
                 }
 
                 expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -120,7 +120,7 @@ describe('Sql Parser', () => {
 
             test('operator [$hasSome] with empty list of values will throw an exception', () => {
                 const filter = {
-                    [ctx.fieldName]: { '$hasSome': [] }
+                    [ctx.fieldName]: { $hasSome: [] }
                 }
 
                 expect( () => env.filterParser.parseFilter(filter, ctx.offset) ).toThrow(InvalidQuery)
@@ -128,7 +128,7 @@ describe('Sql Parser', () => {
 
             test('correctly transform operator [$eq] with null value', () => {
                 const filter = {
-                    [ctx.fieldName]: { '$eq': undefined } 
+                    [ctx.fieldName]: { $eq: undefined } 
                 }
 
                 expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -142,7 +142,7 @@ describe('Sql Parser', () => {
             test('correctly transform operator [$eq] with boolean value', () => {
                 const value = chance.bool()
                 const filter = {
-                    [ctx.fieldName]: { '$eq': value } 
+                    [ctx.fieldName]: { $eq: value } 
                 }
 
                 expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -156,7 +156,7 @@ describe('Sql Parser', () => {
             describe('handle string operators', () => {
                 test('correctly transform operator [$contains]', () => {
                     const filter = {
-                        [ctx.fieldName]: { '$contains': ctx.fieldValue }
+                        [ctx.fieldName]: { $contains: ctx.fieldValue }
                     }
 
                     expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -169,7 +169,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [$startsWith]', () => {
                     const filter = {
-                        [ctx.fieldName]: { '$startsWith': ctx.fieldValue }
+                        [ctx.fieldName]: { $startsWith: ctx.fieldValue }
                     }
 
                     expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -182,7 +182,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [$endsWith]', () => {
                     const filter = {
-                        [ctx.fieldName]: { '$endsWith': ctx.fieldValue }
+                        [ctx.fieldName]: { $endsWith: ctx.fieldValue }
                     }
 
                     expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -195,7 +195,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [$urlized]', () => {
                     const filter = {
-                        [ctx.fieldName]: { '$urlized': ctx.fieldListValue } 
+                        [ctx.fieldName]: { $urlized: ctx.fieldListValue } 
                     }
 
                     expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -230,7 +230,7 @@ describe('Sql Parser', () => {
 
             test('correctly transform operator [$not]', () => {
                 const filter = {
-                    '$not' : [ ctx.filter ]
+                    $not: [ ctx.filter ]
                 }
 
                 expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
