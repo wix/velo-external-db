@@ -7,7 +7,7 @@ const config = () => ({
 })
 
 const createConnection = (_config) => {
-    const { connection, cleanup } = init({ ..._config })
+    const { connection, cleanup } = init(_config)
     return { connection, cleanup }
 }
 
