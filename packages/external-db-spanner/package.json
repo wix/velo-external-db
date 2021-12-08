@@ -31,11 +31,11 @@
   },
   "devDependencies": {
     "chance": "^1.1.8",
-    "jest": "^27.3.1",
-    "jest-each": "^27.3.1",
+    "jest": "^27.4.3",
+    "jest-each": "^27.4.2",
     "jest-when": "^3.4.2",
     "test-commons": "^0.0.0",
-    "ts-jest": "^27.0.7"
+    "ts-jest": "^27.1.1"
   },
   "bugs": {
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
