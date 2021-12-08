@@ -32,13 +32,10 @@ const asParamArrays = item => Object.values(item)
 const isObject = (o) => typeof o === 'object' && o !== null
 
 const updateFieldsFor = item => {
-    // const systemFieldNames = SystemFields.map(f => f.name)
-    // return Object.keys(item)
-    //              .filter( k => !systemFieldNames.includes(k) )
     return Object.keys(item).filter(f => f !== '_id')
 }
 
-const getFilterObject = (filter) => {
+const extractFilterObjects = (filter) => {
     if(isMultipleFieldOperator(filter)) {
         const operator = Object.keys(filter)[0]
         const value = filter[operator]
@@ -64,4 +61,4 @@ const isMultipleFieldOperator = (filter) => {
 }
 
 
-module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor, getFilterObject }
+module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor, extractFilterObjects }

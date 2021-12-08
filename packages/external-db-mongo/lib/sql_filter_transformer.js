@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_SORT, isObject, getFilterObject } = require('velo-external-db-commons')
+const { EMPTY_SORT, isObject, extractFilterObjects } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require('./mongo_utils')
 
 class FilterParser {
@@ -46,7 +46,7 @@ class FilterParser {
         if (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined ) {
             return []
         }
-        const { operator, fieldName, value } = getFilterObject(filter)
+        const { operator, fieldName, value } = extractFilterObjects(filter)
         const mongoOp = this.veloOperatorToMongoOperator(operator)
 
         if (this.isMultipleFieldOperator(mongoOp)) {

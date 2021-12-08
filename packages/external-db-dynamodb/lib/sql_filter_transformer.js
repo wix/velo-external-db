@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject, getFilterObject } = require('velo-external-db-commons')
+const { isObject, extractFilterObjects } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require('./dynamo_utils')
 
 class FilterParser {
@@ -28,7 +28,7 @@ class FilterParser {
             return []
         }
 
-        const { operator, fieldName, value } =  getFilterObject(filter)
+        const { operator, fieldName, value } =  extractFilterObjects(filter)
         
         switch (operator) {
             case '$and':

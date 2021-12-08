@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject, getFilterObject } = require('velo-external-db-commons')
+const { isObject, extractFilterObjects } = require('velo-external-db-commons')
 
 class FilterParser {
     constructor() {
@@ -20,7 +20,7 @@ class FilterParser {
             return []
         }
 
-        const { operator, fieldName, value } =  getFilterObject(filter)
+        const { operator, fieldName, value } =  extractFilterObjects(filter)
 
         if(this.isUnsupportedOperator(operator)) {
             throw new InvalidQuery(`${operator} operator cant be used in firebase`)

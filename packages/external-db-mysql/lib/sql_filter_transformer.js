@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject, getFilterObject } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, extractFilterObjects } = require('velo-external-db-commons')
 const { wildCardWith, escapeId } = require('./mysql_utils')
 
 class FilterParser {
@@ -75,7 +75,7 @@ class FilterParser {
             return []
         }
         
-        const { operator, fieldName, value } =  getFilterObject(filter)
+        const { operator, fieldName, value } =  extractFilterObjects(filter)
 
         switch (operator) {
             case '$and':
