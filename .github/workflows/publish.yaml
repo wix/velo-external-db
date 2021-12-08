@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  aws:
+  AWS:
     runs-on: ubuntu-latest
 
     env:
