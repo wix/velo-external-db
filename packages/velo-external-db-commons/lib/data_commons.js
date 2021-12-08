@@ -56,9 +56,31 @@ const extractFilterObjects = (filter) => {
     }
 }
 
+const patchAggregationObject = (aggregation) => {
+    const newAggregationObject = {}
+    if (isObject(aggregation._id)) {
+        Object.entries(aggregation._id)
+              .forEach(([alias, fieldName]) => {
+                  newAggregationObject._id = { ...newAggregationObject._id, ... {[alias]: fieldName.substring(1)}}
+              })
+    } else {
+        newAggregationObject._id = aggregation._id.substring(1)
+    }
+
+    Object.keys(aggregation)
+          .filter(f => f !== '_id')
+          .forEach(fieldAlias => {
+              Object.entries(aggregation[fieldAlias])
+                    .forEach(([func,field]) => {
+                        newAggregationObject[fieldAlias] = {...newAggregationObject[fieldAlias], ...{[func]: field.substring(1)}}
+                    })
+        })
+    return newAggregationObject
+}
+
 const isMultipleFieldOperator = (filter) => { 
     return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
 }
 
 
-module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor, extractFilterObjects }
+module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor, extractFilterObjects, patchAggregationObject }

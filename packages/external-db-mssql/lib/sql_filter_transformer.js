@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject, extractFilterObjects } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, extractFilterObjects, patchAggregationObject } = require('velo-external-db-commons')
 const { escapeId, validateLiteral, patchFieldName } = require('./mssql_utils')
 
 class FilterParser {
@@ -35,23 +35,23 @@ class FilterParser {
     }
 
     parseAggregation(aggregation, postFilter) {
+        const _aggregation = patchAggregationObject(aggregation)
         const groupByColumns = []
         const filterColumnsStr = []
-        if (isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeId(f.substring(1))))
-            groupByColumns.push(...Object.values(aggregation._id).map(f=>f.substring(1)))
+        if (isObject(_aggregation._id)) {
+            filterColumnsStr.push(...Object.values(_aggregation._id).map(f => escapeId(f)))
+            groupByColumns.push(...Object.values(_aggregation._id))
         } else {
-            filterColumnsStr.push(escapeId(aggregation._id.substring(1)))
-            groupByColumns.push(aggregation._id.substring(1))
+            filterColumnsStr.push(escapeId(_aggregation._id))
+            groupByColumns.push(_aggregation._id)
         }
 
         const aliasToFunction = {}
-        Object.keys(aggregation)
+        Object.keys(_aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
-                  Object.entries(aggregation[fieldAlias])
+                  Object.entries(_aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            field = field.substring(1)
                             filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeId(field)}) AS ${escapeId(fieldAlias)}`)
                             aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeId(field)})`
                         })
