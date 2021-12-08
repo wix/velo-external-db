@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject, extractFilterObjects, patchAggregationObject } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, extractFilterObjects, patchAggregationObject, isEmptyFilter } = require('velo-external-db-commons')
 const { wildCardWith, escapeId } = require('./mysql_utils')
 
 class FilterParser {
@@ -71,7 +71,7 @@ class FilterParser {
     }
 
     parseFilter(filter) {
-        if (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined) {
+        if (isEmptyFilter(filter)) {
             return []
         }
         

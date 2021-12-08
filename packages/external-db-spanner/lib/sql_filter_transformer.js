@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject, extractFilterObjects, patchAggregationObject } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, extractFilterObjects, patchAggregationObject, isEmptyFilter } = require('velo-external-db-commons')
 const { escapeId, validateLiteral, patchFieldName, escapeFieldId } = require('./spanner_utils')
 
 class FilterParser {
@@ -74,7 +74,7 @@ class FilterParser {
     }
 
     parseFilter(filter, inlineFields) {
-        if (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined) {
+        if (isEmptyFilter(filter)) {
             return []
         }
         const { operator, fieldName, value } = extractFilterObjects(filter)

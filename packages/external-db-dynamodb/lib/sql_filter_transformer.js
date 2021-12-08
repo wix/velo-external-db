@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject, extractFilterObjects } = require('velo-external-db-commons')
+const { extractFilterObjects, isEmptyFilter } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require('./dynamo_utils')
 
 class FilterParser {
@@ -24,7 +24,7 @@ class FilterParser {
 
     
     parseFilter(filter) {
-        if (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined ) {
+        if (isEmptyFilter(filter)) {
             return []
         }
 

@@ -78,9 +78,14 @@ const patchAggregationObject = (aggregation) => {
     return newAggregationObject
 }
 
+const isEmptyFilter = (filter) => {
+    return (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined)
+} 
+
 const isMultipleFieldOperator = (filter) => { 
     return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
 }
 
 
-module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor, extractFilterObjects, patchAggregationObject }
+module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor,
+                     extractFilterObjects, patchAggregationObject, isEmptyFilter }
