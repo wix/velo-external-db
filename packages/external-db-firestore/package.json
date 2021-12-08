@@ -26,13 +26,13 @@
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
   "dependencies": {
-    "@google-cloud/firestore": "^4.15.1",
+    "@google-cloud/firestore": "^5.0.1",
     "velo-external-db-commons": "^0.0.0"
   },
   "devDependencies": {
-    "jest": "^27.3.1",
+    "jest": "^27.4.3",
     "jest-when": "^3.4.2",
     "test-commons": "^0.0.0",
-    "ts-jest": "^27.0.7"
+    "ts-jest": "^27.1.1"
   }
 }
