@@ -32,6 +32,7 @@ const asWixSchema = (res, collectionName) => {
         fields: res.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
+                subtype: r.subtype,
                 queryOperators: [
                     'eq',
                     'lt',

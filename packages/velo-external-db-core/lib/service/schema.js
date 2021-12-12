@@ -1,3 +1,4 @@
+const { fieldsWithoutSubType } = require ('./schema_utils')
 class SchemaService {
     constructor(storage, schemaInformation) {
         this.storage = storage
@@ -6,8 +7,12 @@ class SchemaService {
 
     async list() {
         const schemas = await this.storage.list()
+        const fixedSchemas =  schemas.map(({ fields, ...rest }) => ({
+            ...rest,
+            fields: fieldsWithoutSubType(fields)
+        }))
+        return { schemas: fixedSchemas } 
 
-        return { schemas }
     }
 
     async find(collectionNames) {

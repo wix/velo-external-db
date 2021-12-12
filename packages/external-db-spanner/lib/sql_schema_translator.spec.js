@@ -89,13 +89,17 @@ describe('Sql Schema Column Translator', () => {
 
             test('integer', () => {
                 ['INT64'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('number')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'number', subtype: 'int' })
                 })
             })
-
+            test('decimal', () => {
+                ['NUMERIC'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'number', subtype: 'double' })
+                })
+            })
             test('decimal float', () => {
-                ['FLOAT64', 'NUMERIC'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('number')
+                ['FLOAT64'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'number', subtype: 'float' })
                 })
             })
         })
@@ -103,7 +107,7 @@ describe('Sql Schema Column Translator', () => {
         describe('string fields', () => {
             test('string', () => {
                 ['STRING', 'STRING(2048)'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('text')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'text' })
                 })
             })
         })
@@ -111,7 +115,7 @@ describe('Sql Schema Column Translator', () => {
         describe('date time fields', () => {
             test('date', () => {
                 ['DATE', 'TIMESTAMP'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'datetime' })
                 })
             })
         })
@@ -119,7 +123,7 @@ describe('Sql Schema Column Translator', () => {
         describe('other fields', () => {
             test('boolean', () => {
                 ['BOOL'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('boolean')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'boolean' })
                 })
             })
         })
