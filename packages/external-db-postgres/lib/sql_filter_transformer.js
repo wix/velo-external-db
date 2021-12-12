@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject, getFilterObject } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, extractFilterObjects, patchAggregationObject, isEmptyFilter } = require('velo-external-db-commons')
 const { escapeIdentifier } = require('./postgres_utils')
 
 class FilterParser {
@@ -37,23 +37,23 @@ class FilterParser {
     }
 
     parseAggregation(aggregation, postFilter, offset) {
+        const _aggregation = patchAggregationObject(aggregation)
         const groupByColumns = []
         const filterColumnsStr = []
         if (isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(aggregation._id).map(val=>val.substring(1)).map( escapeIdentifier ))
-            groupByColumns.push(...Object.values(aggregation._id).map(val=>val.substring(1)))
+            filterColumnsStr.push(...Object.values(_aggregation._id).map( escapeIdentifier ))
+            groupByColumns.push(...Object.values(_aggregation._id))
         } else {
-            filterColumnsStr.push(escapeIdentifier(aggregation._id.substring(1)))
-            groupByColumns.push(aggregation._id.substring(1))
+            filterColumnsStr.push(escapeIdentifier(_aggregation._id))
+            groupByColumns.push(_aggregation._id)
         }
 
         const aliasToFunction = {}
-        Object.keys(aggregation)
+        Object.keys(_aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
-                  Object.entries(aggregation[fieldAlias])
+                  Object.entries(_aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            field = field.substring(1)
                             filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)}) AS ${escapeIdentifier(fieldAlias)}`)
                             aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)})`
                         })
@@ -77,11 +77,11 @@ class FilterParser {
 
     parseFilter(filter, offset, inlineFields) {
 
-        if (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined) {
+        if (isEmptyFilter(filter)) {
             return []
         }
         
-        const { operator, fieldName, value } = getFilterObject(filter)
+        const { operator, fieldName, value } = extractFilterObjects(filter)
         
         switch (operator) {
             case '$and':

@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, isEmptyFilter } = require('velo-external-db-commons')
 
 const escapeIdentifier = i => i
 const wildCardWith = i => i 
@@ -72,7 +72,7 @@ class FilterParser {
     }
 
     parseFilter(filter) {
-        if (!filter || !isObject(filter)|| filter.operator === undefined) {
+        if (isEmptyFilter(filter)) {
             return []
         }
 

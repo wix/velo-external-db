@@ -139,7 +139,7 @@ const idV2Filter = () => {
     const op = randomOperator()
     const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
-        _id: { [op]: value}
+        _id: { [op]: value }
     }
 }
 

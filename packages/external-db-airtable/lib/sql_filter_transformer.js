@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject, getFilterObject } = require('velo-external-db-commons')
+const { isObject, extractFilterObjects, isEmptyFilter } = require('velo-external-db-commons')
 const { EMPTY_SORT } = require ('./airtable_utils')
 
 class FilterParser {
@@ -18,11 +18,11 @@ class FilterParser {
 
 
     parseFilter(filter) {
-        if (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined) {
+        if (isEmptyFilter(filter)) {
             return []
         }
 
-        const { operator, fieldName, value } =  getFilterObject(filter)
+        const { operator, fieldName, value } =  extractFilterObjects(filter)
 
         switch (operator) {
             case '$and':
@@ -43,7 +43,7 @@ class FilterParser {
                     throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
                 }
 
-                const ress = value.map(val => { return { [fieldName]: { $eq: val }} })
+                const ress = value.map(val => { return { [fieldName]: { $eq: val } } })
                 const ress2 = ress.map(this.parseFilter.bind(this))
                 return [{
                     filterExpr: this.multipleFieldOperatorToFilterExpr('OR', ress2)
