@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject, isEmptyFilter } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, isEmptyFilter, extractFilterObjects, patchAggregationObject } = require('velo-external-db-commons')
 
 const escapeIdentifier = i => i
 const wildCardWith = i => i 
@@ -37,20 +37,21 @@ class FilterParser {
     }
 
     parseAggregation(aggregation, postFilter) {
+        const _aggregation = patchAggregationObject(aggregation)
         const groupByColumns = []
         const filterColumnsStr = []
-        if (isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(aggregation._id).map(f => escapeIdentifier(f) ))
-            groupByColumns.push(...Object.values(aggregation._id))
+        if (isObject(_aggregation._id)) {
+            filterColumnsStr.push(...Object.values(_aggregation._id).map(f => escapeIdentifier(f) ))
+            groupByColumns.push(...Object.values(_aggregation._id))
         } else {
-            filterColumnsStr.push(escapeIdentifier(aggregation._id))
-            groupByColumns.push(aggregation._id)
+            filterColumnsStr.push(escapeIdentifier(_aggregation._id))
+            groupByColumns.push(_aggregation._id)
         }
 
-        Object.keys(aggregation)
+        Object.keys(_aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
-                  Object.entries(aggregation[fieldAlias])
+                  Object.entries(_aggregation[fieldAlias])
                         .forEach(([func, field]) => {
                             filterColumnsStr.push(`CAST(${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)}) AS FLOAT64) AS ${escapeIdentifier(fieldAlias)}`)
                         })
@@ -76,41 +77,43 @@ class FilterParser {
             return []
         }
 
-        switch (filter.operator) {
+        const { operator, fieldName, value } = extractFilterObjects(filter)
+
+        switch (operator) {
             case '$and':
             case '$or':
-                const res = filter.value.map( this.parseFilter.bind(this) )
-                const op = filter.operator === '$and' ? ' AND ' : ' OR '
+                const res = value.map( this.parseFilter.bind(this) )
+                const op = operator === '$and' ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.map(r => r[0].filterExpr).join( op ),
                     parameters: res.map( s => s[0].parameters ).flat()
                 }]
             case '$not':
-                const res2 = this.parseFilter( filter.value )
+                const res2 = this.parseFilter( value[0] )
                 return [{
                     filterExpr: `NOT (${res2[0].filterExpr})`,
                     parameters: res2[0].parameters
                 }]
         }
 
-        if (this.isSingleFieldOperator(filter.operator)) {
+        if (this.isSingleFieldOperator(operator)) {
             return [{
-                filterExpr: `${escapeIdentifier(filter.fieldName)} ${this.veloOperatorToMySqlOperator(filter.operator, filter.value)} ${this.valueForOperator(filter.value, filter.operator)}`.trim(),
-                parameters: filter.value !== undefined ? [].concat( this.patchTrueFalseValue(filter.value) ) : []
+                filterExpr: `${escapeIdentifier(fieldName)} ${this.veloOperatorToMySqlOperator(operator, value)} ${this.valueForOperator(value, operator)}`.trim(),
+                parameters: value !== undefined ? [].concat( this.patchTrueFalseValue(value) ) : []
             }]
         }
 
-        if (this.isSingleFieldStringOperator(filter.operator)) {
+        if (this.isSingleFieldStringOperator(operator)) {
             return [{
-                filterExpr: `${escapeIdentifier(filter.fieldName)} LIKE ?`,
-                parameters: [this.valueForStringOperator(filter.operator, filter.value)]
+                filterExpr: `${escapeIdentifier(fieldName)} LIKE ?`,
+                parameters: [this.valueForStringOperator(operator, value)]
             }]
         }
 
-        if (filter.operator === '$urlized') {
+        if (operator === '$urlized') {
             return [{
-                filterExpr: `LOWER(${escapeIdentifier(filter.fieldName)}) RLIKE ?`,
-                parameters: [filter.value.map(s => s.toLowerCase()).join('[- ]')]
+                filterExpr: `LOWER(${escapeIdentifier(fieldName)}) RLIKE ?`,
+                parameters: [value.map(s => s.toLowerCase()).join('[- ]')]
             }]
         }
 
@@ -144,7 +147,6 @@ class FilterParser {
             return `(${wildCardWith(value.length, '?')})`
         } else if (operator === '$eq' && value === undefined) {
             return ''
-        // } else if (operator === '$eq' && (value === true || value === true)) {
         }
 
         return '?'
