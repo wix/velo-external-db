@@ -107,17 +107,8 @@ const randomNumberDbEntity = (columns) => {
     return entity
 }
 
-const randomFilter = () => {
-    const op = randomOperator()
-    return {
-        // kind: 'filter',
-        operator: op,
-        fieldName: chance.word(),
-        value: op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
-    }
-}
 
-const randomV2Filter = () => {
+const randomFilter = () => {
     const op = randomOperator()
     const fieldName = chance.word()
     const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
@@ -127,15 +118,6 @@ const randomV2Filter = () => {
 }
 
 const idFilter = () => {
-    const op = randomOperator()
-    return {
-        operator: randomOperator(),
-        fieldName: '_id',
-        value: op === '$hasSome' ? [chance.guid(), chance.guid(), chance.guid(), chance.guid(), chance.guid()] : chance.guid()
-    }
-}
-
-const idV2Filter = () => {
     const op = randomOperator()
     const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
@@ -184,6 +166,6 @@ const randomConfig = () => ({
 
 module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject,
      randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, randomV2Filter, idV2Filter }
+      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig }
 
 

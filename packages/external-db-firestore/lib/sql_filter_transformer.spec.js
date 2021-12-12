@@ -7,7 +7,7 @@ const chance = Chance()
 
 const EMPTY_SORT = []
 
-const randomV2Filter = () => {
+const randomFilter = () => { //TODO: remove this
     const op = chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$startsWith', '$endsWith'])
     const fieldName = chance.word()
     const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
@@ -235,8 +235,8 @@ describe('Fire Store Parser', () => {
         ctx.fieldValue = chance.word()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
-        ctx.filter = randomV2Filter()
-        ctx.anotherFilter = randomV2Filter()
+        ctx.filter = randomFilter()
+        ctx.anotherFilter = randomFilter()
 
         ctx.offset = chance.natural({ min: 2, max: 20 })
     })

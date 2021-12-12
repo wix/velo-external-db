@@ -225,9 +225,9 @@ describe('Sql Parser', () => {
         ctx.fieldValue = chance.word()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
-        ctx.filter = gen.randomV2Filter()
-        ctx.idFilter = gen.idV2Filter()
-        ctx.anotherFilter = gen.randomV2Filter()
+        ctx.filter = gen.randomFilter()
+        ctx.idFilter = gen.idFilter()
+        ctx.anotherFilter = gen.randomFilter()
     })
 
     beforeAll(function() {
