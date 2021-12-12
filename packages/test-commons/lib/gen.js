@@ -45,7 +45,13 @@ const randomArrayOf = (gen) => {
 
 const randomCollectionName = () => chance.word({ length: 5 })
 const randomDbField = () => ( { name: chance.word(), type: chance.word(), isPrimary: chance.bool() } )
-const randomDbFields = () => randomArrayOf( randomDbField )
+const randomDbFields = () => randomArrayOf( randomDbField ).reduce((pV, cV) => ({
+                                                                ...pV, ...{ [cV.name]: { 
+                                                                    displayName: cV.name,
+                                                                    type: cV.type,
+                                                                    isPrimary: cV.isPrimary
+                                                                } }
+                                                            }), {})
 
 const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 const randomNumberColumns = () => {
