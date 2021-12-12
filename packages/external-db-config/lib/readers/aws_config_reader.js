@@ -11,10 +11,7 @@ class AwsConfigReader {
 
   async readConfig() {
     const cfg = await this.readExternalConfig()
-                          .catch(e => {
-                            console.log(e)
-                            return EmptyAWSConfig
-                          })
+                          .catch(() => EmptyAWSConfig)
     const { host, username, password, DB, SECRET_KEY } = cfg
     return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY }
   }
@@ -51,10 +48,7 @@ class AwsConfigReader {
         return { region: this.region, secretKey: process.env.SECRET_KEY, endpoint: process.env.ENDPOINT_URL }
       }
       const cfg = await this.readExternalConfig()
-                            .catch(e => {
-                              console.log(e)
-                              return EmptyAWSConfig
-                            })
+                            .catch(() => EmptyAWSConfig)
   
       const { SECRET_KEY } = cfg
       return { region: this.region, secretKey: SECRET_KEY }
