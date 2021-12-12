@@ -32,13 +32,10 @@ const asParamArrays = item => Object.values(item)
 const isObject = (o) => typeof o === 'object' && o !== null
 
 const updateFieldsFor = item => {
-    // const systemFieldNames = SystemFields.map(f => f.name)
-    // return Object.keys(item)
-    //              .filter( k => !systemFieldNames.includes(k) )
     return Object.keys(item).filter(f => f !== '_id')
 }
 
-const getFilterObject = (filter) => {
+const extractFilterObjects = (filter) => {
     if(isMultipleFieldOperator(filter)) {
         const operator = Object.keys(filter)[0]
         const value = filter[operator]
@@ -59,9 +56,36 @@ const getFilterObject = (filter) => {
     }
 }
 
+const patchAggregationObject = (aggregation) => {
+    const newAggregationObject = {}
+    if (isObject(aggregation._id)) {
+        Object.entries(aggregation._id)
+              .forEach(([alias, fieldName]) => {
+                  newAggregationObject._id = { ...newAggregationObject._id, ... { [alias]: fieldName.substring(1) } }
+              })
+    } else {
+        newAggregationObject._id = aggregation._id.substring(1)
+    }
+
+    Object.keys(aggregation)
+          .filter(f => f !== '_id')
+          .forEach(fieldAlias => {
+              Object.entries(aggregation[fieldAlias])
+                    .forEach(([func, field]) => {
+                        newAggregationObject[fieldAlias] = { ...newAggregationObject[fieldAlias], ...{ [func]: field.substring(1) } }
+                    })
+        })
+    return newAggregationObject
+}
+
+const isEmptyFilter = (filter) => {
+    return (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined)
+} 
+
 const isMultipleFieldOperator = (filter) => { 
     return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
 }
 
 
-module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor, getFilterObject }
+module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor,
+                     extractFilterObjects, patchAggregationObject, isEmptyFilter }

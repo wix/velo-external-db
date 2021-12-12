@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_SORT, isObject, getFilterObject } = require('velo-external-db-commons')
+const { EMPTY_SORT, isObject, extractFilterObjects, patchAggregationObject, isEmptyFilter } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require('./mongo_utils')
 
 class FilterParser {
@@ -17,22 +17,22 @@ class FilterParser {
     }
 
     parseAggregation(aggregation, postFilter) {
+        const _aggregation = patchAggregationObject(aggregation)
         const havingFilter = this.parseFilter(postFilter)
         const fieldsStatement = {}
-        if (isObject(aggregation._id)) {
-            const _id = Object.keys(aggregation._id)
-                              .reduce((r, c) => ( { ...r, [aggregation._id[c].substring(1)]: `${aggregation._id[c]}` } ), {})
+        if (isObject(_aggregation._id)) {
+            const _id = Object.keys(_aggregation._id)
+                              .reduce((r, c) => ( { ...r, [_aggregation._id[c]]: `$${_aggregation._id[c]}` } ), {})
             Object.assign(fieldsStatement, { _id } )
         } else {
-            Object.assign(fieldsStatement, { [aggregation._id.substring(1)]: `${aggregation._id}` })
+            Object.assign(fieldsStatement, { [_aggregation._id]: `$${_aggregation._id}` })
         }
-        
-        Object.keys(aggregation)
+        Object.keys(_aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
-                  Object.entries(aggregation[fieldAlias])
+                  Object.entries(_aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `${field}` } })
+                            Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `$${field}` } })
                         })
               })
         const filterObj = havingFilter.reduce((r, c) => ( { ...r, ...c } ), {})
@@ -43,10 +43,10 @@ class FilterParser {
     }
 
     parseFilter(filter) {
-        if (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined ) {
+        if (isEmptyFilter(filter)) {
             return []
         }
-        const { operator, fieldName, value } = getFilterObject(filter)
+        const { operator, fieldName, value } = extractFilterObjects(filter)
         const mongoOp = this.veloOperatorToMongoOperator(operator)
 
         if (this.isMultipleFieldOperator(mongoOp)) {
