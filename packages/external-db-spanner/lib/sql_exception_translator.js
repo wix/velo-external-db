@@ -18,7 +18,6 @@ const notThrowingTranslateErrorCodes = err => {
             } else if (err.details.includes('Table')) {
                 return new CollectionDoesNotExists(err.details)
             } else {
-                console.log(err)
                 return new Error(`default ${err.details}`)
             }
 
