@@ -1,9 +1,10 @@
 
 const fieldsWithoutSubType = (fields) => {
-    return Object.entries(fields).reduce((pV, cV) => {
-        const { subtype, ...rest } = cV[1]
-        return { ...pV, ...{ [cV[0]]: rest } }
-    }, {})
+    return Object.entries(fields)
+                 .reduce((pV, [k, v]) => {
+                        const { subtype, ...rest } = v
+                        return { ...pV, ...{ [k]: rest } }
+                    }, {})
 }
 
 module.exports = { fieldsWithoutSubType }
