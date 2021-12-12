@@ -30,6 +30,7 @@ const bigqueryTestEnv = require('./engines/bigquery_resources')
 const env = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
+    schemaColumnTranslator: Uninitialized,
     cleanup: Uninitialized,
     driver: Uninitialized,
 }
