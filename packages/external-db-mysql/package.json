@@ -34,6 +34,6 @@
     "jest-when": "^3.4.2",
     "test-commons": "^0.0.0",
     "ts-jest": "^27.1.1",
-    "chance": "^1.1.7"
+    "chance": "^1.1.8"
   }
 }
