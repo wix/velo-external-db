@@ -314,8 +314,8 @@ describe('Sql Parser', () => {
         ctx.fieldValue = chance.word()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
-        ctx.filter = gen.randomV2Filter()
-        ctx.anotherFilter = gen.randomV2Filter()
+        ctx.filter = gen.randomFilter()
+        ctx.anotherFilter = gen.randomFilter()
 
         ctx.offset = chance.natural({ min: 2, max: 20 })
     })
