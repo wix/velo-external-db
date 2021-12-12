@@ -3,18 +3,18 @@
 # Wix Velo External Database Adapter
 
 ## Overview
-
+  
 Velo by Wix is a development platform built on top of Wix, adding a built-in database and node.js backend. The built-in database is a document based database optimized for websites and content. Depending on the specific workload, it can support 10K - 100K records, and for some workloads even more. It is globally replicated, has native support for PII encryption, GDPR, and other non-functional features. It runs on shared infrastructure and is fully managed by Wix. 
 
-However, when there are requirements for data locality, regulations, data ownership, dedicated infrastructure, or workloads that demand specific engines. This adapter enables connecting external database engines to your site.
+However, requirements for data locality, regulations, data ownership, dedicated infrastructure, or workloads that demand specific engines may require an external database. This adapter enables connecting external database engines to your site.
 
-Velo lets you connect an “external database” and map the structures of the underlying tables as wix-data collections. Once connected, you can work with that database and it’s collections in your site just as you would with the built-in database.
+Velo lets you connect an “external database” and map the structures of the underlying tables as wix-data collections. Once connected, you can work with the database and it’s collections in your site just as you would with the built-in database.
 
-You can use wix-data APIs, display data from an external database collection in Wix Editor elements, use the data to create dynamic pages and connect it to user input elements.
+You can use wix-data APIs, display data from an external database collection in Wix Editor elements, use the data to create dynamic pages, and connect it to user input elements.
 
 This project is a reference implementation of the [wix-data SPI](https://www.wix.com/velo/reference/spis/external-database-collections), allowing the development or extension of alternative external database adapters, to connect Velo with external databases.
 
-For a detailed guide to installing and integrating this adapter on Google Cloud Platform, see the [Integrate Your Google Cloud MySQL or Postgres Database with Your Velo Site](https://support.wix.com/en/article/integrate-your-google-cloud-mysql-or-postgres-database-with-your-velo-site) article. If deploying to Amazon AWS, please follow [Integrate Your AWS RDS Database with Your Velo Site](https://support.wix.com/en/article/integrate-your-aws-mysql-database-with-your-velo-site) tutorial.
+For a detailed guide to installing and integrating this adapter on Google Cloud Platform, see the [Integrate Your Google Cloud MySQL or Postgres Database with Your Velo Site](https://support.wix.com/en/article/integrate-your-google-cloud-mysql-or-postgres-database-with-your-velo-site) article. If you are deploying to AWS, please follow the [Integrate Your AWS RDS Database with Your Velo Site](https://support.wix.com/en/article/integrate-your-aws-mysql-database-with-your-velo-site) tutorial.
 
 ## Architecture
 
@@ -25,7 +25,7 @@ The Wix-Data SPI is a REST over HTTPS protocol in which the Wix site forwards da
 
 ### Deployment Considerations
 
-Wix maintains a pre-built Docker container image that is ready to be deployed. It is recommended to run the container as close as possible to a database to minimize the latency of the native DB protocol traffic between the adapter and the database. Additionally, some databases require persistent connections and are not suited to HTTP. Security and firewall configurations between the adapter and database should also be considered. 
+Wix maintains a pre-built Docker container image that is ready to be deployed. Your should run the container as close as possible to a database to minimize the latency of the native DB protocol traffic between the adapter and the database. Additionally, some databases require persistent connections and are not suited to HTTP. Security and firewall configurations between the adapter and database should also be considered. 
 
 It is important to note the location of the deployed environment. The Wix infrastructure has a global presence, and site data is replicated worldwide to give your site visitors the best performance. Where the database is managed externally, it is important to set up the adapter and the database in the correct region for optimal performance.
 
