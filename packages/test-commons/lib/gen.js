@@ -44,8 +44,21 @@ const randomArrayOf = (gen) => {
 }
 
 const randomCollectionName = () => chance.word({ length: 5 })
+const randomFieldName = () => chance.word({ length: 5 })
 const randomDbField = () => ( { name: chance.word(), type: chance.word(), isPrimary: chance.bool() } )
-const randomDbFields = () => randomArrayOf( randomDbField )
+const randomDbFields = () => {
+    const fields = randomArrayOf( randomDbField )
+    return fieldsArrayToFieldObj(fields)
+}
+
+const fieldsArrayToFieldObj = fields => fields.reduce((pV, cV) => ({
+        ...pV, ...{ [cV.name]: { 
+        displayName: cV.name,
+        type: cV.type,
+        subtype: cV.subtype,
+        isPrimary: cV.isPrimary
+        } }
+}), {})
 
 const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 const randomNumberColumns = () => {
@@ -99,8 +112,6 @@ const randomNumberDbEntity = (columns) => {
             entity[column.name] = chance.integer({ min: 0, max: 10000 })
         } else if (column.type === 'number' && column.subtype === 'decimal') {
             entity[column.name] = chance.floating({ min: 0, max: 10000, fixed: 2 })
-            if (entity[column.name] - parseInt(entity[column.name]) === 0 )  
-                entity[column.name] + 0.01    // todo - fix this by check if spanner and then insert as Spanner.float()
         }
     })
 
@@ -166,6 +177,6 @@ const randomConfig = () => ({
 
 module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject,
      randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig }
+      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, fieldsArrayToFieldObj, randomFieldName }
 
 

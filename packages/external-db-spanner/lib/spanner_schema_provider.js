@@ -93,9 +93,11 @@ class SchemaProvider {
     }
 
     reformatFields(r) {
+        const { type, subtype } = this.sqlSchemaTranslator.translateType(r['SPANNER_TYPE'])
         return {
             field: unpatchFieldName(r['COLUMN_NAME']),
-            type: this.sqlSchemaTranslator.translateType(r['SPANNER_TYPE']),
+            type,
+            subtype
         }
     }
 

@@ -73,6 +73,10 @@
         ],
         "jest/no-conditional-expect": [
             "off"
+        ],
+        "no-unused-vars": [
+            "error",
+            { "ignoreRestSiblings": true }
         ]
         }
 }
