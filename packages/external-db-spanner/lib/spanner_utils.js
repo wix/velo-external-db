@@ -1,5 +1,6 @@
 const { escapeId } = require('sqlstring')
 const { InvalidQuery } = require('velo-external-db-commons').errors
+const { Spanner } = require ('@google-cloud/spanner')
 
 const recordSetToObj = (rows) => rows.map(row => row.toJSON())
 
@@ -27,4 +28,20 @@ const validateLiteral = l => {
 
 const escapeFieldId = f => escapeId(patchFieldName(f))
 
-module.exports = { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, testLiteral, validateLiteral, escapeFieldId }
+
+const patchFloat = (item, floatFields) => {
+    return Object.keys(item).reduce((pV, key) => (
+        { ...pV, ...{ [key]: floatFields.includes(key) ? Spanner.float(item[key]) : item[key] } }
+    ), {})
+} 
+const extractFloatFields = fields => ( parseFields(fields).filter(f => isFloatSubtype(f.subtype)).map(f => f.name) ) 
+    
+const isFloatSubtype = (subtype) => (['float', 'double', 'decimal'].includes(subtype))
+
+const parseFields = fields => (
+    Object.entries(fields).map(([name, v]) => ({ name, type: v.type, subtype: v.subtype }))
+)
+
+module.exports = { recordSetToObj, escapeId, patchFieldName, unpatchFieldName,
+                    testLiteral, validateLiteral, escapeFieldId,
+                    patchFloat, extractFloatFields }
