@@ -107,15 +107,20 @@ describe('Sql Schema Column Translator', () => {
         describe('string fields', () => {
             test('string', () => {
                 ['STRING', 'STRING(2048)'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'text' })
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'text', subtype: 'string' })
                 })
             })
         })
 
         describe('date time fields', () => {
-            test('date', () => {
-                ['DATE', 'TIMESTAMP'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'datetime' })
+            test('datetime date', () => {
+                ['DATE'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'datetime', subtype: 'date' })
+                })
+            })
+            test('datetime timestamp', () => {
+                ['TIMESTAMP'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'datetime', subtype: 'timestamp' })
                 })
             })
         })

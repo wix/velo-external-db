@@ -21,13 +21,13 @@ class SchemaColumnTranslator {
                 return { type: 'number', subtype: 'float' }
 
             case 'date':
-                return { type: 'datetime' }
+                return { type: 'datetime', subtype: 'date' }
 
             case 'timestamp':
-                return { type: 'datetime' }
+                return { type: 'datetime', subtype: 'timestamp' }
 
             case 'string':
-                return { type: 'text' }
+                return { type: 'text', subtype: 'string' }
 
             case 'bool':
                 return { type: 'boolean' }
