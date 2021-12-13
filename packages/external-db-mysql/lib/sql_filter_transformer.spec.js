@@ -78,9 +78,6 @@ describe('Sql Parser', () => {
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
                     [ctx.fieldName]: { [o]: ctx.fieldValue }
-                    /*operator: o,
-                    fieldName: ctx.fieldName,
-                    value: ctx.fieldValue*/
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -290,6 +287,20 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: `${escapeId(ctx.fieldName)}, ${mySqlFunction}(${escapeId(ctx.anotherFieldName)}) AS ${escapeId(ctx.moreFieldName)}`,
+                        groupByColumns: [ctx.fieldName],
+                        havingFilter: '',
+                        parameters: [],
+                    })
+                })
+
+                test('translate COUNT function', () => {
+                    const aggregation = {
+                        _id: `$${ctx.fieldName}`,
+                        count: { $sum: 1 }
+                    }
+
+                    expect(env.filterParser.parseAggregation(aggregation)).toEqual({
+                        fieldsStatement: `${escapeId(ctx.fieldName)}, COUNT(${escapeId('*')}) AS ${escapeId('count')}`,
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
                         parameters: [],
