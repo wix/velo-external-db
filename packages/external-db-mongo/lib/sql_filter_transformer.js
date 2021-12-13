@@ -19,14 +19,17 @@ class FilterParser {
     parseAggregation(aggregation, postFilter) {
         const _aggregation = patchAggregationObject(aggregation)
         const havingFilter = this.parseFilter(postFilter)
-        const fieldsStatement = {}
+        const fieldsStatement = { }
+        
         if (isObject(_aggregation._id)) {
-            const _id = Object.keys(_aggregation._id)
-                              .reduce((r, c) => ( { ...r, [_aggregation._id[c]]: `$${_aggregation._id[c]}` } ), {})
-            Object.assign(fieldsStatement, { _id } )
+           const _id = Object.keys(_aggregation._id)
+                             .reduce((r, c) => ( { ...r, [_aggregation._id[c]]: `$${_aggregation._id[c]}` } ), {})
+           Object.assign(fieldsStatement, { _id })
         } else {
-            Object.assign(fieldsStatement, { [_aggregation._id]: `$${_aggregation._id}` })
+            const _id = { [_aggregation._id]: `$${_aggregation._id}` }
+            Object.assign(fieldsStatement, { _id })
         }
+
         Object.keys(_aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
