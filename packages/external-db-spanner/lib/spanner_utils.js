@@ -28,19 +28,12 @@ const validateLiteral = l => {
 
 const escapeFieldId = f => escapeId(patchFieldName(f))
 
-const patchFloat = (items, fields) => {
-    const floatFields = extractFloatFields(fields)
-    return items.map(item => patchItemFloat(item, floatFields))   
+
+const patchFloat = (item, floatFields) => {
+    return Object.keys(item).reduce((pV, key) => (
+        { ...pV, ...{ [key]: floatFields.includes(key) ? Spanner.float(item[key]) : item[key] } }
+    ), {})
 } 
-
-const patchItemFloat = (item, floatFields) => {
-    const newItem = {}
-    Object.keys(item).forEach((key) => {
-        newItem[key] = floatFields.includes(key) ? Spanner.float(item[key]) : item[key]
-    })
-    return newItem
-}
-
 const extractFloatFields = fields => ( parseFields(fields).filter(f => isFloatSubtype(f.subtype)).map(f => f.name) ) 
     
 const isFloatSubtype = (subtype) => (['float', 'double', 'decimal'].includes(subtype))
@@ -50,5 +43,5 @@ const parseFields = fields => (
 )
 
 module.exports = { recordSetToObj, escapeId, patchFieldName, unpatchFieldName,
-                    testLiteral, validateLiteral, escapeFieldId, patchItemFloat,
+                    testLiteral, validateLiteral, escapeFieldId,
                     patchFloat, extractFloatFields }

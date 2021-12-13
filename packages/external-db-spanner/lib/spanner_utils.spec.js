@@ -1,4 +1,4 @@
-const { patchFloat } = require('./spanner_utils')
+const { patchFloat, extractFloatFields } = require('./spanner_utils')
 const { Spanner } = require ('@google-cloud/spanner')
 const { Chance } = require('chance')
 const { Uninitialized } = require('test-commons')
@@ -7,14 +7,12 @@ const chance = Chance()
 
 describe('Spanner utils', () => {
     test('patchFloat will wrap with Spanner.float float columns data', () => {
-        const items = [
-            {
-              floatColumn: ctx.integer,
-              doubleColumn: ctx.integer,
-              intColumn: ctx.integer,
-              field: ctx.text,
-            }
-          ]
+        const item = {
+                      floatColumn: ctx.integer,
+                      doubleColumn: ctx.integer,
+                      intColumn: ctx.integer,
+                      field: ctx.text,
+                    }
 
           const fields = {
             floatColumn: {
@@ -39,14 +37,14 @@ describe('Spanner utils', () => {
             },
           }
 
-        expect(patchFloat(items, fields)).toEqual([
+        expect(patchFloat(item, extractFloatFields(fields))).toEqual(
             {
                 floatColumn: Spanner.float(ctx.integer),
                 doubleColumn: Spanner.float(ctx.integer),
                 intColumn: ctx.integer,
                 field: ctx.text,
               }
-        ])
+        )
     })
 
     const ctx = {
