@@ -1,46 +1,38 @@
 const { fieldsWithoutSubType } = require('./schema_utils')
+const { Uninitialized, gen } = require('test-commons')
 
 describe('Schema utils', () => {
     test('fieldsWithoutSubType should remove subtype from fields', () => {
         const fields = {
-            _owner: {
-              displayName: '_owner',
-              type: 'text',
-              subtype: undefined,
+            [ctx.fieldName]: {
+              displayName: ctx.fieldName,
+              type: 'type',
+              subtype: 'subtype',
             },
-            _id: {
-              displayName: '_id',
-              type: 'text',
-              subtype: undefined,
+            [ctx.anotherFieldName]: {
+              displayName: ctx.anotherFieldName,
+              type: 'type',
             },
-            _createdDate: {
-              displayName: '_createdDate',
-              type: 'datetime',
-              subtype: 'timestamp',
-            },
-            _updatedDate: {
-              displayName: '_updatedDate',
-              type: 'datetime',
-              subtype: 'timestamp',
-            }
-          }
+        } 
         expect(fieldsWithoutSubType(fields)).toEqual({
-            _owner: {
-              displayName: '_owner',
-              type: 'text',
+            [ctx.fieldName]: {
+              displayName: ctx.fieldName,
+              type: 'type',
             },
-            _id: {
-              displayName: '_id',
-              type: 'text',
-            },
-            _createdDate: {
-              displayName: '_createdDate',
-              type: 'datetime',
-            },
-            _updatedDate: {
-              displayName: '_updatedDate',
-              type: 'datetime',
+            [ctx.anotherFieldName]: {
+              displayName: ctx.anotherFieldName,
+              type: 'type',
             }
           })
+    })
+
+    const ctx = {
+      fieldName: Uninitialized,
+      anotherFieldName: Uninitialized,
+    }
+    
+    beforeEach(() => {
+      ctx.fieldName = gen.randomFieldName()
+      ctx.anotherFieldName = gen.randomFieldName()
     })
 })
