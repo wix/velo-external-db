@@ -294,6 +294,20 @@ describe('Sql Parser', () => {
                         parameters: {},
                     })
                 })
+
+                test('translate COUNT function', () => {
+                    const aggregation = {
+                        _id: `$${ctx.fieldName}`,
+                        count: { $sum: 1 }
+                    }
+
+                    expect( env.filterParser.parseAggregation(aggregation)).toEqual({
+                        fieldsStatement: `${escapeId(ctx.fieldName)}, COUNT(${escapeId('*')}) AS ${escapeId('count')}`,
+                        groupByColumns: [ctx.fieldName],
+                        havingFilter: '',
+                        parameters: {},
+                    })
+                })
             })
 
         })
