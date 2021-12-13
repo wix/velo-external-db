@@ -1,4 +1,4 @@
-const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } = require('./spanner_utils')
+const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, patchFloat } = require('./spanner_utils')
 
 class DataProvider {
     constructor(database, filterParser) {
@@ -37,10 +37,11 @@ class DataProvider {
         return objs[0].num
     }
 
-    async insert(collectionName, items) {
-        await this.database.table(collectionName)
-                           .insert(items.map(this.asDBEntity.bind(this)))
-        return items.length
+    async insert(collectionName, items, fields) {
+            const preparedItems = fields ? patchFloat(items, fields) : items
+            await this.database.table(collectionName)
+                               .insert(preparedItems.map(this.asDBEntity.bind(this)))
+            return items.length
     }
 
     asDBEntity(item) {
@@ -68,9 +69,10 @@ class DataProvider {
                      }.bind(this), {})
     }
 
-    async update(collectionName, items) {
+    async update(collectionName, items, fields) {
+        const preparedItems = fields ? patchFloat(items, fields) : items
         await this.database.table(collectionName)
-                           .update(items.map( this.asDBEntity.bind(this) ))
+                           .update(preparedItems.map( this.asDBEntity.bind(this) ))
         return items.length
     }
 

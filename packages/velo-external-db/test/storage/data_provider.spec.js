@@ -17,8 +17,8 @@ describe('Data API', () => {
         }, 20000)
 
 
-        const givenCollectionWith = async(entities, forCollection) => {
-            await env.dataProvider.insert(forCollection, entities)
+        const givenCollectionWith = async(entities, forCollection, fields) => {
+            await env.dataProvider.insert(forCollection, entities, fields)
         }
 
         test('search with empty filter and order by and no data', async() => {
@@ -101,7 +101,7 @@ describe('Data API', () => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
             env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.insert(ctx.numericCollectionName, [ctx.numberEntity]) ).toEqual(1)
+            expect( await env.dataProvider.insert(ctx.numericCollectionName, [ctx.numberEntity], gen.fieldsArrayToFieldObj(ctx.numericColumns)) ).toEqual(1)
 
             expect( await env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50) ).toEqual([ctx.numberEntity])
         })
@@ -154,7 +154,7 @@ describe('Data API', () => {
         if (shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb'], name)) {
             test('aggregate api without filter', async() => {
                 await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
-                await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
+                await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName, gen.fieldsArrayToFieldObj(ctx.numericColumns))
     
                 env.driver.stubEmptyFilterFor(ctx.filter)
                 env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 1)
@@ -168,7 +168,7 @@ describe('Data API', () => {
     
             test('aggregate api without having', async() => {
                 await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
-                await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
+                await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName, gen.fieldsArrayToFieldObj(ctx.numericColumns))
     
                 env.driver.stubEmptyFilterFor(ctx.filter)
                 env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 1)
@@ -182,7 +182,7 @@ describe('Data API', () => {
     
             test('aggregate api with filter', async() => {
                 await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
-                await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName)
+                await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName, gen.fieldsArrayToFieldObj(ctx.numericColumns))
     
                 env.driver.givenFilterByIdWith(ctx.numberEntity._id, ctx.filter)
                 env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 2)
