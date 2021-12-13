@@ -1,3 +1,5 @@
+const { schemasWithoutSubtype } = require ('velo-external-db-commons')
+
 class SchemaService {
     constructor(storage, schemaInformation) {
         this.storage = storage
@@ -6,13 +8,12 @@ class SchemaService {
 
     async list() {
         const schemas = await this.storage.list()
-
-        return { schemas }
+        return { schemas: schemasWithoutSubtype(schemas) } 
     }
 
     async find(collectionNames) {
         const schemas = await Promise.all(collectionNames.map(collectionName => this.storage.describeCollection(collectionName)))
-        return { schemas }
+        return { schemas: schemasWithoutSubtype(schemas) }
     }
 
     async create(collectionName) {

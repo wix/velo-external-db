@@ -4,7 +4,7 @@ const each = require('jest-each').default
 const Chance = require('chance')
 const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
 const chance = new Chance()
-const { SystemFields, asWixSchema } = require('velo-external-db-commons')
+const { SystemFields, asWixSchema, schemasWithoutSubtype } = require('velo-external-db-commons')
 
 
 describe('Schema API', () => {
@@ -30,7 +30,7 @@ describe('Schema API', () => {
 
             const dbs = await env.schemaProvider.list()
 
-            expect(dbs).toEqual(expect.arrayContaining([
+            expect(schemasWithoutSubtype(dbs)).toEqual(expect.arrayContaining([
                                     asWixSchema([{ field: '_id', type: 'text' },
                                                      { field: '_createdDate', type: 'datetime' },
                                                      { field: '_updatedDate', type: 'datetime' },
@@ -46,7 +46,8 @@ describe('Schema API', () => {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            expect(db).toEqual(asWixSchema([{ field: '_id', type: 'text' },
+
+            expect(schemasWithoutSubtype([db])[0]).toEqual(asWixSchema([{ field: '_id', type: 'text' },
                                                 { field: '_createdDate', type: 'datetime' },
                                                 { field: '_updatedDate', type: 'datetime' },
                                                 { field: '_owner', type: 'text' }], ctx.collectionName))
@@ -64,7 +65,7 @@ describe('Schema API', () => {
             await env.schemaProvider.create(ctx.collectionName.toUpperCase())
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName.toUpperCase())
-            expect(db).toEqual(asWixSchema([{ field: '_id', type: 'text' },
+            expect(schemasWithoutSubtype([db])[0]).toEqual(asWixSchema([{ field: '_id', type: 'text' },
                                                 { field: '_createdDate', type: 'datetime' },
                                                 { field: '_updatedDate', type: 'datetime' },
                                                 { field: '_owner', type: 'text' }], ctx.collectionName.toUpperCase()))
@@ -74,7 +75,7 @@ describe('Schema API', () => {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            expect(db).toEqual(asWixSchema([{ field: '_id', type: 'text' },
+            expect(schemasWithoutSubtype([db])[0]).toEqual(asWixSchema([{ field: '_id', type: 'text' },
                                                 { field: '_createdDate', type: 'datetime' },
                                                 { field: '_updatedDate', type: 'datetime' },
                                                 { field: '_owner', type: 'text' }], ctx.collectionName))
@@ -94,24 +95,24 @@ describe('Schema API', () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
-
-            expect((await env.schemaProvider.describeCollection(ctx.collectionName))
-                                            .fields).toHaveProperty(ctx.columnName,
-                                                                           { displayName: ctx.columnName, type: 'datetime',
-                                                                             queryOperators: [
-                                                                                 'eq',
-                                                                                 'lt',
-                                                                                 'gt',
-                                                                                 'hasSome',
-                                                                                 'and',
-                                                                                 'lte',
-                                                                                 'gte',
-                                                                                 'or',
-                                                                                 'not',
-                                                                                 'ne',
-                                                                                 'startsWith',
-                                                                                 'endsWith',
-                                                                             ] })
+            const db = await env.schemaProvider.describeCollection(ctx.collectionName)
+            
+            expect(schemasWithoutSubtype([db])[0].fields).toHaveProperty(ctx.columnName,
+                                                                            { displayName: ctx.columnName, type: 'datetime',
+                                                                                queryOperators: [
+                                                                                    'eq',
+                                                                                    'lt',
+                                                                                    'gt',
+                                                                                    'hasSome',
+                                                                                    'and',
+                                                                                    'lte',
+                                                                                    'gte',
+                                                                                    'or',
+                                                                                    'not',
+                                                                                    'ne',
+                                                                                    'startsWith',
+                                                                                    'endsWith',
+                                                                                ] })
         })
 
         test('add duplicate column will fail', async() => {
