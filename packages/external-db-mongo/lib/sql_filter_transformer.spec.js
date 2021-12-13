@@ -209,11 +209,11 @@ describe('Sql Parser', () => {
             describe('transform select fields', () => {
                 test('single id field', () => {
                     const aggregation = {
-                        _id: `$${ctx.fieldName}`
+                        _id: { [ctx.fieldName]: `$${ctx.fieldName}` }
                     }
 
                     expect(env.filterParser.parseAggregation(aggregation)).toEqual({
-                        fieldsStatement: { $group: { [ctx.fieldName]: `$${ctx.fieldName}` } },
+                        fieldsStatement: { $group: { _id: { [ctx.fieldName]: `$${ctx.fieldName}` } } },
                         havingFilter: { $match: {} },
                     })
                 })
@@ -252,7 +252,9 @@ describe('Sql Parser', () => {
                     expect(env.filterParser.parseAggregation(aggregation, havingFilter)).toEqual({
                         fieldsStatement: {
                             $group: {
-                                [ctx.fieldName]: `$${(ctx.fieldName)}`,
+                                _id: {
+                                    [ctx.fieldName]: `$${(ctx.fieldName)}`
+                                },
                                 [ctx.moreFieldName]: { $avg: `$${ctx.anotherFieldName}` }
                             }
                         },
@@ -278,7 +280,9 @@ describe('Sql Parser', () => {
                     expect(env.filterParser.parseAggregation(aggregation)).toEqual({
                         fieldsStatement: {
                             $group: {
-                                [ctx.fieldName]: `$${ctx.fieldName}`,
+                                _id: {
+                                    [ctx.fieldName]: `$${ctx.fieldName}`
+                                },
                                 [ctx.moreFieldName]: { [wixDataFunction]: `$${ctx.anotherFieldName}` }
                             }
                         },
