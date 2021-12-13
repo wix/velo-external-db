@@ -1,6 +1,6 @@
 const { fieldsWithoutSubType } = require('./schema_utils')
 
-describe('Schema utils spec', () => {
+describe('Schema utils', () => {
     test('fieldsWithoutSubType should remove subtype from fields', () => {
         const fields = {
             _owner: {
