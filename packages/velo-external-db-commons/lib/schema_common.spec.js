@@ -1,7 +1,7 @@
-const { fieldsWithoutSubType } = require('./schema_utils')
+const { fieldsWithoutSubType } = require('./schema_commons')
 const { Uninitialized, gen } = require('test-commons')
 
-describe('Schema utils', () => {
+describe('Schema common', () => {
     test('fieldsWithoutSubType should remove subtype from fields', () => {
         const fields = {
             [ctx.fieldName]: {
@@ -30,7 +30,7 @@ describe('Schema utils', () => {
       fieldName: Uninitialized,
       anotherFieldName: Uninitialized,
     }
-    
+
     beforeEach(() => {
       ctx.fieldName = gen.randomFieldName()
       ctx.anotherFieldName = gen.randomFieldName()

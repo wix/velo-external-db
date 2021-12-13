@@ -66,4 +66,22 @@ const parseTableData = data => data.reduce((o, r) => {
                                                 }, {})
 
 
-module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData }
+
+const schemasWithoutSubtype = schemas => (
+            schemas.map(({ fields, ...rest }) => ({
+                            ...rest,
+                            fields: fieldsWithoutSubType(fields)
+                            })
+                        )
+)
+
+const fieldsWithoutSubType = (fields) => {
+    return Object.entries(fields)
+                    .reduce((pV, [k, v]) => {
+                        const { subtype, ...rest } = v
+                        return { ...pV, ...{ [k]: rest } }
+                    }, {})
+}
+                                                
+
+module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData, schemasWithoutSubtype, fieldsWithoutSubType }
