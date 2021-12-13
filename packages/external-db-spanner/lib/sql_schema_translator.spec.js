@@ -89,13 +89,17 @@ describe('Sql Schema Column Translator', () => {
 
             test('integer', () => {
                 ['INT64'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('number')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'number', subtype: 'int' })
                 })
             })
-
+            test('decimal', () => {
+                ['NUMERIC'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'number', subtype: 'double' })
+                })
+            })
             test('decimal float', () => {
-                ['FLOAT64', 'NUMERIC'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('number')
+                ['FLOAT64'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'number', subtype: 'float' })
                 })
             })
         })
@@ -103,15 +107,20 @@ describe('Sql Schema Column Translator', () => {
         describe('string fields', () => {
             test('string', () => {
                 ['STRING', 'STRING(2048)'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('text')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'text', subtype: 'string' })
                 })
             })
         })
 
         describe('date time fields', () => {
-            test('date', () => {
-                ['DATE', 'TIMESTAMP'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
+            test('datetime date', () => {
+                ['DATE'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'datetime', subtype: 'date' })
+                })
+            })
+            test('datetime timestamp', () => {
+                ['TIMESTAMP'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'datetime', subtype: 'timestamp' })
                 })
             })
         })
@@ -119,7 +128,7 @@ describe('Sql Schema Column Translator', () => {
         describe('other fields', () => {
             test('boolean', () => {
                 ['BOOL'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('boolean')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'boolean' })
                 })
             })
         })

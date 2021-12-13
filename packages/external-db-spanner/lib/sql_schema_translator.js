@@ -11,20 +11,26 @@ class SchemaColumnTranslator {
             .shift()
 
         switch (type) {
-            case 'numeric':
-            case 'float64':
             case 'int64':
-                return 'number'
+                return { type: 'number', subtype: 'int' }
+           
+            case 'numeric':
+                return { type: 'number', subtype: 'double' }
+            
+            case 'float64':
+                return { type: 'number', subtype: 'float' }
 
             case 'date':
+                return { type: 'datetime', subtype: 'date' }
+
             case 'timestamp':
-                return 'datetime'
+                return { type: 'datetime', subtype: 'timestamp' }
 
             case 'string':
-                return 'text'
+                return { type: 'text', subtype: 'string' }
 
             case 'bool':
-                return 'boolean'
+                return { type: 'boolean' }
 
             default:
                 console.log(type)
