@@ -13,7 +13,7 @@ class SchemaProvider {
     }
 
     async list() {
-        const res = await this.pool.query('SELECT table_name, column_name AS field, data_type as type, FROM INFORMATION_SCHEMA.COLUMNS')
+        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.COLUMNS`)
         const tables = parseTableData(res[0])
         return Object.entries(tables)
                         .map(([collectionName, rs]) => ({
@@ -38,7 +38,7 @@ class SchemaProvider {
     async addColumn(collectionName, column) {   
         await validateSystemFields(column.name)
         try{
-            await this.pool.query(`ALTER TABLE ${escapeIdentifier(collectionName)} ADD COLUMN ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
+            await this.pool.query(`ALTER TABLE ${this.projectId}.${this.databaseId}.${escapeIdentifier(collectionName)} ADD COLUMN ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
         } catch (err) {
             if (err.message.includes('was not found')) 
                 throw new CollectionDoesNotExists('Collection does not exists')
