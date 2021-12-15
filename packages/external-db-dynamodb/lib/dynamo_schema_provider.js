@@ -1,6 +1,6 @@
 const { SystemTable, validateTable, reformatFields } = require('./dynamo_utils')
 const { translateErrorCodes } = require('./sql_exception_translator')
-const { SystemFields, validateSystemFields, asWixSchema } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 const { DynamoDBDocument }  = require ('@aws-sdk/lib-dynamodb')
 const dynamoRequests = require ('./dynamo_schema_requests_utils')
@@ -16,7 +16,10 @@ class SchemaProvider {
 
         const { Items } = await this.docClient
                                     .scan(dynamoRequests.listTablesExpression())
-        return Items.map(table => asWixSchema([...SystemFields, ...table.fields].map(reformatFields), table.tableName))
+        return Items.map(table => ({
+            id: table.tableName,
+            fields: [...SystemFields, ...table.fields].map(reformatFields)
+        }))
     }
 
     async create(collectionName, columns) {
