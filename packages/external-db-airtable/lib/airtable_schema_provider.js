@@ -1,5 +1,5 @@
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { asWixSchema, SystemFields, validateSystemFields } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 
 const axios = require('axios')
@@ -23,7 +23,10 @@ class SchemaProvider {
         const response = await this.axios.get(`v0/meta/bases/${this.baseId}/tables`)
         const tables = this.extractTableData(response.data)
         return Object.entries(tables)
-            .map(([collectionName, rs]) => asWixSchema(rs.fields, collectionName))
+                     .map(([collectionName, rs]) => ({
+                         id: collectionName,
+                         fields: rs.fields
+                     }))
     }
 
     async create(collectionName) {
@@ -65,7 +68,7 @@ class SchemaProvider {
         const collection = (await this.list()).find(schemas => schemas.id === collectionName)
         if (!collection)
             throw new CollectionDoesNotExists('Collection does not exists')
-        return collection
+        return collection.fields
     }
 
 

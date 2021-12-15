@@ -3,8 +3,9 @@ const { Uninitialized, gen } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
+const { collectionWithDefaultFields, hasSameSchemaFieldsLike } = require('../drivers/schema_provider_matchers')
 const chance = new Chance()
-const { SystemFields, asWixSchema, schemasWithoutSubtype } = require('velo-external-db-commons')
+const { SystemFields } = require('velo-external-db-commons')
 
 
 describe('Schema API', () => {
@@ -30,15 +31,15 @@ describe('Schema API', () => {
 
             const dbs = await env.schemaProvider.list()
 
-            expect(schemasWithoutSubtype(dbs)).toEqual(expect.arrayContaining([
-                                    asWixSchema([{ field: '_id', type: 'text' },
-                                                     { field: '_createdDate', type: 'datetime' },
-                                                     { field: '_updatedDate', type: 'datetime' },
-                                                     { field: '_owner', type: 'text' }], ctx.collectionName),
-                                    asWixSchema([{ field: '_id', type: 'text' },
-                                                     { field: '_createdDate', type: 'datetime' },
-                                                     { field: '_updatedDate', type: 'datetime' },
-                                                     { field: '_owner', type: 'text' }], ctx.anotherCollectionName),
+            expect(dbs).toEqual(expect.arrayContaining([
+                expect.objectContaining({
+                    id: ctx.collectionName,
+                    fields: collectionWithDefaultFields()
+                }),
+                expect.objectContaining({
+                    id: ctx.anotherCollectionName,
+                    fields: collectionWithDefaultFields()
+                })
             ]))
         })
 
@@ -47,10 +48,7 @@ describe('Schema API', () => {
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
 
-            expect(schemasWithoutSubtype([db])[0]).toEqual(asWixSchema([{ field: '_id', type: 'text' },
-                                                { field: '_createdDate', type: 'datetime' },
-                                                { field: '_updatedDate', type: 'datetime' },
-                                                { field: '_owner', type: 'text' }], ctx.collectionName))
+            expect(db).toEqual(collectionWithDefaultFields())
         })
 
         test('drop collection', async() => {
@@ -65,20 +63,16 @@ describe('Schema API', () => {
             await env.schemaProvider.create(ctx.collectionName.toUpperCase())
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName.toUpperCase())
-            expect(schemasWithoutSubtype([db])[0]).toEqual(asWixSchema([{ field: '_id', type: 'text' },
-                                                { field: '_createdDate', type: 'datetime' },
-                                                { field: '_updatedDate', type: 'datetime' },
-                                                { field: '_owner', type: 'text' }], ctx.collectionName.toUpperCase()))
+            expect(db).toEqual(collectionWithDefaultFields())
         })
+
+
 
         test('retrieve collection data by collection name', async() => {
             await env.schemaProvider.create(ctx.collectionName)
 
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            expect(schemasWithoutSubtype([db])[0]).toEqual(asWixSchema([{ field: '_id', type: 'text' },
-                                                { field: '_createdDate', type: 'datetime' },
-                                                { field: '_updatedDate', type: 'datetime' },
-                                                { field: '_owner', type: 'text' }], ctx.collectionName))
+            expect(db).toEqual(collectionWithDefaultFields())
         })
 
         // eslint-disable-next-line jest/expect-expect
@@ -96,23 +90,8 @@ describe('Schema API', () => {
 
             await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
             const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            
-            expect(schemasWithoutSubtype([db])[0].fields).toHaveProperty(ctx.columnName,
-                                                                            { displayName: ctx.columnName, type: 'datetime',
-                                                                                queryOperators: [
-                                                                                    'eq',
-                                                                                    'lt',
-                                                                                    'gt',
-                                                                                    'hasSome',
-                                                                                    'and',
-                                                                                    'lte',
-                                                                                    'gte',
-                                                                                    'or',
-                                                                                    'not',
-                                                                                    'ne',
-                                                                                    'startsWith',
-                                                                                    'endsWith',
-                                                                                ] })
+
+            expect(db).toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
         })
 
         test('add duplicate column will fail', async() => {
@@ -137,8 +116,7 @@ describe('Schema API', () => {
             await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
 
             await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
-
-            expect((await env.schemaProvider.describeCollection(ctx.collectionName)).fields).not.toHaveProperty(ctx.columnName)
+            expect((await env.schemaProvider.describeCollection(ctx.collectionName))).not.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]) )
         })
 
         test('drop column on a a non existing collection', async() => {

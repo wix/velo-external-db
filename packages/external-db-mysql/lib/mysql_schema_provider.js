@@ -2,7 +2,7 @@ const { promisify } = require('util')
 const { translateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeId, escapeTable } = require('./mysql_utils')
-const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData } = require('velo-external-db-commons')
 
 class SchemaProvider {
     constructor(pool) {
@@ -18,7 +18,10 @@ class SchemaProvider {
         const data = await this.query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION', currentDb)
         const tables = parseTableData( data )
         return Object.entries(tables)
-                     .map(([collectionName, rs]) => asWixSchema(rs.map( this.translateDbTypes.bind(this) ), collectionName))
+                     .map(([collectionName, rs]) => ({
+                         id: collectionName,
+                         fields: rs.map( this.translateDbTypes.bind(this) )
+                     } ))
     }
 
 
@@ -52,9 +55,8 @@ class SchemaProvider {
     async describeCollection(collectionName) {
         const res = await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
                               .catch( translateErrorCodes )
-        const rows = res.map(r => ({ field: r.Field, type: r.Type }))
-                        .map( this.translateDbTypes.bind(this) )
-        return asWixSchema(rows, collectionName)
+        return res.map(r => ({ field: r.Field, type: r.Type }))
+                  .map( this.translateDbTypes.bind(this) )
     }
 
     translateDbTypes(row) {

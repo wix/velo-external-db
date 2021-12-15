@@ -43,7 +43,7 @@ describe('Schema Information Service', () => {
     beforeEach(() => {
         driver.reset()
 
-        ctx.dbs = gen.randomDbs()
+        ctx.dbs = gen.randomDbs2()
         ctx.collectionName = gen.randomCollectionName()
     })
 })

@@ -1,4 +1,4 @@
-const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
@@ -26,7 +26,10 @@ class SchemaProvider {
         const tables = parseTableData(res)
 
         return Object.entries(tables)
-                     .map(([collectionName, rs]) => asWixSchema(rs.map( this.reformatFields.bind(this) ), collectionName))
+                     .map(([collectionName, rs]) => ({
+                         id: collectionName,
+                         fields: rs.map( this.reformatFields.bind(this) )
+                     }))
     }
 
     async create(collectionName, columns) {
@@ -67,7 +70,7 @@ class SchemaProvider {
             throw new CollectionDoesNotExists('Collection does not exists')
         }
 
-        return asWixSchema(res.map( this.reformatFields.bind(this) ), collectionName)
+        return res.map( this.reformatFields.bind(this) )
     }
 
     async drop(collectionName) {

@@ -1,4 +1,5 @@
 const SchemaService = require('./schema')
+const { asWixSchema } = require('velo-external-db-commons')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
@@ -9,14 +10,14 @@ describe('Schema Service', () => {
         driver.givenListResult(ctx.dbs)
 
         const actual = await env.schemaService.list()
-        expect( actual ).toEqual({ schemas: ctx.dbs })
+        expect( actual ).toEqual({ schemas: ctx.dbs.map(db => asWixSchema(db.fields, db.id)) })
     })
 
     test('retrieve collections by ids from provider', async() => {
         driver.givenFindResults(ctx.dbs)
 
         const actual = await env.schemaService.find(ctx.dbs.map(db => db.id))
-        expect( actual ).toEqual({ schemas: ctx.dbs })
+        expect( actual ).toEqual({ schemas: ctx.dbs.map(db => asWixSchema(db.fields, db.id)) })
     })
 
     // eslint-disable-next-line jest/expect-expect
@@ -57,7 +58,7 @@ describe('Schema Service', () => {
         driver.reset()
         schema.reset()
 
-        ctx.dbs = gen.randomDbs()
+        ctx.dbs = gen.randomDbs2()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
 

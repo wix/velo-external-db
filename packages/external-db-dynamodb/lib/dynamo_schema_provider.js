@@ -78,7 +78,7 @@ class SchemaProvider {
         
         const collection = await this.collectionDataFor(collectionName)
 
-        return asWixSchema([...SystemFields, ...collection.fields].map(reformatFields), collection.tableName)
+        return [...SystemFields, ...collection.fields].map( reformatFields )
     }
 
     async ensureSystemTableExists() {

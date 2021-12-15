@@ -51,6 +51,10 @@ const randomDbFields = () => {
     return fieldsArrayToFieldObj(fields)
 }
 
+const randomDbField2 = () => ( { name: chance.word(), type: chance.word(), subtype: chance.word(), isPrimary: chance.bool() } )
+
+const randomDbFields2 = () => randomArrayOf( randomDbField2 )
+
 const fieldsArrayToFieldObj = fields => fields.reduce((pV, cV) => ({
         ...pV, ...{ [cV.name]: { 
         displayName: cV.name,
@@ -143,7 +147,11 @@ const veloDate = () => ( { $date: newDate().toISOString() } )
 const randomDb = () => ( { id: randomCollectionName(),
                            fields: randomDbFields() })
 
+const randomDb2 = () => ( { id: randomCollectionName(),
+                           fields: randomDbFields2() })
+
 const randomDbs = () => randomArrayOf( randomDb )
+const randomDbs2 = () => [randomDb2(), randomDb2()]//randomArrayOf( randomDb2 )
 
 const randomObjectFromArray = (array) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
@@ -175,7 +183,7 @@ const randomConfig = () => ({
     db: chance.word(),
 })
 
-module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject,
+module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs2,
      randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
       randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, fieldsArrayToFieldObj, randomFieldName }
 

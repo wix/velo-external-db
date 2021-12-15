@@ -15,7 +15,7 @@ const SystemFields = [
     }]
 
 
-const asWixSchema = (res, collectionName) => {
+const asWixSchema = (fields, collectionName) => {
     return {
         id: collectionName,
         displayName: collectionName,
@@ -29,10 +29,10 @@ const asWixSchema = (res, collectionName) => {
         ],
         maxPageSize: 50,
         ttl: 3600,
-        fields: res.reduce( (o, r) => ( { ...o, [r.field]: {
+        fields: fields.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
-                subtype: r.subtype,
+                // subtype: r.subtype,
                 queryOperators: [
                     'eq',
                     'lt',

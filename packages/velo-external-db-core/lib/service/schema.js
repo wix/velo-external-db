@@ -1,4 +1,4 @@
-const { schemasWithoutSubtype } = require ('velo-external-db-commons')
+const { asWixSchema } = require('velo-external-db-commons')
 
 class SchemaService {
     constructor(storage, schemaInformation) {
@@ -7,13 +7,15 @@ class SchemaService {
     }
 
     async list() {
-        const schemas = await this.storage.list()
-        return { schemas: schemasWithoutSubtype(schemas) } 
+        const dbs = await this.storage.list()
+
+        // console.log(JSON.stringify(dbs))
+        return { schemas: dbs.map(db => asWixSchema(db.fields, db.id) ) }
     }
 
     async find(collectionNames) {
-        const schemas = await Promise.all(collectionNames.map(collectionName => this.storage.describeCollection(collectionName)))
-        return { schemas: schemasWithoutSubtype(schemas) }
+        const dbs = await Promise.all(collectionNames.map(async collectionName => ({ id: collectionName, fields: await this.storage.describeCollection(collectionName) })))
+        return { schemas: dbs.map(db => asWixSchema(db.fields, db.id) ) }
     }
 
     async create(collectionName) {
