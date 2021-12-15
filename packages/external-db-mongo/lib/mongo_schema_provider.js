@@ -25,7 +25,7 @@ class SchemaProvider {
         return Object.entries(tables)
                      .map(([collectionName, rs]) => ({
                          id: collectionName,
-                         fields: rs.map( this.reformatFields.bind(this) )
+                         fields: [...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) )
                      }))
 
     }
