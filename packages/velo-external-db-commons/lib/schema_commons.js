@@ -32,7 +32,6 @@ const asWixSchema = (fields, collectionName) => {
         fields: fields.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
-                // subtype: r.subtype,
                 queryOperators: [
                     'eq',
                     'lt',
@@ -65,23 +64,4 @@ const parseTableData = data => data.reduce((o, r) => {
                                                     return o
                                                 }, {})
 
-
-
-const schemasWithoutSubtype = schemas => (
-            schemas.map(({ fields, ...rest }) => ({
-                            ...rest,
-                            fields: fieldsWithoutSubType(fields)
-                            })
-                        )
-)
-
-const fieldsWithoutSubType = (fields) => {
-    return Object.entries(fields)
-                    .reduce((pV, [k, v]) => {
-                        const { subtype, ...rest } = v
-                        return { ...pV, ...{ [k]: rest } }
-                    }, {})
-}
-                                                
-
-module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData, schemasWithoutSubtype, fieldsWithoutSubType }
+module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData }
