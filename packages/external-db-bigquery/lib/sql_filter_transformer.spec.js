@@ -270,7 +270,6 @@ describe('Sql Parser', () => {
                     })
                 })
 
-
                 each([
                     ['AVG', '$avg'],
                     ['MIN', '$min'],
@@ -286,6 +285,20 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: `${escapeId(ctx.fieldName)}, CAST(${mySqlFunction}(${escapeId(ctx.anotherFieldName)}) AS FLOAT64) AS ${escapeId(ctx.moreFieldName)}`,
+                        groupByColumns: [ctx.fieldName],
+                        havingFilter: '',
+                        parameters: [],
+                    })
+                })
+
+                test('translate COUNT function', () => {
+                    const aggregation = {
+                        _id: `$${ctx.fieldName}`,
+                        count: { $sum: 1 }
+                    }
+                    
+                    expect(env.filterParser.parseAggregation(aggregation) ).toEqual({
+                        fieldsStatement: `${escapeId(ctx.fieldName)}, CAST(COUNT(*) AS FLOAT64) AS count`,
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
                         parameters: [],

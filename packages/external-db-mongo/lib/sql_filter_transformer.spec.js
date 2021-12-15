@@ -289,6 +289,25 @@ describe('Sql Parser', () => {
                         havingFilter: { $match: {} },
                     })
                 })
+
+                test('translate $count function', () => {
+                    const aggregation = {
+                        _id: { [ctx.fieldName]: `$${ctx.fieldName}` },
+                        count: { $sum: 1 }
+                    }
+
+                    expect(env.filterParser.parseAggregation(aggregation)).toEqual({
+                        fieldsStatement: {
+                            $group: {
+                                _id: {
+                                    [ctx.fieldName]: `$${ctx.fieldName}`
+                                },
+                                count: { $sum: 1 }
+                            }
+                        },
+                        havingFilter: { $match: {} },
+                    })
+                })
             })
 
         })
