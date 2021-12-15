@@ -71,7 +71,6 @@ class SchemaProvider {
         return collection.fields
     }
 
-
     translateDbTypes(type) {
         return this.sqlSchemaTranslator.translateType(type)
     }
@@ -88,8 +87,8 @@ class SchemaProvider {
 
     }
 
-    columnExists(collection, columnName) {
-        return Object.keys(collection.fields).find(f => f === columnName)
+    columnExists(fields, columnName) {
+        return fields.some(f => f.field === columnName)
     }
 
 }

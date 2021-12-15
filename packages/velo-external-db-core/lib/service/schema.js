@@ -8,8 +8,6 @@ class SchemaService {
 
     async list() {
         const dbs = await this.storage.list()
-
-        // console.log(JSON.stringify(dbs))
         return { schemas: dbs.map(db => asWixSchema(db.fields, db.id) ) }
     }
 
