@@ -31,6 +31,8 @@ class FilterParser {
                 return 'MIN'
             case '$sum':
                 return 'SUM'
+            case '$count':
+                return 'COUNT'
             default:
                 throw new InvalidQuery(`Unrecognized function ${f}`)
         }
