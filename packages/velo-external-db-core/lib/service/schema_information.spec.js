@@ -17,6 +17,18 @@ describe('Schema Information Service', () => {
         await expect( env.schemaInformation.schemaFor(ctx.collectionName) ).rejects.toThrow(CollectionDoesNotExists)
     })
 
+    test('will automatically refresh and return schema fields for collection when queried', async() => {
+        driver.givenListResult(ctx.dbs)
+
+        await expect( env.schemaInformation.schemaFieldsFor(ctx.dbs[0].id) ).resolves.toEqual(ctx.dbs[0].fields)
+    })
+
+    test('retrieve collection fields if it does not exists, throw an exception', async() => {
+        driver.givenListResult([])
+
+        await expect( env.schemaInformation.schemaFieldsFor(ctx.collectionName) ).rejects.toThrow(CollectionDoesNotExists)
+    })
+
     test('force refresh will invalidate cache', async() => {
         driver.givenListResult([])
         await env.schemaInformation.refresh()
@@ -43,7 +55,7 @@ describe('Schema Information Service', () => {
     beforeEach(() => {
         driver.reset()
 
-        ctx.dbs = gen.randomDbs2()
+        ctx.dbs = gen.randomDbs()
         ctx.collectionName = gen.randomCollectionName()
     })
 })

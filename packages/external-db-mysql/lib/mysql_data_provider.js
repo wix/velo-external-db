@@ -29,7 +29,6 @@ class DataProvider {
         return resultset[0]['num']
     }
 
-    // todo: check if we can get schema in a safer way. should be according to schema of the table
     async insert(collectionName, items) {
         const item = items[0]
         const sql = `INSERT INTO ${escapeTable(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES ?`

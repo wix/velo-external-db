@@ -58,7 +58,7 @@ describe('Schema Service', () => {
         driver.reset()
         schema.reset()
 
-        ctx.dbs = gen.randomDbs2()
+        ctx.dbs = gen.randomDbs()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
 

@@ -45,15 +45,10 @@ const randomArrayOf = (gen) => {
 
 const randomCollectionName = () => chance.word({ length: 5 })
 const randomFieldName = () => chance.word({ length: 5 })
-const randomDbField = () => ( { name: chance.word(), type: chance.word(), isPrimary: chance.bool() } )
-const randomDbFields = () => {
-    const fields = randomArrayOf( randomDbField )
-    return fieldsArrayToFieldObj(fields)
-}
 
-const randomDbField2 = () => ( { name: chance.word(), type: chance.word(), subtype: chance.word(), isPrimary: chance.bool() } )
+const randomDbField = () => ( { name: chance.word(), type: chance.word(), subtype: chance.word(), isPrimary: chance.bool() } )
 
-const randomDbFields2 = () => randomArrayOf( randomDbField2 )
+const randomDbFields = () => randomArrayOf( randomDbField )
 
 const fieldsArrayToFieldObj = fields => fields.reduce((pV, cV) => ({
         ...pV, ...{ [cV.name]: { 
@@ -147,11 +142,7 @@ const veloDate = () => ( { $date: newDate().toISOString() } )
 const randomDb = () => ( { id: randomCollectionName(),
                            fields: randomDbFields() })
 
-const randomDb2 = () => ( { id: randomCollectionName(),
-                           fields: randomDbFields2() })
-
 const randomDbs = () => randomArrayOf( randomDb )
-const randomDbs2 = () => [randomDb2(), randomDb2()]//randomArrayOf( randomDb2 )
 
 const randomObjectFromArray = (array) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
@@ -183,8 +174,8 @@ const randomConfig = () => ({
     db: chance.word(),
 })
 
-module.exports = { randomDbs, randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs2,
-     randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-      randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, fieldsArrayToFieldObj, randomFieldName }
+module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
+                   randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
+                   randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, fieldsArrayToFieldObj, randomFieldName }
 
 

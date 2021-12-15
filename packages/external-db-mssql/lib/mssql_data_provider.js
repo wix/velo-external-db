@@ -31,7 +31,6 @@ class DataProvider {
         return Object.entries(item).reduce((o, [k, v]) => ( { ...o, [patchFieldName(k)]: v } ), {})
     }
 
-    // todo: check if we can get schema in a safer way. should be according to schema of the table
     async insert(collectionName, items) {
         const rss = await Promise.all(items.map(item => this.insertSingle(collectionName, item)))
 

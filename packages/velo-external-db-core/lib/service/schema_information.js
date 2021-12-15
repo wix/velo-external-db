@@ -18,6 +18,11 @@ class CacheableSchemaInformation {
         return schema.find(s => s.id === collectionName)
     }
 
+    async schemaFieldsFor(collectionName) {
+        const schema = await this.schemaFor(collectionName)
+        return schema.fields
+    }
+
     async schema() {
         const schema = this.cache.get(CacheKey)
         if ( schema === undefined ) {
