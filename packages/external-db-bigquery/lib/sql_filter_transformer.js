@@ -31,6 +31,8 @@ class FilterParser {
                 return 'MIN'
             case '$sum':
                 return 'SUM'
+            case '$count':
+                return 'COUNT'
             default:
                 throw new InvalidQuery(`Unrecognized function ${f}`)
         }
@@ -48,13 +50,15 @@ class FilterParser {
             groupByColumns.push(_aggregation._id)
         }
 
+        const aliasToFunction = {}
         Object.keys(_aggregation)
               .filter(f => f !== '_id')
               .forEach(fieldAlias => {
                   Object.entries(_aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            filterColumnsStr.push(`CAST(${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)}) AS FLOAT64) AS ${escapeIdentifier(fieldAlias)}`)
-                        })
+                                filterColumnsStr.push(`CAST(${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)}) AS FLOAT64) AS ${escapeIdentifier(fieldAlias)}`)
+                                aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)})`
+                            })
               })
 
         const havingFilter = this.parseFilter(postFilter)
