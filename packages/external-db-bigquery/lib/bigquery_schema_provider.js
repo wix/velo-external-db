@@ -13,18 +13,13 @@ class SchemaProvider {
     }
 
     async list() {
-        try{
-            const res = await this.pool.query('SELECT table_name, column_name AS field, data_type as type, FROM INFORMATION_SCHEMA.COLUMNS')
-            const tables = parseTableData(res[0])
-            return Object.entries(tables)
-                         .map(([collectionName, rs]) => ({
-                             id: collectionName,
-                             fields: rs.map( this.translateDbTypes.bind(this) )
-                         }))
-        } catch(e) {
-            console.log(e)
-        }
-
+        const res = await this.pool.query('SELECT table_name, column_name AS field, data_type as type, FROM INFORMATION_SCHEMA.COLUMNS')
+        const tables = parseTableData(res[0])
+        return Object.entries(tables)
+                        .map(([collectionName, rs]) => ({
+                            id: collectionName,
+                            fields: rs.map( this.translateDbTypes.bind(this) )
+                        }))
     }
 
     async create(collectionName, _columns) {
