@@ -34,13 +34,6 @@ class DataProvider {
     }
 
     async insert(collectionName, items) {
-
-        // const patchedItems = items.map(patchDateTime)
-        // const itemsArr = patchedItems.map( item => `(${Object.values(item).map(i => typeof(i) === 'number' ? i : `"${i}"`).join(', ')})` ).join(', ')
-        // const sql = `INSERT INTO \`${collectionName}\` (${Object.keys(items[0]).join(', ')}) VALUES ${itemsArr}`
-
-        // const res = await this.pool.query(sql).catch( translateErrorCodes )
-
         const table = await this.pool.table(collectionName)
         await table.insert(items)
 
