@@ -35,9 +35,14 @@ class FilterParser {
               .forEach(fieldAlias => {
                   Object.entries(_aggregation[fieldAlias])
                         .forEach(([func, field]) => {
-                            Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `$${field}` } })
+                            if (func === '$count') {
+                                Object.assign(fieldsStatement, { count: { $sum: 1 } })
+                            } else {
+                                Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `$${field}` } })
+                            }
                         })
               })
+
         const filterObj = havingFilter.reduce((r, c) => ( { ...r, ...c } ), {})
         return {
             fieldsStatement: { $group: fieldsStatement },
