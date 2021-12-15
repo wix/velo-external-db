@@ -47,7 +47,7 @@ describe('Converters', () => {
     })
 
     test('if item does not contain properties that exists in the schema, add default value for them', async() => {
-        expect(prepareForInsert({ }, [{ name: ctx.property, type: 'text' }] )).toEqual({ [ctx.property]: '' } )
+        expect(prepareForInsert({ }, [{ field: ctx.property, type: 'text' }] )).toEqual({ [ctx.property]: '' } )
     })
 
     test('default value for non primary key text field is empty string', async() => {
@@ -100,7 +100,7 @@ describe('Converters', () => {
 
     beforeEach(() => {
         ctx.obj = gen.randomObject()
-        ctx.objSchemaFields = Object.keys(ctx.obj).reduce((s, f) => ({ ...s, [f]: { type: 'text' } }), { })
+        ctx.objSchemaFields = Object.keys(ctx.obj).map(f => ({ field: f, type: 'text' }), { })
         ctx.property = chance.word()
         ctx.anotherProperty = chance.word()
         ctx.veloDate = gen.veloDate()

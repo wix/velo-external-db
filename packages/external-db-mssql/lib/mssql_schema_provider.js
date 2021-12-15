@@ -1,7 +1,7 @@
 const { translateErrorCodes, notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeId, escapeTable } = require('./mssql_utils')
-const { SystemFields, validateSystemFields, asWixSchema, parseTableData } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
 
 class SchemaProvider {
@@ -19,7 +19,10 @@ class SchemaProvider {
                                  .query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = @db')
         const tables = parseTableData( rs.recordset )
         return Object.entries(tables)
-                     .map(([collectionName, rs]) => asWixSchema(rs.map( this.translateDbTypes.bind(this) ), collectionName))
+                     .map(([collectionName, rs]) => ({
+                         id: collectionName,
+                         fields: rs.map( this.translateDbTypes.bind(this) )
+                     }))
     }
 
     async create(collectionName, columns) {
@@ -62,7 +65,7 @@ class SchemaProvider {
             throw new CollectionDoesNotExists('Collection does not exists')
         }
 
-        return asWixSchema(rs.recordset.map( this.translateDbTypes.bind(this) ), collectionName)
+        return rs.recordset.map( this.translateDbTypes.bind(this) )
     }
 
     translateDbTypes(row) {

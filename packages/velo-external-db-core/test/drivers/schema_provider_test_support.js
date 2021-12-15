@@ -12,7 +12,7 @@ const givenListResult = (dbs) =>
     when(schemaProvider.list).mockResolvedValue(dbs)
 
 const givenFindResults = (dbs) =>
-    dbs.forEach(db => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db) )
+    dbs.forEach(db => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db.fields) )
 
 const expectCreateOf = (collectionName) =>
     when(schemaProvider.create).calledWith(collectionName)

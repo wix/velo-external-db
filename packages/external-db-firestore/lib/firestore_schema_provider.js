@@ -1,4 +1,4 @@
-const { SystemFields, validateSystemFields, asWixSchema } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 
 const SystemTable = '_descriptor'
@@ -19,7 +19,10 @@ class SchemaProvider {
         const l = await this.database.collection(SystemTable).get()
         const tables = l.docs.reduce((o, d) => ( { ...o, [d.id]: d.data() } ), {})
         return Object.entries(tables)
-                     .map(([collectionName, rs]) => asWixSchema([...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) ), collectionName))
+                     .map(([collectionName, rs]) => ({
+                         id: collectionName,
+                         fields: [...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) )
+                     }))
     }
 
     async create(collectionName, columns) {
@@ -88,7 +91,7 @@ class SchemaProvider {
             throw new CollectionDoesNotExists('Collection does not exists')
         }
 
-        return asWixSchema([...SystemFields, ...collection.data().fields].map( this.reformatFields.bind(this) ), collectionName)
+        return [...SystemFields, ...collection.data().fields].map( this.reformatFields.bind(this) )
     }
 
     async drop(collectionName) {

@@ -49,10 +49,8 @@ const defaultValueFor = (f) => {
     }
 }
 
-const parseFields = fields => Object.entries(fields).map(([k, v]) => ({ name: k, ...v }))
-
-const prepareForInsert = (item, fields) => parseFields(fields).reduce((pv, f) => ({ ...pv, [f.name]: item[f.name] || defaultValueFor(f) }), {})
-const prepareForUpdate = (item, fields) => parseFields(fields).reduce((pv, f) => f.name in item ? ({ ...pv, [f.name]: item[f.name] }) : pv, {})
+const prepareForInsert = (item, fields) => fields.reduce((pv, f) => ({ ...pv, [f.field]: item[f.field] || defaultValueFor(f) }), {})
+const prepareForUpdate = (item, fields) => fields.reduce((pv, f) => f.field in item ? ({ ...pv, [f.field]: item[f.field] }) : pv, {})
 
 const clone = o => ({ ...o })
 

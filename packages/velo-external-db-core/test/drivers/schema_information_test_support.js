@@ -8,7 +8,7 @@ const schemaInformation = {
 
 const givenDefaultSchemaFor = collectionName => {
     when(schemaInformation.schemaFor).calledWith(collectionName)
-                                     .mockResolvedValue( { id: collectionName, fields: SystemFields.reduce((s, f) => ({ ...s, [f.name]: { type: f.type, subtype: f.subtype } }), {}) })
+                                     .mockResolvedValue( { id: collectionName, fields: SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }), {}) })
 }
 
 const expectSchemaRefresh = () =>
