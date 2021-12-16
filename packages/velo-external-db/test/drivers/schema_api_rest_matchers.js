@@ -1,5 +1,7 @@
 const { SystemFields } = require('velo-external-db-commons')
 
+const responseWith = (matcher) => expect.objectContaining( { data: matcher } )
+
 const hasSameSchemaFieldsLike = fields => expect.objectContaining( fields.reduce((o, f) => ( { ...o, [f.name]: expect.objectContaining({ displayName: f.name, type: f.type }) } ), {}) )
 
 const schemaWithDefaultFieldsFor = collectionName => expect.objectContaining({ id: collectionName,
@@ -12,17 +14,11 @@ const collectionWithDefaultFieldsFor = collectionName => expect.objectContaining
     schemas: expect.arrayContaining( [ schemaWithDefaultFieldsFor( collectionName ) ] )
 } )
 
-const collectionResponseWithDefaultFieldsFor = collectionName => expect.objectContaining( {
-    data: collectionWithDefaultFieldsFor( collectionName )
-} )
+const collectionResponseWithDefaultFieldsFor = collectionName => responseWith( collectionWithDefaultFieldsFor( collectionName ) )
 
-const collectionResponseHasField = field => expect.objectContaining( {
-    data: collectionHasField( field )
-} )
+const collectionResponseHasField = field => responseWith(collectionHasField( field ))
 
-const collectionResponseWithNoCollections = () => expect.objectContaining( {
-    data: toHaveNoCollections()
-} )
+const collectionResponseWithNoCollections = () => responseWith(toHaveNoCollections())
 
 const collectionHasField = field => expect.objectContaining( {
     schemas: expect.arrayContaining( [ schemaWithFields( [field] ) ] )
@@ -32,4 +28,4 @@ const toHaveNoCollections = () => expect.objectContaining( {
     schemas: [ ]
 } )
 
-module.exports = { collectionResponseWithDefaultFieldsFor, collectionResponseHasField, collectionResponseWithNoCollections }
+module.exports = { collectionResponseWithDefaultFieldsFor, collectionResponseHasField, collectionResponseWithNoCollections, responseWith }
