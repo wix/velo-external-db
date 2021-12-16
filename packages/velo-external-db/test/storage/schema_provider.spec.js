@@ -20,18 +20,14 @@ describe('Schema API', () => {
         }, 20000)
 
         test('list of empty db will result with an empty array', async() => {
-            const db = await env.schemaProvider.list()
-
-            expect(db).toEqual([])
+            await expect( env.schemaProvider.list() ).resolves.toEqual([])
         })
 
         test('list db will result with a list of wix databases', async() => {
             await env.schemaProvider.create(ctx.collectionName)
             await env.schemaProvider.create(ctx.anotherCollectionName)
 
-            const dbs = await env.schemaProvider.list()
-
-            expect(dbs).toEqual(expect.arrayContaining([
+            await expect( env.schemaProvider.list() ).resolves.toEqual(expect.arrayContaining([
                 expect.objectContaining({
                     id: ctx.collectionName,
                     fields: collectionWithDefaultFields()
@@ -46,9 +42,7 @@ describe('Schema API', () => {
         test('create collection with default columns', async() => {
             await env.schemaProvider.create(ctx.collectionName)
 
-            const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-
-            expect(db).toEqual(collectionWithDefaultFields())
+            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(collectionWithDefaultFields())
         })
 
         test('drop collection', async() => {
@@ -62,15 +56,13 @@ describe('Schema API', () => {
         test('collection name and variables are case sensitive', async() => {
             await env.schemaProvider.create(ctx.collectionName.toUpperCase())
 
-            const db = await env.schemaProvider.describeCollection(ctx.collectionName.toUpperCase())
-            expect(db).toEqual(collectionWithDefaultFields())
+            await expect( env.schemaProvider.describeCollection(ctx.collectionName.toUpperCase()) ).resolves.toEqual(collectionWithDefaultFields())
         })
 
         test('retrieve collection data by collection name', async() => {
             await env.schemaProvider.create(ctx.collectionName)
 
-            const db = await env.schemaProvider.describeCollection(ctx.collectionName)
-            expect(db).toEqual(collectionWithDefaultFields())
+            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(collectionWithDefaultFields())
         })
 
         test('create collection twice will do nothing', async() => {
@@ -87,9 +79,8 @@ describe('Schema API', () => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
             await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
-            const db = await env.schemaProvider.describeCollection(ctx.collectionName)
 
-            expect(db).toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
+            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
         })
 
         test('add duplicate column will fail', async() => {
@@ -114,7 +105,7 @@ describe('Schema API', () => {
             await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
 
             await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
-            expect((await env.schemaProvider.describeCollection(ctx.collectionName))).not.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]) )
+            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.not.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]) )
         })
 
         test('drop column on a a non existing collection', async() => {
