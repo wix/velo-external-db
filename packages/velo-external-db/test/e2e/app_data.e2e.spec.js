@@ -28,8 +28,11 @@ describe('Velo External DB Data REST API',  () => {
             test('find api', async() => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-                expect((await axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authAdmin)).data).toEqual({ items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
-                    totalCount: 2 })
+                await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authAdmin) ).resolves.toEqual(
+                    expect.objectContaining({ data: {
+                            items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
+                            totalCount: 2
+                        } }))
             })
         }
 
@@ -38,7 +41,7 @@ describe('Velo External DB Data REST API',  () => {
 
             await axios.post('/data/insert', { collectionName: ctx.collectionName, item: ctx.item }, authAdmin)
 
-            expect(await data.expectAllDataIn(ctx.collectionName, authAdmin)).toEqual({ items: [ctx.item], totalCount: 1 })
+            await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ctx.item], totalCount: 1 })
         })
 
         test('bulk insert api', async() => {
@@ -46,7 +49,7 @@ describe('Velo External DB Data REST API',  () => {
 
             await axios.post('/data/insert/bulk', { collectionName: ctx.collectionName, items: ctx.items }, authAdmin)
 
-            expect((await data.expectAllDataIn(ctx.collectionName, authAdmin)).items).toEqual(expect.arrayContaining(ctx.items))
+            await expect( data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual( { items: expect.arrayContaining(ctx.items), totalCount: ctx.items.length })
         })
 
 

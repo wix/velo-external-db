@@ -25,9 +25,7 @@ describe('Data API', () => {
             env.driver.stubEmptyFilterFor(ctx.filter)
             env.driver.stubEmptyOrderByFor(ctx.sort)
 
-            const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-
-            expect( res ).toEqual([])
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit) ).resolves.toEqual([])
         })
 
 
@@ -37,9 +35,7 @@ describe('Data API', () => {
                 env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
                 env.driver.stubEmptyOrderByFor(ctx.sort)
 
-                const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-
-                expect( res ).toEqual(expect.arrayContaining([ctx.entity]))
+                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
             })
         
             test('search with non empty order by will return sorted data', async() => {
@@ -47,9 +43,7 @@ describe('Data API', () => {
                 env.driver.stubEmptyFilterFor(ctx.filter)
                 env.driver.givenOrderByFor('_owner', ctx.sort)
 
-                const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-
-                expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner > b._owner) ? 1 : -1))
+                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit) ).resolves.toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner > b._owner) ? 1 : -1))
             })
 
             test('search with empty order and filter but with limit and skip', async() => {
@@ -57,9 +51,7 @@ describe('Data API', () => {
                 env.driver.stubEmptyFilterFor(ctx.filter)
                 env.driver.givenOrderByFor('_owner', ctx.sort)
 
-                const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1)
-
-                expect( res ).toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1))
+                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1) ).resolves.toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1))
             })
         }
 
@@ -67,70 +59,66 @@ describe('Data API', () => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
             env.driver.stubEmptyFilterFor(ctx.filter)
 
-            const res = await env.dataProvider.count(ctx.collectionName, ctx.filter)
-
-            expect( res ).toEqual(ctx.entities.length)
+            await expect( env.dataProvider.count(ctx.collectionName, ctx.filter) ).resolves.toEqual(ctx.entities.length)
         })
 
         test('count will run query with filter', async() => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
             env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
 
-            const res = await env.dataProvider.count(ctx.collectionName, ctx.filter)
-
-            expect( res ).toEqual(1)
+            await expect( env.dataProvider.count(ctx.collectionName, ctx.filter) ).resolves.toEqual(1)
         })
 
         test('insert data into collection name and query all of it', async() => {
             env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.insert(ctx.collectionName, [ctx.entity]) ).toEqual(1)
+            await expect( env.dataProvider.insert(ctx.collectionName, [ctx.entity]) ).resolves.toEqual(1)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity])
+            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual([ctx.entity])
         })
 
         test('bulk insert data into collection name and query all of it', async() => {
             env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.insert(ctx.collectionName, ctx.entities) ).toEqual(ctx.entities.length)
+            await expect( env.dataProvider.insert(ctx.collectionName, ctx.entities) ).resolves.toEqual(ctx.entities.length)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual(expect.arrayContaining(ctx.entities))
+            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual(expect.arrayContaining(ctx.entities))
         })
 
         test('insert entity with number', async() => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
             env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.insert(ctx.numericCollectionName, [ctx.numberEntity], gen.fieldsArrayToFieldObj(ctx.numericColumns)) ).toEqual(1)
+            await expect( env.dataProvider.insert(ctx.numericCollectionName, [ctx.numberEntity], gen.fieldsArrayToFieldObj(ctx.numericColumns)) ).resolves.toEqual(1)
 
-            expect( await env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50) ).toEqual([ctx.numberEntity])
+            await expect( env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50) ).resolves.toEqual([ctx.numberEntity])
         })
 
         test('delete data from collection', async() => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
             env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).toEqual(ctx.entities.length)
+            await expect( env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).resolves.toEqual(ctx.entities.length)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([])
+            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual([])
         })
 
         test('allow update for single entity', async() => {
             await givenCollectionWith([ctx.entity], ctx.collectionName)
             env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).toEqual(1)
+            await expect( env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).resolves.toEqual(1)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.modifiedEntity])
+            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual([ctx.modifiedEntity])
         })
 
         test('allow update for multiple entities', async() => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
             env.driver.stubEmptyFilterAndSortFor('', '')
 
-            expect( await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntities) ).toEqual(ctx.modifiedEntities.length)
+            await expect( env.dataProvider.update(ctx.collectionName, ctx.modifiedEntities) ).resolves.toEqual(ctx.modifiedEntities.length)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
+            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual(expect.arrayContaining(ctx.modifiedEntities))
         })
 
         // testt('if update does not have and updatable fields, do nothing', async () => {
@@ -148,7 +136,7 @@ describe('Data API', () => {
 
             await env.dataProvider.truncate(ctx.collectionName)
 
-            expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([])
+            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual([])
         })
 
         if (shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb'], name)) {
@@ -159,9 +147,7 @@ describe('Data API', () => {
                 env.driver.stubEmptyFilterFor(ctx.filter)
                 env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 1)
     
-                const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
-    
-                expect( res ).toEqual(expect.arrayContaining([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name] },
+                await expect( env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation) ).resolves.toEqual(expect.arrayContaining([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name] },
                                                               { _id: ctx.anotherNumberEntity._id, [ctx.aliasColumns[0]]: ctx.anotherNumberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.anotherNumberEntity[ctx.numericColumns[1].name] }
                 ]))
             })
@@ -173,10 +159,8 @@ describe('Data API', () => {
                 env.driver.stubEmptyFilterFor(ctx.filter)
                 env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 1)
     
-                const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
-    
-                expect( res ).toEqual(expect.arrayContaining([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name] },
-                                                              { _id: ctx.anotherNumberEntity._id, [ctx.aliasColumns[0]]: ctx.anotherNumberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.anotherNumberEntity[ctx.numericColumns[1].name] }
+                await expect( env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation) ).resolves.toEqual(expect.arrayContaining([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name] },
+                                                                                                                                                                { _id: ctx.anotherNumberEntity._id, [ctx.aliasColumns[0]]: ctx.anotherNumberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.anotherNumberEntity[ctx.numericColumns[1].name] }
                 ]))
             })
     
@@ -187,9 +171,7 @@ describe('Data API', () => {
                 env.driver.givenFilterByIdWith(ctx.numberEntity._id, ctx.filter)
                 env.driver.givenAggregateQueryWith(ctx.aggregation.processingStep, ctx.numericColumns, ctx.aliasColumns, ['_id'], ctx.aggregation.postFilteringStep, 2)
     
-                const res = await env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation)
-    
-                expect( res ).toEqual([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name] }])
+                await expect( env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation) ).resolves.toEqual([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name] }])
             })
         }
 
