@@ -19,16 +19,19 @@ class SchemaService {
     async create(collectionName) {
         await this.storage.create(collectionName)
         await this.schemaInformation.refresh()
+        return {}
     }
 
     async addColumn(collectionName, column) {
         await this.storage.addColumn(collectionName, column)
         await this.schemaInformation.refresh()
+        return {}
     }
 
     async removeColumn(collectionName, columnName) {
         await this.storage.removeColumn(collectionName, columnName)
         await this.schemaInformation.refresh()
+        return {}
     }
 }
 

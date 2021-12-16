@@ -66,8 +66,6 @@ describe('Schema API', () => {
             expect(db).toEqual(collectionWithDefaultFields())
         })
 
-
-
         test('retrieve collection data by collection name', async() => {
             await env.schemaProvider.create(ctx.collectionName)
 
@@ -75,10 +73,10 @@ describe('Schema API', () => {
             expect(db).toEqual(collectionWithDefaultFields())
         })
 
-        // eslint-disable-next-line jest/expect-expect
         test('create collection twice will do nothing', async() => {
             await env.schemaProvider.create(ctx.collectionName, [])
-            await env.schemaProvider.create(ctx.collectionName, [])
+
+            await expect( env.schemaProvider.create(ctx.collectionName, []) ).resolves.toBeUndefined()
         })
 
         test('add column on a non existing collection will fail', async() => {

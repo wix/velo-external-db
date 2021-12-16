@@ -1,5 +1,6 @@
 const { Uninitialized, gen } = require('test-commons')
 const schema = require('../drivers/schema_api_rest_test_support')
+const matchers = require('../drivers/schema_api_rest_matchers')
 const { authOwner } = require('../drivers/auth_test_support')
 const Chance = require('chance')
 const each = require('jest-each').default
@@ -23,23 +24,19 @@ describe('Velo External DB Schema REST API',  () => {
         }, 20000)
 
         test('list', async() => {
-            expect((await axios.post('/schemas/list', {}, authOwner)).data).toEqual({ schemas: [] })
+            await expect( axios.post('/schemas/list', {}, authOwner) ).resolves.toEqual( matchers.collectionResponseWithNoCollections() )
         })
 
-        // eslint-disable-next-line jest/expect-expect
         test('create', async() => {
-            await schema.givenCollection(ctx.collectionName, [], authOwner)
+            await axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)
 
-            const res = await axios.post('/schemas/list', {}, authOwner)
-            schema.expectDefaultCollectionWith(ctx.collectionName, res)
+            await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseWithDefaultFieldsFor(ctx.collectionName) )
         })
 
-        // eslint-disable-next-line jest/expect-expect
         test('find', async() => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
 
-            const res = await axios.post('/schemas/find', { schemaIds: [ctx.collectionName] }, authOwner)
-            schema.expectDefaultCollectionWith(ctx.collectionName, res)
+            await expect( axios.post('/schemas/find', { schemaIds: [ctx.collectionName] }, authOwner)).resolves.toEqual( matchers.collectionResponseWithDefaultFieldsFor(ctx.collectionName) )
         })
 
         test('add column', async() => {
@@ -47,23 +44,7 @@ describe('Velo External DB Schema REST API',  () => {
 
             await axios.post('/schemas/column/add', { collectionName: ctx.collectionName, column: ctx.column }, authOwner)
 
-            const field = await schema.expectColumnInCollection(ctx.column.name, ctx.collectionName, authOwner)
-            expect(field).toEqual({ displayName: ctx.column.name,
-                type: 'text',
-                queryOperators: [
-                    'eq',
-                    'lt',
-                    'gt',
-                    'hasSome',
-                    'and',
-                    'lte',
-                    'gte',
-                    'or',
-                    'not',
-                    'ne',
-                    'startsWith',
-                    'endsWith',
-                ] })
+            await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseHasField( ctx.column ) )
         })
 
         test('remove column', async() => {
@@ -71,10 +52,8 @@ describe('Velo External DB Schema REST API',  () => {
 
             await axios.post('/schemas/column/remove', { collectionName: ctx.collectionName, columnName: ctx.column.name }, authOwner)
 
-            const field = await schema.expectColumnInCollection(ctx.column.name, ctx.collectionName, authOwner)
-            expect(field).toBeUndefined()
+            await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.not.toEqual( matchers.collectionResponseHasField( ctx.column ) )
         })
-
     })
 
 
