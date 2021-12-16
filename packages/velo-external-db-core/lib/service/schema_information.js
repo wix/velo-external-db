@@ -19,8 +19,8 @@ class CacheableSchemaInformation {
     }
 
     async schemaFieldsFor(collectionName) {
-        const schema = await this.schemaFor(collectionName)
-        return schema.fields
+        const s = await this.schemaFor(collectionName)
+        return s.fields
     }
 
     async schema() {
@@ -35,6 +35,10 @@ class CacheableSchemaInformation {
     async refresh() {
         const schema = await this.schemaProvider.list()
         this.cache.set(CacheKey, schema)
+    }
+
+    async clear() {
+        this.cache.flushAll()
     }
 }
 

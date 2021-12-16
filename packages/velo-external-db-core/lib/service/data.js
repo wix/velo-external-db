@@ -33,9 +33,9 @@ class DataService {
     }
 
     async bulkInsert(collectionName, items) {
-        const info = await this.schemaInformation.schemaFor(collectionName)
-        const prepared = items.map(i => prepareForInsert(i, info.fields))
-        await this.storage.insert(collectionName, prepared.map(i => unpackDates(i)), info.fields)
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        const prepared = items.map(i => prepareForInsert(i, fields))
+        await this.storage.insert(collectionName, prepared.map(i => unpackDates(i)), fields)
         return { items: prepared }
     }
 
@@ -45,9 +45,9 @@ class DataService {
     }
 
     async bulkUpdate(collectionName, items) {
-        const info = await this.schemaInformation.schemaFor(collectionName)
-        const prepared = items.map(i => prepareForUpdate(i, info.fields))
-        await this.storage.update(collectionName, prepared.map(i => unpackDates(i)), info.fields)
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        const prepared = items.map(i => prepareForUpdate(i, fields))
+        await this.storage.update(collectionName, prepared.map(i => unpackDates(i)), fields)
         return { items: prepared }
     }
 
