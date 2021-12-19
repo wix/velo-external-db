@@ -22,6 +22,14 @@ class SchemaProvider {
         }))
     }
 
+    async listHeaders() {
+        await this.ensureSystemTableExists()
+
+        const { Items } = await this.docClient
+                                    .scan(dynamoRequests.listTablesExpression())
+        return Items.map(table => table.tableName)
+    }
+
     async create(collectionName, columns) {
         await this.ensureSystemTableExists()
         validateTable(collectionName)
