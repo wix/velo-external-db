@@ -30,6 +30,10 @@ class SchemaProvider {
         return l.docs.map(rs => rs.id)
     }
 
+    supportedOperations() {
+        return ['todo']
+    }
+
     async create(collectionName, columns) {
         const coll = await this.database.collection(SystemTable)
                                         .doc(collectionName)

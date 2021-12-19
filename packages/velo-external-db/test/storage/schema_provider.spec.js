@@ -29,6 +29,10 @@ describe('Schema API', () => {
             await expect( env.schemaProvider.listHeaders() ).resolves.toEqual([ctx.collectionName])
         })
 
+        test('supported operations is defined', async() => {
+            expect( env.schemaProvider.supportedOperations() ).not.toEqual([])
+        })
+
         test('list db will result with a list of wix databases', async() => {
             await env.schemaProvider.create(ctx.collectionName)
             await env.schemaProvider.create(ctx.anotherCollectionName)
