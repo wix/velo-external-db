@@ -13,7 +13,7 @@ class SchemaProvider {
     }
 
     async list() {
-        const res = await this.pool.query('SELECT table_name, column_name AS field, data_type as type, FROM INFORMATION_SCHEMA.COLUMNS')
+        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.COLUMNS`)
         const tables = parseTableData(res[0])
         return Object.entries(tables)
                         .map(([collectionName, rs]) => ({
