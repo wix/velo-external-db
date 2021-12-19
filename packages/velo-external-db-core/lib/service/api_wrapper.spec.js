@@ -36,6 +36,14 @@ describe('Api Wrapper', () => {
     })
     
     describe('correctly transform Wix filter to adapter filter', () => {
+        test('handles undefined filter', () => {
+            expect(env.ApiWrapper.parseFilter('')).toEqual(EMPTY_FILTER)
+            expect(env.ApiWrapper.parseFilter(undefined)).toEqual(EMPTY_FILTER)
+            expect(env.ApiWrapper.parseFilter(null)).toEqual(EMPTY_FILTER)
+            expect(env.ApiWrapper.parseFilter(555)).toEqual(EMPTY_FILTER)
+            
+        })
+
         test('handles empty filter', () => {
             expect(env.ApiWrapper.parseFilter({})).toEqual(EMPTY_FILTER)
             expect(env.ApiWrapper.parseFilter([])).toEqual(EMPTY_FILTER)
