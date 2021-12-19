@@ -34,6 +34,11 @@ class SchemaProvider {
         return response.data.tables.map(rs => rs.name)
     }
 
+    supportedOperations() {
+        return ['todo']
+    }
+
+
     async create(collectionName) {
         const systemColumnsAsAirTableColumns = SystemFields.map(field => this.sqlSchemaTranslator.wixColumnToAirtableColumn(field))
         await this.axios.post(`v0/meta/bases/${this.baseId}/table`, { collectionName, columns: systemColumnsAsAirTableColumns })
