@@ -14,6 +14,15 @@ const SystemFields = [
         name: '_owner', type: 'text', subtype: 'string', precision: '50'
     }]
 
+const allowedQueryOperators = {
+    number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'],
+    text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'urlized'],
+    boolean: ['eq'],
+    url: ['eq', 'ne', 'contains', 'hasSome', 'urlized'],
+    datetime: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'],
+    image: [],
+    object: ['eq', 'ne', 'contains'],
+}
 
 const asWixSchema = (fields, collectionName) => {
     return {
@@ -32,20 +41,7 @@ const asWixSchema = (fields, collectionName) => {
         fields: fields.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
-                queryOperators: [
-                    'eq',
-                    'lt',
-                    'gt',
-                    'hasSome',
-                    'and',
-                    'lte',
-                    'gte',
-                    'or',
-                    'not',
-                    'ne',
-                    'startsWith',
-                    'endsWith' // todo: customize this list according to type
-                ]
+                queryOperators: allowedQueryOperators[r.type],
             } }), {} )
     }
 }
