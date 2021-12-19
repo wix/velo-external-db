@@ -25,6 +25,11 @@ class SchemaProvider {
                      }))
     }
 
+    async listHeaders() {
+        const l = await this.database.collection(SystemTable).get()
+        return l.docs.map(rs => rs.id)
+    }
+
     async create(collectionName, columns) {
         const coll = await this.database.collection(SystemTable)
                                         .doc(collectionName)

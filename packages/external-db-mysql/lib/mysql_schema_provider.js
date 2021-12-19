@@ -24,6 +24,11 @@ class SchemaProvider {
                      } ))
     }
 
+    async listHeaders() {
+        const currentDb = this.pool.config.connectionConfig.database
+        const data = await this.query('SELECT TABLE_NAME as table_name FROM information_schema.tables WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME', currentDb)
+        return data.map( rs => rs.table_name )
+    }
 
     async create(collectionName, columns) {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )

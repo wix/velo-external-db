@@ -151,6 +151,15 @@ const createRouter = () => {
         }
     })
 
+    router.post('/schemas/list/headers', async(req, res, next) => {
+        try {
+            const data = await schemaService.listHeaders()
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
+    })
+
     router.post('/schemas/find', async(req, res, next) => {
         try {
             const { schemaIds } = req.body
