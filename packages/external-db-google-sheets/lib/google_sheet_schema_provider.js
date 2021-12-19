@@ -24,6 +24,10 @@ class SchemaProvider {
         return await Promise.all( Object.values(this.doc.sheetsByTitle) )
     }
 
+    supportedOperations() {
+        return ['todo']
+    }
+
     async create(collectionName) {
         try{
             const newSheet = await this.doc.addSheet({ title: collectionName })

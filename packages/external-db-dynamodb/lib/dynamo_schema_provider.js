@@ -30,6 +30,10 @@ class SchemaProvider {
         return Items.map(table => table.tableName)
     }
 
+    supportedOperations() {
+        return ['todo']
+    }
+
     async create(collectionName, columns) {
         await this.ensureSystemTableExists()
         validateTable(collectionName)

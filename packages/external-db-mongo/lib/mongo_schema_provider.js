@@ -40,6 +40,10 @@ class SchemaProvider {
         return data.map(rs => rs._id)
     }
 
+    supportedOperations() {
+        return ['todo']
+    }
+
     async create(collectionName, columns) {
         validateTable(collectionName)
         const collection = await this.collectionDataFor(collectionName)

@@ -32,6 +32,10 @@ class SchemaProvider {
         return rs.recordset.map( rs => rs.table_name )
     }
 
+    supportedOperations() {
+        return ['todo']
+    }
+
     async create(collectionName, columns) {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                        .join(', ')
