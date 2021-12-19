@@ -65,13 +65,13 @@ describe('Schema API', () => {
             await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(collectionWithDefaultFields())
         })
 
-        // if (shouldNotRunOn(['BigQuery'], name)) {
+        if (shouldNotRunOn(['BigQuery'], name)) {
             test('create collection twice will do nothing', async() => {
                 await env.schemaProvider.create(ctx.collectionName, [])
 
                 await expect( env.schemaProvider.create(ctx.collectionName, []) ).resolves.toBeUndefined()
             })
-        // }
+        }
 
         test('add column on a non existing collection will fail', async() => {
             await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(CollectionDoesNotExists)
