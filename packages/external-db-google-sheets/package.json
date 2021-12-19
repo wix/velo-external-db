@@ -16,7 +16,7 @@
     "test": ""
   },
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.2",
     "google-spreadsheet": "^3.2.0",
     "googleapis": "^92.0.0",
     "velo-external-db-commons": "^0.0.0"
@@ -24,6 +24,6 @@
   "devDependencies": {
     "jest": "^27.4.5",
     "test-commons": "^0.0.0",
-    "ts-jest": "^27.1.1"
+    "ts-jest": "^27.1.2"
   }
 }

@@ -24,7 +24,7 @@
   "dependencies": {
     "compression": "^1.7.4",
     "ejs": "^3.1.6",
-    "express": "^4.17.1",
+    "express": "^4.17.2",
     "external-db-airtable": "^0.0.0",
     "external-db-bigquery": "^0.0.0",
     "external-db-config": "^0.0.0",
@@ -49,6 +49,6 @@
     "jest-each": "^27.4.2",
     "jest-when": "^3.5.0",
     "test-commons": "^0.0.0",
-    "ts-jest": "^27.1.1"
+    "ts-jest": "^27.1.2"
   }
 }
