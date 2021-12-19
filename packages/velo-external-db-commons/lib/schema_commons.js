@@ -14,7 +14,7 @@ const SystemFields = [
         name: '_owner', type: 'text', subtype: 'string', precision: '50'
     }]
 
-const allowedQueryOperators = {
+const queryOperatorsFor = {
     number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'],
     text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'urlized'],
     boolean: ['eq'],
@@ -41,7 +41,7 @@ const asWixSchema = (fields, collectionName) => {
         fields: fields.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
-                queryOperators: allowedQueryOperators[r.type],
+                queryOperators: queryOperatorsFor[r.type],
             } }), {} )
     }
 }
