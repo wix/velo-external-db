@@ -27,6 +27,12 @@ describe('Velo External DB Schema REST API',  () => {
             await expect( axios.post('/schemas/list', {}, authOwner) ).resolves.toEqual( matchers.collectionResponseWithNoCollections() )
         })
 
+        test('list headers', async() => {
+            await schema.givenCollection(ctx.collectionName, [], authOwner)
+
+            await expect( axios.post('/schemas/list/headers', {}, authOwner) ).resolves.toEqual( matchers.collectionResponseWithCollections([ctx.collectionName]) )
+        })
+
         test('create', async() => {
             await axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)
 

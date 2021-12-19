@@ -44,6 +44,8 @@ const randomArrayOf = (gen) => {
 }
 
 const randomCollectionName = () => chance.word({ length: 5 })
+const randomCollections = () => randomArrayOf( randomCollectionName )
+
 const randomFieldName = () => chance.word({ length: 5 })
 
 const randomDbField = () => ( { name: chance.word(), type: chance.word(), subtype: chance.word(), isPrimary: chance.bool() } )
@@ -176,6 +178,7 @@ const randomConfig = () => ({
 
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
+                   randomCollections,
                    randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, fieldsArrayToFieldObj, randomFieldName, randomOperator }
 
 

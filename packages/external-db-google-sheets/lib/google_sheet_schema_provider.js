@@ -19,6 +19,11 @@ class SchemaProvider {
                                                        .map( this.describeSheet ))
     }
 
+    async listHeaders() {
+        await this.doc.loadInfo()
+        return await Promise.all( Object.values(this.doc.sheetsByTitle) )
+    }
+
     async create(collectionName) {
         try{
             const newSheet = await this.doc.addSheet({ title: collectionName })

@@ -25,6 +25,13 @@ class SchemaProvider {
                      }))
     }
 
+    async listHeaders() {
+        const rs = await this.sql.request()
+                                 .input('db', this.dbName)
+                                 .query('SELECT TABLE_NAME as table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_CATALOG = @db')
+        return rs.recordset.map( rs => rs.table_name )
+    }
+
     async create(collectionName, columns) {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                        .join(', ')

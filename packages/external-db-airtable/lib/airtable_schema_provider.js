@@ -29,6 +29,11 @@ class SchemaProvider {
                      }))
     }
 
+    async listHeaders() {
+        const response = await this.axios.get(`v0/meta/bases/${this.baseId}/tables`)
+        return response.data.tables.map(rs => rs.name)
+    }
+
     async create(collectionName) {
         const systemColumnsAsAirTableColumns = SystemFields.map(field => this.sqlSchemaTranslator.wixColumnToAirtableColumn(field))
         await this.axios.post(`v0/meta/bases/${this.baseId}/table`, { collectionName, columns: systemColumnsAsAirTableColumns })

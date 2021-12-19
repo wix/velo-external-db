@@ -32,6 +32,19 @@ class SchemaProvider {
                      }))
     }
 
+    async listHeaders() {
+        const query = {
+            sql: 'SELECT table_name FROM information_schema.tables WHERE table_catalog = @tableCatalog and table_schema = @tableSchema',
+            params: {
+                tableSchema: '',
+                tableCatalog: '',
+            },
+        }
+
+        const [rows] = await this.database.run(query)
+        return recordSetToObj(rows).map(rs => rs['table_name'])
+    }
+
     async create(collectionName, columns) {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( this.fixColumn.bind(this) )
                                                                   .map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )

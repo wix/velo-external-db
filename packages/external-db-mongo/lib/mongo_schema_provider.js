@@ -30,6 +30,16 @@ class SchemaProvider {
 
     }
 
+    async listHeaders() {
+        await this.ensureSystemTableExists()
+
+        const resp = await this.client.db()
+                                      .collection(SystemTable)
+                                      .find({})
+        const data = await resp.toArray()
+        return data.map(rs => rs._id)
+    }
+
     async create(collectionName, columns) {
         validateTable(collectionName)
         const collection = await this.collectionDataFor(collectionName)

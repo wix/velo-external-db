@@ -1,4 +1,4 @@
-const { SystemFields } = require('velo-external-db-commons')
+const { SystemFields, asWixSchemaHeaders } = require('velo-external-db-commons')
 
 const responseWith = (matcher) => expect.objectContaining( { data: matcher } )
 
@@ -20,6 +20,8 @@ const collectionResponseHasField = field => responseWith(collectionHasField( fie
 
 const collectionResponseWithNoCollections = () => responseWith(toHaveNoCollections())
 
+const collectionResponseWithCollections = (collections) => responseWith( toHaveCollections(collections) )
+
 const collectionHasField = field => expect.objectContaining( {
     schemas: expect.arrayContaining( [ schemaWithFields( [field] ) ] )
 } )
@@ -28,4 +30,8 @@ const toHaveNoCollections = () => expect.objectContaining( {
     schemas: [ ]
 } )
 
-module.exports = { collectionResponseWithDefaultFieldsFor, collectionResponseHasField, collectionResponseWithNoCollections, responseWith }
+const toHaveCollections = (collections) => expect.objectContaining( {
+    schemas: collections.map( asWixSchemaHeaders )
+} )
+
+module.exports = { collectionResponseWithDefaultFieldsFor, collectionResponseHasField, collectionResponseWithNoCollections, responseWith, collectionResponseWithCollections }

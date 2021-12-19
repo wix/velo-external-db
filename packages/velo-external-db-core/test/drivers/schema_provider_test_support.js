@@ -2,6 +2,7 @@ const { when } = require('jest-when')
 
 const schemaProvider = {
     list: jest.fn(),
+    listHeaders: jest.fn(),
     describeCollection: jest.fn(),
     create: jest.fn(),
     addColumn: jest.fn(),
@@ -10,6 +11,9 @@ const schemaProvider = {
 
 const givenListResult = (dbs) =>
     when(schemaProvider.list).mockResolvedValue(dbs)
+
+const givenListHeadersResult = (collections) =>
+    when(schemaProvider.listHeaders).mockResolvedValue(collections)
 
 const givenFindResults = (dbs) =>
     dbs.forEach(db => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db.fields) )
@@ -28,6 +32,7 @@ const expectRemoveColumnOf = (columnName, collectionName) =>
 
 const reset = () => {
     schemaProvider.list.mockClear()
+    schemaProvider.listHeaders.mockClear()
     schemaProvider.describeCollection.mockClear()
     schemaProvider.create.mockClear()
     schemaProvider.addColumn.mockClear()
@@ -35,4 +40,6 @@ const reset = () => {
 }
 
 
-module.exports = { givenFindResults, expectRemoveColumnOf, givenListResult, expectCreateOf, expectCreateColumnOf, schemaProvider, reset }
+module.exports = { givenFindResults, expectRemoveColumnOf, givenListResult, givenListHeadersResult,
+                   expectCreateOf, expectCreateColumnOf,
+                   schemaProvider, reset }

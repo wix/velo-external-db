@@ -1,5 +1,5 @@
 const SchemaService = require('./schema')
-const { asWixSchema } = require('velo-external-db-commons')
+const { asWixSchema, asWixSchemaHeaders } = require('velo-external-db-commons')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
@@ -11,6 +11,13 @@ describe('Schema Service', () => {
 
         const actual = await env.schemaService.list()
         expect( actual ).toEqual({ schemas: ctx.dbs.map(db => asWixSchema(db.fields, db.id)) })
+    })
+
+    test('retrieve short list of all collections from provider', async() => {
+        driver.givenListHeadersResult(ctx.collections)
+
+        const actual = await env.schemaService.listHeaders()
+        expect( actual ).toEqual({ schemas: ctx.collections.map( asWixSchemaHeaders ) })
     })
 
     test('retrieve collections by ids from provider', async() => {
@@ -46,6 +53,7 @@ describe('Schema Service', () => {
 
     const ctx = {
         dbs: Uninitialized,
+        collections: Uninitialized,
         collectionName: Uninitialized,
         column: Uninitialized,
     }
@@ -59,6 +67,7 @@ describe('Schema Service', () => {
         schema.reset()
 
         ctx.dbs = gen.randomDbs()
+        ctx.collections = gen.randomCollections()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
 

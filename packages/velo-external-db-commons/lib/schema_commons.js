@@ -50,6 +50,23 @@ const asWixSchema = (fields, collectionName) => {
     }
 }
 
+const asWixSchemaHeaders = collectionName => {
+    return {
+        id: collectionName,
+        displayName: collectionName,
+        allowedOperations: [
+            'get',
+            'find',
+            'count',
+            'update',
+            'insert',
+            'remove'
+        ],
+        maxPageSize: 50,
+        ttl: 3600,
+    }
+}
+
 const validateSystemFields = (columnName) => {
     if (SystemFields.find(f => f.name === columnName)) {
         throw new CannotModifySystemField('Cannot modify system field')
@@ -64,4 +81,4 @@ const parseTableData = data => data.reduce((o, r) => {
                                                     return o
                                                 }, {})
 
-module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData }
+module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData, asWixSchemaHeaders }

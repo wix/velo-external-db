@@ -22,6 +22,11 @@ class SchemaProvider {
                      }))
     }
 
+    async listHeaders() {
+        const data = await this.pool.query('SELECT table_name FROM information_schema.tables WHERE table_schema = $1 ORDER BY table_name', ['public'])
+        return data.rows.map(rs => rs.table_name )
+    }
+
     async create(collectionName, _columns) {
         const columns = _columns || []
         const dbColumnsSql = [...SystemFields, ...columns].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
