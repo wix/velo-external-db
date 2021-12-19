@@ -5,60 +5,63 @@ const { SystemFields, validateSystemFields, parseTableData } = require('velo-ext
 
 const escapeIdentifier = i => i
 class SchemaProvider {
-    constructor(pool) {
+    constructor(pool, { projectId, databaseId }) {
+        this.projectId = projectId
+        this.databaseId = databaseId
         this.pool = pool
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
     }
 
     async list() {
-        const res = await this.pool.query('SELECT table_name, column_name AS field, data_type as type, FROM INFORMATION_SCHEMA.COLUMNS')
+        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.COLUMNS`)
         const tables = parseTableData(res[0])
-
         return Object.entries(tables)
-                     .map(([collectionName, rs]) => ({
-                         id: collectionName,
-                         fields: rs.map( this.translateDbTypes.bind(this) )
-                     }))
+                        .map(([collectionName, rs]) => ({
+                            id: collectionName,
+                            fields: rs.map( this.translateDbTypes.bind(this) )
+                        }))
     }
 
     async create(collectionName, _columns) {
         const columns = _columns || []
-        const dbColumnsSql = [...SystemFields, ...columns].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c))
+        const dbColumnsSql = [...SystemFields, ...columns].map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c))
         await this.pool.createTable(collectionName, { schema: dbColumnsSql })
-                  .catch(translateErrorCodes)         
+                       .catch(translateErrorCodes)
     }
 
     async drop(collectionName) {
         await this.pool.table(collectionName).delete()
-                  .catch(translateErrorCodes)  
+            .catch(translateErrorCodes)
     }
 
 
-    async addColumn(collectionName, column) {
+    async addColumn(collectionName, column) {   
         await validateSystemFields(column.name)
-
-        await this.pool.query(`ALTER TABLE ${escapeIdentifier(collectionName)} ADD COLUMN ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
-                  .catch(translateErrorCodes)
-        
+        try{
+            await this.pool.query(`ALTER TABLE ${escapeIdentifier(collectionName)} ADD COLUMN ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
+        } catch (err) {
+            if (err.message.includes('was not found')) 
+                throw new CollectionDoesNotExists('Collection does not exists')
+            else 
+                translateErrorCodes(err)
+        }
     }
 
     async removeColumn(collectionName, columnName) {
         await validateSystemFields(columnName)
-
-        await this.pool.query(`CREATE OR REPLACE TABLE ${escapeIdentifier(collectionName)} AS SELECT * EXCEPT (${escapeIdentifier(columnName)}) FROM  ${escapeIdentifier(collectionName)}`)
-                         .catch(translateErrorCodes)
-        
+        await this.pool.query(`CREATE OR REPLACE TABLE ${this.projectId}.${this.databaseId}.${escapeIdentifier(collectionName)} AS SELECT * EXCEPT (${escapeIdentifier(columnName)}) FROM  ${escapeIdentifier(collectionName)}`)
+            .catch(translateErrorCodes)
     }
 
     async describeCollection(collectionName) {
-        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name="${escapeIdentifier(collectionName)}"`)
+        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.COLUMNS WHERE table_name="${escapeIdentifier(collectionName)}"`)
 
         if (res[0].length === 0) {
             throw new CollectionDoesNotExists('Collection does not exists')
         }
+
         return res[0].map( this.translateDbTypes.bind(this) )
     }
-
 
     translateDbTypes(row) {
         row.type = this.sqlSchemaTranslator.translateType(row.type)

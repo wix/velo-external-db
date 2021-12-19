@@ -99,13 +99,13 @@ class GcpBigQueryConfigReader {
   }
 
   async readConfig() {
-    const { DATABASE_ID, SECRET_KEY } = process.env
-    return { databaseId: DATABASE_ID, secretKey: SECRET_KEY }
+    const { PROJECT_ID, DATABASE_ID, SECRET_KEY } = process.env
+    return { projectId: PROJECT_ID, databaseId: DATABASE_ID, secretKey: SECRET_KEY }
   }
 
   validate() {
     return {
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['DATABASE_ID', 'SECRET_KEY'])
+      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['PROJECT_ID', 'DATABASE_ID', 'SECRET_KEY'])
     }
   }
 
