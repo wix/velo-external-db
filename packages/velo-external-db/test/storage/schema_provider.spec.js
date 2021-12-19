@@ -23,6 +23,12 @@ describe('Schema API', () => {
             await expect( env.schemaProvider.list() ).resolves.toEqual([])
         })
 
+        test('list headers will result with an array of collection names', async() => {
+            await env.schemaProvider.create(ctx.collectionName)
+
+            await expect( env.schemaProvider.listHeaders() ).resolves.toEqual([ctx.collectionName])
+        })
+
         test('list db will result with a list of wix databases', async() => {
             await env.schemaProvider.create(ctx.collectionName)
             await env.schemaProvider.create(ctx.anotherCollectionName)
