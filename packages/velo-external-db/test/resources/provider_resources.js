@@ -27,6 +27,9 @@ const dynamoTestEnv = require ('./engines/dynamodb_resources.js')
 const bigquery = require('external-db-bigquery')
 const bigqueryTestEnv = require('./engines/bigquery_resources')
 
+const googleSheet = require('external-db-google-sheets')
+const googleSheetTestEnv = require('./engines/google_sheets_resources')
+
 const env = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
@@ -64,6 +67,7 @@ const mongoTestEnvInit = async() => await dbInit(mongoTestEnv, mongo)
 const airTableTestEnvInit = async() => await dbInit(airtableEnv, airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamoTestEnv, dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigqueryTestEnv, bigquery)
+const googleSheetTestEnvInit = async() => await dbInit(googleSheetTestEnv, googleSheet)
 
 
 const testSuits = () => [
@@ -76,6 +80,7 @@ const testSuits = () => [
     ['Airtable', airTableTestEnvInit],
     ['DynamoDb', dynamoTestEnvInit],
     ['BigQuery', bigqueryTestEnvInit],
+    ['Google-Sheet', googleSheetTestEnvInit],
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 module.exports = { env, dbTeardown, testSuits }
