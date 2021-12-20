@@ -1,5 +1,5 @@
 const { isEmptyFilter, AdapterOperators } = require('velo-external-db-commons')
-const { EMPTY_FILTER } = require ('./api_wrapper_utils')
+const { EMPTY_FILTER } = require ('./utils')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 
 class filterTransformer {

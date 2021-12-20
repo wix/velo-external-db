@@ -1,6 +1,6 @@
 const { Uninitialized, gen } = require('test-commons')
 const FilterTransformer = require('./filter_transformer')
-const { EMPTY_FILTER } = require('./api_wrapper_utils')
+const { EMPTY_FILTER } = require('./utils')
 const Chance = require('chance')
 const chance = Chance()
 const each = require('jest-each').default
