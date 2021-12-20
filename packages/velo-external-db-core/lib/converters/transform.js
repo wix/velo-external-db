@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
-let dateTimeProvider = require('./date_time_provider')
+let dateTimeProvider = require('../utils/date_time_provider')
 
 const asWixData = e => packDates(e)
 
