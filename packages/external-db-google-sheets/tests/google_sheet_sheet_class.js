@@ -63,17 +63,13 @@ class GoogleSpreadsheetSheet {
     }
 
     deleteRows(startRowIndex, endRowIndex) {
-        const part1 = this.values.slice(0, startRowIndex)
-        const part2 = this.values.slice(startRowIndex, endRowIndex)
-        const part3 = this.values.slice(endRowIndex)
-        this.values = part1.concat(part3)
-        return part2
+        const removedRows = this.values.slice(startRowIndex, endRowIndex)
+        this.values = this.values.filter( (i, index) => (index < startRowIndex || index >= endRowIndex))
+        return removedRows
     }
 
     updateRows(startRowIndex, endRowIndex, values) {
-        console.log({ before: this.values })
         this.values[startRowIndex-1] = values[0]
-        console.log({ after: this.values })
         return {
             updatedData: { values }
         }
