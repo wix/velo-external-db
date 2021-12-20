@@ -35,7 +35,7 @@ describe('Aggregation Transformer', () => {
         const postFilteringStep = null
 
         expect(env.AggregationTransformer.transform(processingStep, postFilteringStep)).toEqual({
-            projection: [{ name: ctx.fieldName, alias: ctx.fieldName }],
+            projection: [{ name: ctx.fieldName }],
             postFilter: EMPTY_FILTER
         })
     })
@@ -53,8 +53,8 @@ describe('Aggregation Transformer', () => {
 
         expect(env.AggregationTransformer.transform(processingStep, postFilteringStep)).toEqual({
             projection: [
-                            { name: ctx.fieldName, alias: ctx.fieldName },
-                            { name: ctx.anotherFieldName, alias: ctx.anotherFieldName }
+                            { name: ctx.fieldName },
+                            { name: ctx.anotherFieldName }
                         ],
             postFilter: EMPTY_FILTER
         })
@@ -73,7 +73,7 @@ describe('Aggregation Transformer', () => {
 
         expect(env.AggregationTransformer.transform(processingStep, postFilteringStep)).toEqual({
             projection: [
-                            { name: ctx.fieldName, alias: ctx.fieldName }, 
+                            { name: ctx.fieldName }, 
                             { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg }
                         ],
             postFilter: EMPTY_FILTER
@@ -93,7 +93,7 @@ describe('Aggregation Transformer', () => {
 
         expect(env.AggregationTransformer.transform(processingStep, postFilteringStep)).toEqual({
             projection: [
-                            { name: ctx.fieldName, alias: ctx.fieldName }, 
+                            { name: ctx.fieldName }, 
                             { alias: ctx.fieldAlias, function: AdapterFunctions.count }
                         ],
             postFilter: EMPTY_FILTER
@@ -116,7 +116,7 @@ describe('Aggregation Transformer', () => {
 
         expect(env.AggregationTransformer.transform(processingStep, postFilteringStep)).toEqual({
             projection: [
-                            { name: ctx.fieldName, alias: ctx.fieldName }, 
+                            { name: ctx.fieldName }, 
                             { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg },
                             { name: ctx.moreFieldName, alias: ctx.anotherFieldAlias, function: AdapterFunctions.sum }
                         ],
@@ -138,7 +138,7 @@ describe('Aggregation Transformer', () => {
 
         expect(env.AggregationTransformer.transform(processingStep, postFilteringStep)).toEqual({
             projection: [
-                            { name: ctx.fieldName, alias: ctx.fieldName }, 
+                            { name: ctx.fieldName }, 
                             { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg }
                         ],
             postFilter: env.driver.filterTransformer.transform(ctx.filter)

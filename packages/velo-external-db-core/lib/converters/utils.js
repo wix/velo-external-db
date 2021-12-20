@@ -2,9 +2,10 @@ const { AdapterFunctions } = require('velo-external-db-commons')
 
 const EMPTY_FILTER = {}
 
-const projectionFieldFor = (fieldName, fieldAlias) => (
-    { name: fieldName.substring(1), alias: fieldAlias || fieldName.substring(1) }
-)
+const projectionFieldFor = (fieldName, fieldAlias) => {
+    const field = { name: fieldName.substring(1) }
+    return fieldAlias ? { ...field, ...{ alias: fieldAlias } } : field
+}
 
 const projectionFunctionFor = (fieldName, fieldAlias, func) => {
     if (isCountFunc(func, fieldName))
