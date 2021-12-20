@@ -27,28 +27,25 @@ describe('Schema Service', () => {
         expect( actual ).toEqual({ schemas: ctx.dbs.map(db => asWixSchema(db.fields, db.id)) })
     })
 
-    // eslint-disable-next-line jest/expect-expect
     test('create collection name', async() => {
         driver.expectCreateOf(ctx.collectionName)
         schema.expectSchemaRefresh()
 
-        await env.schemaService.create(ctx.collectionName)
+        await expect(env.schemaService.create(ctx.collectionName)).resolves.toEqual({})
     })
 
-    // eslint-disable-next-line jest/expect-expect
     test('add column for collection name', async() => {
         driver.expectCreateColumnOf(ctx.column, ctx.collectionName)
         schema.expectSchemaRefresh()
 
-        await env.schemaService.addColumn(ctx.collectionName, ctx.column)
+        await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).resolves.toEqual({})
     })
 
-    // eslint-disable-next-line jest/expect-expect
     test('remove column from collection name', async() => {
         driver.expectRemoveColumnOf(ctx.column, ctx.collectionName)
         schema.expectSchemaRefresh()
 
-        await env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)
+        await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).resolves.toEqual({})
     })
 
     const ctx = {
