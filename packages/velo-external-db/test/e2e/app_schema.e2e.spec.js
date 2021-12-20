@@ -1,4 +1,4 @@
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
 const schema = require('../drivers/schema_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
 const { authOwner } = require('../drivers/auth_test_support')
@@ -53,13 +53,16 @@ describe('Velo External DB Schema REST API',  () => {
             await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseHasField( ctx.column ) )
         })
 
-        test('remove column', async() => {
-            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-
-            await axios.post('/schemas/column/remove', { collectionName: ctx.collectionName, columnName: ctx.column.name }, authOwner)
-
-            await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.not.toEqual( matchers.collectionResponseHasField( ctx.column ) )
-        })
+        if (shouldNotRunOn(['Google-sheet'], name)) {
+            test('remove column', async() => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+    
+                await axios.post('/schemas/column/remove', { collectionName: ctx.collectionName, columnName: ctx.column.name }, authOwner)
+    
+                await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.not.toEqual( matchers.collectionResponseHasField( ctx.column ) )
+            })
+        }
+        
     })
 
 

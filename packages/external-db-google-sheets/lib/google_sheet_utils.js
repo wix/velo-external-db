@@ -13,7 +13,7 @@ const describeSheetHeaders = async(sheet) => {
     return headers.map(h => ({
         table_name: sheet._rawProperties.title,
         field: h,
-        type: 'text',
+        type: (h === '_createdDate' || h === '_updatedDate') ?  'datetime' : 'text',
     }))
 }
 

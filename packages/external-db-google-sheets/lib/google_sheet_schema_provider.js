@@ -26,7 +26,8 @@ class SchemaProvider {
 
     async listHeaders() {
         await this.doc.loadInfo()
-        return await Promise.all( Object.values(this.doc.sheetsByTitle) )
+        const sheets = await Promise.all( Object.values(this.doc.sheetsByTitle) )
+        return sheets.map(sheet => sheet._rawProperties.title)
     }
 
     supportedOperations() {
@@ -44,7 +45,7 @@ class SchemaProvider {
 
     async describeCollection(collectionName) {
         const sheet = await sheetFor(collectionName, this.doc)
-        return await this.describeSheet(sheet)
+        return await describeSheetHeaders(sheet)
     }
 
     async addColumn(collectionName, column) {
