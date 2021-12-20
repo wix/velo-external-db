@@ -1,4 +1,4 @@
-const { asWixData, unpackDates, prepareForInsert, prepareForUpdate } = require('./transform')
+const { asWixData, unpackDates, prepareForInsert, prepareForUpdate } = require('../converters/transform')
 
 class DataService {
     constructor(storage, schemaInformation) {
