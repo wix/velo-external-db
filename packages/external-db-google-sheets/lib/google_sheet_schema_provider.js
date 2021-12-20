@@ -1,22 +1,27 @@
-const { SystemFields, validateSystemFields, errors } = require('velo-external-db-commons')
-const { asWixSchema } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData, errors } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./google_sheet_exception_translator')
-const { headersFrom, sheetFor, reformatFields } = require('./google_sheet_utils')
+const { describeSheetHeaders, headersFrom, sheetFor } = require('./google_sheet_utils')
 
 class SchemaProvider {
     constructor(doc) {
         this.doc = doc
     }
 
-    async describeSheet(sheet) {
-        const headers = await headersFrom(sheet)
-        return asWixSchema(reformatFields(headers), sheet._rawProperties.title)
+    async sheetsHeaders(sheets) {
+        const describedSheets = await Promise.all(sheets.map(describeSheetHeaders))
+        return describedSheets.flatMap(s => s)
     }
 
     async list() {
         await this.doc.loadInfo()
-        return await Promise.all(Object.values(this.doc.sheetsByTitle)
-                                                       .map( this.describeSheet ))
+        const sheets = Object.values(this.doc.sheetsByTitle)
+        const sheetsHeaders = await this.sheetsHeaders(sheets)
+        const parsedSheetsHeadersData = parseTableData(sheetsHeaders)
+        return Object.entries(parsedSheetsHeadersData)
+                     .map(([collectionName, rs]) => ({
+                         id: collectionName,
+                         fields: rs.map(this.translateDbTypes.bind(this))
+                     }))
     }
 
     async listHeaders() {
@@ -51,6 +56,13 @@ class SchemaProvider {
 
     async removeColumn() {
         throw new errors.InvalidRequest('Columns in Google Sheets cannot be deleted')
+    }
+
+    translateDbTypes(row) {
+        return {
+            field: row.field,
+            type: row.type
+        }
     }
 }
 

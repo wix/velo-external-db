@@ -8,10 +8,12 @@ const loadSheets = async(doc) => {
     }
 }
 
-const reformatFields = (headerRow) => {
-    return headerRow.map(h => ({
+const describeSheetHeaders = async(sheet) => {
+    const headers = await headersFrom(sheet)
+    return headers.map(h => ({
+        table_name: sheet._rawProperties.title,
         field: h,
-        type: 'text', 
+        type: 'text',
     }))
 }
 
@@ -42,4 +44,19 @@ const headersFrom = async(sheet) => {
     }
 }
 
-module.exports = { reformatFields, formatRow, sheetFor, headersFrom, loadSheets }
+const findRowById = async(sheet, id) => {
+    const rows = await sheet.getRows()
+    return rows.find(r => r._id === id)
+}
+
+const getRows= async(sheet, filter, offset, limit) => {
+    switch (filter.operator) {
+        case '$eq':
+            const rows = await sheet.getRows()
+            return rows.filter(r => r[filter.fieldName] === filter.value)        
+        default:
+            return await sheet.getRows({ offset, limit })
+    }
+}
+
+module.exports = { formatRow, sheetFor, headersFrom, loadSheets, findRowById, getRows, describeSheetHeaders }
