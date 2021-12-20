@@ -66,7 +66,9 @@ class filterTransformer {
                 return AdapterOperators.and
             case '$not':
                 return AdapterOperators.not
-            
+            case '$urlized':
+                return AdapterOperators.urlized
+                
             default:
                 throw new InvalidQuery(`Unrecognized operator ${operator}`)
         }

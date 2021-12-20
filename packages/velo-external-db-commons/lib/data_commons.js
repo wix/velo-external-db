@@ -103,7 +103,8 @@ const AdapterOperators = {
     string_contains: 'contains',
     and: 'and',
     or: 'or',
-    not: 'not'
+    not: 'not',
+    urlized: 'urlized'
 }
 
 const AdapterFunctions = { 

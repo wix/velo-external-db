@@ -13,7 +13,7 @@ describe('Filter Transformer', () => {
     })
     describe('correctly transform Wix operators to adapter operators', () => {
         each([
-            '$eq', '$ne', '$lt', '$lte', '$gt', '$gte', '$or', '$and', '$not'
+            '$eq', '$ne', '$lt', '$lte', '$gt', '$gte', '$or', '$and', '$not', '$urlized'
         ])
             .test('correctly transform [%s]', (o) => {
                 const adapterOperator = o.substring(1)
