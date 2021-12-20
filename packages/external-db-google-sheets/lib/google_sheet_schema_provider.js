@@ -1,23 +1,14 @@
 const { SystemFields, validateSystemFields, parseTableData, errors } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./google_sheet_exception_translator')
-const { headersFrom, sheetFor } = require('./google_sheet_utils')
+const { describeSheetHeaders, headersFrom, sheetFor } = require('./google_sheet_utils')
 
 class SchemaProvider {
     constructor(doc) {
         this.doc = doc
     }
 
-    async describeSheet(sheet) {
-        const headers = await headersFrom(sheet)
-        return headers.map(h => ({
-            table_name: sheet._rawProperties.title,
-            field: h,
-            type: 'text',
-        }))
-    }
-
     async sheetsHeaders(sheets) {
-        const describedSheets = await Promise.all(sheets.map(this.describeSheet))
+        const describedSheets = await Promise.all(sheets.map(describeSheetHeaders))
         return describedSheets.flatMap(s => s)
     }
 
