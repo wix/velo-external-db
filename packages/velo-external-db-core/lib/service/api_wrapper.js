@@ -1,6 +1,5 @@
-const { isObject } = require('velo-external-db-commons')
-const { AdapterOperators, EMPTY_FILTER } = require ('./api_wrapper_utils')
-
+const { isObject, isEmptyFilter } = require('velo-external-db-commons')
+const { AdapterOperators, AdapterFunctions, EMPTY_FILTER, projectionFieldFor, projectionFunctionFor } = require ('./api_wrapper_utils')
 
 //FilterService 
 //ApiFilterService
@@ -8,9 +7,35 @@ const { AdapterOperators, EMPTY_FILTER } = require ('./api_wrapper_utils')
 class ApiWrapper {
     constructor() {}
 
+    parseAggregation(processingStep, postFilteringStep) {
+        const projection = []
+        
+        if (isObject(processingStep._id)) {
+            projection.push(...Object.values(processingStep._id).map(f => projectionFieldFor(f)) )
+        } else {
+            projection.push(projectionFieldFor(processingStep._id))
+        }
+
+        Object.keys(processingStep)
+              .filter(f => f !== '_id')
+              .forEach(fieldAlias => {
+                  Object.entries(processingStep[fieldAlias])
+                        .forEach(([func, field]) => {
+                            projection.push(projectionFunctionFor(field, fieldAlias, this.wixFunctionToAdapterFunction(func)))
+                        })
+              })
+
+        const postFilter = this.parseFilter(postFilteringStep)
+
+        return {
+            projection,
+            postFilter
+        }
+    }
+
+    
     parseFilter(filter) {
-        if (!filter || !isObject(filter)) return EMPTY_FILTER
-        if (!Object.keys(filter)[0]) return EMPTY_FILTER
+        if (isEmptyFilter(filter)) return EMPTY_FILTER
 
         if(this.isMultipleFieldOperator(filter)) {
             const wixOperator = Object.keys(filter)[0]
@@ -70,6 +95,22 @@ class ApiWrapper {
                 return AdapterOperators.not
         }
     }
+
+    wixFunctionToAdapterFunction(func) {
+        switch (func) {
+            case '$avg':
+                return AdapterFunctions.avg
+            case '$max':
+                return AdapterFunctions.max
+            case '$min':
+                return AdapterFunctions.min
+            case '$sum':
+                return AdapterFunctions.sum
+            //COUNT!
+        }
+    }
+
+    
 }
 
 
