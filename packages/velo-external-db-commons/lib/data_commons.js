@@ -90,6 +90,30 @@ const isMultipleFieldOperator = (filter) => {
     return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
 }
 
+const AdapterOperators = {
+    eq: 'eq',
+    gt: 'gt',
+    gte: 'gte',
+    include: 'in', 
+    lt: 'lt',
+    lte: 'lte',
+    ne: 'ne',
+    string_begins: 'begins',
+    string_ends: 'ends',
+    string_contains: 'contains',
+    and: 'and',
+    or: 'or',
+    not: 'not'
+}
+
+const AdapterFunctions = { 
+    avg: 'avg',
+    max: 'max',
+    min: 'min',
+    sum: 'sum',
+    count: 'count'
+}
+
 
 module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor,
-                     extractFilterObjects, patchAggregationObject, isEmptyFilter }
+                     extractFilterObjects, patchAggregationObject, isEmptyFilter, AdapterOperators, AdapterFunctions }
