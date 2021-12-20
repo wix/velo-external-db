@@ -1,47 +1,20 @@
-const { isObject, isEmptyFilter } = require('velo-external-db-commons')
-const { AdapterOperators, AdapterFunctions, EMPTY_FILTER, projectionFieldFor, projectionFunctionFor } = require ('./api_wrapper_utils')
+const { isEmptyFilter, AdapterOperators } = require('velo-external-db-commons')
+const { EMPTY_FILTER } = require ('./utils')
+const { InvalidQuery } = require('velo-external-db-commons').errors
 
-//FilterService 
-//ApiFilterService
-//ApiFilterWrapper
-class ApiWrapper {
-    constructor() {}
+class filterTransformer {
+    constructor() {
 
-    parseAggregation(processingStep, postFilteringStep) {
-        const projection = []
-        
-        if (isObject(processingStep._id)) {
-            projection.push(...Object.values(processingStep._id).map(f => projectionFieldFor(f)) )
-        } else {
-            projection.push(projectionFieldFor(processingStep._id))
-        }
-
-        Object.keys(processingStep)
-              .filter(f => f !== '_id')
-              .forEach(fieldAlias => {
-                  Object.entries(processingStep[fieldAlias])
-                        .forEach(([func, field]) => {
-                            projection.push(projectionFunctionFor(field, fieldAlias, this.wixFunctionToAdapterFunction(func)))
-                        })
-              })
-
-        const postFilter = this.parseFilter(postFilteringStep)
-
-        return {
-            projection,
-            postFilter
-        }
     }
 
-    
-    parseFilter(filter) {
+    transform(filter) {
         if (isEmptyFilter(filter)) return EMPTY_FILTER
 
         if(this.isMultipleFieldOperator(filter)) {
             const wixOperator = Object.keys(filter)[0]
             const operator = this.wixOperatorToAdapterOperator(wixOperator)
             const values = filter[wixOperator]
-            const res = values.map(this.parseFilter.bind(this))
+            const res = values.map(this.transform.bind(this))
             return {
                 operator,
                 value: res
@@ -80,7 +53,7 @@ class ApiWrapper {
             case '$gte':
                 return AdapterOperators.gte
             case '$hasSome':
-                return AdapterOperators.in
+                return AdapterOperators.include
             case '$contains':
                 return AdapterOperators.string_contains
             case '$startsWith':
@@ -93,26 +66,13 @@ class ApiWrapper {
                 return AdapterOperators.and
             case '$not':
                 return AdapterOperators.not
+            case '$urlized':
+                return AdapterOperators.urlized
+                
+            default:
+                throw new InvalidQuery(`Unrecognized operator ${operator}`)
         }
     }
-
-    wixFunctionToAdapterFunction(func) {
-        switch (func) {
-            case '$avg':
-                return AdapterFunctions.avg
-            case '$max':
-                return AdapterFunctions.max
-            case '$min':
-                return AdapterFunctions.min
-            case '$sum':
-                return AdapterFunctions.sum
-            //COUNT!
-        }
-    }
-
-    
 }
 
-
-
-module.exports = ApiWrapper
+module.exports = filterTransformer
