@@ -3,13 +3,14 @@ const { errorMiddleware } = require('./web/error-middleware')
 const { appInfoFor } = require ('./health/app_info')
 const { InvalidRequest, ItemNotFound } = require('velo-external-db-commons').errors
 
-let dataService, schemaService, operationService, externalDbConfigClient
+let dataService, schemaService, operationService, externalDbConfigClient, cfg
 
-const initServices = (_dataService, _schemaService, _operationService, _externalDbConfigClient) => {
+const initServices = (_dataService, _schemaService, _operationService, _externalDbConfigClient, _cfg) => {
     dataService = _dataService
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient
+    cfg = _cfg
 }
 
 const createRouter = () => {
@@ -22,7 +23,7 @@ const createRouter = () => {
     })
 
     router.post('/provision', (req, res) => {
-        res.json({ protocolVersion: 2 })
+        res.json({ ...cfg, protocolVersion: 2 })
     })
 
     // *************** Data API **********************
