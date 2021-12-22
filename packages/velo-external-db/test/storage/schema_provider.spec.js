@@ -87,13 +87,15 @@ describe('Schema API', () => {
             await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(CollectionDoesNotExists)
         })
 
-        test('add column on a an existing collection', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
+        if (shouldNotRunOn(['Google-Sheet'], name)) {
+            test('add column on a an existing collection', async() => {
+                await env.schemaProvider.create(ctx.collectionName, [])
 
-            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'text', subtype: 'text' })
+                await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
 
-            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'text' }]))
-        })
+                await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
+            })
+        }
 
         if (shouldNotRunOn(['BigQuery'], name)) {
             test('add duplicate column will fail', async() => {
