@@ -10,4 +10,9 @@ const escapeTable = t => {
     return escapeId(t)
 }
 
-module.exports = { wildCardWith, escapeId, escapeTable }
+const extractGroupByNames = (projection) =>  projection.filter(f => !f.function).map( f => f.name ) 
+
+const extractProjectionFunctionsObjects = (projection) => projection.filter(f => f.function)
+
+
+module.exports = { wildCardWith, escapeId, escapeTable, extractGroupByNames, extractProjectionFunctionsObjects }

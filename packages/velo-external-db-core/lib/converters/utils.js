@@ -9,7 +9,7 @@ const projectionFieldFor = (fieldName, fieldAlias) => {
 
 const projectionFunctionFor = (fieldName, fieldAlias, func) => {
     if (isCountFunc(func, fieldName))
-        return { alias: fieldAlias, function: AdapterFunctions.count }
+        return { alias: fieldAlias, function: AdapterFunctions.count, name: '*' }
     return { name: fieldName.substring(1), alias: fieldAlias || fieldName.substring(1), function: func }
 }
 

@@ -1,12 +1,17 @@
-const { asWixData, unpackDates, prepareForInsert, prepareForUpdate } = require('../converters/transform')
+const { asWixData, unpackDates, prepareForInsert, prepareForUpdate, transformIfSupported } = require('../converters/transform')
+const FilterTransformer = require ('../converters/filter_transformer')
+const AggregationTransformer = require ('../converters/aggregation_transformer')
 
 class DataService {
-    constructor(storage, schemaInformation) {
+    constructor(storage, schemaInformation, supportAdapterFormat) {
         this.storage = storage
         this.schemaInformation = schemaInformation
+        this.filterTransformer = supportAdapterFormat ? new FilterTransformer() : false
+        this.aggregationTransformer = supportAdapterFormat ? new AggregationTransformer(this.filterTransformer): false
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, _filter, sort, skip, limit) {
+        const filter = transformIfSupported(_filter, this.filterTransformer)
         const items = await this.storage.find(collectionName, filter, sort, skip, limit)
         return {
             items: items.map( asWixData ),
@@ -22,7 +27,8 @@ class DataService {
         return { item: result.items[0] }
     }
 
-    async count(collectionName, filter) {
+    async count(collectionName, _filter) {
+        const filter = transformIfSupported(_filter, this.filterTransformer)
         const c = await this.storage.count(collectionName, filter)
         return { totalCount: c }
     }
@@ -65,7 +71,9 @@ class DataService {
         return this.storage.truncate(collectionName)
     }
 
-    async aggregate(collectionName, filter, aggregation) {
+    async aggregate(collectionName, _filter, _aggregation) {
+        const aggregation = transformIfSupported(_aggregation, this.aggregationTransformer)
+        const filter = transformIfSupported(_filter, this.filterTransformer)
         return {
             items: (await this.storage.aggregate(collectionName, filter, aggregation))
                                       .map( asWixData ),

@@ -1,4 +1,7 @@
 const Chance = require('chance')
+const { AdapterOperators } = require('../../velo-external-db-core/node_modules/velo-external-db-commons/lib')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators //TODO: extract
+
 const chance = Chance()
 
 const randomObject = () => {
@@ -129,6 +132,17 @@ const randomFilter = () => {
     }
 }
 
+const randomWrappedFilter = () => {
+    const operator = randomAdapterOperator()
+    const fieldName = chance.word()
+    const value = operator === AdapterOperators.include ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
+    return {
+        fieldName,
+        operator,
+        value
+    }
+}
+
 const idFilter = () => {
     const op = randomOperator()
     const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
@@ -138,6 +152,8 @@ const idFilter = () => {
 }
 
 const randomOperator = () => (chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith']))
+
+const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
 
 const veloDate = () => ( { $date: newDate().toISOString() } )
 
@@ -178,7 +194,7 @@ const randomConfig = () => ({
 
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-                   randomCollections,
-                   randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig, fieldsArrayToFieldObj, randomFieldName, randomOperator }
+                   randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
+                   fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter }
 
 
