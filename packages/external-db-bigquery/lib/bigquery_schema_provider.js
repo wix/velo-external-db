@@ -22,6 +22,11 @@ class SchemaProvider {
                         }))
     }
 
+    async listHeaders() {
+        const data = await this.pool.query(`SELECT table_name FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME`)
+        return data[0].map(rs => rs.table_name )
+    }
+
     supportedOperations() {
         return ['todo']
     }
