@@ -58,7 +58,7 @@ class DataProvider {
 
     async aggregate(collectionName, filter, aggregation) {
         validateTable(collectionName)
-        const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep)
+        const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation)
         const { filterExpr } = this.filterParser.transform(filter)
         const result = await this.client.db()
                                     .collection(collectionName)
