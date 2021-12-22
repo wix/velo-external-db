@@ -77,4 +77,15 @@ const parseTableData = data => data.reduce((o, r) => {
                                                     return o
                                                 }, {})
 
-module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData, asWixSchemaHeaders }
+const SchemaOperations = Object.freeze({
+    LIST: 1,
+    LIST_HEADERS: 2,
+    CREATE: 3,
+    DROP: 4, 
+    ADD_COLUMN: 5,
+    REMOVE_COLUMN: 6,
+    DESCRIBE_COLLECTION: 7
+})
+
+module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
+                        asWixSchemaHeaders, SchemaOperations }
