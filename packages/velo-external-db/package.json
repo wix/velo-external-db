@@ -11,7 +11,7 @@
     "test:firestore": "TEST_ENGINE=firestore jest --runInBand ./test",
     "test:mssql": "TEST_ENGINE=mssql jest --runInBand ./test",
     "test:mongo": "TEST_ENGINE=mongo jest --runInBand ./test",
-    "test:google-sheets": "TEST_ENGINE=google-sheet jest  -i  packages/velo-external-db/test/e2e/app_data.e2e.spec.js  --runInBand -t 'Schema API' ",
+    "test:google-sheets": "TEST_ENGINE=google-sheet jest --runInBand schema_provider.spec.js  app_data.e2e.spec.js  app_schema.e2e.spec.js ",
     "test:airtable": "TEST_ENGINE=airtable jest --runInBand ./test ",
     "test:dynamodb": "TEST_ENGINE=dynamodb jest --runInBand ./test ",
     "test:bigquery": "TEST_ENGINE=bigquery jest --runInBand ./test",

@@ -90,9 +90,9 @@ describe('Schema API', () => {
         test('add column on a an existing collection', async() => {
             await env.schemaProvider.create(ctx.collectionName, [])
 
-            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'text', subtype: 'text' })
 
-            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
+            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'text' }]))
         })
 
         if (shouldNotRunOn(['BigQuery'], name)) {
@@ -114,15 +114,17 @@ describe('Schema API', () => {
                         })
         })
 
-        test('drop column on a an existing collection', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+        if (shouldNotRunOn(['BigQuery', 'Google-Sheet'], name)) {
+            test('drop column on a an existing collection', async() => {
+                await env.schemaProvider.create(ctx.collectionName, [])
+                await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
 
-            await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
-            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.not.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]) )
-        })
+                await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
+                await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.not.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]) )
+            })
+        }
 
-        if (shouldNotRunOn(['BigQuery'], name)) {
+        if (shouldNotRunOn(['BigQuery', 'Google-Sheet'], name)) {
             test('drop column on a a non existing collection', async() => {
                 await env.schemaProvider.create(ctx.collectionName, [])
 
@@ -130,7 +132,7 @@ describe('Schema API', () => {
             })
         }
 
-        if (shouldNotRunOn(['BigQuery'], name)) {
+        if (shouldNotRunOn(['BigQuery', 'Google-Sheet'], name)) {
             test('drop system column will fail', async() => {
                 await env.schemaProvider.create(ctx.collectionName, [])
 
