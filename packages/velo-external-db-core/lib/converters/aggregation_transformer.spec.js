@@ -94,7 +94,7 @@ describe('Aggregation Transformer', () => {
         expect(env.AggregationTransformer.transform(processingStep, postFilteringStep)).toEqual({
             projection: [
                             { name: ctx.fieldName }, 
-                            { alias: ctx.fieldAlias, function: AdapterFunctions.count }
+                            { alias: ctx.fieldAlias, function: AdapterFunctions.count, name: '*' }
                         ],
             postFilter: EMPTY_FILTER
         })
