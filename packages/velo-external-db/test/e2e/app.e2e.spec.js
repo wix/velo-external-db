@@ -21,7 +21,7 @@ describe('Velo External DB',  () => {
         })
 
         test('answer provision with stub response', async() => {
-            expect((await axios.post('/provision', { }, authOwner)).data).toEqual(expect.objectContaining({ protocolVersion: 2, vendor: 'azr' }))
+            expect((await axios.post('/provision', { }, authOwner)).data).toEqual(expect.objectContaining({ protocolVersion: 2, vendor: 'azure' }))
         })
     })
 

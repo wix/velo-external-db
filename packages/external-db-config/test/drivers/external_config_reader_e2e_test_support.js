@@ -14,7 +14,7 @@ const initDriver = (vendor, engine) => {
     switch (vendor.toLowerCase()) {
         case 'aws':
             return awsMySql
-        case 'azr':
+        case 'azure':
             return azureMySql
         case 'gcp':
             switch (engine) {

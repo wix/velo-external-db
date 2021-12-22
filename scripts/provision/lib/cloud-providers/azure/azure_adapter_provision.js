@@ -69,7 +69,7 @@ class AdapterProvision {
                                  .updateApplicationSettings(resourceGroupName, webAppName, {
                                                                 properties: 
                                                                 { 
-                                                                    CLOUD_VENDOR: 'azr',
+                                                                    CLOUD_VENDOR: 'azure',
                                                                     TYPE: engine,
                                                                     ...appServiceVariables(keyVaultName)
                                                                 }
