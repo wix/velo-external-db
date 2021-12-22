@@ -24,7 +24,7 @@ const init = async(cfg) => {
     const dataProvider = new DataProvider(doc, filterParser)
     const schemaProvider = new SchemaProvider(doc)
 
-    return { dataProvider, schemaProvider, databaseOperations, connection: 'google-sheet', cleanup: async() => {} }
+    return { dataProvider, schemaProvider, databaseOperations, connection: doc, cleanup: async() => await Promise.all(doc.sheetsByIndex.map(sheet => sheet.delete())) }
 }
 
 
