@@ -1,3 +1,4 @@
+const { FieldAlreadyExists } = require('velo-external-db-commons').errors
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {
@@ -6,7 +7,11 @@ const notThrowingTranslateErrorCodes = err => {
     }
 }
 const translateErrorCodes = err => {
-    throw new Error(`${err.errors[0].message}`)
+    if (err.message.includes('Duplicate header detected')) {
+        throw new FieldAlreadyExists()
+    } else {
+        throw new Error(`${err.errors[0].message}`)
+    }
 }
 
 module.exports = { translateErrorCodes, notThrowingTranslateErrorCodes }

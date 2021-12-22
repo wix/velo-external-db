@@ -1,7 +1,8 @@
-const { sheetFor, headersFrom } = require('./google_sheet_utils')
+const { sheetFor, headersFrom, findRowById } = require('./google_sheet_utils')
 
 class DataProvider {
-    constructor(doc) {
+    constructor(doc, filterParser) {
+        this.filterParser = filterParser
         this.doc = doc
     }
 
@@ -18,15 +19,20 @@ class DataProvider {
     }
     
     async find(collectionName, filter, sort, skip, limit) {
+        const { filterExpr, fieldName, parameter } = this.filterParser.transform(filter)
         const sheet = await sheetFor(collectionName, this.doc)
-        const rows = await sheet.getRows({ offset: skip, limit })
 
+        if (filterExpr === '$eq' && fieldName === '_id') {
+            const row = await findRowById(sheet, parameter)
+            return row !== undefined ? [this.formatRow(row)] : []
+        }
+
+        const rows = await sheet.getRows({ offset: skip, limit })
         return rows.map(this.formatRow)
     }
 
-    async count(collectionName) {
-        const sheet = await sheetFor(collectionName, this.doc)
-        const rows = await sheet.getRows()
+    async count(collectionName, filter) {
+        const rows = await this.find(collectionName, filter)
         return rows.length
     }
 

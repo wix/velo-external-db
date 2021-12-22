@@ -27,11 +27,12 @@ describe('Velo External DB Data REST API',  () => {
 
         if (shouldNotRunOn(['DynamoDb'], name)) {
             test('find api', async() => {
+                const items = name === 'Google-sheet' ? [ ctx.item, ctx.anotherItem ] : [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1)
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
                 await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authAdmin) ).resolves.toEqual(
                     expect.objectContaining({ data: {
-                            items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
+                            items,
                             totalCount: 2
                         } }))
             })
@@ -39,7 +40,6 @@ describe('Velo External DB Data REST API',  () => {
 
         test('insert api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-
             await axios.post('/data/insert', { collectionName: ctx.collectionName, item: ctx.item }, authAdmin)
 
             await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ctx.item], totalCount: 1 })
@@ -55,7 +55,7 @@ describe('Velo External DB Data REST API',  () => {
 
 
 
-        if ( shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb'], name) ) {
+        if ( shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb', 'Google-sheet'], name) ) {
         test('aggregate api', async() => {
             await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
             await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
@@ -99,7 +99,7 @@ describe('Velo External DB Data REST API',  () => {
         })
     }
 
-    if (shouldNotRunOn(['BigQuery'], name)) {
+    if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
         test('bulk delete api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
@@ -130,7 +130,7 @@ describe('Velo External DB Data REST API',  () => {
             })
         }
 
-        if (shouldNotRunOn(['BigQuery'], name)) {
+        if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
             test('bulk update api', async() => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
@@ -148,14 +148,16 @@ describe('Velo External DB Data REST API',  () => {
             await expect( axios.post('/data/count', { collectionName: ctx.collectionName, filter: '' }, authAdmin) ).resolves.toEqual(matchers.responseWith( { totalCount: 2 } ))
         })
 
-        test('truncate api', async() => {
-            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-            await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        if (shouldNotRunOn(['Google-sheet'], name)) {
+            test('truncate api', async() => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
 
-            await axios.post('/data/truncate', { collectionName: ctx.collectionName }, authAdmin)
+                await axios.post('/data/truncate', { collectionName: ctx.collectionName }, authAdmin)
 
-            await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
-        })
+                await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
+            })
+        }
     })
 
 

@@ -2,6 +2,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet')
 const { loadSheets } = require('./google_sheet_utils')
 const SchemaProvider = require('./google_sheet_schema_provider')
 const DataProvider = require('./google_sheet_data_provider')
+const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./google_sheet_operations')
 
 const init = async(cfg) => {
@@ -19,10 +20,11 @@ const init = async(cfg) => {
 
     await loadSheets(doc) 
     const databaseOperations = new DatabaseOperations(doc)
-    const dataProvider = new DataProvider(doc)
+    const filterParser = new FilterParser()
+    const dataProvider = new DataProvider(doc, filterParser)
     const schemaProvider = new SchemaProvider(doc)
 
-    return { dataProvider, schemaProvider, databaseOperations, connection: 'google-sheet', cleanup: async() => {} }
+    return { dataProvider, schemaProvider, databaseOperations, connection: doc, cleanup: async() => await Promise.all(doc.sheetsByIndex.map(sheet => sheet.delete())) }
 }
 
 

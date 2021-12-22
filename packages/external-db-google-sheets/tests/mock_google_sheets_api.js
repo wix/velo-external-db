@@ -70,6 +70,10 @@ const batchUpdateFunctions = ( request, doc ) => {
             const { sheetId, startRowIndex, endRowIndex } = request.deleteRange.range
             const sheet = doc.getSheetById(sheetId)
             return sheet.deleteRows(startRowIndex, endRowIndex)
+        case 'deleteSheet':
+            const sheetToDelete = request.deleteSheet.sheetId
+            doc.deleteSheet(sheetToDelete)
+            return ''    
         default:
             break
     }

@@ -45,6 +45,10 @@ class GoogleSpreadsheetDoc {
         this.sheets = []
     }
 
+    deleteSheet(sheetId) {
+        this.sheets = this.sheets.filter(s => s.sheetId !== sheetId)
+    }
+
 
 }
 
