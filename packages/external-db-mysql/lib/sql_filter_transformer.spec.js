@@ -8,6 +8,7 @@ const { escapeId } = require('./mysql_utils')
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators //TODO: extract
 const { avg, max, min, sum, count } = AdapterFunctions
+
 describe('Sql Parser', () => {
     describe('sort parser', () => {
 
