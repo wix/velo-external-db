@@ -44,7 +44,8 @@ jobs:
                    "mongo", "mongo4",
                    "firestore",
                    "airtable",
-                   "dynamodb"]
+                   "dynamodb",
+                   "google-sheets"]
 
     steps:
       - uses: actions/checkout@v2
@@ -63,16 +64,19 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
       - name: Downloading Docker Compose V2
+        if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
           curl -sfL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
           docker compose version
 
       - name: Downloading Image
+        if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
           cd packages/velo-external-db/test/resources
           docker compose pull --quiet ${{ matrix.database }}
 
       - name: Start Container
+        if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
           cd packages/velo-external-db/test/resources
           docker compose up --detach ${{ matrix.database }}
@@ -87,6 +91,7 @@ jobs:
         run: npm run test:${{ matrix.database }}
 
       - name: Stop Container
+        if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
           cd packages/velo-external-db/test/resources
           docker compose down
