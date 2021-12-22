@@ -1,5 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject, extractFilterObjects, isEmptyFilter } = require('velo-external-db-commons')
+const { isObject, AdapterOperators, isEmptyFilter } = require('velo-external-db-commons')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 
 class FilterParser {
     constructor() {
@@ -20,7 +21,7 @@ class FilterParser {
             return []
         }
 
-        const { operator, fieldName, value } =  extractFilterObjects(filter)
+        const { operator, fieldName, value } =  filter
 
         if(this.isUnsupportedOperator(operator)) {
             throw new InvalidQuery(`${operator} operator cant be used in firebase`)
@@ -31,7 +32,7 @@ class FilterParser {
     
             return [{
                 fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
-                opStr: this.veloOperatorToFirestoreOperator(operator),
+                opStr: this.adapterOperatorToFirestoreOperator(operator),
                 value: _value,
             }]
         }
@@ -46,49 +47,49 @@ class FilterParser {
     }
 
     isSingleFieldOperator(operator) {
-        return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$startsWith', '$endsWith'].includes(operator)
+        return [ne, lt, lte, gt, gte, include, eq, string_begins, string_ends].includes(operator)
     }
     
     isUnsupportedOperator(operator) {
-        return ['$or', '$urlized', '$contains', '$not'].includes(operator)
+        return [or, urlized, string_contains, not].includes(operator)
     }
     
     isMultipleFiledOperator(operator) {
-        return ['$and'].includes(operator)
+        return [and].includes(operator)
     }
     
     valueForOperator(value, operator) {
-        if (operator === '$hasSome') {
+        if (operator === include) {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery(`${operator} cannot have an empty list of arguments`)
             }
             return value  
-        } else if (operator === '$eq' && value === undefined) {
+        } else if (operator === eq && value === undefined) {
             return null
         }
         
         return value
     }
     
-    veloOperatorToFirestoreOperator(operator) {
+    adapterOperatorToFirestoreOperator(operator) {
         switch (operator) {
-            case '$eq':
+            case eq:
                 return '=='
-            case '$ne':
+            case ne:
                 return '!='
-            case '$lt':
+            case lt:
                 return '<'
-            case '$lte':
+            case lte:
                 return '<='
-            case '$gt':
+            case gt:
                 return '>'
-            case '$gte':
+            case gte:
                 return '>='
-            case '$hasSome':
+            case include:
                 return 'in'
-            case '$startsWith':
+            case string_begins: // TODO: fix string_begins, string_ends, shouldn't work like this
                 return '>='
-            case '$endsWith':
+            case string_ends:
                 return '<'
         }
     }

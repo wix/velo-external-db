@@ -4,15 +4,19 @@ const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()
+const { AdapterOperators } = require('velo-external-db-commons')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, urlized } = AdapterOperators
 
 const EMPTY_SORT = []
 
-const randomFilter = () => { //TODO: remove this
-    const op = chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$startsWith', '$endsWith'])
+const randomFilter = () => {
+    const operator = chance.pickone([ne, lt, lte, gt, gte, include, eq, string_begins, string_ends])
     const fieldName = chance.word()
-    const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
+    const value = operator === include ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
-        [fieldName]: { [op]: value }
+        fieldName,
+        operator,
+        value
     }
 }
 
@@ -85,15 +89,17 @@ describe('Fire Store Parser', () => {
 
         describe('handle single field operator', () => {
             each([
-                '$ne', '$lt', '$lte', '$gt', '$gte', '$eq',
+                ne, lt, lte, gt, gte, eq,
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
-                    [ctx.fieldName]: { [o]: ctx.fieldValue }
+                    operator: o,
+                    fieldName: ctx.fieldName,
+                    value: ctx.fieldValue
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     fieldName: ctx.fieldName,
-                    opStr: env.filterParser.veloOperatorToFirestoreOperator(o, ctx.fieldValue),
+                    opStr: env.filterParser.adapterOperatorToFirestoreOperator(o, ctx.fieldValue),
                     value: ctx.fieldValue,
                 }])
 
@@ -101,35 +107,41 @@ describe('Fire Store Parser', () => {
 
             test('correctly extract filter value if value is 0', () => {
                 const filter = {
-                    [ctx.fieldName]: { $eq: 0 }
+                    operator: eq,
+                    fieldName: ctx.fieldName,
+                    value: 0
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     fieldName: ctx.fieldName,
-                    opStr: env.filterParser.veloOperatorToFirestoreOperator('$eq', ctx.fieldValue),
+                    opStr: env.filterParser.adapterOperatorToFirestoreOperator(eq, ctx.fieldValue),
                     value: 0,
                 }])
 
             })
 
-            test('correctly transform operator [$hasSome]', () => {
+            test('correctly transform operator [include]', () => {
                 const filter = {
-                    [ctx.fieldName]: { $hasSome: ctx.fieldListValue }
+                    operator: include,
+                    fieldName: ctx.fieldName,
+                    value: ctx.fieldListValue
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([
                 {
                     fieldName: ctx.fieldName,
-                    opStr: env.filterParser.veloOperatorToFirestoreOperator('$hasSome'),
+                    opStr: env.filterParser.adapterOperatorToFirestoreOperator(include),
                     value: ctx.fieldListValue,
                 }
             
             ])
             })
 
-            test('operator [$hasSome] with empty list of values will throw an exception', () => {
+            test('operator [include] with empty list of values will throw an exception', () => {
                 const filter = {
-                    [ctx.fieldName]: { $hasSome: [] }
+                    operator: include,
+                    fieldName: ctx.fieldName,
+                    value: []
                 }
 
                 expect( () => env.filterParser.parseFilter(filter) ).toThrow(InvalidQuery)
@@ -137,12 +149,14 @@ describe('Fire Store Parser', () => {
 
             test('correctly transform operator [$eq] with null value', () => {
                 const filter = {
-                    [ctx.fieldName]: { $eq: undefined } 
+                    operator: eq,
+                    fieldName: ctx.fieldName,
+                    value: undefined 
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     fieldName: ctx.fieldName,
-                    opStr: env.filterParser.veloOperatorToFirestoreOperator('$eq'),
+                    opStr: env.filterParser.adapterOperatorToFirestoreOperator(eq),
                     value: null
                 }])
             })
@@ -150,43 +164,51 @@ describe('Fire Store Parser', () => {
             test('correctly transform operator [$eq] with boolean value', () => {
                 const value = chance.bool()
                 const filter = {
-                    [ctx.fieldName]: { $eq: value } 
+                    operator: eq,
+                    fieldName: ctx.fieldName,
+                    value: value
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     fieldName: ctx.fieldName,
-                    opStr: env.filterParser.veloOperatorToFirestoreOperator('$eq'),               
+                    opStr: env.filterParser.adapterOperatorToFirestoreOperator(eq),               
                     value
                 }])
             })
 
             describe('handle string operators', () => {
-                test('operator [$contains] will throw an exception', () => {
+                test('operator [string_contains] will throw an exception', () => {
                     const filter = {
-                        [ctx.fieldName]: { $contains: ctx.fieldValue }
+                        operator: string_contains,
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldValue
                     }
 
                     expect(() => env.filterParser.parseFilter(filter)).toThrow(InvalidQuery)
                 })
 
                 each([
-                    '$startsWith', '$endsWith',
+                    string_begins, string_ends,
                 ]).test('correctly transform operator [%s]', (o) => {
                     const filter = {
-                        [ctx.fieldName]: { [o]: ctx.fieldValue }
+                        operator: o,
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldValue
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         fieldName: ctx.fieldName,
-                        opStr: env.filterParser.veloOperatorToFirestoreOperator(o, ctx.fieldValue),
+                        opStr: env.filterParser.adapterOperatorToFirestoreOperator(o, ctx.fieldValue),
                         value: ctx.fieldValue,
                     }])
 
                 })
 
-                test('correctly transform operator [$urlized]', () => {
+                test('operator [urlized] will throw an exception', () => {
                     const filter = {
-                        [ctx.fieldName]: { $urlized: ctx.fieldListValue } 
+                        operator: urlized,
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldListValue
                     }
 
                     expect(() => env.filterParser.parseFilter(filter)).toThrow(InvalidQuery)
@@ -197,11 +219,13 @@ describe('Fire Store Parser', () => {
 
         describe('handle multi field operator', () => {
             each([
-                '$and'
+                and
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
-                    [o]: [ctx.filter, ctx.anotherFilter]
+                    operator: o,
+                    value: [ctx.filter, ctx.anotherFilter]
                 }
+
                 const filter1 = env.filterParser.parseFilter(ctx.filter)[0]
                 const filter2 = env.filterParser.parseFilter(ctx.anotherFilter)[0]
                 expect( env.filterParser.parseFilter(filter) ).toEqual([
