@@ -115,6 +115,10 @@ const AdapterFunctions = {
     count: 'count'
 }
 
+const extractGroupByNames = (projection) =>  projection.filter(f => !f.function).map( f => f.name ) 
+
+const extractProjectionFunctionsObjects = (projection) => projection.filter(f => f.function)
 
 module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor,
-                     extractFilterObjects, patchAggregationObject, isEmptyFilter, AdapterOperators, AdapterFunctions }
+                     extractFilterObjects, patchAggregationObject, isEmptyFilter, AdapterOperators, AdapterFunctions,
+                     extractGroupByNames, extractProjectionFunctionsObjects }
