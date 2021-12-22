@@ -65,7 +65,7 @@ class DataProvider {
 
     async aggregate(collectionName, filter, aggregation) {
         const { filterExpr: whereFilterExpr, parameters: whereParameters, offset } = this.filterParser.transform(filter)
-        const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters } = this.filterParser.parseAggregation(aggregation.processingStep, aggregation.postFilteringStep, offset)
+        const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters } = this.filterParser.parseAggregation(aggregation, offset)
 
         const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr}`
         const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters])
