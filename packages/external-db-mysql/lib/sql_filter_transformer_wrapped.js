@@ -1,6 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { EMPTY_FILTER, EMPTY_SORT, isObject, AdapterOperators, AdapterFunctions } = require('velo-external-db-commons')
-const { wildCardWith, escapeId } = require('./mysql_utils')
+const { wildCardWith, escapeId, extractGroupByNames, extractProjectionFunctionsObjects } = require('./mysql_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators //TODO: extract
 const { avg, max, min, sum, count } = AdapterFunctions
 
@@ -163,9 +163,10 @@ class FilterParser {
 
     parseAggregation(aggregation) {
 
-        const groupByColumns = this.extractGroupBy(aggregation.projection)
+        const groupByColumns = extractGroupByNames(aggregation.projection)
         
-        const projectionFunctions = aggregation.projection.filter(f => f.function)
+        const projectionFunctions = extractProjectionFunctionsObjects(aggregation.projection)
+
         const filterColumnsStr = this.createFieldsStatementArray(projectionFunctions, groupByColumns)
 
         const havingFilter = this.parseFilter(aggregation.postFilter)
@@ -178,10 +179,6 @@ class FilterParser {
             havingFilter: filterExpr,
             parameters: parameters,
         }
-    }
-
-    extractGroupBy(projection) {
-        return projection.filter(f => !f.function).map( f => f.name)
     }
 
     createFieldsStatementArray(projectionFunctions, groupByColumns) {
