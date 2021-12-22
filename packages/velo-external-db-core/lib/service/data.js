@@ -1,4 +1,4 @@
-const { asWixData, unpackDates, prepareForInsert, prepareForUpdate } = require('../converters/transform')
+const { asWixData, unpackDates, prepareForInsert, prepareForUpdate, transformIfSupported } = require('../converters/transform')
 const FilterTransformer = require ('../converters/filter_transformer')
 const AggregationTransformer = require ('../converters/aggregation_transformer')
 
@@ -11,7 +11,7 @@ class DataService {
     }
 
     async find(collectionName, _filter, sort, skip, limit) {
-        const filter = this.filterTransformer ? this.filterTransformer.transform(_filter) : _filter
+        const filter = transformIfSupported(_filter, this.filterTransformer)
         const items = await this.storage.find(collectionName, filter, sort, skip, limit)
         return {
             items: items.map( asWixData ),
@@ -28,7 +28,7 @@ class DataService {
     }
 
     async count(collectionName, _filter) {
-        const filter = this.filterTransformer ? this.filterTransformer.transform(_filter) : _filter
+        const filter = transformIfSupported(_filter, this.filterTransformer)
         const c = await this.storage.count(collectionName, filter)
         return { totalCount: c }
     }
@@ -72,8 +72,8 @@ class DataService {
     }
 
     async aggregate(collectionName, _filter, _aggregation) {
-        const aggregation = this.aggregationTransformer ? this.aggregationTransformer.transform(_aggregation.processingStep, _aggregation.postFilteringStep) : _aggregation
-        const filter = this.filterTransformer ? this.filterTransformer.transform(_filter) : _filter
+        const aggregation = transformIfSupported(_aggregation, this.aggregationTransformer)
+        const filter = transformIfSupported(_filter, this.filterTransformer)
         return {
             items: (await this.storage.aggregate(collectionName, filter, aggregation))
                                       .map( asWixData ),

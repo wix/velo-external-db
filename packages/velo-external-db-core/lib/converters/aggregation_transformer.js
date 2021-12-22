@@ -7,7 +7,7 @@ class AggregationTransformer {
         this.filterTransformer = filterTransformer
     }
 
-    transform(processingStep, postFilteringStep) {        
+    transform({ processingStep, postFilteringStep }) {        
         const { _id: fields, ...functions } = processingStep
 
         const projectionFields = this.extractProjectionFields(fields)
