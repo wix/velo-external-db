@@ -35,12 +35,9 @@ class SchemaProvider {
     }
 
     async create(collectionName) {
-        try{
-            const newSheet = await this.doc.addSheet({ title: collectionName })
-            await newSheet.setHeaderRow(SystemFields.map(i => i.name))
-        } catch(err) {
-            translateErrorCodes(err)
-        }
+        const newSheet = await this.doc.addSheet({ title: collectionName })
+        await newSheet.setHeaderRow(SystemFields.map(i => i.name))
+                      .catch(translateErrorCodes)
     }
 
     async describeCollection(collectionName) {
@@ -53,10 +50,16 @@ class SchemaProvider {
         const sheet = await sheetFor(collectionName, this.doc)
         const header = await headersFrom(sheet)
         await sheet.setHeaderRow([ ...header, column.name])
+                   .catch(translateErrorCodes)
     }
 
     async removeColumn() {
         throw new errors.InvalidRequest('Columns in Google Sheets cannot be deleted')
+    }
+
+    async drop(collectionName) {
+        const sheet = await sheetFor(collectionName, this.doc)
+        await sheet.delete()
     }
 
     translateDbTypes(row) {
