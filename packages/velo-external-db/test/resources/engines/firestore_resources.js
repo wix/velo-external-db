@@ -1,4 +1,4 @@
-const { init } = require('external-db-firestore')
+const { init, schemaSupportedOperations } = require('external-db-firestore')
 const { runImage, stopImage } = require('./docker_support')
 
 const setEmulatorOn = () => process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8082'
@@ -37,4 +37,4 @@ const shutdownEnv = async() => {
     await stopImage('firestore')
 }
 
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaSupportedOperations }

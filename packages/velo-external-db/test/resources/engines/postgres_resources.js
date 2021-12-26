@@ -1,4 +1,4 @@
-const { init } = require('external-db-postgres')
+const { init, schemaSupportedOperations } = require('external-db-postgres')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = () => {
@@ -30,4 +30,4 @@ const shutdownEnv = async() => {
     await stopImage('postgres')
 }
 
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaSupportedOperations }

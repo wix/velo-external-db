@@ -1,4 +1,4 @@
-const { init } = require('external-db-mysql')
+const { init, schemaSupportedOperations } = require('external-db-mysql')
 const { runImage, stopImage } = require('./docker_support')
 const { waitUntil } = require('async-wait-until')
 
@@ -34,4 +34,4 @@ const setActive = () => {
 
 
 
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaSupportedOperations }

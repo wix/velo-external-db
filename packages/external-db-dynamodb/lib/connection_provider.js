@@ -1,4 +1,4 @@
-const SchemaProvider = require('./dynamo_schema_provider')
+const { SchemaProvider } = require('./dynamo_schema_provider')
 const DataProvider  = require('./dynamo_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./dynamo_operations')

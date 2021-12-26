@@ -59,17 +59,18 @@ const airtableTestEnvInit = async() => await dbInit(airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 
+
 const testSuits = () => [
-    ['MySql', mysqlTestEnvInit],
-    ['Postgres', postgresTestEnvInit],
-    ['Spanner', spannerTestEnvInit],
-    ['Firestore', firestoreTestEnvInit],
-    ['Sql Server', mssqlTestEnvInit],
-    ['Mongo', mongoTestEnvInit],
-    ['Google-sheet', googleSheetTestEnvInit],
-    ['Airtable', airtableTestEnvInit],
-    ['DynamoDb', dynamoTestEnvInit],
-    ['BigQuery', bigqueryTestEnvInit]
+    ['MySql', mysqlTestEnvInit, mysql.schemaSupportedOperations],
+    ['Postgres', postgresTestEnvInit, postgres.schemaSupportedOperations],
+    ['Spanner', spannerTestEnvInit, spanner.schemaSupportedOperations],
+    ['Firestore', firestoreTestEnvInit, firestore.schemaSupportedOperations],
+    ['Sql Server', mssqlTestEnvInit, mssql.schemaSupportedOperations],
+    ['Mongo', mongoTestEnvInit, mongo.schemaSupportedOperations],
+    ['Google-sheet', googleSheetTestEnvInit, googleSheet.schemaSupportedOperations],
+    ['Airtable', airtableTestEnvInit, airtable.schemaSupportedOperations],
+    ['DynamoDb', dynamoTestEnvInit, dynamo.schemaSupportedOperations],
+    ['BigQuery', bigqueryTestEnvInit, bigquery.schemaSupportedOperations]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 

@@ -2,7 +2,10 @@ const { promisify } = require('util')
 const { translateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeId, escapeTable } = require('./mysql_utils')
-const { SystemFields, validateSystemFields, parseTableData } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData, SchemaOperations } = require('velo-external-db-commons')
+
+const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
+const schemaSupportedOperations =  [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
 
 class SchemaProvider {
     constructor(pool) {
@@ -31,7 +34,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return ['todo']
+        return schemaSupportedOperations
     }
 
     async create(collectionName, columns) {
@@ -74,4 +77,4 @@ class SchemaProvider {
     }
 }
 
-module.exports = SchemaProvider
+module.exports = { SchemaProvider, schemaSupportedOperations }

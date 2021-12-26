@@ -68,7 +68,7 @@
             { "before": true, "after": true }
         ],
         "jest/no-standalone-expect": [
-            "error",
+            "off",
             { "additionalTestBlockFunctions": ["each.test"] }
         ],
         "jest/no-conditional-expect": [

@@ -1,4 +1,4 @@
-const { init, mockServer } = require('external-db-airtable')
+const { init, mockServer, schemaSupportedOperations } = require('external-db-airtable')
 
 let _server
 const PORT = 9000
@@ -44,4 +44,4 @@ const schemaProviderTestVariables = () => (
 
 const connectionConfig = () => ({ apiPrivateKey: 'key123', baseId: 'app123', metaApiKey: 'meta123',  baseUrl: `http://localhost:${PORT}` })
 
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaProviderTestVariables }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaProviderTestVariables, schemaSupportedOperations }
