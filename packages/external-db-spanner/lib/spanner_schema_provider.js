@@ -1,8 +1,11 @@
-const { SystemFields, validateSystemFields, parseTableData } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData, SchemaOperations } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
 const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, escapeFieldId } = require('./spanner_utils')
+
+const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
+const schemaSupportedOperations =  [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
 
 class SchemaProvider {
     constructor(database) {
@@ -46,7 +49,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return ['todo']
+        return schemaSupportedOperations
     }
 
     async create(collectionName, columns) {
@@ -124,4 +127,4 @@ class SchemaProvider {
 }
 
 
-module.exports = SchemaProvider
+module.exports = { SchemaProvider, schemaSupportedOperations }
