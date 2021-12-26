@@ -5,7 +5,7 @@ const Chance = require('chance')
 const chance = Chance()
 const each = require('jest-each').default
 const { AdapterFunctions } = require('velo-external-db-commons')
-const driver = require ('./tests/drivers/filter_transformer_test_support')
+const driver = require ('../../test/drivers/filter_transformer_test_support')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 
 describe('Aggregation Transformer', () => {
