@@ -69,7 +69,7 @@ const testSuits = () => [
     ['Spanner', spannerTestEnvInit, spanner.schemaSupportedOperations],
     ['Firestore', firestoreTestEnvInit, firestore.schemaSupportedOperations],
     ['Sql Server', mssqlTestEnvInit, allSchemaOperations],
-    ['Mongo', mongoTestEnvInit, allSchemaOperations],
+    ['Mongo', mongoTestEnvInit, mongo.schemaSupportedOperations],
     ['Google-sheet', googleSheetTestEnvInit, googleSheet.schemaSupportedOperations],
     ['Airtable', airtableTestEnvInit, airtable.schemaSupportedOperations],
     ['DynamoDb', dynamoTestEnvInit, dynamo.schemaSupportedOperations],

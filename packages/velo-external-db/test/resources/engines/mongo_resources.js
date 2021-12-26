@@ -1,4 +1,4 @@
-const { init } = require('external-db-mongo')
+const { init, schemaSupportedOperations } = require('external-db-mongo')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = async() => {
@@ -31,4 +31,4 @@ const setActive = () => {
 
 
 
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaSupportedOperations }
