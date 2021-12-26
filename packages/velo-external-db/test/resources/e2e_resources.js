@@ -64,7 +64,7 @@ const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_CO
 const allSchemaOperations = [ LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION ]
 
 const testSuits = () => [
-    ['MySql', mysqlTestEnvInit, allSchemaOperations],
+    ['MySql', mysqlTestEnvInit, mysql.schemaSupportedOperations],
     ['Postgres', postgresTestEnvInit, postgres.schemaSupportedOperations],
     ['Spanner', spannerTestEnvInit, allSchemaOperations],
     ['Firestore', firestoreTestEnvInit, firestore.schemaSupportedOperations],
