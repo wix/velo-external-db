@@ -72,7 +72,7 @@ const testSuits = () => [
     ['Mongo', mongoTestEnvInit, allSchemaOperations],
     ['Google-sheet', googleSheetTestEnvInit, googleSheet.schemaSupportedOperations],
     ['Airtable', airtableTestEnvInit, airtable.schemaSupportedOperations],
-    ['DynamoDb', dynamoTestEnvInit, allSchemaOperations],
+    ['DynamoDb', dynamoTestEnvInit, dynamo.schemaSupportedOperations],
     ['BigQuery', bigqueryTestEnvInit, bigquery.schemaSupportedOperations]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
