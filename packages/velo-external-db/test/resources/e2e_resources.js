@@ -59,17 +59,21 @@ const airtableTestEnvInit = async() => await dbInit(airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 
+// the next 2 lines will be removed after each implementation will have supported schemaOperations array
+const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = require('velo-external-db-commons').SchemaOperations
+const allSchemaOperations = [ LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION ]
+
 const testSuits = () => [
-    ['MySql', mysqlTestEnvInit],
-    ['Postgres', postgresTestEnvInit],
-    ['Spanner', spannerTestEnvInit],
-    ['Firestore', firestoreTestEnvInit],
-    ['Sql Server', mssqlTestEnvInit],
-    ['Mongo', mongoTestEnvInit],
-    ['Google-sheet', googleSheetTestEnvInit],
-    ['Airtable', airtableTestEnvInit],
-    ['DynamoDb', dynamoTestEnvInit],
-    ['BigQuery', bigqueryTestEnvInit]
+    ['MySql', mysqlTestEnvInit, allSchemaOperations],
+    ['Postgres', postgresTestEnvInit, postgres.schemaSupportedOperations],
+    ['Spanner', spannerTestEnvInit, allSchemaOperations],
+    ['Firestore', firestoreTestEnvInit, allSchemaOperations],
+    ['Sql Server', mssqlTestEnvInit, allSchemaOperations],
+    ['Mongo', mongoTestEnvInit, allSchemaOperations],
+    ['Google-sheet', googleSheetTestEnvInit, googleSheet.schemaSupportedOperations],
+    ['Airtable', airtableTestEnvInit, airtable.schemaSupportedOperations],
+    ['DynamoDb', dynamoTestEnvInit, allSchemaOperations],
+    ['BigQuery', bigqueryTestEnvInit, allSchemaOperations]
 ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
 
