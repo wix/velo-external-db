@@ -45,7 +45,7 @@ const givenFilterByIdWith = (id, filter) => {
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
     const c = numericColumns.map(c => c.name)
-    when(filterParser.parseAggregation).calledWith(having, filter)
+    when(filterParser.parseAggregation).calledWith({ postFilteringStep: filter, processingStep: having })
                                        .mockReturnValue({
                                            fieldsStatement: `${groupByColumns.map( patchFieldName ).map( escapeId )}, MAX(${escapeFieldId(c[0])}) AS ${escapeId(columnAliases[0])}, SUM(${escapeId(c[1])}) AS ${escapeId(columnAliases[1])}`,
                                            groupByColumns: groupByColumns.map( patchFieldName ),
