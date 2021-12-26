@@ -197,7 +197,7 @@ describe('Sql Parser', () => {
                     }])
                 })
 
-                test('correctly transform operator [$urlized]', () => {
+                test('correctly transform operator [urlized]', () => {
                     const filter = {
                         operator: urlized,
                         fieldName: ctx.fieldName,

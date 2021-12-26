@@ -19,7 +19,7 @@ const load = async() => {
     const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey } = await init(adapterType, vendor, configReader)
     const operationService = new OperationService(databaseOperations)
     const schemaInformation = new CacheableSchemaInformation(schemaProvider)
-    const supportAdapterFormat = ['mysql', 'mongo'].includes(adapterType)
+    const supportAdapterFormat = ['mysql', 'mongo', 'postgres'].includes(adapterType)
     const dataService = new DataService(dataProvider, schemaInformation, supportAdapterFormat)
     const schemaService = new SchemaService(schemaProvider, schemaInformation)
     initServices(dataService, schemaService, operationService, configReader, { vendor, type: adapterType })

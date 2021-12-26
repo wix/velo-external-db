@@ -36,7 +36,7 @@ const givenFilterByIdWith = (id, filter) => {
 }
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter, offest) => {
-    when(filterParser.parseAggregation).calledWith(having, filter, offest)
+    when(filterParser.parseAggregation).calledWith({ postFilteringStep: filter, processingStep: having }, offest)
                                        .mockReturnValue({
                                            fieldsStatement: `${groupByColumns.map( escapeIdentifier ).join(', ')}, MAX(${escapeIdentifier(numericColumns[0].name)}) AS ${escapeIdentifier(columnAliases[0])}, SUM(${escapeIdentifier(numericColumns[1].name)}) AS ${escapeIdentifier(columnAliases[1])}`,
                                            groupByColumns: groupByColumns,

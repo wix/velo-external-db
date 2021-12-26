@@ -1,6 +1,8 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject, extractFilterObjects, patchAggregationObject, isEmptyFilter } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames } = require('velo-external-db-commons')
 const { escapeIdentifier } = require('./postgres_utils')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
+const { avg, max, min, sum, count } = AdapterFunctions
 
 class FilterParser {
     constructor() {
@@ -21,53 +23,34 @@ class FilterParser {
         }
     }
 
-    wixDataFunction2Sql(f) {
+    adapterFunction2Sql(f) {
         switch (f) {
-            case '$avg':
+            case avg:
                 return 'AVG'
-            case '$max':
+            case max:
                 return 'MAX'
-            case '$min':
+            case min:
                 return 'MIN'
-            case '$sum':
+            case sum:
                 return 'SUM'
-            case '$count':
+            case count:
                 return 'COUNT'
             default:
                 throw new InvalidQuery(`Unrecognized function ${f}`)
         }
     }
 
-    parseAggregation(aggregation, postFilter, offset) {
-        const _aggregation = patchAggregationObject(aggregation)
-        const groupByColumns = []
-        const filterColumnsStr = []
-        if (isObject(aggregation._id)) {
-            filterColumnsStr.push(...Object.values(_aggregation._id).map( escapeIdentifier ))
-            groupByColumns.push(...Object.values(_aggregation._id))
-        } else {
-            filterColumnsStr.push(escapeIdentifier(_aggregation._id))
-            groupByColumns.push(_aggregation._id)
-        }
+    parseAggregation(aggregation, offset) {
 
-        const aliasToFunction = {}
-        Object.keys(_aggregation)
-              .filter(f => f !== '_id')
-              .forEach(fieldAlias => {
-                  Object.entries(_aggregation[fieldAlias])
-                        .forEach(([func, field]) => {
-                            filterColumnsStr.push(`${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)}) AS ${escapeIdentifier(fieldAlias)}`)
-                            aliasToFunction[fieldAlias] = `${this.wixDataFunction2Sql(func)}(${escapeIdentifier(field)})`
-                        })
-              })
+        const groupByColumns = extractGroupByNames(aggregation.projection)
+        
+        const projectionFunctions = extractProjectionFunctionsObjects(aggregation.projection)
 
-        const havingFilter = this.parseFilter(postFilter, offset, aliasToFunction)
+        const { filterColumnsStr, aliasToFunction }  = this.createFieldsStatementAndAliases(projectionFunctions, groupByColumns)
 
-        const { filterExpr, parameters } =
-            havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                              parameters: parameters }))
-                        .concat(EMPTY_FILTER)[0]
+        const havingFilter = this.parseFilter(aggregation.postFilter, offset, aliasToFunction)
 
+        const { filterExpr, parameters } = this.extractFilterExprAndParams(havingFilter, offset, aliasToFunction)
 
         return {
             fieldsStatement: filterColumnsStr.join(', '),
@@ -77,17 +60,35 @@ class FilterParser {
         }
     }
 
+    createFieldsStatementAndAliases(projectionFunctions, groupByColumns) {
+        const filterColumnsStr = []
+        const aliasToFunction = {}
+        groupByColumns.forEach(f => filterColumnsStr.push(escapeIdentifier(f)))
+        projectionFunctions.forEach(f => { 
+            filterColumnsStr.push(`${this.adapterFunction2Sql(f.function)}(${escapeIdentifier(f.name)}) AS ${escapeIdentifier(f.alias)}`)
+            aliasToFunction[f.alias] = `${this.adapterFunction2Sql(f.function)}(${escapeIdentifier(f.name)})`
+        })
+
+        return { filterColumnsStr, aliasToFunction }
+    }
+
+    extractFilterExprAndParams(havingFilter) {
+        return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+                                                                     parameters: parameters }))
+                           .concat(EMPTY_FILTER)[0]
+    }
+
     parseFilter(filter, offset, inlineFields) {
 
-        if (isEmptyFilter(filter)) {
+        if (!filter || !filter.operator) {
             return []
         }
         
-        const { operator, fieldName, value } = extractFilterObjects(filter)
+        const { operator, fieldName, value } = filter
         
         switch (operator) {
-            case '$and':
-            case '$or':
+            case and:
+            case or:
                 const res = value.reduce((o, f) => {
                     const res = this.parseFilter.bind(this)(f, o.offset, inlineFields)
                     return {
@@ -96,14 +97,14 @@ class FilterParser {
                     }
                 }, { filter: [], offset: offset })
 
-                const op = operator === '$and' ? ' AND ' : ' OR '
+                const op = operator === and ? ' AND ' : ' OR '
                 return [{
                     filterExpr: res.filter.map(r => r.filterExpr).join( op ),
                     filterColumns: [],
                     offset: res.offset,
                     parameters: res.filter.map( s => s.parameters ).flat()
                 }]
-            case '$not':
+            case not:
                 const res2 = this.parseFilter( value[0], offset, inlineFields )
                 return [{
                     filterExpr: `NOT (${res2[0].filterExpr})`,
@@ -117,7 +118,7 @@ class FilterParser {
             const params = this.valueForOperator(value, operator, offset)
 
             return [{
-                filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} ${this.veloOperatorToMySqlOperator(operator, value)} ${params.sql}`.trim(),
+                filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} ${this.adapterOperatorToMySqlOperator(operator, value)} ${params.sql}`.trim(),
                 filterColumns: [],
                 offset: params.offset,
                 parameters: value !== undefined ? [].concat( this.patchTrueFalseValue(value) ) : []
@@ -134,7 +135,7 @@ class FilterParser {
             }]
         }
 
-        if (operator === '$urlized') {
+        if (operator === urlized) {
             return [{
                 filterExpr: `LOWER(${escapeIdentifier(fieldName)}) RLIKE $${offset}`,
                 filterColumns: [],
@@ -148,21 +149,21 @@ class FilterParser {
 
     valueForStringOperator(operator, value) {
         switch (operator) {
-            case '$contains':
+            case string_contains:
                 return `%${value}%`
-            case '$startsWith':
+            case string_begins:
                 return `${value}%`
-            case '$endsWith':
+            case string_ends:
                 return `%${value}`
         }
     }
 
     isSingleFieldOperator(operator) {
-        return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq'].includes(operator)
+        return [ne, lt, lte, gt, gte, include, eq].includes(operator)
     }
 
     isSingleFieldStringOperator(operator) {
-        return ['$contains', '$startsWith', '$endsWith'].includes(operator)
+        return [string_contains, string_begins, string_ends].includes(operator)
     }
 
     prepareStatementVariables(n, offset) {
@@ -172,7 +173,7 @@ class FilterParser {
 
 
     valueForOperator(value, operator, offset) {
-        if (operator === '$hasSome') {
+        if (operator === include) {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
             }
@@ -180,7 +181,7 @@ class FilterParser {
                 sql: `(${this.prepareStatementVariables(value.length, offset)})`,
                 offset: offset + value.length
             }
-        } else if (operator === '$eq' && value === undefined) {
+        } else if (operator === eq && value === undefined) {
             return {
                 sql: '',
                 offset: offset
@@ -193,24 +194,24 @@ class FilterParser {
         }
     }
 
-    veloOperatorToMySqlOperator(operator, value) {
+    adapterOperatorToMySqlOperator(operator, value) {
         switch (operator) {
-            case '$eq':
+            case eq:
                 if (value !== undefined) {
                     return '='
                 }
                 return 'IS NULL'
-            case '$ne':
+            case ne:
                 return '<>'
-            case '$lt':
+            case lt:
                 return '<'
-            case '$lte':
+            case lte:
                 return '<='
-            case '$gt':
+            case gt:
                 return '>'
-            case '$gte':
+            case gte:
                 return '>='
-            case '$hasSome':
+            case include:
                 return 'IN'
         }
     }
