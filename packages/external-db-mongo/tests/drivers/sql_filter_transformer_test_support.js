@@ -38,7 +38,7 @@ const givenFilterByIdWith = (id, filter) => {
 
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
     const c = numericColumns.map(c => c.name)
-    when(filterParser.parseAggregation).calledWith(having, filter)
+    when(filterParser.parseAggregation).calledWith({ postFilteringStep: filter, processingStep: having })
                                        .mockReturnValue({
                                         fieldsStatement: {
                                             $group: {

@@ -1,6 +1,8 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_SORT, isObject, extractFilterObjects, patchAggregationObject, isEmptyFilter } = require('velo-external-db-commons')
+const { EMPTY_SORT, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require('./mongo_utils')
+const { string_begins, string_ends, string_contains, urlized } = AdapterOperators
+const { count } = AdapterFunctions
 
 class FilterParser {
     constructor() {
@@ -16,46 +18,43 @@ class FilterParser {
         }
     }
 
-    parseAggregation(aggregation, postFilter) {
-        const _aggregation = patchAggregationObject(aggregation)
-        const havingFilter = this.parseFilter(postFilter)
-        const fieldsStatement = { }
+    parseAggregation(aggregation) {
         
-        if (isObject(_aggregation._id)) {
-           const _id = Object.keys(_aggregation._id)
-                             .reduce((r, c) => ( { ...r, [_aggregation._id[c]]: `$${_aggregation._id[c]}` } ), {})
-           Object.assign(fieldsStatement, { _id })
-        } else {
-            const _id = { [_aggregation._id]: `$${_aggregation._id}` }
-            Object.assign(fieldsStatement, { _id })
-        }
+        const groupByFields = extractGroupByNames(aggregation.projection)
 
-        Object.keys(_aggregation)
-              .filter(f => f !== '_id')
-              .forEach(fieldAlias => {
-                  Object.entries(_aggregation[fieldAlias])
-                        .forEach(([func, field]) => {
-                            if (func === '$count') {
-                                Object.assign(fieldsStatement, { count: { $sum: 1 } })
-                            } else {
-                                Object.assign(fieldsStatement, { [fieldAlias]: { [func]: `$${field}` } })
-                            }
-                        })
-              })
+        const projectionFunctions = extractProjectionFunctionsObjects(aggregation.projection)
 
-        const filterObj = havingFilter.reduce((r, c) => ( { ...r, ...c } ), {})
+        const fieldsStatement = this.createFieldsStatement(projectionFunctions, groupByFields)
+        
+        const postFilter = this.parseFilter(aggregation.postFilter)[0]?.filterExpr
+
         return {
             fieldsStatement: { $group: fieldsStatement },
-            havingFilter: { $match: filterObj.filterExpr || {} },
+            havingFilter: { $match: postFilter || {} },
         }
     }
 
+    createFieldsStatement(projectionFunctions, groupByFields) {
+        const fieldsStatement = projectionFunctions.reduce((pV, cV) => ({ ...pV, ...{ [cV.alias]: this.parseFuncObject(cV.function, cV.name) } }), {})
+        fieldsStatement._id = groupByFields.reduce((pV, cV) => ({ ...pV, ...{ [cV]: `$${cV}` } }), {})
+        return fieldsStatement
+    }
+
+    parseFuncObject(func, fieldName) {
+        if (func === count) return { $sum: 1 }
+        return { [this.adapterFunctionToMongo(func)]: `$${fieldName}` }
+    }
+    
+    adapterFunctionToMongo(func) {
+        return `$${func}`
+    }
+
     parseFilter(filter) {
-        if (isEmptyFilter(filter)) {
+        if (!filter || !filter.operator) {
             return []
         }
-        const { operator, fieldName, value } = extractFilterObjects(filter)
-        const mongoOp = this.veloOperatorToMongoOperator(operator)
+        const { operator, fieldName, value } = filter
+        const mongoOp = this.adapterOperatorToMongoOperator(operator)
 
         if (this.isMultipleFieldOperator(mongoOp)) {
             const res = value.map( this.parseFilter.bind(this) )
@@ -67,11 +66,11 @@ class FilterParser {
             return [{ filterExpr: { [mongoOp]: res[0].filterExpr } }]
         }
 
-        if (this.isSingleFieldStringOperator(mongoOp)) {
-            return [{ filterExpr: { [fieldName]: { $regex: this.valueForStringOperator(mongoOp, value) } } }]
+        if (this.isSingleFieldStringOperator(operator)) {
+            return [{ filterExpr: { [fieldName]: { $regex: this.valueForStringOperator(operator, value) } } }]
         }
 
-        if (mongoOp === '$urlized') {
+        if (operator === urlized) {
             return [{
                 filterExpr: { [fieldName]: { $regex: `/${value.map(s => s.toLowerCase()).join('.*')}/i` } }
             }]
@@ -86,17 +85,17 @@ class FilterParser {
 
     valueForStringOperator(operator, value) {
         switch (operator) {
-            case '$contains':
+            case string_contains:
                 return value
-            case '$startsWith':
+            case string_begins:
                 return `^${value}`
-            case '$endsWith':
+            case string_ends:
                 return `${value}$`
         }
     }
 
     isSingleFieldStringOperator(operator) {
-        return ['$contains', '$startsWith', '$endsWith'].includes(operator)
+        return [string_contains, string_begins, string_ends].includes(operator)
     }
 
     valueForOperator(value, operator) {
@@ -113,12 +112,12 @@ class FilterParser {
         return value
     }
 
-    veloOperatorToMongoOperator(operator) {
+    adapterOperatorToMongoOperator(operator) {
         switch (operator) {
             case '$hasSome':
                 return '$in'
             default:
-                return operator
+                return `$${operator}`
         }
     }
 
