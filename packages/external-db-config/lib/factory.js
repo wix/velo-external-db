@@ -50,7 +50,7 @@ const create = () => {
       }
       break
 
-    case 'azr':
+    case 'azure':
       switch (type) {
         case 'spanner':
           internalConfigReader = new gcp.GcpSpannerConfigReader()

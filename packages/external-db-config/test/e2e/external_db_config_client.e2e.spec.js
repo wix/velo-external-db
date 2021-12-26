@@ -4,7 +4,7 @@ const each = require('jest-each').default
 
 each(
 [
-       ['AZR', ['mysql', 'postgres']],
+       ['AZURE', ['mysql', 'postgres']],
        ['AWS', ['mysql', 'postgres']],
        ['GCP', ['mysql', 'postgres', 'spanner', 'firestore']]
       ]

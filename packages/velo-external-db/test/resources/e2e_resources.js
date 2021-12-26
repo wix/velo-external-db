@@ -21,7 +21,7 @@ const env = {
 }
 
 const initApp = async() => {
-    process.env.CLOUD_VENDOR = 'azr'
+    process.env.CLOUD_VENDOR = 'azure'
 
     if (env.app) {
         await env.app.reload()
