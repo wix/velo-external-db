@@ -33,7 +33,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return ['todo']
+        return schemaSupportedOperations
     }
 
     async create(collectionName) {
