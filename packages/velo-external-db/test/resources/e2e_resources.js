@@ -59,16 +59,13 @@ const airtableTestEnvInit = async() => await dbInit(airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 
-// the next 2 lines will be removed after each implementation will have supported schemaOperations array
-const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = require('velo-external-db-commons').SchemaOperations
-const allSchemaOperations = [ LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION ]
 
 const testSuits = () => [
     ['MySql', mysqlTestEnvInit, mysql.schemaSupportedOperations],
     ['Postgres', postgresTestEnvInit, postgres.schemaSupportedOperations],
     ['Spanner', spannerTestEnvInit, spanner.schemaSupportedOperations],
     ['Firestore', firestoreTestEnvInit, firestore.schemaSupportedOperations],
-    ['Sql Server', mssqlTestEnvInit, allSchemaOperations],
+    ['Sql Server', mssqlTestEnvInit, mssql.schemaSupportedOperations],
     ['Mongo', mongoTestEnvInit, mongo.schemaSupportedOperations],
     ['Google-sheet', googleSheetTestEnvInit, googleSheet.schemaSupportedOperations],
     ['Airtable', airtableTestEnvInit, airtable.schemaSupportedOperations],
