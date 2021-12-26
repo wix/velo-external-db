@@ -67,7 +67,7 @@ const testSuits = () => [
     ['MySql', mysqlTestEnvInit, allSchemaOperations],
     ['Postgres', postgresTestEnvInit, postgres.schemaSupportedOperations],
     ['Spanner', spannerTestEnvInit, allSchemaOperations],
-    ['Firestore', firestoreTestEnvInit, allSchemaOperations],
+    ['Firestore', firestoreTestEnvInit, firestore.schemaSupportedOperations],
     ['Sql Server', mssqlTestEnvInit, allSchemaOperations],
     ['Mongo', mongoTestEnvInit, allSchemaOperations],
     ['Google-sheet', googleSheetTestEnvInit, googleSheet.schemaSupportedOperations],
