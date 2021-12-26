@@ -1,6 +1,8 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { extractFilterObjects, isEmptyFilter } = require('velo-external-db-commons')
+const { isEmptyFilter } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require('./dynamo_utils')
+const { AdapterOperators } = require('velo-external-db-commons')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
 
 class FilterParser {
     constructor() {
@@ -28,13 +30,13 @@ class FilterParser {
             return []
         }
 
-        const { operator, fieldName, value } =  extractFilterObjects(filter)
+        const { operator, fieldName, value } =  filter
         
         switch (operator) {
-            case '$and':
-            case '$or':
+            case and:
+            case or:
                 const res = value.map( this.parseFilter.bind(this) )
-                const op = operator === '$and' ? ' AND ' : ' OR '
+                const op = operator === and ? ' AND ' : ' OR '
                 return [{
                     filterExpr: {
                         FilterExpression: res.map(r => r[0].filterExpr.FilterExpression).join( op ),
@@ -42,7 +44,7 @@ class FilterParser {
                         ExpressionAttributeValues: Object.assign({}, ...res.map(r => r[0].filterExpr.ExpressionAttributeValues) )
                     }
                 }]
-            case '$not':
+            case not:
                 const res2 = this.parseFilter( value[0] )
                 return [{
                     filterExpr: {
@@ -56,7 +58,7 @@ class FilterParser {
         if (this.isSingleFieldOperator(operator)) {
             return [{
                 filterExpr: {
-                    FilterExpression: `#${fieldName} ${this.veloOperatorToDynamoOperator(operator)} :${fieldName}`,
+                    FilterExpression: `#${fieldName} ${this.adapterOperatorToDynamoOperator(operator)} :${fieldName}`,
                     ExpressionAttributeNames: {
                         [`#${fieldName}`]: fieldName
                     },
@@ -70,7 +72,7 @@ class FilterParser {
         if (this.isSingleFieldStringOperator(operator)) {
             return [{
                 filterExpr: {
-                    FilterExpression: `${this.veloOperatorToDynamoOperator(operator)} (#${fieldName}, :${fieldName})`,
+                    FilterExpression: `${this.adapterOperatorToDynamoOperator(operator)} (#${fieldName}, :${fieldName})`,
                     ExpressionAttributeNames: {
                         [`#${fieldName}`]: fieldName
                     },
@@ -82,9 +84,9 @@ class FilterParser {
         }
 
 
-        if (operator === '$hasSome') {
+        if (operator === include) {
             
-            if (operator === '$hasSome' && (value === undefined || value.length === 0))
+            if (value === undefined || value.length === 0)
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
 
             const filterExpressionVariables = { ...value }
@@ -107,45 +109,45 @@ class FilterParser {
     }
 
     isSingleFieldOperator(operator) {
-        return ['$ne', '$lt', '$lte', '$gt', '$gte', '$eq'].includes(operator)
+        return [ne, lt, lte, gt, gte, eq].includes(operator)
     }
 
     isSingleFieldStringOperator(operator) {
-        return ['$contains', '$startsWith', '$endsWith'].includes(operator)
+        return [ string_contains, string_begins, string_ends].includes(operator)
     }
 
     valueForOperator(value, operator) {
-        if (operator === '$hasSome' && (value === undefined || value.length === 0)) {
+        if (operator === include && (value === undefined || value.length === 0)) {
             throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
         }
-        if (operator === '$eq' && value === undefined) {
+        if (operator === eq && value === undefined) {
             return null
         }
 
         return value
     }
 
-    veloOperatorToDynamoOperator(operator) {
+    adapterOperatorToDynamoOperator(operator) {
         switch (operator) {
-            case '$eq':
+            case eq:
                 return '='
-            case '$ne':
+            case ne:
                 return '<>'
-            case '$lt':
+            case lt:
                 return '<'
-            case '$lte':
+            case lte:
                 return '<='
-            case '$gt':
+            case gt:
                 return '>'
-            case '$gte':
+            case gte:
                 return '>='
-            case '$hasSome':
+            case include:
                 return 'IN'
-            case '$contains':
+            case string_contains:
                 return 'contains'
-            case '$startsWith':
+            case string_begins:
                 return 'begins_with'
-            case '$endsWith':
+            case string_ends:
                 //not exists maybe use contains and then locally
                 break
 

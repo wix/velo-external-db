@@ -144,10 +144,12 @@ const randomWrappedFilter = () => {
 }
 
 const idFilter = () => {
-    const op = randomOperator()
-    const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
+    const operator = randomAdapterOperator()
+    const value = operator === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
-        _id: { [op]: value }
+        fieldName: '_id',
+        operator,
+        value
     }
 }
 
