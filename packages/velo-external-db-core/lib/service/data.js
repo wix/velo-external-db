@@ -3,11 +3,11 @@ const FilterTransformer = require ('../converters/filter_transformer')
 const AggregationTransformer = require ('../converters/aggregation_transformer')
 
 class DataService {
-    constructor(storage, schemaInformation) {
+    constructor(storage, schemaInformation, filterTransformer, aggregationTransformer) {
         this.storage = storage
         this.schemaInformation = schemaInformation
-        this.filterTransformer = new FilterTransformer() 
-        this.aggregationTransformer = new AggregationTransformer(this.filterTransformer)
+        this.filterTransformer = filterTransformer || new FilterTransformer() 
+        this.aggregationTransformer = aggregationTransformer || new AggregationTransformer(this.filterTransformer)
     }
 
     async find(collectionName, _filter, sort, skip, limit) {
