@@ -98,7 +98,7 @@ if ! [ "$(command -v docker)" ]; then
 	exit 1
 fi
 
-download_cmd='curl -fsSLO'
+download_cmd='curl -fsSLo'
 # Check that system has curl installed
 if ! [ "$(command -v curl)" ]; then
 	echo "Error: curl not found"
@@ -175,6 +175,7 @@ echo "Downloading CLI..."
 
 # Download CLI to temporary directory
 download_dir=$($sh_c 'mktemp -d')
+echo "${download_cmd} ${download_dir}/docker ${DOWNLOAD_URL}"
 $sh_c "${download_cmd} ${download_dir}/docker ${DOWNLOAD_URL}"
 
 echo "Downloaded CLI!"

@@ -65,10 +65,6 @@ jobs:
       - name: Downloading Docker Compose V2
         if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
-          cd .github/workflows
-          ls -a 
-          chmod +x install_docker_compose_linux.sh
-          install_docker_compose_linux.sh
           docker compose version
         shell: bash
 
