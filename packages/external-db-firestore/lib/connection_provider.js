@@ -1,4 +1,4 @@
-const { SchemaProvider } = require('./firestore_schema_provider')
+const SchemaProvider = require('./firestore_schema_provider')
 const DataProvider  = require('./firestore_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./firestore_operations')
