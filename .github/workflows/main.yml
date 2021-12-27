@@ -65,9 +65,12 @@ jobs:
       - name: Downloading Docker Compose V2
         if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
-          chmod +x ./.github/install_docker_compose_linux.sh
-          ./.github/install_docker_compose_linux.sh
+          cd .github/workflows
+          ls -a 
+          chmod +x install_docker_compose_linux.sh
+          install_docker_compose_linux.sh
           docker compose version
+        shell: bash
 
       - name: Downloading Image
         if: ${{ ( matrix.database != 'google-sheets') }}
