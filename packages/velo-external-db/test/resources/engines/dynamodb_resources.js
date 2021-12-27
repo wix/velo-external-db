@@ -1,4 +1,4 @@
-const { init, schemaSupportedOperations } = require('external-db-dynamodb')
+const init = require('external-db-dynamodb')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = async() => {
@@ -37,4 +37,4 @@ const accessOptions = () => ({
                                 credentials: { accessKeyId: 'TEST_ACCESS_KEY_ID', secretAccessKey: 'TEST_SECRET_ACCESS_KEY' }
                             })
 
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaSupportedOperations }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }
