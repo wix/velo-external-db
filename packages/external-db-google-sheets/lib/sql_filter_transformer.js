@@ -1,6 +1,6 @@
 
 
-const { extractFilterObjects, isEmptyFilter } = require('velo-external-db-commons')
+const { isEmptyFilter } = require('velo-external-db-commons')
 
 
 class FilterParser {
@@ -25,7 +25,7 @@ class FilterParser {
             return []
         }
 
-        const { operator, fieldName, value } = extractFilterObjects(filter)
+        const { operator, fieldName, value } = filter
         
         if (this.isSingleFieldOperator(operator)) {
             return { filterExpr: operator, fieldName, parameter: value }
