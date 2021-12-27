@@ -1,4 +1,4 @@
-const { isEmptyFilter, AdapterOperators } = require('velo-external-db-commons')
+const { AdapterOperators, isObject } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require ('./utils')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 
@@ -8,7 +8,7 @@ class filterTransformer {
     }
 
     transform(filter) {
-        if (isEmptyFilter(filter)) return EMPTY_FILTER
+        if (this.isEmptyFilter(filter)) return EMPTY_FILTER
 
         if(this.isMultipleFieldOperator(filter)) {
             const wixOperator = Object.keys(filter)[0]
@@ -73,6 +73,11 @@ class filterTransformer {
                 throw new InvalidQuery(`Unrecognized operator ${operator}`)
         }
     }
+
+    isEmptyFilter(filter) {
+        return (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined)
+    } 
+    
 }
 
 module.exports = filterTransformer
