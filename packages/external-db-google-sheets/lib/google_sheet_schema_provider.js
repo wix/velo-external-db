@@ -30,7 +30,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return supportedSchemaOperationsFor('google-sheets')
+        return supportedSchemaOperationsFor('google-sheet')
     }
 
     async create(collectionName) {
