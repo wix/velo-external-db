@@ -61,13 +61,7 @@ jobs:
             node_modules
             */*/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
-
-      - name: Downloading Docker Compose V2
-        if: ${{ ( matrix.database != 'google-sheets') }}
-        run: |
-          curl -sfL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
-          docker compose version
-
+          
       - name: Downloading Image
         if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
