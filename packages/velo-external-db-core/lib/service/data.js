@@ -1,17 +1,17 @@
-const { asWixData, unpackDates, prepareForInsert, prepareForUpdate, transformIfSupported } = require('../converters/transform')
+const { asWixData, unpackDates, prepareForInsert, prepareForUpdate } = require('../converters/transform')
 const FilterTransformer = require ('../converters/filter_transformer')
 const AggregationTransformer = require ('../converters/aggregation_transformer')
 
 class DataService {
-    constructor(storage, schemaInformation, supportAdapterFormat) {
+    constructor(storage, schemaInformation) {
         this.storage = storage
         this.schemaInformation = schemaInformation
-        this.filterTransformer = supportAdapterFormat ? new FilterTransformer() : false
-        this.aggregationTransformer = supportAdapterFormat ? new AggregationTransformer(this.filterTransformer): false
+        this.filterTransformer = new FilterTransformer() 
+        this.aggregationTransformer = new AggregationTransformer(this.filterTransformer)
     }
 
     async find(collectionName, _filter, sort, skip, limit) {
-        const filter = transformIfSupported(_filter, this.filterTransformer)
+        const filter = this.filterTransformer.transform(_filter)
         const items = await this.storage.find(collectionName, filter, sort, skip, limit)
         return {
             items: items.map( asWixData ),
@@ -28,7 +28,7 @@ class DataService {
     }
 
     async count(collectionName, _filter) {
-        const filter = transformIfSupported(_filter, this.filterTransformer)
+        const filter = this.filterTransformer.transform(_filter)
         const c = await this.storage.count(collectionName, filter)
         return { totalCount: c }
     }
@@ -72,8 +72,8 @@ class DataService {
     }
 
     async aggregate(collectionName, _filter, _aggregation) {
-        const aggregation = transformIfSupported(_aggregation, this.aggregationTransformer)
-        const filter = transformIfSupported(_filter, this.filterTransformer)
+        const aggregation = this.aggregationTransformer.transform(_aggregation)
+        const filter = this.filterTransformer.transform(_filter)
         return {
             items: (await this.storage.aggregate(collectionName, filter, aggregation))
                                       .map( asWixData ),

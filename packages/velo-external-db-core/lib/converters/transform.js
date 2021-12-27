@@ -62,6 +62,4 @@ const isDate = d => {
 const packDates = item => Object.entries(item)
                                 .reduce((o, [k, v]) => ( { ...o, [k]: isDate(v) ? { $date: v.toISOString() } : v } ), { } )
 
-const transformIfSupported = (filter, transformer) => transformer? transformer.transform(filter) : filter
-
-module.exports = { asWixData, unpackDates, generateIdsIfNeeded, defaultValueFor, isDate, prepareForInsert, prepareForUpdate, transformIfSupported }
+module.exports = { asWixData, unpackDates, generateIdsIfNeeded, defaultValueFor, isDate, prepareForInsert, prepareForUpdate }
