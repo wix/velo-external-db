@@ -327,7 +327,7 @@ describe('Sql Parser', () => {
                     }
                     
                     expect(env.filterParser.parseAggregation(aggregation) ).toEqual({
-                        fieldsStatement: `${escapeId(ctx.fieldName)}, CAST(COUNT(*) AS FLOAT64) AS $${ctx.moreFieldName}`,
+                        fieldsStatement: `${escapeId(ctx.fieldName)}, CAST(COUNT(*) AS FLOAT64) AS ${ctx.moreFieldName}`,
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
                         parameters: [],
