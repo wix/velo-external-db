@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject, AdapterOperators } = require('velo-external-db-commons')
+const { isObject, AdapterOperators, isEmptyFilter } = require('velo-external-db-commons')
 const { EMPTY_SORT } = require ('./airtable_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 
@@ -19,7 +19,7 @@ class FilterParser {
 
 
     parseFilter(filter) {
-        if (!filter || !filter.operator) {
+        if (isEmptyFilter(filter)) {
             return []
         }
 

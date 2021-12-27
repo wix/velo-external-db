@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects  } = require('velo-external-db-commons')
+const { EMPTY_FILTER, EMPTY_SORT, isObject, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter  } = require('velo-external-db-commons')
 const { wildCardWith, escapeId } = require('./mysql_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -20,7 +20,7 @@ class FilterParser {
     }
 
     parseFilter(filter) {
-        if (!filter || !filter.operator ) {
+        if (isEmptyFilter(filter)) {
             return []
         }
 

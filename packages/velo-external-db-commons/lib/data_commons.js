@@ -35,60 +35,10 @@ const updateFieldsFor = item => {
     return Object.keys(item).filter(f => f !== '_id')
 }
 
-const extractFilterObjects = (filter) => {
-    if(isMultipleFieldOperator(filter)) {
-        const operator = Object.keys(filter)[0]
-        const value = filter[operator]
-        return {
-            operator,
-            value
-        }
-    }
-
-    const fieldName = Object.keys(filter)[0]
-    const operator = Object.keys(filter[fieldName])[0]
-    const value = filter[fieldName][operator]
-
-    return {
-        operator,
-        fieldName,
-        value
-    }
-}
-
-const patchAggregationObject = (aggregation) => {
-    const newAggregationObject = {}
-    if (isObject(aggregation._id)) {
-        Object.entries(aggregation._id)
-              .forEach(([alias, fieldName]) => { 
-                  newAggregationObject._id = { ...newAggregationObject._id, ... { [alias]: fieldName.substring(1) } }
-              })
-    } else {
-        newAggregationObject._id = aggregation._id.substring(1)
-    }
-
-    Object.keys(aggregation)
-          .filter(f => f !== '_id')
-          .forEach(fieldAlias => {
-              Object.entries(aggregation[fieldAlias])
-                    .forEach(([func, field]) => {
-                        if (fieldAlias === 'count') {
-                            newAggregationObject[fieldAlias] = { ...newAggregationObject[fieldAlias], ...{ $count: '*' } }
-                        } else {
-                            newAggregationObject[fieldAlias] = { ...newAggregationObject[fieldAlias], ...{ [func]: field.substring(1) } }
-                        }
-                    })
-        })
-    return newAggregationObject
-}
 
 const isEmptyFilter = (filter) => {
-    return (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined)
+    return (!filter || !filter.operator)
 } 
-
-const isMultipleFieldOperator = (filter) => { 
-    return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
-}
 
 const AdapterOperators = {
     eq: 'eq',
@@ -120,5 +70,5 @@ const extractGroupByNames = (projection) =>  projection.filter(f => !f.function)
 const extractProjectionFunctionsObjects = (projection) => projection.filter(f => f.function)
 
 module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor,
-                     extractFilterObjects, patchAggregationObject, isEmptyFilter, AdapterOperators, AdapterFunctions,
+                     isEmptyFilter, AdapterOperators, AdapterFunctions,
                      extractGroupByNames, extractProjectionFunctionsObjects }

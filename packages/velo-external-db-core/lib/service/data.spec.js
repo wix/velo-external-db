@@ -2,6 +2,8 @@ const DataService = require('./data')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/data_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
+const filterTransformer = require ('../../test/drivers/filter_transformer_test_support')
+const aggregationTransformer = require('../../test/drivers/aggregation_transformer_test_support')
 const Chance = require('chance')
 const chance = new Chance()
 
@@ -9,6 +11,7 @@ describe('Data Service', () => {
 
     test('delegate request to data provider and translate data to velo format', async() => {
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+        filterTransformer.stubIgnoreTransform(ctx.filter)
 
         const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
         expect( actual ).toEqual({ items: ctx.entities, totalCount: ctx.entities.length })
@@ -16,14 +19,17 @@ describe('Data Service', () => {
 
     test('count data from collection', async() => {
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
+        filterTransformer.stubIgnoreTransform(ctx.filter)
 
         const actual = await env.dataService.count(ctx.collectionName, ctx.filter)
         expect( actual ).toEqual({ totalCount: ctx.total })
     })
 
     test('get by id will issue a call to find and transform the result', async() => {
+        const idFilter = { _id: { $eq: ctx.itemId } } 
         driver.givenListResult([ctx.entity], ctx.collectionName,
-                        { _id: { $eq: ctx.itemId } }, '', 0, 1)
+                        idFilter, '', 0, 1)
+        filterTransformer.stubIgnoreTransform(idFilter)
 
         const actual = await env.dataService.getById(ctx.collectionName, ctx.itemId)
         expect( actual ).toEqual({ item: ctx.entity })
@@ -118,6 +124,8 @@ describe('Data Service', () => {
 
     test('aggregate api', async() => {
         driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
+        aggregationTransformer.stubIgnoreTransform(ctx.aggregation)
+        filterTransformer.stubIgnoreTransform(ctx.filter)
 
         const actual = await env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)
 
@@ -147,6 +155,8 @@ describe('Data Service', () => {
     beforeEach(() => {
         driver.reset()
         schema.reset()
+        filterTransformer.reset()
+        aggregationTransformer.reset()
 
         ctx.collectionName = gen.randomCollectionName()
         ctx.filter = chance.word()
@@ -166,6 +176,6 @@ describe('Data Service', () => {
         ctx.entityWithoutId = e
         ctx.entitiesWithoutId = gen.randomEntities().map(i => { delete i._id; return i })
 
-        env.dataService = new DataService(driver.dataProvider, schema.schemaInformation)
+        env.dataService = new DataService(driver.dataProvider, schema.schemaInformation, filterTransformer.filterTransformer, aggregationTransformer.aggregationTransformer)
     })
 })
