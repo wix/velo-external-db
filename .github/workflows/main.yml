@@ -64,9 +64,9 @@ jobs:
 
       - name: Downloading Docker Compose V2
         if: ${{ ( matrix.database != 'google-sheets') }}
-        run: |
-          curl -sfL https://raw.githubusercontent.com/docker/compose-cli/main/scripts/install/install_linux.sh | sh
-          docker compose version
+        uses: KengoTODA/actions-setup-docker-compose@main
+        with:
+          version: '2.2.2'
 
       - name: Downloading Image
         if: ${{ ( matrix.database != 'google-sheets') }}
