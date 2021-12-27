@@ -90,7 +90,7 @@ const SchemaOperations = Object.freeze({
 const supportedSchemaOperationsFor = (impl) => {
     const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
 
-    switch (impl) {
+    switch (impl.toLowerCase()) {
         case 'airtable':
         case 'bigquery':
         case 'dynamodb':
@@ -102,7 +102,7 @@ const supportedSchemaOperationsFor = (impl) => {
         case 'spanner':
             return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
         
-        case 'google-sheets':
+        case 'google-sheet':
             return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, DESCRIBE_COLLECTION]
     
         default:
