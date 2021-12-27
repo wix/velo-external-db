@@ -1,10 +1,7 @@
 const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
 const { translateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { SystemFields, validateSystemFields, parseTableData, SchemaOperations } = require('velo-external-db-commons')
-
-const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
-const schemaSupportedOperations =  [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
+const { SystemFields, validateSystemFields, parseTableData, supportedSchemaOperationsFor } = require('velo-external-db-commons')
 
 const escapeIdentifier = i => i
 class SchemaProvider {
@@ -31,7 +28,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return schemaSupportedOperations
+        return supportedSchemaOperationsFor('bigquery')
     }
 
     async create(collectionName, _columns) {
@@ -82,4 +79,4 @@ class SchemaProvider {
 
 }
 
-module.exports = { SchemaProvider, schemaSupportedOperations }
+module.exports = SchemaProvider

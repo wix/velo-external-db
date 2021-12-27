@@ -1,7 +1,7 @@
 const { BigQuery } = require('@google-cloud/bigquery')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require ('./bigquery_operations')
-const { SchemaProvider } = require('./bigquery_schema_provider')
+const SchemaProvider = require('./bigquery_schema_provider')
 const DataProvider = require('./bigquery_data_provider')
 
 const init = ({ projectId, databaseId }) => {
