@@ -1,8 +1,7 @@
-const { SystemFields, validateSystemFields, parseTableData, errors } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData, supportedSchemaOperationsFor, errors } = require('velo-external-db-commons')
 const { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes } = require('./sql_exception_translator')
-const { schemaSupportedOperations, escapeIdentifier } = require('./bigquery_utils')
+const { escapeIdentifier } = require('./bigquery_utils')
 const SchemaColumnTranslator = require('./sql_schema_translator')
-
 class SchemaProvider {
     constructor(pool, { projectId, databaseId }) {
         this.projectId = projectId
@@ -27,7 +26,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return schemaSupportedOperations
+        return supportedSchemaOperationsFor('bigquery')
     }
 
     async create(collectionName, _columns) {
