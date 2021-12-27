@@ -88,4 +88,4 @@ const SchemaOperations = Object.freeze({
 })
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                        asWixSchemaHeaders, SchemaOperations }
+                        asWixSchemaHeaders, SchemaOperations, queryOperatorsFor }
