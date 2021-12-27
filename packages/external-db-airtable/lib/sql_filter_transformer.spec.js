@@ -2,9 +2,11 @@ const FilterParser = require('./sql_filter_transformer')
 const { EMPTY_SORT } = require ('./airtable_utils')
 const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
+const { AdapterOperators } = require('velo-external-db-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
 
 describe('Sql Parser', () => {
     describe('sort parser', () => {
@@ -73,21 +75,25 @@ describe('Sql Parser', () => {
 
         describe('handle single field operator', () => {
             each([
-                '$ne', '$lt', '$lte', '$gt', '$gte', '$eq',
+                ne, lt, lte, gt, gte, eq,
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
-                    [ctx.fieldName]: { [o]: ctx.fieldValue }
+                    operator: o,
+                    fieldName: ctx.fieldName,
+                    value: ctx.fieldValue
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `${ctx.fieldName} ${env.filterParser.veloOperatorToAirtableOperator(o, ctx.fieldValue)} "${ctx.fieldValue}"`,
+                    filterExpr: `${ctx.fieldName} ${env.filterParser.adapterOperatorToAirtableOperator(o, ctx.fieldValue)} "${ctx.fieldValue}"`,
                 }])
 
             })
 
             test('correctly extract filter value if value is 0', () => {
                 const filter = {
-                    [ctx.fieldName]: { $eq: 0 }
+                    operator: eq,
+                    fieldName: ctx.fieldName,
+                    value: 0
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -96,10 +102,11 @@ describe('Sql Parser', () => {
 
             })
 
-            // todo: $hasAll ???
-            test('correctly transform operator [$hasSome]', () => {
+            test('correctly transform operator [include]', () => {
                 const filter = {
-                    [ctx.fieldName]: { $hasSome: ctx.fieldListValue }
+                    operator: include,
+                    fieldName: ctx.fieldName,
+                    value: ctx.fieldListValue
                 }
                 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -107,17 +114,21 @@ describe('Sql Parser', () => {
                 }])
             })
 
-            test('operator [$hasSome] with empty list of values will throw an exception', () => {
+            test('operator [include] with empty list of values will throw an exception', () => {
                 const filter = {
-                    [ctx.fieldName]: { $hasSome: [] }
+                    operator: include,
+                    fieldName: ctx.fieldName,
+                    value: []
                 }
 
                 expect( () => env.filterParser.parseFilter(filter) ).toThrow(InvalidQuery)
             })
 
-            test('correctly transform operator [$eq] with null value', () => {
+            test('correctly transform operator [eq] with null value', () => {
                 const filter = {
-                    [ctx.fieldName]: { $eq: undefined } 
+                    operator: eq,
+                    fieldName: ctx.fieldName,
+                    value: undefined                    
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -126,11 +137,13 @@ describe('Sql Parser', () => {
 
             })
 
-            test('correctly transform operator [$eq] with boolean value', () => {
+            test('correctly transform operator [eq] with boolean value', () => {
                 const value = chance.bool()
                 const operator = '$eq'
                 const filter = {
-                    [ctx.fieldName]: { [operator]: value } 
+                    operator: eq,
+                    fieldName: ctx.fieldName,
+                    value: value
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -140,9 +153,11 @@ describe('Sql Parser', () => {
             })
 
             describe('handle string operators', () => {
-                test('correctly transform operator [$contains]', () => {
+                test('correctly transform operator [string_contains]', () => {
                     const filter = {
-                        [ctx.fieldName]: { $contains: ctx.fieldValue }
+                        operator: string_contains,
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldValue
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -151,9 +166,11 @@ describe('Sql Parser', () => {
 
                 })
 
-                test('correctly transform operator [$startsWith]', () => {
+                test('correctly transform operator [string_begins]', () => {
                     const filter = {
-                        [ctx.fieldName]: { $startsWith: ctx.fieldValue }
+                        operator: string_begins,
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldValue
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -162,9 +179,11 @@ describe('Sql Parser', () => {
 
                 })
 
-                test('correctly transform operator [$endsWith]', () => {
+                test('correctly transform operator [string_ends]', () => {
                     const filter = {
-                        [ctx.fieldName]: { $endsWith: ctx.fieldValue }
+                        operator: string_ends,
+                        fieldName: ctx.fieldName,
+                        value: ctx.fieldValue
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -175,12 +194,13 @@ describe('Sql Parser', () => {
         })
         describe('handle multi field operator', () => {
             each([
-                '$and', '$or'
+                and, or
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
-                    [o]: [ctx.filter, ctx.anotherFilter]
+                    operator: o,
+                    value: [ctx.filter, ctx.anotherFilter]
                 }
-                const op = o === '$and' ? 'AND' : 'OR'
+                const op = o === and ? 'AND' : 'OR'
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual(
                     [{
@@ -189,9 +209,10 @@ describe('Sql Parser', () => {
                 )
             })
 
-            test('correctly transform operator [$not]', () => {
+            test('correctly transform operator [not]', () => {
                 const filter = {
-                    $not: [ ctx.filter ]
+                    operator: not,
+                    value: [ ctx.filter ]
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -224,8 +245,8 @@ describe('Sql Parser', () => {
         ctx.fieldValue = chance.word()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
-        ctx.filter = gen.randomFilter()
-        ctx.anotherFilter = gen.randomFilter()
+        ctx.filter = gen.randomWrappedFilter()
+        ctx.anotherFilter = gen.randomWrappedFilter()
     })
 
     beforeAll(function() {

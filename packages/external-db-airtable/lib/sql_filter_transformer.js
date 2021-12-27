@@ -1,6 +1,7 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject, extractFilterObjects, isEmptyFilter } = require('velo-external-db-commons')
+const { isObject, AdapterOperators } = require('velo-external-db-commons')
 const { EMPTY_SORT } = require ('./airtable_utils')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 
 class FilterParser {
     constructor() {
@@ -18,32 +19,36 @@ class FilterParser {
 
 
     parseFilter(filter) {
-        if (isEmptyFilter(filter)) {
+        if (!filter || !filter.operator) {
             return []
         }
 
-        const { operator, fieldName, value } =  extractFilterObjects(filter)
+        const { operator, fieldName, value } = filter
 
         switch (operator) {
-            case '$and':
-            case '$or':
+            case and:
+            case or:
                 const res = value.map(this.parseFilter.bind(this))
-                const op = operator === '$and' ? 'AND' : 'OR' 
+                const op = operator === and ? 'AND' : 'OR' 
                 return [{
                     filterExpr: this.multipleFieldOperatorToFilterExpr(op, res)
                 }]
 
-            case '$not':
+            case not:
                 const res2 = this.parseFilter(value[0])
                 return [{
                     filterExpr: `NOT(${res2[0].filterExpr})`
                 }]
-            case '$hasSome': //todo - refactor
+            case include:
                 if (value === undefined || value.length === 0) {
                     throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
                 }
 
-                const ress = value.map(val => { return { [fieldName]: { $eq: val } } })
+                const ress = value.map(val => { return { fieldName,
+                                                         operator: eq,
+                                                         value: val }
+                                              }
+                                      )
                 const ress2 = ress.map(this.parseFilter.bind(this))
                 return [{
                     filterExpr: this.multipleFieldOperatorToFilterExpr('OR', ress2)
@@ -54,7 +59,7 @@ class FilterParser {
 
         if (this.isSingleFieldOperator(operator)) {
             return [{
-                filterExpr: `${fieldName} ${this.veloOperatorToAirtableOperator(operator, value)} ${this.valueForOperator(value, operator)}` // TODO: value for operator?
+                filterExpr: `${fieldName} ${this.adapterOperatorToAirtableOperator(operator, value)} ${this.valueForOperator(value, operator)}`
             }]
         }
 
@@ -63,7 +68,7 @@ class FilterParser {
                filterExpr: `REGEX_MATCH({${fieldName}},'${this.valueForStringOperator(operator, value)}')` }]
         }
 
-        if (operator === '$urlized') {
+        if (operator === urlized) {
             console.error('not implemented')
         }
         return []
@@ -75,23 +80,23 @@ class FilterParser {
 
     valueForStringOperator(operator, value) {
         switch (operator) {
-            case '$contains':
+            case string_contains:
                 return value
-            case '$startsWith':
+            case string_begins:
                 return `^${value}`
-            case '$endsWith':
+            case string_ends:
                 return `${value}$`
         }
     }
 
     valueForOperator(value, operator) {
-        if (operator === '$hasSome') {
+        if (operator === include) {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
             }
             return this.multipleFieldOperatorToFilterExpr('OR', value)
         }
-        else if (operator === '$eq' && value === undefined) {
+        else if (operator === eq && value === undefined) {
             return '""'
         }
 
@@ -99,26 +104,26 @@ class FilterParser {
     }
 
     isSingleFieldOperator(operator) {
-        return ['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq'].includes(operator)
+        return [ne, lt, lte, gt, gte, include, eq].includes(operator)
     }
 
     isSingleFieldStringOperator(operator) {
-        return ['$contains', '$startsWith', '$endsWith'].includes(operator)
+        return [string_contains, string_begins, string_ends].includes(operator)
     }
 
-    veloOperatorToAirtableOperator(operator) {
+    adapterOperatorToAirtableOperator(operator) {
         switch (operator) {
-            case '$eq':
+            case eq:
                 return '='
-            case '$ne':
+            case ne:
                 return '!='
-            case '$lt':
+            case lt:
                 return '<'
-            case '$lte':
+            case lte:
                 return '<='
-            case '$gt':
+            case gt:
                 return '>'
-            case '$gte':
+            case gte:
                 return '>='
         }
     }
@@ -137,13 +142,6 @@ class FilterParser {
         }
     }
 
-    // skipExpression(skip) {
-    //     if (!skip) return {}
-    //     return {
-    //         pageSize: 1,
-    //         offset: skip
-    //     }
-    // }
 
     parseSort({ fieldName, direction }) {
         if (typeof fieldName !== 'string') {
