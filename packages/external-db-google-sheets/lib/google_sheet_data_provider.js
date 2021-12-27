@@ -1,4 +1,5 @@
 const { sheetFor, headersFrom, findRowById } = require('./google_sheet_utils')
+const { eq } = require('velo-external-db-commons').AdapterOperators
 
 class DataProvider {
     constructor(doc, filterParser) {
@@ -19,11 +20,10 @@ class DataProvider {
     }
     
     async find(collectionName, filter, sort, skip, limit) {
-        const { filterExpr, fieldName, parameter } = this.filterParser.transform(filter)
         const sheet = await sheetFor(collectionName, this.doc)
-
-        if (filterExpr === '$eq' && fieldName === '_id') {
-            const row = await findRowById(sheet, parameter)
+        console.log({ filter })
+        if (filter && filter.operator === eq && filter.fieldName === '_id') {
+            const row = await findRowById(sheet, filter.value)
             return row !== undefined ? [this.formatRow(row)] : []
         }
 
