@@ -1,5 +1,5 @@
 const { SchemaProvider, schemaSupportedOperations } = require('./google_sheet_schema_provider')
-const DataProvider = require('./google_sheet_schema_provider')
+const DataProvider = require('./google_sheet_data_provider')
 
 const init = require('./connection_provider')
 const { app: mockServer, cleanupSheets }  = require('../tests/mock_google_sheets_api')
