@@ -1,6 +1,6 @@
 const Chance = require('chance')
-const { AdapterOperators } = require('../../velo-external-db-core/node_modules/velo-external-db-commons/lib')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators //TODO: extract
+const { AdapterOperators } = require('velo-external-db-commons')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators
 
 const chance = Chance()
 
@@ -196,10 +196,14 @@ const randomConfig = () => ({
 
 const randomWixType = () => randomObjectFromArray(['number', 'text', 'boolean', 'url', 'datetime', 'object'])
 
+const invalidOperatorForType = (validOperators) => randomObjectFromArray (
+                                                                Object.values(AdapterOperators).filter(x => !validOperators.includes(x))
+                                                            )
 
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
                    randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
-                   fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter, randomWixType }
+                   fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter, randomWixType,
+                   invalidOperatorForType }
 
 
