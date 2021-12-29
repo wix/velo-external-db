@@ -3,10 +3,19 @@ const NodeCache = require('node-cache')
 
 const CacheKey = 'schema'
 
+const FiveMinutes = 5 * 60
+
 class CacheableSchemaInformation {
     constructor(schemaProvider) {
         this.schemaProvider = schemaProvider
-        this.cache = new NodeCache( { stdTTL: 5 * 60, checkperiod: (5 * 60) + 10 } )
+        this.cache = new NodeCache( { checkperiod: FiveMinutes + 10 } )
+
+        const refreshFunc = async() => {
+            await this.refresh()
+                      .catch( console.log )
+        }
+        this.timer = setInterval(refreshFunc, FiveMinutes * 1000)
+        setImmediate(refreshFunc)
     }
 
     async schemaFor(collectionName) {
@@ -34,11 +43,15 @@ class CacheableSchemaInformation {
 
     async refresh() {
         const schema = await this.schemaProvider.list()
-        this.cache.set(CacheKey, schema)
+        this.cache.set(CacheKey, schema, FiveMinutes)
     }
 
     async clear() {
         this.cache.flushAll()
+    }
+
+    cleanup() {
+        this.timer.unref()
     }
 }
 

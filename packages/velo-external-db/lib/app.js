@@ -22,7 +22,10 @@ const load = async() => {
     const dataService = new DataService(dataProvider, schemaInformation)
     const schemaService = new SchemaService(schemaProvider, schemaInformation)
     initServices(dataService, schemaService, operationService, configReader, { vendor, type: adapterType })
-    _cleanup = cleanup
+    _cleanup = async() => {
+        await cleanup()
+        schemaInformation.cleanup()
+    }
     return { secretKey }
 }
 
