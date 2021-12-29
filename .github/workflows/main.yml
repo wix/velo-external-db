@@ -61,14 +61,19 @@ jobs:
             node_modules
             */*/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
-          
+
+      - name: Set up Docker cache
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+        with:
+          key: docker-layer-caching-CI-{hash}
+          restore-keys: docker-layer-caching-CI-
+
       - name: Downloading Image
         if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
           cd packages/velo-external-db/test/resources
           docker compose pull --quiet ${{ matrix.database }}
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
 
       - name: Start Container
         if: ${{ ( matrix.database != 'google-sheets') }}
