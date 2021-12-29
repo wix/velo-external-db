@@ -4,6 +4,7 @@ const driver = require('../../test/drivers/data_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
 const filterTransformer = require ('../../test/drivers/filter_transformer_test_support')
 const aggregationTransformer = require('../../test/drivers/aggregation_transformer_test_support')
+const { AdapterOperators } = require('velo-external-db-commons')
 const Chance = require('chance')
 const chance = new Chance()
 
@@ -26,10 +27,9 @@ describe('Data Service', () => {
     })
 
     test('get by id will issue a call to find and transform the result', async() => {
-        const idFilter = { _id: { $eq: ctx.itemId } } 
+        const idFilter = { fieldName: '_id', operator: AdapterOperators.eq, value: ctx.itemId } 
         driver.givenListResult([ctx.entity], ctx.collectionName,
                         idFilter, '', 0, 1)
-        filterTransformer.stubIgnoreTransform(idFilter)
 
         const actual = await env.dataService.getById(ctx.collectionName, ctx.itemId)
         expect( actual ).toEqual({ item: ctx.entity })
