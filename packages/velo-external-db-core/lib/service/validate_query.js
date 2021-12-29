@@ -1,6 +1,7 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { queryOperatorsFor } = require('velo-external-db-commons') 
 const FilterTransformer = require ('../converters/filter_transformer')
+const { EMPTY_FILTER } = require ('../converters/utils')
 const WixOperatorToAdapterOperator = new FilterTransformer().wixOperatorToAdapterOperator
 
 
@@ -26,7 +27,7 @@ const validateOperators = (fields, filterObj) => {
 const queryAdapterOperatorsFor = (type) => ( queryOperatorsFor[type].map(op => WixOperatorToAdapterOperator(`$${op}`)) )
 
 const extractFieldsAndOperators = (filter) => { 
-    if (!filter) return []
+    if (filter === EMPTY_FILTER) return []
     if (filter.fieldName) return [{ name: filter.fieldName, operator: filter.operator }]
     return filter.value.map(filter =>  extractFieldsAndOperators(filter)).flat()
 }

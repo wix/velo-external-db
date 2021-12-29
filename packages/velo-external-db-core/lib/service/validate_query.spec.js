@@ -1,6 +1,7 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { AdapterOperators } = require('velo-external-db-commons')
 const { Uninitialized, gen } = require('test-commons')
+const { EMPTY_FILTER } = require('../converters/utils')
 const { extractFieldsAndOperators, validateFilterFieldsExists, validateOperators, queryAdapterOperatorsFor } = require ('./validate_query')
 const Chance = require('chance')
 const chance = Chance()
@@ -8,6 +9,10 @@ const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_co
 
 describe('Validate query', () => {
     describe('extractFieldsAndOperators', () => {
+        test('should return empty array when called with empty filter', () => {
+            expect(extractFieldsAndOperators(EMPTY_FILTER)).toEqual([])
+        })
+        
         test('correctly extract fields and operators with single field filter', () => {
             expect(extractFieldsAndOperators({
                                                 fieldName: ctx.fieldName, 
