@@ -8,7 +8,7 @@ class SchemaService {
 
     async list() {
         const dbs = await this.storage.list()
-        return { schemas: dbs.map(db => asWixSchema(db.fields, db.id) ) }
+        return { schemas: dbs.map( asWixSchema ) }
     }
 
     async listHeaders() {
@@ -18,7 +18,7 @@ class SchemaService {
 
     async find(collectionNames) {
         const dbs = await Promise.all(collectionNames.map(async collectionName => ({ id: collectionName, fields: await this.storage.describeCollection(collectionName) })))
-        return { schemas: dbs.map(db => asWixSchema(db.fields, db.id) ) }
+        return { schemas: dbs.map( asWixSchema ) }
     }
 
     async create(collectionName) {

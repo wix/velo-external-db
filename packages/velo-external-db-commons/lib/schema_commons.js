@@ -24,10 +24,10 @@ const queryOperatorsFor = {
     object: ['eq', 'ne', 'contains'],
 }
 
-const asWixSchema = (fields, collectionName) => {
+const asWixSchema = db => {
     return {
-        id: collectionName,
-        displayName: collectionName,
+        id: db.id,
+        displayName: db.id,
         allowedOperations: [
             'get',
             'find',
@@ -38,7 +38,7 @@ const asWixSchema = (fields, collectionName) => {
         ],
         maxPageSize: 50,
         ttl: 3600,
-        fields: fields.reduce( (o, r) => ( { ...o, [r.field]: {
+        fields: db.fields.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
                 queryOperators: queryOperatorsFor[r.type],

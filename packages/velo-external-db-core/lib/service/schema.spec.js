@@ -10,7 +10,7 @@ describe('Schema Service', () => {
         driver.givenListResult(ctx.dbs)
 
         const actual = await env.schemaService.list()
-        expect( actual ).toEqual({ schemas: ctx.dbs.map(db => asWixSchema(db.fields, db.id)) })
+        expect( actual ).toEqual({ schemas: ctx.dbs.map( asWixSchema ) })
     })
 
     test('retrieve short list of all collections from provider', async() => {
@@ -24,7 +24,7 @@ describe('Schema Service', () => {
         driver.givenFindResults(ctx.dbs)
 
         const actual = await env.schemaService.find(ctx.dbs.map(db => db.id))
-        expect( actual ).toEqual({ schemas: ctx.dbs.map(db => asWixSchema(db.fields, db.id)) })
+        expect( actual ).toEqual({ schemas: ctx.dbs.map( asWixSchema ) })
     })
 
     test('create collection name', async() => {
