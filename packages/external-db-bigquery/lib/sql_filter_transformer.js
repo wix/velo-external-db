@@ -1,10 +1,8 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
+const { escapeIdentifier, wildCardWith } = require('./bigquery_utils')
 const { EMPTY_FILTER, EMPTY_SORT, isObject, isEmptyFilter, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects } = require('velo-external-db-commons')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
-
-const escapeIdentifier = i => i
-const wildCardWith = i => i 
 
 class FilterParser {
     constructor() {

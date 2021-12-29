@@ -1,4 +1,10 @@
+const { SchemaOperations } = require('velo-external-db-commons')
+const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
 
+const schemaSupportedOperations =  [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
+
+const escapeIdentifier = i => i
+const wildCardWith = i => i
 
 const patchDateTime = (item) => {
     const obj = {}
@@ -32,4 +38,4 @@ const unPatchDateTime = (item) => {
 }
 
 
-module.exports = { patchDateTime, unPatchDateTime }
+module.exports = { patchDateTime, unPatchDateTime, escapeIdentifier, schemaSupportedOperations, wildCardWith }

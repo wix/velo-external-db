@@ -1,8 +1,7 @@
-const { unPatchDateTime, patchDateTime } = require('./bigquery_utils')
+const { unPatchDateTime, patchDateTime, escapeIdentifier } = require('./bigquery_utils')
 const { asParamArrays, updateFieldsFor } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 
-const escapeIdentifier = i => i
 class DataProvider {
     constructor(pool, filterParser) {
         this.filterParser = filterParser
