@@ -52,6 +52,10 @@ describe('Schema Information Service', () => {
         env.schemaInformation = new SchemaInformation(driver.schemaProvider)
     })
 
+    afterAll(() => {
+        env.schemaInformation.cleanup()
+    })
+
     beforeEach(() => {
         driver.reset()
         env.schemaInformation.clear()
