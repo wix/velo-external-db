@@ -24,7 +24,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@google-cloud/spanner": "^5.16.1",
+    "@google-cloud/spanner": "^5.16.0",
     "sqlstring": "^2.3.2",
     "test-commons": "^0.0.0",
     "velo-external-db-commons": "^0.0.0"
