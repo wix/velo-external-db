@@ -1,8 +1,7 @@
-const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
-const { translateErrorCodes } = require('./sql_exception_translator')
+const { SystemFields, validateSystemFields, parseTableData, errors } = require('velo-external-db-commons')
+const { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes } = require('./sql_exception_translator')
 const { schemaSupportedOperations, escapeIdentifier } = require('./bigquery_utils')
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { SystemFields, validateSystemFields, parseTableData } = require('velo-external-db-commons')
 
 class SchemaProvider {
     constructor(pool, { projectId, databaseId }) {
@@ -35,7 +34,7 @@ class SchemaProvider {
         const columns = _columns || []
         const dbColumnsSql = [...SystemFields, ...columns].map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c))
         await this.pool.createTable(collectionName, { schema: dbColumnsSql })
-                       .catch(translateErrorCodes)
+                       .catch(createCollectionTranslateErrorCodes)
     }
 
     async drop(collectionName) {
@@ -47,21 +46,15 @@ class SchemaProvider {
     async addColumn(collectionName, column) {   
         await validateSystemFields(column.name)
         const fullCollectionName = `${this.projectId}.${this.databaseId}.${collectionName}`
-        try{
-            await this.pool.query(`ALTER TABLE ${escapeIdentifier(fullCollectionName)} ADD COLUMN ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
-        } catch (err) {
-            if (err.message.includes('was not found')) 
-                throw new CollectionDoesNotExists('Collection does not exists')
-            else 
-                translateErrorCodes(err)
-        }
+        await this.pool.query(`ALTER TABLE ${escapeIdentifier(fullCollectionName)} ADD COLUMN ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
+                       .catch(addColumnTranslateErrorCodes)
     }
 
     async removeColumn(collectionName, columnName) {
         await validateSystemFields(columnName)
         const fullCollectionName = `${this.projectId}.${this.databaseId}.${collectionName}`
         await this.pool.query(`CREATE OR REPLACE TABLE ${escapeIdentifier(fullCollectionName)} AS SELECT * EXCEPT (${escapeIdentifier(columnName)}) FROM ${escapeIdentifier(fullCollectionName)}`)
-            .catch(translateErrorCodes)
+                       .catch(translateErrorCodes)
     }
 
     async describeCollection(collectionName) {
@@ -69,7 +62,7 @@ class SchemaProvider {
                                    .catch(translateErrorCodes)
 
         if (res[0].length === 0) {
-            throw new CollectionDoesNotExists('Collection does not exists')
+            throw new errors.CollectionDoesNotExists('Collection does not exists')
         }
 
         return res[0].map( this.translateDbTypes.bind(this) )
