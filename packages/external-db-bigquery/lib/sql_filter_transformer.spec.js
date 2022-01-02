@@ -4,7 +4,7 @@ const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
-const escapeId = i => i 
+const { escapeIdentifier: escapeId } = require('./bigquery_utils')
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -105,19 +105,6 @@ describe('Sql Parser', () => {
 
             })
             
-            // bigquery does not support list of values
-            // todo: $hasAll ???
-            // testt('correctly transform operator [$hasSome]', () => {
-            //     const filter = {
-            //         [ctx.fieldName]: { $hasSome: ctx.fieldListValue }
-            //     }
-
-            //     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-            //         filterExpr: `${escapeId(ctx.fieldName)} IN (?, ?, ?, ?, ?)`,
-            //         parameters: ctx.fieldListValue
-            //     }])
-            // })
-
             test('operator [include] with empty list of values will throw an exception', () => {
                 const filter = {
                     operator: include,
@@ -157,7 +144,6 @@ describe('Sql Parser', () => {
             })
 
             describe('handle string operators', () => {
-                //'$contains', '', ''
                 test('correctly transform operator [string_contains]', () => {
                     const filter = {
                         operator: string_contains,
@@ -327,7 +313,7 @@ describe('Sql Parser', () => {
                     }
                     
                     expect(env.filterParser.parseAggregation(aggregation) ).toEqual({
-                        fieldsStatement: `${escapeId(ctx.fieldName)}, CAST(COUNT(*) AS FLOAT64) AS ${ctx.moreFieldName}`,
+                        fieldsStatement: `${escapeId(ctx.fieldName)}, CAST(COUNT(${escapeId('*')}) AS FLOAT64) AS ${escapeId(ctx.moreFieldName)}`,
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
                         parameters: [],

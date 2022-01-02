@@ -75,14 +75,12 @@ describe('Schema API', () => {
             await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(collectionWithDefaultFields())
         })
 
-        if (shouldNotRunOn(['BigQuery'], name)) {
-            test('create collection twice will do nothing', async() => {
-                await env.schemaProvider.create(ctx.collectionName, [])
+        test('create collection twice will do nothing', async() => {
+            await env.schemaProvider.create(ctx.collectionName, [])
 
-                await expect( env.schemaProvider.create(ctx.collectionName, []) ).resolves.toBeUndefined()
-            })
-        }
-
+            await expect( env.schemaProvider.create(ctx.collectionName, []) ).resolves.toBeUndefined()
+        })
+        
         test('add column on a non existing collection will fail', async() => {
             await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(CollectionDoesNotExists)
         })
@@ -97,15 +95,15 @@ describe('Schema API', () => {
             })
         }
 
-        if (shouldNotRunOn(['BigQuery'], name)) {
-            test('add duplicate column will fail', async() => {
-                await env.schemaProvider.create(ctx.collectionName, [])
+        
+        test('add duplicate column will fail', async() => {
+            await env.schemaProvider.create(ctx.collectionName, [])
 
-                await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
 
-                await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(FieldAlreadyExists)
-            })
-        }
+            await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(FieldAlreadyExists)
+        })
+        
 
         test('add system column will fail', async() => {
             await env.schemaProvider.create(ctx.collectionName, [])
