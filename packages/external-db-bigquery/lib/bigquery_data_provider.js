@@ -43,10 +43,10 @@ class DataProvider {
         const updateFields = updateFieldsFor(items[0])
         const queries = items.map(() => `UPDATE ${escapeIdentifier(collectionName)} SET ${updateFields.map(f => `${escapeIdentifier(f)} = ?`).join(', ')} WHERE _id = ?` )
                              .join(';')
-        const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
+        const updateTables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
                                 .map(u => asParamArrays( patchDateTime(u) ))
 
-        const resultSet = await this.pool.query({ query: queries, params: [].concat(...updatables) })
+        const resultSet = await this.pool.query({ query: queries, params: [].concat(...updateTables) })
                                     .catch( translateErrorCodes )
 
         return resultSet[0].length
