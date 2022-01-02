@@ -1,8 +1,7 @@
-const { unPatchDateTime, patchDateTime } = require('./bigquery_utils')
+const { unPatchDateTime, patchDateTime, escapeIdentifier } = require('./bigquery_utils')
 const { asParamArrays, updateFieldsFor } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 
-const escapeIdentifier = i => i
 class DataProvider {
     constructor(pool, filterParser) {
         this.filterParser = filterParser
@@ -44,10 +43,10 @@ class DataProvider {
         const updateFields = updateFieldsFor(items[0])
         const queries = items.map(() => `UPDATE ${escapeIdentifier(collectionName)} SET ${updateFields.map(f => `${escapeIdentifier(f)} = ?`).join(', ')} WHERE _id = ?` )
                              .join(';')
-        const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
+        const updateTables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
                                 .map(u => asParamArrays( patchDateTime(u) ))
 
-        const resultSet = await this.pool.query({ query: queries, params: [].concat(...updatables) })
+        const resultSet = await this.pool.query({ query: queries, params: [].concat(...updateTables) })
                                     .catch( translateErrorCodes )
 
         return resultSet[0].length

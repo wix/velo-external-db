@@ -1,12 +1,8 @@
-const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
-const { translateErrorCodes } = require('./sql_exception_translator')
+const { SystemFields, validateSystemFields, parseTableData, errors } = require('velo-external-db-commons')
+const { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes } = require('./sql_exception_translator')
+const { schemaSupportedOperations, escapeIdentifier } = require('./bigquery_utils')
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { SystemFields, validateSystemFields, parseTableData, SchemaOperations } = require('velo-external-db-commons')
 
-const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
-const schemaSupportedOperations =  [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
-
-const escapeIdentifier = i => i
 class SchemaProvider {
     constructor(pool, { projectId, databaseId }) {
         this.projectId = projectId
@@ -38,38 +34,35 @@ class SchemaProvider {
         const columns = _columns || []
         const dbColumnsSql = [...SystemFields, ...columns].map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c))
         await this.pool.createTable(collectionName, { schema: dbColumnsSql })
-                       .catch(translateErrorCodes)
+                       .catch(createCollectionTranslateErrorCodes)
     }
 
     async drop(collectionName) {
         await this.pool.table(collectionName).delete()
-            .catch(translateErrorCodes)
+                       .catch(translateErrorCodes)
     }
 
 
     async addColumn(collectionName, column) {   
         await validateSystemFields(column.name)
-        try{
-            await this.pool.query(`ALTER TABLE ${escapeIdentifier(collectionName)} ADD COLUMN ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
-        } catch (err) {
-            if (err.message.includes('was not found')) 
-                throw new CollectionDoesNotExists('Collection does not exists')
-            else 
-                translateErrorCodes(err)
-        }
+        const fullCollectionName = `${this.projectId}.${this.databaseId}.${collectionName}`
+        await this.pool.query(`ALTER TABLE ${escapeIdentifier(fullCollectionName)} ADD COLUMN ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
+                       .catch(addColumnTranslateErrorCodes)
     }
 
     async removeColumn(collectionName, columnName) {
         await validateSystemFields(columnName)
-        await this.pool.query(`CREATE OR REPLACE TABLE ${this.projectId}.${this.databaseId}.${escapeIdentifier(collectionName)} AS SELECT * EXCEPT (${escapeIdentifier(columnName)}) FROM  ${escapeIdentifier(collectionName)}`)
-            .catch(translateErrorCodes)
+        const fullCollectionName = `${this.projectId}.${this.databaseId}.${collectionName}`
+        await this.pool.query(`CREATE OR REPLACE TABLE ${escapeIdentifier(fullCollectionName)} AS SELECT * EXCEPT (${escapeIdentifier(columnName)}) FROM ${escapeIdentifier(fullCollectionName)}`)
+                       .catch(translateErrorCodes)
     }
 
     async describeCollection(collectionName) {
-        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.COLUMNS WHERE table_name="${escapeIdentifier(collectionName)}"`)
+        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.COLUMNS WHERE table_name='${collectionName}'`)
+                                   .catch(translateErrorCodes)
 
         if (res[0].length === 0) {
-            throw new CollectionDoesNotExists('Collection does not exists')
+            throw new errors.CollectionDoesNotExists('Collection does not exists')
         }
 
         return res[0].map( this.translateDbTypes.bind(this) )
@@ -82,4 +75,4 @@ class SchemaProvider {
 
 }
 
-module.exports = { SchemaProvider, schemaSupportedOperations }
+module.exports = SchemaProvider

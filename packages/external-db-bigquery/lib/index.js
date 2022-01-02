@@ -1,4 +1,5 @@
-const { SchemaProvider, schemaSupportedOperations } = require('./bigquery_schema_provider')
+const SchemaProvider = require('./bigquery_schema_provider')
+const { schemaSupportedOperations } = require('./bigquery_utils')
 const DataProvider = require('./bigquery_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const SchemaColumnTranslator = require('./sql_schema_translator')
