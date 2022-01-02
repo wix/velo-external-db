@@ -21,7 +21,6 @@ class DataProvider {
     
     async find(collectionName, filter, sort, skip, limit) {
         const sheet = await sheetFor(collectionName, this.doc)
-        console.log({ filter })
         if (filter && filter.operator === eq && filter.fieldName === '_id') {
             const row = await findRowById(sheet, filter.value)
             return row !== undefined ? [this.formatRow(row)] : []
