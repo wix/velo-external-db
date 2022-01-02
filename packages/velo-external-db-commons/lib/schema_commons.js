@@ -92,6 +92,7 @@ const supportedSchemaOperationsFor = (impl) => {
 
     switch (impl.toLowerCase()) {
         case 'airtable':
+        case 'bigquery':
         case 'dynamodb':
         case 'firestore':
         case 'mongo':
@@ -102,7 +103,6 @@ const supportedSchemaOperationsFor = (impl) => {
             return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
         
         case 'google-sheet':
-        case 'bigquery':
             return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, DESCRIBE_COLLECTION]
     
         default:
