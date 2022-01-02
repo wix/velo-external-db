@@ -38,6 +38,10 @@ class SchemaService {
         await this.schemaInformation.refresh()
         return {}
     }
+
+    async supportedOperations() {
+        return this.storage.supportedOperations()
+    }
 }
 
 module.exports = SchemaService
