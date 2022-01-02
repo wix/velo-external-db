@@ -1,4 +1,4 @@
-const { init, schemaSupportedOperations } = require('external-db-spanner')
+const { init } = require('external-db-spanner')
 const { runImage, stopImage } = require('./docker_support')
 
 const setEmulatorOn = () => process.env.SPANNER_EMULATOR_HOST = 'localhost:9010'
@@ -37,4 +37,4 @@ const shutdownEnv = async() => {
     await stopImage('spanner')
 }
 
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaSupportedOperations }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup }

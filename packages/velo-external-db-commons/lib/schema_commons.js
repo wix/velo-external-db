@@ -87,5 +87,28 @@ const SchemaOperations = Object.freeze({
     DESCRIBE_COLLECTION: 'describe-collection',
 })
 
+const supportedSchemaOperationsFor = (impl) => {
+    const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
+
+    switch (impl.toLowerCase()) {
+        case 'airtable':
+        case 'bigquery':
+        case 'dynamodb':
+        case 'firestore':
+        case 'mongo':
+        case 'mssql':
+        case 'mysql':
+        case 'postgres':
+        case 'spanner':
+            return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
+        
+        case 'google-sheet':
+            return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, DESCRIBE_COLLECTION]
+    
+        default:
+            throw new Error('Unknown implementation')
+    }
+}
+
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                        asWixSchemaHeaders, SchemaOperations }
+                        asWixSchemaHeaders, SchemaOperations, supportedSchemaOperationsFor }
