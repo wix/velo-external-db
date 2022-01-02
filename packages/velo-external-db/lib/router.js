@@ -143,6 +143,15 @@ const createRouter = () => {
 
 
     // *************** Schema API **********************
+    router.post('/schemas/supported_operations', async(req, res, next) => {
+        try {
+            const data = await schemaService.supportedOperations()
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
+    })
+
     router.post('/schemas/list', async(req, res, next) => {
         try {
             const data = await schemaService.list()
