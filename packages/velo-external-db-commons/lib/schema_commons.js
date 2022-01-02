@@ -80,8 +80,8 @@ const parseTableData = data => data.reduce((o, r) => {
 const SchemaOperations = Object.freeze({
     LIST: 'list',
     LIST_HEADERS: 'list-headers',
-    CREATE: 'create-table',
-    DROP: 'drop-table', 
+    CREATE: 'create-collection',
+    DROP: 'drop-collection', 
     ADD_COLUMN: 'add-column',
     REMOVE_COLUMN: 'remove-column',
     DESCRIBE_COLLECTION: 'describe-collection',
@@ -92,7 +92,6 @@ const supportedSchemaOperationsFor = (impl) => {
 
     switch (impl.toLowerCase()) {
         case 'airtable':
-        case 'bigquery':
         case 'dynamodb':
         case 'firestore':
         case 'mongo':
@@ -103,6 +102,7 @@ const supportedSchemaOperationsFor = (impl) => {
             return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
         
         case 'google-sheet':
+        case 'bigquery':
             return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, DESCRIBE_COLLECTION]
     
         default:
