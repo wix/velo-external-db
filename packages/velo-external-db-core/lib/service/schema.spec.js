@@ -8,9 +8,10 @@ describe('Schema Service', () => {
 
     test('retrieve all collections from provider', async() => {
         driver.givenListResult(ctx.dbs)
+        driver.givenSupportedOperations(ctx.schemaOperations)
 
         const actual = await env.schemaService.list()
-        expect( actual ).toEqual({ schemas: ctx.dbs.map( asWixSchema ) })
+        expect( actual ).toEqual({ schemas: ctx.dbs.map( db => asWixSchema(db, ctx.schemaOperations) ) })
     })
 
     test('retrieve short list of all collections from provider', async() => {
@@ -22,9 +23,10 @@ describe('Schema Service', () => {
 
     test('retrieve collections by ids from provider', async() => {
         driver.givenFindResults(ctx.dbs)
+        driver.givenSupportedOperations(ctx.schemaOperations)
 
         const actual = await env.schemaService.find(ctx.dbs.map(db => db.id))
-        expect( actual ).toEqual({ schemas: ctx.dbs.map( asWixSchema ) })
+        expect( actual ).toEqual({ schemas: ctx.dbs.map( db => asWixSchema(db, ctx.schemaOperations) ) })
     })
 
     test('create collection name', async() => {
@@ -53,6 +55,7 @@ describe('Schema Service', () => {
         collections: Uninitialized,
         collectionName: Uninitialized,
         column: Uninitialized,
+        schemaOperations: Uninitialized,
     }
 
     const env = {
@@ -67,6 +70,7 @@ describe('Schema Service', () => {
         ctx.collections = gen.randomCollections()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
+        ctx.schemaOperations = gen.randomSchemaOperations()
 
         env.schemaService = new SchemaService(driver.schemaProvider, schema.schemaInformation)
     })
