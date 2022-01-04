@@ -36,18 +36,14 @@ const SchemaOperations = Object.freeze({
 
 const AllSchemaOperations = Object.values(SchemaOperations)
 
+const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove']
+const ReadOnlyOperations = ['get']
+
 const asWixSchema = (collection, allowedSchemaOperations) => {
     return {
         id: collection.id,
         displayName: collection.id,
-        allowedOperations: [
-            'get',
-            'find',
-            'count',
-            'update',
-            'insert',
-            'remove'
-        ],
+        allowedOperations: allowedOperationsFor(collection),
         allowedSchemaOperations,
         maxPageSize: 50,
         ttl: 3600,
@@ -111,6 +107,10 @@ const supportedSchemaOperationsFor = (impl) => {
         default:
             throw new Error('Unknown implementation')
     }
+}
+
+const allowedOperationsFor = (collection) => {
+    return collection.fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
 }
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
