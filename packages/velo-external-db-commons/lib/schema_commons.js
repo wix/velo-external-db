@@ -88,6 +88,8 @@ const SchemaOperations = Object.freeze({
     DESCRIBE_COLLECTION: 'describeCollection',
 })
 
+const AllSchemaOperations = Object.values(SchemaOperations)
+
 const supportedSchemaOperationsFor = (impl) => {
     const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
 
@@ -112,4 +114,4 @@ const supportedSchemaOperationsFor = (impl) => {
 }
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                        asWixSchemaHeaders, SchemaOperations, supportedSchemaOperationsFor }
+                        asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor }
