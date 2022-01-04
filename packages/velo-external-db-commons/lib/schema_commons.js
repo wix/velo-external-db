@@ -24,7 +24,7 @@ const queryOperatorsFor = {
     object: ['eq', 'ne', 'contains'],
 }
 
-const asWixSchema = db => {
+const asWixSchema = (db, allowedSchemaOperations) => {
     return {
         id: db.id,
         displayName: db.id,
@@ -36,6 +36,7 @@ const asWixSchema = db => {
             'insert',
             'remove'
         ],
+        allowedSchemaOperations,
         maxPageSize: 50,
         ttl: 3600,
         fields: db.fields.reduce( (o, r) => ( { ...o, [r.field]: {
@@ -79,13 +80,15 @@ const parseTableData = data => data.reduce((o, r) => {
 
 const SchemaOperations = Object.freeze({
     LIST: 'list',
-    LIST_HEADERS: 'list-headers',
-    CREATE: 'create-table',
-    DROP: 'drop-table', 
-    ADD_COLUMN: 'add-column',
-    REMOVE_COLUMN: 'remove-column',
-    DESCRIBE_COLLECTION: 'describe-collection',
+    LIST_HEADERS: 'listHeaders',
+    CREATE: 'createCollection',
+    DROP: 'dropCollection', 
+    ADD_COLUMN: 'addColumn',
+    REMOVE_COLUMN: 'removeColumn',
+    DESCRIBE_COLLECTION: 'describeCollection',
 })
+
+const AllSchemaOperations = Object.values(SchemaOperations)
 
 const supportedSchemaOperationsFor = (impl) => {
     const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
@@ -111,4 +114,4 @@ const supportedSchemaOperationsFor = (impl) => {
 }
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                        asWixSchemaHeaders, SchemaOperations, supportedSchemaOperationsFor }
+                        asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor }

@@ -1,4 +1,5 @@
 const Chance = require('chance')
+const { AllSchemaOperations } = require('velo-external-db-commons')
 const { AdapterOperators } = require('../../velo-external-db-core/node_modules/velo-external-db-commons/lib')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators //TODO: extract
 
@@ -44,6 +45,11 @@ const randomArrayOf = (gen) => {
         arr.push(gen())
     }
     return arr
+}
+
+const randomElementsFromArray = (arr) => {
+    const quantity = chance.natural({ min: 1, max: arr.length })
+    return chance.pickset(arr, quantity)
 }
 
 const randomCollectionName = () => chance.word({ length: 5 })
@@ -194,9 +200,14 @@ const randomConfig = () => ({
     db: chance.word(),
 })
 
+const randomSchemaOperation = () => (chance.pickone(AllSchemaOperations))
+
+const randomSchemaOperations = () => randomElementsFromArray(AllSchemaOperations)
+
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
                    randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
-                   fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter }
+                   fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter,
+                   randomSchemaOperation, randomSchemaOperations }
 
 
