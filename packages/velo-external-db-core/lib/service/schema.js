@@ -8,7 +8,8 @@ class SchemaService {
 
     async list() {
         const dbs = await this.storage.list()
-        return { schemas: dbs.map( asWixSchema ) }
+        const schemaSupportedOperations = await this.storage.supportedOperations()
+        return { schemas: dbs.map( d => asWixSchema(d, schemaSupportedOperations) ) }
     }
 
     async listHeaders() {
