@@ -14,7 +14,7 @@ const SystemFields = [
         name: '_owner', type: 'text', subtype: 'string', precision: '50'
     }]
 
-const queryOperatorsFor = {
+const QueryOperatorsFor = {
     number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'],
     text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'urlized'],
     boolean: ['eq'],
@@ -24,10 +24,22 @@ const queryOperatorsFor = {
     object: ['eq', 'ne', 'contains'],
 }
 
-const asWixSchema = (db, allowedSchemaOperations) => {
+const SchemaOperations = Object.freeze({
+    LIST: 'list',
+    LIST_HEADERS: 'listHeaders',
+    CREATE: 'createCollection',
+    DROP: 'dropCollection', 
+    ADD_COLUMN: 'addColumn',
+    REMOVE_COLUMN: 'removeColumn',
+    DESCRIBE_COLLECTION: 'describeCollection',
+})
+
+const AllSchemaOperations = Object.values(SchemaOperations)
+
+const asWixSchema = (collection, allowedSchemaOperations) => {
     return {
-        id: db.id,
-        displayName: db.id,
+        id: collection.id,
+        displayName: collection.id,
         allowedOperations: [
             'get',
             'find',
@@ -39,10 +51,10 @@ const asWixSchema = (db, allowedSchemaOperations) => {
         allowedSchemaOperations,
         maxPageSize: 50,
         ttl: 3600,
-        fields: db.fields.reduce( (o, r) => ( { ...o, [r.field]: {
+        fields: collection.fields.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
-                queryOperators: queryOperatorsFor[r.type],
+                queryOperators: QueryOperatorsFor[r.type],
             } }), {} )
     }
 }
@@ -77,18 +89,6 @@ const parseTableData = data => data.reduce((o, r) => {
                                                     o[r.table_name] = arr
                                                     return o
                                                 }, {})
-
-const SchemaOperations = Object.freeze({
-    LIST: 'list',
-    LIST_HEADERS: 'listHeaders',
-    CREATE: 'createCollection',
-    DROP: 'dropCollection', 
-    ADD_COLUMN: 'addColumn',
-    REMOVE_COLUMN: 'removeColumn',
-    DESCRIBE_COLLECTION: 'describeCollection',
-})
-
-const AllSchemaOperations = Object.values(SchemaOperations)
 
 const supportedSchemaOperationsFor = (impl) => {
     const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
