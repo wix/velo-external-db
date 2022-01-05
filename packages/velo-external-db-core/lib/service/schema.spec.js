@@ -1,5 +1,5 @@
 const SchemaService = require('./schema')
-const { asWixSchema, asWixSchemaHeaders } = require('velo-external-db-commons')
+const { asWixSchema, asWixSchemaHeaders, prepareDbsList } = require('velo-external-db-commons')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
@@ -11,7 +11,7 @@ describe('Schema Service', () => {
         driver.givenSupportedOperations(ctx.schemaOperations)
 
         const actual = await env.schemaService.list()
-        expect( actual ).toEqual({ schemas: ctx.dbs.map( db => asWixSchema(db, ctx.schemaOperations) ) })
+        expect( actual ).toEqual({ schemas: prepareDbsList(ctx.dbs, ctx.schemaOperations).map( asWixSchema ) })
     })
 
     test('retrieve short list of all collections from provider', async() => {
@@ -26,7 +26,7 @@ describe('Schema Service', () => {
         driver.givenSupportedOperations(ctx.schemaOperations)
 
         const actual = await env.schemaService.find(ctx.dbs.map(db => db.id))
-        expect( actual ).toEqual({ schemas: ctx.dbs.map( db => asWixSchema(db, ctx.schemaOperations) ) })
+        expect( actual ).toEqual({ schemas: prepareDbsList(ctx.dbs, ctx.schemaOperations).map( asWixSchema ) })
     })
 
     test('create collection name', async() => {

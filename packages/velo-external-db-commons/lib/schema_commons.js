@@ -39,18 +39,18 @@ const AllSchemaOperations = Object.values(SchemaOperations)
 const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove']
 const ReadOnlyOperations = ['get']
 
-const asWixSchema = (collection, allowedSchemaOperations) => {
+const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }) => {
     return {
-        id: collection.id,
-        displayName: collection.id,
-        allowedOperations: allowedOperationsFor(collection),
+        id,
+        displayName: id,
+        allowedOperations,
         allowedSchemaOperations,
         maxPageSize: 50,
         ttl: 3600,
-        fields: collection.fields.reduce( (o, r) => ( { ...o, [r.field]: {
+        fields: fields.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
-                queryOperators: QueryOperatorsFor[r.type],
+                queryOperators: r.queryOperators,
             } }), {} )
     }
 }
@@ -113,5 +113,17 @@ const allowedOperationsFor = (collection) => {
     return collection.fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
 }
 
+const prepareDbsList = (dbs, allowedSchemaOperations) => {
+    return dbs.map(db => ({ 
+            ...db, 
+            allowedSchemaOperations,
+            allowedOperations: allowedOperationsFor(db),
+            fields: prepareFieldsList(db.fields),
+         })
+    )
+}
+
+const prepareFieldsList = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperatorsFor[f.type] }))
+
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                        asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor }
+                        asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor, prepareDbsList }

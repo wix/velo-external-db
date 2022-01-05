@@ -1,4 +1,4 @@
-const { asWixSchema, asWixSchemaHeaders } = require('velo-external-db-commons')
+const { asWixSchema, asWixSchemaHeaders, prepareDbsList } = require('velo-external-db-commons')
 
 class SchemaService {
     constructor(storage, schemaInformation) {
@@ -9,7 +9,9 @@ class SchemaService {
     async list() {
         const dbs = await this.storage.list()
         const schemaSupportedOperations = await this.storage.supportedOperations()
-        return { schemas: dbs.map( db => asWixSchema(db, schemaSupportedOperations) ) }
+        const dbsList = prepareDbsList(dbs, schemaSupportedOperations)
+
+        return { schemas: dbsList.map( asWixSchema ) }
     }
 
     async listHeaders() {
@@ -20,7 +22,9 @@ class SchemaService {
     async find(collectionNames) {
         const dbs = await Promise.all(collectionNames.map(async collectionName => ({ id: collectionName, fields: await this.storage.describeCollection(collectionName) })))
         const schemaSupportedOperations = await this.storage.supportedOperations()
-        return { schemas: dbs.map( db => asWixSchema(db, schemaSupportedOperations) ) }
+        const dbsList = prepareDbsList(dbs, schemaSupportedOperations)
+
+        return { schemas: dbsList.map( asWixSchema ) }
     }
 
     async create(collectionName) {
