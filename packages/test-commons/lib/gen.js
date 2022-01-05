@@ -57,9 +57,9 @@ const randomCollections = () => randomArrayOf( randomCollectionName )
 
 const randomFieldName = () => chance.word({ length: 5 })
 
-const randomDbField = () => ( { name: chance.word(), type: chance.word(), subtype: chance.word(), isPrimary: chance.bool() } )
+const randomCollectionField = () => ({ field: chance.word(), type: randomWixDataType() })
 
-const randomDbFields = () => randomArrayOf( randomDbField )
+const randomCollectionFields = () => randomArrayOf( randomCollectionField )
 
 const fieldsArrayToFieldObj = fields => fields.reduce((pV, cV) => ({
         ...pV, ...{ [cV.name]: { 
@@ -166,7 +166,7 @@ const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, incl
 const veloDate = () => ( { $date: newDate().toISOString() } )
 
 const randomDb = () => ( { id: randomCollectionName(),
-                           fields: randomDbFields() })
+                           fields: randomCollectionFields() })
 
 const randomDbs = () => randomArrayOf( randomDb )
 
@@ -203,6 +203,8 @@ const randomConfig = () => ({
 const randomSchemaOperation = () => (chance.pickone(AllSchemaOperations))
 
 const randomSchemaOperations = () => randomElementsFromArray(AllSchemaOperations)
+
+const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'url', 'datetime', 'image', 'object' ])
 
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
