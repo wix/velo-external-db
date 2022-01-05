@@ -113,17 +113,8 @@ const allowedOperationsFor = (collection) => {
     return collection.fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
 }
 
-const prepareDbsList = (dbs, allowedSchemaOperations) => {
-    return dbs.map(db => ({ 
-            ...db, 
-            allowedSchemaOperations,
-            allowedOperations: allowedOperationsFor(db),
-            fields: prepareFieldsList(db.fields),
-         })
-    )
-}
-
 const prepareFieldsList = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperatorsFor[f.type] }))
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                        asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor, prepareDbsList }
+                    asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor, 
+                    allowedOperationsFor, prepareFieldsList }
