@@ -1,4 +1,5 @@
 const SchemaService = require('./schema')
+const { errors } = require('velo-external-db-commons')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
@@ -45,6 +46,14 @@ describe('Schema Service', () => {
         schema.expectSchemaRefresh()
 
         await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).resolves.toEqual({})
+    })
+    
+    test('run unsupported operations should throw', async() => {
+        driver.givenSupportedOperations(['operation1'])
+
+        await expect(env.schemaService.create(ctx.collectionName)).rejects.toThrow(errors.UnsupportedOperation)
+        await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).rejects.toThrow(errors.UnsupportedOperation)
+        await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).rejects.toThrow(errors.UnsupportedOperation)
     })
 
     test('collections without _id column will have read-only capabilities', async() => {

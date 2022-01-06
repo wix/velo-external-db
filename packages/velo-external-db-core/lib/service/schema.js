@@ -1,5 +1,4 @@
-const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo } = require('velo-external-db-commons')
-
+const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, SchemaOperations, errors } = require('velo-external-db-commons')
 class SchemaService {
     constructor(storage, schemaInformation) {
         this.storage = storage
@@ -28,18 +27,21 @@ class SchemaService {
     }
 
     async create(collectionName) {
+        await this.validateOperation(SchemaOperations.CREATE)
         await this.storage.create(collectionName)
         await this.schemaInformation.refresh()
         return {}
     }
 
     async addColumn(collectionName, column) {
+        await this.validateOperation(SchemaOperations.ADD_COLUMN)
         await this.storage.addColumn(collectionName, column)
         await this.schemaInformation.refresh()
         return {}
     }
 
     async removeColumn(collectionName, columnName) {
+        await this.validateOperation(SchemaOperations.REMOVE_COLUMN)
         await this.storage.removeColumn(collectionName, columnName)
         await this.schemaInformation.refresh()
         return {}
@@ -53,6 +55,14 @@ class SchemaService {
             fields: appendQueryOperatorsTo(db.fields)
         }))
     }
+    
+    async validateOperation(operationName) {
+        const schemaSupportedOperations = await this.storage.supportedOperations()
+
+        if (!schemaSupportedOperations.includes(operationName)) 
+            throw new errors.UnsupportedOperation(`You database doesn't support ${operationName} operation`)
+    }
+
 }
 
 module.exports = SchemaService
