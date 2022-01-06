@@ -1,8 +1,9 @@
 const SchemaService = require('./schema')
-const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, prepareFieldsList } = require('velo-external-db-commons')
+const { asWixSchemaHeaders } = require('velo-external-db-commons')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
+const { schemasList, readWriteSchemaList } = require('./schema_matchers')
 
 describe('Schema Service', () => {
 
@@ -11,7 +12,7 @@ describe('Schema Service', () => {
         driver.givenSupportedOperations(ctx.schemaOperations)
 
         const actual = await env.schemaService.list()
-        expect( actual ).toEqual({ schemas: ctx.dbsList.map( asWixSchema ) })
+        expect( actual ).toEqual({ schemas: schemasList(ctx.dbs, ctx.schemaOperations) })
     })
 
     test('retrieve short list of all collections from provider', async() => {
@@ -26,7 +27,7 @@ describe('Schema Service', () => {
         driver.givenSupportedOperations(ctx.schemaOperations)
 
         const actual = await env.schemaService.find(ctx.dbs.map(db => db.id))
-        expect( actual ).toEqual({ schemas: ctx.dbsList.map( asWixSchema ) })
+        expect( actual ).toEqual({ schemas: schemasList(ctx.dbs, ctx.schemaOperations) })
     })
 
     test('create collection name', async() => {
@@ -50,13 +51,21 @@ describe('Schema Service', () => {
         await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).resolves.toEqual({})
     })
 
+    test('collections with _id column will have read-write capabilities', async() => {
+        driver.givenListWithIdColumnResult(ctx.dbs)
+        driver.givenSupportedOperations(ctx.schemaOperations)
+
+        const actual = await env.schemaService.list()
+
+        expect( actual ).toEqual({ schemas: readWriteSchemaList(ctx.dbs, ctx.schemaOperations) })
+    })
+
     const ctx = {
         dbs: Uninitialized,
         collections: Uninitialized,
         collectionName: Uninitialized,
         column: Uninitialized,
         schemaOperations: Uninitialized,
-        dbsList: Uninitialized,
     }
 
     const env = {
@@ -72,7 +81,6 @@ describe('Schema Service', () => {
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
         ctx.schemaOperations = gen.randomSchemaOperations()
-        ctx.dbsList = ctx.dbs.map(db => ({ ...db, allowedSchemaOperations: ctx.schemaOperations, allowedOperations: allowedOperationsFor(db), fields: prepareFieldsList(db.fields) }))
         
         env.schemaService = new SchemaService(driver.schemaProvider, schema.schemaInformation)
     })

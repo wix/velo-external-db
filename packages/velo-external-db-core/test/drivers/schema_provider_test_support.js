@@ -13,6 +13,12 @@ const schemaProvider = {
 const givenListResult = (dbs) =>
     when(schemaProvider.list).mockResolvedValue(dbs)
 
+const givenListWithIdColumnResult = (dbs) => {
+    const idColumn = { field: '_id', type: 'text' }
+    const dbsWithIdColumn = dbs.map( i => ({ ...i, fields: [ ...i.fields, idColumn] }) )
+    when(schemaProvider.list).mockResolvedValue(dbsWithIdColumn)
+}
+
 const givenListHeadersResult = (collections) =>
     when(schemaProvider.listHeaders).mockResolvedValue(collections)
 
@@ -47,4 +53,5 @@ const reset = () => {
 
 module.exports = { givenFindResults, expectRemoveColumnOf, givenListResult, givenListHeadersResult,
                    expectCreateOf, expectCreateColumnOf, givenSupportedOperations,
+                   givenListWithIdColumnResult,
                    schemaProvider, reset }
