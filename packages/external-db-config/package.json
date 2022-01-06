@@ -25,8 +25,8 @@
 	"devDependencies": {
 		"aws-sdk-client-mock": "^0.5.6",
 		"chance": "^1.1.8",
-		"jest": "^27.4.5",
-		"jest-each": "^27.4.2",
+		"jest": "^27.4.7",
+		"jest-each": "^27.4.6",
 		"jest-when": "^3.5.0",
 		"ts-jest": "^27.1.2",
 		"test-commons": "^0.0.0"
