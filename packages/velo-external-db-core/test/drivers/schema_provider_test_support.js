@@ -53,5 +53,4 @@ const reset = () => {
 
 module.exports = { givenFindResults, expectRemoveColumnOf, givenListResult, givenListHeadersResult,
                    expectCreateOf, expectCreateColumnOf, givenSupportedOperations,
-                   givenListWithIdColumnResult,
-                   schemaProvider, reset }
+                   givenListWithIdColumnResult, schemaProvider, reset }
