@@ -57,7 +57,7 @@ const randomCollections = () => randomArrayOf( randomCollectionName )
 
 const randomFieldName = () => chance.word({ length: 5 })
 
-const randomDbField = () => ( { name: chance.word(), type: chance.word(), subtype: chance.word(), isPrimary: chance.bool() } )
+const randomDbField = () => ( { field: chance.word(), type: randomWixDataType(), subtype: chance.word(), isPrimary: chance.bool() } )
 
 const randomDbFields = () => randomArrayOf( randomDbField )
 
@@ -203,6 +203,8 @@ const randomConfig = () => ({
 const randomSchemaOperation = () => (chance.pickone(AllSchemaOperations))
 
 const randomSchemaOperations = () => randomElementsFromArray(AllSchemaOperations)
+
+const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'url', 'datetime', 'image', 'object' ])
 
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
