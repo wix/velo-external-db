@@ -14,7 +14,7 @@ const SystemFields = [
         name: '_owner', type: 'text', subtype: 'string', precision: '50'
     }]
 
-const QueryOperatorsFor = {
+const FIELD_TYPE_QUERY_OPERATORS_MAP = {
     number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'],
     text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'urlized'],
     boolean: ['eq'],
@@ -59,14 +59,6 @@ const asWixSchemaHeaders = collectionName => {
     return {
         id: collectionName,
         displayName: collectionName,
-        allowedOperations: [
-            'get',
-            'find',
-            'count',
-            'update',
-            'insert',
-            'remove'
-        ],
         maxPageSize: 50,
         ttl: 3600,
     }
@@ -109,12 +101,10 @@ const supportedSchemaOperationsFor = (impl) => {
     }
 }
 
-const allowedOperationsFor = (collection) => {
-    return collection.fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
-}
+const allowedOperationsFor = ({ fields }) => fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
 
-const prepareFieldsList = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperatorsFor[f.type] }))
+const appendQueryOperatorsFor = (fields) => fields.map(f => ({ ...f, queryOperators: FIELD_TYPE_QUERY_OPERATORS_MAP[f.type] }))
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
                     asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor, 
-                    allowedOperationsFor, prepareFieldsList }
+                    allowedOperationsFor, appendQueryOperatorsFor }

@@ -1,4 +1,4 @@
-const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, prepareFieldsList } = require('velo-external-db-commons')
+const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsFor } = require('velo-external-db-commons')
 
 class SchemaService {
     constructor(storage, schemaInformation) {
@@ -9,9 +9,9 @@ class SchemaService {
     async list() {
         const dbs = await this.storage.list()
         const schemaSupportedOperations = await this.storage.supportedOperations()
-        const dbsList = this.prepareDbsList(dbs, schemaSupportedOperations)
+        const dbsWithAllowedOperations = this.appendAllowedOperationsFor(dbs, schemaSupportedOperations)
 
-        return { schemas: dbsList.map( asWixSchema ) }
+        return { schemas: dbsWithAllowedOperations.map( asWixSchema ) }
     }
 
     async listHeaders() {
@@ -22,9 +22,9 @@ class SchemaService {
     async find(collectionNames) {
         const dbs = await Promise.all(collectionNames.map(async collectionName => ({ id: collectionName, fields: await this.storage.describeCollection(collectionName) })))
         const schemaSupportedOperations = await this.storage.supportedOperations()
-        const dbsList = this.prepareDbsList(dbs, schemaSupportedOperations)
+        const dbsWithAllowedOperations = this.appendAllowedOperationsFor(dbs, schemaSupportedOperations)
 
-        return { schemas: dbsList.map( asWixSchema ) }
+        return { schemas: dbsWithAllowedOperations.map( asWixSchema ) }
     }
 
     async create(collectionName) {
@@ -45,12 +45,12 @@ class SchemaService {
         return {}
     }
 
-    prepareDbsList(dbs, schemaSupportedOperations) {
+    appendAllowedOperationsFor(dbs, allowedSchemaOperations) {
         return dbs.map(db => ({
             ...db, 
-            allowedSchemaOperations: schemaSupportedOperations,
+            allowedSchemaOperations,
             allowedOperations: allowedOperationsFor(db),
-            fields: prepareFieldsList(db.fields)
+            fields: appendQueryOperatorsFor(db.fields)
         }))
     }
 }
