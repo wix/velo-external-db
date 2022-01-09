@@ -14,7 +14,7 @@ const SystemFields = [
         name: '_owner', type: 'text', subtype: 'string', precision: '50'
     }]
 
-const QueryOperatorsFor = {
+const QueryOperatorsByFieldType = {
     number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'],
     text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'urlized'],
     boolean: ['eq'],
@@ -36,25 +36,21 @@ const SchemaOperations = Object.freeze({
 
 const AllSchemaOperations = Object.values(SchemaOperations)
 
-const asWixSchema = (collection, allowedSchemaOperations) => {
+const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove']
+const ReadOnlyOperations = ['get']
+
+const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }) => {
     return {
-        id: collection.id,
-        displayName: collection.id,
-        allowedOperations: [
-            'get',
-            'find',
-            'count',
-            'update',
-            'insert',
-            'remove'
-        ],
+        id,
+        displayName: id,
+        allowedOperations,
         allowedSchemaOperations,
         maxPageSize: 50,
         ttl: 3600,
-        fields: collection.fields.reduce( (o, r) => ( { ...o, [r.field]: {
+        fields: fields.reduce( (o, r) => ( { ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
-                queryOperators: QueryOperatorsFor[r.type],
+                queryOperators: r.queryOperators,
             } }), {} )
     }
 }
@@ -63,14 +59,6 @@ const asWixSchemaHeaders = collectionName => {
     return {
         id: collectionName,
         displayName: collectionName,
-        allowedOperations: [
-            'get',
-            'find',
-            'count',
-            'update',
-            'insert',
-            'remove'
-        ],
         maxPageSize: 50,
         ttl: 3600,
     }
@@ -113,5 +101,10 @@ const supportedSchemaOperationsFor = (impl) => {
     }
 }
 
+const allowedOperationsFor = ({ fields }) => fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
+
+const appendQueryOperatorsTo = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperatorsByFieldType[f.type] }))
+
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                        asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor }
+                    asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor, 
+                    allowedOperationsFor, appendQueryOperatorsTo }

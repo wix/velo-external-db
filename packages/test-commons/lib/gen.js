@@ -170,6 +170,8 @@ const randomDb = () => ( { id: randomCollectionName(),
 
 const randomDbs = () => randomArrayOf( randomDb )
 
+const randomDbsWithIdColumn = () => randomDbs().map(i => ({ ...i, fields: [ ...i.fields, { field: '_id', type: 'text' }] }))
+
 const randomObjectFromArray = (array) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
 const randomKeyObject = (obj) => {
@@ -210,6 +212,6 @@ module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDat
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
                    randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
                    fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter,
-                   randomSchemaOperation, randomSchemaOperations }
+                   randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn }
 
 
