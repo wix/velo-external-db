@@ -1,4 +1,4 @@
-const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsFor } = require('velo-external-db-commons')
+const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo } = require('velo-external-db-commons')
 
 class SchemaService {
     constructor(storage, schemaInformation) {
@@ -9,7 +9,7 @@ class SchemaService {
     async list() {
         const dbs = await this.storage.list()
         const schemaSupportedOperations = await this.storage.supportedOperations()
-        const dbsWithAllowedOperations = this.appendAllowedOperationsFor(dbs, schemaSupportedOperations)
+        const dbsWithAllowedOperations = this.appendAllowedOperationsTo(dbs, schemaSupportedOperations)
 
         return { schemas: dbsWithAllowedOperations.map( asWixSchema ) }
     }
@@ -22,7 +22,7 @@ class SchemaService {
     async find(collectionNames) {
         const dbs = await Promise.all(collectionNames.map(async collectionName => ({ id: collectionName, fields: await this.storage.describeCollection(collectionName) })))
         const schemaSupportedOperations = await this.storage.supportedOperations()
-        const dbsWithAllowedOperations = this.appendAllowedOperationsFor(dbs, schemaSupportedOperations)
+        const dbsWithAllowedOperations = this.appendAllowedOperationsTo(dbs, schemaSupportedOperations)
 
         return { schemas: dbsWithAllowedOperations.map( asWixSchema ) }
     }
@@ -45,12 +45,12 @@ class SchemaService {
         return {}
     }
 
-    appendAllowedOperationsFor(dbs, allowedSchemaOperations) {
+    appendAllowedOperationsTo(dbs, allowedSchemaOperations) {
         return dbs.map(db => ({
             ...db, 
             allowedSchemaOperations,
             allowedOperations: allowedOperationsFor(db),
-            fields: appendQueryOperatorsFor(db.fields)
+            fields: appendQueryOperatorsTo(db.fields)
         }))
     }
 }

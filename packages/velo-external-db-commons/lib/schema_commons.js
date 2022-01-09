@@ -14,7 +14,7 @@ const SystemFields = [
         name: '_owner', type: 'text', subtype: 'string', precision: '50'
     }]
 
-const FIELD_TYPE_QUERY_OPERATORS_MAP = {
+const QueryOperatorsByFieldType = {
     number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'],
     text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'urlized'],
     boolean: ['eq'],
@@ -103,8 +103,8 @@ const supportedSchemaOperationsFor = (impl) => {
 
 const allowedOperationsFor = ({ fields }) => fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
 
-const appendQueryOperatorsFor = (fields) => fields.map(f => ({ ...f, queryOperators: FIELD_TYPE_QUERY_OPERATORS_MAP[f.type] }))
+const appendQueryOperatorsTo = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperatorsByFieldType[f.type] }))
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
                     asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor, 
-                    allowedOperationsFor, appendQueryOperatorsFor }
+                    allowedOperationsFor, appendQueryOperatorsTo }
