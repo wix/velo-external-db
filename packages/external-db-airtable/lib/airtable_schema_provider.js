@@ -1,5 +1,5 @@
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { SystemFields, validateSystemFields, supportedSchemaOperationsFor } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, AllSchemaOperations } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 
 const axios = require('axios')
@@ -34,7 +34,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return supportedSchemaOperationsFor('airtable')
+        return AllSchemaOperations
     }
 
 

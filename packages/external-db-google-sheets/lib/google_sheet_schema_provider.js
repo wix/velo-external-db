@@ -1,4 +1,4 @@
-const { SystemFields, validateSystemFields, parseTableData, errors, supportedSchemaOperationsFor } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData, errors, SchemaOperations } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./google_sheet_exception_translator')
 const { describeSheetHeaders, headersFrom, sheetFor } = require('./google_sheet_utils')
 class SchemaProvider {
@@ -30,7 +30,8 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return supportedSchemaOperationsFor('google-sheet')
+        const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
+        return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, DESCRIBE_COLLECTION]
     }
 
     async create(collectionName) {
