@@ -5,6 +5,10 @@ const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
 const matchers = require('./schema_matchers')
 
+expect.extend({
+    toHaveReadOnlyCapability: matchers.toHaveReadOnlyCapability,
+})
+
 describe('Schema Service', () => {
 
     test('retrieve all collections from provider', async() => {
@@ -49,7 +53,8 @@ describe('Schema Service', () => {
     test('collections without _id column will have read-only capabilities', async() => {
         driver.givenListResult(ctx.dbsWithoutIdColumn)
 
-        await expect( env.schemaService.list() ).resolves.toEqual( matchers.haveSchemaFor(ctx.dbsWithoutIdColumn, ctx.schemaOperations) )
+        // await expect( env.schemaService.list() ).resolves.toEqual( matchers.haveSchemaFor(ctx.dbsWithoutIdColumn, ctx.schemaOperations) )
+        await expect( env.schemaService.list() ).resolves.toHaveReadOnlyCapability()
     })
 
     test('run unsupported operations should throw', async() => {
