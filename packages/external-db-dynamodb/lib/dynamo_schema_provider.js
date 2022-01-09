@@ -1,6 +1,6 @@
 const { SystemTable, validateTable, reformatFields } = require('./dynamo_utils')
 const { translateErrorCodes } = require('./sql_exception_translator')
-const { SystemFields, validateSystemFields, supportedSchemaOperationsFor } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, AllSchemaOperations } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 const { DynamoDBDocument }  = require ('@aws-sdk/lib-dynamodb')
 const dynamoRequests = require ('./dynamo_schema_requests_utils')
@@ -31,7 +31,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return supportedSchemaOperationsFor('dynamodb')
+        return AllSchemaOperations
     }
 
     async create(collectionName, columns) {

@@ -1,4 +1,4 @@
-const { SystemFields, validateSystemFields, supportedSchemaOperationsFor } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, AllSchemaOperations } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 
 const SystemTable = '_descriptor'
@@ -30,7 +30,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return supportedSchemaOperationsFor('firestore')
+        return AllSchemaOperations
     }
 
     async create(collectionName, columns) {

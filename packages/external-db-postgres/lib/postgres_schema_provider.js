@@ -2,7 +2,7 @@ const { translateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeIdentifier } = require('./postgres_utils')
 const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
-const { SystemFields, validateSystemFields, parseTableData, supportedSchemaOperationsFor } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } = require('velo-external-db-commons')
 
 class SchemaProvider {
     constructor(pool) {
@@ -28,7 +28,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return supportedSchemaOperationsFor('postgres')
+        return AllSchemaOperations
     }
 
     async create(collectionName, _columns) {

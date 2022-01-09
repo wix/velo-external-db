@@ -1,4 +1,4 @@
-const { SystemFields, validateSystemFields, supportedSchemaOperationsFor } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, AllSchemaOperations } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 const { validateTable, SystemTable } = require ('./mongo_utils')
 
@@ -41,7 +41,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return supportedSchemaOperationsFor('mongo')
+        return AllSchemaOperations
     }
 
     async create(collectionName, columns) {

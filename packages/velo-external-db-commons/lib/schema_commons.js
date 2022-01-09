@@ -78,33 +78,10 @@ const parseTableData = data => data.reduce((o, r) => {
                                                     return o
                                                 }, {})
 
-const supportedSchemaOperationsFor = (impl) => {
-    const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
-
-    switch (impl.toLowerCase()) {
-        case 'airtable':
-        case 'bigquery':
-        case 'dynamodb':
-        case 'firestore':
-        case 'mongo':
-        case 'mssql':
-        case 'mysql':
-        case 'postgres':
-        case 'spanner':
-            return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, REMOVE_COLUMN, DESCRIBE_COLLECTION]
-        
-        case 'google-sheet':
-            return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, DESCRIBE_COLLECTION]
-    
-        default:
-            throw new Error('Unknown implementation')
-    }
-}
-
 const allowedOperationsFor = ({ fields }) => fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
 
 const appendQueryOperatorsTo = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperatorsByFieldType[f.type] }))
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                    asWixSchemaHeaders, SchemaOperations, AllSchemaOperations, supportedSchemaOperationsFor, 
+                    asWixSchemaHeaders, SchemaOperations, AllSchemaOperations,  
                     allowedOperationsFor, appendQueryOperatorsTo }
