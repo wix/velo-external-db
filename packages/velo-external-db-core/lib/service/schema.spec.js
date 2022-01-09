@@ -1,5 +1,5 @@
 const SchemaService = require('./schema')
-const { errors } = require('velo-external-db-commons')
+const { AllSchemaOperations, errors } = require('velo-external-db-commons')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
@@ -9,7 +9,6 @@ describe('Schema Service', () => {
 
     test('retrieve all collections from provider', async() => {
         driver.givenListResult(ctx.dbsWithIdColumn)
-        driver.givenSupportedOperations(ctx.schemaOperations)
 
         await expect( env.schemaService.list() ).resolves.toEqual( matchers.haveSchemaFor(ctx.dbsWithIdColumn, ctx.schemaOperations) )
     })
@@ -22,7 +21,6 @@ describe('Schema Service', () => {
 
     test('retrieve collections by ids from provider', async() => {
         driver.givenFindResults(ctx.dbsWithIdColumn)
-        driver.givenSupportedOperations(ctx.schemaOperations)
 
         await expect( env.schemaService.find(ctx.dbsWithIdColumn.map(db => db.id)) ).resolves.toEqual( matchers.haveSchemaFor(ctx.dbsWithIdColumn, ctx.schemaOperations) )
     })
@@ -47,20 +45,19 @@ describe('Schema Service', () => {
 
         await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).resolves.toEqual({})
     })
-    
+
+    test('collections without _id column will have read-only capabilities', async() => {
+        driver.givenListResult(ctx.dbsWithoutIdColumn)
+
+        await expect( env.schemaService.list() ).resolves.toEqual( matchers.haveSchemaFor(ctx.dbsWithoutIdColumn, ctx.schemaOperations) )
+    })
+
     test('run unsupported operations should throw', async() => {
-        driver.givenSupportedOperations(['operation1'])
+        driver.givenSupportedOperations(['aaa'])
 
         await expect(env.schemaService.create(ctx.collectionName)).rejects.toThrow(errors.UnsupportedOperation)
         await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).rejects.toThrow(errors.UnsupportedOperation)
         await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).rejects.toThrow(errors.UnsupportedOperation)
-    })
-
-    test('collections without _id column will have read-only capabilities', async() => {
-        driver.givenListResult(ctx.dbsWithoutIdColumn)
-        driver.givenSupportedOperations(ctx.schemaOperations)
-
-        await expect( env.schemaService.list() ).resolves.toEqual( matchers.haveSchemaFor(ctx.dbsWithoutIdColumn, ctx.schemaOperations) )
     })
 
     const ctx = {
@@ -86,8 +83,9 @@ describe('Schema Service', () => {
         ctx.collections = gen.randomCollections()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
-        ctx.schemaOperations = gen.randomSchemaOperations()
+        ctx.schemaOperations = AllSchemaOperations
         
         env.schemaService = new SchemaService(driver.schemaProvider, schema.schemaInformation)
+        driver.givenSupportedOperations(AllSchemaOperations)
     })
 })
