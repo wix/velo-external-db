@@ -9,9 +9,9 @@ const appendAllowedOperationsToDbs = (dbs, allowedSchemaOperations) => {
     }))
 }
 
-const toHaveSchema = ( dbsWithAllowedOperations ) => ({ schemas: dbsWithAllowedOperations.map(asWixSchema) })
+const toHaveSchemas = ( dbsWithAllowedOperations ) => ({ schemas: dbsWithAllowedOperations.map(asWixSchema) })
 
-const haveSchemaFor = (dbs, allowedSchemaOperations) =>  toHaveSchema(appendAllowedOperationsToDbs(dbs, allowedSchemaOperations))
+const haveSchemaFor = (dbs, allowedSchemaOperations) =>  toHaveSchemas(appendAllowedOperationsToDbs(dbs, allowedSchemaOperations))
 
 const haveSchemaHeadersFor = ( collections ) =>  ({ schemas: collections.map(asWixSchemaHeaders) })
 
