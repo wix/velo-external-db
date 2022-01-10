@@ -17,7 +17,7 @@ const givenListHeadersResult = (collections) =>
     when(schemaProvider.listHeaders).mockResolvedValue(collections)
 
 const givenSupportedOperations = (operations) =>
-    when(schemaProvider.supportedOperations).mockResolvedValue(operations)
+    when(schemaProvider.supportedOperations).mockReturnValue(operations)
 
 const givenFindResults = (dbs) =>
     dbs.forEach(db => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db.fields) )
