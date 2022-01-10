@@ -7,6 +7,7 @@ const schemaProvider = {
     create: jest.fn(),
     addColumn: jest.fn(),
     removeColumn: jest.fn(),
+    supportedOperations: jest.fn()
 }
 
 const givenListResult = (dbs) =>
@@ -14,6 +15,9 @@ const givenListResult = (dbs) =>
 
 const givenListHeadersResult = (collections) =>
     when(schemaProvider.listHeaders).mockResolvedValue(collections)
+
+const givenSupportedOperations = (operations) =>
+    when(schemaProvider.supportedOperations).mockReturnValue(operations)
 
 const givenFindResults = (dbs) =>
     dbs.forEach(db => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db.fields) )
@@ -37,9 +41,10 @@ const reset = () => {
     schemaProvider.create.mockClear()
     schemaProvider.addColumn.mockClear()
     schemaProvider.removeColumn.mockClear()
+    schemaProvider.supportedOperations.mockClear()
 }
 
 
 module.exports = { givenFindResults, expectRemoveColumnOf, givenListResult, givenListHeadersResult,
-                   expectCreateOf, expectCreateColumnOf,
+                   expectCreateOf, expectCreateColumnOf, givenSupportedOperations,
                    schemaProvider, reset }

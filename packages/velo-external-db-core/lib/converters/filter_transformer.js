@@ -2,7 +2,7 @@ const { AdapterOperators, isObject } = require('velo-external-db-commons')
 const { EMPTY_FILTER } = require ('./utils')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 
-class filterTransformer {
+class FilterTransformer {
     constructor() {
 
     }
@@ -80,4 +80,4 @@ class filterTransformer {
     
 }
 
-module.exports = filterTransformer
+module.exports = FilterTransformer

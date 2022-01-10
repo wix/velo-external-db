@@ -1,5 +1,5 @@
 const { ConnectionPool } = require('mssql')
-const { SchemaProvider } = require('./mssql_schema_provider')
+const SchemaProvider = require('./mssql_schema_provider')
 const DataProvider = require('./mssql_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mssql_operations')

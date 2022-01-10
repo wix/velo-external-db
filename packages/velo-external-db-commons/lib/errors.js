@@ -64,5 +64,11 @@ class ItemNotFound extends BaseHttpError {
     }
 }
 
+class UnsupportedOperation extends BaseHttpError {
+    constructor(message) {
+        super(message, 405)
+    }
+}
+
 module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField, InvalidQuery,
-                   CollectionAlreadyExists, DbConnectionError, InvalidRequest, ItemNotFound }
+                   CollectionAlreadyExists, DbConnectionError, InvalidRequest, ItemNotFound, UnsupportedOperation }

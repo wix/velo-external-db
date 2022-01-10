@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb')
-const { SchemaProvider } = require('./mongo_schema_provider')
+const SchemaProvider = require('./mongo_schema_provider')
 const DataProvider = require('./mongo_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mongo_operations')

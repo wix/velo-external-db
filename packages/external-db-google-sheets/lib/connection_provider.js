@@ -1,6 +1,6 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet')
 const { loadSheets } = require('./google_sheet_utils')
-const { SchemaProvider } = require('./google_sheet_schema_provider')
+const SchemaProvider = require('./google_sheet_schema_provider')
 const DataProvider = require('./google_sheet_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./google_sheet_operations')

@@ -44,7 +44,8 @@ jobs:
                    "mongo", "mongo4",
                    "firestore",
                    "airtable",
-                   "dynamodb"]
+                   "dynamodb",
+                   "google-sheets"]
 
     steps:
       - uses: actions/checkout@v2

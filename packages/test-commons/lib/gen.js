@@ -1,6 +1,7 @@
 const Chance = require('chance')
-const { AdapterOperators } = require('velo-external-db-commons')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators
+const { AllSchemaOperations } = require('velo-external-db-commons')
+const { AdapterOperators } = require('../../velo-external-db-core/node_modules/velo-external-db-commons/lib')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators //TODO: extract
 
 const chance = Chance()
 
@@ -46,12 +47,17 @@ const randomArrayOf = (gen) => {
     return arr
 }
 
+const randomElementsFromArray = (arr) => {
+    const quantity = chance.natural({ min: 1, max: arr.length })
+    return chance.pickset(arr, quantity)
+}
+
 const randomCollectionName = () => chance.word({ length: 5 })
 const randomCollections = () => randomArrayOf( randomCollectionName )
 
 const randomFieldName = () => chance.word({ length: 5 })
 
-const randomDbField = () => ( { name: chance.word(), type: chance.word(), subtype: chance.word(), isPrimary: chance.bool() } )
+const randomDbField = () => ( { field: chance.word(), type: randomWixDataType(), subtype: chance.word(), isPrimary: chance.bool() } )
 
 const randomDbFields = () => randomArrayOf( randomDbField )
 
@@ -164,6 +170,8 @@ const randomDb = () => ( { id: randomCollectionName(),
 
 const randomDbs = () => randomArrayOf( randomDb )
 
+const randomDbsWithIdColumn = () => randomDbs().map(i => ({ ...i, fields: [ ...i.fields, { field: '_id', type: 'text' }] }))
+
 const randomObjectFromArray = (array) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
 const randomKeyObject = (obj) => {
@@ -194,16 +202,23 @@ const randomConfig = () => ({
     db: chance.word(),
 })
 
+
 const randomWixType = () => randomObjectFromArray(['number', 'text', 'boolean', 'url', 'datetime', 'object'])
 
 const invalidOperatorForType = (validOperators) => randomObjectFromArray (
                                                                 Object.values(AdapterOperators).filter(x => !validOperators.includes(x))
                                                             )
 
+const randomSchemaOperation = () => (chance.pickone(AllSchemaOperations))
+
+const randomSchemaOperations = () => randomElementsFromArray(AllSchemaOperations)
+
+const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'url', 'datetime', 'image', 'object' ])
+
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
                    randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
                    fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter, randomWixType,
-                   invalidOperatorForType }
+                   invalidOperatorForType, randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn }
 
 
