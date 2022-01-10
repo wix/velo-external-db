@@ -26,7 +26,7 @@
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
   "dependencies": {
-    "@google-cloud/firestore": "^5.0.1",
+    "@google-cloud/firestore": "^5.0.2",
     "velo-external-db-commons": "^0.0.0"
   },
   "devDependencies": {
