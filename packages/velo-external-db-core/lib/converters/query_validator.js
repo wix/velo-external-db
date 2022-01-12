@@ -8,22 +8,34 @@ class QueryValidator {
 
     validateFilter(fields, filter) {
         const filterFieldsAndOpsObj = extractFieldsAndOperators(filter)
-        this.validateFilterFieldsExists(fields.map(f => f.field), filterFieldsAndOpsObj)
+        const fieldNames = fields.map(f => f.field)
+
+        this.validateFilterFieldsExists(fieldNames, filterFieldsAndOpsObj)
         this.validateOperators(fields, filterFieldsAndOpsObj)
+    
     }
 
     validateFilterFieldsExists(fields, filterObj) { 
-        const allFieldsExists = filterObj.every(field => fields.includes(field.name))
-        if (!allFieldsExists) throw new InvalidQuery('Field doesn\'t exists')
+        const nonExistentFields = filterObj.filter(field => !fields.includes(field.name)) 
+
+        if (nonExistentFields.length) {
+            throw new InvalidQuery(`fields ${nonExistentFields.map(f => f.name).join(', ')} don't exist`)
+        }
     }
 
     validateOperators(fields, filterObj) {
         filterObj.forEach(field => {
-            const type = fields.find(f => f.field === field.name).type
-            if (! queryAdapterOperatorsFor(type).includes(field.operator))
-                throw new InvalidQuery(`data type ${type} doesn't allow operator: ${field.operator}`)
+            const fieldType = this.fieldTypeFor(field.name, fields)
+
+            if (! queryAdapterOperatorsFor(fieldType).includes(field.operator))
+                throw new InvalidQuery(`data type ${fieldType} doesn't allow operator: ${field.operator}`)
         })
     }
+
+    fieldTypeFor(fieldName, fields) {
+        return fields.find(f => f.field === fieldName).type
+    }
+
 }
 
 module.exports = QueryValidator
