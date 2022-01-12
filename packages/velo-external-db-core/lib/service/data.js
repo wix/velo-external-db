@@ -1,6 +1,7 @@
 const { asWixData, unpackDates, prepareForInsert, prepareForUpdate } = require('../converters/transform')
 const { AdapterOperators } = require('velo-external-db-commons')
-// const { validateQueryFields } = require ('./validate_query')
+const QueryValidator = require ('../converters/query_validator')
+
 
 class DataService {
     constructor(storage, schemaInformation, filterTransformer, aggregationTransformer) {
@@ -8,14 +9,17 @@ class DataService {
         this.schemaInformation = schemaInformation
         this.filterTransformer = filterTransformer
         this.aggregationTransformer = aggregationTransformer 
+        this.queryValidator = new QueryValidator()
     }
 
     async find(collectionName, _filter, sort, skip, limit) {
         const filter = this.filterTransformer.transform(_filter)
-        // const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-        // validateQueryFields(fields, filter)
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
 
+        this.queryValidator.validateFilter(fields, filter)
+        
         const items = await this.storage.find(collectionName, filter, sort, skip, limit)
+        
         return {
             items: items.map( asWixData ),
             totalCount: items.length
