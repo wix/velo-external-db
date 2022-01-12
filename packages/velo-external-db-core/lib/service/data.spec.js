@@ -10,7 +10,8 @@ const chance = new Chance()
 
 describe('Data Service', () => {
 
-    test('delegate request to data provider and translate data to velo format', async() => {
+    // eslint-disable-next-line jest/no-disabled-tests
+    test.skip('delegate request to data provider and translate data to velo format', async() => {
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
         filterTransformer.stubIgnoreTransform(ctx.filter)
 
