@@ -202,6 +202,13 @@ const randomConfig = () => ({
     db: chance.word(),
 })
 
+
+const randomWixType = () => randomObjectFromArray(['number', 'text', 'boolean', 'url', 'datetime', 'object'])
+
+const invalidOperatorForType = (validOperators) => randomObjectFromArray (
+                                                                Object.values(AdapterOperators).filter(x => !validOperators.includes(x))
+                                                            )
+
 const randomSchemaOperation = () => (chance.pickone(AllSchemaOperations))
 
 const randomSchemaOperations = () => randomElementsFromArray(AllSchemaOperations)
@@ -211,7 +218,7 @@ const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'ur
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
                    randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
-                   fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter,
-                   randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn }
+                   fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter, randomWixType,
+                   invalidOperatorForType, randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn }
 
 

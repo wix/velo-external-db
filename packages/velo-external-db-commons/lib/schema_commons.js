@@ -83,5 +83,6 @@ const allowedOperationsFor = ({ fields }) => fields.find(c => c.field === '_id')
 const appendQueryOperatorsTo = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperatorsByFieldType[f.type] }))
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                    asWixSchemaHeaders, SchemaOperations, AllSchemaOperations,  
-                    allowedOperationsFor, appendQueryOperatorsTo }
+                    asWixSchemaHeaders, SchemaOperations, AllSchemaOperations,
+                    allowedOperationsFor, appendQueryOperatorsTo, QueryOperatorsByFieldType }
+
