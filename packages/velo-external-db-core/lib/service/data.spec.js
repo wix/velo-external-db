@@ -10,12 +10,13 @@ const chance = new Chance()
 
 describe('Data Service', () => {
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    test.skip('delegate request to data provider and translate data to velo format', async() => {
-        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-        filterTransformer.stubIgnoreTransform(ctx.filter)
 
-        const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+    test('delegate request to data provider and translate data to velo format', async() => {
+        filterTransformer.givenFilter(ctx.filterField)
+        schema.giveSchemaWithFieldFor(ctx.collectionName, ctx.field)
+        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filterField, ctx.sort, ctx.skip, ctx.limit)
+
+        const actual = await env.dataService.find(ctx.collectionName, ctx.filterField, ctx.sort, ctx.skip, ctx.limit)
         expect( actual ).toEqual({ items: ctx.entities, totalCount: ctx.entities.length })
     })
 
@@ -147,6 +148,8 @@ describe('Data Service', () => {
         itemId: Uninitialized,
         itemIds: Uninitialized,
         total: Uninitialized,
+        field: Uninitialized,
+        filterField: Uninitialized,
     }
 
     const env = {
@@ -168,6 +171,8 @@ describe('Data Service', () => {
         ctx.itemId = chance.guid()
         ctx.itemIds = Array.from({ length: 10 }, () => chance.guid())
         ctx.total = chance.natural({ min: 2, max: 20 })
+        ctx.field = gen.randomDbField()
+        ctx.filterField = gen.randomFilterBaseOnField(ctx.field.field, ctx.field.type)
 
         ctx.entities = gen.randomEntities()
         ctx.entity = gen.randomEntity()

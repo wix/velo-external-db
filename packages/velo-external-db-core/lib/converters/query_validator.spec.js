@@ -69,7 +69,7 @@ describe('Query Validator', () => {
         ctx.anotherFieldName = chance.word()
         ctx.value = chance.word()
         ctx.operator = gen.randomOperator()
-        ctx.type = gen.randomWixType()
+        ctx.type = gen.randomWixDataType()
         ctx.validOperatorForType = gen.randomObjectFromArray(queryAdapterOperatorsFor(ctx.type))
         ctx.invalidOperatorForType = gen.invalidOperatorForType(queryAdapterOperatorsFor(ctx.type))
     })

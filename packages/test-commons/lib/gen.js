@@ -1,7 +1,5 @@
 const Chance = require('chance')
-const { AllSchemaOperations } = require('velo-external-db-commons')
-const { AdapterOperators } = require('../../velo-external-db-core/node_modules/velo-external-db-commons/lib')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators //TODO: extract
+const { AllSchemaOperations, QueryOperatorsByFieldType, wixOperatorToAdapterOperator, AdapterOperators, WixOperators } = require('velo-external-db-commons')
 
 const chance = Chance()
 
@@ -130,8 +128,16 @@ const randomNumberDbEntity = (columns) => {
 
 
 const randomFilter = () => {
-    const op = randomOperator()
+    const op = randomWixOperator()
     const fieldName = chance.word()
+    const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
+    return {
+        [fieldName]: { [op]: value } 
+    }
+}
+
+const randomFilterBaseOnField = (fieldName, fieldType) => {
+    const op = randomAdapterOperatorByType(fieldType)
     const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
         [fieldName]: { [op]: value } 
@@ -150,7 +156,7 @@ const randomWrappedFilter = () => {
 }
 
 const idFilter = () => {
-    const operator = randomAdapterOperator()
+    const operator = randomAdapterOperatorByType('text')
     const value = operator === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
         fieldName: '_id',
@@ -159,9 +165,18 @@ const idFilter = () => {
     }
 }
 
-const randomOperator = () => (chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith']))
+const randomEnumValue = (_enum) => chance.pickone(Object.values(_enum))
 
-const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
+const randomWixOperator = () => randomEnumValue(WixOperators)
+
+const randomAdapterOperator = () => randomEnumValue(AdapterOperators)
+
+const randomAdapterOperatorByType = (fieldType) => {
+    const allowedOperatorForType = QueryOperatorsByFieldType[fieldType]
+    const wixFormatAllowedOperatorForType = allowedOperatorForType.map( i => `$${i}`)
+    const adapterFormatAllowedOperatorForType = wixFormatAllowedOperatorForType.map( i => wixOperatorToAdapterOperator(i))
+    return chance.pickone(adapterFormatAllowedOperatorForType)
+}
 
 const veloDate = () => ( { $date: newDate().toISOString() } )
 
@@ -202,9 +217,6 @@ const randomConfig = () => ({
     db: chance.word(),
 })
 
-
-const randomWixType = () => randomObjectFromArray(['number', 'text', 'boolean', 'url', 'datetime', 'object'])
-
 const invalidOperatorForType = (validOperators) => randomObjectFromArray (
                                                                 Object.values(AdapterOperators).filter(x => !validOperators.includes(x))
                                                             )
@@ -213,12 +225,13 @@ const randomSchemaOperation = () => (chance.pickone(AllSchemaOperations))
 
 const randomSchemaOperations = () => randomElementsFromArray(AllSchemaOperations)
 
-const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'url', 'datetime', 'image', 'object' ])
+const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'url', 'datetime', 'object'])
 
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
                    randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
-                   fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter, randomWixType,
-                   invalidOperatorForType, randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn }
+                   fieldsArrayToFieldObj, randomFieldName, randomWixOperator, randomAdapterOperator, randomWrappedFilter, randomWixDataType,
+                   invalidOperatorForType, randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn,
+                   randomDbField, randomFilterBaseOnField }
 
 
