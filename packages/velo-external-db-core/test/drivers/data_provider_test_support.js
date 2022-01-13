@@ -12,7 +12,7 @@ const dataProvider = {
 }
 
 const givenListResult = (entities, forCollectionName, filter, sort, skip, andLimit) =>
-    when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit)
+    when(dataProvider.find).calledWith(forCollectionName, expect.anything(), sort, skip, andLimit)
                            .mockResolvedValue(entities.map( unpackDates ))
 
 const givenCountResult = (total, forCollectionName, filter) =>

@@ -11,6 +11,11 @@ const givenDefaultSchemaFor = collectionName => {
                                            .mockResolvedValue( SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) ) )
 }
 
+const giveSchemaWithFieldFor = (collectionName, field) => {
+    when(schemaInformation.schemaFieldsFor).calledWith(collectionName)
+                                           .mockResolvedValue([field])
+}
+
 const expectSchemaRefresh = () =>
     when(schemaInformation.refresh).mockResolvedValue()
 
@@ -22,5 +27,6 @@ const reset = () => {
 
 module.exports = {
     givenDefaultSchemaFor, expectSchemaRefresh,
-    schemaInformation, reset
+    schemaInformation, reset,
+    giveSchemaWithFieldFor
 }
