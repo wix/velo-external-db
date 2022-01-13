@@ -1,5 +1,6 @@
 const Chance = require('chance')
 const { AllSchemaOperations, QueryOperatorsByFieldType, wixOperatorToAdapterOperator, AdapterOperators, WixOperators } = require('velo-external-db-commons')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators
 
 const chance = Chance()
 
@@ -171,7 +172,7 @@ const randomEnumValue = (_enum) => chance.pickone(Object.values(_enum))
 
 const randomWixOperator = () => randomEnumValue(WixOperators)
 
-const randomAdapterOperator = () => randomEnumValue(AdapterOperators)
+const randomAdapterOperator = () => (chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]))
 
 const randomAdapterOperatorByType = (fieldType) => {
     const allowedOperatorForType = QueryOperatorsByFieldType[fieldType]
