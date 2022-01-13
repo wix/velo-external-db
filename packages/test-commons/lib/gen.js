@@ -165,6 +165,8 @@ const idFilter = () => {
     }
 }
 
+const randomOperator = () => (chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith']))
+
 const randomEnumValue = (_enum) => chance.pickone(Object.values(_enum))
 
 const randomWixOperator = () => randomEnumValue(WixOperators)
@@ -232,6 +234,6 @@ module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDat
                    randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
                    fieldsArrayToFieldObj, randomFieldName, randomWixOperator, randomAdapterOperator, randomWrappedFilter, randomWixDataType,
                    invalidOperatorForType, randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn,
-                   randomDbField, randomFilterBaseOnField }
+                   randomDbField, randomFilterBaseOnField, randomOperator }
 
 
