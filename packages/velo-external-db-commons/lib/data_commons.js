@@ -57,6 +57,19 @@ const AdapterOperators = {
     urlized: 'urlized'
 }
 
+const WixOperators = {
+    $eq: '$eq',
+    $ne: '$ne',
+    $startsWith: '$startsWith',
+    $endsWith: '$endsWith',
+    $contains: '$contains',
+    $hasSome: '$hasSome',
+    $lt: '$lt',
+    $lte: '$lte',
+    $gt: '$gt',
+    $gte: '$gte',
+}
+
 const AdapterFunctions = { 
     avg: 'avg',
     max: 'max',
@@ -105,4 +118,4 @@ const extractProjectionFunctionsObjects = (projection) => projection.filter(f =>
 module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor,
                      isEmptyFilter, AdapterOperators, AdapterFunctions,
                      extractGroupByNames, extractProjectionFunctionsObjects,
-                     wixOperatorToAdapterOperator }
+                     wixOperatorToAdapterOperator, WixOperators }
