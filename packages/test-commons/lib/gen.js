@@ -157,7 +157,7 @@ const randomWrappedFilter = () => {
 }
 
 const idFilter = () => {
-    const operator = randomAdapterOperatorByType('text')
+    const operator = randomAdapterOperator()
     const value = operator === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
         fieldName: '_id',
