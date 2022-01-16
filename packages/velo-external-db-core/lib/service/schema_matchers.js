@@ -9,20 +9,20 @@ const appendAllowedOperationsToDbs = (dbs, allowedSchemaOperations) => {
     }))
 }
 
-const toHaveSchemas = ( collections, func, ...args ) => ({
-    schemas: collections.map( c => func(c, args) )
+const toHaveSchemas = ( collections, functionOnEachCollection, ...args ) => ({
+    schemas: collections.map( c => functionOnEachCollection(c, args) )
 })
 
 const collectionToHaveReadOnlyCapability = () => expect.objectContaining({ allowedOperations: expect.toIncludeSameMembers(ReadOnlyOperations) })
 
-const haveSchemaFor = (dbs, allowedSchemaOperations) => {
+const schemasListFor = (dbs, allowedSchemaOperations) => {
     const dbsWithAllowedOperations = appendAllowedOperationsToDbs(dbs, allowedSchemaOperations)
     return toHaveSchemas(dbsWithAllowedOperations, asWixSchema)
 }
 
-const haveSchemaHeadersFor = (collections) => toHaveSchemas(collections, asWixSchemaHeaders)
+const schemaHeadersListFor = (collections) => toHaveSchemas(collections, asWixSchemaHeaders)
 
-const toHaveReadOnlyCapability = (collections) => toHaveSchemas(collections, collectionToHaveReadOnlyCapability)
+const schemasWithReadOnlyCapabilitiesFor = (collections) => toHaveSchemas(collections, collectionToHaveReadOnlyCapability)
 
 
-module.exports = { haveSchemaFor, haveSchemaHeadersFor, toHaveReadOnlyCapability }
+module.exports = { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor }
