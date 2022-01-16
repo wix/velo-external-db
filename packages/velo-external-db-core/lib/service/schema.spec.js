@@ -57,7 +57,7 @@ describe('Schema Service', () => {
     })
 
     test('run unsupported operations should throw', async() => {
-        driver.givenSupportedOperations(ctx.unrealOperations)
+        driver.givenAdapterSupportedOperationsWith(ctx.unrealOperations)
 
         await expect(env.schemaService.create(ctx.collectionName)).rejects.toThrow(errors.UnsupportedOperation)
         await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).rejects.toThrow(errors.UnsupportedOperation)
@@ -93,6 +93,6 @@ describe('Schema Service', () => {
         ctx.unrealOperations = [chance.word(), chance.word()]
         
         env.schemaService = new SchemaService(driver.schemaProvider, schema.schemaInformation)
-        driver.givenSupportedOperations(AllSchemaOperations)
+        driver.givenAdapterSupportedOperationsWith(AllSchemaOperations)
     })
 })

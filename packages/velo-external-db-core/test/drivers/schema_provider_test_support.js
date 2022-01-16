@@ -16,7 +16,7 @@ const givenListResult = (dbs) =>
 const givenListHeadersResult = (collections) =>
     when(schemaProvider.listHeaders).mockResolvedValue(collections)
 
-const givenSupportedOperations = (operations) =>
+const givenAdapterSupportedOperationsWith = (operations) =>
     when(schemaProvider.supportedOperations).mockReturnValue(operations)
 
 const givenFindResults = (dbs) =>
@@ -46,5 +46,5 @@ const reset = () => {
 
 
 module.exports = { givenFindResults, expectRemoveColumnOf, givenListResult, givenListHeadersResult,
-                   expectCreateOf, expectCreateColumnOf, givenSupportedOperations,
+                   expectCreateOf, expectCreateColumnOf, givenAdapterSupportedOperationsWith,
                    schemaProvider, reset }
