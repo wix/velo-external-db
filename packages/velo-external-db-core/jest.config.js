@@ -4,5 +4,6 @@ module.exports = {
     roots: ['<rootDir>/lib'],
     preset: 'ts-jest',
     testRegex: '(.*\\.spec\\.)js$',
-    testEnvironment: 'node'
+    testEnvironment: 'node',
+    setupFilesAfterEnv: ['jest-extended/all'],
 }

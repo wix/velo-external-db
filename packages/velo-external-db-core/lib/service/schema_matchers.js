@@ -1,4 +1,4 @@
-const { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders } = require('velo-external-db-commons')
+const { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders, ReadOnlyOperations } = require('velo-external-db-commons')
 
 const appendAllowedOperationsToDbs = (dbs, allowedSchemaOperations) => {
     return dbs.map( db => ({
@@ -9,10 +9,20 @@ const appendAllowedOperationsToDbs = (dbs, allowedSchemaOperations) => {
     }))
 }
 
-const toHaveSchemas = ( dbsWithAllowedOperations ) => ({ schemas: dbsWithAllowedOperations.map(asWixSchema) })
+const toHaveSchemas = ( collections, functionOnEachCollection, ...args ) => ({
+    schemas: collections.map( c => functionOnEachCollection(c, args) )
+})
 
-const haveSchemaFor = (dbs, allowedSchemaOperations) =>  toHaveSchemas(appendAllowedOperationsToDbs(dbs, allowedSchemaOperations))
+const collectionToHaveReadOnlyCapability = () => expect.objectContaining({ allowedOperations: expect.toIncludeSameMembers(ReadOnlyOperations) })
 
-const haveSchemaHeadersFor = ( collections ) =>  ({ schemas: collections.map(asWixSchemaHeaders) })
+const schemasListFor = (dbs, allowedSchemaOperations) => {
+    const dbsWithAllowedOperations = appendAllowedOperationsToDbs(dbs, allowedSchemaOperations)
+    return toHaveSchemas(dbsWithAllowedOperations, asWixSchema)
+}
 
-module.exports = { haveSchemaFor, haveSchemaHeadersFor }
+const schemaHeadersListFor = (collections) => toHaveSchemas(collections, asWixSchemaHeaders)
+
+const schemasWithReadOnlyCapabilitiesFor = (collections) => toHaveSchemas(collections, collectionToHaveReadOnlyCapability)
+
+
+module.exports = { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor }

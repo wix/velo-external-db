@@ -84,5 +84,5 @@ const appendQueryOperatorsTo = (fields) => fields.map(f => ({ ...f, queryOperato
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
                     asWixSchemaHeaders, SchemaOperations, AllSchemaOperations,
-                    allowedOperationsFor, appendQueryOperatorsTo, QueryOperatorsByFieldType }
-
+                    allowedOperationsFor, appendQueryOperatorsTo, QueryOperatorsByFieldType,
+                    ReadWriteOperations, ReadOnlyOperations }
