@@ -14,4 +14,4 @@ const reset = () => {
 }
 
 
-module.exports = { aggregationTransformer, givenAggregateTransformResult, reset, transform: aggregationTransformer.transform }
+module.exports = { aggregationTransformer, givenAggregateTransformResult, reset }
