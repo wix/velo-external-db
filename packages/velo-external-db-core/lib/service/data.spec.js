@@ -15,10 +15,13 @@ describe('Data Service', () => {
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
         schema.givenDefaultSchemaFor(ctx.collectionName)
         filterTransformer.givenTransformResult(ctx.filter)
-        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
-        queryValidator.expectValidFilter(fields, ctx.filter)
 
-        const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+        const transformedFilter = filterTransformer.transform(ctx.filter)
+        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
+        
+        queryValidator.expectValidFilter(fields, transformedFilter)
+
+        const actual = await env.dataService.find(ctx.collectionName, transformedFilter, ctx.sort, ctx.skip, ctx.limit)
         expect( actual ).toEqual({ items: ctx.entities, totalCount: ctx.entities.length })
     })
 
@@ -26,7 +29,9 @@ describe('Data Service', () => {
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
         filterTransformer.givenTransformResult(ctx.filter)
 
-        const actual = await env.dataService.count(ctx.collectionName, ctx.filter)
+        const transformedFilter = filterTransformer.transform(ctx.filter)
+
+        const actual = await env.dataService.count(ctx.collectionName, transformedFilter)
         expect( actual ).toEqual({ totalCount: ctx.total })
     })
 
@@ -131,7 +136,10 @@ describe('Data Service', () => {
         aggregationTransformer.givenAggregateTransformResult(ctx.aggregation)
         filterTransformer.givenTransformResult(ctx.filter)
 
-        const actual = await env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)
+        const transformedFilter = filterTransformer.transform(ctx.filter)
+        const transformedAggregate = aggregationTransformer.transform(ctx.aggregation)
+
+        const actual = await env.dataService.aggregate(ctx.collectionName, transformedFilter, transformedAggregate)
 
         expect( actual ).toEqual({ items: ctx.entities, totalCount: 0 })
     })

@@ -29,4 +29,4 @@ const reset = () => {
     filterTransformer.transform.mockClear()
 }
 
-module.exports = { filterTransformer, stubEmptyFilterFor, givenFilterByIdWith, givenTransformResult, reset }
+module.exports = { filterTransformer, stubEmptyFilterFor, givenFilterByIdWith, givenTransformResult, reset, transform: filterTransformer.transform }
