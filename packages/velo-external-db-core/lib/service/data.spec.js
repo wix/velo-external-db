@@ -4,16 +4,17 @@ const driver = require('../../test/drivers/data_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
 const filterTransformer = require ('../../test/drivers/filter_transformer_test_support')
 const aggregationTransformer = require('../../test/drivers/aggregation_transformer_test_support')
+const queryValidator = require('../../test/drivers/query_validator_test_support')
 const { AdapterOperators } = require('velo-external-db-commons')
 const Chance = require('chance')
 const chance = new Chance()
 
 describe('Data Service', () => {
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    test.skip('delegate request to data provider and translate data to velo format', async() => {
+    test('delegate request to data provider and translate data to velo format', async() => {
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-        filterTransformer.stubIgnoreTransform(ctx.filter)
+        filterTransformer.givenTransformResult(ctx.filter)
+        queryValidator.expectValidFilter(ctx.filter)
 
         const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
         expect( actual ).toEqual({ items: ctx.entities, totalCount: ctx.entities.length })
@@ -21,7 +22,7 @@ describe('Data Service', () => {
 
     test('count data from collection', async() => {
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
-        filterTransformer.stubIgnoreTransform(ctx.filter)
+        filterTransformer.givenTransformResult(ctx.filter)
 
         const actual = await env.dataService.count(ctx.collectionName, ctx.filter)
         expect( actual ).toEqual({ totalCount: ctx.total })
@@ -125,8 +126,8 @@ describe('Data Service', () => {
 
     test('aggregate api', async() => {
         driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
-        aggregationTransformer.stubIgnoreTransform(ctx.aggregation)
-        filterTransformer.stubIgnoreTransform(ctx.filter)
+        aggregationTransformer.stubgivenTransformResult(ctx.aggregation)
+        filterTransformer.givenTransformResult(ctx.filter)
 
         const actual = await env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)
 
