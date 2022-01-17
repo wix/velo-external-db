@@ -13,8 +13,10 @@ describe('Data Service', () => {
 
     test('delegate request to data provider and translate data to velo format', async() => {
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+        schema.givenDefaultSchemaFor(ctx.collectionName)
         filterTransformer.givenTransformResult(ctx.filter)
-        queryValidator.expectValidFilter(ctx.filter)
+        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
+        queryValidator.expectValidFilter(fields, ctx.filter)
 
         const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
         expect( actual ).toEqual({ items: ctx.entities, totalCount: ctx.entities.length })
@@ -126,7 +128,7 @@ describe('Data Service', () => {
 
     test('aggregate api', async() => {
         driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
-        aggregationTransformer.stubgivenTransformResult(ctx.aggregation)
+        aggregationTransformer.givenAggregateTransformResult(ctx.aggregation)
         filterTransformer.givenTransformResult(ctx.filter)
 
         const actual = await env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)
@@ -159,6 +161,7 @@ describe('Data Service', () => {
         schema.reset()
         filterTransformer.reset()
         aggregationTransformer.reset()
+        queryValidator.reset()
 
         ctx.collectionName = gen.randomCollectionName()
         ctx.filter = chance.word()
@@ -178,6 +181,6 @@ describe('Data Service', () => {
         ctx.entityWithoutId = e
         ctx.entitiesWithoutId = gen.randomEntities().map(i => { delete i._id; return i })
 
-        env.dataService = new DataService(driver.dataProvider, schema.schemaInformation, filterTransformer.filterTransformer, aggregationTransformer.aggregationTransformer)
+        env.dataService = new DataService(driver.dataProvider, schema.schemaInformation, filterTransformer.filterTransformer, aggregationTransformer.aggregationTransformer, queryValidator.queryValidator)
     })
 })

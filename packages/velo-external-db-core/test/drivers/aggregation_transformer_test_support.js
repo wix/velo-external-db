@@ -4,7 +4,7 @@ const aggregationTransformer = {
     transform: jest.fn(),
 }
 
-const stubIgnoreTransform = (aggregation) => {
+const givenAggregateTransformResult = (aggregation) => {
     when(aggregationTransformer.transform).calledWith(aggregation)
                                           .mockReturnValue(aggregation)
 }
@@ -14,4 +14,4 @@ const reset = () => {
 }
 
 
-module.exports = { aggregationTransformer, stubIgnoreTransform, reset }
+module.exports = { aggregationTransformer, givenAggregateTransformResult, reset }

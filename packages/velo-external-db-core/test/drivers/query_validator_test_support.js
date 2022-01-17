@@ -4,8 +4,8 @@ const queryValidator = {
     validateFilter: jest.fn(),
 }
 
-const expectValidFilter = (filter) => {
-    when(queryValidator.validateFilter).calledWith(filter)
+const expectValidFilter = (fields, filter) => {
+    when(queryValidator.validateFilter).calledWith(fields, filter)
                                        .mockReturnValue()
 }
 
@@ -14,5 +14,5 @@ const reset = () => {
 }
 
 module.exports = {
-    expectValidFilter, reset
+    queryValidator, expectValidFilter, reset
 }
