@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid')
 let dateTimeProvider = require('../utils/date_time_provider')
 
-const asWixData = e => packDates(e)
+const asWixData = e => generateIdsIfNeeded(packDates(e))
 
 const isObject = (o) => typeof o === 'object' && o !== null
 
