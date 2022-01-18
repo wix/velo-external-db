@@ -59,7 +59,7 @@ describe('Config Reader Client', () => {
 
         const actual = await env.configReader.configStatus()
 
-        expect( actual ).toEqual('Cloud type not supported')
+        expect( actual ).toEqual('Cloud type is not supported')
     })
 
     test('status call with wrong db type', async() => {
@@ -68,7 +68,7 @@ describe('Config Reader Client', () => {
 
         const actual = await env.configReader.configStatus()
 
-        expect( actual ).toEqual('DB type not supported')
+        expect( actual ).toEqual('DB type is not supported')
     })
 
 
