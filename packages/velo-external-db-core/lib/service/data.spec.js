@@ -4,27 +4,40 @@ const driver = require('../../test/drivers/data_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
 const filterTransformer = require ('../../test/drivers/filter_transformer_test_support')
 const aggregationTransformer = require('../../test/drivers/aggregation_transformer_test_support')
+const queryValidator = require('../../test/drivers/query_validator_test_support')
 const { AdapterOperators } = require('velo-external-db-commons')
 const Chance = require('chance')
 const chance = new Chance()
 
 describe('Data Service', () => {
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    test.skip('delegate request to data provider and translate data to velo format', async() => {
-        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-        filterTransformer.stubIgnoreTransform(ctx.filter)
-
-        const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-        expect( actual ).toEqual({ items: ctx.entities, totalCount: ctx.entities.length })
+    test('delegate request to data provider and translate data to velo format', async() => {
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
+        
+        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
+        
+        queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
+        
+        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.sort, ctx.skip, ctx.limit)
+        
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({
+                                                                                                                        items: ctx.entities,
+                                                                                                                        totalCount: ctx.entities.length 
+                                                                                                                    })
     })
 
     test('count data from collection', async() => {
-        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
-        filterTransformer.stubIgnoreTransform(ctx.filter)
+        filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
+        
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
+        
+        queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
 
-        const actual = await env.dataService.count(ctx.collectionName, ctx.filter)
-        expect( actual ).toEqual({ totalCount: ctx.total })
+        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.transformedFilter)
+
+        return expect(env.dataService.count(ctx.collectionName, ctx.filter)).resolves.toEqual({ totalCount: ctx.total })
     })
 
     test('get by id will issue a call to find and transform the result', async() => {
@@ -32,87 +45,79 @@ describe('Data Service', () => {
         driver.givenListResult([ctx.entity], ctx.collectionName,
                         idFilter, '', 0, 1)
 
-        const actual = await env.dataService.getById(ctx.collectionName, ctx.itemId)
-        expect( actual ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.getById(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: ctx.entity })
     })
 
     test('insert will insert data into db', async() => {
         driver.expectInsertFor([ctx.entity], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.insert(ctx.collectionName, ctx.entity)
-        return expect( actual  ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.insert(ctx.collectionName, ctx.entity)).resolves.toEqual({ item: ctx.entity })
     })
 
     test('insert will removed fields that does not exists in the schema from entities', async() => {
         driver.expectInsertFor([ctx.entity], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.insert(ctx.collectionName, { ...ctx.entity, some: 'prop' })
-        return expect( actual  ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.insert(ctx.collectionName, { ...ctx.entity, some: 'prop' })).resolves.toEqual({ item: ctx.entity })
     })
 
     test('insert will add default values according to the schema', async() => {
         driver.expectInsertMatchedFor([ctx.entityWithoutId], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.insert(ctx.collectionName, ctx.entityWithoutId)
-        return expect( actual.item  ).toHaveProperty('_id' )
+        const { item } = await env.dataService.insert(ctx.collectionName, ctx.entityWithoutId)
+        
+        return expect(item).toHaveProperty('_id')
     })
-
+    
     test('bulk insert items without _id will apply random _id to all items', async() => {
         driver.expectInsertMatchedFor(ctx.entitiesWithoutId, ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.bulkInsert(ctx.collectionName, ctx.entitiesWithoutId)
+        const { items } = await env.dataService.bulkInsert(ctx.collectionName, ctx.entitiesWithoutId)
 
-        return actual.items.map(item => expect(item).toHaveProperty( '_id' ) )
+        return items.map(item => expect(item).toHaveProperty( '_id' ) )
     })
 
     test('bulk insert will insert data into db', async() => {
         driver.expectInsertFor(ctx.entities, ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.bulkInsert(ctx.collectionName, ctx.entities)
-        return expect( actual  ).toEqual({ items: ctx.entities })
+        return expect(env.dataService.bulkInsert(ctx.collectionName, ctx.entities)).resolves.toEqual({ items: ctx.entities })
     })
 
     test('update will update data into db', async() => {
         driver.expectUpdateFor([ctx.entity], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.update(ctx.collectionName, ctx.entity)
-        expect( actual ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.update(ctx.collectionName, ctx.entity)).resolves.toEqual({ item: ctx.entity })
     })
 
     test('update will remove non existing fields from update according to the schema', async() => {
         driver.expectUpdateFor([ctx.entity], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.update(ctx.collectionName, { ...ctx.entity, someProp: 'whatever' })
-        expect( actual ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.update(ctx.collectionName, { ...ctx.entity, someProp: 'whatever' })).resolves.toEqual({ item: ctx.entity })
     })
 
     test('bulk update will update data into db', async() => {
         driver.expectUpdateFor(ctx.entities, ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.bulkUpdate(ctx.collectionName, ctx.entities)
-        expect( actual ).toEqual({ items: ctx.entities })
+        return expect(env.dataService.bulkUpdate(ctx.collectionName, ctx.entities)).resolves.toEqual({ items: ctx.entities })
     })
 
     test('delete by item id', async() => {
         driver.expectDeleteFor([ctx.itemId], ctx.collectionName)
 
-        const actual = await env.dataService.delete(ctx.collectionName, ctx.itemId)
-        expect( actual ).toEqual({ item: {} })
+        return expect(env.dataService.delete(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: {} })
     })
 
     test('bulk delete by item ids', async() => {
         driver.expectDeleteFor(ctx.itemIds, ctx.collectionName)
 
-        const actual = await env.dataService.bulkDelete(ctx.collectionName, ctx.itemIds)
-        expect( actual ).toEqual({ items: [] })
+        return expect(env.dataService.bulkDelete(ctx.collectionName, ctx.itemIds)).resolves.toEqual({ items: [] })
     })
 
     
@@ -124,19 +129,24 @@ describe('Data Service', () => {
     })
 
     test('aggregate api', async() => {
-        driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
-        aggregationTransformer.stubIgnoreTransform(ctx.aggregation)
-        filterTransformer.stubIgnoreTransform(ctx.filter)
+        aggregationTransformer.givenTransformTo(ctx.aggregation, ctx.transformedAggregation)
+        filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
+        
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
+        
+        queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
+        driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.transformedAggregation)
 
-        const actual = await env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)
-
-        expect( actual ).toEqual({ items: ctx.entities, totalCount: 0 })
+        return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
     })
 
     const ctx = {
         collectionName: Uninitialized,
         filter: Uninitialized,
+        transformedFilter: Uninitialized,
         aggregation: Uninitialized,
+        transformedAggregation: Uninitialized,
         sort: Uninitialized,
         skip: Uninitialized,
         limit: Uninitialized,
@@ -158,10 +168,13 @@ describe('Data Service', () => {
         schema.reset()
         filterTransformer.reset()
         aggregationTransformer.reset()
+        queryValidator.reset()
 
         ctx.collectionName = gen.randomCollectionName()
         ctx.filter = chance.word()
         ctx.aggregation = chance.word()
+        ctx.transformedAggregation = chance.word()
+        ctx.transformedFilter = chance.word()
         ctx.sort = chance.word()
         ctx.skip = chance.word()
         ctx.limit = chance.word()
@@ -177,6 +190,6 @@ describe('Data Service', () => {
         ctx.entityWithoutId = e
         ctx.entitiesWithoutId = gen.randomEntities().map(i => { delete i._id; return i })
 
-        env.dataService = new DataService(driver.dataProvider, schema.schemaInformation, filterTransformer.filterTransformer, aggregationTransformer.aggregationTransformer)
+        env.dataService = new DataService(driver.dataProvider, schema.schemaInformation, filterTransformer.filterTransformer, aggregationTransformer.aggregationTransformer, queryValidator.queryValidator)
     })
 })

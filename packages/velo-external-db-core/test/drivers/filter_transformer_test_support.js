@@ -20,13 +20,13 @@ const givenFilterByIdWith = (id, filter) => {
                                 })
 }
 
-const stubIgnoreTransform = (filter) => {
+const givenTransformTo = (filter, transformedFilter) => {
     when(filterTransformer.transform).calledWith(filter)
-                                .mockReturnValue(filter)
+                                .mockReturnValue(transformedFilter)
 }
 
 const reset = () => {
     filterTransformer.transform.mockClear()
 }
 
-module.exports = { filterTransformer, stubEmptyFilterFor, givenFilterByIdWith, stubIgnoreTransform, reset }
+module.exports = { filterTransformer, stubEmptyFilterFor, givenFilterByIdWith, givenTransformTo, reset, transform: filterTransformer.transform }
