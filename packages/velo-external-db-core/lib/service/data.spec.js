@@ -12,22 +12,23 @@ const chance = new Chance()
 describe('Data Service', () => {
 
     test('delegate request to data provider and translate data to velo format', async() => {
-        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        filterTransformer.givenTransformResult(ctx.filter)
-
-        const transformedFilter = filterTransformer.transform(ctx.filter)
+        filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
+        
         const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
         
-        queryValidator.expectValidFilter(fields, transformedFilter)
-
+        queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
+        
+        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.sort, ctx.skip, ctx.limit)
+        
         const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
         expect( actual ).toEqual({ items: ctx.entities, totalCount: ctx.entities.length })
     })
 
     test('count data from collection', async() => {
-        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
-        filterTransformer.givenTransformResult(ctx.filter)
+        filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
+
+        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.transformedFilter)
 
         const actual = await env.dataService.count(ctx.collectionName, ctx.filter)
         expect( actual ).toEqual({ totalCount: ctx.total })
@@ -130,9 +131,11 @@ describe('Data Service', () => {
     })
 
     test('aggregate api', async() => {
-        driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
-        aggregationTransformer.givenAggregateTransformResult(ctx.aggregation)
-        filterTransformer.givenTransformResult(ctx.filter)
+        aggregationTransformer.givenTransformTo(ctx.aggregation, ctx.transformedAggregation)
+        filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
+
+        driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.transformedAggregation)
+    
 
         const actual = await env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)
 
@@ -142,7 +145,9 @@ describe('Data Service', () => {
     const ctx = {
         collectionName: Uninitialized,
         filter: Uninitialized,
+        transformedFilter: Uninitialized,
         aggregation: Uninitialized,
+        transformedAggregation: Uninitialized,
         sort: Uninitialized,
         skip: Uninitialized,
         limit: Uninitialized,
@@ -169,6 +174,8 @@ describe('Data Service', () => {
         ctx.collectionName = gen.randomCollectionName()
         ctx.filter = chance.word()
         ctx.aggregation = chance.word()
+        ctx.transformedAggregation = chance.word()
+        ctx.transformedFilter = chance.word()
         ctx.sort = chance.word()
         ctx.skip = chance.word()
         ctx.limit = chance.word()

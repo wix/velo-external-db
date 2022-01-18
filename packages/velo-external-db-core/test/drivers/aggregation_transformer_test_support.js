@@ -4,14 +4,13 @@ const aggregationTransformer = {
     transform: jest.fn(),
 }
 
-const givenAggregateTransformResult = (aggregation) => {
+const givenTransformTo = (aggregation, transformedAggregation) => {
     when(aggregationTransformer.transform).calledWith(aggregation)
-                                          .mockReturnValue(aggregation)
+                                          .mockReturnValue(transformedAggregation)
 }
 
 const reset = () => {
     aggregationTransformer.transform.mockClear()
 }
 
-
-module.exports = { aggregationTransformer, givenAggregateTransformResult, reset }
+module.exports = { aggregationTransformer, givenTransformTo, reset, transform: aggregationTransformer.transform }
