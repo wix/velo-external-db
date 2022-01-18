@@ -6,25 +6,25 @@ const chance = Chance()
 
 describe('BigQuery Utils', () => {
     describe('unPatchDateTime Function', () => {
-        test('Object with null value should be returned with null value', () => {        
+        test('Object with a null value should contain a null field', () => {        
             driver.givenNullValueTo(ctx.propertyName)
 
             expect( unPatchDateTime(env.bigQueryItem) ).toEqual({ [ctx.propertyName]: null })
         })
 
-        test('Object with number value should contain number', () => {         
+        test('Object with a number value should contain a number field', () => {         
             driver.givenNumberValueTo(ctx.propertyName, ctx.randomNumber)
                         
             expect( unPatchDateTime(env.bigQueryItem) ).toEqual({ [ctx.propertyName]: ctx.randomNumber })
         })
 
-        test('Object with date value should contain date object', () => {         
+        test('Object with a date object value should contain a date object', () => {         
             driver.givenDateValueTo(ctx.propertyName, ctx.randomDate)
                         
             expect( unPatchDateTime(env.bigQueryItem) ).toEqual({ [ctx.propertyName]: ctx.randomDate })
         })
 
-        test('Object with wrong date value should not be convert to date object', () => {         
+        test('Object with a date string value should not be converted to a date object', () => {         
             driver.givenWrongFormatDateValueTo(ctx.propertyName, ctx.randomDate)
                         
             expect( unPatchDateTime(env.bigQueryItem) ).toEqual({ [ctx.propertyName]: (ctx.randomDate).toISOString() })
