@@ -19,6 +19,10 @@ const givenCountResult = (total, forCollectionName, filter) =>
     when(dataProvider.count).calledWith(forCollectionName, filter)
                             .mockResolvedValue(total)
 
+const givenTotalCountResult = (total, forCollectionName) =>
+when(dataProvider.count).calledWith(forCollectionName)
+                        .mockResolvedValue(total)
+                        
 const givenAggregateResult = (total, forCollectionName, filter, andAggregation) =>
     when(dataProvider.aggregate).calledWith(forCollectionName, filter, andAggregation)
                                 .mockResolvedValue(total)
@@ -53,4 +57,4 @@ const reset = () => {
     dataProvider.delete.mockClear()
 }
 
-module.exports = { givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult, expectTruncateFor, givenAggregateResult, expectDeleteFor, expectInsertMatchedFor, reset }
+module.exports = { givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult, expectTruncateFor, givenAggregateResult, expectDeleteFor, expectInsertMatchedFor, givenTotalCountResult, reset }

@@ -20,10 +20,11 @@ describe('Data Service', () => {
         queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
         
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.sort, ctx.skip, ctx.limit)
-        
+        driver.givenTotalCountResult(ctx.total, ctx.collectionName)
+
         return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({
                                                                                                                         items: ctx.entities,
-                                                                                                                        totalCount: ctx.entities.length 
+                                                                                                                        totalCount: ctx.total
                                                                                                                     })
     })
 
