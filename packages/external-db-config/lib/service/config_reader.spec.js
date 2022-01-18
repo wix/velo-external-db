@@ -53,6 +53,24 @@ describe('Config Reader Client', () => {
            .forEach(s => expect( actual ).toContain(s) )
     })
 
+    test('status call with wrong cloud vendor', async() => {
+        driver.givenValidConfig()
+        driver.givenInvalidCloudVendor()
+
+        const actual = await env.configReader.configStatus()
+
+        expect( actual ).toEqual('Cloud type not supported')
+    })
+
+    test('status call with wrong db type', async() => {
+        driver.givenValidConfig()
+        driver.givenInvalidDBType()
+
+        const actual = await env.configReader.configStatus()
+
+        expect( actual ).toEqual('DB type not supported')
+    })
+
 
     const ctx = {
         config: Uninitialized,

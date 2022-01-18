@@ -52,6 +52,10 @@ const init = async(type, vendor, config) => {
             const { init } = require('external-db-bigquery')
             return append(await init(cfg), cfg.secretKey)
         }
+        default: {
+            const init = require('./stub-db/init')
+            return append(await init(type), cfg.secretKey)
+        }
     }
 }
 

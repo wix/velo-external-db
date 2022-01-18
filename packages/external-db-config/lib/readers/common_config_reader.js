@@ -1,4 +1,4 @@
-const { checkRequiredKeys } = require('../utils/config_utils')
+const { checkRequiredKeys, supportedDBs, supportedVendors } = require('../utils/config_utils')
 
 class CommonConfigReader {
     constructor() { }
@@ -9,7 +9,11 @@ class CommonConfigReader {
     }
 
     validate() {
+        const validType = supportedDBs.includes(process.env.TYPE)
+        const validVendor = supportedVendors.includes(process.env.CLOUD_VENDOR)
         return {
+            validType,
+            validVendor,
             missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLOUD_VENDOR', 'TYPE'])
         }
     }

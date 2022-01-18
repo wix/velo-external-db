@@ -70,5 +70,11 @@ class UnsupportedOperation extends BaseHttpError {
     }
 }
 
+class UnsupportedDatabase extends BaseHttpError {
+    constructor(message) {
+        super(message, 405)
+    }
+}
+
 module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField, InvalidQuery,
-                   CollectionAlreadyExists, DbConnectionError, InvalidRequest, ItemNotFound, UnsupportedOperation }
+                   CollectionAlreadyExists, DbConnectionError, InvalidRequest, ItemNotFound, UnsupportedOperation, UnsupportedDatabase }
