@@ -21,8 +21,10 @@ describe('Data Service', () => {
         
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.sort, ctx.skip, ctx.limit)
         
-        const actual = await env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
-        expect( actual ).toEqual({ items: ctx.entities, totalCount: ctx.entities.length })
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({
+                                                                                                                        items: ctx.entities,
+                                                                                                                        totalCount: ctx.entities.length 
+                                                                                                                    })
     })
 
     test('count data from collection', async() => {
@@ -30,8 +32,7 @@ describe('Data Service', () => {
 
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.transformedFilter)
 
-        const actual = await env.dataService.count(ctx.collectionName, ctx.filter)
-        expect( actual ).toEqual({ totalCount: ctx.total })
+        return expect(env.dataService.count(ctx.collectionName, ctx.filter)).resolves.toEqual({ totalCount: ctx.total })
     })
 
     test('get by id will issue a call to find and transform the result', async() => {
@@ -39,87 +40,79 @@ describe('Data Service', () => {
         driver.givenListResult([ctx.entity], ctx.collectionName,
                         idFilter, '', 0, 1)
 
-        const actual = await env.dataService.getById(ctx.collectionName, ctx.itemId)
-        expect( actual ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.getById(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: ctx.entity })
     })
 
     test('insert will insert data into db', async() => {
         driver.expectInsertFor([ctx.entity], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.insert(ctx.collectionName, ctx.entity)
-        return expect( actual  ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.insert(ctx.collectionName, ctx.entity)).resolves.toEqual({ item: ctx.entity })
     })
 
     test('insert will removed fields that does not exists in the schema from entities', async() => {
         driver.expectInsertFor([ctx.entity], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.insert(ctx.collectionName, { ...ctx.entity, some: 'prop' })
-        return expect( actual  ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.insert(ctx.collectionName, { ...ctx.entity, some: 'prop' })).resolves.toEqual({ item: ctx.entity })
     })
 
     test('insert will add default values according to the schema', async() => {
         driver.expectInsertMatchedFor([ctx.entityWithoutId], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.insert(ctx.collectionName, ctx.entityWithoutId)
-        return expect( actual.item  ).toHaveProperty('_id' )
+        const { item } = await env.dataService.insert(ctx.collectionName, ctx.entityWithoutId)
+        
+        return expect(item).toHaveProperty('_id')
     })
-
+    
     test('bulk insert items without _id will apply random _id to all items', async() => {
         driver.expectInsertMatchedFor(ctx.entitiesWithoutId, ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.bulkInsert(ctx.collectionName, ctx.entitiesWithoutId)
+        const { items } = await env.dataService.bulkInsert(ctx.collectionName, ctx.entitiesWithoutId)
 
-        return actual.items.map(item => expect(item).toHaveProperty( '_id' ) )
+        return items.map(item => expect(item).toHaveProperty( '_id' ) )
     })
 
     test('bulk insert will insert data into db', async() => {
         driver.expectInsertFor(ctx.entities, ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.bulkInsert(ctx.collectionName, ctx.entities)
-        return expect( actual  ).toEqual({ items: ctx.entities })
+        return expect(env.dataService.bulkInsert(ctx.collectionName, ctx.entities)).resolves.toEqual({ items: ctx.entities })
     })
 
     test('update will update data into db', async() => {
         driver.expectUpdateFor([ctx.entity], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.update(ctx.collectionName, ctx.entity)
-        expect( actual ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.update(ctx.collectionName, ctx.entity)).resolves.toEqual({ item: ctx.entity })
     })
 
     test('update will remove non existing fields from update according to the schema', async() => {
         driver.expectUpdateFor([ctx.entity], ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.update(ctx.collectionName, { ...ctx.entity, someProp: 'whatever' })
-        expect( actual ).toEqual({ item: ctx.entity })
+        return expect(env.dataService.update(ctx.collectionName, { ...ctx.entity, someProp: 'whatever' })).resolves.toEqual({ item: ctx.entity })
     })
 
     test('bulk update will update data into db', async() => {
         driver.expectUpdateFor(ctx.entities, ctx.collectionName)
         schema.givenDefaultSchemaFor(ctx.collectionName)
 
-        const actual = await env.dataService.bulkUpdate(ctx.collectionName, ctx.entities)
-        expect( actual ).toEqual({ items: ctx.entities })
+        return expect(env.dataService.bulkUpdate(ctx.collectionName, ctx.entities)).resolves.toEqual({ items: ctx.entities })
     })
 
     test('delete by item id', async() => {
         driver.expectDeleteFor([ctx.itemId], ctx.collectionName)
 
-        const actual = await env.dataService.delete(ctx.collectionName, ctx.itemId)
-        expect( actual ).toEqual({ item: {} })
+        return expect(env.dataService.delete(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: {} })
     })
 
     test('bulk delete by item ids', async() => {
         driver.expectDeleteFor(ctx.itemIds, ctx.collectionName)
 
-        const actual = await env.dataService.bulkDelete(ctx.collectionName, ctx.itemIds)
-        expect( actual ).toEqual({ items: [] })
+        return expect(env.dataService.bulkDelete(ctx.collectionName, ctx.itemIds)).resolves.toEqual({ items: [] })
     })
 
     
@@ -135,11 +128,8 @@ describe('Data Service', () => {
         filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
 
         driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.transformedAggregation)
-    
 
-        const actual = await env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)
-
-        expect( actual ).toEqual({ items: ctx.entities, totalCount: 0 })
+        return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
     })
 
     const ctx = {
