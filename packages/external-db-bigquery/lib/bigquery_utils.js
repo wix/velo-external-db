@@ -20,21 +20,21 @@ const patchDateTime = (item) => {
 }
 
 const unPatchDateTime = (item) => {
-    const obj = {}
-    for (const key of Object.keys(item)) {
+    return Object.keys(item).reduce((acc, key) => {
         const value = item[key]?.value
+        
+        if (isDate(value)) 
+            acc[key] = new Date(value)
+        
+        else if (isNumber(item[key])) 
+            acc[key] = item[key].toNumber()
+        
+        else 
+            acc[key] = item[key]
 
-        if (isDate(value)) {
-            obj[key] = new Date(value)
-        }
-        else if (isNumber(item[key])) {
-            obj[key] = item[key].toNumber()
-        }
-        else {
-            obj[key] = item[key]
-        } 
-    }
-    return obj
+
+        return acc
+    }, {})
 }
 
 const isNumber = (value) => value !== null && value.toNumber
