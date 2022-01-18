@@ -38,7 +38,10 @@ class DataService {
     }
 
     async count(collectionName, _filter) {
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         const filter = this.filterTransformer.transform(_filter)
+        this.queryValidator.validateFilter(fields, filter)
+
         const c = await this.storage.count(collectionName, filter)
         return { totalCount: c }
     }
@@ -82,8 +85,11 @@ class DataService {
     }
 
     async aggregate(collectionName, _filter, _aggregation) {
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         const aggregation = this.aggregationTransformer.transform(_aggregation)
         const filter = this.filterTransformer.transform(_filter)
+        this.queryValidator.validateFilter(fields, filter)
+        
         return {
             items: (await this.storage.aggregate(collectionName, filter, aggregation))
                                       .map( asWixData ),

@@ -29,6 +29,11 @@ describe('Data Service', () => {
 
     test('count data from collection', async() => {
         filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
+        
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
+        
+        queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
 
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.transformedFilter)
 
@@ -126,7 +131,11 @@ describe('Data Service', () => {
     test('aggregate api', async() => {
         aggregationTransformer.givenTransformTo(ctx.aggregation, ctx.transformedAggregation)
         filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
-
+        
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
+        
+        queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
         driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.transformedAggregation)
 
         return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
