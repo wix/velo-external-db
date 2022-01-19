@@ -8,7 +8,10 @@ const { authMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const { createRouter, initServices } = require('./router')
+const { createAuthRouter } = require('./auth_router')
 const { create, readCommonConfig } = require('external-db-config')
+const session = require('express-session')
+const passport = require('passport')
 
 let started = false
 let server, _cleanup
@@ -39,13 +42,24 @@ load().then(({ secretKey }) => {
 
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(express.json())
-    app.use(unless(['/', '/provision', '/favicon.ico'], authMiddleware({ secretKey: secretKey })))
+    
+    // *************** AUTHORIZATION **********************
+    app.use(require('cookie-parser')())
+    app.use(session({ secret: 'secret-key', resave: false, saveUninitialized: false }))
+    app.use(passport.initialize())
+    app.use(passport.session())
+    // ****************************************************
+
+
+    app.use(unless(['/', '/provision', '/favicon.ico', '/auth/login', '/auth/callback', '/auth/logout'], authMiddleware({ secretKey: secretKey })))
     config.forEach( ( { pathPrefix, roles }) => app.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
     app.use(compression())
     app.set('view engine', 'ejs')
 
     const router = createRouter()
+    const authRouter = createAuthRouter()
 
+    app.use('/', authRouter)
     app.use('/', router)
 
     const port = process.env.PORT || 8080
