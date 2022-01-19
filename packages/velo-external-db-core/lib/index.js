@@ -7,5 +7,6 @@ const OperationService = require('./service/operation')
 const FilterTransformer = require ('./converters/filter_transformer')
 const AggregationTransformer = require ('./converters/aggregation_transformer')
 const QueryValidator = require ('./converters/query_validator')
+const PreDataService = require ('./service/pre_data')
 
-module.exports = { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator }
+module.exports = { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, PreDataService }

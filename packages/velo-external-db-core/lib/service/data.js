@@ -1,4 +1,4 @@
-const { asWixData, unpackDates, prepareForInsert, prepareForUpdate } = require('../converters/transform')
+const { asWixData } = require('../converters/transform')
 const { AdapterOperators } = require('velo-external-db-commons')
 
 
@@ -12,14 +12,8 @@ class DataService {
     }
 
     async find(collectionName, _filter, sort, skip, limit) {
-        const filter = this.filterTransformer.transform(_filter)
-        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-
-        this.queryValidator.validateFilter(fields, filter)
-        
-        const items = await this.storage.find(collectionName, filter, sort, skip, limit)
-        const totalCount = await this.storage.count(collectionName, filter)
-
+        const items = await this.storage.find(collectionName, _filter, sort, skip, limit)
+        const totalCount = await this.storage.count(collectionName, _filter)
         return {
             items: items.map( asWixData ),
             totalCount
@@ -39,11 +33,7 @@ class DataService {
     }
 
     async count(collectionName, _filter) {
-        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-        const filter = this.filterTransformer.transform(_filter)
-        this.queryValidator.validateFilter(fields, filter)
-
-        const c = await this.storage.count(collectionName, filter)
+        const c = await this.storage.count(collectionName, _filter)
         return { totalCount: c }
     }
 
@@ -53,10 +43,8 @@ class DataService {
     }
 
     async bulkInsert(collectionName, items) {
-        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-        const prepared = items.map(i => prepareForInsert(i, fields))
-        await this.storage.insert(collectionName, prepared.map(i => unpackDates(i)), fields)
-        return { items: prepared }
+        await this.storage.insert(collectionName, items)
+        return { items }
     }
 
     async update(collectionName, item) {
@@ -65,10 +53,8 @@ class DataService {
     }
 
     async bulkUpdate(collectionName, items) {
-        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-        const prepared = items.map(i => prepareForUpdate(i, fields))
-        await this.storage.update(collectionName, prepared.map(i => unpackDates(i)), fields)
-        return { items: prepared }
+        await this.storage.update(collectionName, items)
+        return { items }
     }
 
     async delete(collectionName, itemId) {
@@ -86,13 +72,8 @@ class DataService {
     }
 
     async aggregate(collectionName, _filter, _aggregation) {
-        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-        const aggregation = this.aggregationTransformer.transform(_aggregation)
-        const filter = this.filterTransformer.transform(_filter)
-        this.queryValidator.validateFilter(fields, filter)
-        
         return {
-            items: (await this.storage.aggregate(collectionName, filter, aggregation))
+            items: (await this.storage.aggregate(collectionName, _filter, _aggregation))
                                       .map( asWixData ),
             totalCount: 0
         }
