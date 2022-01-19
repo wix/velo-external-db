@@ -18,7 +18,7 @@ class DataService {
         this.queryValidator.validateFilter(fields, filter)
         
         const items = await this.storage.find(collectionName, filter, sort, skip, limit)
-        const totalCount = await this.storage.count(collectionName)
+        const totalCount = await this.storage.count(collectionName, filter)
 
         return {
             items: items.map( asWixData ),
