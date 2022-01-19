@@ -1,11 +1,12 @@
+const { SystemFields } = require('velo-external-db-commons')
 const { when } = require('jest-when')
 
 const queryValidator = {
     validateFilter: jest.fn(),
 }
 
-const givenValidFilterResponseFor = (fields, filter) => {
-    when(queryValidator.validateFilter).calledWith(fields, filter)
+const givenValidFilterForDefaultFieldsOf = (filter) => {
+    when(queryValidator.validateFilter).calledWith(SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) ), filter)
                                        .mockReturnValue()
 }
 
@@ -14,5 +15,5 @@ const reset = () => {
 }
 
 module.exports = {
-    queryValidator, givenValidFilterResponseFor, reset, validateFilter: queryValidator.validateFilter
+    queryValidator, givenValidFilterForDefaultFieldsOf, reset, validateFilter: queryValidator.validateFilter
 }
