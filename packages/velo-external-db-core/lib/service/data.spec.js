@@ -14,10 +14,8 @@ describe('Data Service', () => {
     test('delegate request to data provider and translate data to velo format', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
         filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
-        
-        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
-        
-        queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
+                
+        queryValidator.givenValidFilterForDefaultFieldsOf(ctx.transformedFilter)
         
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.sort, ctx.skip, ctx.limit)
         
@@ -31,9 +29,8 @@ describe('Data Service', () => {
         filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
         
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
         
-        queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
+        queryValidator.givenValidFilterForDefaultFieldsOf(ctx.transformedFilter)
 
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.transformedFilter)
 
@@ -133,9 +130,8 @@ describe('Data Service', () => {
         filterTransformer.givenTransformTo(ctx.filter, ctx.transformedFilter)
         
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        const fields = await schema.schemaInformation.schemaFieldsFor(ctx.collectionName)
         
-        queryValidator.givenValidFilterResponseFor(fields, ctx.transformedFilter)
+        queryValidator.givenValidFilterForDefaultFieldsOf(ctx.transformedFilter)
         driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.transformedFilter, ctx.transformedAggregation)
 
         return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
