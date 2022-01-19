@@ -17,22 +17,20 @@ class AwsStrategy {
     return new OAuth2Strategy(this.options, this.verify)
   }
 
-  verify(AccessToken, tokenSecret, profile, done) {
+  verify(accessToken, tokenSecret, _profile, done) {
     const cognitoClient = new CognitoIdentityProviderClient()
-    const command = new GetUserCommand({ AccessToken })
+    const command = new GetUserCommand({ AccessToken: accessToken })
 
     cognitoClient.send(command).then( userData => {
-    
-        const profile = userData.UserAttributes.reduce( (attribute, acc) => {
-          acc[attribute.Name] = attribute.Value
-          return acc
-        }, {})
+      const profile = userData.UserAttributes.reduce( (attribute, acc) => {
+        acc[attribute.Name] = attribute.Value
+        return acc
+      }, {})
   
-        profile.username = userData.Username
-  
-        done(null, profile)
-  
-    })
+      profile.username = userData.Username
+        
+      done(null, profile)
+    }).catch( err => done(err, null))
 
   }
 
