@@ -11,9 +11,10 @@ const chance = Chance()
 describe('Schema Service', () => {
 
     test('retrieve all collections from provider', async() => {
+        driver.givenAllSchemaOperations()
         driver.givenListResult(ctx.dbsWithIdColumn)
 
-        await expect( env.schemaService.list() ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, ctx.schemaOperations) )
+        await expect( env.schemaService.list() ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
     })
 
     test('retrieve short list of all collections from provider', async() => {
@@ -24,12 +25,14 @@ describe('Schema Service', () => {
     })
 
     test('retrieve collections by ids from provider', async() => {
+        driver.givenAllSchemaOperations()
         driver.givenFindResults(ctx.dbsWithIdColumn)
 
-        await expect( env.schemaService.find(ctx.dbsWithIdColumn.map(db => db.id)) ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, ctx.schemaOperations) )
+        await expect( env.schemaService.find(ctx.dbsWithIdColumn.map(db => db.id)) ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
     })
 
     test('create collection name', async() => {
+        driver.givenAllSchemaOperations()
         driver.expectCreateOf(ctx.collectionName)
         schema.expectSchemaRefresh()
 
@@ -37,6 +40,7 @@ describe('Schema Service', () => {
     })
 
     test('add column for collection name', async() => {
+        driver.givenAllSchemaOperations()
         driver.expectCreateColumnOf(ctx.column, ctx.collectionName)
         schema.expectSchemaRefresh()
 
@@ -44,6 +48,7 @@ describe('Schema Service', () => {
     })
 
     test('remove column from collection name', async() => {
+        driver.givenAllSchemaOperations()
         driver.expectRemoveColumnOf(ctx.column, ctx.collectionName)
         schema.expectSchemaRefresh()
 
@@ -51,13 +56,14 @@ describe('Schema Service', () => {
     })
 
     test('collections without _id column will have read-only capabilities', async() => {
+        driver.givenAllSchemaOperations()
         driver.givenListResult(ctx.dbsWithoutIdColumn)
 
         await expect( env.schemaService.list() ).resolves.toEqual( schemasWithReadOnlyCapabilitiesFor(ctx.dbsWithoutIdColumn) )
     })
 
     test('run unsupported operations should throw', async() => {
-        driver.givenAdapterSupportedOperationsWith(ctx.unrealOperations)
+        driver.givenAdapterSupportedOperationsWith(ctx.invalidOperations)
 
         await expect(env.schemaService.create(ctx.collectionName)).rejects.toThrow(errors.UnsupportedOperation)
         await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).rejects.toThrow(errors.UnsupportedOperation)
@@ -70,8 +76,7 @@ describe('Schema Service', () => {
         collections: Uninitialized,
         collectionName: Uninitialized,
         column: Uninitialized,
-        schemaOperations: Uninitialized,
-        unrealOperations: Uninitialized,
+        invalidOperations: Uninitialized,
     }
 
     const env = {
@@ -88,11 +93,9 @@ describe('Schema Service', () => {
         ctx.collections = gen.randomCollections()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
-        ctx.schemaOperations = AllSchemaOperations
 
-        ctx.unrealOperations = [chance.word(), chance.word()]
+        ctx.invalidOperations = [chance.word(), chance.word()]
         
         env.schemaService = new SchemaService(driver.schemaProvider, schema.schemaInformation)
-        driver.givenAdapterSupportedOperationsWith(AllSchemaOperations)
     })
 })

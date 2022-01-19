@@ -1,4 +1,5 @@
 const { when } = require('jest-when')
+const { AllSchemaOperations } = require('velo-external-db-commons')
 
 const schemaProvider = {
     list: jest.fn(),
@@ -18,6 +19,9 @@ const givenListHeadersResult = (collections) =>
 
 const givenAdapterSupportedOperationsWith = (operations) =>
     when(schemaProvider.supportedOperations).mockReturnValue(operations)
+
+const givenAllSchemaOperations = () =>
+    when(schemaProvider.supportedOperations).mockReturnValue(AllSchemaOperations)
 
 const givenFindResults = (dbs) =>
     dbs.forEach(db => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db.fields) )
@@ -47,4 +51,4 @@ const reset = () => {
 
 module.exports = { givenFindResults, expectRemoveColumnOf, givenListResult, givenListHeadersResult,
                    expectCreateOf, expectCreateColumnOf, givenAdapterSupportedOperationsWith,
-                   schemaProvider, reset }
+                   givenAllSchemaOperations, schemaProvider, reset }
