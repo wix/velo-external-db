@@ -13,7 +13,7 @@ describe('Converters', () => {
     })
 
     test('pack dates will duplicate object and do nothing is date is not there', async() => {
-        expect(asWixData(ctx.obj)).toEqual(ctx.obj)
+        expect(asWixData(ctx.obj)).toMatchObject(ctx.obj)
     })
 
     test('unpack dates will take all properties with velo date structure and convert them to new Date', async() => {
@@ -26,7 +26,7 @@ describe('Converters', () => {
         const objWithJsDates = { ...ctx.obj, [ctx.property]: dateTimeProvider.currentDateTime(),
                                              [ctx.anotherProperty]: dateTimeProvider.currentDateTime() }
 
-        expect(asWixData(objWithJsDates)).toEqual( { ...ctx.obj, [ctx.property]: { $date: dateTimeProvider.currentDateTime().toISOString() },
+        expect(asWixData(objWithJsDates)).toMatchObject( { ...ctx.obj, [ctx.property]: { $date: dateTimeProvider.currentDateTime().toISOString() },
                                                                           [ctx.anotherProperty]: { $date: dateTimeProvider.currentDateTime().toISOString() } } )
     })
 
