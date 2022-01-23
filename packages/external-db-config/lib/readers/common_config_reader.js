@@ -4,13 +4,13 @@ class CommonConfigReader {
     constructor() { }
 
     readConfig() {
-        const { CLOUD_VENDOR, AUTH_VENDOR, TYPE, REGION, SECRET_NAME } = process.env
-        return { vendor: CLOUD_VENDOR, authVendor: AUTH_VENDOR, type: TYPE, region: REGION, secretId: SECRET_NAME }
+        const { CLOUD_VENDOR, TYPE, REGION, SECRET_NAME } = process.env
+        return { vendor: CLOUD_VENDOR, type: TYPE, region: REGION, secretId: SECRET_NAME }
     }
 
     validate() {
         return {
-            missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLOUD_VENDOR', 'TYPE', 'AUTH_VENDOR'])
+            missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLOUD_VENDOR', 'TYPE'])
         }
     }
 }

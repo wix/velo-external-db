@@ -9,18 +9,14 @@ const defineValidConfig = (config) => {
     if (config.type) {
         process.env.TYPE = config.type
     }
-    if (config.authVendor) {
-        process.env.AUTH_VENDOR = config.authVendor
-    }
 }
 
 const validConfig = () => ({
     vendor: chance.word(),
-    type: chance.word(),
-    authVendor: chance.word(),
+    type: chance.word()
 })
 
-const ExpectedProperties = ['CLOUD_VENDOR', 'TYPE', 'AUTH_VENDOR']
+const ExpectedProperties = ['CLOUD_VENDOR', 'TYPE']
 
 const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 

@@ -8,10 +8,10 @@ const DefaultSecretId = 'VELO-EXTERNAL-DB-SECRETS'
 
 const createAuthConfigReader = () => {
   const common = new CommonConfigReader()
-  const { authVendor, region, secretId } = common.readConfig()
+  const { vendor, region, secretId } = common.readConfig()
 
   let internalConfigReader
-  switch (authVendor.toLowerCase()) {
+  switch (vendor.toLowerCase()) {
 
     case 'aws':
       internalConfigReader = AwsAuthConfigReader(secretId || DefaultSecretId, region)
