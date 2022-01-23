@@ -1,7 +1,7 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
 const { checkRequiredKeys } = require('../utils/config_utils')
 
-const EmptyAWSAuthConfig = { callbackurl: '', clientid: '', clientsecret: '', clientdomain: '' }
+const EmptyAWSAuthConfig = { callbackUrl: '', clientId: '', clientSecret: '', clientDomain: '' }
 
 class AwsAuthConfigReader {
   constructor(secretId, region) {
@@ -12,8 +12,8 @@ class AwsAuthConfigReader {
   async readConfig() {
     const cfg = await this.readExternalConfig()
                           .catch(() => EmptyAWSAuthConfig)
-    const { CALLBACKURL, CLIENTID, CLIENTSECRET, CLIENTDOMAIN } = cfg
-    return { callbackurl: CALLBACKURL, clientid: CLIENTID, clientsecret: CLIENTSECRET, clientdomain: CLIENTDOMAIN }
+    const { callbackUrl, clientId, clientSecret, clientDomain } = cfg
+    return { callbackUrl, clientId, clientSecret, clientDomain }
   }
 
   async readExternalConfig() {
@@ -25,7 +25,7 @@ class AwsAuthConfigReader {
   async validate() {
     try {
       const cfg = await this.readExternalConfig()
-      return { missingRequiredSecretsKeys: checkRequiredKeys(cfg, ['CALLBACKURL', 'CLIENTID', 'CLIENTSECRET', 'CLIENTDOMAIN']) }
+      return { missingRequiredSecretsKeys: checkRequiredKeys(cfg, ['callbackUrl', 'clientId', 'clientSecret', 'clientDomain']) }
     } catch (err) {
       return { configReadError: err.message, missingRequiredSecretsKeys: [] }
     }

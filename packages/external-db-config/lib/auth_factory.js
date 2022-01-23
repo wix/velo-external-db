@@ -14,11 +14,11 @@ const createAuthConfigReader = () => {
   switch (vendor.toLowerCase()) {
 
     case 'aws':
-      internalConfigReader = AwsAuthConfigReader(secretId || DefaultSecretId, region)
+      internalConfigReader = new AwsAuthConfigReader(secretId || DefaultSecretId, region)
       break
       
     case 'gcp':
-      internalConfigReader = GcpAuthConfigReader()
+      internalConfigReader = new GcpAuthConfigReader()
       break
 
     case 'azure':

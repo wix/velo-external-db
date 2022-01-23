@@ -5,13 +5,13 @@ class GcpAuthConfigReader {
   }
 
   async readConfig() {
-    const { CALLBACKURL, CLIENTID, CLIENTSECRET } = process.env
-    return { callbackurl: CALLBACKURL, clientid: CLIENTID, clientsecret: CLIENTSECRET }
+    const { callbackUrl, clientId, clientSecret } = process.env
+    return { callbackUrl, clientId, clientSecret }
   }
 
   validate() {
     return {
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CALLBACKURL', 'CLIENTID', 'CLIENTSECRET'])
+      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['callbackUrl', 'clientId', 'clientSecret'])
     }
   }
 }
