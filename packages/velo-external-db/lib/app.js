@@ -8,10 +8,11 @@ const { authMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const { createRouter, initServices } = require('./router')
-const { createAuthRouter } = require('./auth_router')
+const { createAuthRouter, initAuthService } = require('./auth_router')
 const { create, readCommonConfig } = require('external-db-config')
 const session = require('express-session')
 const passport = require('passport')
+const { createAuthService } = require('external-db-authorization')
 
 let started = false
 let server, _cleanup
@@ -28,7 +29,11 @@ const load = async() => {
     const dataService = new DataService(dataProvider)
     const schemaAwareDataService = new SchemaAwareDataService(dataService, queryValidator, schemaInformation)
     const schemaService = new SchemaService(schemaProvider, schemaInformation)
+    const authService = await createAuthService(vendor, configReader)
+    
     initServices(schemaAwareDataService, schemaService, operationService, configReader, { vendor, type: adapterType }, filterTransformer, aggregationTransformer)
+    initAuthService(authService)
+    
     _cleanup = async() => {
         await cleanup()
         schemaInformation.cleanup()
@@ -42,13 +47,10 @@ load().then(({ secretKey }) => {
 
     app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.use(express.json())
-    
-    // *************** AUTHORIZATION **********************
     app.use(require('cookie-parser')())
     app.use(session({ secret: 'secret-key', resave: false, saveUninitialized: false }))
     app.use(passport.initialize())
     app.use(passport.session())
-    // ****************************************************
 
 
     app.use(unless(['/', '/provision', '/favicon.ico', '/auth/login', '/auth/callback', '/auth/logout'], authMiddleware({ secretKey: secretKey })))

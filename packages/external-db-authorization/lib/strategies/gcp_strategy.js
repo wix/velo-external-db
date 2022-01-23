@@ -1,11 +1,11 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 
 class GcpStrategy {
-  constructor({ clientID, clientSecret, callbackURL }) {
+  constructor({ clientId, clientSecret, callbackUrl }) {
     this.options = {
-      clientID,
-      clientSecret,
-      callbackURL,
+      clientID: clientId,
+      clientSecret: clientSecret,
+      callbackURL: callbackUrl,
       scope: ['email', 'profile']
     }
 

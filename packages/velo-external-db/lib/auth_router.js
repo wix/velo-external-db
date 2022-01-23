@@ -1,21 +1,22 @@
 const express = require('express')
 const passport = require('passport')
-const { create } = require('external-db-authorization')
 
+let authService
+
+const initAuthService = ( _authService ) => {
+  authService = _authService
+}
 
 const createAuthRouter = () => {
-  
   // Disable the auth in tests
   if (process.env.NODE_ENV === 'test' ) {
     const router = express.Router()
     return router
   }
   
-  const Strategy = create()
-
   const router = express.Router()
 
-  passport.use('external-db-authorization', Strategy)
+  passport.use('external-db-authorization', authService)
 
   passport.serializeUser((user, done) => done(null, user))
   passport.deserializeUser((obj, done) => done(null, obj))
@@ -28,7 +29,7 @@ const createAuthRouter = () => {
     failureRedirect: '/auth/login'
   }))
 
-  router.get('/auth/logout', function(req, res) {
+  router.get('/auth/logout', (req, res) => {
       req.logout()
       res.redirect('/')
   })
@@ -40,4 +41,4 @@ const createAuthRouter = () => {
 
 
 
-module.exports = { createAuthRouter }
+module.exports = { createAuthRouter, initAuthService }

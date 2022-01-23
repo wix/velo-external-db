@@ -1,18 +1,19 @@
-const { AwsStrategy } = require('./strategies/aws_strategy')
-const { GcpStrategy } = require('./strategies/gcp_strategy')
 
-// require('dotenv').config()
-
-const create = () => {
-  const { AUTH_VENDOR: vendor, CALLBACKURL: callbackURL, CLIENTID: clientID, CLIENTSECRET: clientSecret, CLIENTDOMAIN: clientDomain } = process.env
+const createAuthService = async(vendor, config) => {
+  const cfg = await config.readConfig()
   
   switch (vendor.toLowerCase()) {
+    case 'aws': {
+      const { AwsStrategy } = require('./strategies/aws_strategy')
+      
+      return new AwsStrategy(cfg)
+    }
+    
+    case 'gcp': {
+      const { GcpStrategy } = require('./strategies/gcp_strategy')
 
-    case 'aws':
-      return new AwsStrategy({ callbackURL, clientDomain, clientID, clientSecret })
-
-    case 'gcp':
-      return new GcpStrategy({ clientID, clientSecret, callbackURL })
+      return new GcpStrategy(cfg)
+    }
 
     case 'azure':
       break  
@@ -20,4 +21,4 @@ const create = () => {
 
 }
 
-module.exports = { create }
+module.exports = { createAuthService }

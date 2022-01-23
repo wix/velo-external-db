@@ -3,13 +3,12 @@ const { CognitoIdentityProviderClient, GetUserCommand } = require('@aws-sdk/clie
 
 
 class AwsStrategy {
-  constructor({ clientDomain, clientID, clientSecret, callbackURL, passReqToCallback }) {
-
+  constructor({ clientDomain, clientId, clientSecret, callbackUrl, passReqToCallback }) {
     this.options = {
         authorizationURL: `${clientDomain}/oauth2/authorize`,
-        clientID,
+        clientID: clientId,
         clientSecret,
-        callbackURL,
+        callbackURL: callbackUrl,
         passReqToCallback,
         tokenURL: `${clientDomain}/oauth2/token`
     }

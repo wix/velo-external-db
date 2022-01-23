@@ -1,3 +1,3 @@
-const { create } = require('./factory')
+const { createAuthService } = require('./factory')
 
-module.exports = { create }
+module.exports = { createAuthService }
