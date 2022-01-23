@@ -10,7 +10,7 @@ class CommonConfigReader {
 
     validate() {
         return {
-            missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLOUD_VENDOR', 'TYPE'])
+            missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLOUD_VENDOR', 'TYPE', 'AUTH_VENDOR'])
         }
     }
 }
