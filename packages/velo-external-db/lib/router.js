@@ -20,7 +20,9 @@ const createRouter = () => {
 
     // *************** INFO **********************
     const ensureLoggedIn = (req, res, next) => {
-        if (process.env.NODE_ENV !== 'test' && !req.user) { return res.render('home') }
+        if (!req.user) 
+            return res.render('login') 
+        
         next()
     }
 

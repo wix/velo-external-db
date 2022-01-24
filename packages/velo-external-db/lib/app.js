@@ -53,7 +53,7 @@ load().then(({ secretKey }) => {
     app.use(passport.session())
 
 
-    app.use(unless(['/', '/provision', '/favicon.ico', '/auth/login', '/auth/callback', '/auth/logout'], authMiddleware({ secretKey: secretKey })))
+    app.use(unless(['/', '/provision', '/favicon.ico', '/auth/login', '/auth/callback', '/auth/logout', '/auth/signup'], authMiddleware({ secretKey: secretKey })))
     config.forEach( ( { pathPrefix, roles }) => app.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
     app.use(compression())
     app.set('view engine', 'ejs')

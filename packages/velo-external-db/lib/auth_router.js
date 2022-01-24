@@ -8,12 +8,6 @@ const initAuthService = ( _authService ) => {
 }
 
 const createAuthRouter = () => {
-  // Disable the auth in tests
-  if (process.env.NODE_ENV === 'test' ) {
-    const router = express.Router()
-    return router
-  }
-  
   const router = express.Router()
 
   passport.use('external-db-authorization', authService)
@@ -23,6 +17,17 @@ const createAuthRouter = () => {
 
 
   router.get('/auth/login', passport.authenticate('external-db-authorization'))
+  
+  router.get('/auth/signup', (req, res, next) => {
+    const user = { id: Math.random().toString(36) }
+
+    req.login(user, err => {
+      if (err) return next(err)
+
+      res.redirect('/')
+    })
+
+  })
 
   router.get('/auth/callback', passport.authenticate('external-db-authorization', {
     successReturnToOrRedirect: '/',
