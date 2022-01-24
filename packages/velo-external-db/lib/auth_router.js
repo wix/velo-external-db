@@ -18,6 +18,7 @@ const createAuthRouter = () => {
 
   router.get('/auth/login', passport.authenticate('external-db-authorization'))
   
+  // TODO: disable this route when using GCP/AWS
   router.get('/auth/signup', (req, res, next) => {
     const user = { id: Math.random().toString(36) }
 

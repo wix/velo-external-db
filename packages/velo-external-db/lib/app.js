@@ -53,6 +53,7 @@ load().then(({ secretKey }) => {
     app.use(passport.session())
 
     app.use(unless(['/', '/provision', '/favicon.ico', '/auth/login', '/auth/callback', '/auth/logout', '/auth/signup'], secretKeyAuthMiddleware({ secretKey: secretKey })))
+    // TODO: new unless function that will skip /data/* and /schema/* routes 
     app.all('/', authMiddleware)
     config.forEach( ( { pathPrefix, roles }) => app.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
