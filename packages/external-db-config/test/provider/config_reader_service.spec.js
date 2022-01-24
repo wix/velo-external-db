@@ -65,7 +65,7 @@ describe('External DB config client', () => {
 
       const expected = await env.configReaderProvider.validate()
 
-      expect(expected).toEqual({ missingRequiredSecretsKeys: [s] })
+      expect(expected).toMatchObject({ missingRequiredSecretsKeys: [s] })
     })
 
     test('validate will detect config read errors', async() => {
