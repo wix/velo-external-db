@@ -19,14 +19,7 @@ const createRouter = () => {
     const router = express.Router()
 
     // *************** INFO **********************
-    const ensureLoggedIn = (req, res, next) => {
-        if (!req.user) 
-            return res.render('login') 
-        
-        next()
-    }
-
-    router.get('/', ensureLoggedIn, async(req, res) => {
+    router.get('/', async(req, res) => {
         const appInfo = await appInfoFor(operationService, externalDbConfigClient)
         res.render('index', appInfo)
     })

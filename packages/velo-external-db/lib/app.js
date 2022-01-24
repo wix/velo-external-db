@@ -4,7 +4,7 @@ const { config } = require('../roles-config.json')
 const compression = require('compression')
 const { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService } = require('velo-external-db-core')
 const { init } = require('./storage/factory')
-const { authMiddleware } = require('./web/auth-middleware')
+const { authMiddleware, secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const { createRouter, initServices } = require('./router')
@@ -52,9 +52,10 @@ load().then(({ secretKey }) => {
     app.use(passport.initialize())
     app.use(passport.session())
 
-
-    app.use(unless(['/', '/provision', '/favicon.ico', '/auth/login', '/auth/callback', '/auth/logout', '/auth/signup'], authMiddleware({ secretKey: secretKey })))
+    app.use(unless(['/', '/provision', '/favicon.ico', '/auth/login', '/auth/callback', '/auth/logout', '/auth/signup'], secretKeyAuthMiddleware({ secretKey: secretKey })))
+    app.all('/', authMiddleware)
     config.forEach( ( { pathPrefix, roles }) => app.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
+
     app.use(compression())
     app.set('view engine', 'ejs')
 

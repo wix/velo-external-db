@@ -1,5 +1,5 @@
 const { Uninitialized } = require('test-commons')
-const { authMiddleware } = require('./auth-middleware')
+const { secretKeyAuthMiddleware } = require('./auth-middleware')
 const driver = require('../../test/drivers/auth_middleware_test_support')
 const { UnauthorizedError } = require('velo-external-db-commons').errors
 const Chance = require('chance')
@@ -22,7 +22,7 @@ describe('Auth Middleware', () => {
         ctx.anotherSecretKey = chance.word()
         ctx.next = jest.fn().mockName('next')
 
-        env.auth = authMiddleware({ secretKey: ctx.secretKey })
+        env.auth = secretKeyAuthMiddleware({ secretKey: ctx.secretKey })
     })
 
     test('should throw when request does not contain auth', () => {

@@ -9,11 +9,18 @@ const authorizeSecretKey = (req, secretKey) => {
     }
 }
 
-function authMiddleware({ secretKey }) {
+const secretKeyAuthMiddleware = ({ secretKey }) => {
     return (req, res, next) => {
         authorizeSecretKey(req, secretKey)
         next()
     }
 }
 
-module.exports = { authMiddleware }
+const authMiddleware = (req, res, next) => {
+    if (!req.user) 
+        return res.render('login')
+    else
+        next()
+}
+
+module.exports = { authMiddleware, secretKeyAuthMiddleware }
