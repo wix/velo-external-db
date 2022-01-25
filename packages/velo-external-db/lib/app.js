@@ -4,7 +4,7 @@ const { config } = require('../roles-config.json')
 const compression = require('compression')
 const { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService } = require('velo-external-db-core')
 const { init } = require('./storage/factory')
-const { authMiddleware, secretKeyAuthMiddleware } = require('./web/auth-middleware')
+const { authMiddleware, secretKeyAuthMiddleware, initAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const { createRouter, initServices } = require('./router')
@@ -29,10 +29,11 @@ const load = async() => {
     const dataService = new DataService(dataProvider)
     const schemaAwareDataService = new SchemaAwareDataService(dataService, queryValidator, schemaInformation)
     const schemaService = new SchemaService(schemaProvider, schemaInformation)
-    const authService = await createAuthService(vendor, configReader)
+    const { authService, validAuthService } = await createAuthService(vendor, configReader)
     
     initServices(schemaAwareDataService, schemaService, operationService, configReader, { vendor, type: adapterType }, filterTransformer, aggregationTransformer)
     initAuthService(authService)
+    initAuthMiddleware(validAuthService, configReader)
     
     _cleanup = async() => {
         await cleanup()
@@ -52,10 +53,9 @@ load().then(({ secretKey }) => {
     app.use(passport.initialize())
     app.use(passport.session())
 
-    app.use(unless(['/', '/provision', '/favicon.ico', '/auth/login', '/auth/callback', '/auth/logout', '/auth/signup'], secretKeyAuthMiddleware({ secretKey: secretKey })))
-    // TODO: new unless function that will skip /data/* and /schema/* routes 
-    app.all('/', authMiddleware)
+    app.use(unless(['/', '/provision', '/favicon.ico', '/auth/login', '/auth/callback', '/auth/logout'], secretKeyAuthMiddleware({ secretKey: secretKey })))
     config.forEach( ( { pathPrefix, roles }) => app.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
+    app.all('/', authMiddleware)
 
     app.use(compression())
     app.set('view engine', 'ejs')

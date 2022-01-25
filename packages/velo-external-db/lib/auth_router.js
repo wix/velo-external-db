@@ -16,19 +16,7 @@ const createAuthRouter = () => {
   passport.deserializeUser((obj, done) => done(null, obj))
 
 
-  router.get('/auth/login', passport.authenticate('external-db-authorization'))
-  
-  // TODO: disable this route when using GCP/AWS
-  router.get('/auth/signup', (req, res, next) => {
-    const user = { id: Math.random().toString(36) }
-
-    req.login(user, err => {
-      if (err) return next(err)
-
-      res.redirect('/')
-    })
-
-  })
+  router.get('/auth/login', passport.authenticate('external-db-authorization')) 
 
   router.get('/auth/callback', passport.authenticate('external-db-authorization', {
     successReturnToOrRedirect: '/',
@@ -39,12 +27,9 @@ const createAuthRouter = () => {
       req.logout()
       res.redirect('/')
   })
-
+  
   return router
-
+  
 }
-
-
-
 
 module.exports = { createAuthRouter, initAuthService }
