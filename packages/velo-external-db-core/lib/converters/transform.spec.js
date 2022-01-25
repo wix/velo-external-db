@@ -38,6 +38,10 @@ describe('Converters', () => {
         expect(generateIdsIfNeeded(ctx.obj)).toHaveProperty( '_id' )
     })
 
+    test('call to generateIdsIfNeeded twice will return the same result', () => {
+        expect(generateIdsIfNeeded(ctx.obj)).toEqual(generateIdsIfNeeded(ctx.obj))
+    })
+
     test('if item has all fields like in schema fields, item should stay the same', async() => {
         expect(prepareForInsert(ctx.obj, ctx.objSchemaFields)).toEqual( ctx.obj )
     })

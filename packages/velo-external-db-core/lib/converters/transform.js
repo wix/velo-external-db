@@ -25,7 +25,7 @@ const generateIdsIfNeeded = item => {
     if ('_id' in item)
         return item
     const sha = crypto.createHash('sha1')
-    const fieldsConcat = Object.keys(item).reduce((pV, key) => (pV.concat(item[key])), '')
+    const fieldsConcat = Object.values(item).join('')
     return { ...item, _id: sha.update(fieldsConcat).digest('base64') }
 }
 
