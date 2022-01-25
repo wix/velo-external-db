@@ -39,7 +39,10 @@ each(
 
             const actual = await env.configReader.configStatus()
 
-            expect(actual).toContain('Missing props:')
+            expect(actual.missingRequiredSecretsKeys).not.toEqual([])
+            expect(actual.missingRequiredEnvs).not.toEqual([])
+            expect(actual.validType).toBeFalsy()
+            expect(actual.validVendor).toBeFalsy()
         })
 
     })

@@ -12,7 +12,7 @@ describe('Config Reader Client', () => {
         const actual = await env.configReader.readConfig()
 
         expect( actual ).toEqual(ctx.config)
-    })
+    }) 
 
     test('status call will return successful message in case config is valid', async() => {
         driver.givenValidConfig()
@@ -20,55 +20,62 @@ describe('Config Reader Client', () => {
 
         const actual = await env.configReader.configStatus()
 
-        expect( actual ).toEqual('External DB Config read successfully')
+        expect( actual.missingRequiredSecretsKeys ).toEqual([])
+        expect( actual.missingRequiredEnvs ).toEqual([])
+        expect( actual.validType ).toBeTruthy()
+        expect( actual.validVendor ).toBeTruthy()
     })
 
     test('status call will return error message containing list of missing properties', async() => {
         driver.givenInvalidConfigWith(ctx.missingProperties)
         driver.givenValidCommonConfig()
 
-        const actual = await env.configReader.configStatus()
+        const { missingRequiredSecretsKeys } = await env.configReader.configStatus()
 
         ctx.missingProperties
-           .forEach(s => expect( actual ).toContain(s) )
+           .forEach(s => expect( missingRequiredSecretsKeys ).toContain(s) )
     })
 
     test('status call will return error message containing list of missing properties from common reader', async() => {
         driver.givenValidConfig()
         driver.givenInvalidCommonConfigWith(ctx.missingProperties)
 
-        const actual = await env.configReader.configStatus()
+        const { missingRequiredEnvs } = await env.configReader.configStatus()
 
         ctx.missingProperties
-           .forEach(s => expect( actual ).toContain(s) )
+           .forEach(s => expect( missingRequiredEnvs ).toContain(s) )
     })
 
     test('status call will return error message containing list of all missing properties from common reader and normal reader', async() => {
         driver.givenInvalidConfigWith(ctx.missingProperties)
         driver.givenInvalidCommonConfigWith(ctx.moreMissingProperties)
 
-        const actual = await env.configReader.configStatus()
+        const { missingRequiredSecretsKeys, missingRequiredEnvs } = await env.configReader.configStatus()
 
-        ctx.missingProperties.concat(ctx.moreMissingProperties)
-           .forEach(s => expect( actual ).toContain(s) )
+        ctx.missingProperties
+           .forEach(s => expect( missingRequiredSecretsKeys ).toContain(s) )
+
+        ctx.moreMissingProperties
+           .forEach(s => expect( missingRequiredEnvs ).toContain(s) )
+
     })
 
     test('status call with wrong cloud vendor', async() => {
         driver.givenValidConfig()
         driver.givenInvalidCloudVendor()
 
-        const actual = await env.configReader.configStatus()
+        const { validVendor } = await env.configReader.configStatus()
 
-        expect( actual ).toEqual('Cloud type is not supported')
+        expect( validVendor ).toBeFalsy()
     })
 
     test('status call with wrong db type', async() => {
         driver.givenValidConfig()
         driver.givenInvalidDBType()
 
-        const actual = await env.configReader.configStatus()
+        const { validType } = await env.configReader.configStatus()
 
-        expect( actual ).toEqual('DB type is not supported')
+        expect( validType ).toBeFalsy()
     })
 
 
