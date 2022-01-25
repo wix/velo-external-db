@@ -3,13 +3,13 @@ const strategyFor = (vendor = '', cfg) => {
     case 'aws': {
       const { AwsStrategy } = require('./strategies/aws_strategy')
       
-      return { authService: new AwsStrategy(cfg), validAuthService: true }
+      return { authStrategy: new AwsStrategy(cfg), isValidAuthService: true }
     
     }
     case 'gcp': {
       const { GcpStrategy } = require('./strategies/gcp_strategy')
 
-      return { authService: new GcpStrategy(cfg), validAuthService: true } 
+      return { authStrategy: new GcpStrategy(cfg), isValidAuthService: true } 
     }
 
     case 'azure':
@@ -17,7 +17,7 @@ const strategyFor = (vendor = '', cfg) => {
     default: {
       const { LocalStrategy } = require('./strategies/local_strategy')
       
-      return { authService: new LocalStrategy(cfg), validAuthService: false }  
+      return { authStrategy: new LocalStrategy(cfg), isValidAuthService: false }  
     }      
   }
 }

@@ -1,16 +1,16 @@
 const express = require('express')
 const passport = require('passport')
 
-let authService
+let authStrategy
 
-const initAuthService = ( _authService ) => {
-  authService = _authService
+const initAuthService = ( _authStrategy ) => {
+  authStrategy = _authStrategy
 }
 
 const createAuthRouter = () => {
   const router = express.Router()
 
-  passport.use('external-db-authorization', authService)
+  passport.use('external-db-authorization', authStrategy)
 
   passport.serializeUser((user, done) => done(null, user))
   passport.deserializeUser((obj, done) => done(null, obj))
