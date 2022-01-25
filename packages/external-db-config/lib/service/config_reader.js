@@ -12,13 +12,8 @@ class ConfigReader {
     const { missingRequiredSecretsKeys } = await this.externalConfigReader.validate()
     const { missingRequiredSecretsKeys: missingRequiredEnvs, validType, validVendor } = this.commonConfigReader.validate()
 
-    return {
-      missingRequiredSecretsKeys,
-      missingRequiredEnvs,
-      validType,
-      validVendor,
-    }
-
+    return { missingRequiredSecretsKeys, missingRequiredEnvs,
+             validType, validVendor }
 
   }
 }
