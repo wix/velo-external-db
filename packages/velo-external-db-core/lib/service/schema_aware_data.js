@@ -1,6 +1,6 @@
 const { prepareForUpdate, unpackDates, prepareForInsert } = require('../converters/transform')
 
-class PreDataService {
+class SchemaAwareDataService {
     constructor(filterTransformer, aggregationTransformer, queryValidator, schemaInformation) {
         this.filterTransformer = filterTransformer
         this.aggregationTransformer = aggregationTransformer
@@ -39,4 +39,4 @@ class PreDataService {
 
 }
 
-module.exports = PreDataService
+module.exports = SchemaAwareDataService
