@@ -3,12 +3,8 @@ const { AdapterOperators } = require('velo-external-db-commons')
 
 
 class DataService {
-    constructor(storage, schemaInformation, filterTransformer, aggregationTransformer, queryValidator) {
+    constructor(storage) {
         this.storage = storage
-        this.schemaInformation = schemaInformation
-        this.filterTransformer = filterTransformer
-        this.aggregationTransformer = aggregationTransformer 
-        this.queryValidator = queryValidator
     }
 
     async find(collectionName, _filter, sort, skip, limit) {

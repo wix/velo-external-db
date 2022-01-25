@@ -23,7 +23,7 @@ const load = async() => {
     const aggregationTransformer = new AggregationTransformer(filterTransformer)
     const queryValidator = new QueryValidator()
     const preDataService = new PreDataService(filterTransformer, aggregationTransformer, queryValidator, schemaInformation)
-    const dataService = new DataService(dataProvider, schemaInformation, filterTransformer, aggregationTransformer, queryValidator)
+    const dataService = new DataService(dataProvider)
     const schemaService = new SchemaService(schemaProvider, schemaInformation)
     initServices(dataService, schemaService, operationService, configReader, preDataService, { vendor, type: adapterType })
     _cleanup = async() => {
