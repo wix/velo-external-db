@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid')
 let dateTimeProvider = require('../utils/date_time_provider')
+const crypto = require('crypto')
 
 const asWixData = e => generateIdsIfNeeded(packDates(e))
 
@@ -21,10 +22,11 @@ const unpackDates = item => {
 }
 
 const generateIdsIfNeeded = item => {
-    if ('_id' in item) {
+    if ('_id' in item)
         return item
-    }
-    return { ...item, _id: uuidv4() }
+    const sha = crypto.createHash('sha1')
+    const fieldsConcat = Object.values(item).join('')
+    return { ...item, _id: sha.update(fieldsConcat).digest('base64') }
 }
 
 const defaultValueFor = (f) => {
