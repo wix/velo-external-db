@@ -18,7 +18,7 @@
     "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "echo \"Error: no test specified\" "
   },
   "bugs": {
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
@@ -26,9 +26,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.47.0",
     "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
     "passport-oauth2": "^1.6.1"
-  },
-  "devDependencies": {
-    "dotenv": "^14.2.0"
   }
 }

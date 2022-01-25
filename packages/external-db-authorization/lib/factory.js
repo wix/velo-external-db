@@ -3,13 +3,13 @@ const strategyFor = (vendor = '', cfg) => {
     case 'aws': {
       const { AwsStrategy } = require('./strategies/aws_strategy')
       
-      return new AwsStrategy(cfg)
-    }
+      return { authService: new AwsStrategy(cfg), validAuthService: true }
     
+    }
     case 'gcp': {
       const { GcpStrategy } = require('./strategies/gcp_strategy')
 
-      return new GcpStrategy(cfg)
+      return { authService: new GcpStrategy(cfg), validAuthService: true } 
     }
 
     case 'azure':
@@ -17,7 +17,7 @@ const strategyFor = (vendor = '', cfg) => {
     default: {
       const { LocalStrategy } = require('./strategies/local_strategy')
       
-      return new LocalStrategy(cfg)
+      return { authService: new LocalStrategy(cfg), validAuthService: false }  
     }      
   }
 }
@@ -26,6 +26,7 @@ const createAuthService = async(vendor, config) => {
   const cfg = await config.readConfig()
   const configStatus = await config.configStatus()
 
+  // Change it when there will be a new configStatus function 
   if (configStatus !== 'External DB Config read successfully') {
     return strategyFor('local')
   }

@@ -1,15 +1,8 @@
-const OAuth2Strategy = require('passport-oauth2')
+const localStrategy = require('passport-local')
 
 class LocalStrategy {
   constructor() {
-    this.options = {
-        authorizationURL: '/auth/signup',
-        clientID: 'clientID',
-        clientSecret: 'clientSecret',
-        tokenURL: '/oauth2/token'
-    }
-    return new OAuth2Strategy(this.options, this.verify)
-    
+    return new localStrategy(this.verify) 
   }
 
   verify(AccessToken, tokenSecret, profile, done) {
