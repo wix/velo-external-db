@@ -16,6 +16,7 @@ class AggregationTransformer {
         const postFilter = this.filterTransformer.transform(postFilteringStep)
 
         const projection = [...projectionFields, ...projectionFunctions]
+
         return {
             projection,
             postFilter

@@ -20,7 +20,7 @@ describe ('Pre Data Service', () => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
         aggregationTransformer.givenTransformTo(ctx.aggregation, ctx.transformAggregation)
 
-        return expect(env.preDataService.transformAndValidateFilter(ctx.collectionName, ctx.filter)).resolves.toEqual(ctx.transformedFilter)
+        return expect(env.preDataService.transformAndValidateAggregation(ctx.collectionName, ctx.aggregation)).resolves.toEqual(ctx.transformAggregation)
     }) 
 
     test('prepareItemsForInsert will add default values according to the schema', async() => {
