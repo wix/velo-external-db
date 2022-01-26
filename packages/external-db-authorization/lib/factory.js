@@ -23,15 +23,14 @@ const strategyFor = (vendor = '', cfg) => {
 }
 
 const createAuthService = async(vendor, config) => {
-  const cfg = await config.readConfig()
-  const configStatus = await config.configStatus()
 
-  // Change it when there will be a new configStatus function 
-  if (configStatus !== 'External DB Config read successfully') {
+  const { auth: authConfig } = await config.readConfig()
+  const { validAuthConfig } = await config.configStatus()
+
+  if (!validAuthConfig) 
     return strategyFor('local')
-  }
   
-  return strategyFor(vendor, cfg)
+  return strategyFor(vendor, authConfig)
 
 }
 

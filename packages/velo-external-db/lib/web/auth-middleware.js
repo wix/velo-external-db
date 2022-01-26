@@ -25,8 +25,9 @@ const secretKeyAuthMiddleware = ({ secretKey }) => {
 
 const authMiddleware = async(req, res, next) => {
     if (!isValidAuthService || !req.user) {
-        const authConfigReaderStatus = await authConfigReader.configStatus()
-        return res.render('login', { authConfigReaderStatus })
+        const { message } = await authConfigReader.configStatus()
+        const statusMessage = isValidAuthService? 'Authorization configured successfully' : message
+        return res.render('login', { isValidAuthService, statusMessage })
       }
   
       next()

@@ -29,11 +29,11 @@ const load = async() => {
     const dataService = new DataService(dataProvider)
     const schemaAwareDataService = new SchemaAwareDataService(dataService, queryValidator, schemaInformation)
     const schemaService = new SchemaService(schemaProvider, schemaInformation)
-    const { authService, validAuthService } = await createAuthService(vendor, configReader)
+    const { authStrategy, isValidAuthService } = await createAuthService(vendor, configReader)
     
     initServices(schemaAwareDataService, schemaService, operationService, configReader, { vendor, type: adapterType }, filterTransformer, aggregationTransformer)
-    initAuthService(authService)
-    initAuthMiddleware(validAuthService, configReader)
+    initAuthService(authStrategy)
+    initAuthMiddleware(isValidAuthService, configReader)
     
     _cleanup = async() => {
         await cleanup()

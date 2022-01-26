@@ -1,6 +1,6 @@
 <%
-const connectionColor =  authConfigReaderStatus === 'External DB Config read successfully' ? 'success': 'danger' 
-const buttonVisability = authConfigReaderStatus === 'External DB Config read successfully' ? '': 'disabled'
+const connectionColor =  isValidAuthService  ? 'success': 'danger' 
+const buttonVisability = isValidAuthService ? '': 'invisible'
 %>
 <!doctype html>
 <html lang=en>
@@ -41,7 +41,7 @@ const buttonVisability = authConfigReaderStatus === 'External DB Config read suc
 					<div>
 						<h6 class="mb-0">Authorization Status</h6>
 						<p class="mb-0 opacity-75">
-							<%= authConfigReaderStatus %>
+							<%= statusMessage %>
 						</p>
 					</div>
 				</div>
