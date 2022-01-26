@@ -57,5 +57,19 @@ const truncateResultTo = (forCollectionName) =>
 const givenAggregateResult = (items, forCollectionName, filter, aggregation) =>    
     when(dataService.aggregate).calledWith(forCollectionName, filter, aggregation)
                                .mockResolvedValue({ items, totalCount: 0 })
-    
-module.exports = { dataService, givenListResult, givenCountResult, givenGetByIdResult, givenInsertResult, givenBulkInsertResult, givenUpdateResult, givenBulkUpdateResult, deleteResultTo, bulkDeleteResultTo, truncateResultTo, givenAggregateResult }
+
+const reset = () => {
+    dataService.find.mockClear()
+    dataService.count.mockClear()
+    dataService.getById.mockClear()
+    dataService.insert.mockClear()
+    dataService.bulkInsert.mockClear()
+    dataService.update.mockClear()
+    dataService.bulkUpdate.mockClear()
+    dataService.truncate.mockClear()
+    dataService.aggregate.mockClear()
+    dataService.delete.mockClear()
+    dataService.bulkDelete.mockClear()
+}
+module.exports = { dataService, givenListResult, givenCountResult, givenGetByIdResult, givenInsertResult, givenBulkInsertResult,
+                 givenUpdateResult, givenBulkUpdateResult, deleteResultTo, bulkDeleteResultTo, truncateResultTo, givenAggregateResult, reset }

@@ -120,7 +120,9 @@ describe ('Schema Aware Data Service', () => {
     }
 
     beforeEach(() => {
+        data.reset()
         env.schemaAwareDataService = new SchemaAwareDataService(data.dataService, queryValidator.queryValidator, schema.schemaInformation)
+        
         ctx.entity = gen.randomEntity()
         ctx.entities = gen.randomEntities()
         const e = gen.randomEntity()
