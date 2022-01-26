@@ -25,7 +25,7 @@ const defineValidConfigReaderClient = (config) => {
     when(configReaderClient.readConfig).calledWith()
                                            .mockReturnValue(config)
     when(configReaderClient.configStatus).calledWith()
-                                           .mockReturnValue(validConfigReaderStatus)
+                                           .mockReturnValue({ message: validConfigReaderStatus })
 }
 
 const defineBrokenConfigReaderClient = (config) => {
@@ -33,7 +33,7 @@ const defineBrokenConfigReaderClient = (config) => {
     when(configReaderClient.readConfig).calledWith()
                                            .mockReturnValue(newObject)
     when(configReaderClient.configStatus).calledWith()
-                                           .mockReturnValue(`${missingRequiredConfigKeys}: ${deletedKey}`)
+                                           .mockReturnValue({ message: `${missingRequiredConfigKeys}: ${deletedKey}` })
 }
 
 const defineBrokenOperationService = () => {

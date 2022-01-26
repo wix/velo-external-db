@@ -18,6 +18,15 @@ const defineValidConfig = (config) => {
     if (config.secretKey) {
         process.env.SECRET_KEY = config.secretKey
     }
+    if (config.auth?.clientId) {
+        process.env.clientId = config.auth.clientId
+    }
+    if (config.auth?.clientSecret) {
+        process.env.clientSecret = config.auth.clientSecret
+    }
+    if (config.auth?.callbackUrl) {
+        process.env.callbackUrl = config.auth.callbackUrl
+    } 
 }
 
 const validConfig = () => ({
@@ -28,7 +37,18 @@ const validConfig = () => ({
     secretKey: chance.word(),
 })
 
-const ExpectedProperties = ['HOST', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY' ]
+const validConfigWithAuthConfig = () => ({
+    ...validConfig(),
+    auth: {
+        callbackUrl: chance.word(),
+        clientId: chance.word(),
+        clientSecret: chance.word()
+    }  
+})
+
+const defineInvalidConfig = () => defineValidConfig({})
+
+const ExpectedProperties = ['HOST', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret']
 
 const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 
@@ -36,6 +56,8 @@ const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 
 module.exports = {
     defineValidConfig,
+    validConfigWithAuthConfig,
+    defineInvalidConfig,
     validConfig,
     reset,
     hasReadErrors: false,

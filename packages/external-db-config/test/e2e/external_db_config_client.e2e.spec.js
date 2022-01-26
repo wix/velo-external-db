@@ -1,6 +1,7 @@
 const { Uninitialized } = require('test-commons')
 const { env, initEnv, reset } = require('../drivers/external_config_reader_e2e_test_support')
 const each = require('jest-each').default
+const { invalidConfigStatusResponse } = require('./external_db_config_client_matcher')
 
 each(
 [
@@ -22,24 +23,20 @@ each(
 
         beforeEach(async() => {
             reset()
-            ctx.config = env.driver.validConfig()
+            ctx.config = env.driver.validConfigWithAuthConfig()
         })
 
 
         test('read config', async() => {
             env.driver.defineValidConfig(ctx.config)
 
-            const actual = await env.configReader.readConfig()
-
-            expect(actual).toEqual(ctx.config)
+            await expect( env.configReader.readConfig() ).resolves.toEqual(ctx.config)
         })
 
         test('validate config', async() => {
-            env.driver.defineValidConfig({})
+            env.driver.defineInvalidConfig()
 
-            const actual = await env.configReader.configStatus()
-
-            expect(actual).toContain('Missing props:')
+            await expect( env.configReader.configStatus() ).resolves.toEqual( invalidConfigStatusResponse() )
         })
 
     })
