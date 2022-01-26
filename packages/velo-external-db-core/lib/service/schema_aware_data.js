@@ -1,4 +1,3 @@
-const { ItemNotFound } = require('velo-external-db-commons/lib/errors')
 const { prepareForUpdate, unpackDates, prepareForInsert } = require('../converters/transform')
 
 class SchemaAwareDataService {
@@ -13,10 +12,8 @@ class SchemaAwareDataService {
         return await this.dataService.find(collectionName, filter, sort, skip, limit)
     }
 
-    async getById(collectionName, filter) {
-        await this.validateFilter(collectionName, filter)
-        const data = await this.dataService.getById(collectionName, filter)
-        if (!data.item) throw new ItemNotFound('Item not found')
+    async getById(collectionName, itemId) {
+        const data = await this.dataService.getById(collectionName, itemId)
         return data
     }
 

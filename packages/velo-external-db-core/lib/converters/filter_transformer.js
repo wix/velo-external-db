@@ -32,14 +32,6 @@ class FilterTransformer {
         }
     }
 
-    geyByIdFilter(itemId) { //add test for that
-        return {
-            operator: AdapterOperators.eq,
-            fieldName: '_id',
-            value: itemId
-        }
-    }
-
     isMultipleFieldOperator(filter) { 
         return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
     }

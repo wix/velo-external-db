@@ -5,7 +5,7 @@ const { InvalidRequest, ItemNotFound } = require('velo-external-db-commons').err
 
 let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer
 
-const initServices = (_dataService, _schemaService, _operationService, _externalDbConfigClient, _schemaAwareDataService, _cfg, _filterTransformer, _aggregationTransformer) => {
+const initServices = (_schemaAwareDataService, _schemaService, _operationService, _externalDbConfigClient, _cfg, _filterTransformer, _aggregationTransformer) => {
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient
@@ -72,7 +72,7 @@ const createRouter = () => {
     router.post('/data/get', async(req, res, next) => {
         try {
             const { collectionName, itemId } = req.body
-            const data = await schemaAwareDataService.getById(collectionName, filterTransformer.getByIdFilter(itemId), '', 0, 1)
+            const data = await schemaAwareDataService.getById(collectionName, itemId, '', 0, 1)
             if (!data.item) {
                 throw new ItemNotFound('Item not found')
             }

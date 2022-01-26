@@ -1,5 +1,5 @@
 const { asWixData } = require('../converters/transform')
-
+const { AdapterOperators } = require('velo-external-db-commons')
 
 class DataService {
     constructor(storage) {
@@ -15,7 +15,12 @@ class DataService {
         }
     }
 
-    async getById(collectionName, filter) {
+    async getById(collectionName, itemId) {
+        const filter = {
+            fieldName: '_id',
+            operator: AdapterOperators.eq,
+            value: itemId
+        }
         const item = await this.storage.find(collectionName, filter, '', 0, 1)
         
         return { item: asWixData(item[0]) }
