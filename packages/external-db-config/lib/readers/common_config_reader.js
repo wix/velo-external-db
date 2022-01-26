@@ -9,8 +9,9 @@ class CommonConfigReader {
     }
 
     validate() {
-        const validType = supportedDBs.includes(process.env.TYPE)
-        const validVendor = supportedVendors.includes(process.env.CLOUD_VENDOR)
+        const cfg = this.readConfig()
+        const validType = supportedDBs.includes(cfg.type)
+        const validVendor = supportedVendors.includes(cfg.vendor)
         return {
             validType,
             validVendor,
