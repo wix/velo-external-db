@@ -15,14 +15,6 @@ class QueryValidator {
     
     }
     
-    /* eslint-disable no-unused-vars */
-    validateAggregation(fields, aggregation) {
-        
-        // const fieldNames = aggregation.projection.map(f => [f.name, f.alias]).flat().filter(f => f !== undefined)
-        // this.validateFilter(fields, aggregation.postFilter)
-        // this.validateFieldsExists(fieldNames)
-    }
-
     validateAggregation(fields, aggregation) {
         const fieldsWithAliases = aggregation.projection.reduce((pV, cV) => {
             if (cV.alias) return [...pV, { field: cV.alias, type: fields.find(f => f.field === cV.name).type }]
