@@ -38,8 +38,12 @@ describe('Converters', () => {
         expect(generateIdsIfNeeded(ctx.obj)).toHaveProperty( '_id' )
     })
 
-    test('call to generateIdsIfNeeded twice will return the same result', () => {
+    test('call to generateIdsIfNeeded twice with same object will return the same result', () => {
         expect(generateIdsIfNeeded(ctx.obj)).toEqual(generateIdsIfNeeded(ctx.obj))
+    })
+
+    test('call to generateIdsIfNeeded twice with different objects will return different id', () => {
+        expect(generateIdsIfNeeded(ctx.obj)._id).not.toEqual(generateIdsIfNeeded(ctx.anotherObj)._id)
     })
 
     test('if item has all fields like in schema fields, item should stay the same', async() => {
@@ -96,6 +100,7 @@ describe('Converters', () => {
 
     const ctx = {
         obj: Uninitialized,
+        anotherObj: Uninitialized,
         objSchemaFields: Uninitialized,
         property: Uninitialized,
         anotherProperty: Uninitialized,
@@ -104,6 +109,7 @@ describe('Converters', () => {
 
     beforeEach(() => {
         ctx.obj = gen.randomObject()
+        ctx.anotherObj = gen.randomObject()
         ctx.objSchemaFields = Object.keys(ctx.obj).map(f => ({ field: f, type: 'text' }), { })
         ctx.property = chance.word()
         ctx.anotherProperty = chance.word()
