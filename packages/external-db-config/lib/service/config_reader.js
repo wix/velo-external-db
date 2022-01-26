@@ -1,31 +1,33 @@
 class ConfigReader {
-  constructor(externalConfigReader, commonConfigReader) {
+  constructor(externalConfigReader, commonConfigReader, externalAuthConfigReader) {
     this.externalConfigReader = externalConfigReader
+    this.externalAuthConfigReader = externalAuthConfigReader
     this.commonConfigReader = commonConfigReader
   }
 
   async readConfig() {
-    return await this.externalConfigReader.readConfig()
+    const externalConfig = await this.externalConfigReader.readConfig()
+    const authConfig = await this.externalAuthConfigReader.readConfig()
+
+    return { ...externalConfig, auth: authConfig }
   }
 
   async configStatus() {
     const { missingRequiredSecretsKeys } = await this.externalConfigReader.validate()
+    const { missingRequiredSecretsKeys: missingRequiredAuthSecretsKeys } = await this.externalAuthConfigReader.validate()
     const { missingRequiredSecretsKeys: missing, validType, validVendor } = this.commonConfigReader.validate()
 
-    if (missingRequiredSecretsKeys.length > 0 || (missing && missing.length > 0)) {
-      return `Missing props: ${[...missingRequiredSecretsKeys, missing].join(', ')}`
-    }
-    
-    else if (!validVendor) {
-      return 'Cloud type is not supported'
-    }
+    if (missingRequiredSecretsKeys.length > 0 || (missing && missing.length > 0) || missingRequiredAuthSecretsKeys.length > 0) 
+      return { message: `Missing props: ${[...missingRequiredSecretsKeys, ...missingRequiredAuthSecretsKeys, ...missing].join(', ')}`, valid: false }
+        
+    else if (!validVendor) 
+      return { message: 'Cloud type is not supported', valid: false }       
 
-    else if(!validType) {
-      return 'DB type is not supported'
-    }
+    else if(!validType)
+      return { message: 'DB type is not supported', valid: false }
+   
 
-
-    return 'External DB Config read successfully'
+    return { message: 'External DB Config read successfully', valid: true }
   }
 }
 
