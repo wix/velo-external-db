@@ -3,15 +3,16 @@ const { errorMiddleware } = require('./web/error-middleware')
 const { appInfoFor } = require ('./health/app_info')
 const { InvalidRequest, ItemNotFound } = require('velo-external-db-commons').errors
 
-let dataService, schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg
+let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer
 
-const initServices = (_dataService, _schemaService, _operationService, _externalDbConfigClient, _schemaAwareDataService, _cfg) => {
-    dataService = _dataService
+const initServices = (_dataService, _schemaService, _operationService, _externalDbConfigClient, _schemaAwareDataService, _cfg, _filterTransformer, _aggregationTransformer) => {
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient
     cfg = _cfg
     schemaAwareDataService = _schemaAwareDataService
+    filterTransformer = _filterTransformer
+    aggregationTransformer = _aggregationTransformer
 }
 
 const createRouter = () => {
@@ -31,8 +32,7 @@ const createRouter = () => {
     router.post('/data/find', async(req, res, next) => {
         try {
             const { collectionName, filter, sort, skip, limit } = req.body
-            const domainFilter = await schemaAwareDataService.transformAndValidateFilter(collectionName, filter)
-            const data = await dataService.find(collectionName, domainFilter, sort, skip, limit)
+            const data = await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), sort, skip, limit)
             res.json(data)
         } catch (e) {
             next(e)
@@ -42,9 +42,7 @@ const createRouter = () => {
     router.post('/data/aggregate', async(req, res, next) => {
         try {
             const { collectionName, filter, processingStep, postFilteringStep } = req.body
-            const domainFilter = await schemaAwareDataService.transformAndValidateFilter(collectionName, filter)
-            const domainAggregation = await schemaAwareDataService.transformAndValidateAggregation(collectionName, { processingStep, postFilteringStep })
-            const data = await dataService.aggregate(collectionName, domainFilter, domainAggregation)
+            const data = await schemaAwareDataService.aggregate(collectionName, filterTransformer.transform(filter), aggregationTransformer.transform({ processingStep, postFilteringStep }))
             res.json(data)
         } catch (e) {
             next(e)
@@ -54,8 +52,7 @@ const createRouter = () => {
     router.post('/data/insert', async(req, res, next) => {
         try {
             const { collectionName, item } = req.body
-            const prepared = await schemaAwareDataService.prepareItemsForInsert(collectionName, [item])  
-            const data = await dataService.insert(collectionName, prepared[0])
+            const data = await schemaAwareDataService.insert(collectionName, item)
             res.json(data)
         } catch (e) {
             next(e)
@@ -65,8 +62,7 @@ const createRouter = () => {
     router.post('/data/insert/bulk', async(req, res, next) => {
         try {
             const { collectionName, items } = req.body
-            const prepared = await schemaAwareDataService.prepareItemsForInsert(collectionName, items) 
-            const data = await dataService.bulkInsert(collectionName, prepared)
+            const data = await schemaAwareDataService.bulkInsert(collectionName, items)
             res.json(data)
         } catch (e) {
             next(e)
@@ -76,7 +72,7 @@ const createRouter = () => {
     router.post('/data/get', async(req, res, next) => {
         try {
             const { collectionName, itemId } = req.body
-            const data = await dataService.getById(collectionName, itemId)
+            const data = await schemaAwareDataService.getById(collectionName, filterTransformer.getByIdFilter(itemId), '', 0, 1)
             if (!data.item) {
                 throw new ItemNotFound('Item not found')
             }
@@ -89,8 +85,7 @@ const createRouter = () => {
     router.post('/data/update', async(req, res, next) => {
         try {
             const { collectionName, item } = req.body
-            const prepared = await schemaAwareDataService.prepareItemsForUpdate(collectionName, [item])
-            const data = await dataService.update(collectionName, prepared[0])
+            const data = await schemaAwareDataService.update(collectionName, item)
             res.json(data)
         } catch (e) {
             next(e)
@@ -100,8 +95,7 @@ const createRouter = () => {
     router.post('/data/update/bulk', async(req, res, next) => {
         try {
             const { collectionName, items } = req.body
-            const prepared = await schemaAwareDataService.prepareItemsForUpdate(collectionName, items)
-            const data = await dataService.bulkUpdate(collectionName, prepared)
+            const data = await schemaAwareDataService.bulkUpdate(collectionName, items)
             res.json(data)
         } catch (e) {
             next(e)
@@ -111,7 +105,7 @@ const createRouter = () => {
     router.post('/data/remove', async(req, res, next) => {
         try {
             const { collectionName, itemId } = req.body
-            const data = await dataService.delete(collectionName, itemId)
+            const data = await schemaAwareDataService.delete(collectionName, itemId)
             res.json(data)
         } catch (e) {
             next(e)
@@ -121,7 +115,7 @@ const createRouter = () => {
     router.post('/data/remove/bulk', async(req, res, next) => {
         try {
             const { collectionName, itemIds } = req.body
-            const data = await dataService.bulkDelete(collectionName, itemIds)
+            const data = await schemaAwareDataService.bulkDelete(collectionName, itemIds)
             res.json(data)
         } catch (e) {
             next(e)
@@ -131,8 +125,7 @@ const createRouter = () => {
     router.post('/data/count', async(req, res, next) => {
         try {
             const { collectionName, filter } = req.body
-            const domainFilter = await schemaAwareDataService.transformAndValidateFilter(collectionName, filter)
-            const data = await dataService.count(collectionName, domainFilter)
+            const data = await schemaAwareDataService.count(collectionName, filterTransformer.transform(filter))        
             res.json(data)
         } catch (e) {
             next(e)
@@ -142,7 +135,7 @@ const createRouter = () => {
     router.post('/data/truncate', async(req, res, next) => {
         try {
             const { collectionName } = req.body
-            const data = await dataService.truncate(collectionName)
+            const data = await schemaAwareDataService.truncate(collectionName)
             res.json(data)
         } catch (e) {
             next(e)

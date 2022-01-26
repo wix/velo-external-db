@@ -22,10 +22,10 @@ const load = async() => {
     const filterTransformer = new FilterTransformer()
     const aggregationTransformer = new AggregationTransformer(filterTransformer)
     const queryValidator = new QueryValidator()
-    const schemaAwareDataService = new SchemaAwareDataService(filterTransformer, aggregationTransformer, queryValidator, schemaInformation)
     const dataService = new DataService(dataProvider)
+    const schemaAwareDataService = new SchemaAwareDataService(dataService, queryValidator, schemaInformation)
     const schemaService = new SchemaService(schemaProvider, schemaInformation)
-    initServices(dataService, schemaService, operationService, configReader, schemaAwareDataService, { vendor, type: adapterType })
+    initServices(schemaAwareDataService, schemaService, operationService, configReader, { vendor, type: adapterType }, filterTransformer, aggregationTransformer)
     _cleanup = async() => {
         await cleanup()
         schemaInformation.cleanup()

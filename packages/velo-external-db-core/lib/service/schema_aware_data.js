@@ -1,26 +1,77 @@
+const { ItemNotFound } = require('velo-external-db-commons/lib/errors')
 const { prepareForUpdate, unpackDates, prepareForInsert } = require('../converters/transform')
 
 class SchemaAwareDataService {
-    constructor(filterTransformer, aggregationTransformer, queryValidator, schemaInformation) {
-        this.filterTransformer = filterTransformer
-        this.aggregationTransformer = aggregationTransformer
+    constructor(dataService, queryValidator, schemaInformation) {
         this.queryValidator = queryValidator
         this.schemaInformation = schemaInformation
+        this.dataService = dataService
     }
 
-    async transformAndValidateFilter(collectionName, _filter) {
-        const filter = this.filterTransformer.transform(_filter)      
+    async find(collectionName, filter, sort, skip, limit) {
+        await this.validateFilter(collectionName, filter)
+        return await this.dataService.find(collectionName, filter, sort, skip, limit)
+    }
+
+    async getById(collectionName, filter) {
+        await this.validateFilter(collectionName, filter)
+        const data = await this.dataService.getById(collectionName, filter)
+        if (!data.item) throw new ItemNotFound('Item not found')
+        return data
+    }
+
+    async count(collectionName, filter) {
+        await this.validateFilter(collectionName, filter)
+        return await this.dataService.count(collectionName, filter)
+    }
+    
+    async insert(collectionName, item) {
+        const prepared = await this.prepareItemsForInsert(collectionName, [item])
+        return await this.dataService.insert(collectionName, prepared[0])
+    }
+    
+    async bulkInsert(collectionName, items) {
+        const prepared = await this.prepareItemsForInsert(collectionName, items)
+        return await this.dataService.bulkInsert(collectionName, prepared)
+    }
+    
+    async update(collectionName, item) {
+        const prepared = await this.prepareItemsForUpdate(collectionName, [item])
+        return await this.dataService.update(collectionName, prepared[0])
+    }
+
+    async bulkUpdate(collectionName, items) {
+        const prepared = await this.prepareItemsForUpdate(collectionName, items)
+        return await this.dataService.bulkUpdate(collectionName, prepared)
+    }
+
+    async delete(collectionName, itemId) {
+        return await this.dataService.delete(collectionName, itemId)
+    }
+
+    async bulkDelete(collectionName, itemIds) {
+        return await this.dataService.bulkDelete(collectionName, itemIds)
+    }
+
+    async truncate(collectionName) {
+        return await this.dataService.truncate(collectionName)
+    }
+    
+    async aggregate(collectionName, filter, aggregation) {
+        await this.validateAggregation(collectionName, aggregation)
+        await this.validateFilter(collectionName, filter)
+        return await this.dataService.aggregate(collectionName, filter, aggregation)
+    }
+
+    async validateFilter(collectionName, filter) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         this.queryValidator.validateFilter(fields, filter)
-        return filter
     }
-
-    async transformAndValidateAggregation(collectionName, _aggregation) {
-        const aggregation = this.aggregationTransformer.transform(_aggregation)      
-        // const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-        // this.queryValidator.validateAggregation(fields, aggregation)
+    
+    /* eslint-disable no-unused-vars */
+    async validateAggregation(collectionName, aggregation) {
         //TODO: validate aggregation
-        return aggregation
+        // return aggregation
     }
 
     async prepareItemsForUpdate(collectionName, items) {
