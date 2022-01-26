@@ -1,0 +1,53 @@
+<%
+const connectionColor =  isValidAuthService  ? 'success': 'danger' 
+const buttonVisability = isValidAuthService ? '': 'invisible'
+%>
+<!doctype html>
+<html lang=en>
+<head>
+	<meta charset=utf-8>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Velo External DB</title>
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="preload" as="font">
+	<link type="image/png" href="https://www.wix.com/favicon.ico" rel="shortcut icon">
+    <link rel='stylesheet' href='/assets/stylesheets/style.css' />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+</head>
+<style>
+	.list-group {
+		width: auto;
+		max-width: 650px;
+		margin: 3rem auto;
+	}
+</style>
+
+<body>
+	<div class="container">
+		<div class="hero">
+			<div style="text-align:center;">
+				<picture>
+					<img src="/assets/wix-logo.svg" width="427" height="231">
+				</picture>
+			</div>
+		</div>
+		<div class="list-group">
+			<div class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=connectionColor%> py-3" aria-current="true"> 
+				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16">
+					<path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.793-.793-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z"/>
+					<path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+				  </svg>
+				<div class="d-flex gap-2 w-100 justify-content-between">
+					<div>
+						<h6 class="mb-0">Authorization Status</h6>
+						<p class="mb-0 opacity-75">
+							<%= statusMessage %>
+						</p>
+					</div>
+				</div>
+		</div>
+		<a class=" mt-2 btn btn-primary btn-lg  <%=buttonVisability%> " href="/auth/login"> Sign in </a>
+	</div>
+</body>
+
+</html>
