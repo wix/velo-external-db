@@ -8,8 +8,9 @@ class QueryValidator {
 
     validateFilter(fields, filter) {
         const filterFieldsAndOpsObj = extractFieldsAndOperators(filter)
+        const filterFields = filterFieldsAndOpsObj.map(f => f.name)
         const fieldNames = fields.map(f => f.field)
-        this.validateFilterFieldsExists(fieldNames, filterFieldsAndOpsObj)
+        this.validateFieldsExists(fieldNames, filterFields)
         this.validateOperators(fields, filterFieldsAndOpsObj)
     
     }
@@ -22,8 +23,21 @@ class QueryValidator {
         // this.validateFieldsExists(fieldNames)
     }
 
-    validateFilterFieldsExists(fields, filterObj) { 
-        const nonExistentFields = filterObj.filter(field => !fields.includes(field.name)) 
+    validateAggregation(fields, aggregation) {
+        const fieldsWithAliases = aggregation.projection.reduce((pV, cV) => {
+            if (cV.alias) return [...pV, { field: cV.alias, type: fields.find(f => f.field === cV.name).type }]
+            return pV
+        }, fields)
+
+        const fieldNames = fieldsWithAliases.map(f => f.field)
+        const projectionFields = aggregation.projection.map(f => [f.name, f.alias]).flat().filter(f => f !== undefined)
+        
+        this.validateFilter(fieldsWithAliases, aggregation.postFilter)
+        this.validateFieldsExists(fieldNames, projectionFields)
+    }
+
+    validateFieldsExists(allFields, queryFields) { 
+        const nonExistentFields = queryFields.filter(field => !allFields.includes(field)) 
 
         if (nonExistentFields.length) {
             throw new InvalidQuery(`fields ${nonExistentFields.map(f => f.name).join(', ')} don't exist`)
