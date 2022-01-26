@@ -32,7 +32,6 @@ class FilterTransformer {
         }
     }
 
-
     isMultipleFieldOperator(filter) { 
         return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
     }

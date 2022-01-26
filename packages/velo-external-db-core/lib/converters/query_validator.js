@@ -9,10 +9,17 @@ class QueryValidator {
     validateFilter(fields, filter) {
         const filterFieldsAndOpsObj = extractFieldsAndOperators(filter)
         const fieldNames = fields.map(f => f.field)
-
         this.validateFilterFieldsExists(fieldNames, filterFieldsAndOpsObj)
         this.validateOperators(fields, filterFieldsAndOpsObj)
     
+    }
+    
+    /* eslint-disable no-unused-vars */
+    validateAggregation(fields, aggregation) {
+        
+        // const fieldNames = aggregation.projection.map(f => [f.name, f.alias]).flat().filter(f => f !== undefined)
+        // this.validateFilter(fields, aggregation.postFilter)
+        // this.validateFieldsExists(fieldNames)
     }
 
     validateFilterFieldsExists(fields, filterObj) { 
