@@ -67,8 +67,8 @@ class SchemaAwareDataService {
     
     /* eslint-disable no-unused-vars */
     async validateAggregation(collectionName, aggregation) {
-        //TODO: validate aggregation
-        // return aggregation
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        this.queryValidator.validateAggregation(fields, aggregation)
     }
 
     async prepareItemsForUpdate(collectionName, items) {

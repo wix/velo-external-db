@@ -13,11 +13,13 @@ class QueryValidator {
         this.validateOperators(fields, filterFieldsAndOpsObj)
     
     }
-
+    
+    /* eslint-disable no-unused-vars */
     validateAggregation(fields, aggregation) {
-        const fieldNames = aggregation.projection.map(f => [f.name, f.alias]).flat().filter(f => f !== undefined)
-        this.validateFilter(fields, aggregation.postFilter)
-        this.validateFieldsExists(fieldNames)
+        
+        // const fieldNames = aggregation.projection.map(f => [f.name, f.alias]).flat().filter(f => f !== undefined)
+        // this.validateFilter(fields, aggregation.postFilter)
+        // this.validateFieldsExists(fieldNames)
     }
 
     validateFilterFieldsExists(fields, filterObj) { 
