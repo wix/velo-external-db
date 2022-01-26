@@ -46,13 +46,13 @@
   },
   "devDependencies": {
     "async-wait-until": "^2.0.9",
-    "axios": "^0.24.0",
+    "axios": "^0.25.0",
     "chance": "^1.1.8",
-    "docker-compose": "^0.23.14",
+    "docker-compose": "^0.23.17",
     "jest": "^27.4.7",
     "jest-each": "^27.4.6",
     "jest-when": "^3.5.0",
     "test-commons": "^0.0.0",
-    "ts-jest": "^27.1.2"
+    "ts-jest": "^27.1.3"
   }
 }

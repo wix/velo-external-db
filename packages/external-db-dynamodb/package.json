@@ -26,8 +26,8 @@
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.46.0",
-    "@aws-sdk/lib-dynamodb": "^3.46.0",
+    "@aws-sdk/client-dynamodb": "^3.48.0",
+    "@aws-sdk/lib-dynamodb": "^3.48.0",
     "mysql": "^2.18.1",
     "velo-external-db-commons": "^0.0.0"
   },
@@ -36,6 +36,6 @@
     "jest": "^27.4.7",
     "jest-when": "^3.5.0",
     "test-commons": "^0.0.0",
-    "ts-jest": "^27.1.2"
+    "ts-jest": "^27.1.3"
   }
 }
