@@ -4,8 +4,6 @@ const StubConfigReader = require('./readers/stub_config_reader')
 const aws = require('./readers/aws_config_reader')
 const gcp = require('./readers/gcp_config_reader')
 const azure = require('./readers/azure_config_reader')
-const { AwsAuthConfigReader } = require('./readers/aws_auth_config_reader')
-const { GcpAuthConfigReader } = require('./readers/gcp_auth_config_reader')
 
 const DefaultSecretId = 'VELO-EXTERNAL-DB-SECRETS'
 
@@ -16,34 +14,25 @@ const create = () => {
   let internalAuthConfigReader
 
   switch (vendor.toLowerCase()) {
-
-    case 'aws':
+    case 'aws': {
+      const { AwsAuthConfigReader } = require('./readers/aws_auth_config_reader')
       internalAuthConfigReader = new AwsAuthConfigReader(secretId || DefaultSecretId, region)
-      break
-      
-    case 'gcp':
-      internalAuthConfigReader = new GcpAuthConfigReader()
-      break
 
-    case 'azure':
-      // TODO 
-      break
-  }
-
-
-  switch (vendor.toLowerCase()) {
-
-    case 'aws':
       switch(type) {
         case 'dynamodb':
           internalConfigReader = new aws.AwsDynamoConfigReader(region) 
           break
         default:
           internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId, region)
-      }
-      break
+      }      
+    
+    }
+    break
       
-    case 'gcp':
+    case 'gcp': {
+      const { GcpAuthConfigReader } = require('./readers/gcp_auth_config_reader')
+      internalAuthConfigReader = new GcpAuthConfigReader()
+
       switch (type) {
         case 'spanner':
           internalConfigReader = new gcp.GcpSpannerConfigReader()
@@ -68,9 +57,13 @@ const create = () => {
           internalConfigReader = new gcp.GcpConfigReader()
           break
       }
-      break
+    }
+    break
 
-    case 'azure':
+    case 'azure': {
+      const { AzureAuthConfigReader } = require('./readers/azure_auth_config_reader')
+      internalAuthConfigReader = new AzureAuthConfigReader()
+
       switch (type) {
         case 'spanner':
           internalConfigReader = new gcp.GcpSpannerConfigReader()
@@ -99,7 +92,8 @@ const create = () => {
           internalConfigReader = new azure.AzureConfigReader()
           break
       }
-      break
+    }
+    break
   }
 
   return new ConfigReader(internalConfigReader || new StubConfigReader, common, internalAuthConfigReader || new StubConfigReader)

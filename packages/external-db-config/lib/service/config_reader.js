@@ -15,19 +15,30 @@ class ConfigReader {
   async configStatus() {
     const { missingRequiredSecretsKeys } = await this.externalConfigReader.validate()
     const { missingRequiredSecretsKeys: missingRequiredAuthSecretsKeys } = await this.externalAuthConfigReader.validate()
-    const { missingRequiredSecretsKeys: missing, validType, validVendor } = this.commonConfigReader.validate()
+    const { missingRequiredSecretsKeys: missingRequiredEnvs, validType, validVendor } = this.commonConfigReader.validate()
 
-    if (missingRequiredSecretsKeys.length > 0 || (missing && missing.length > 0) || missingRequiredAuthSecretsKeys.length > 0) 
-      return { message: `Missing props: ${[...missingRequiredSecretsKeys, ...missingRequiredAuthSecretsKeys, ...missing].join(', ')}`, valid: false }
-        
-    else if (!validVendor) 
-      return { message: 'Cloud type is not supported', valid: false }       
-
+    const validConfig = missingRequiredSecretsKeys.length === 0 && missingRequiredEnvs.length === 0 && validType && validVendor
+    const validAuthConfig = missingRequiredAuthSecretsKeys.length === 0
+    
+  
+    let message 
+    if (!validAuthConfig) 
+      message = `Missing props: ${missingRequiredAuthSecretsKeys.join(', ')}`      
+    
+    else if (missingRequiredSecretsKeys.length > 0 || missingRequiredEnvs.length > 0)
+      message = `Missing props: ${[...missingRequiredSecretsKeys, ...missingRequiredEnvs].join(', ')}`
+    
+    else if (!validVendor)
+        message = 'Cloud type is not supported'
+    
     else if(!validType)
-      return { message: 'DB type is not supported', valid: false }
-   
+        message = 'DB type is not supported'
 
-    return { message: 'External DB Config read successfully', valid: true }
+    else 
+      message = 'External DB Config read successfully'
+
+    return { validAuthConfig, validConfig, message }
+  
   }
 }
 

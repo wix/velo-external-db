@@ -9,13 +9,26 @@ const commonConfigReader = {
     validate: jest.fn(),
 }
 
+const authConfigReader = {
+    readConfig: jest.fn(),
+    validate: jest.fn(),
+}
+
 const givenConfig = (config) =>
     when(configReader.readConfig).calledWith()
                                  .mockResolvedValue(config)
 
+const givenAuthConfig = (config) =>
+    when(authConfigReader.readConfig).calledWith()
+                                 .mockResolvedValue(config)
+
 const givenValidConfig = () =>
     when(configReader.validate).calledWith()
-                               .mockResolvedValue({ missingRequiredSecretsKeys: [], validType: true, validVendor: true })
+                               .mockResolvedValue({ missingRequiredSecretsKeys: [] })
+
+const givenValidAuthConfig = () =>
+    when(authConfigReader.validate).calledWith()
+                               .mockResolvedValue({ missingRequiredSecretsKeys: [] })
 
 const givenValidCommonConfig = () =>
     when(commonConfigReader.validate).calledWith()
@@ -24,6 +37,10 @@ const givenValidCommonConfig = () =>
 
 const givenInvalidConfigWith = (missing) =>
     when(configReader.validate).calledWith()
+                               .mockResolvedValue({ missingRequiredSecretsKeys: missing })
+
+const givenInvalidAuthConfigWith = (missing) =>
+    when(authConfigReader.validate).calledWith()
                                .mockResolvedValue({ missingRequiredSecretsKeys: missing })
 
 const givenInvalidCommonConfigWith = (missing) =>
@@ -41,12 +58,16 @@ const givenInvalidDBType = () =>
 const reset = () => {
     configReader.readConfig.mockClear()
     configReader.validate.mockClear()
+    
+    authConfigReader.readConfig.mockClear()
+    authConfigReader.validate.mockClear()
 
     commonConfigReader.validate.mockClear()
 }
 
-module.exports = { configReader, commonConfigReader, reset,
-                   givenValidCommonConfig,
+module.exports = { configReader, commonConfigReader, authConfigReader, reset,
+                   givenValidCommonConfig, 
+                   givenValidAuthConfig, givenAuthConfig, givenInvalidAuthConfigWith,
                    givenConfig, givenValidConfig, givenInvalidConfigWith, givenInvalidCommonConfigWith,
                    givenInvalidCloudVendor, givenInvalidDBType
 }

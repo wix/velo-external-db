@@ -1,27 +1,31 @@
-const readConfigResponse = ( config, authConfig ) => expect.objectContaining({
+const configResponseFor = ( config, authConfig ) => expect.objectContaining({
     ...config,
     auth: authConfig
 })
 
-const configStatusResponse = () => expect.objectContaining({ 
-    message: expect.stringContaining('External DB Config read successfully'), 
-    valid: true 
+const validConfigStatusResponse = () => expect.objectContaining({ 
+    validAuthConfig: true,
+    validConfig: true,
+    message: expect.stringContaining('External DB Config read successfully'),  
 })
 
-const invalidConfigStatusResponse = ( missingProperties ) => expect.objectContaining({
-    message: expect.stringContaining([...missingProperties].join(', ')),   
-    valid: false
+const configResponseWithMissingProperties = ( missingProperties ) => expect.objectContaining({
+    validAuthConfig: true,
+    validConfig: false,
+    message: expect.stringContaining([...missingProperties].join(', ')),  
 })
 
 const invalidVendorConfigStatusResponse = () => expect.objectContaining({
+    validAuthConfig: true,
+    validConfig: false,
     message: expect.stringContaining('Cloud type is not supported'),
-    valid: false
 })
 
 const invalidDbTypeConfigStatusResponse = () => expect.objectContaining({
+    validAuthConfig: true,
+    validConfig: false,
     message: expect.stringContaining('DB type is not supported'),
-    valid: false
 })
 
-module.exports = { readConfigResponse, configStatusResponse, invalidConfigStatusResponse, 
+module.exports = { configResponseFor, validConfigStatusResponse, configResponseWithMissingProperties, 
     invalidVendorConfigStatusResponse, invalidDbTypeConfigStatusResponse }

@@ -23,8 +23,23 @@ const defineValidConfig = (config) => {
     if (config.secretKey) {
         awsConfig.SECRET_KEY = config.secretKey
     }
+    if (config.auth?.callbackUrl) {
+        awsConfig.callbackUrl = config.auth.callbackUrl
+    }
+    if (config.auth?.clientId) {
+        awsConfig.clientId = config.auth.clientId
+    }
+    if (config.auth?.clientSecret) {
+        awsConfig.clientSecret = config.auth.clientSecret
+    }
+    if (config.auth?.clientDomain) {
+        awsConfig.clientDomain = config.auth.clientDomain
+    }
+
     mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(awsConfig) })
 }
+
+const defineInvalidConfig = () => defineValidConfig({})
 
 const validConfig = () => ({
     host: chance.word(),
@@ -34,7 +49,17 @@ const validConfig = () => ({
     secretKey: chance.word(),
 })
 
-const ExpectedProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY' ]
+const validConfigWithAuthConfig = () => ({
+    ...validConfig(),
+    auth: {
+        callbackUrl: chance.word(),
+        clientId: chance.word(),
+        clientSecret: chance.word(),
+        clientDomain: chance.word()
+    } 
+})
+
+const ExpectedProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'clientDomain']
 
 const reset = () => mockedAwsSdk.reset()
 
@@ -50,6 +75,8 @@ const defaultConfig = {
 
 module.exports = {
     defineValidConfig,
+    validConfigWithAuthConfig,
+    defineInvalidConfig,
     defineErroneousConfig,
     validConfig,
     defaultConfig,
