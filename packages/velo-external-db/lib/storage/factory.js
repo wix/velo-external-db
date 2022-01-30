@@ -1,6 +1,7 @@
 const append = (res, secretKey) => ( { ...res, secretKey: secretKey } )
 
-const init = async(type, vendor, config) => {
+const init = async(_type, vendor, config) => {
+    const type = _type || ''
     console.log(`INIT: ${vendor + '/' + type}`)
     const cfg = await config.readConfig()
     switch ( type.toLowerCase() ) {

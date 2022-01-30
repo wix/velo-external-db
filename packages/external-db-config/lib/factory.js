@@ -9,7 +9,7 @@ const DefaultSecretId = 'VELO-EXTERNAL-DB-SECRETS'
 
 const create = () => {
   const common = new CommonConfigReader()
-  const { vendor, type, secretId, region } = common.readConfig()
+  const { vendor = '', type, secretId, region } = common.readConfig()
   let internalConfigReader
   let internalAuthConfigReader
 
