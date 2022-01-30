@@ -4,4 +4,6 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const shouldNotRunOn = (impl, current) => !impl.includes(current)
 
-module.exports = { shouldNotRunOn, sleep, Uninitialized }
+const shouldRunOnlyOn = (impl, current) => impl.includes(current)
+
+module.exports = { shouldNotRunOn, shouldRunOnlyOn, sleep, Uninitialized }

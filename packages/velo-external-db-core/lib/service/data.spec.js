@@ -1,17 +1,17 @@
 const DataService = require('./data')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/data_provider_test_support')
-const { AdapterOperators } = require('velo-external-db-commons')
+const { AdapterOperators, SystemFields } = require('velo-external-db-commons')
 const Chance = require('chance')
 const chance = new Chance()
 
 describe('Data Service', () => {
 
     test('delegate request to data provider and translate data to velo format', async() => {
-        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
         
-        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)).resolves.toEqual({
                                                                                                                         items: ctx.entities,
                                                                                                                         totalCount: ctx.total
                                                                                                                     })
@@ -26,9 +26,9 @@ describe('Data Service', () => {
     test('get by id will issue a call to find and transform the result', async() => {
         const idFilter = { fieldName: '_id', operator: AdapterOperators.eq, value: ctx.itemId } 
         driver.givenListResult([ctx.entity], ctx.collectionName,
-                        idFilter, '', 0, 1)
+                        idFilter, '', 0, 1, ctx.defaultProjection)
 
-        return expect(env.dataService.getById(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: ctx.entity })
+        return expect(env.dataService.getById(ctx.collectionName, ctx.itemId, ctx.defaultProjection)).resolves.toEqual({ item: ctx.entity })
     })
 
     test('insert will insert data into db', async() => {
@@ -110,6 +110,8 @@ describe('Data Service', () => {
         ctx.sort = chance.word()
         ctx.skip = chance.word()
         ctx.limit = chance.word()
+        ctx.defaultProjection = SystemFields.map(f => f.name)
+
         ctx.itemId = chance.guid()
         ctx.itemIds = Array.from({ length: 10 }, () => chance.guid())
         ctx.total = chance.natural({ min: 2, max: 20 })

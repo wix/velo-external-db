@@ -1,7 +1,8 @@
-const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
+const { Uninitialized, gen, shouldNotRunOn, shouldRunOnlyOn } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
+const { entitiesWithOwnerFieldOnly } = require ('./data_provider_matchers')
 const chance = new Chance()
 
 describe('Data API', () => {
@@ -21,40 +22,50 @@ describe('Data API', () => {
             await env.dataProvider.insert(forCollection, entities, fields)
         }
 
-        test('search with empty filter and order by and no data', async() => {
+        test('search with empty filter, default projection and empty order by and no data', async() => {
             env.driver.stubEmptyFilterFor(ctx.filter)
             env.driver.stubEmptyOrderByFor(ctx.sort)
-
-            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit) ).resolves.toEqual([])
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual([])
         })
 
 
         if (shouldNotRunOn(['DynamoDb'], name)) {
-            test('search with non empty filter will return data', async() => {
+            test('search with non empty filter, default projection will return data', async() => {
                 await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
                 env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
                 env.driver.stubEmptyOrderByFor(ctx.sort)
-
-                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
+                env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
             })
         
-            test('search with non empty order by will return sorted data', async() => {
+            test('search with non empty order by, default projection will return sorted data', async() => {
                 await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
                 env.driver.stubEmptyFilterFor(ctx.filter)
                 env.driver.givenOrderByFor('_owner', ctx.sort)
-
-                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit) ).resolves.toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner > b._owner) ? 1 : -1))
+                env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner > b._owner) ? 1 : -1))
             })
 
-            test('search with empty order and filter but with limit and skip', async() => {
+            test('search with empty order, filter and default projection but with limit and skip', async() => {
                 await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName)
                 env.driver.stubEmptyFilterFor(ctx.filter)
                 env.driver.givenOrderByFor('_owner', ctx.sort)
-
-                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1) ).resolves.toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1))
+                env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1, ctx.projection) ).resolves.toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1))
             })
         }
 
+        if(shouldRunOnlyOn(['Postgres'], name)) {
+            test('search with projection will return the specified fields', async() => {
+                const projection = ['_owner']
+                await givenCollectionWith(ctx.entities, ctx.collectionName)
+                env.driver.stubEmptyFilterFor(ctx.filter)
+                env.driver.stubEmptyOrderByFor(ctx.sort)
+                env.driver.givenProjectionExprFor(projection)
+                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 0, 50, projection) ).resolves.toEqual(entitiesWithOwnerFieldOnly(ctx.entities))
+            })
+        }
         test('count will run query', async() => {
             await givenCollectionWith(ctx.entities, ctx.collectionName)
             env.driver.stubEmptyFilterFor(ctx.filter)
@@ -71,37 +82,41 @@ describe('Data API', () => {
 
         test('insert data into collection name and query all of it', async() => {
             env.driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
             await expect( env.dataProvider.insert(ctx.collectionName, [ctx.entity]) ).resolves.toEqual(1)
 
-            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual([ctx.entity])
+            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.entity])
         })
 
         test('bulk insert data into collection name and query all of it', async() => {
             env.driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
             await expect( env.dataProvider.insert(ctx.collectionName, ctx.entities) ).resolves.toEqual(ctx.entities.length)
 
-            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual(expect.arrayContaining(ctx.entities))
+            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual(expect.arrayContaining(ctx.entities))
         })
 
         test('insert entity with number', async() => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
             env.driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
             await expect( env.dataProvider.insert(ctx.numericCollectionName, [ctx.numberEntity], gen.fieldsArrayToFieldObj(ctx.numericColumns)) ).resolves.toEqual(1)
 
-            await expect( env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50) ).resolves.toEqual([ctx.numberEntity])
+            await expect( env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.numberEntity])
         })
 
         if (shouldNotRunOn(['BigQuery'], name)) {
             test('delete data from collection', async() => {
                 await givenCollectionWith(ctx.entities, ctx.collectionName)
                 env.driver.stubEmptyFilterAndSortFor('', '')
+                env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
-            await expect( env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).resolves.toEqual(ctx.entities.length)
+                await expect( env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).resolves.toEqual(ctx.entities.length)
 
-            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual([])
+                await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([])
             })
         }
 
@@ -109,10 +124,11 @@ describe('Data API', () => {
             test('allow update for single entity', async() => {
                 await givenCollectionWith([ctx.entity], ctx.collectionName)
                 env.driver.stubEmptyFilterAndSortFor('', '')
+                env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
-            await expect( env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).resolves.toEqual(1)
+                await expect( env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).resolves.toEqual(1)
 
-            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual([ctx.modifiedEntity])
+                await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.modifiedEntity])
         })
     }
 
@@ -120,10 +136,11 @@ describe('Data API', () => {
             test('allow update for multiple entities', async() => {
                 await givenCollectionWith(ctx.entities, ctx.collectionName)
                 env.driver.stubEmptyFilterAndSortFor('', '')
+                env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
                 expect( await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntities) ).toEqual(ctx.modifiedEntities.length)
 
-                expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
+                expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
             })
         }
 
@@ -139,10 +156,11 @@ describe('Data API', () => {
         test('truncate will remove all data from collection', async() => {
             await givenCollectionWith([ctx.entity], ctx.collectionName)
             env.driver.stubEmptyFilterAndSortFor('', '')
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
             await env.dataProvider.truncate(ctx.collectionName)
 
-            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).resolves.toEqual([])
+            await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([])
         })
 
         if (shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb'], name)) {
@@ -189,6 +207,7 @@ describe('Data API', () => {
             sort: Uninitialized,
             skip: Uninitialized,
             limit: Uninitialized,
+            projection: Uninitialized,
             column: Uninitialized,
             numericColumns: Uninitialized,
             aliasColumns: Uninitialized,
@@ -212,6 +231,7 @@ describe('Data API', () => {
             ctx.sort = chance.word()
             ctx.skip = 0
             ctx.limit = 10
+            ctx.projection = chance.word()
 
             ctx.entity = gen.randomDbEntity([ctx.column.name])
             ctx.modifiedEntity = { ...ctx.entity, [ctx.column.name]: chance.word() }

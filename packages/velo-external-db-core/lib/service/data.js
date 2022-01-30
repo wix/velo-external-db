@@ -6,8 +6,8 @@ class DataService {
         this.storage = storage
     }
 
-    async find(collectionName, _filter, sort, skip, limit) {
-        const items = await this.storage.find(collectionName, _filter, sort, skip, limit)
+    async find(collectionName, _filter, sort, skip, limit, projection) {
+        const items = await this.storage.find(collectionName, _filter, sort, skip, limit, projection)
         const totalCount = await this.storage.count(collectionName, _filter)
         return {
             items: items.map( asWixData ),
@@ -15,13 +15,13 @@ class DataService {
         }
     }
 
-    async getById(collectionName, itemId) {
+    async getById(collectionName, itemId, projection) {
         const filter = {
             fieldName: '_id',
             operator: AdapterOperators.eq,
             value: itemId
         }
-        const item = await this.storage.find(collectionName, filter, '', 0, 1)
+        const item = await this.storage.find(collectionName, filter, '', 0, 1, projection)
         
         return { item: asWixData(item[0]) }
         
