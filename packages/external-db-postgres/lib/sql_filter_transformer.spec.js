@@ -265,6 +265,22 @@ describe('Sql Parser', () => {
             })
         })
 
+        describe('transform projection', () => {
+            test('projection handle single field projection', () => {
+                expect(env.filterParser.projection([ctx.fieldName])).toEqual(`${escapeIdentifier(ctx.fieldName)}`)
+            })
+            
+            test('projection handle multiple field projection', () => {
+                expect(env.filterParser.projection([ctx.fieldName, ctx.anotherFieldName])).toEqual(
+                    `${escapeIdentifier(ctx.fieldName)}, ${escapeIdentifier(ctx.anotherFieldName)}`
+                    )
+            })
+
+            test('call to projection without projection should return *', () => {
+                expect(env.filterParser.projection()).toEqual('*')
+            })
+
+        })
 
         describe('aggregation functions', () => {
 
