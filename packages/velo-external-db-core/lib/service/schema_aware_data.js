@@ -1,4 +1,4 @@
-const { prepareForUpdate, unpackDates, prepareForInsert } = require('../converters/transform')
+const { prepareForUpdate, unpackDates, prepareForInsert, createProjectionArr } = require('../converters/transform')
 
 class SchemaAwareDataService {
     constructor(dataService, queryValidator, schemaInformation) {
@@ -7,13 +7,16 @@ class SchemaAwareDataService {
         this.dataService = dataService
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, _projection) {
         await this.validateFilter(collectionName, filter)
-        return await this.dataService.find(collectionName, filter, sort, skip, limit)
+        const projection = await this.createProjectionArr(collectionName, _projection)
+
+        return await this.dataService.find(collectionName, filter, sort, skip, limit, projection)
     }
 
-    async getById(collectionName, itemId) {
-        const data = await this.dataService.getById(collectionName, itemId)
+    async getById(collectionName, itemId, _projection) {
+        const projection = await this.createProjectionArr(collectionName, _projection)
+        const data = await this.dataService.getById(collectionName, itemId, projection)
         return data
     }
 
@@ -65,7 +68,6 @@ class SchemaAwareDataService {
         this.queryValidator.validateFilter(fields, filter)
     }
     
-    /* eslint-disable no-unused-vars */
     async validateAggregation(collectionName, aggregation) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         this.queryValidator.validateAggregation(fields, aggregation)
@@ -83,6 +85,11 @@ class SchemaAwareDataService {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         return items.map(i => prepareForInsert(i, fields))
                     .map(i => unpackDates(i))
+    }
+
+    async createProjectionArr(collectionName, projection) {
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        return createProjectionArr(fields, projection)
     }
 
 }
