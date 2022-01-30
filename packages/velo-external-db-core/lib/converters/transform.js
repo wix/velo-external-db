@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid')
 let dateTimeProvider = require('../utils/date_time_provider')
 const crypto = require('crypto')
+const { isEmptyProjection } = require('velo-external-db-commons')
 
 const asWixData = e => generateIdsIfNeeded(packDates(e))
 
@@ -54,6 +55,22 @@ const defaultValueFor = (f) => {
 const prepareForInsert = (item, fields) => fields.reduce((pv, f) => ({ ...pv, [f.field]: item[f.field] || defaultValueFor(f) }), {})
 const prepareForUpdate = (item, fields) => fields.reduce((pv, f) => f.field in item ? ({ ...pv, [f.field]: item[f.field] }) : pv, {})
 
+
+const createProjectionArr = (fields, projection) => {
+    const fieldsArr = fields.map(f => f.field)
+ 
+    if (isEmptyProjection(projection)) return fieldsArr
+    
+    return removeNonExistentFieldsFromProjection(fieldsArr, projection)
+}
+
+const removeNonExistentFieldsFromProjection = (fields, projection) => {
+    const existedFields = projection.filter(field => fields.includes(field)) 
+    
+    return existedFields.length ? existedFields : fields
+}
+
+
 const clone = o => ({ ...o })
 
 const isDate = d => {
@@ -64,4 +81,4 @@ const isDate = d => {
 const packDates = item => Object.entries(item)
                                 .reduce((o, [k, v]) => ( { ...o, [k]: isDate(v) ? { $date: v.toISOString() } : v } ), { } )
 
-module.exports = { asWixData, unpackDates, generateIdsIfNeeded, defaultValueFor, isDate, prepareForInsert, prepareForUpdate }
+module.exports = { asWixData, unpackDates, generateIdsIfNeeded, defaultValueFor, isDate, prepareForInsert, prepareForUpdate, createProjectionArr }

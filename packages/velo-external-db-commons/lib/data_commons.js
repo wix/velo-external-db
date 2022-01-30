@@ -40,6 +40,10 @@ const isEmptyFilter = (filter) => {
     return (!filter || !filter.operator)
 } 
 
+const isEmptyProjection = (projection) => {
+    return (!Array.isArray(projection) || !projection.length)
+}
+
 const AdapterOperators = {
     eq: 'eq',
     gt: 'gt',
@@ -70,5 +74,5 @@ const extractGroupByNames = (projection) =>  projection.filter(f => !f.function)
 const extractProjectionFunctionsObjects = (projection) => projection.filter(f => f.function)
 
 module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor,
-                     isEmptyFilter, AdapterOperators, AdapterFunctions,
+                     isEmptyFilter, AdapterOperators, AdapterFunctions, isEmptyProjection,
                      extractGroupByNames, extractProjectionFunctionsObjects }
