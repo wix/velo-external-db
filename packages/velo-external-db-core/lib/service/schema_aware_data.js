@@ -1,4 +1,5 @@
 const { prepareForUpdate, unpackDates, prepareForInsert } = require('../converters/transform')
+const { getByIdFilter } = require('../utils/data_utils')
 
 class SchemaAwareDataService {
     constructor(dataService, queryValidator, schemaInformation) {
@@ -13,6 +14,7 @@ class SchemaAwareDataService {
     }
 
     async getById(collectionName, itemId) {
+        await this.validateFilter(collectionName, getByIdFilter(itemId))
         const data = await this.dataService.getById(collectionName, itemId)
         return data
     }
