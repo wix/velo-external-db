@@ -1,5 +1,4 @@
 const { prepareForUpdate, unpackDates, prepareForInsert } = require('../converters/transform')
-const { getByIdFilter } = require('../utils/data_utils')
 
 class SchemaAwareDataService {
     constructor(dataService, queryValidator, schemaInformation) {
@@ -14,7 +13,7 @@ class SchemaAwareDataService {
     }
 
     async getById(collectionName, itemId) {
-        await this.validateFilter(collectionName, getByIdFilter(itemId))
+        await this.validateGetById(collectionName, itemId)
         const data = await this.dataService.getById(collectionName, itemId)
         return data
     }
@@ -67,6 +66,11 @@ class SchemaAwareDataService {
         this.queryValidator.validateFilter(fields, filter)
     }
     
+    async validateGetById(collectionName, itemId) {
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        await this.queryValidator.validateGetById(fields, itemId)
+    }
+
     /* eslint-disable no-unused-vars */
     async validateAggregation(collectionName, aggregation) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)

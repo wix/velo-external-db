@@ -1,5 +1,5 @@
 const { asWixData } = require('../converters/transform')
-const { getByIdFilter } = require('../utils/data_utils')
+const { getByIdFilterFor } = require('../utils/data_utils')
 
 class DataService {
     constructor(storage) {
@@ -16,7 +16,7 @@ class DataService {
     }
 
     async getById(collectionName, itemId) {
-        const item = await this.storage.find(collectionName, getByIdFilter(itemId), '', 0, 1)
+        const item = await this.storage.find(collectionName, getByIdFilterFor(itemId), '', 0, 1)
         
         return { item: asWixData(item[0]) }
     }
