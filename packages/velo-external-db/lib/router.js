@@ -31,8 +31,8 @@ const createRouter = () => {
     // *************** Data API **********************
     router.post('/data/find', async(req, res, next) => {
         try {
-            const { collectionName, filter, sort, skip, limit, projection } = req.body
-            const data = await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), sort, skip, limit, projection)
+            const { collectionName, filter, sort, skip, limit } = req.body
+            const data = await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), sort, skip, limit)
             res.json(data)
         } catch (e) {
             next(e)
@@ -71,8 +71,8 @@ const createRouter = () => {
 
     router.post('/data/get', async(req, res, next) => {
         try {
-            const { collectionName, itemId, projection } = req.body
-            const data = await schemaAwareDataService.getById(collectionName, itemId, '', 0, 1, projection)
+            const { collectionName, itemId } = req.body
+            const data = await schemaAwareDataService.getById(collectionName, itemId, '', 0, 1)
             if (!data.item) {
                 throw new ItemNotFound('Item not found')
             }

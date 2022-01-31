@@ -1,4 +1,4 @@
-const { prepareForUpdate, unpackDates, prepareForInsert, createProjectionArr } = require('../converters/transform')
+const { prepareForUpdate, unpackDates, prepareForInsert } = require('../converters/transform')
 
 class SchemaAwareDataService {
     constructor(dataService, queryValidator, schemaInformation) {
@@ -7,15 +7,16 @@ class SchemaAwareDataService {
         this.dataService = dataService
     }
 
-    async find(collectionName, filter, sort, skip, limit, _projection) {
+    async find(collectionName, filter, sort, skip, limit) {
         await this.validateFilter(collectionName, filter)
-        const projection = await this.createProjectionArr(collectionName, _projection)
+        const projection = await this.schemaFieldNamesFor(collectionName)
 
         return await this.dataService.find(collectionName, filter, sort, skip, limit, projection)
     }
 
-    async getById(collectionName, itemId, _projection) {
-        const projection = await this.createProjectionArr(collectionName, _projection)
+    async getById(collectionName, itemId) {
+        const projection = await this.schemaFieldNamesFor(collectionName)
+        
         const data = await this.dataService.getById(collectionName, itemId, projection)
         return data
     }
@@ -87,9 +88,9 @@ class SchemaAwareDataService {
                     .map(i => unpackDates(i))
     }
 
-    async createProjectionArr(collectionName, projection) {
+    async schemaFieldNamesFor(collectionName) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-        return createProjectionArr(fields, projection)
+        return fields.map(f => f.field)
     }
 
 }

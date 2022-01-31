@@ -1,12 +1,11 @@
 const rewire = require('rewire')
 const transform = rewire('./transform')
-const { asWixData, unpackDates, generateIdsIfNeeded, prepareForInsert, defaultValueFor, isDate, prepareForUpdate, createProjectionArr } = transform
+const { asWixData, unpackDates, generateIdsIfNeeded, prepareForInsert, defaultValueFor, isDate, prepareForUpdate } = transform
 const { Uninitialized, gen } = require('test-commons')
 const Chance = require('chance')
 const chance = Chance()
 const validate = require('uuid-validate')
 const dateTimeProvider = require('../../test/drivers/date_time_provider_test_support')
-const { SystemFields } = require('velo-external-db-commons')
 
 describe('Converters', () => {
     test('unpack dates will duplicate object and do nothing is date is not there', async() => {
@@ -99,21 +98,6 @@ describe('Converters', () => {
         expect(prepareForUpdate({ ...ctx.obj, someProp: 'whatever' }, ctx.objSchemaFields)).toEqual( ctx.obj )
     })
 
-    describe ('createProjectionArr', () => {
-        test('will remove nonexistent fields from projection', () => {
-            expect(createProjectionArr(ctx.defaultFields, ['_id', 'wrong'])).toEqual(['_id'])
-        }) 
-
-        test('will return array with all of the fields when receive invalid projection', async() => {
-            const defaultFieldsArray = ctx.defaultFields.map(f => f.field)
-            
-            expect(createProjectionArr(ctx.defaultFields, ['wrong'])).toEqual(defaultFieldsArray) 
-            expect(createProjectionArr(ctx.defaultFields, [])).toEqual(defaultFieldsArray) 
-            expect(createProjectionArr(ctx.defaultFields)).toEqual(defaultFieldsArray) 
-            expect(createProjectionArr(ctx.defaultFields, 5)).toEqual(defaultFieldsArray)  
-        }) 
-
-    })
 
     const ctx = {
         obj: Uninitialized,
@@ -122,7 +106,6 @@ describe('Converters', () => {
         property: Uninitialized,
         anotherProperty: Uninitialized,
         veloDate: Uninitialized,
-        defaultFields: Uninitialized
     }
 
     beforeEach(() => {
@@ -132,7 +115,5 @@ describe('Converters', () => {
         ctx.property = chance.word()
         ctx.anotherProperty = chance.word()
         ctx.veloDate = gen.veloDate()
-        
-        ctx.defaultFields = SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) )
     })
 })
