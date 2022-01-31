@@ -98,7 +98,6 @@ describe('Converters', () => {
         expect(prepareForUpdate({ ...ctx.obj, someProp: 'whatever' }, ctx.objSchemaFields)).toEqual( ctx.obj )
     })
 
-
     const ctx = {
         obj: Uninitialized,
         anotherObj: Uninitialized,

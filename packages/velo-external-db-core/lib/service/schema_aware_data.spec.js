@@ -9,7 +9,7 @@ const chance = new Chance()
 
 describe ('Schema Aware Data Service', () => {
     
-    test('find without projection validate filter and call data service with projection of all fields', async() => {
+    test('find validate filter and call data service with projection fields', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.transformedFilter) 
         data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultFields)  
@@ -28,9 +28,8 @@ describe ('Schema Aware Data Service', () => {
         return expect(env.schemaAwareDataService.count(ctx.collectionName, ctx.filter)).resolves.toEqual({ totalCount: ctx.totalCount })
     })
 
-    test('get by id without projection call data service with projection of all fields', async() => {
-        const projection = SystemFields.map(f => f.name)
-        data.givenGetByIdResult(ctx.entity, ctx.collectionName, ctx.itemId, projection)
+    test('get by id call data service with projection fields', async() => {
+        data.givenGetByIdResult(ctx.entity, ctx.collectionName, ctx.itemId, ctx.defaultFields)
         
         return expect(env.schemaAwareDataService.getById(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: ctx.entity })
     })
