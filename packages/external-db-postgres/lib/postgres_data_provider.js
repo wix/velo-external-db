@@ -11,7 +11,7 @@ class DataProvider {
     async find(collectionName, filter, sort, skip, limit, projection) {
         const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
-        const projectionExpr = this.filterParser.projection(projection)
+        const projectionExpr = this.filterParser.selectFieldsFor(projection)
         const resultset = await this.pool.query(`SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultset.rows

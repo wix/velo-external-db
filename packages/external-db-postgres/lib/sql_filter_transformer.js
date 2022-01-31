@@ -245,8 +245,7 @@ class FilterParser {
         }]
     }
 
-    projection(projection) {
-        if (!projection) return '*'
+    selectFieldsFor(projection) {
         return projection.map(escapeIdentifier).join(', ')
     }
 

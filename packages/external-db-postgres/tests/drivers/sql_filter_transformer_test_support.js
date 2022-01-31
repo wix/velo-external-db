@@ -7,7 +7,7 @@ const filterParser = {
     parseFilter: jest.fn(),
     orderBy: jest.fn(),
     parseAggregation: jest.fn(),
-    projection: jest.fn(),
+    selectFieldsFor: jest.fn(),
 }
 
 const stubEmptyFilterAndSortFor = (filter, sort) => {
@@ -48,11 +48,11 @@ const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByC
 }
 
 const givenAllFieldsProjectionFor = (projection) => 
-    when(filterParser.projection).calledWith(projection)
+    when(filterParser.selectFieldsFor).calledWith(projection)
                                  .mockReturnValue('*')
 
 const givenProjectionExprFor = (projection) => 
-    when(filterParser.projection).calledWith(projection)
+    when(filterParser.selectFieldsFor).calledWith(projection)
                                  .mockReturnValue(projection.map(escapeIdentifier).join(', '))
 
 const reset = () => {
