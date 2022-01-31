@@ -55,6 +55,7 @@ describe('Query Validator', () => {
         test('should throw InvalidQuery if itemId is not defined', () => {
             expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId)).toThrow(InvalidQuery)
             expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, '')).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, ' ')).toThrow(InvalidQuery)
             expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, null)).toThrow(InvalidQuery)
             expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, undefined)).toThrow(InvalidQuery)
         })
