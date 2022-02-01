@@ -31,6 +31,11 @@ const asParamArrays = item => Object.values(item)
 
 const isObject = (o) => typeof o === 'object' && o !== null
 
+const isDate = d => {
+    const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
+    return d instanceof Date || Object.prototype.toString.call(d) === '[object Date]' || (typeof d === 'string' && reISO.test(d))
+}
+
 const updateFieldsFor = item => {
     return Object.keys(item).filter(f => f !== '_id')
 }
@@ -69,6 +74,6 @@ const extractGroupByNames = (projection) =>  projection.filter(f => !f.function)
 
 const extractProjectionFunctionsObjects = (projection) => projection.filter(f => f.function)
 
-module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, updateFieldsFor,
-                     isEmptyFilter, AdapterOperators, AdapterFunctions,
+module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, isDate,
+                     updateFieldsFor, isEmptyFilter, AdapterOperators, AdapterFunctions,
                      extractGroupByNames, extractProjectionFunctionsObjects }
