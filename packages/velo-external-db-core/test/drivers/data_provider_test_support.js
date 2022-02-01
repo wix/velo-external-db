@@ -1,4 +1,3 @@
-const { unpackDates } = require('../../lib/converters/transform')
 const { when } = require('jest-when')
 
 const dataProvider = {
@@ -11,9 +10,9 @@ const dataProvider = {
     delete: jest.fn(),
 }
 
-const givenListResult = (entities, forCollectionName, filter, sort, skip, andLimit, projection) =>
-    when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit, projection)
-                           .mockResolvedValue(entities.map( unpackDates ))
+const givenListResult = (entities, forCollectionName, filter, sort, skip, andLimit) =>
+    when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit)
+                           .mockResolvedValue(entities)
 
 const givenCountResult = (total, forCollectionName, filter) =>
     when(dataProvider.count).calledWith(forCollectionName, filter)
@@ -24,7 +23,7 @@ const givenAggregateResult = (total, forCollectionName, filter, andAggregation) 
                                 .mockResolvedValue(total)
 
 const expectInsertFor = (items, forCollectionName) =>
-    when(dataProvider.insert).calledWith(forCollectionName, items.map(i => unpackDates(i)))
+    when(dataProvider.insert).calledWith(forCollectionName, items)
                              .mockResolvedValue(items.length)
 
 const expectInsertMatchedFor = (items, forCollectionName) =>
@@ -32,7 +31,7 @@ const expectInsertMatchedFor = (items, forCollectionName) =>
                              .mockResolvedValue(1)
 
 const expectUpdateFor = (items, forCollectionName) =>
-    when(dataProvider.update).calledWith(forCollectionName, items.map(i => unpackDates(i)))
+    when(dataProvider.update).calledWith(forCollectionName, items)
                              .mockResolvedValue(items.length)
 
 const expectDeleteFor = (itemIds, forCollectionName) =>
