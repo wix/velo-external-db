@@ -14,16 +14,16 @@ const dataService = {
     bulkDelete: jest.fn()
 }
 
-const givenListResult = (entities, totalCount, forCollectionName, filter, sort, skip, limit) => 
-    when(dataService.find).calledWith(forCollectionName, filter, sort, skip, limit)
+const givenListResult = (entities, totalCount, forCollectionName, filter, sort, skip, limit, projection) => 
+    when(dataService.find).calledWith(forCollectionName, filter, sort, skip, limit, projection)
                           .mockResolvedValue( { items: entities, totalCount } )
 
 const givenCountResult = (totalCount, forCollectionName, filter) =>
     when(dataService.count).calledWith(forCollectionName, filter)
                            .mockResolvedValue( { totalCount })
 
-const givenGetByIdResult = (item, forCollectionName, itemId) => 
-    when(dataService.getById).calledWith(forCollectionName, itemId)
+const givenGetByIdResult = (item, forCollectionName, itemId, projection) => 
+    when(dataService.getById).calledWith(forCollectionName, itemId, projection)
                              .mockResolvedValue({ item })
 
 const givenInsertResult = (item, forCollectionName) =>

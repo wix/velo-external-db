@@ -6,8 +6,8 @@ class DataService {
         this.storage = storage
     }
 
-    async find(collectionName, _filter, sort, skip, limit) {
-        const items = await this.storage.find(collectionName, _filter, sort, skip, limit)
+    async find(collectionName, _filter, sort, skip, limit, projection) {
+        const items = await this.storage.find(collectionName, _filter, sort, skip, limit, projection) //todo: change order when all implementation support projection
         const totalCount = await this.storage.count(collectionName, _filter)
         return {
             items: items.map( asWixData ),
@@ -15,8 +15,8 @@ class DataService {
         }
     }
 
-    async getById(collectionName, itemId) {
-        const item = await this.storage.find(collectionName, getByIdFilterFor(itemId), '', 0, 1)
+    async getById(collectionName, itemId, projection) {
+        const item = await this.storage.find(collectionName, getByIdFilterFor(itemId), '', 0, 1, projection)
         
         return { item: asWixData(item[0]) }
     }

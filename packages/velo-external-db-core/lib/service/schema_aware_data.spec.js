@@ -4,14 +4,15 @@ const data = require ('../../test/drivers/data_service_test_support')
 const queryValidator = require('../../test/drivers/query_validator_test_support')
 const { Uninitialized, gen } = require('test-commons')
 const Chance = require('chance')
+const { SystemFields } = require('velo-external-db-commons')
 const chance = new Chance()
 
 describe ('Schema Aware Data Service', () => {
     
-    test('find validate filter and call data service', async() => {
+    test('find validate filter and call data service with projection fields', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.transformedFilter) 
-        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultFields)  
 
         return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({
                                                                                                                         items: ctx.entities,
@@ -31,7 +32,7 @@ describe ('Schema Aware Data Service', () => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
         data.givenGetByIdResult(ctx.entity, ctx.collectionName, ctx.itemId)
         queryValidator.givenValidGetByIdForDefaultFieldsFor(ctx.itemId)
-
+      
         return expect(env.schemaAwareDataService.getById(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: ctx.entity })
     })
 
@@ -114,7 +115,8 @@ describe ('Schema Aware Data Service', () => {
         totalCount: Uninitialized,
         sort: Uninitialized,
         limit: Uninitialized,
-        skip: Uninitialized
+        skip: Uninitialized,
+        defaultFields: Uninitialized
     }
 
     const env = {
@@ -145,5 +147,7 @@ describe ('Schema Aware Data Service', () => {
         ctx.sort = chance.word()
         ctx.skip = chance.integer()
         ctx.limit = chance.integer()
+
+        ctx.defaultFields = SystemFields.map(f => f.name)
     })
 })
