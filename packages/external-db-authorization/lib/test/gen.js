@@ -1,5 +1,4 @@
 const { gen }  = require('test-commons')
-console.log(gen)
 const Chance = require('chance')
 const chance = Chance()
 
