@@ -30,9 +30,9 @@ describe ('Schema Aware Data Service', () => {
 
     test('get by id call data service', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        data.givenGetByIdResult(ctx.entity, ctx.collectionName, ctx.itemId)
         queryValidator.givenValidGetByIdForDefaultFieldsFor(ctx.itemId)
-      
+        data.givenGetByIdResult(ctx.entity, ctx.collectionName, ctx.itemId, ctx.defaultFields)
+
         return expect(env.schemaAwareDataService.getById(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: ctx.entity })
     })
 
