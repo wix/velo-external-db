@@ -27,7 +27,7 @@
     "test:dynamodb": "lerna exec --scope external-db-dynamodb \"npm test\" && lerna exec --scope velo-external-db \"npm run test:dynamodb\"",
     "test:bigquery": "lerna exec --scope external-db-bigquery \"npm test\" && lerna exec --scope velo-external-db \"npm run test:bigquery\"",
     "release": "lerna version --no-push",
-    "outdated:all": "lerna exec --scope '{external-db-config,external-db-firestore,external-db-mongo,external-db-mssql,external-db-mysql,external-db-postgres,external-db-spanner,external-db-google-sheets,external-db-airtable,external-db-dynamodb,velo-external-db,velo-external-db-core}' \"npm outdated\"",
+    "outdated:all": "lerna exec --scope '{external-db-config,external-db-firestore,external-db-mongo,external-db-mssql,external-db-mysql,external-db-postgres,external-db-spanner,external-db-google-sheets,external-db-airtable,external-db-dynamodb,velo-external-db,velo-external-db-core,external-db-authorization }' \"npm outdated\"",
     "ci:publish": "lerna publish -y from-git",
     "prepare": "husky install"
   },
@@ -52,7 +52,8 @@
       "external-db-dynamodb",
       "external-db-bigquery",
       "velo-external-db",
-      "velo-external-db-core"
+      "velo-external-db-core",
+      "external-db-authorization"
     ]
   },
   "lint-staged": {

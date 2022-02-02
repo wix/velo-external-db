@@ -1,5 +1,6 @@
 const RoleAuthorizationService = require('./role_authorization')
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized } = require('test-commons')
+const gen = require ('../test/gen') 
 const { UnauthorizedError } = require('velo-external-db-commons/lib/errors')
 const each = require('jest-each').default
 
