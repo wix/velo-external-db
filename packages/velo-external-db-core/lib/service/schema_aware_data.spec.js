@@ -2,6 +2,7 @@ const SchemaAwareDataService = require ('./schema_aware_data')
 const schema = require ('../../test/drivers/schema_information_test_support')
 const data = require ('../../test/drivers/data_service_test_support')
 const queryValidator = require('../../test/drivers/query_validator_test_support')
+const patcher = require ('../../test/drivers/item_patcher_test_support')
 const { Uninitialized, gen } = require('test-commons')
 const Chance = require('chance')
 const { SystemFields } = require('velo-external-db-commons')
@@ -38,38 +39,34 @@ describe ('Schema Aware Data Service', () => {
 
     test('insert will prepare item for insert and call data service with the prepared item', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        const [item] = await env.schemaAwareDataService.prepareItemsForInsert(ctx.collectionName, [ctx.entityWithoutId]) //todo: mock this
-        
-        data.givenInsertResult(item, ctx.collectionName)
+        patcher.givenPreparedItemsForInsertWith([ctx.preparedEntity], [ctx.entityWithoutId])
+        data.givenInsertResult(ctx.preparedEntity, ctx.collectionName)
 
-        return expect(env.schemaAwareDataService.insert(ctx.collectionName, ctx.entityWithoutId)).resolves.toEqual({ item })
+        return expect(env.schemaAwareDataService.insert(ctx.collectionName, ctx.entityWithoutId)).resolves.toEqual({ item: ctx.preparedEntity })
     })
 
     test('bulk insert will prepare items for insert and call data service with the prepared items', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        const items = await env.schemaAwareDataService.prepareItemsForInsert(ctx.collectionName, ctx.entitiesWithoutId)
-        
-        data.givenBulkInsertResult(items, ctx.collectionName)  
+        patcher.givenPreparedItemsForInsertWith(ctx.preparedEntities, ctx.entitiesWithoutId)
+        data.givenBulkInsertResult(ctx.preparedEntities, ctx.collectionName)  
 
-        return expect(env.schemaAwareDataService.bulkInsert(ctx.collectionName, ctx.entitiesWithoutId)).resolves.toEqual({ items })
+        return expect(env.schemaAwareDataService.bulkInsert(ctx.collectionName, ctx.entitiesWithoutId)).resolves.toEqual({ items: ctx.preparedEntities })
     })
 
     test('update will prepare item for update and call data service with the prepared item', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        const [item] = await env.schemaAwareDataService.prepareItemsForUpdate(ctx.collectionName, [ctx.entityWithExtraProps]) //todo: mock this
-        
-        data.givenUpdateResult(item, ctx.collectionName)
+        patcher.givenPreparedItemsForUpdateWith([ctx.preparedEntity], [ctx.entityWithExtraProps])
+        data.givenUpdateResult(ctx.preparedEntity, ctx.collectionName)
 
-        return expect(env.schemaAwareDataService.update(ctx.collectionName, ctx.entityWithExtraProps)).resolves.toEqual({ item })
+        return expect(env.schemaAwareDataService.update(ctx.collectionName, ctx.entityWithExtraProps)).resolves.toEqual({ item: ctx.preparedEntity })
     })
 
     test('bulk update will prepare items for update and call data service with the prepared items', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        const items = await env.schemaAwareDataService.prepareItemsForUpdate(ctx.collectionName, ctx.entitiesWithExtraProps) 
-        
-        data.givenBulkUpdateResult(items, ctx.collectionName)
+        patcher.givenPreparedItemsForUpdateWith(ctx.preparedEntities, ctx.entitiesWithExtraProps)
+        data.givenBulkUpdateResult(ctx.preparedEntities, ctx.collectionName)
 
-        return expect(env.schemaAwareDataService.bulkUpdate(ctx.collectionName, ctx.entitiesWithExtraProps)).resolves.toEqual({ items })
+        return expect(env.schemaAwareDataService.bulkUpdate(ctx.collectionName, ctx.entitiesWithExtraProps)).resolves.toEqual({ items: ctx.preparedEntities })
     })
 
     test('delete by item id will call data service', async() => {
@@ -105,6 +102,8 @@ describe ('Schema Aware Data Service', () => {
         entityWithoutId: Uninitialized,
         entities: Uninitialized,
         entity: Uninitialized,
+        preparedEntity: Uninitialized,
+        preparedEntities: Uninitialized,
         itemId: Uninitialized,
         itemIds: Uninitialized,
         entitiesWithoutId: Uninitialized,
@@ -125,10 +124,16 @@ describe ('Schema Aware Data Service', () => {
 
     beforeEach(() => {
         data.reset()
-        env.schemaAwareDataService = new SchemaAwareDataService(data.dataService, queryValidator.queryValidator, schema.schemaInformation)
+        queryValidator.reset()
+        schema.reset()
+
+        env.schemaAwareDataService = new SchemaAwareDataService(data.dataService, queryValidator.queryValidator, schema.schemaInformation, patcher.itemTransformer)
         
+        ctx.collectionName = chance.word()
         ctx.entity = gen.randomEntity()
+        ctx.preparedEntity = gen.randomEntity()
         ctx.entities = gen.randomEntities()
+        ctx.preparedEntities = gen.randomEntities()
         const e = gen.randomEntity()
         delete e._id
         ctx.entityWithoutId = e

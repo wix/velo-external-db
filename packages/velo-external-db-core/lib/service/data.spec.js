@@ -1,8 +1,9 @@
 const DataService = require('./data')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/data_provider_test_support')
-const { AdapterOperators, SystemFields } = require('velo-external-db-commons')
+const { SystemFields } = require('velo-external-db-commons')
 const Chance = require('chance')
+const { getByIdFilterFor } = require('../utils/data_utils')
 const chance = new Chance()
 
 describe('Data Service', () => {
@@ -24,7 +25,7 @@ describe('Data Service', () => {
     })
 
     test('get by id will issue a call to find and transform the result', async() => {
-        const idFilter = { fieldName: '_id', operator: AdapterOperators.eq, value: ctx.itemId } 
+        const idFilter = getByIdFilterFor(ctx.itemId)
         driver.givenListResult([ctx.entity], ctx.collectionName,
                         idFilter, '', 0, 1, ctx.defaultProjection)
 

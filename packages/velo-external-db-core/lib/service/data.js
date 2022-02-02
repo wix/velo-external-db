@@ -1,5 +1,5 @@
-const { asWixData } = require('../converters/transform')
-const { getByIdFilterFor } = require('../utils/data_utils')
+const { asWixData } = require('../converters/data_utils')
+const { getByIdFilterFor } = require ('../utils/data_utils')
 
 class DataService {
     constructor(storage) {

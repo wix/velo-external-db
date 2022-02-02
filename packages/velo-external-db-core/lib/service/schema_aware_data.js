@@ -1,10 +1,10 @@
-const { prepareForUpdate, unpackDates, prepareForInsert } = require('../converters/transform')
 
 class SchemaAwareDataService {
-    constructor(dataService, queryValidator, schemaInformation) {
+    constructor(dataService, queryValidator, schemaInformation, itemTransformer) {
         this.queryValidator = queryValidator
         this.schemaInformation = schemaInformation
         this.dataService = dataService
+        this.itemTransformer = itemTransformer
     }
 
     async find(collectionName, filter, sort, skip, limit) {
@@ -82,15 +82,13 @@ class SchemaAwareDataService {
     async prepareItemsForUpdate(collectionName, items) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
 
-        return items.map(i => prepareForUpdate(i, fields))
-                    .map(i => unpackDates(i))
-
+        return this.itemTransformer.prepareItemsForUpdate(items, fields)
     }
     
     async prepareItemsForInsert(collectionName, items) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-        return items.map(i => prepareForInsert(i, fields))
-                    .map(i => unpackDates(i))
+
+        return this.itemTransformer.prepareItemsForInsert(items, fields)
     }
 
     async schemaFieldNamesFor(collectionName) {
