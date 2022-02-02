@@ -1,33 +1,33 @@
-const AuthorizationService = require('./authorization')
+const RoleAuthorizationService = require('./role_authorization')
 const { Uninitialized, gen } = require('test-commons')
 const { UnauthorizedError, InvalidQuery } = require('velo-external-db-commons/lib/errors')
 
 describe('Authorization Service', () => {
     describe('Authorize read', () => {
         test('authorizeRead on collection with permitted role should not throw', () => {
-            expect(() => env.authorizationService.authorizeRead(ctx.collectionName, ctx.authorizedReadRole)).not.toThrow()
+            expect(() => env.roleAuthorizationService.authorizeRead(ctx.collectionName, ctx.authorizedReadRole)).not.toThrow()
         })
     
         test('authorizeRead on collection with not permitted role should throw UnauthorizedError', () => {
-            expect(() => env.authorizationService.authorizeRead(ctx.collectionName, ctx.unauthorizedReadRole)).toThrow(UnauthorizedError)
+            expect(() => env.roleAuthorizationService.authorizeRead(ctx.collectionName, ctx.unauthorizedReadRole)).toThrow(UnauthorizedError)
         })
     
         test('authorizeRead on nonexistent collection should throw InvalidQuery', () => {
-            expect(() => env.authorizationService.authorizeRead('wrong', ctx.authorizedReadRole)).toThrow(InvalidQuery)
+            expect(() => env.roleAuthorizationService.authorizeRead('wrong', ctx.authorizedReadRole)).toThrow(InvalidQuery)
         })
     })  
     
     describe('Authorize write', () => {
         test('authorizeWrite on collection with permitted role should not throw', () => {
-            expect(() => env.authorizationService.authorizeWrite(ctx.collectionName, ctx.authorizedWriteRole)).not.toThrow()
+            expect(() => env.roleAuthorizationService.authorizeWrite(ctx.collectionName, ctx.authorizedWriteRole)).not.toThrow()
         })
     
         test('authorizeWrite on collection with not permitted role should throw UnauthorizedError', () => {
-            expect(() => env.authorizationService.authorizeWrite(ctx.collectionName, ctx.unauthorizedWriteRole)).toThrow(UnauthorizedError)
+            expect(() => env.roleAuthorizationService.authorizeWrite(ctx.collectionName, ctx.unauthorizedWriteRole)).toThrow(UnauthorizedError)
         })
     
         test('authorizeWrite on nonexistent collection should throw InvalidQuery', () => {
-            expect(() => env.authorizationService.authorizeWrite('wrong', ctx.authorizedWriteRole)).toThrow(InvalidQuery)
+            expect(() => env.roleAuthorizationService.authorizeWrite('wrong', ctx.authorizedWriteRole)).toThrow(InvalidQuery)
         })
     })  
 
@@ -35,12 +35,12 @@ describe('Authorization Service', () => {
 
     const env = {
         config: Uninitialized,
-        authorizationService: Uninitialized
+        roleAuthorizationService: Uninitialized
     }
     
     beforeAll(() => {
         env.config = gen.authorizationConfig()
-        env.authorizationService = new AuthorizationService(env.config)
+        env.roleAuthorizationService = new RoleAuthorizationService(env.config)
     })
     
     const ctx = {

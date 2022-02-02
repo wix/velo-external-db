@@ -1,6 +1,6 @@
 const { UnauthorizedError, InvalidQuery } = require('velo-external-db-commons/lib/errors')
 
-class AuthorizationService {
+class RoleAuthorizationService {
     constructor(config) {
         this.config = config
     }
@@ -38,4 +38,4 @@ class AuthorizationService {
     }
 }
 
-module.exports = AuthorizationService
+module.exports = RoleAuthorizationService

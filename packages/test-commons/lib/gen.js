@@ -48,7 +48,7 @@ const randomArrayOf = (gen) => {
 }
 
 const randomElementsFromArray = (arr) => {
-    const quantity = chance.natural({ min: 1, max: arr.length })
+    const quantity = chance.natural({ min: 1, max: arr.length-1 })
     return chance.pickset(arr, quantity)
 }
 
