@@ -18,7 +18,7 @@
   "dependencies": {
     "express": "^4.17.2",
     "google-spreadsheet": "^3.2.0",
-    "googleapis": "^92.0.0",
+    "googleapis": "^94.0.0",
     "velo-external-db-commons": "^0.0.0"
   },
   "devDependencies": {
