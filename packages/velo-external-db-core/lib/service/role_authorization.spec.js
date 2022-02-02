@@ -1,6 +1,7 @@
 const RoleAuthorizationService = require('./role_authorization')
 const { Uninitialized, gen } = require('test-commons')
-const { UnauthorizedError, InvalidQuery } = require('velo-external-db-commons/lib/errors')
+const { UnauthorizedError } = require('velo-external-db-commons/lib/errors')
+const each = require('jest-each').default
 
 describe('Authorization Service', () => {
     describe('Authorize read', () => {
@@ -12,9 +13,18 @@ describe('Authorization Service', () => {
             expect(() => env.roleAuthorizationService.authorizeRead(ctx.collectionName, ctx.unauthorizedReadRole)).toThrow(UnauthorizedError)
         })
     
-        test('authorizeRead on nonexistent collection should throw InvalidQuery', () => {
-            expect(() => env.roleAuthorizationService.authorizeRead('wrong', ctx.authorizedReadRole)).toThrow(InvalidQuery)
+        each([
+            'OWNER', 'BACKEND_CODE'
+        ]).test('authorizeRead on nonexistent collection in config should allow default policies', (role) => {
+            expect(() => env.roleAuthorizationService.authorizeRead('wrong', role)).not.toThrow()
         })
+
+        each([
+            'MEMBER', 'VISITOR'
+        ]).test('authorizeRead on nonexistent collection in config should throw UnauthorizedError on any other role but default', (role) => {
+            expect(() => env.roleAuthorizationService.authorizeRead('wrong', role)).toThrow(UnauthorizedError)
+        })
+
     })  
     
     describe('Authorize write', () => {
@@ -26,8 +36,16 @@ describe('Authorization Service', () => {
             expect(() => env.roleAuthorizationService.authorizeWrite(ctx.collectionName, ctx.unauthorizedWriteRole)).toThrow(UnauthorizedError)
         })
     
-        test('authorizeWrite on nonexistent collection should throw InvalidQuery', () => {
-            expect(() => env.roleAuthorizationService.authorizeWrite('wrong', ctx.authorizedWriteRole)).toThrow(InvalidQuery)
+        each([
+            'OWNER', 'BACKEND_CODE'
+        ]).test('authorizeWrite on nonexistent collection in config should allow default policies', (role) => {
+            expect(() => env.roleAuthorizationService.authorizeWrite('wrong', role)).not.toThrow()
+        })
+        
+        each([
+            'MEMBER', 'VISITOR'
+        ]).test('authorizeWrite on nonexistent collection in config should throw UnauthorizedError on any other role but default', (role) => {
+            expect(() => env.roleAuthorizationService.authorizeWrite('wrong', role)).toThrow(UnauthorizedError)
         })
     })  
 

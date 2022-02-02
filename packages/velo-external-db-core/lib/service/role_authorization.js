@@ -1,4 +1,5 @@
-const { UnauthorizedError, InvalidQuery } = require('velo-external-db-commons/lib/errors')
+const { UnauthorizedError } = require('velo-external-db-commons/lib/errors')
+const DefaultPolicies = ['OWNER', 'BACKEND_CODE']
 
 class RoleAuthorizationService {
     constructor(config) {
@@ -8,16 +9,12 @@ class RoleAuthorizationService {
     authorizeRead(collectionName, role) {
         const readPolicies = this.readPoliciesFor(collectionName)
         
-        if (!readPolicies) throw new InvalidQuery('There is no such collection in config')
-        
         if (!readPolicies.includes(role)) throw new UnauthorizedError('You are not authorized')
     }
     
     authorizeWrite(collectionName, role) {
         const writePolicies = this.writePoliciesFor(collectionName)
-
-        if (!writePolicies) throw new InvalidQuery('There is no such collection in config')
-        
+ 
         if (!writePolicies.includes(role)) throw new UnauthorizedError('You are not authorized')
     }
 
@@ -30,11 +27,11 @@ class RoleAuthorizationService {
     }
 
     readPoliciesFor(collectionName) {
-        return this.policiesFor(collectionName)?.readPolicies
+        return this.policiesFor(collectionName)?.readPolicies || DefaultPolicies
     }
 
     writePoliciesFor(collectionName) {
-        return this.policiesFor(collectionName)?.writePolicies
+        return this.policiesFor(collectionName)?.writePolicies || DefaultPolicies
     }
 }
 
