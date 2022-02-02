@@ -1,5 +1,5 @@
 const { asWixData } = require('../converters/data_utils')
-const { AdapterOperators } = require('velo-external-db-commons')
+const { getByIdFilterFor } = require ('../utils/data_utils')
 
 class DataService {
     constructor(storage) {
