@@ -1,5 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { extractFieldsAndOperators, queryAdapterOperatorsFor } = require ('./query_validator_utils')
+const { extractFieldsAndOperators, queryAdapterOperatorsFor, isBlank } = require ('./query_validator_utils')
+
 
 class QueryValidator {
     constructor() {
@@ -13,6 +14,12 @@ class QueryValidator {
         this.validateFieldsExists(fieldNames, filterFields)
         this.validateOperators(fields, filterFieldsAndOpsObj)
     
+    }
+    
+    validateGetById(fields, itemId) {
+        if (isBlank(itemId)) throw new InvalidQuery('A value must be provided for itemId')
+        const fieldNames = fields.map(f => f.field)
+        this.validateFieldsExists(fieldNames, ['_id'])
     }
     
     validateAggregation(fields, aggregation) {

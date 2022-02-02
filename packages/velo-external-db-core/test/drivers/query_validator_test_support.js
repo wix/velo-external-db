@@ -5,7 +5,8 @@ const systemFields = SystemFields.map(({ name, type, subtype }) => ({ field: nam
 
 const queryValidator = {
     validateFilter: jest.fn(),
-    validateAggregation: jest.fn()
+    validateAggregation: jest.fn(),
+    validateGetById: jest.fn()
 }
 
 const givenValidFilterForDefaultFieldsOf = (filter) => 
@@ -17,11 +18,15 @@ const givenValidAggregationForDefaultFieldsOf = (aggregation) =>
     when(queryValidator.validateAggregation).calledWith(systemFields, aggregation)
                                             .mockResolvedValue()
 
+const givenValidGetByIdForDefaultFieldsFor = (itemId) => 
+    when(queryValidator.validateGetById).calledWith(systemFields, itemId)
+                                       .mockReturnValue()
 
 const reset = () => {
     queryValidator.validateFilter.mockClear()
 }
 
 module.exports = {
-    queryValidator, givenValidFilterForDefaultFieldsOf, reset, validateFilter: queryValidator.validateFilter, givenValidAggregationForDefaultFieldsOf
+    queryValidator, givenValidFilterForDefaultFieldsOf, reset, validateFilter: queryValidator.validateFilter,
+     givenValidAggregationForDefaultFieldsOf, givenValidGetByIdForDefaultFieldsFor
 }

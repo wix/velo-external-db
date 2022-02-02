@@ -28,9 +28,11 @@ describe ('Schema Aware Data Service', () => {
         return expect(env.schemaAwareDataService.count(ctx.collectionName, ctx.filter)).resolves.toEqual({ totalCount: ctx.totalCount })
     })
 
-    test('get by id call data service with projection fields', async() => {
+    test('get by id call data service', async() => {
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        queryValidator.givenValidGetByIdForDefaultFieldsFor(ctx.itemId)
         data.givenGetByIdResult(ctx.entity, ctx.collectionName, ctx.itemId, ctx.defaultFields)
-        
+
         return expect(env.schemaAwareDataService.getById(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: ctx.entity })
     })
 

@@ -15,10 +15,10 @@ class SchemaAwareDataService {
     }
 
     async getById(collectionName, itemId) {
+        await this.validateGetById(collectionName, itemId)
         const projection = await this.schemaFieldNamesFor(collectionName)
         
-        const data = await this.dataService.getById(collectionName, itemId, projection)
-        return data
+        return await this.dataService.getById(collectionName, itemId, projection)
     }
 
     async count(collectionName, filter) {
@@ -69,6 +69,11 @@ class SchemaAwareDataService {
         this.queryValidator.validateFilter(fields, filter)
     }
     
+    async validateGetById(collectionName, itemId) {
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        await this.queryValidator.validateGetById(fields, itemId)
+    }
+
     async validateAggregation(collectionName, aggregation) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         this.queryValidator.validateAggregation(fields, aggregation)

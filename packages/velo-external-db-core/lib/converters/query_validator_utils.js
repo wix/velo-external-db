@@ -11,4 +11,6 @@ const extractFieldsAndOperators = (filter) => {
     return filter.value.map(filter =>  extractFieldsAndOperators(filter)).flat()
 }
 
-module.exports = { queryAdapterOperatorsFor, extractFieldsAndOperators }
+const isBlank = (str) => (!str || /^\s*$/.test(str)) 
+
+module.exports = { queryAdapterOperatorsFor, extractFieldsAndOperators, isBlank }

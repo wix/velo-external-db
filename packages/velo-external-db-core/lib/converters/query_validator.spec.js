@@ -51,6 +51,25 @@ describe('Query Validator', () => {
         })
     })
 
+    describe ('validateGetById', () => {
+        test('should throw InvalidQuery if itemId is not defined', () => {
+            expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId)).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, '')).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, ' ')).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, null)).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, undefined)).toThrow(InvalidQuery)
+        })
+
+        test('should not throw with any string but empty for itemId', () => {
+            expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, '0')).not.toThrow()
+            expect ( () => env.queryValidator.validateGetById(ctx.fieldArrWithId, ctx.itemId)).not.toThrow()
+        })
+
+        test('should throw Invalid if _id fields doesn\'t exist', () => {
+            expect ( () => env.queryValidator.validateGetById([{ field: ctx.fieldName, type: ctx.type }], '0')).toThrow(InvalidQuery)
+        })  
+    })
+
     describe('validateAggregation', () => {
         test('will not throw if projection fields exist', () => {
             const aggregation = {
@@ -126,7 +145,9 @@ describe('Query Validator', () => {
         operator: Uninitialized,
         value: Uninitialized,
         type: Uninitialized,
-        validOperatorForType: Uninitialized
+        validOperatorForType: Uninitialized,
+        fieldArrWithId: Uninitialized,
+        itemId: Uninitialized
     }
 
 
@@ -136,7 +157,9 @@ describe('Query Validator', () => {
         ctx.value = chance.word()
         ctx.operator = gen.randomOperator()
         ctx.type = gen.randomWixType()
+        ctx.fieldArrWithId = [{ field: '_id', type: 'text' }]
         ctx.validOperatorForType = gen.randomObjectFromArray(queryAdapterOperatorsFor(ctx.type))
         ctx.invalidOperatorForType = gen.invalidOperatorForType(queryAdapterOperatorsFor(ctx.type))
+        ctx.itemId = chance.word()
     })
 })
