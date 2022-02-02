@@ -48,7 +48,7 @@ const randomArrayOf = (gen) => {
 }
 
 const randomElementsFromArray = (arr) => {
-    const quantity = chance.natural({ min: 1, max: arr.length })
+    const quantity = chance.natural({ min: 1, max: arr.length-1 })
     return chance.pickset(arr, quantity)
 }
 
@@ -215,10 +215,41 @@ const randomSchemaOperations = () => randomElementsFromArray(AllSchemaOperations
 
 const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'url', 'datetime', 'image', 'object' ])
 
+const veloRoles = ['OWNER', 'BACKEND_CODE', 'MEMBER', 'VISITOR']
+
+const collectionConfigEntity = () => ({
+    id: chance.word(),
+    readPolicies: randomElementsFromArray(veloRoles),
+    writePolicies: randomElementsFromArray(veloRoles)
+})
+
+const authorizationConfig = () => randomArrayOf( collectionConfigEntity )
+
+const collectionNameFrom = (config) => randomObjectFromArray(config).id
+
+const readRolesFor = (collectionName, config) => config.find(c => c.id = collectionName).readPolicies
+const writeRolesFor = (collectionName, config) => config.find(c => c.id = collectionName).writePolicies
+
+const authorizedReadRoleFor = (collectionName, config) => randomObjectFromArray(readRolesFor(collectionName, config))
+
+const unauthorizedReadRoleFor = (collectionName, config) => randomObjectFromArray(
+                                                                veloRoles.filter(x => !readRolesFor(collectionName, config).includes(x))
+                                                                )
+
+const authorizedWriteRoleFor = (collectionName, config) => randomObjectFromArray(writeRolesFor(collectionName, config))
+
+const unauthorizedWriteRoleFor = (collectionName, config) => randomObjectFromArray(
+                                                                veloRoles.filter(x => !writeRolesFor(collectionName, config).includes(x))
+                                                                )
+
+    
+
+
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
                    randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
                    fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter, randomWixType,
-                   invalidOperatorForType, randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn }
+                   invalidOperatorForType, randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn, authorizationConfig, 
+                   collectionNameFrom, authorizedReadRoleFor, unauthorizedReadRoleFor, authorizedWriteRoleFor, unauthorizedWriteRoleFor }
 
 
