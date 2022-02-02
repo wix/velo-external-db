@@ -1,7 +1,7 @@
 const { when } = require('jest-when')
 const { SystemFields } = require('velo-external-db-commons')
 
-const itemPatcher = {
+const itemTransformer = {
     prepareItemsForInsert: jest.fn(),
     prepareItemsForUpdate: jest.fn()
 }
@@ -9,17 +9,17 @@ const itemPatcher = {
 const systemFields = SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) )
 
 const givenPreparedItemsForInsertWith = (prepared, items) => 
-    when(itemPatcher.prepareItemsForInsert).calledWith(items, systemFields)
+    when(itemTransformer.prepareItemsForInsert).calledWith(items, systemFields)
                                            .mockReturnValue(prepared)
 
 const givenPreparedItemsForUpdateWith = (prepared, items) => 
-    when(itemPatcher.prepareItemsForUpdate).calledWith(items, systemFields)
+    when(itemTransformer.prepareItemsForUpdate).calledWith(items, systemFields)
                                            .mockReturnValue(prepared)
 
 
 const reset = () => {
-    itemPatcher.prepareItemsForInsert.mockClear()
-    itemPatcher.prepareItemsForUpdate.mockClear()
+    itemTransformer.prepareItemsForInsert.mockClear()
+    itemTransformer.prepareItemsForUpdate.mockClear()
 }
 
-module.exports = { itemPatcher, givenPreparedItemsForInsertWith, givenPreparedItemsForUpdateWith, reset }
+module.exports = { itemTransformer, givenPreparedItemsForInsertWith, givenPreparedItemsForUpdateWith, reset }

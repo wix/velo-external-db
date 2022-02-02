@@ -127,7 +127,7 @@ describe ('Schema Aware Data Service', () => {
         queryValidator.reset()
         schema.reset()
 
-        env.schemaAwareDataService = new SchemaAwareDataService(data.dataService, queryValidator.queryValidator, schema.schemaInformation, patcher.itemPatcher)
+        env.schemaAwareDataService = new SchemaAwareDataService(data.dataService, queryValidator.queryValidator, schema.schemaInformation, patcher.itemTransformer)
         
         ctx.collectionName = chance.word()
         ctx.entity = gen.randomEntity()

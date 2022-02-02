@@ -1,10 +1,10 @@
 
 class SchemaAwareDataService {
-    constructor(dataService, queryValidator, schemaInformation, itemPatcher) {
+    constructor(dataService, queryValidator, schemaInformation, itemTransformer) {
         this.queryValidator = queryValidator
         this.schemaInformation = schemaInformation
         this.dataService = dataService
-        this.itemPatcher = itemPatcher
+        this.itemTransformer = itemTransformer
     }
 
     async find(collectionName, filter, sort, skip, limit) {
@@ -82,13 +82,13 @@ class SchemaAwareDataService {
     async prepareItemsForUpdate(collectionName, items) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
 
-        return this.itemPatcher.prepareItemsForUpdate(items, fields)
+        return this.itemTransformer.prepareItemsForUpdate(items, fields)
     }
     
     async prepareItemsForInsert(collectionName, items) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
 
-        return this.itemPatcher.prepareItemsForInsert(items, fields)
+        return this.itemTransformer.prepareItemsForInsert(items, fields)
     }
 
     async schemaFieldNamesFor(collectionName) {
