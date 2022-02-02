@@ -11,8 +11,8 @@ const dataProvider = {
     delete: jest.fn(),
 }
 
-const givenListResult = (entities, forCollectionName, filter, sort, skip, andLimit) =>
-    when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit)
+const givenListResult = (entities, forCollectionName, filter, sort, skip, andLimit, projection) =>
+    when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit, projection)
                            .mockResolvedValue(entities.map( unpackDates ))
 
 const givenCountResult = (total, forCollectionName, filter) =>

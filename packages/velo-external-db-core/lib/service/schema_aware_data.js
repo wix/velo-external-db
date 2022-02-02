@@ -9,11 +9,15 @@ class SchemaAwareDataService {
 
     async find(collectionName, filter, sort, skip, limit) {
         await this.validateFilter(collectionName, filter)
-        return await this.dataService.find(collectionName, filter, sort, skip, limit)
+        const projection = await this.schemaFieldNamesFor(collectionName)
+
+        return await this.dataService.find(collectionName, filter, sort, skip, limit, projection)
     }
 
     async getById(collectionName, itemId) {
-        const data = await this.dataService.getById(collectionName, itemId)
+        const projection = await this.schemaFieldNamesFor(collectionName)
+        
+        const data = await this.dataService.getById(collectionName, itemId, projection)
         return data
     }
 
@@ -65,7 +69,6 @@ class SchemaAwareDataService {
         this.queryValidator.validateFilter(fields, filter)
     }
     
-    /* eslint-disable no-unused-vars */
     async validateAggregation(collectionName, aggregation) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         this.queryValidator.validateAggregation(fields, aggregation)
@@ -83,6 +86,11 @@ class SchemaAwareDataService {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         return items.map(i => prepareForInsert(i, fields))
                     .map(i => unpackDates(i))
+    }
+
+    async schemaFieldNamesFor(collectionName) {
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        return fields.map(f => f.field)
     }
 
 }

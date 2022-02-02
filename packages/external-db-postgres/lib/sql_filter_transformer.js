@@ -245,6 +245,10 @@ class FilterParser {
         }]
     }
 
+    selectFieldsFor(projection) {
+        return projection.map(escapeIdentifier).join(', ')
+    }
+
     patchTrueFalseValue(value) {
         if (value === true || value === false) {
             return value ? 1 : 0

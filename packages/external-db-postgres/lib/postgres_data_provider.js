@@ -8,11 +8,11 @@ class DataProvider {
         this.pool = pool
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, projection) {
         const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
-
-        const resultset = await this.pool.query(`SELECT * FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
+        const projectionExpr = this.filterParser.selectFieldsFor(projection)
+        const resultset = await this.pool.query(`SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultset.rows
     }
@@ -24,7 +24,6 @@ class DataProvider {
         return parseInt(resultset.rows[0]['num'], 10)
     }
 
-    // todo: check if we can get schema in a safer way. should be according to schema of the table
     async insert(collectionName, items) {
         const item = items[0]
         const n = Object.keys(item).length
