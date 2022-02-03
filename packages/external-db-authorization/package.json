@@ -25,10 +25,11 @@
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.47.0",
+    "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.6.1",
-    "velo-external-db-commons": "^0.0.0",
-    "test-commons": "^0.0.0"
+    "test-commons": "^0.0.0",
+    "velo-external-db-commons": "^0.0.0"
   }
 }
