@@ -2,7 +2,7 @@ const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
-const { authAdmin, authOwner } = require('../drivers/auth_test_support')
+const { authAdmin, authOwner, authVisitor } = require('../drivers/auth_test_support')
 const Chance = require('chance')
 const each = require('jest-each').default
 const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
@@ -158,6 +158,10 @@ describe('Velo External DB Data REST API',  () => {
                 await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
             })
         }
+
+        test('should throw 401 on a request to data api without the appropriate role', async() => {
+            return expect(() => axios.post('/data/truncate', { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
+        })
     })
 
 
