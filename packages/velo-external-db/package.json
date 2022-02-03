@@ -40,7 +40,6 @@
     "external-db-postgres": "^0.0.0",
     "external-db-spanner": "^0.0.0",
     "nested-property": "^4.0.0",
-    "passport": "^0.5.2",
     "velo-external-db-commons": "^0.0.0",
     "velo-external-db-core": "^0.0.0"
   },

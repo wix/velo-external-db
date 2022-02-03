@@ -1,15 +1,12 @@
-const strategyFor = (vendor = '', cfg) => {
+const authProviderFor = (vendor = '', cfg) => {
   switch (vendor.toLowerCase()) {
     case 'aws': {
       const { AwsStrategy } = require('./strategies/aws_strategy')
-      
-      return { authStrategy: new AwsStrategy(cfg), isValidAuthService: true }
-    
+      return new AwsStrategy(cfg)
     }
     case 'gcp': {
       const { GcpStrategy } = require('./strategies/gcp_strategy')
-
-      return { authStrategy: new GcpStrategy(cfg), isValidAuthService: true } 
+      return new GcpStrategy(cfg)
     }
 
     case 'azure':
@@ -17,21 +14,20 @@ const strategyFor = (vendor = '', cfg) => {
     default: {
       const { LocalStrategy } = require('./strategies/local_strategy')
       
-      return { authStrategy: new LocalStrategy(cfg), isValidAuthService: false }  
+      return { authProvider: new LocalStrategy(cfg), isValidAuthService: false }  
     }      
   }
 }
 
-const createAuthService = async(vendor, config) => {
+const initAuthProvider = async(vendor, config) => {
 
   const { auth: authConfig } = await config.readConfig()
-  const { validAuthConfig } = await config.configStatus()
+  const authInformation = await config.configStatus()
 
-  if (!validAuthConfig) 
-    return strategyFor('local')
-  
-  return strategyFor(vendor, authConfig)
+  const authProvider = authProviderFor(vendor, authConfig)
+
+  return { authProvider, authInformation }
 
 }
 
-module.exports = { createAuthService }
+module.exports = { initAuthProvider }

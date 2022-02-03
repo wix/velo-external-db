@@ -1,3 +1,4 @@
-const { createAuthService } = require('./factory')
+const { AuthenticationService } = require('./services/authentication_service')
+const { initAuthProvider } = require('./factory')
 
-module.exports = { createAuthService }
+module.exports = { initAuthProvider, AuthenticationService }
