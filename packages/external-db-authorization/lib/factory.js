@@ -13,8 +13,7 @@ const authProviderFor = (vendor = '', cfg) => {
     case 'local':
     default: {
       const { LocalStrategy } = require('./strategies/local_strategy')
-      
-      return { authProvider: new LocalStrategy(cfg), isValidAuthService: false }  
+      return new LocalStrategy(cfg)
     }      
   }
 }
