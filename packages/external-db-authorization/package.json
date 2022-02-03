@@ -8,7 +8,7 @@
   "main": "lib/index.js",
   "directories": {
     "lib": "lib",
-    "test": "__tests__"
+    "test": "test"
   },
   "files": [
     "lib"
@@ -18,7 +18,7 @@
     "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" "
+    "test": "jest"
   },
   "bugs": {
     "url": "https://github.com/wix-private/noam-external-db-poc/issues"
@@ -27,6 +27,8 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.47.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
-    "passport-oauth2": "^1.6.1"
+    "passport-oauth2": "^1.6.1",
+    "velo-external-db-commons": "^0.0.0",
+    "test-commons": "^0.0.0"
   }
 }
