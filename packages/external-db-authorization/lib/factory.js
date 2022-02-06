@@ -10,13 +10,10 @@ const authProviderFor = (vendor = '', cfg) => {
     }
 
     case 'azure': {
-    const { AzureStrategy } = require('./strategies/azure_strategy')
-
-      return { authStrategy: new  AzureStrategy(cfg), isValidAuthService: true } 
+      const { AzureStrategy } = require('./strategies/azure_strategy')
+      return new  AzureStrategy(cfg)
     }
-
-
-    case 'local':
+    
     default: {
       const { LocalStrategy } = require('./strategies/local_strategy')
       return new LocalStrategy(cfg)
