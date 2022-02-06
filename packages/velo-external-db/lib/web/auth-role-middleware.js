@@ -17,4 +17,4 @@ function authRoleMiddleware( { roles } ) {
     }
 }
 
-module.exports = { authRoleMiddleware }
+module.exports = { authRoleMiddleware, extractRole }
