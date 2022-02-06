@@ -158,9 +158,10 @@ describe('Velo External DB Data REST API',  () => {
                 await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
             })
         }
-        each(['find', 'aggregate', 'insert', 'insert/bulk', 'get', 'update', 'update/bulk', 'remove', 'remove/bulk', 'count'])
-        .test('should throw 401 on a request to /data/%s without the appropriate role', async(api) => {
-            return expect(() => axios.post(`/data/${api}`, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
+        each(['data/find', 'data/aggregate', 'data/insert', 'data/insert/bulk', 'data/get', 'data/update',
+             'data/update/bulk', 'data/remove', 'data/remove/bulk', 'data/count'])
+        .test('should throw 401 on a request to %s without the appropriate role', async(api) => {
+            return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
         })
     })
 
