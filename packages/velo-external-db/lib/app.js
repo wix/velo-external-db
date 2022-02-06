@@ -4,7 +4,7 @@ const { config } = require('../roles-config.json')
 const { collectionLevelConfig } = require ('../collection-level-roles-config.json')
 const compression = require('compression')
 const { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer } = require('velo-external-db-core')
-const { RoleAuthorizationService } = require ('external-db-authorization')
+const { initAuthProvider, AuthenticationService, RoleAuthorizationService } = require('external-db-authorization')
 const { init } = require('./storage/factory')
 const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
@@ -12,7 +12,6 @@ const { unless, includes } = require('./web/middleware-support')
 const { createRouter, initServices } = require('./router')
 const { create, readCommonConfig } = require('external-db-config')
 const session = require('express-session')
-const { initAuthProvider, AuthenticationService } = require('external-db-authorization')
 
 let started = false
 let server, _cleanup
