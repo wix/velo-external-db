@@ -28,6 +28,10 @@ const authOwner = { transformRequest: axios.defaults
                                       .transformRequest
                                       .concat( appendSecretKeyToRequest, appendRoleToRequest('OWNER' ) ) }
 
+const authVisitor = { transformRequest: axios.defaults
+                                      .transformRequest
+                                      .concat( appendSecretKeyToRequest, appendRoleToRequest('VISITOR' ) ) }
 
-module.exports = { authInit, authAdmin, authOwner }
+
+module.exports = { authInit, authAdmin, authOwner, authVisitor }
 

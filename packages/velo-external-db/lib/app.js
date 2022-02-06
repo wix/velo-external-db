@@ -1,8 +1,10 @@
 const express = require('express')
 const path = require('path')
 const { config } = require('../roles-config.json')
+const { collectionLevelConfig } = require ('../collection-level-roles-config.json')
 const compression = require('compression')
 const { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer } = require('velo-external-db-core')
+const { RoleAuthorizationService } = require ('external-db-authorization')
 const { init } = require('./storage/factory')
 const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
@@ -28,11 +30,12 @@ const load = async() => {
     const itemTransformer = new ItemTransformer()
     const schemaAwareDataService = new SchemaAwareDataService(dataService, queryValidator, schemaInformation, itemTransformer)
     const schemaService = new SchemaService(schemaProvider, schemaInformation)
-
+    
     const { authProvider, authInformation } = await initAuthProvider(vendor, configReader)
     const authService = new AuthenticationService({ authProvider, authInformation })
+    const roleAuthorizationService = new RoleAuthorizationService(collectionLevelConfig)
     
-    initServices(schemaAwareDataService, schemaService, operationService, configReader, { vendor, type: adapterType }, filterTransformer, aggregationTransformer)
+    initServices(schemaAwareDataService, schemaService, operationService, configReader, { vendor, type: adapterType }, filterTransformer, aggregationTransformer, roleAuthorizationService)
     
     _cleanup = async() => {
         await cleanup()

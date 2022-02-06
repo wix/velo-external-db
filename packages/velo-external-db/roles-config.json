@@ -1,10 +1,6 @@
 {
     "config": [
         {
-            "pathPrefix": "/data",
-            "roles": ["OWNER", "BACKEND_CODE", "MEMBER"]
-        },
-        {
             "pathPrefix": "/schemas/column",
             "roles": ["OWNER"]
         },
