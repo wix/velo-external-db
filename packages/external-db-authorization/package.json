@@ -26,6 +26,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.47.0",
     "passport": "^0.5.2",
+    "passport-azure-ad-oauth2": "^0.0.4",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.6.1",

@@ -9,7 +9,13 @@ const authProviderFor = (vendor = '', cfg) => {
       return new GcpStrategy(cfg)
     }
 
-    case 'azure':
+    case 'azure': {
+    const { AzureStrategy } = require('./strategies/azure_strategy')
+
+      return { authStrategy: new  AzureStrategy(cfg), isValidAuthService: true } 
+    }
+
+
     case 'local':
     default: {
       const { LocalStrategy } = require('./strategies/local_strategy')
