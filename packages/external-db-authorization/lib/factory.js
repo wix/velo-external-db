@@ -13,7 +13,7 @@ const authProviderFor = (vendor = '', cfg) => {
       const { AzureStrategy } = require('./strategies/azure_strategy')
       return new  AzureStrategy(cfg)
     }
-    
+
     default: {
       const { LocalStrategy } = require('./strategies/local_strategy')
       return new LocalStrategy(cfg)
@@ -26,10 +26,11 @@ const initAuthProvider = async(vendor, config) => {
   const { auth: authConfig } = await config.readConfig()
   const authInformation = await config.configStatus()
 
-  const authProvider = authProviderFor(vendor, authConfig)
+  if (!authInformation.validAuthConfig) {
+    return { authProvider: authProviderFor(), authInformation }
+  }
 
-  return { authProvider, authInformation }
-
+  return { authProvider: authProviderFor(vendor, authConfig), authInformation }
 }
 
 module.exports = { initAuthProvider }
