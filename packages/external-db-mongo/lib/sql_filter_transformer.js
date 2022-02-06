@@ -149,11 +149,9 @@ class FilterParser {
     }
 
     selectFieldsFor(projection) {
-        const projectionExpr = projection.reduce((pV, cV) => (
+        return projection.reduce((pV, cV) => (
             { ...pV, [cV]: 1 }
-        ), {})
-        if (!projection.includes('_id')) return { _id: 0, ...projectionExpr }
-        return projectionExpr
+        ), { _id: 0 })
     }
 
 }
