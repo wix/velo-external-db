@@ -31,8 +31,8 @@ class GcpAuthProvider {
     }
 
     getProjectOwners()
-            .then(projectOwners => projectOwners.includes(usersEmail) ? cb(null, profile) : cb(new Error('You are not authorized to use this application'), null))
-            .catch(err => cb(new Error('Not authorized', err), null) )
+            .then(projectOwners => projectOwners.includes(usersEmail) ? cb(null, profile) : cb('Unauthorized', null))
+            .catch(err => cb(`Error fetching project owners: ${err}`, null) )
   
   }
 
