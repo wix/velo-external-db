@@ -1,3 +1,4 @@
+const { GoogleAuth } = require('google-auth-library')
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 
 class GcpAuthProvider {
@@ -12,8 +13,27 @@ class GcpAuthProvider {
     return new GoogleStrategy(this.options, this.verify)
   }
 
-  verify(accessToken, tokenSecret, profile, done) {
-        done(null, profile)
+  verify(accessToken, tokenSecret, profile, cb) {
+    const usersEmail = profile._json.email
+
+    const getProjectOwners = async() => {
+      const authClient = new GoogleAuth({ scopes: 'https://www.googleapis.com/auth/cloud-platform' })
+      const client = await authClient.getClient()
+      const projectId = await authClient.getProjectId()
+      const getIamPolicyRestUrl = `https://cloudresourcemanager.googleapis.com/v1/projects/${projectId}:getIamPolicy`
+  
+      const res = await client.request({ method: 'POST', url: getIamPolicyRestUrl })
+      const { members: allOwners } = res.data.bindings.find(i => i.role === 'roles/owner')
+  
+      const projectOwnersUsers = allOwners.filter(i => i.startsWith('user:')).map(i => i.split(':')[1])
+
+      return projectOwnersUsers
+    }
+
+    getProjectOwners()
+            .then(projectOwners => projectOwners.includes(usersEmail) ? cb(null, profile) : cb(new Error('You are not authorized to use this application'), null))
+            .catch(err => cb(new Error('Not authorized', err), null) )
+  
   }
 
 }
