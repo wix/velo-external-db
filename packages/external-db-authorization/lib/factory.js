@@ -1,43 +1,36 @@
 const strategyFor = (vendor = '', cfg) => {
   switch (vendor.toLowerCase()) {
     case 'aws': {
-      const { AwsStrategy } = require('./strategies/aws_strategy')
-      
-      return { authStrategy: new AwsStrategy(cfg), isValidAuthService: true }
+      const { AwsAuthProvider } = require('./auth-providers/aws_auth_provider')
+      return { authProvider: new AwsAuthProvider(cfg), isValidAuthProvider: true }
     
     }
     case 'gcp': {
-      const { GcpStrategy } = require('./strategies/gcp_strategy')
-
-      return { authStrategy: new GcpStrategy(cfg), isValidAuthService: true } 
+      const { GcpAuthProvider } = require('./auth-providers/gcp_auth_provider.js')
+      return { authProvider: new GcpAuthProvider(cfg), isValidAuthProvider: true } 
     }
 
     case 'azure': {
-    const { AzureStrategy } = require('./strategies/azure_strategy')
-
-      return { authStrategy: new  AzureStrategy(cfg), isValidAuthService: true } 
+      const { AzureAuthProvider } = require('./auth-providers/azure_auth_provider')
+      return { authProvider: new  AzureAuthProvider(cfg), isValidAuthProvider: true } 
     }
 
-
-    case 'local':
     default: {
-      const { LocalStrategy } = require('./strategies/local_strategy')
-      
-      return { authStrategy: new LocalStrategy(cfg), isValidAuthService: false }  
+      const { StubAuthProvider } = require('./auth-providers/stub_auth_provider')
+      return { authProvider: new StubAuthProvider(), isValidAuthProvider: false }
     }      
   }
 }
 
-const createAuthService = async(vendor, config) => {
-
+const createAuthProviderFor = async(vendor, config) => {
   const { auth: authConfig } = await config.readConfig()
   const { validAuthConfig } = await config.configStatus()
 
-  if (!validAuthConfig) 
-    return strategyFor('local')
-  
-  return strategyFor(vendor, authConfig)
+  if (!validAuthConfig) {
+    return strategyFor('stub')
+  }
 
+  return strategyFor(vendor, authConfig)
 }
 
-module.exports = { createAuthService }
+module.exports = { createAuthProviderFor }
