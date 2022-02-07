@@ -2,7 +2,7 @@ const OAuth2Strategy = require('passport-oauth2')
 const { CognitoIdentityProviderClient, GetUserCommand } = require('@aws-sdk/client-cognito-identity-provider')
 
 
-class AwsStrategy {
+class AwsAuthProvider {
   constructor({ clientDomain, clientId, clientSecret, callbackUrl, passReqToCallback }) {
     this.options = {
         authorizationURL: `${clientDomain}/oauth2/authorize`,
@@ -36,4 +36,4 @@ class AwsStrategy {
   
 }
 
-module.exports = { AwsStrategy }
+module.exports = { AwsAuthProvider }

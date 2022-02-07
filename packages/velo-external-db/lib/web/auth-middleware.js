@@ -1,11 +1,11 @@
 const { property } = require('./middleware-support')
 const { UnauthorizedError } = require('velo-external-db-commons').errors
 
-let isValidAuthService, authConfigReader
+let isValidAuthProvider, authConfigReader
 
-const initAuthMiddleware = (_isValidAuthService, _authConfigReader) => {
-    isValidAuthService = _isValidAuthService
+const initAuthMiddleware = (_isValidAuthProvider, _authConfigReader) => {
     authConfigReader = _authConfigReader
+    isValidAuthProvider = _isValidAuthProvider
 }
 
 const extractSecretKey = body => property('requestContext.settings.secretKey', body)
@@ -24,13 +24,13 @@ const secretKeyAuthMiddleware = ({ secretKey }) => {
 }
 
 const authMiddleware = async(req, res, next) => {
-    if (!isValidAuthService || !req.user) {
+    if (!isValidAuthProvider || !req.user) {
         const { message } = await authConfigReader.configStatus()
-        const statusMessage = isValidAuthService? 'Authorization configured successfully' : message
-        return res.render('login', { isValidAuthService, statusMessage })
+        const statusMessage = isValidAuthProvider ? 'Authorization configured successfully' : message
+        return res.render('login', { isValidAuthProvider, statusMessage })
       }
   
-      next()
+    next()
 }
 
 module.exports = { authMiddleware, secretKeyAuthMiddleware, initAuthMiddleware }

@@ -1,14 +1,14 @@
 const localStrategy = require('passport-local')
 
-class LocalStrategy {
+class StubAuthProvider {
   constructor() {
     return new localStrategy(this.verify) 
   }
 
-  verify(AccessToken, tokenSecret, profile, done) {
+  verify(accessToken, tokenSecret, profile, done) {
         done(null, profile)
   }
 
 }
 
-module.exports = { LocalStrategy }
+module.exports = { StubAuthProvider }

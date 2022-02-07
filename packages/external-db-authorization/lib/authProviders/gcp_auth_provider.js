@@ -1,6 +1,6 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 
-class GcpStrategy {
+class GcpAuthProvider {
   constructor({ clientId, clientSecret, callbackUrl }) {
     this.options = {
       clientID: clientId,
@@ -12,10 +12,10 @@ class GcpStrategy {
     return new GoogleStrategy(this.options, this.verify)
   }
 
-  verify(AccessToken, tokenSecret, profile, done) {
+  verify(accessToken, tokenSecret, profile, done) {
         done(null, profile)
   }
 
 }
 
-module.exports = { GcpStrategy }
+module.exports = { GcpAuthProvider }

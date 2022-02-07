@@ -4,7 +4,7 @@ const { config } = require('../roles-config.json')
 const { collectionLevelConfig } = require ('../collection-level-roles-config.json')
 const compression = require('compression')
 const { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer } = require('velo-external-db-core')
-const { RoleAuthorizationService } = require ('external-db-authorization')
+const { RoleAuthorizationService, createAuthProviderFor } = require ('external-db-authorization')
 const { init } = require('./storage/factory')
 const { authMiddleware, secretKeyAuthMiddleware, initAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
@@ -14,7 +14,6 @@ const { createAuthRouter, initAuthService } = require('./auth_router')
 const { create, readCommonConfig } = require('external-db-config')
 const session = require('express-session')
 const passport = require('passport')
-const { createAuthService } = require('external-db-authorization')
 
 let started = false
 let server, _cleanup
@@ -32,12 +31,12 @@ const load = async() => {
     const itemTransformer = new ItemTransformer()
     const schemaAwareDataService = new SchemaAwareDataService(dataService, queryValidator, schemaInformation, itemTransformer)
     const schemaService = new SchemaService(schemaProvider, schemaInformation)
-    const { authStrategy, isValidAuthService } = await createAuthService(vendor, configReader)
+    const { authProvider, isValidAuthProvider } = await createAuthProviderFor(vendor, configReader)
     const roleAuthorizationService = new RoleAuthorizationService(collectionLevelConfig)
     
     initServices(schemaAwareDataService, schemaService, operationService, configReader, { vendor, type: adapterType }, filterTransformer, aggregationTransformer, roleAuthorizationService)
-    initAuthService(authStrategy)
-    initAuthMiddleware(isValidAuthService, configReader)
+    initAuthService(authProvider)
+    initAuthMiddleware(isValidAuthProvider, configReader)
     
     _cleanup = async() => {
         await cleanup()

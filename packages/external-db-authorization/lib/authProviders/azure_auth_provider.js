@@ -1,6 +1,6 @@
 const AzureAdOAuth2Strategy = require('passport-azure-ad-oauth2')
 
-class AzureStrategy {
+class AzureAuthProvider {
   constructor({ clientId, clientSecret, callbackUrl }) {
     this.options = {
       clientID: clientId,
@@ -11,10 +11,10 @@ class AzureStrategy {
     return new AzureAdOAuth2Strategy(this.options, this.verify)
   }
 
-  verify(AccessToken, tokenSecret, profile, done) {
+  verify(accessToken, tokenSecret, profile, done) {
         done(null, profile)
   }
 
 }
 
-module.exports = { AzureStrategy }
+module.exports = { AzureAuthProvider }
