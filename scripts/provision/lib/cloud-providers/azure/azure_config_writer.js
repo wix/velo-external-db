@@ -15,21 +15,21 @@ class ConfigWriter {
         this.region = region
     }
 
-    async writeConfig( { dbCredentials, host, dbName, secretKey, provisionVariables, instanceName }) {
+    async writeConfig( { dbCredentials, host, db, secretKey, provisionVariables, instanceName }) {
         const { resourceGroupName, keyVaultName, subnetName, virtualNetworkName } = provisionVariables
         await this.createKeyVaultInstance(resourceGroupName, keyVaultName, virtualNetworkName, subnetName, this.userObjectId)
 
-        await this.writeConfigurationToKeyVault(keyVaultName, dbCredentials, dbName, secretKey, host, instanceName)
+        await this.writeConfigurationToKeyVault(keyVaultName, dbCredentials, db, secretKey, host, instanceName)
     }
 
-    async writeConfigurationToKeyVault(keyVaultName, dbCredentials, dbName, secretKey, host, instanceName) {
+    async writeConfigurationToKeyVault(keyVaultName, dbCredentials, db, secretKey, host, instanceName) {
         const secretClient = new SecretClient(`https://${keyVaultName}.vault.azure.net`, this.azureCreds)
 
         const config = {
             HOST: host,
             USER: `${dbCredentials.user}@${instanceName}`,
             PASSWORD: dbCredentials.passwd,
-            DB: dbName,
+            DB: db,
             SECRETKEY: secretKey,
         }
 
