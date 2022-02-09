@@ -12,6 +12,6 @@ const generateIdsIfNeeded = item => {
 }
 
 const packDates = item => Object.entries(item)
-                                .reduce((o, [k, v]) => ({ ...o, [k]: isDate(v) ? { $date: v.toISOString() } : v }), {})
+                                .reduce((o, [k, v]) => ({ ...o, [k]: isDate(v) ? { $date: new Date(v).toISOString() } : v }), {})
 
 module.exports = { asWixData, generateIdsIfNeeded }

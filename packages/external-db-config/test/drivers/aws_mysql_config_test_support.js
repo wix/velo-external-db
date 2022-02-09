@@ -23,19 +23,6 @@ const defineValidConfig = (config) => {
     if (config.secretKey) {
         awsConfig.SECRET_KEY = config.secretKey
     }
-    if (config.auth?.callbackUrl) {
-        awsConfig.callbackUrl = config.auth.callbackUrl
-    }
-    if (config.auth?.clientId) {
-        awsConfig.clientId = config.auth.clientId
-    }
-    if (config.auth?.clientSecret) {
-        awsConfig.clientSecret = config.auth.clientSecret
-    }
-    if (config.auth?.clientDomain) {
-        awsConfig.clientDomain = config.auth.clientDomain
-    }
-
     mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(awsConfig) })
 }
 

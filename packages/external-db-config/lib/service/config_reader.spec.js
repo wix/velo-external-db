@@ -9,14 +9,12 @@ describe('Config Reader Client', () => {
 
     test('read config will retrieve config from secret provider and validate retrieved data', async() => {
         driver.givenConfig(ctx.config)
-        driver.givenAuthConfig(ctx.config)
 
         await expect( env.configReader.readConfig() ).resolves.toEqual(configResponseFor(ctx.config, ctx.config))
     })
 
     test('status call will return successful message in case config is valid', async() => {
         driver.givenValidConfig()
-        driver.givenValidAuthConfig()
         driver.givenValidCommonConfig()
 
         await expect( env.configReader.configStatus() ).resolves.toEqual( validConfigStatusResponse() )
@@ -24,7 +22,6 @@ describe('Config Reader Client', () => {
 
     test('status call will return error message containing list of missing properties', async() => {
         driver.givenInvalidConfigWith(ctx.missingProperties)
-        driver.givenValidAuthConfig()
         driver.givenValidCommonConfig()
 
         await expect( env.configReader.configStatus() ).resolves.toEqual( configResponseWithMissingProperties(ctx.missingProperties) )
@@ -32,7 +29,6 @@ describe('Config Reader Client', () => {
 
     test('status call will return error message containing list of missing properties from common reader', async() => {
         driver.givenValidConfig()
-        driver.givenValidAuthConfig()
         driver.givenInvalidCommonConfigWith(ctx.missingProperties)
 
         await expect( env.configReader.configStatus() ).resolves.toEqual( configResponseWithMissingProperties(ctx.missingProperties) )
@@ -47,7 +43,6 @@ describe('Config Reader Client', () => {
 
     test('status call with wrong cloud vendor', async() => {
         driver.givenValidConfig()
-        driver.givenValidAuthConfig()
         driver.givenInvalidCloudVendor()
 
         await expect( env.configReader.configStatus() ).resolves.toEqual( invalidVendorConfigStatusResponse() )
