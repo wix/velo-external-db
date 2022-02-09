@@ -11,13 +11,9 @@ const create = () => {
   const common = new CommonConfigReader()
   const { vendor = '', type, secretId, region } = common.readConfig()
   let internalConfigReader
-  let internalAuthConfigReader
 
   switch (vendor.toLowerCase()) {
     case 'aws': {
-      const { AwsAuthConfigReader } = require('./readers/aws_auth_config_reader')
-      internalAuthConfigReader = new AwsAuthConfigReader(secretId || DefaultSecretId, region)
-
       switch(type) {
         case 'dynamodb':
           internalConfigReader = new aws.AwsDynamoConfigReader(region) 
@@ -30,9 +26,6 @@ const create = () => {
     break
       
     case 'gcp': {
-      const { GcpAuthConfigReader } = require('./readers/gcp_auth_config_reader')
-      internalAuthConfigReader = new GcpAuthConfigReader()
-
       switch (type) {
         case 'spanner':
           internalConfigReader = new gcp.GcpSpannerConfigReader()
@@ -61,9 +54,6 @@ const create = () => {
     break
 
     case 'azure': {
-      const { AzureAuthConfigReader } = require('./readers/azure_auth_config_reader')
-      internalAuthConfigReader = new AzureAuthConfigReader()
-
       switch (type) {
         case 'spanner':
           internalConfigReader = new gcp.GcpSpannerConfigReader()
@@ -96,7 +86,7 @@ const create = () => {
     break
   }
 
-  return new ConfigReader(internalConfigReader || new StubConfigReader, common, internalAuthConfigReader || new StubConfigReader)
+  return new ConfigReader(internalConfigReader || new StubConfigReader, common)
 }
 
 module.exports = { create }
