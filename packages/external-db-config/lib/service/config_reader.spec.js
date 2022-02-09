@@ -77,6 +77,6 @@ describe('Config Reader Client', () => {
         ctx.missingProperties = Array.from({ length: 5 }, () => chance.word())
         ctx.moreMissingProperties = Array.from({ length: 5 }, () => chance.word())
 
-        env.configReader = new ConfigReader(driver.configReader, driver.commonConfigReader, driver.authConfigReader, driver.authorizationConfigReader)
+        env.configReader = new ConfigReader(driver.configReader, driver.commonConfigReader, driver.authorizationConfigReader)
     })
 })
