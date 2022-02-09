@@ -9,8 +9,9 @@ describe('Config Reader Client', () => {
 
     test('read config will retrieve config from secret provider and validate retrieved data', async() => {
         driver.givenConfig(ctx.config)
+        driver.givenAuthorizationConfig(ctx.authorizationConfig)
 
-        await expect( env.configReader.readConfig() ).resolves.toEqual(configResponseFor(ctx.config, ctx.config))
+        await expect( env.configReader.readConfig() ).resolves.toEqual(configResponseFor(ctx.config, ctx.authorizationConfig))
     })
 
     test('status call will return successful message in case config is valid', async() => {
@@ -71,10 +72,11 @@ describe('Config Reader Client', () => {
     beforeEach(() => {
         driver.reset()
         ctx.config = gen.randomConfig()
+        ctx.authorizationConfig = gen.randomConfig()
         ctx.configStatus = gen.randomConfig()
         ctx.missingProperties = Array.from({ length: 5 }, () => chance.word())
         ctx.moreMissingProperties = Array.from({ length: 5 }, () => chance.word())
 
-        env.configReader = new ConfigReader(driver.configReader, driver.commonConfigReader, driver.authConfigReader)
+        env.configReader = new ConfigReader(driver.configReader, driver.commonConfigReader, driver.authConfigReader, driver.authorizationConfigReader)
     })
 })

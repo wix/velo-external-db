@@ -1,4 +1,7 @@
-const configResponseFor = ( config ) => expect.objectContaining(config)
+const configResponseFor = ( config, authorizationConfig ) => expect.objectContaining({
+    ...config,
+    authorization: authorizationConfig
+})
 
 const validConfigStatusResponse = () => expect.objectContaining({ 
     validConfig: true,
