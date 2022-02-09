@@ -26,15 +26,14 @@ describe('Velo External DB Data REST API',  () => {
             await dbTeardown()
         }, 20000)
 
-        if (shouldNotRunOn(['DynamoDb'], name)) {
+        if (shouldNotRunOn(['DynamoDb', 'Google-sheet'], name)) { //todo: create another test without sort for these implementations
             test('find api', async() => {
-                const items = name === 'Google-sheet' ? [ ctx.item, ctx.anotherItem ] : [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1)
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
                 await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
                 await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authVisitor) ).resolves.toEqual(
                     expect.objectContaining({ data: {
-                            items,
+                            items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
                             totalCount: 2
                         } }))
             })
