@@ -2,7 +2,8 @@ const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
-const { authAdmin, authOwner } = require('../drivers/auth_test_support')
+const { authAdmin, authOwner, authVisitor } = require('../drivers/auth_test_support')
+const authorization = require ('../drivers/authorization_test_support')
 const Chance = require('chance')
 const each = require('jest-each').default
 const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
@@ -30,7 +31,8 @@ describe('Velo External DB Data REST API',  () => {
                 const items = name === 'Google-sheet' ? [ ctx.item, ctx.anotherItem ] : [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1)
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-                await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authAdmin) ).resolves.toEqual(
+                await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
+                await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authVisitor) ).resolves.toEqual(
                     expect.objectContaining({ data: {
                             items,
                             totalCount: 2
