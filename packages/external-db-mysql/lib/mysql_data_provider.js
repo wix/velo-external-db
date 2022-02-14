@@ -12,10 +12,11 @@ class DataProvider {
         this.query = promisify(this.pool.query).bind(this.pool)
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, projection) {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
-        const sql = `SELECT * FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
+        const projectionExpr = this.filterParser.selectFieldsFor(projection)
+        const sql = `SELECT ${projectionExpr} FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
         const resultset = await this.query(sql, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultset
