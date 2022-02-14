@@ -8,11 +8,12 @@ class DataProvider {
         this.pool = pool
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, projection) {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
+        const projectionExpr = this.filterParser.selectFieldsFor(projection)
 
-        const sql = `SELECT * FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} LIMIT ${limit} OFFSET ${skip}`
+        const sql = `SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} LIMIT ${limit} OFFSET ${skip}`
 
         const resultSet = await this.pool.query({ query: sql, params: parameters })
                                          .catch( translateErrorCodes )

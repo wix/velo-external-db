@@ -214,6 +214,10 @@ class FilterParser {
         }
         return value
     }
+
+    selectFieldsFor(projection) { 
+        return projection.map(escapeIdentifier).join(', ')
+    }
 }
 
 module.exports = FilterParser
