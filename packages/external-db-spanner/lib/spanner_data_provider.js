@@ -7,12 +7,13 @@ class DataProvider {
         this.database = database
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, projection) {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
+        const projectionExpr = this.filterParser.selectFieldsFor(projection)
 
         const query = {
-            sql: `SELECT * FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} LIMIT @limit OFFSET @skip`,
+            sql: `SELECT ${projectionExpr} FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} LIMIT @limit OFFSET @skip`,
             params: {
                 skip: skip,
                 limit: limit,
