@@ -73,7 +73,7 @@ class SchemaProvider {
         await this.client.db()
                          .collection(SystemTable)
                          .updateOne({ _id: collectionName },
-                                    { $push: { fields: column } })
+                                    { $addToSet: { fields: column } })
     }
 
     async removeColumn(collectionName, columnName) {
