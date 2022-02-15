@@ -23,10 +23,8 @@
   "license": "ISC",
   "dependencies": {
     "compression": "^1.7.4",
-    "cookie-parser": "^1.4.6",
     "ejs": "^3.1.6",
     "express": "^4.17.2",
-    "express-session": "^1.17.2",
     "external-db-airtable": "^0.0.0",
     "external-db-security": "^0.0.0",
     "external-db-bigquery": "^0.0.0",
@@ -40,7 +38,6 @@
     "external-db-postgres": "^0.0.0",
     "external-db-spanner": "^0.0.0",
     "nested-property": "^4.0.0",
-    "passport": "^0.5.2",
     "velo-external-db-commons": "^0.0.0",
     "velo-external-db-core": "^0.0.0"
   },
