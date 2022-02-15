@@ -28,7 +28,7 @@
     "express": "^4.17.2",
     "express-session": "^1.17.2",
     "external-db-airtable": "^0.0.0",
-    "external-db-authorization": "^0.0.0",
+    "external-db-security": "^0.0.0",
     "external-db-bigquery": "^0.0.0",
     "external-db-config": "^0.0.0",
     "external-db-dynamodb": "^0.0.0",

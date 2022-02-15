@@ -1,8 +1,7 @@
 {
-  "name": "external-db-authorization",
+  "name": "external-db-security",
   "version": "0.0.0",
-  "description": "> TODO: description",
-  "author": "Max Polsky <maxim.polski@gmail.com>",
+  "description": "> external-db-security",
   "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
   "license": "ISC",
   "main": "lib/index.js",
