@@ -26,13 +26,13 @@ class DataService {
         return { totalCount: c }
     }
 
-    async insert(collectionName, item) {
-        const resp = await this.bulkInsert(collectionName, [item])
+    async insert(collectionName, item, fields) {
+        const resp = await this.bulkInsert(collectionName, [item], fields)
         return { item: resp.items[0] }
     }
 
-    async bulkInsert(collectionName, items) {
-        await this.storage.insert(collectionName, items)
+    async bulkInsert(collectionName, items, fields) {
+        await this.storage.insert(collectionName, items, fields)
         return { items }
     }
 
