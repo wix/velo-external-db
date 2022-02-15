@@ -1,6 +1,11 @@
 const { updateFieldsFor } = require('velo-external-db-commons') 
+const { isEmptyObject } = require('./dynamo_utils')
 
 const findCommand = (collectionName, filter, limit) => {
+    if (isEmptyObject(filter.ExpressionAttributeNames)) {
+        delete filter.ExpressionAttributeNames
+        delete filter.ProjectionExpression
+    }
     return {
         TableName: collectionName, 
         ...filter,
