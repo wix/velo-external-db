@@ -177,6 +177,7 @@ describe('Sql Parser', () => {
                 })
             })
         })
+
         describe('handle multi field operator', () => {
             each([
                 and, or
@@ -220,6 +221,25 @@ describe('Sql Parser', () => {
                 }])
             })
         })
+
+        describe('transform projection', () => {
+            test('projection handle single field projection', () => {
+                expect(env.filterParser.selectFieldsFor([ctx.fieldName])).toEqual({
+                    projectionExpr: `#${ctx.fieldName}`,
+                    projectionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName }
+                })
+            })
+
+            test('projection handle multiple field projection', () => {
+                expect(env.filterParser.selectFieldsFor([ctx.fieldName, ctx.anotherFieldName])).toEqual(
+                        { 
+                            projectionExpr: `#${ctx.fieldName}, #${ctx.anotherFieldName}`,
+                            projectionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName, [`#${ctx.anotherFieldName}`]: ctx.anotherFieldName }
+                        }
+                    )
+            })
+        })
+
     })
 
     const ctx = {
