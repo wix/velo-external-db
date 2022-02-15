@@ -24,6 +24,8 @@ const givenValidGetByIdForDefaultFieldsFor = (itemId) =>
 
 const reset = () => {
     queryValidator.validateFilter.mockClear()
+    queryValidator.validateAggregation.mockClear()
+    queryValidator.validateGetById.mockClear()
 }
 
 module.exports = {
