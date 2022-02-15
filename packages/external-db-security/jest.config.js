@@ -5,5 +5,4 @@ module.exports = {
     preset: 'ts-jest',
     testRegex: '(.*\\.spec\\.)js$',
     testEnvironment: 'node',
-    setupFilesAfterEnv: ['jest-extended/all'],
 }
