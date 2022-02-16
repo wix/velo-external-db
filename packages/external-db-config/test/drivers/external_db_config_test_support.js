@@ -14,13 +14,22 @@ const authConfigReader = {
     validate: jest.fn(),
 }
 
+const authorizationConfigReader = {
+    readConfig: jest.fn(),
+    validate: jest.fn(),
+}
+
 const givenConfig = (config) =>
     when(configReader.readConfig).calledWith()
                                  .mockResolvedValue(config)
 
 const givenAuthConfig = (config) =>
     when(authConfigReader.readConfig).calledWith()
-                                 .mockResolvedValue(config)
+                                     .mockResolvedValue(config)
+
+const givenAuthorizationConfig = (config) => 
+    when(authorizationConfigReader.readConfig).calledWith()
+                                              .mockResolvedValue(config)
 
 const givenValidConfig = () =>
     when(configReader.validate).calledWith()
@@ -63,11 +72,13 @@ const reset = () => {
     authConfigReader.validate.mockClear()
 
     commonConfigReader.validate.mockClear()
+
+    authorizationConfigReader.readConfig.mockClear()
 }
 
-module.exports = { configReader, commonConfigReader, authConfigReader, reset,
+module.exports = { configReader, commonConfigReader, authConfigReader, authorizationConfigReader, reset,
                    givenValidCommonConfig, 
                    givenValidAuthConfig, givenAuthConfig, givenInvalidAuthConfigWith,
                    givenConfig, givenValidConfig, givenInvalidConfigWith, givenInvalidCommonConfigWith,
-                   givenInvalidCloudVendor, givenInvalidDBType
+                   givenInvalidCloudVendor, givenInvalidDBType, givenAuthorizationConfig
 }

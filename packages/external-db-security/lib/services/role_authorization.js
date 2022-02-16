@@ -3,7 +3,7 @@ const DefaultPolicies = ['OWNER', 'BACKEND_CODE']
 
 class RoleAuthorizationService {
     constructor(config) {
-        this.config = config
+        this.config = config || []
     }
 
     authorizeRead(collectionName, role) {

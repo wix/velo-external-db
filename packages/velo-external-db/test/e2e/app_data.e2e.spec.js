@@ -3,6 +3,7 @@ const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
 const { authAdmin, authOwner, authVisitor } = require('../drivers/auth_test_support')
+const authorization = require ('../drivers/authorization_test_support')
 const Chance = require('chance')
 const each = require('jest-each').default
 const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
@@ -25,14 +26,14 @@ describe('Velo External DB Data REST API',  () => {
             await dbTeardown()
         }, 20000)
 
-        if (shouldNotRunOn(['DynamoDb'], name)) {
+        if (shouldNotRunOn(['DynamoDb', 'Google-sheet'], name)) { //todo: create another test without sort for these implementations
             test('find api', async() => {
-                const items = name === 'Google-sheet' ? [ ctx.item, ctx.anotherItem ] : [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1)
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-                await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authAdmin) ).resolves.toEqual(
+                await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
+                await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authVisitor) ).resolves.toEqual(
                     expect.objectContaining({ data: {
-                            items,
+                            items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
                             totalCount: 2
                         } }))
             })
@@ -158,11 +159,7 @@ describe('Velo External DB Data REST API',  () => {
                 await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
             })
         }
-        each(['data/find', 'data/aggregate', 'data/insert', 'data/insert/bulk', 'data/get', 'data/update',
-             'data/update/bulk', 'data/remove', 'data/remove/bulk', 'data/count'])
-        .test('should throw 401 on a request to %s without the appropriate role', async(api) => {
-            return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
-        })
+
     })
 
 

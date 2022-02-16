@@ -1,6 +1,7 @@
 const ConfigReader = require('./service/config_reader')
 const CommonConfigReader = require('./readers/common_config_reader')
 const StubConfigReader = require('./readers/stub_config_reader')
+const AuthorizationConfigReader = require ('./readers/authorization_config_reader')
 const aws = require('./readers/aws_config_reader')
 const gcp = require('./readers/gcp_config_reader')
 const azure = require('./readers/azure_config_reader')
@@ -86,7 +87,7 @@ const create = () => {
     break
   }
 
-  return new ConfigReader(internalConfigReader || new StubConfigReader, common)
+  return new ConfigReader(internalConfigReader || new StubConfigReader, common, new AuthorizationConfigReader())
 }
 
 module.exports = { create }
