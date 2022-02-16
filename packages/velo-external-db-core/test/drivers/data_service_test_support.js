@@ -1,4 +1,5 @@
 const { when } = require('jest-when')
+const { SystemFields } = require('velo-external-db-commons')
 
 const dataService = {
     find: jest.fn(),
@@ -14,6 +15,8 @@ const dataService = {
     bulkDelete: jest.fn()
 }
 
+const systemFields = SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) )
+
 const givenListResult = (entities, totalCount, forCollectionName, filter, sort, skip, limit, projection) => 
     when(dataService.find).calledWith(forCollectionName, filter, sort, skip, limit, projection)
                           .mockResolvedValue( { items: entities, totalCount } )
@@ -27,11 +30,11 @@ const givenGetByIdResult = (item, forCollectionName, itemId, projection) =>
                              .mockResolvedValue({ item })
 
 const givenInsertResult = (item, forCollectionName) =>
-    when(dataService.insert).calledWith(forCollectionName, item)
+    when(dataService.insert).calledWith(forCollectionName, item, systemFields)
                              .mockResolvedValue({ item })
 
 const givenBulkInsertResult = (items, forCollectionName) =>
-    when(dataService.bulkInsert).calledWith(forCollectionName, items)
+    when(dataService.bulkInsert).calledWith(forCollectionName, items, systemFields)
                              .mockResolvedValue({ items: items })
 
 const givenUpdateResult = (item, forCollectionName) => 
