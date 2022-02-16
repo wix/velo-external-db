@@ -14,9 +14,16 @@ class DataProvider {
         return queryable ? await this.docClient.query(command) : await this.docClient.scan(command)
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, projection) {
         const { filterExpr, queryable } = this.filterParser.transform(filter)
-        const { Items } = await this.query(dynamoRequests.findCommand(collectionName, filterExpr, limit), queryable)
+        const { projectionExpr, projectionAttributeNames } = this.filterParser.selectFieldsFor(projection)
+
+        const expressionAttributeNames = { ...filterExpr.ExpressionAttributeNames, ...projectionAttributeNames }
+
+        const filterExprWithProjection = { ...filterExpr, ProjectionExpression: projectionExpr, ExpressionAttributeNames: expressionAttributeNames }
+
+        const { Items } = await this.query(dynamoRequests.findCommand(collectionName, filterExprWithProjection, limit), queryable)
+
         return Items.map(patchFixDates)
     }
     

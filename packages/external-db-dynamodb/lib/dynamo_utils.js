@@ -42,4 +42,6 @@ const canQuery = (filterExpr, collectionKeys) => {
     return filterAttributes.every(v => collectionKeys.includes(v))
 }
 
-module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates, reformatFields, patchCollectionKeys, canQuery }
+const isEmptyObject = obj => Object.keys(obj).length === 0
+
+module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates, reformatFields, patchCollectionKeys, canQuery, isEmptyObject }

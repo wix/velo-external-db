@@ -12,7 +12,7 @@ class FilterParser {
         
         const results = this.parseFilter(filter)
         if (results.length === 0) {
-            return { EMPTY_FILTER, queryable: false }
+            return { ...EMPTY_FILTER, queryable: false }
         }
 
         const { filterExpr, queryable } = this.filterExprToQueryIfPossible(results[0].filterExpr, fields)
@@ -178,6 +178,13 @@ class FilterParser {
         return filterAttributes.every(v => collectionKeys.includes(v))
     }
 
+    selectFieldsFor(projection) { 
+        const projectionExpr = projection.map(f => `#${f}`).join(', ')
+        const projectionAttributeNames = projection.reduce((pV, cV) => (
+            { ...pV, [`#${cV}`]: cV }
+        ), {})
+        return { projectionExpr, projectionAttributeNames }
+    }
 }
 
 module.exports = FilterParser

@@ -6,6 +6,7 @@ const filterParser = {
     parseFilter: jest.fn(),
     orderBy: jest.fn(),
     parseAggregation: jest.fn(),
+    selectFieldsFor: jest.fn(),
 }
 
 const stubEmptyFilterAndSortFor = (filter, sort) => {
@@ -37,6 +38,26 @@ const givenFilterByIdWith = (id, filter) => {
                             })
 }
 
+const givenAllFieldsProjectionFor = (projection) => 
+    when(filterParser.selectFieldsFor).calledWith(projection)
+                                      .mockReturnValue(
+                                          {
+                                              projectionExpr: '',
+                                              projectionAttributeNames: {}
+                                          }
+                                      )
+
+const givenProjectionExprFor = (projection) => 
+    when(filterParser.selectFieldsFor).calledWith(projection)
+                                      .mockReturnValue(
+                                            {
+                                                projectionExpr: projection.map(f => `#${f}`).join(', '),
+                                                projectionAttributeNames: projection.reduce((pV, cV) => (
+                                                    { ...pV, [`#${cV}`]: cV }
+                                                ), {})
+                                            }
+                                        )
+
 // eslint-disable-next-line no-unused-vars
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {}
 
@@ -45,8 +66,10 @@ const reset = () => {
     filterParser.orderBy.mockClear()
     filterParser.parseAggregation.mockClear()
     filterParser.parseFilter.mockClear()
+    filterParser.selectFieldsFor.mockClear()
 }
 
 module.exports = { stubEmptyFilterAndSortFor, stubEmptyOrderByFor, stubEmptyFilterFor,
-                   givenFilterByIdWith, filterParser, reset, givenAggregateQueryWith
+                   givenFilterByIdWith, filterParser, reset, givenAggregateQueryWith,
+                   givenAllFieldsProjectionFor, givenProjectionExprFor
 }
