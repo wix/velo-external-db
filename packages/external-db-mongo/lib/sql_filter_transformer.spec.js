@@ -226,6 +226,24 @@ describe('Sql Parser', () => {
             })
         })
 
+        describe('transform projection', () => {
+            test('projection handle single field projection', () => {
+                expect(env.filterParser.selectFieldsFor([ctx.fieldName])).toEqual({ [ctx.fieldName]: 1, _id: 0 })
+            })
+
+            test('projection handle projection with _id', () => {
+                expect(env.filterParser.selectFieldsFor([ctx.fieldName, '_id'])).toEqual({ [ctx.fieldName]: 1, _id: 1 })
+            })
+            
+            test('projection handle multiple field projection', () => {
+                expect(env.filterParser.selectFieldsFor([ctx.fieldName, ctx.anotherFieldName])).toEqual(
+                        { [ctx.fieldName]: 1, [ctx.anotherFieldName]: 1, _id: 0 }
+                    )
+            })
+
+
+        })
+
         describe('aggregation functions', () => {
 
             describe('transform select fields', () => {

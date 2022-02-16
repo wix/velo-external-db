@@ -6,13 +6,15 @@ class DataProvider {
         this.filterParser = filterParser
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, projection) {
         validateTable(collectionName)
         const { filterExpr } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
+        const projectionExpr = this.filterParser.selectFieldsFor(projection)
         return await this.client.db()
                                 .collection(collectionName)
                                 .find(filterExpr, { ...sortExpr, skip, limit } )
+                                .project(projectionExpr)
                                 .toArray()
     }
 

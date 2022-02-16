@@ -60,6 +60,7 @@ const reset = () => {
     filterParser.orderBy.mockClear()
     filterParser.parseAggregation.mockClear()
     filterParser.parseFilter.mockClear()
+    filterParser.selectFieldsFor.mockClear()
 }
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor, stubEmptyFilterFor, 

@@ -148,6 +148,12 @@ class FilterParser {
         }
     }
 
+    selectFieldsFor(projection) {
+        return projection.reduce((pV, cV) => (
+            { ...pV, [cV]: 1 }
+        ), { _id: 0 })
+    }
+
 }
 
 module.exports = FilterParser
