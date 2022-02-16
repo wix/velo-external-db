@@ -155,6 +155,10 @@ class FilterParser {
 
     }
 
+    selectFieldsFor(projection) {
+        return projection
+    }
+
 }
 
 module.exports = FilterParser

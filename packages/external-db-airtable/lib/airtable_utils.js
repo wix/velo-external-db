@@ -1,9 +1,7 @@
-
 const minifyAndFixDates = record => {
-    const fields = record.fields
-    if (fields._createdDate && typeof fields._createdDate === 'string') fields._createdDate = new Date(fields._createdDate)
-    if (fields._updatedDate && typeof fields._updatedDate === 'string') fields._updatedDate = new Date(fields._updatedDate)
-    return fields
+    if (record._createdDate && typeof record._createdDate === 'string') record._createdDate = new Date(record._createdDate)
+    if (record._updatedDate && typeof record._updatedDate === 'string') record._updatedDate = new Date(record._updatedDate)
+    return record
 }
 const DEFAULT_MAX_RECORDS = 100
 

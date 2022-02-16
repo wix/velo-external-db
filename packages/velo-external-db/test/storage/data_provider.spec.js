@@ -1,4 +1,4 @@
-const { Uninitialized, gen, shouldNotRunOn, shouldRunOnlyOn } = require('test-commons')
+const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
@@ -56,7 +56,7 @@ describe('Data API', () => {
             })
         }
 
-        if(shouldRunOnlyOn(['Postgres', 'Mongo', 'Mysql', 'Mssql', 'Spanner', 'BigQuery', 'DynamoDb'], name)) {
+        if(shouldNotRunOn(['Firestore', 'Google-Sheet'], name)) {
             test('search with projection will return the specified fields', async() => {
                 const projection = ['_owner']
                 await givenCollectionWith(ctx.entities, ctx.collectionName)
