@@ -7,11 +7,12 @@ class DataProvider {
     }
 
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, projection) {
         const filterByFormula = this.filterToFilterByFormula(filter)
         const limitExpr = limit ? { maxRecords: limit } : {}
         const sortExpr = this.filterParser.orderBy(sort)
-        const result = await this.query({ collectionName, filterByFormula, limitExpr, sortExpr, skip })
+        const projectionExpr = this.filterParser.selectFieldsFor(projection)
+        const result = await this.query({ collectionName, filterByFormula, projection: projectionExpr, limitExpr, sortExpr, skip })
         return result.map(minifyAndFixDates)
     }
 
@@ -56,7 +57,7 @@ class DataProvider {
     }
 
 
-    async query({ collectionName, filterByFormula, limitExpr, sortExpr, idsOnly, skip }) {
+    async query({ collectionName, filterByFormula, limitExpr, sortExpr, idsOnly, skip, projection }) {
         const resultsByPages = []
         
         const limit = limitExpr?.maxRecords ? limitExpr : { maxRecords: DEFAULT_MAX_RECORDS }
@@ -64,11 +65,19 @@ class DataProvider {
 
         const sort = EMPTY_SORT
         if (sortExpr && sortExpr.sort) Object.assign (sort, sortExpr)
-
         await this.base(collectionName)
                   .select({ ...filterByFormula, ...limitExpr, ...sort })
                   .eachPage((records, fetchNextPage) => {
-                      const recordsToReturn = idsOnly ? records.map(record => record.id) : records 
+                    let recordsToReturn
+                    if (idsOnly) recordsToReturn = records.map(record => record.id)
+                    else { 
+                        recordsToReturn = projection ? records.map(record => {
+                                  return projection.reduce((pV, cV) => (
+                                      { ...pV, [cV]: record.fields[cV] }
+                                  ), {})
+                        }): records.map(record => record.fields)
+                    }
+
                       resultsByPages.push(recordsToReturn)
                       fetchNextPage()
                   })

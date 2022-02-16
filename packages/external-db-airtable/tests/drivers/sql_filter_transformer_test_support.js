@@ -7,6 +7,7 @@ const filterParser = {
     parseFilter: jest.fn(),
     orderBy: jest.fn(),
     parseAggregation: jest.fn(),
+    selectFieldsFor: jest.fn()
 }
 
 const stubEmptyFilterAndSortFor = (filter, sort) => {
@@ -36,6 +37,15 @@ const givenFilterByIdWith = (id, filter) => {
                                 .mockReturnValue({ filterExpr: `_id = "${id}"` })
 }
 
+const givenAllFieldsProjectionFor = (projection) => 
+    when(filterParser.selectFieldsFor).calledWith(projection)
+                                      .mockReturnValue()
+
+const givenProjectionExprFor = (projection) => 
+    when(filterParser.selectFieldsFor).calledWith(projection)
+                                      .mockReturnValue(projection)
+
+
 
 
 const reset = () => {
@@ -43,8 +53,8 @@ const reset = () => {
     filterParser.orderBy.mockClear()
     filterParser.parseAggregation.mockClear()
     filterParser.parseFilter.mockClear()
+    filterParser.selectFieldsFor.mockClear()
 }
 
-module.exports = { stubEmptyOrderByFor, stubEmptyFilterFor, givenFilterByIdWith, givenOrderByFor, stubEmptyFilterAndSortFor,
-    
-     filterParser, reset }
+module.exports = { stubEmptyOrderByFor, stubEmptyFilterFor, givenFilterByIdWith, givenOrderByFor, stubEmptyFilterAndSortFor
+                    , givenAllFieldsProjectionFor, givenProjectionExprFor, filterParser, reset }
