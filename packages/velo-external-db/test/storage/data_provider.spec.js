@@ -56,7 +56,7 @@ describe('Data API', () => {
             })
         }
 
-        if(shouldRunOnlyOn(['Postgres', 'Mongo'], name)) {
+        if(shouldRunOnlyOn(['Postgres', 'Mongo', 'Mysql'], name)) {
             test('search with projection will return the specified fields', async() => {
                 const projection = ['_owner']
                 await givenCollectionWith(ctx.entities, ctx.collectionName)

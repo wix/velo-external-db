@@ -210,6 +210,10 @@ class FilterParser {
                 throw new InvalidQuery(`Unrecognized function ${f}`)
         }
     }
+
+    selectFieldsFor(projection) {
+        return projection.map(escapeId).join(', ')
+    }
 }
 
 module.exports = FilterParser
