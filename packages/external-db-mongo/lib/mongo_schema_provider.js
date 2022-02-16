@@ -73,7 +73,7 @@ class SchemaProvider {
         await this.client.db()
                          .collection(SystemTable)
                          .updateOne({ _id: collectionName },
-                                    { $set: { fields: [...fields, column] } })
+                                    { $addToSet: { fields: column } })
     }
 
     async removeColumn(collectionName, columnName) {
@@ -93,7 +93,7 @@ class SchemaProvider {
         await this.client.db()
                          .collection(SystemTable)
                          .updateOne({ _id: collectionName },
-                                    { $set: { fields: fields.filter(f => f.name !== columnName) } })
+                                    { $pull: { fields: { name: { $eq: columnName } } } } )
     }
 
     async describeCollection(collectionName) {
