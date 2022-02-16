@@ -4,7 +4,7 @@ const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
-const { escapeIdentifier: escapeId } = require('./bigquery_utils')
+const { escapeIdentifier: escapeId, escapeIdentifier } = require('./bigquery_utils')
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -224,6 +224,18 @@ describe('Sql Parser', () => {
                     filterExpr: `NOT (${env.filterParser.parseFilter(ctx.filter)[0].filterExpr})`,
                     parameters: env.filterParser.parseFilter(ctx.filter)[0].parameters
                 }])
+            })
+        })
+
+        describe('transform projection', () => {
+            test('projection handle single field projection', () => {
+                expect(env.filterParser.selectFieldsFor([ctx.fieldName])).toEqual(`${escapeIdentifier(ctx.fieldName)}`)
+            })
+
+            test('projection handle multiple field projection', () => {
+                expect(env.filterParser.selectFieldsFor([ctx.fieldName, ctx.anotherFieldName])).toEqual(
+                    `${escapeIdentifier(ctx.fieldName)}, ${escapeIdentifier(ctx.anotherFieldName)}`
+                    )
             })
         })
 
