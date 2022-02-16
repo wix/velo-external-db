@@ -8,12 +8,13 @@ class DataProvider {
         this.sql = pool
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, projection) {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
         const pagingQueryStr = this.pagingQueryFor(skip, limit)
+        const projectionExpr = this.filterParser.selectFieldsFor(projection)
 
-        const sql = `SELECT * FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} ${pagingQueryStr}`
+        const sql = `SELECT ${projectionExpr} FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} ${pagingQueryStr}`
 
         return await this.query(sql, parameters)
     }
