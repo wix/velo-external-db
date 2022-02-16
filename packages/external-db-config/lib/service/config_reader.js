@@ -1,7 +1,6 @@
 class ConfigReader {
-  constructor(externalConfigReader, commonConfigReader, externalAuthConfigReader) {
+  constructor(externalConfigReader, commonConfigReader) {
     this.externalConfigReader = externalConfigReader
-    this.externalAuthConfigReader = externalAuthConfigReader
     this.commonConfigReader = commonConfigReader
   }
 
