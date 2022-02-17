@@ -61,14 +61,18 @@ const randomDbField = () => ( { field: chance.word(), type: randomWixDataType(),
 
 const randomDbFields = () => randomArrayOf( randomDbField )
 
-const fieldsArrayToFieldObj = fields => fields.reduce((pV, cV) => ({
-        ...pV, ...{ [cV.name]: { 
-        displayName: cV.name,
-        type: cV.type,
-        subtype: cV.subtype,
-        isPrimary: cV.isPrimary
-        } }
-}), {})
+const fieldsArrayToFieldObj = fields => {
+    const { SystemFields } = require('velo-external-db-commons')
+    const systemFields = SystemFields.map(({ name, type, subtype, isPrimary }) => ({ field: name, type, subtype, isPrimary }) )
+    return fields.reduce((pV, cV) => 
+        [...pV, { 
+            field: cV.name,
+            type: cV.type,
+            subtype: cV.subtype,
+            isPrimary: cV.isPrimary
+            } ]
+    , systemFields )
+}
 
 const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 const randomNumberColumns = () => {
