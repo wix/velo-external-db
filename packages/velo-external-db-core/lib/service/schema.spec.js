@@ -4,7 +4,7 @@ const { AllSchemaOperations, errors } = require('velo-external-db-commons')
 const { Uninitialized, gen } = require('test-commons')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
-const matchers = require('./schema_matchers')
+const matchers = require('../../test/drivers/schema_matchers')
 const { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor  } = matchers
 const chance = Chance()
 

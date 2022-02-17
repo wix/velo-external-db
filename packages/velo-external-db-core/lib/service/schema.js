@@ -1,5 +1,6 @@
 const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, SchemaOperations, errors } = require('velo-external-db-commons')
 const { CREATE, ADD_COLUMN, REMOVE_COLUMN } = SchemaOperations
+
 class SchemaService {
     constructor(storage, schemaInformation) {
         this.storage = storage
