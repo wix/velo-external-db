@@ -8,9 +8,11 @@ const maskSensitiveData = (cfg) => {
 const appInfoFor = async(operationService, configReaderClient) => {
     const connectionStatus = await operationService.connectionStatus()
     const config = await configReaderClient.readConfig()
-    const { message: configReaderStatus } = await configReaderClient.configStatus()
+    const { message: configReaderStatus, authorizationMessage: authorizationConfigStatus } = await configReaderClient.configStatus()
+    
     return {
-        configReaderStatus,
+        configReaderStatus: configReaderStatus,
+        authorizationConfigStatus, 
         config: maskSensitiveData(config),
         dbConnectionStatus: connectionStatus.error || connectionStatus.status 
     }
