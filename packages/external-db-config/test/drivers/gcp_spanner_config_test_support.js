@@ -15,6 +15,9 @@ const defineValidConfig = (config) => {
     if (config.secretKey) {
         process.env.SECRET_KEY = config.secretKey
     }
+    if (config.roleConfig) {
+        process.env.ROLE_CONFIG = config.roleConfig
+    }
     if (config.auth?.callbackUrl) {
         process.env.callbackUrl = config.auth.callbackUrl
     }
@@ -33,6 +36,19 @@ const validConfig = () => ({
     secretKey: chance.word(),
 })
 
+const validConfigWithAuthorization = () => ({
+    ...validConfig(),
+    roleConfig: {
+        collectionLevelConfig: [
+            {
+                id: chance.word(),
+                readPolicies: ['OWNER'],
+                writePolicies: ['BACKEND_CODE'],
+            }
+        ]
+    }
+})
+
 const validConfigWithAuthConfig = () => ({
     ...validConfig(),
     auth: {
@@ -42,6 +58,8 @@ const validConfigWithAuthConfig = () => ({
     }  
 })
 
+
+
 const defineInvalidConfig = () => defineValidConfig({})
 
 const ExpectedProperties = ['PROJECT_ID', 'INSTANCE_ID', 'DATABASE_ID', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret']
@@ -50,6 +68,7 @@ const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 
 module.exports = {
     defineValidConfig,
+    validConfigWithAuthorization,
     validConfigWithAuthConfig,
     defineInvalidConfig,
     validConfig,

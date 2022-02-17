@@ -11,7 +11,6 @@ class AuthorizationConfigReader {
   async readConfig() {
     const { ROLE_CONFIG } = process.env
     const { collectionLevelConfig } = isJson(ROLE_CONFIG) ? JSON.parse(ROLE_CONFIG) : EMPTY_ROLE_CONFIG
-
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
 
@@ -21,7 +20,6 @@ class AuthorizationConfigReader {
     const valid = isJson(ROLE_CONFIG) && this.configValidator(JSON.parse(ROLE_CONFIG))
     let message 
     
-    console.log(this.configValidator.errors)
 
     if (checkRequiredKeys(process.env, ['ROLE_CONFIG']).length)  
       message = 'Role config is not defined, using default'

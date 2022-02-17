@@ -18,6 +18,9 @@ const defineValidConfig = (config) => {
     if (config.secretKey) {
         process.env.SECRET_KEY = config.secretKey
     }
+    if (config.authorization) {
+        process.env.ROLE_CONFIG = JSON.stringify({ collectionLevelConfig: config.authorization })
+    }
     if (config.auth?.callbackUrl) {
         process.env.callbackUrl = config.auth.callbackUrl
     }
@@ -37,6 +40,21 @@ const validConfig = () => ({
     secretKey: chance.word(),
 })
 
+const validConfigWithAuthorization = () => ({
+    ...validConfig(),
+    authorization: validAuthorizationConfig.collectionLevelConfig 
+})
+
+const validAuthorizationConfig = {
+    collectionLevelConfig: [
+        {
+            id: chance.word(),
+            readPolicies: ['OWNER'],
+            writePolicies: ['BACKEND_CODE'],
+        }
+    ]
+}
+
 const validConfigWithAuthConfig = () => ({
     ...validConfig(),
     auth: {
@@ -46,7 +64,7 @@ const validConfigWithAuthConfig = () => ({
     }  
 })
 
-const ExpectedProperties = ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret']
+const ExpectedProperties = ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'ROLE_CONFIG']
 
 const defineInvalidConfig = () => defineValidConfig({})
 
@@ -58,6 +76,7 @@ const reset = () => {
 module.exports = {
     defineValidConfig,
     validConfigWithAuthConfig,
+    validConfigWithAuthorization,
     defineInvalidConfig,
     ExpectedProperties,
     validConfig,

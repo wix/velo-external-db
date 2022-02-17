@@ -14,7 +14,7 @@ class ConfigReader {
   async configStatus() {
     const { missingRequiredSecretsKeys } = await this.externalConfigReader.validate()
     const { missingRequiredSecretsKeys: missingRequiredEnvs, validType, validVendor } = this.commonConfigReader.validate()  
-    const { valid: validAuthorization, message: authorizationMessage  } = this.authorizationConfig.validate()
+    const { valid: validAuthorization, message: authorizationMessage  } = await this.authorizationConfig.validate()
 
     const validConfig = missingRequiredSecretsKeys.length === 0 && missingRequiredEnvs.length === 0 && validType && validVendor
     
