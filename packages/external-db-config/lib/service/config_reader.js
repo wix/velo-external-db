@@ -13,13 +13,14 @@ class ConfigReader {
 
   async configStatus() {
     const { missingRequiredSecretsKeys } = await this.externalConfigReader.validate()
-    const { missingRequiredSecretsKeys: missingRequiredEnvs, validType, validVendor } = this.commonConfigReader.validate()
+    const { missingRequiredSecretsKeys: missingRequiredEnvs, validType, validVendor } = this.commonConfigReader.validate()  
+    const { valid: validAuthorization, message: authorizationMessage  } = this.authorizationConfig.validate()
 
     const validConfig = missingRequiredSecretsKeys.length === 0 && missingRequiredEnvs.length === 0 && validType && validVendor
     
   
     let message 
-    if (missingRequiredSecretsKeys.length > 0 || missingRequiredEnvs.length > 0)
+    if (missingRequiredSecretsKeys.length || missingRequiredEnvs.length )
       message = `Missing props: ${[...missingRequiredSecretsKeys, ...missingRequiredEnvs].join(', ')}`
     
     else if (!validVendor)
@@ -31,7 +32,7 @@ class ConfigReader {
     else 
       message = 'External DB Config read successfully'
 
-    return { validConfig, message }
+    return { validConfig, message, validAuthorization, authorizationMessage }
   
   }
 }

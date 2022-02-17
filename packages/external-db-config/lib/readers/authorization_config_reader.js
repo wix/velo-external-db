@@ -17,12 +17,22 @@ class AuthorizationConfigReader {
 
   validate() {
     const { ROLE_CONFIG } = process.env
+    
+    const valid = isJson(ROLE_CONFIG) && this.configValidator(JSON.parse(ROLE_CONFIG))
+    let message 
+    
+    console.log(this.configValidator.errors)
 
-    return {
-      valid: isJson(ROLE_CONFIG) && this.configValidator(JSON.parse(ROLE_CONFIG)),
-      message: this.configValidator.errors ? this.configValidator.errors.map(e => e.message).join(', ') : 'Authorization config is valid',
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['ROLE_CONFIG'])
-    }
+    if (checkRequiredKeys(process.env, ['ROLE_CONFIG']).length)  
+      message = 'Role config is not defined, using default'
+    else if (!isJson(ROLE_CONFIG)) 
+      message = 'Role config is not valid JSON'
+    else if (!valid)
+      message = this.configValidator.errors.map(err => (`Error in ${err.instancePath}: ${err.message}`)).join(', ')
+    else 
+      message = 'Authorization Config read successfully'
+
+    return { valid, message }
   }
 }
 
