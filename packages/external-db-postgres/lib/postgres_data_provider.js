@@ -25,13 +25,11 @@ class DataProvider {
     }
 
     async insert(collectionName, items, fields) {
-
-        const n = fields.length
         const escapedFieldsNames = fields.map( f => escapeIdentifier(f.field)).join(', ')
         const res = await Promise.all(
             items.map(async item => {
                 const data = asParamArrays( patchDateTime(item) )
-                const res = await this.pool.query(`INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES (${prepareStatementVariables(n)})`, data)
+                const res = await this.pool.query(`INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES (${prepareStatementVariables(fields.length)})`, data)
                                .catch( translateErrorCodes )
                 return res.rowCount
             } ) )
