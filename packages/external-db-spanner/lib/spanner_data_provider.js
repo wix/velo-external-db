@@ -37,14 +37,14 @@ class DataProvider {
         return objs[0].num
     }
 
-    async insert(collectionName, items, _fields) {
-            const floatFields = extractFloatFields(_fields || [])
-            await this.database.table(collectionName)
-                               .insert(
-                                   (items.map(item => patchFloat(item, floatFields)))
-                                         .map(this.asDBEntity.bind(this))
-                               )
-            return items.length
+    async insert(collectionName, items, fields) {
+        const floatFields = extractFloatFields(fields)
+        await this.database.table(collectionName)
+                            .insert(
+                                (items.map(item => patchFloat(item, floatFields)))
+                                        .map(this.asDBEntity.bind(this))
+                            )
+        return items.length
     }
 
     asDBEntity(item) {
