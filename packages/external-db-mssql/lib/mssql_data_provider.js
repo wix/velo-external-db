@@ -30,15 +30,16 @@ class DataProvider {
     patch(item) {
         return Object.entries(item).reduce((o, [k, v]) => ( { ...o, [patchFieldName(k)]: v } ), {})
     }
-
-    async insert(collectionName, items) {
-        const rss = await Promise.all(items.map(item => this.insertSingle(collectionName, item)))
+    
+    async insert(collectionName, items, fields) {
+        const fieldsNames = fields.map(f => f.field)
+        const rss = await Promise.all(items.map(item => this.insertSingle(collectionName, item, fieldsNames)))
 
         return rss.reduce((s, rs) => s + rs, 0)
     }
 
-    insertSingle(collectionName, item) {
-        const sql = `INSERT INTO ${escapeTable(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES (${Object.keys(item).map( validateLiteral ).join(', ')})`
+    insertSingle(collectionName, item, fieldsNames) {
+        const sql = `INSERT INTO ${escapeTable(collectionName)} (${fieldsNames.map( escapeId ).join(', ')}) VALUES (${Object.keys(item).map( validateLiteral ).join(', ')})`
         return this.query(sql, this.patch(item), true)
     }
 
