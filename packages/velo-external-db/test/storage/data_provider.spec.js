@@ -242,7 +242,7 @@ describe('Data API', () => {
             ctx.entities = gen.randomDbEntities([ctx.column.name])
             ctx.modifiedEntities = ctx.entities.map(e => ( { ...e, [ctx.column.name]: chance.word() } ))
             ctx.numberEntity = gen.randomNumberDbEntity(ctx.numericColumns)
-            ctx.numberEntityFields = gen.fieldsArrayToFieldObj(ctx.numericColumns)
+            ctx.numberEntityFields = gen.systemFieldsWith(ctx.numericColumns)
             ctx.anotherNumberEntity = gen.randomNumberDbEntity(ctx.numericColumns)
 
             await env.schemaProvider.create(ctx.collectionName, [ctx.column])
