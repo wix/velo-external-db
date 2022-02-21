@@ -30,9 +30,9 @@ class DataProvider {
         return resultset[0]['num']
     }
 
-    async insert(collectionName, items) {
-        const item = items[0]
-        const sql = `INSERT INTO ${escapeTable(collectionName)} (${Object.keys(item).map( escapeId ).join(', ')}) VALUES ?`
+    async insert(collectionName, items, fields) {
+        const escapedFieldsNames = fields.map( f => escapeId(f.field)).join(', ')
+        const sql = `INSERT INTO ${escapeTable(collectionName)} (${escapedFieldsNames}) VALUES ?`
         
         const data = items.map(item => asParamArrays( patchDateTime(item) ) )
         const resultset = await this.query(sql, [data])

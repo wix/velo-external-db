@@ -27,13 +27,15 @@ class SchemaAwareDataService {
     }
     
     async insert(collectionName, item) {
-        const prepared = await this.prepareItemsForInsert(collectionName, [item])
-        return await this.dataService.insert(collectionName, prepared[0])
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        const prepared = await this.prepareItemsForInsert(fields, [item])
+        return await this.dataService.insert(collectionName, prepared[0], fields)
     }
     
     async bulkInsert(collectionName, items) {
-        const prepared = await this.prepareItemsForInsert(collectionName, items)
-        return await this.dataService.bulkInsert(collectionName, prepared)
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        const prepared = await this.prepareItemsForInsert(fields, items)
+        return await this.dataService.bulkInsert(collectionName, prepared, fields)
     }
     
     async update(collectionName, item) {
@@ -85,9 +87,7 @@ class SchemaAwareDataService {
         return this.itemTransformer.prepareItemsForUpdate(items, fields)
     }
     
-    async prepareItemsForInsert(collectionName, items) {
-        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-
+    async prepareItemsForInsert(fields, items) {
         return this.itemTransformer.prepareItemsForInsert(items, fields)
     }
 

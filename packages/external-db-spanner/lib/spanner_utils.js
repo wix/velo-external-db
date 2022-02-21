@@ -34,13 +34,9 @@ const patchFloat = (item, floatFields) => {
         { ...pV, ...{ [key]: floatFields.includes(key) ? Spanner.float(item[key]) : item[key] } }
     ), {})
 } 
-const extractFloatFields = fields => ( parseFields(fields).filter(f => isFloatSubtype(f.subtype)).map(f => f.name) ) 
+const extractFloatFields = fields => fields.filter(f => isFloatSubtype(f.subtype)).map(f => f.field)
     
 const isFloatSubtype = (subtype) => (['float', 'double', 'decimal'].includes(subtype))
-
-const parseFields = fields => (
-    Object.entries(fields).map(([name, v]) => ({ name, type: v.type, subtype: v.subtype }))
-)
 
 module.exports = { recordSetToObj, escapeId, patchFieldName, unpatchFieldName,
                     testLiteral, validateLiteral, escapeFieldId,

@@ -1,5 +1,5 @@
 const Chance = require('chance')
-const { AllSchemaOperations } = require('velo-external-db-commons')
+const { SystemFields, AllSchemaOperations } = require('velo-external-db-commons')
 const { AdapterOperators } = require('../../velo-external-db-core/node_modules/velo-external-db-commons/lib')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators //TODO: extract
 
@@ -61,14 +61,18 @@ const randomDbField = () => ( { field: chance.word(), type: randomWixDataType(),
 
 const randomDbFields = () => randomArrayOf( randomDbField )
 
-const fieldsArrayToFieldObj = fields => fields.reduce((pV, cV) => ({
-        ...pV, ...{ [cV.name]: { 
-        displayName: cV.name,
-        type: cV.type,
-        subtype: cV.subtype,
-        isPrimary: cV.isPrimary
-        } }
-}), {})
+const systemFieldsWith = fields => {
+    const systemFields = SystemFields.map(({ name, type, subtype, isPrimary }) => ({ field: name, type, subtype, isPrimary }))
+    return fields.reduce((pV, cV) =>
+        [...pV, 
+        {
+            field: cV.name,
+            type: cV.type,
+            subtype: cV.subtype,
+            isPrimary: cV.isPrimary
+        }]
+        , systemFields)
+}
 
 const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 const randomNumberColumns = () => {
@@ -219,7 +223,7 @@ const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'ur
 module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
                    randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
                    randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
-                   fieldsArrayToFieldObj, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter, randomWixType,
+                   systemFieldsWith, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter, randomWixType,
                    invalidOperatorForType, randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn, randomArrayOf,
                    randomElementsFromArray }
 
