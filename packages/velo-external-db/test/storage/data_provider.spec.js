@@ -2,7 +2,7 @@ const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
-const { entitiesWithOwnerFieldOnly } = require ('./data_provider_matchers')
+const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers')
 const chance = new Chance()
 
 describe('Data API', () => {
