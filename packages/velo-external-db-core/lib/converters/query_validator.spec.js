@@ -1,5 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized } = require('test-commons')
+const gen = require('../../test/gen')
 const { EMPTY_FILTER } = require ('../converters/utils')
 const { queryAdapterOperatorsFor } = require ('./query_validator_utils')
 const QueryValidator = require ('./query_validator')

@@ -1,8 +1,9 @@
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized } = require('test-commons')
 const { extractFieldsAndOperators, queryAdapterOperatorsFor } = require ('./query_validator_utils')
 const { AdapterOperators } = require('velo-external-db-commons')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, urlized, and } = AdapterOperators
 const { EMPTY_FILTER } = require('./utils')
+const gen2 = require('../../test/gen')
 const Chance = require('chance')
 const chance = Chance()
 
@@ -78,7 +79,7 @@ describe('Query Validator utils spec', () => {
         ctx.fieldName = chance.word()
         ctx.anotherFieldName = chance.word()
         ctx.value = chance.word()
-        ctx.operator = gen.randomOperator()
-        ctx.anotherOperator = gen.randomOperator()
+        ctx.operator = gen2.randomOperator()
+        ctx.anotherOperator = gen2.randomOperator()
     })
 })

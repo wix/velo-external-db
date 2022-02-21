@@ -1,4 +1,5 @@
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized } = require('test-commons')
+const gen2 = require('../../test/gen')
 const FilterTransformer = require('./filter_transformer')
 const { EMPTY_FILTER } = require('./utils')
 const Chance = require('chance')
@@ -145,11 +146,12 @@ describe('Filter Transformer', () => {
     }
 
     beforeEach(() => {
-        ctx.filter = gen.randomFilter()
-        ctx.anotherFilter = gen.randomFilter()
+        ctx.filter = gen2.randomFilter()
+        ctx.anotherFilter = gen2.randomFilter()
         ctx.fieldName = chance.word()
         ctx.fieldValue = chance.word()
-        ctx.operator = gen.randomOperator()
+        ctx.operator = gen2.randomOperator()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
     })
 })
+

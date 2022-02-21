@@ -5,6 +5,7 @@ const matchers = require('../drivers/schema_api_rest_matchers')
 const { authAdmin, authOwner, authVisitor } = require('../drivers/auth_test_support')
 const authorization = require ('../drivers/authorization_test_support')
 const Chance = require('chance')
+const gen2 = require('../gen')
 const each = require('jest-each').default
 const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
 
@@ -179,15 +180,15 @@ describe('Velo External DB Data REST API',  () => {
     afterAll(async() => await teardownApp())
 
     beforeEach(async() => {
-        ctx.collectionName = gen.randomCollectionName()
-        ctx.column = gen.randomColumn()
-        ctx.numberColumns = gen.randomNumberColumns()
+        ctx.collectionName = gen2.randomCollectionName()
+        ctx.column = gen2. randomColumn()
+        ctx.numberColumns = gen2.randomNumberColumns()
         ctx.item = gen.randomEntity([ctx.column.name])
         ctx.items = Array.from({ length: 10 }, () => gen.randomEntity([ctx.column.name]))
         ctx.modifiedItems = ctx.items.map(i => ( { ...i, [ctx.column.name]: chance.word() } ) )
         ctx.modifiedItem = { ...ctx.item, [ctx.column.name]: chance.word() }
         ctx.anotherItem = gen.randomEntity([ctx.column.name])
-        ctx.numberItem = gen.randomNumberDbEntity(ctx.numberColumns)
-        ctx.anotherNumberItem = gen.randomNumberDbEntity(ctx.numberColumns)
+        ctx.numberItem = gen2.randomNumberDbEntity(ctx.numberColumns)
+        ctx.anotherNumberItem = gen2.randomNumberDbEntity(ctx.numberColumns)
     })
 })
