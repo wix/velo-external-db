@@ -1,5 +1,5 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('velo-external-db-commons').errors
-const { Uninitialized, gen, removeColumnNotIn, addColumnNotIn } = require('test-commons')
+const { Uninitialized, gen, removeColumnNotIn, addColumnNotIn, passTest } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
@@ -90,7 +90,7 @@ describe('Schema API', () => {
         test('add column on a an existing collection', async() => {
 
             if (addColumnNotIn(env.schemaOperations))
-                return expect(true).toBe(true)
+                return passTest()
             
             await env.schemaProvider.create(ctx.collectionName, [])
             await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
@@ -117,7 +117,7 @@ describe('Schema API', () => {
         test('drop column on a an existing collection', async() => {
             
             if (removeColumnNotIn(env.schemaOperations))
-                return expect(true).toBe(true)
+                return passTest()
 
             await env.schemaProvider.create(ctx.collectionName, [])
             await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
@@ -128,15 +128,16 @@ describe('Schema API', () => {
         test('drop column on a a non existing collection', async() => {
             
             if (removeColumnNotIn(env.schemaOperations))
-                return expect(true).toBe(true)
+                return passTest()
 
             await env.schemaProvider.create(ctx.collectionName, [])
             await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
         })
 
         test('drop system column will fail', async() => {
+            
             if (removeColumnNotIn(env.schemaOperations))
-                return expect(true).toBe(true)
+                return passTest()
 
             await env.schemaProvider.create(ctx.collectionName, [])
             SystemFields.map(f => f.name)

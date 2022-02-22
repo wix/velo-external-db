@@ -13,5 +13,7 @@ const removeColumnNotIn = (supportedOperations) => !supportedOperations.includes
 
 const addColumnNotIn = (supportedOperations) => !supportedOperations.includes(ADD_COLUMN)
 
+const passTest = () =>  expect(true).toBe(true)
+
 module.exports = { shouldNotRunOn, shouldRunOnlyOn, sleep, Uninitialized, 
-    removeColumnNotIn, addColumnNotIn }
+    removeColumnNotIn, addColumnNotIn, passTest }
