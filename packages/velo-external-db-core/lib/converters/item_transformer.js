@@ -37,7 +37,7 @@ class ItemTransformer {
                 }
                 return 0  // default for number is 0 
             case 'text':
-                return f.isPrimary ? uuidv4() : ''
+                return f.isPrimary || f.field ==='_id' ? uuidv4() : ''
             case 'datetime':
                 return dateTimeProvider.currentDateTime()
             case 'boolean':
