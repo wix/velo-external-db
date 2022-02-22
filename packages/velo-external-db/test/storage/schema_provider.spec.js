@@ -1,15 +1,15 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('velo-external-db-commons').errors
 const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
-const each = require('jest-each').default
 const Chance = require('chance')
-const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
+const { env, testedSuit, dbTeardown } = require('../resources/provider_resources')
 const { collectionWithDefaultFields, hasSameSchemaFieldsLike } = require('../drivers/schema_provider_matchers')
 const chance = new Chance()
 const { SystemFields } = require('velo-external-db-commons')
 
 
 describe('Schema API', () => {
-    each(testSuits()).describe('%s', (name, setup) => {
+    const [name, setup] = testedSuit()
+    describe(`${name}`, () => {
 
         beforeAll(async() => {
             await setup()

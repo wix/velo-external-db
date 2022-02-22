@@ -1,9 +1,9 @@
 const { DbConnectionError } = require('velo-external-db-commons').errors
-const each = require('jest-each').default
-const { env, testSuits } = require('../resources/operations_resources')
+const { env, testedSuit } = require('../resources/operations_resources')
 
 describe('Check Pool Connection', () => {
-    each(testSuits()).describe('%s', (dbType, setup) => {
+    const [dbType, setup] = testedSuit()
+    describe(`${dbType}`, () => {
 
         beforeAll(async() => {
             setup()

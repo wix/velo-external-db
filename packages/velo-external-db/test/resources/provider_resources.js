@@ -70,17 +70,36 @@ const bigqueryTestEnvInit = async() => await dbInit(bigqueryTestEnv, bigquery)
 const googleSheetTestEnvInit = async() => await dbInit(googleSheetTestEnv, googleSheet)
 
 
-const testSuits = () => [
-    ['MySql', mysqlTestEnvInit],
-    ['Postgres', postgresTestEnvInit],
-    ['Spanner', spannerTestEnvInit],
-    ['Firestore', firestoreTestEnvInit],
-    ['Sql Server', mssqlTestEnvInit],
-    ['Mongo', mongoTestEnvInit],
-    ['Airtable', airTableTestEnvInit],
-    ['DynamoDb', dynamoTestEnvInit],
-    ['BigQuery', bigqueryTestEnvInit],
-    ['Google-Sheet', googleSheetTestEnvInit],
-].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
+// const testSuits = () => [
+//     ['MySql', mysqlTestEnvInit],
+//     ['Postgres', postgresTestEnvInit],
+//     ['Spanner', spannerTestEnvInit],
+//     ['Firestore', firestoreTestEnvInit],
+//     ['Sql Server', mssqlTestEnvInit],
+//     ['Mongo', mongoTestEnvInit],
+//     ['Airtable', airTableTestEnvInit],
+//     ['DynamoDb', dynamoTestEnvInit],
+//     ['BigQuery', bigqueryTestEnvInit],
+//     ['Google-Sheet', googleSheetTestEnvInit],
+// ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
 
-module.exports = { env, dbTeardown, testSuits }
+const testSuits = {
+    mysql: ['MySql', mysqlTestEnvInit],
+    postgres: ['Postgres', postgresTestEnvInit],
+    spanner: ['Spanner', spannerTestEnvInit],
+    firestore: ['Firestore', firestoreTestEnvInit],
+    mssql: ['Sql Server', mssqlTestEnvInit],
+    mongo: ['Mongo', mongoTestEnvInit],
+    airtable: ['Airtable', airTableTestEnvInit],
+    dynamodb: ['DynamoDb', dynamoTestEnvInit],
+    bigquery: ['BigQuery', bigqueryTestEnvInit],
+    'google-sheet': ['Google-Sheet', googleSheetTestEnvInit],
+}
+
+const testedSuit = () => {
+    console.log('testedSuit', testSuits[process.env.TEST_ENGINE])
+
+    return testSuits[process.env.TEST_ENGINE]
+}
+
+module.exports = { env, dbTeardown, testedSuit }

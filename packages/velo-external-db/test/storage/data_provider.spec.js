@@ -1,13 +1,12 @@
 const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
-const each = require('jest-each').default
 const Chance = require('chance')
-const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
+const { env, dbTeardown, testedSuit } = require('../resources/provider_resources')
 const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers')
 const chance = new Chance()
 
 describe('Data API', () => {
-
-    each(testSuits()).describe('%s', (name, setup) => {
+    const [name, setup] = testedSuit()
+    describe(`${name}`, () => {
 
         beforeAll(async() => {
             await setup()

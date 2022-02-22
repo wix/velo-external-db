@@ -25,21 +25,23 @@ const spannerTestEnvInit = async() => await init(spanner)
 const firestoreTestEnvInit = async() => await init(firestore)
 const mssqlTestEnvInit = async() => await init(mssql)
 const mongoTestEnvInit = async() => await init(mongo)
-const airtableTestEnvInit = async() => await init(airtable)
+const airTableTestEnvInit = async() => await init(airtable)
 const dynamoTestEnvInit = async() => await init(dynamo)
 const bigqueryTestEnvInit = async() => await init(bigquery)
 
-const testSuits = () => [
-    ['MySql', mysqlTestEnvInit],
-    ['Postgres', postgresTestEnvInit],
-    ['Spanner', spannerTestEnvInit],
-    ['Firestore', firestoreTestEnvInit],
-    ['Sql Server', mssqlTestEnvInit],
-    ['Mongo', mongoTestEnvInit],
-    ['Airtable', airtableTestEnvInit],
-    ['DynamoDb', dynamoTestEnvInit],
-    ['Bigquery', bigqueryTestEnvInit]
-].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
+const testSuits = {
+    mysql: ['MySql', mysqlTestEnvInit],
+    postgres: ['Postgres', postgresTestEnvInit],
+    spanner: ['Spanner', spannerTestEnvInit],
+    firestore: ['Firestore', firestoreTestEnvInit],
+    mssql: ['Sql Server', mssqlTestEnvInit],
+    mongo: ['Mongo', mongoTestEnvInit],
+    airtable: ['Airtable', airTableTestEnvInit],
+    dynamodb: ['DynamoDb', dynamoTestEnvInit],
+    bigquery: ['BigQuery', bigqueryTestEnvInit],
+}
+
+const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 
 
-module.exports = { env, testSuits }
+module.exports = { env, testedSuit }

@@ -1,7 +1,7 @@
 const { Uninitialized, gen } = require('test-commons')
 const { authVisitor } = require('../drivers/auth_test_support')
 const each = require('jest-each').default
-const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
+const { initApp, teardownApp, dbTeardown, testedSuit } = require('../resources/e2e_resources')
 
 
 const axios = require('axios').create({
@@ -9,7 +9,8 @@ const axios = require('axios').create({
 })
 
 describe('Velo External DB authorization', () => {
-    each(testSuits()).describe('%s', (name, setup) => {
+    const [name, setup] = testedSuit()
+    describe(`${name}`, () => {
         beforeAll(async() => {
             await setup()
 

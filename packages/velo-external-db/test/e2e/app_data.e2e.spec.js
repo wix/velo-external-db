@@ -5,8 +5,7 @@ const matchers = require('../drivers/schema_api_rest_matchers')
 const { authAdmin, authOwner, authVisitor } = require('../drivers/auth_test_support')
 const authorization = require ('../drivers/authorization_test_support')
 const Chance = require('chance')
-const each = require('jest-each').default
-const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
+const { initApp, teardownApp, dbTeardown, testedSuit } = require('../resources/e2e_resources')
 
 const chance = Chance()
 
@@ -15,7 +14,8 @@ const axios = require('axios').create({
 })
 
 describe('Velo External DB Data REST API',  () => {
-    each(testSuits()).describe('%s', (name, setup) => {
+    const [name, setup] = testedSuit()
+    describe(`${name}`, () => {
         beforeAll(async() => {
             await setup()
 
