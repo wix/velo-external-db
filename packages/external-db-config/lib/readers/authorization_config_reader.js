@@ -9,21 +9,21 @@ class AuthorizationConfigReader {
   }
 
   async readConfig() {
-    const { ROLE_CONFIG } = process.env
-    const { collectionLevelConfig } = isJson(ROLE_CONFIG) ? JSON.parse(ROLE_CONFIG) : EMPTY_ROLE_CONFIG
+    const { ROLE_CONFIG: roleConfig } = process.env
+    const { collectionLevelConfig } = isJson(roleConfig) ? JSON.parse(roleConfig) : EMPTY_ROLE_CONFIG
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
 
   validate() {
-    const { ROLE_CONFIG } = process.env
+    const { ROLE_CONFIG: roleConfig } = process.env
     
-    const valid = isJson(ROLE_CONFIG) && this.configValidator(JSON.parse(ROLE_CONFIG))
+    const valid = isJson(roleConfig) && this.configValidator(JSON.parse(roleConfig))
     let message 
     
 
     if (checkRequiredKeys(process.env, ['ROLE_CONFIG']).length)  
       message = 'Role config is not defined, using default'
-    else if (!isJson(ROLE_CONFIG)) 
+    else if (!isJson(roleConfig)) 
       message = 'Role config is not valid JSON'
     else if (!valid)
       message = this.configValidator.errors.map(err => (`Error in ${err.instancePath}: ${err.message}`)).join(', ')

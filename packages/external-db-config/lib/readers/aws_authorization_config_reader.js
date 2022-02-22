@@ -13,10 +13,10 @@ class AwsAuthorizationConfigReader {
   }
 
   async readConfig() {
-    const { ROLE_CONFIG } = await this.readExternalConfig()
+    const { ROLE_CONFIG: roleConfig } = await this.readExternalConfig()
                           .catch(() => EmptyAWSAuthConfig)
     
-    const { collectionLevelConfig } = isJson(ROLE_CONFIG) ? JSON.parse(ROLE_CONFIG) : EMPTY_ROLE_CONFIG
+    const { collectionLevelConfig } = isJson(roleConfig) ? JSON.parse(roleConfig) : EMPTY_ROLE_CONFIG
     
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
@@ -29,16 +29,16 @@ class AwsAuthorizationConfigReader {
 
   async validate() {
     try{
-        const { ROLE_CONFIG } = await this.readExternalConfig()
+        const { ROLE_CONFIG: roleConfig } = await this.readExternalConfig()
 
-        const valid = isJson(ROLE_CONFIG) && this.configValidator(JSON.parse(ROLE_CONFIG))
+        const valid = isJson(roleConfig) && this.configValidator(JSON.parse(roleConfig))
 
         let message 
         
     
         if (checkRequiredKeys(process.env, ['ROLE_CONFIG']).length)  
           message = 'Role config is not defined, using default'
-        else if (!isJson(ROLE_CONFIG)) 
+        else if (!isJson(roleConfig)) 
           message = 'Role config is not valid JSON'
         else if (!valid)
           message = this.configValidator.errors.map(err => (`Error in ${err.instancePath}: ${err.message}`)).join(', ')
