@@ -1,5 +1,5 @@
 const { UnauthorizedError } = require('velo-external-db-commons/lib/errors')
-const DefaultPolicies = ['OWNER', 'BACKEND_CODE']
+const DefaultPolicies = ['Admin']
 
 class RoleAuthorizationService {
     constructor(config) {
@@ -8,14 +8,14 @@ class RoleAuthorizationService {
 
     authorizeRead(collectionName, role) {
         const readPolicies = this.readPoliciesFor(collectionName)
-        
-        if (!readPolicies.includes(role)) throw new UnauthorizedError('You are not authorized')
+
+        if (!readPolicies.includes(this.dataToVeloRole(role))) throw new UnauthorizedError('You are not authorized')
     }
     
     authorizeWrite(collectionName, role) {
         const writePolicies = this.writePoliciesFor(collectionName)
- 
-        if (!writePolicies.includes(role)) throw new UnauthorizedError('You are not authorized')
+        
+        if (!writePolicies.includes(this.dataToVeloRole(role))) throw new UnauthorizedError('You are not authorized')
     }
 
     setConfig(config) {
@@ -33,6 +33,18 @@ class RoleAuthorizationService {
     writePoliciesFor(collectionName) {
         return this.policiesFor(collectionName)?.writePolicies || DefaultPolicies
     }
+
+    dataToVeloRole(role) { 
+        switch (role) {
+            case 'OWNER':
+            case 'BACKEND_CODE':
+                return 'Admin'
+            case 'MEMBER':
+                return 'Member'
+            case 'VISITOR':
+                return 'Visitor'
+        }
+    }     
 }
 
 module.exports = RoleAuthorizationService
