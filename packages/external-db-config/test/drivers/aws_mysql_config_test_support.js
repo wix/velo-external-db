@@ -48,8 +48,8 @@ const validAuthorizationConfig = {
     collectionLevelConfig: [
         {
             id: chance.word(),
-            readPolicies: ['OWNER'],
-            writePolicies: ['BACKEND_CODE'],
+            readPolicies: ['Admin'],
+            writePolicies: ['Admin'],
         }
     ]
 }
