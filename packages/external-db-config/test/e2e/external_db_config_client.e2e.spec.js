@@ -23,7 +23,7 @@ each(
 
         beforeEach(async() => {
             reset()
-            ctx.config = env.driver.validConfig()
+            ctx.config = env.driver.validConfigWithAuthorization()
         })
 
 

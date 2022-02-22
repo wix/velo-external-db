@@ -23,5 +23,16 @@ const invalidDbTypeConfigStatusResponse = () => expect.objectContaining({
     message: expect.stringContaining('DB type is not supported'),
 })
 
+const emptyAuthorizationConfigStatusResponse = () => expect.objectContaining({
+    validAuthorization: false,
+    authorizationMessage: expect.stringContaining('Role config is not defined, using default') 
+})
+
+const invalidAuthorizationConfigStatusResponse = () => expect.objectContaining({
+    validAuthorization: false,
+    authorizationMessage: expect.stringContaining('Error in ')
+})
+
 module.exports = { configResponseFor, validConfigStatusResponse, configResponseWithMissingProperties, 
-    invalidVendorConfigStatusResponse, invalidDbTypeConfigStatusResponse }
+    invalidVendorConfigStatusResponse, invalidDbTypeConfigStatusResponse, emptyAuthorizationConfigStatusResponse,
+    invalidAuthorizationConfigStatusResponse }

@@ -64,6 +64,17 @@ const givenInvalidDBType = () =>
     when(commonConfigReader.validate).calledWith()
                                      .mockReturnValueOnce({ missingRequiredSecretsKeys: [], validType: false, validVendor: true })
 
+const givenValidAuthorizationConfig = () => 
+    when(authorizationConfigReader.validate).calledWith()
+                                            .mockReturnValue({ valid: true, message: 'Authorization Config read successfully' })
+
+const givenEmptyAuthorizationConfig = () =>
+    when(authorizationConfigReader.validate).calledWith()
+                                            .mockReturnValue({ valid: false, message: 'Role config is not defined, using default' })
+
+const givenInvalidAuthorizationConfig = () => 
+    when(authorizationConfigReader.validate).calledWith()
+                                            .mockReturnValue({ valid: false, message: 'Error in /collectionLevelConfig/0/readPolicies/0: must be equal to one of the allowed values' })
 const reset = () => {
     configReader.readConfig.mockClear()
     configReader.validate.mockClear()
@@ -73,12 +84,15 @@ const reset = () => {
 
     commonConfigReader.validate.mockClear()
 
-    authorizationConfigReader.readConfig.mockClear()
+    authorizationConfigReader.readConfig.mockClear(
+    authorizationConfigReader.validate.mockClear()
+    )
 }
 
 module.exports = { configReader, commonConfigReader, authConfigReader, authorizationConfigReader, reset,
                    givenValidCommonConfig, 
                    givenValidAuthConfig, givenAuthConfig, givenInvalidAuthConfigWith,
                    givenConfig, givenValidConfig, givenInvalidConfigWith, givenInvalidCommonConfigWith,
-                   givenInvalidCloudVendor, givenInvalidDBType, givenAuthorizationConfig
+                   givenInvalidCloudVendor, givenInvalidDBType, givenAuthorizationConfig, givenValidAuthorizationConfig,
+                   givenEmptyAuthorizationConfig, givenInvalidAuthorizationConfig
 }
