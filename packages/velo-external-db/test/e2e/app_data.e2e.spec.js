@@ -14,9 +14,7 @@ const axios = require('axios').create({
 })
 
 describe('Velo External DB Data REST API',  () => {
-    console.log('here!!!!!')
     const [name, setup] = testedSuit()
-    console.log('name: ', name, 'setup: ', setup)
     describe(`${name}`, () => {
         beforeAll(async() => {
             await setup()
