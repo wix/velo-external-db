@@ -1,12 +1,12 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('velo-external-db-commons').errors
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen, removeColumnNotIn, addColumnNotIn } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
 const { collectionWithDefaultFields, hasSameSchemaFieldsLike } = require('../drivers/schema_provider_matchers')
 const chance = new Chance()
-const { SystemFields, SchemaOperations } = require('velo-external-db-commons')
-const { ADD_COLUMN, REMOVE_COLUMN } = SchemaOperations
+const { SystemFields } = require('velo-external-db-commons')
+
 
 
 describe('Schema API', () => {
@@ -88,16 +88,13 @@ describe('Schema API', () => {
 
 
         test('add column on a an existing collection', async() => {
-            const neededOperations = [ADD_COLUMN]
 
-            if ( neededOperations.every(op => env.schemaOperations.includes(op)) ) {
-                await env.schemaProvider.create(ctx.collectionName, [])
-                await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
-                await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName  }]))
-            }
-            else {
-                expect(true).toBe(true)
-            }
+            if (addColumnNotIn(env.schemaOperations))
+                return expect(true).toBe(true)
+            
+            await env.schemaProvider.create(ctx.collectionName, [])
+            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName  }]))
         })
         
         test('add duplicate column will fail', async() => {
@@ -118,49 +115,34 @@ describe('Schema API', () => {
         })
 
         test('drop column on a an existing collection', async() => {
-            const neededOperations = [REMOVE_COLUMN]
+            
+            if (removeColumnNotIn(env.schemaOperations))
+                return expect(true).toBe(true)
 
-            if ( neededOperations.every(op => env.schemaOperations.includes(op)) ) {
-                await env.schemaProvider.create(ctx.collectionName, [])
-                await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
-                await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
-                await expect(env.schemaProvider.describeCollection(ctx.collectionName)).resolves.not.toEqual(hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
-            }
-
-            else {
-                expect(true).toBe(true)
-            }
-
+            await env.schemaProvider.create(ctx.collectionName, [])
+            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+            await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
+            await expect(env.schemaProvider.describeCollection(ctx.collectionName)).resolves.not.toEqual(hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
         })
 
         test('drop column on a a non existing collection', async() => {
-            const neededOperations = [REMOVE_COLUMN]
+            
+            if (removeColumnNotIn(env.schemaOperations))
+                return expect(true).toBe(true)
 
-            if ( neededOperations.every(op => env.schemaOperations.includes(op)) ) {
-                await env.schemaProvider.create(ctx.collectionName, [])
-
-                await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
-            }
-            else {
-                expect(true).toBe(true)
-            }
-
+            await env.schemaProvider.create(ctx.collectionName, [])
+            await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
         })
 
         test('drop system column will fail', async() => {
-            const neededOperations = [REMOVE_COLUMN]
+            if (removeColumnNotIn(env.schemaOperations))
+                return expect(true).toBe(true)
 
-            if ( neededOperations.every(op => env.schemaOperations.includes(op)) ) {
-                await env.schemaProvider.create(ctx.collectionName, [])
-
-                SystemFields.map(f => f.name)
-                    .forEach(async f => {
-                        await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
-                    })
-            }
-            else {
-                expect(true).toBe(true)
-            }
+            await env.schemaProvider.create(ctx.collectionName, [])
+            SystemFields.map(f => f.name)
+                .forEach(async f => {
+                    await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
+            })
         })
         
         const ctx = {
