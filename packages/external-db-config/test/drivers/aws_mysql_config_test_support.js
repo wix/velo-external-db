@@ -24,7 +24,7 @@ const defineValidConfig = (config) => {
         awsConfig.SECRET_KEY = config.secretKey
     }
     if (config.authorization) {
-        awsConfig.ROLE_CONFIG = JSON.stringify({ collectionLevelConfig: config.authorization })
+        awsConfig.roleConfig = JSON.stringify({ collectionLevelConfig: config.authorization })
     }
     mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(awsConfig) })
 }
@@ -64,7 +64,7 @@ const validConfigWithAuthConfig = () => ({
     } 
 })
 
-const ExpectedProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'clientDomain', 'ROLE_CONFIG']
+const ExpectedProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'clientDomain', 'roleConfig']
 
 const reset = () => mockedAwsSdk.reset()
 

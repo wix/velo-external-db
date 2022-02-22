@@ -19,7 +19,7 @@ const defineValidConfig = (config) => {
         process.env.SECRET_KEY = config.secretKey
     }
     if (config.authorization) {
-        process.env.ROLE_CONFIG = JSON.stringify({ collectionLevelConfig: config.authorization })
+        process.env.roleConfig = JSON.stringify({ collectionLevelConfig: config.authorization })
     }
     if (config.auth?.callbackUrl) {
         process.env.callbackUrl = config.auth.callbackUrl
@@ -64,7 +64,7 @@ const validConfigWithAuthConfig = () => ({
     }  
 })
 
-const ExpectedProperties = ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'ROLE_CONFIG']
+const ExpectedProperties = ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'roleConfig']
 
 const defineInvalidConfig = () => defineValidConfig({})
 

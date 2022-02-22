@@ -1,8 +1,8 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
-const { checkRequiredKeys, isJson, EMPTY_ROLE_CONFIG, configPattern, collectionConfigPattern } = require('../utils/config_utils')
+const { checkRequiredKeys, isJson, EmptyRoleConfig, configPattern, collectionConfigPattern } = require('../utils/config_utils')
 const Avj = require('ajv')
 const ajv = new Avj()
-const EmptyAWSAuthConfig = { ROLE_CONFIG: EMPTY_ROLE_CONFIG }
+const EmptyAWSAuthConfig = { roleConfig: EmptyRoleConfig }
 
 class AwsAuthorizationConfigReader {
   constructor(region, secretId) {
@@ -13,10 +13,10 @@ class AwsAuthorizationConfigReader {
   }
 
   async readConfig() {
-    const { ROLE_CONFIG: roleConfig } = await this.readExternalConfig()
+    const { roleConfig: roleConfig } = await this.readExternalConfig()
                           .catch(() => EmptyAWSAuthConfig)
     
-    const { collectionLevelConfig } = isJson(roleConfig) ? JSON.parse(roleConfig) : EMPTY_ROLE_CONFIG
+    const { collectionLevelConfig } = isJson(roleConfig) ? JSON.parse(roleConfig) : EmptyRoleConfig
     
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
@@ -29,14 +29,14 @@ class AwsAuthorizationConfigReader {
 
   async validate() {
     try{
-        const { ROLE_CONFIG: roleConfig } = await this.readExternalConfig()
+        const { roleConfig: roleConfig } = await this.readExternalConfig()
 
         const valid = isJson(roleConfig) && this.configValidator(JSON.parse(roleConfig))
 
         let message 
         
     
-        if (checkRequiredKeys(process.env, ['ROLE_CONFIG']).length)  
+        if (checkRequiredKeys(process.env, ['roleConfig']).length)  
           message = 'Role config is not defined, using default'
         else if (!isJson(roleConfig)) 
           message = 'Role config is not valid JSON'

@@ -19,7 +19,7 @@ const defineValidConfig = (config) => {
         process.env.SECRET_KEY = config.secretKey
     }
     if (config.authorization) {
-        process.env.ROLE_CONFIG = JSON.stringify({ collectionLevelConfig: config.authorization })
+        process.env.roleConfig = JSON.stringify({ collectionLevelConfig: config.authorization })
     }
     if (config.auth?.clientId) {
         process.env.clientId = config.auth.clientId
@@ -66,7 +66,7 @@ const validConfigWithAuthConfig = () => ({
 
 const defineInvalidConfig = () => defineValidConfig({})
 
-const ExpectedProperties = ['HOST', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'ROLE_CONFIG']
+const ExpectedProperties = ['HOST', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'roleConfig']
 
 const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 

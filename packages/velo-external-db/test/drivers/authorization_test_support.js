@@ -12,7 +12,7 @@ const authRoleConfig = (collectionName, readPolicies, writePolicies) => {
             }
         ]
     }
-    process.env.ROLE_CONFIG = JSON.stringify(config)
+    process.env.roleConfig = JSON.stringify(config)
 }
 
 const givenCollectionWithVisitorReadPolicy = async(collectionName) => {
