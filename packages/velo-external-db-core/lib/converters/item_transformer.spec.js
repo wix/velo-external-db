@@ -17,6 +17,10 @@ describe('Item Transformer', () => {
             expect(validate(env.itemTransformer.defaultValueFor( { type: 'text', isPrimary: true } ), 4)).toBeTruthy()
         })
         
+        test('default value for _id field is a random uuid v4', async() => {
+            expect(validate(env.itemTransformer.defaultValueFor( { type: 'text', field: '_id' } ), 4)).toBeTruthy()
+        })
+        
         test('default value boolean field is false', async() => {
             expect(env.itemTransformer.defaultValueFor( { type: 'boolean' } )).toBeFalsy()
         })
