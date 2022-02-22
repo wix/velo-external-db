@@ -69,20 +69,6 @@ const dynamoTestEnvInit = async() => await dbInit(dynamoTestEnv, dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigqueryTestEnv, bigquery)
 const googleSheetTestEnvInit = async() => await dbInit(googleSheetTestEnv, googleSheet)
 
-
-// const testSuits = () => [
-//     ['MySql', mysqlTestEnvInit],
-//     ['Postgres', postgresTestEnvInit],
-//     ['Spanner', spannerTestEnvInit],
-//     ['Firestore', firestoreTestEnvInit],
-//     ['Sql Server', mssqlTestEnvInit],
-//     ['Mongo', mongoTestEnvInit],
-//     ['Airtable', airTableTestEnvInit],
-//     ['DynamoDb', dynamoTestEnvInit],
-//     ['BigQuery', bigqueryTestEnvInit],
-//     ['Google-Sheet', googleSheetTestEnvInit],
-// ].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
-
 const testSuits = {
     mysql: ['MySql', mysqlTestEnvInit],
     postgres: ['Postgres', postgresTestEnvInit],
