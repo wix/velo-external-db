@@ -4,8 +4,8 @@ const databaseId = 'testDB'
 const projectId = 'corvid-managed-cfe9809c'
 
 const connection = () => {
-    const { connection, cleanup } = init({ databaseId, projectId })
-    return { pool: connection, cleanup }
+    const { connection, schemaProvider, cleanup } = init({ databaseId, projectId })
+    return { pool: connection, schemaProvider, cleanup }
 }
 
 const cleanup = async() => {

@@ -2,8 +2,8 @@ const { init } = require('external-db-postgres')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = () => {
-    const { connection, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
-    return { pool: connection, cleanup: cleanup }
+    const { connection, schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
+    return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
 const cleanup = async() => {
