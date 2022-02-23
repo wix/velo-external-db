@@ -25,13 +25,13 @@ const QueryOperatorsByFieldType = {
 }
 
 const SchemaOperations = Object.freeze({
-    LIST: 'list',
-    LIST_HEADERS: 'listHeaders',
-    CREATE: 'createCollection',
-    DROP: 'dropCollection', 
-    ADD_COLUMN: 'addColumn',
-    REMOVE_COLUMN: 'removeColumn',
-    DESCRIBE_COLLECTION: 'describeCollection',
+    List: 'list',
+    ListHeaders: 'listHeaders',
+    Create: 'createCollection',
+    Drop: 'dropCollection',
+    AddColumn: 'addColumn',
+    RemoveColumn: 'removeColumn',
+    Describe: 'describeCollection',
 })
 
 const AllSchemaOperations = Object.values(SchemaOperations)
