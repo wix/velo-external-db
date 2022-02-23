@@ -2,9 +2,9 @@ const { init } = require('external-db-mongo')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = async() => {
-    const { connection, cleanup } = await init({ connectionUri: 'mongodb://root:pass@localhost/testdb' })
+    const { connection, schemaProvider, cleanup } = await init({ connectionUri: 'mongodb://root:pass@localhost/testdb' })
 
-    return { pool: connection, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
 const cleanup = async() => {

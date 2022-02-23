@@ -4,10 +4,10 @@ let _server
 const PORT = 9000
 
 const connection = async() => {
-    const { connection, cleanup } = await init(connectionConfig(),
+    const { connection, schemaProvider, cleanup } = await init(connectionConfig(),
         { requestTimeout: 1000 })
 
-    return { pool: connection, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
 const cleanup = async() => {

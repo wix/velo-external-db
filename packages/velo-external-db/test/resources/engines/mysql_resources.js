@@ -3,8 +3,8 @@ const { runImage, stopImage } = require('./docker_support')
 const { waitUntil } = require('async-wait-until')
 
 const connection = () => {
-    const { connection, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { connectionLimit: 1, queueLimit: 0 })
-    return { pool: connection, cleanup: cleanup }
+    const { connection, schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { connectionLimit: 1, queueLimit: 0 })
+    return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
 const cleanup = async() => {
