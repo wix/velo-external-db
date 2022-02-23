@@ -1,4 +1,4 @@
-const { Uninitialized, sleep } = require('test-commons')
+const { Uninitialized, sleep, suitDef } = require('test-commons')
 const { authInit } = require('../drivers/auth_test_support')
 const { waitUntil } = require('async-wait-until')
 
@@ -59,28 +59,19 @@ const airTableTestEnvInit = async() => await dbInit(airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 
-
 const testSuits = {
-    mysql: ['MySql', mysqlTestEnvInit],
-    postgres: ['Postgres', postgresTestEnvInit],
-    spanner: ['Spanner', spannerTestEnvInit],
-    firestore: ['Firestore', firestoreTestEnvInit],
-    mssql: ['Sql Server', mssqlTestEnvInit],
-    mongo: ['Mongo', mongoTestEnvInit],
-    airtable: ['Airtable', airTableTestEnvInit],
-    dynamodb: ['DynamoDb', dynamoTestEnvInit],
-    bigquery: ['BigQuery', bigqueryTestEnvInit],
-    'google-sheet': ['Google-sheet', googleSheetTestEnvInit],
+    mysql: suitDef('MySql', mysqlTestEnvInit),
+    postgres: suitDef('Postgres', postgresTestEnvInit),
+    spanner: suitDef('Spanner', spannerTestEnvInit),
+    firestore: suitDef('Firestore', firestoreTestEnvInit),
+    mssql: suitDef('Sql Server', mssqlTestEnvInit),
+    mongo: suitDef('Mongo', mongoTestEnvInit),
+    airtable: suitDef('Airtable', airTableTestEnvInit),
+    dynamodb: suitDef('DynamoDb', dynamoTestEnvInit),
+    bigquery: suitDef('BigQuery', bigqueryTestEnvInit),
+    'google-sheet': suitDef('Google-sheet', googleSheetTestEnvInit),
 }
 
-const testedSuit = () => {
-    const item = testSuits[process.env.TEST_ENGINE]
-    return {
-        name: item[0],
-        setup: item[1]
-    }
-}
-
-
+const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 
 module.exports = { env, initApp, teardownApp, dbTeardown, testedSuit }
