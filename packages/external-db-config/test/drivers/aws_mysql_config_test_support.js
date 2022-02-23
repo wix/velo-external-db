@@ -2,6 +2,7 @@ const { AwsConfigReader } = require('../../lib/readers/aws_config_reader')
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
 const mockClient = require('aws-sdk-client-mock')
 const mockedAwsSdk = mockClient.mockClient(SecretsManagerClient)
+const { validAuthorizationConfig } = require ('../test_utils')
 
 const Chance = require('chance')
 const chance = new Chance()
@@ -44,15 +45,6 @@ const validConfigWithAuthorization = () => ({
     authorization: validAuthorizationConfig.collectionLevelConfig 
 })
 
-const validAuthorizationConfig = {
-    collectionLevelConfig: [
-        {
-            id: chance.word(),
-            readPolicies: ['Admin'],
-            writePolicies: ['Admin'],
-        }
-    ]
-}
 
 const validConfigWithAuthConfig = () => ({
     ...validConfig(),

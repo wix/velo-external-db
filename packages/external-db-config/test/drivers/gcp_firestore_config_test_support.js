@@ -1,6 +1,7 @@
 const { GcpFirestoreConfigReader } = require('../../lib/readers/gcp_config_reader')
 const Chance = require('chance')
 const chance = new Chance()
+const { validAuthorizationConfig } = require ('../test_utils')
 
 const defineValidConfig = (config) => {
     if (config.projectId) {
@@ -32,16 +33,6 @@ const validConfigWithAuthorization = () => ({
     ...validConfig(),
     authorization: validAuthorizationConfig.collectionLevelConfig 
 })
-
-const validAuthorizationConfig = {
-    collectionLevelConfig: [
-        {
-            id: chance.word(),
-            readPolicies: ['Admin'],
-            writePolicies: ['Admin'],
-        }
-    ]
-}
 
 const validConfigWithAuthConfig = () => ({
     ...validConfig(),
