@@ -43,6 +43,8 @@ class RoleAuthorizationService {
                 return 'Member'
             case 'VISITOR':
                 return 'Visitor'
+            default:
+                return role
         }
     }     
 }
