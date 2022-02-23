@@ -1,11 +1,12 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('velo-external-db-commons').errors
-const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
+const { Uninitialized, gen, removeColumnNotIn, addColumnNotIn, passTest } = require('test-commons')
 const Chance = require('chance')
 const { env, dbTeardown } = require('../resources/provider_resources')
 const { name, setup } = require('../resources/provider_resources').testedSuit()
 const { collectionWithDefaultFields, hasSameSchemaFieldsLike } = require('../drivers/schema_provider_matchers')
 const chance = new Chance()
 const { SystemFields } = require('velo-external-db-commons')
+
 
 
 describe(`Schema API: ${name}`, () => {
@@ -83,63 +84,65 @@ describe(`Schema API: ${name}`, () => {
         await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(CollectionDoesNotExists)
     })
 
-    if (shouldNotRunOn(['Google-Sheet'], name)) {
-        test('add column on a an existing collection', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
 
-            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+    test('add column on a an existing collection', async() => {
 
-            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
-        })
-    }
+        if (addColumnNotIn(env.schemaOperations))
+            return passTest()
 
+        await env.schemaProvider.create(ctx.collectionName, [])
+        await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName  }]))
+    })
 
     test('add duplicate column will fail', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
 
-        await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+    await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
 
         await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(FieldAlreadyExists)
     })
-
 
     test('add system column will fail', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
 
         SystemFields.map(f => f.name)
-                    .forEach(async f => {
-                        await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: f, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(CannotModifySystemField)
-                    })
+            .forEach(async f => {
+                await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: f, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(CannotModifySystemField)
+            })
     })
 
-    if (shouldNotRunOn(['BigQuery', 'Google-Sheet'], name)) {
-        test('drop column on a an existing collection', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-            await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+    test('drop column on a an existing collection', async() => {
 
-            await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
-            await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.not.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]) )
+        if (removeColumnNotIn(env.schemaOperations))
+            return passTest()
+
+        await env.schemaProvider.create(ctx.collectionName, [])
+        await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+        await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
+        await expect(env.schemaProvider.describeCollection(ctx.collectionName)).resolves.not.toEqual(hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
+    })
+
+    test('drop column on a a non existing collection', async() => {
+
+        if (removeColumnNotIn(env.schemaOperations))
+            return passTest()
+
+        await env.schemaProvider.create(ctx.collectionName, [])
+        await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
+    })
+
+    test('drop system column will fail', async() => {
+
+        if (removeColumnNotIn(env.schemaOperations))
+            return passTest()
+
+        await env.schemaProvider.create(ctx.collectionName, [])
+        SystemFields.map(f => f.name)
+            .forEach(async f => {
+                await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
         })
-    }
-
-    if (shouldNotRunOn(['BigQuery', 'Google-Sheet'], name)) {
-        test('drop column on a a non existing collection', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-
-            await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
-        })
-    }
-
-    if (shouldNotRunOn(['BigQuery', 'Google-Sheet'], name)) {
-        test('drop system column will fail', async() => {
-            await env.schemaProvider.create(ctx.collectionName, [])
-
-            SystemFields.map(f => f.name)
-                        .forEach(async f => {
-                            await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
-                        })
-        })
-    }
+    })
 
     const ctx = {
         collectionName: Uninitialized,
@@ -152,5 +155,6 @@ describe(`Schema API: ${name}`, () => {
         ctx.anotherCollectionName = gen.randomCollectionName()
         ctx.columnName = chance.word()
     })
+
 })
 

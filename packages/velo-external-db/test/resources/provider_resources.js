@@ -36,16 +36,18 @@ const env = {
     schemaColumnTranslator: Uninitialized,
     cleanup: Uninitialized,
     driver: Uninitialized,
+    schemaOperations: Uninitialized,
 }
 
 const dbInit = async(testEnv, impl) => {
     await testEnv.cleanup()
 
-    const { pool, cleanup } = await testEnv.connection()
+    const { pool, cleanup, schemaProvider } = await testEnv.connection()
     const driver = impl.driver()
-    
+        
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
     env.schemaProvider = new impl.SchemaProvider(pool, testEnv.schemaProviderTestVariables?.() )
+    env.schemaOperations = schemaProvider.supportedOperations()
     env.driver = driver
     env.cleanup = cleanup
 }
