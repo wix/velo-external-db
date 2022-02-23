@@ -1,6 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { isEmptyFilter } = require('velo-external-db-commons')
-const { EMPTY_FILTER } = require('./dynamo_utils')
+const { EmptyFilter } = require('./dynamo_utils')
 const { AdapterOperators } = require('velo-external-db-commons')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
 
@@ -12,7 +12,7 @@ class FilterParser {
         
         const results = this.parseFilter(filter)
         if (results.length === 0) {
-            return { ...EMPTY_FILTER, queryable: false }
+            return { ...EmptyFilter, queryable: false }
         }
 
         const { filterExpr, queryable } = this.filterExprToQueryIfPossible(results[0].filterExpr, fields)

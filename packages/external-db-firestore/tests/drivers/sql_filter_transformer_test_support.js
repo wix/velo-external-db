@@ -2,7 +2,7 @@
 const { when } = require('jest-when')
 const escapeId = x => x
 
-const EMPTY_SORT = []
+const EmptySort = []
 
 const filterParser = {
     transform: jest.fn(),
@@ -18,12 +18,12 @@ const stubEmptyFilterAndSortFor = (filter, sort) => {
 
 const stubEmptyFilterFor = (filter) => {
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue(EMPTY_SORT)
+                                .mockReturnValue(EmptySort)
 }
 
 const stubEmptyOrderByFor = (sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue(EMPTY_SORT)
+                              .mockReturnValue(EmptySort)
 }
 
 const patchFieldName = (f) => {
