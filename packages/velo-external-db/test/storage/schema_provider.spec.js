@@ -2,7 +2,7 @@ const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, Fi
 const { Uninitialized, gen, removeColumnNotIn, addColumnNotIn, passTest } = require('test-commons')
 const Chance = require('chance')
 const { env, dbTeardown } = require('../resources/provider_resources')
-const { name, setup } = require('../resources/provider_resources').testedSuit()
+const { name, setup } = require('../resources/operations_resources').testedSuit()
 const { collectionWithDefaultFields, hasSameSchemaFieldsLike } = require('../drivers/schema_provider_matchers')
 const chance = new Chance()
 const { SystemFields } = require('velo-external-db-commons')
@@ -98,7 +98,7 @@ describe(`Schema API: ${name}`, () => {
     test('add duplicate column will fail', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
 
-    await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
+        await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
 
         await expect(env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })).rejects.toThrow(FieldAlreadyExists)
     })
