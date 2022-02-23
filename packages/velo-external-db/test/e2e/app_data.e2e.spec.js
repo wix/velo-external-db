@@ -5,7 +5,8 @@ const matchers = require('../drivers/schema_api_rest_matchers')
 const { authAdmin, authOwner, authVisitor } = require('../drivers/auth_test_support')
 const authorization = require ('../drivers/authorization_test_support')
 const Chance = require('chance')
-const { initApp, teardownApp, dbTeardown, testedSuit } = require('../resources/e2e_resources')
+const { initApp, teardownApp, dbTeardown } = require('../resources/e2e_resources')
+const { name, setup } = require('../resources/e2e_resources').testedSuit()
 
 const chance = Chance()
 
@@ -13,154 +14,152 @@ const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
 
-describe('Velo External DB Data REST API',  () => {
-    const [name, setup] = testedSuit()
-    describe(`${name}`, () => {
-        beforeAll(async() => {
-            await setup()
+describe(`Velo External DB Data REST API: ${name}`,  () => {
+    beforeAll(async() => {
+        await setup()
 
-            await initApp()
-        }, 20000)
+        await initApp()
+    }, 20000)
 
-        afterAll(async() => {
-            await dbTeardown()
-        }, 20000)
+    afterAll(async() => {
+        await dbTeardown()
+    }, 20000)
 
-        if (shouldNotRunOn(['DynamoDb', 'Google-sheet'], name)) { //todo: create another test without sort for these implementations
-            test('find api', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-                await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
-                await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authVisitor) ).resolves.toEqual(
-                    expect.objectContaining({ data: {
-                            items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
-                            totalCount: 2
-                        } }))
-            })
-        }
-
-        test('insert api', async() => {
+    if (shouldNotRunOn(['DynamoDb', 'Google-sheet'], name)) { //todo: create another test without sort for these implementations
+        test('find api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-            await axios.post('/data/insert', { collectionName: ctx.collectionName, item: ctx.item }, authAdmin)
-
-            await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ctx.item], totalCount: 1 })
-        })
-
-        test('bulk insert api', async() => {
-            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-
-            await axios.post('/data/insert/bulk', { collectionName: ctx.collectionName, items: ctx.items }, authAdmin)
-
-            await expect( data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual( { items: expect.arrayContaining(ctx.items), totalCount: ctx.items.length })
-        })
-
-
-
-        if ( shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb', 'Google-sheet'], name) ) {
-        test('aggregate api', async() => {
-            await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
-            await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
-
-            await expect( axios.post('/data/aggregate',
-                {
-                    collectionName: ctx.collectionName,
-                    filter: { _id: { $eq: ctx.numberItem._id } },
-                    processingStep: {
-                        _id: {
-                            field1: '$_id',
-                            field2: '$_owner',
-                        },
-                        myAvg: {
-                            $avg: `$${ctx.numberColumns[0].name}`
-                        },
-                        mySum: {
-                            $sum: `$${ctx.numberColumns[1].name}`
-                        }
-                    },
-                    postFilteringStep: {
-                        $and: [
-                            { myAvg: { $gt: 0 } },
-                            { mySum: { $gt: 0 } }
-                        ],
-                    },
-                }, authAdmin) ).resolves.toEqual(matchers.responseWith({ items: [ { _id: ctx.numberItem._id, _owner: ctx.numberItem._owner, myAvg: ctx.numberItem[ctx.numberColumns[0].name], mySum: ctx.numberItem[ctx.numberColumns[1].name] } ],
-                totalCount: 0 }))
+            await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+            await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
+            await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authVisitor) ).resolves.toEqual(
+                expect.objectContaining({ data: {
+                        items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
+                        totalCount: 2
+                    } }))
         })
     }
 
+    test('insert api', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await axios.post('/data/insert', { collectionName: ctx.collectionName, item: ctx.item }, authAdmin)
 
-    if (shouldNotRunOn(['BigQuery'], name)) {    
-        test('delete one api', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+        await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ctx.item], totalCount: 1 })
+    })
 
-                await axios.post('/data/remove', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin)
+    test('bulk insert api', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-            await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
+        await axios.post('/data/insert/bulk', { collectionName: ctx.collectionName, items: ctx.items }, authAdmin)
+
+        await expect( data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual( { items: expect.arrayContaining(ctx.items), totalCount: ctx.items.length })
+    })
+
+
+
+    if ( shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb', 'Google-sheet'], name) ) {
+    test('aggregate api', async() => {
+        await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
+        await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
+
+        await expect( axios.post('/data/aggregate',
+            {
+                collectionName: ctx.collectionName,
+                filter: { _id: { $eq: ctx.numberItem._id } },
+                processingStep: {
+                    _id: {
+                        field1: '$_id',
+                        field2: '$_owner',
+                    },
+                    myAvg: {
+                        $avg: `$${ctx.numberColumns[0].name}`
+                    },
+                    mySum: {
+                        $sum: `$${ctx.numberColumns[1].name}`
+                    }
+                },
+                postFilteringStep: {
+                    $and: [
+                        { myAvg: { $gt: 0 } },
+                        { mySum: { $gt: 0 } }
+                    ],
+                },
+            }, authAdmin) ).resolves.toEqual(matchers.responseWith({ items: [ { _id: ctx.numberItem._id, _owner: ctx.numberItem._owner, myAvg: ctx.numberItem[ctx.numberColumns[0].name], mySum: ctx.numberItem[ctx.numberColumns[1].name] } ],
+            totalCount: 0 }))
+    })
+}
+
+
+if (shouldNotRunOn(['BigQuery'], name)) {
+    test('delete one api', async() => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+
+            await axios.post('/data/remove', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin)
+
+        await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
+    })
+}
+
+if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
+    test('bulk delete api', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
+
+        await axios.post('/data/remove/bulk', { collectionName: ctx.collectionName, itemIds: ctx.items.map(i => i._id) }, authAdmin)
+
+        await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
+    })
+}
+
+if (shouldNotRunOn(['BigQuery'], name)) {
+    test('get by id api', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+
+        await expect( axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin) ).resolves.toEqual(matchers.responseWith({ item: ctx.item }))
+    })
+}
+
+    if (shouldNotRunOn(['BigQuery'], name)) {
+        test('update api', async() => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+
+            await axios.post('/data/update', { collectionName: ctx.collectionName, item: ctx.modifiedItem }, authAdmin)
+
+        await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ctx.modifiedItem], totalCount: 1 })
         })
     }
 
     if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
-        test('bulk delete api', async() => {
+        test('bulk update api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 
-            await axios.post('/data/remove/bulk', { collectionName: ctx.collectionName, itemIds: ctx.items.map(i => i._id) }, authAdmin)
+            await axios.post('/data/update/bulk', { collectionName: ctx.collectionName, items: ctx.modifiedItems }, authAdmin)
 
-            await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
+        await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual( { items: expect.arrayContaining(ctx.modifiedItems), totalCount: ctx.modifiedItems.length })
         })
     }
 
-    if (shouldNotRunOn(['BigQuery'], name)) {
-        test('get by id api', async() => {
-            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-            await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+    test('count api', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
 
-            await expect( axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin) ).resolves.toEqual(matchers.responseWith({ item: ctx.item }))
-        })
-    }
-        
-        if (shouldNotRunOn(['BigQuery'], name)) {
-            test('update api', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+        await expect( axios.post('/data/count', { collectionName: ctx.collectionName, filter: '' }, authAdmin) ).resolves.toEqual(matchers.responseWith( { totalCount: 2 } ))
+    })
 
-                await axios.post('/data/update', { collectionName: ctx.collectionName, item: ctx.modifiedItem }, authAdmin)
-
-            await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ctx.modifiedItem], totalCount: 1 })
-            })
-        }
-
-        if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
-            test('bulk update api', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
-
-                await axios.post('/data/update/bulk', { collectionName: ctx.collectionName, items: ctx.modifiedItems }, authAdmin)
-
-            await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual( { items: expect.arrayContaining(ctx.modifiedItems), totalCount: ctx.modifiedItems.length })
-            })
-        }
-
-        test('count api', async() => {
+    if (shouldNotRunOn(['Google-sheet'], name)) {
+        test('truncate api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
 
-            await expect( axios.post('/data/count', { collectionName: ctx.collectionName, filter: '' }, authAdmin) ).resolves.toEqual(matchers.responseWith( { totalCount: 2 } ))
+            await axios.post('/data/truncate', { collectionName: ctx.collectionName }, authAdmin)
+
+            await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
         })
+    }
 
-        if (shouldNotRunOn(['Google-sheet'], name)) {
-            test('truncate api', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
 
-                await axios.post('/data/truncate', { collectionName: ctx.collectionName }, authAdmin)
-
-                await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
-            })
-        }
-
-    })
 
 
     const ctx = {

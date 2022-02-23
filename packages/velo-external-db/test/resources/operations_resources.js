@@ -41,7 +41,13 @@ const testSuits = {
     bigquery: ['BigQuery', bigqueryTestEnvInit],
 }
 
-const testedSuit = () => testSuits[process.env.TEST_ENGINE]
+const testedSuit = () => {
+    const item = testSuits[process.env.TEST_ENGINE]
+    return {
+        name: item[0],
+        setup: item[1]
+    }
+}
 
 
 module.exports = { env, testedSuit }

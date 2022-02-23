@@ -3,67 +3,64 @@ const schema = require('../drivers/schema_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
 const { authOwner } = require('../drivers/auth_test_support')
 const Chance = require('chance')
-const { initApp, teardownApp, dbTeardown, testedSuit } = require('../resources/e2e_resources')
+const { initApp, teardownApp, dbTeardown } = require('../resources/e2e_resources')
+const { name, setup } = require('../resources/e2e_resources').testedSuit()
 const chance = Chance()
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
 
-describe('Velo External DB Schema REST API',  () => {
-    const [name, setup] = testedSuit()
-    describe(`${name}`, () => {
-        beforeAll(async() => {
-            await setup()
+describe(`Velo External DB Schema REST API: ${name}`,  () => {
+    beforeAll(async() => {
+        await setup()
 
-            await initApp()
-        }, 20000)
+        await initApp()
+    }, 20000)
 
-        afterAll(async() => {
-            await dbTeardown()
-        }, 20000)
+    afterAll(async() => {
+        await dbTeardown()
+    }, 20000)
 
-        test('list', async() => {
-            await expect( axios.post('/schemas/list', {}, authOwner) ).resolves.toEqual( matchers.collectionResponseWithNoCollections() )
-        })
-
-        test('list headers', async() => {
-            await schema.givenCollection(ctx.collectionName, [], authOwner)
-
-            await expect( axios.post('/schemas/list/headers', {}, authOwner) ).resolves.toEqual( matchers.collectionResponseWithCollections([ctx.collectionName]) )
-        })
-
-        test('create', async() => {
-            await axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)
-
-            await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseWithDefaultFieldsFor(ctx.collectionName) )
-        })
-
-        test('find', async() => {
-            await schema.givenCollection(ctx.collectionName, [], authOwner)
-
-            await expect( axios.post('/schemas/find', { schemaIds: [ctx.collectionName] }, authOwner)).resolves.toEqual( matchers.collectionResponseWithDefaultFieldsFor(ctx.collectionName) )
-        })
-
-        test('add column', async() => {
-            await schema.givenCollection(ctx.collectionName, [], authOwner)
-
-            await axios.post('/schemas/column/add', { collectionName: ctx.collectionName, column: ctx.column }, authOwner)
-
-            await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseHasField( ctx.column ) )
-        })
-
-        if (shouldNotRunOn(['Google-sheet'], name)) {
-            test('remove column', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-    
-                await axios.post('/schemas/column/remove', { collectionName: ctx.collectionName, columnName: ctx.column.name }, authOwner)
-    
-                await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.not.toEqual( matchers.collectionResponseHasField( ctx.column ) )
-            })
-        }
-        
+    test('list', async() => {
+        await expect( axios.post('/schemas/list', {}, authOwner) ).resolves.toEqual( matchers.collectionResponseWithNoCollections() )
     })
+
+    test('list headers', async() => {
+        await schema.givenCollection(ctx.collectionName, [], authOwner)
+
+        await expect( axios.post('/schemas/list/headers', {}, authOwner) ).resolves.toEqual( matchers.collectionResponseWithCollections([ctx.collectionName]) )
+    })
+
+    test('create', async() => {
+        await axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)
+
+        await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseWithDefaultFieldsFor(ctx.collectionName) )
+    })
+
+    test('find', async() => {
+        await schema.givenCollection(ctx.collectionName, [], authOwner)
+
+        await expect( axios.post('/schemas/find', { schemaIds: [ctx.collectionName] }, authOwner)).resolves.toEqual( matchers.collectionResponseWithDefaultFieldsFor(ctx.collectionName) )
+    })
+
+    test('add column', async() => {
+        await schema.givenCollection(ctx.collectionName, [], authOwner)
+
+        await axios.post('/schemas/column/add', { collectionName: ctx.collectionName, column: ctx.column }, authOwner)
+
+        await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseHasField( ctx.column ) )
+    })
+
+    if (shouldNotRunOn(['Google-sheet'], name)) {
+        test('remove column', async() => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+
+            await axios.post('/schemas/column/remove', { collectionName: ctx.collectionName, columnName: ctx.column.name }, authOwner)
+
+            await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.not.toEqual( matchers.collectionResponseHasField( ctx.column ) )
+        })
+    }
 
 
     const ctx = {

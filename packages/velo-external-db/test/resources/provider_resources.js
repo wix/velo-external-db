@@ -82,6 +82,12 @@ const testSuits = {
     'google-sheet': ['Google-Sheet', googleSheetTestEnvInit],
 }
 
-const testedSuit = () => testSuits[process.env.TEST_ENGINE]
+const testedSuit = () => {
+    const item = testSuits[process.env.TEST_ENGINE]
+    return {
+        name: item[0],
+        setup: item[1]
+    }
+}
 
 module.exports = { env, dbTeardown, testedSuit }
