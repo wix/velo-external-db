@@ -1,6 +1,6 @@
 const { checkRequiredKeys, isJson, EmptyRoleConfig, configPattern, collectionConfigPattern } = require('../utils/config_utils')
 const Avj = require('ajv')
-const ajv = new Avj()
+const ajv = new Avj({ strict: false })
 
 class AuthorizationConfigReader {
   constructor() {

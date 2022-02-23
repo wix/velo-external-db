@@ -1,7 +1,7 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
 const { checkRequiredKeys, isJson, EmptyRoleConfig, configPattern, collectionConfigPattern } = require('../utils/config_utils')
 const Avj = require('ajv')
-const ajv = new Avj()
+const ajv = new Avj({ strict: false })
 const EmptyAWSAuthConfig = { ROLE_CONFIG: EmptyRoleConfig }
 
 class AwsAuthorizationConfigReader {
