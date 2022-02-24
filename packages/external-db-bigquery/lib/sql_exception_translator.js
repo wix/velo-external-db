@@ -10,7 +10,6 @@ const notThrowingTranslateErrorCodes = err => {
 }
 
 const translateErrorCodes = err => {
-    console.log(err)
     throw notThrowingTranslateErrorCodes(err)
 }
 
