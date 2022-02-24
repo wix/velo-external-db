@@ -54,7 +54,7 @@ describe(`Velo External DB Data REST API: ${testedSuit().name}`,  () => {
 
 
 
-    if ( shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb', 'Google-sheet'], name) ) {
+    if ( shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb', 'Google-sheet'], testedSuit().name) ) {
     test('aggregate api', async() => {
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
         await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
@@ -87,7 +87,7 @@ describe(`Velo External DB Data REST API: ${testedSuit().name}`,  () => {
 }
 
 
-if (shouldNotRunOn(['BigQuery'], name)) {
+if (shouldNotRunOn(['BigQuery'], testedSuit().name)) {
     test('delete one api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
@@ -98,7 +98,7 @@ if (shouldNotRunOn(['BigQuery'], name)) {
     })
 }
 
-if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
+if (shouldNotRunOn(['BigQuery', 'Google-sheet'], testedSuit().name)) {
     test('bulk delete api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
@@ -109,7 +109,7 @@ if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
     })
 }
 
-if (shouldNotRunOn(['BigQuery'], name)) {
+if (shouldNotRunOn(['BigQuery'], testedSuit().name)) {
     test('get by id api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
@@ -118,7 +118,7 @@ if (shouldNotRunOn(['BigQuery'], name)) {
     })
 }
 
-    if (shouldNotRunOn(['BigQuery'], name)) {
+    if (shouldNotRunOn(['BigQuery'], testedSuit().name)) {
         test('update api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
@@ -129,7 +129,7 @@ if (shouldNotRunOn(['BigQuery'], name)) {
         })
     }
 
-    if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
+    if (shouldNotRunOn(['BigQuery', 'Google-sheet'], testedSuit().name)) {
         test('bulk update api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
@@ -147,7 +147,7 @@ if (shouldNotRunOn(['BigQuery'], name)) {
         await expect( axios.post('/data/count', { collectionName: ctx.collectionName, filter: '' }, authAdmin) ).resolves.toEqual(matchers.responseWith( { totalCount: 2 } ))
     })
 
-    if (shouldNotRunOn(['Google-sheet'], name)) {
+    if (shouldNotRunOn(['Google-sheet'], testedSuit().name)) {
         test('truncate api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)

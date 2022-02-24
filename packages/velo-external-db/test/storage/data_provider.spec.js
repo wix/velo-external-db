@@ -26,7 +26,7 @@ describe(`Data API: ${testedSuit().name}`, () => {
     })
 
 
-    if (shouldNotRunOn(['DynamoDb'], name)) {
+    if (shouldNotRunOn(['DynamoDb'], testedSuit().name)) {
         test('search with non empty filter, default projection will return data', async() => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
             env.driver.givenFilterByIdWith(ctx.entity._id, ctx.filter)
@@ -52,7 +52,7 @@ describe(`Data API: ${testedSuit().name}`, () => {
         })
     }
 
-    if(shouldNotRunOn(['Firestore', 'Google-Sheet'], name)) {
+    if(shouldNotRunOn(['Firestore', 'Google-Sheet'], testedSuit().name)) {
         test('search with projection will return the specified fields', async() => {
             const projection = ['_owner']
             await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)
@@ -104,7 +104,7 @@ describe(`Data API: ${testedSuit().name}`, () => {
         await expect( env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.numberEntity])
     })
 
-    if (shouldNotRunOn(['BigQuery'], name)) {
+    if (shouldNotRunOn(['BigQuery'], testedSuit().name)) {
         test('delete data from collection', async() => {
             await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)
             env.driver.stubEmptyFilterAndSortFor('', '')
@@ -116,7 +116,7 @@ describe(`Data API: ${testedSuit().name}`, () => {
         })
     }
 
-    if (shouldNotRunOn(['BigQuery'], name)) {
+    if (shouldNotRunOn(['BigQuery'], testedSuit().name)) {
         test('allow update for single entity', async() => {
             await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
             env.driver.stubEmptyFilterAndSortFor('', '')
@@ -128,7 +128,7 @@ describe(`Data API: ${testedSuit().name}`, () => {
     })
 }
 
-    if (shouldNotRunOn(['BigQuery'], name)) {
+    if (shouldNotRunOn(['BigQuery'], testedSuit().name)) {
         test('allow update for multiple entities', async() => {
             await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)
             env.driver.stubEmptyFilterAndSortFor('', '')
@@ -159,7 +159,7 @@ describe(`Data API: ${testedSuit().name}`, () => {
         await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([])
     })
 
-    if (shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb'], name)) {
+    if (shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb'], testedSuit().name)) {
         test('aggregate api without filter', async() => {
             await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
             await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName, ctx.numberEntityFields)

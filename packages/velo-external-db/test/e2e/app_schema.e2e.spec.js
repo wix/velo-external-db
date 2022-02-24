@@ -51,7 +51,7 @@ describe(`Velo External DB Schema REST API: ${testedSuit().name}`,  () => {
         await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseHasField( ctx.column ) )
     })
 
-    if (shouldNotRunOn(['Google-sheet'], name)) {
+    if (shouldNotRunOn(['Google-sheet'], testedSuit().name)) {
         test('remove column', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
