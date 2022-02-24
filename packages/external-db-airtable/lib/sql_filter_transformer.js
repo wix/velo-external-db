@@ -1,6 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { isObject, AdapterOperators, isEmptyFilter } = require('velo-external-db-commons')
-const { EMPTY_SORT } = require ('./airtable_utils')
+const { EmptySort } = require ('./airtable_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 
 class FilterParser {
@@ -130,12 +130,12 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return EMPTY_SORT
+            return EmptySort
         }
 
         const results=  sort.flatMap(this.parseSort)
         if (results.length === 0) {
-            return EMPTY_SORT
+            return EmptySort
         }
         return {
             sort: results

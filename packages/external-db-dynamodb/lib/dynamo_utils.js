@@ -2,7 +2,7 @@ const { InvalidQuery } = require('velo-external-db-commons').errors
 
 const SystemTable = '_descriptor'
 
-const EMPTY_FILTER = { filterExpr: {} }
+const EmptyFilter = { filterExpr: {} }
 
 const isSystemTable = collectionId => SystemTable === collectionId.trim().toLowerCase()
 
@@ -44,4 +44,4 @@ const canQuery = (filterExpr, collectionKeys) => {
 
 const isEmptyObject = obj => Object.keys(obj).length === 0
 
-module.exports = { SystemTable, isSystemTable, validateTable, EMPTY_FILTER, patchFixDates, reformatFields, patchCollectionKeys, canQuery, isEmptyObject }
+module.exports = { SystemTable, isSystemTable, validateTable, EmptyFilter, patchFixDates, reformatFields, patchCollectionKeys, canQuery, isEmptyObject }

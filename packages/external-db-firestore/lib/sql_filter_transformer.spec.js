@@ -7,7 +7,7 @@ const chance = Chance()
 const { AdapterOperators } = require('velo-external-db-commons')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, urlized } = AdapterOperators
 
-const EMPTY_SORT = []
+const EmptySort = []
 
 const randomFilter = () => {
     const operator = chance.pickone([ne, lt, lte, gt, gte, include, eq, string_begins, string_ends])
@@ -26,18 +26,18 @@ describe('Fire Store Parser', () => {
 
         // todo: should we even check for valid input or should we let the validation library to handle this ?
         test('handles undefined sort', () => {
-            expect( env.filterParser.orderBy('') ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy('    ') ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy(undefined) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy(null) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy({ invalid: 'object' }) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy(555) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy([5555]) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy(['sdfsdf']) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy([null]) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy([undefined]) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy([{ invalid: 'object' }]) ).toEqual(EMPTY_SORT)
-            expect( env.filterParser.orderBy([]) ).toEqual(EMPTY_SORT)
+            expect( env.filterParser.orderBy('') ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy('    ') ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy(undefined) ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy(null) ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy({ invalid: 'object' }) ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy(555) ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy([5555]) ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy(['sdfsdf']) ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy([null]) ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy([undefined]) ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy([{ invalid: 'object' }]) ).toEqual(EmptySort)
+            expect( env.filterParser.orderBy([]) ).toEqual(EmptySort)
         })
 
         test('process single sort expression invalid sort will return empty result', () => {

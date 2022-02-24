@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_FILTER, EMPTY_SORT, isObject, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter  } = require('velo-external-db-commons')
+const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter  } = require('velo-external-db-commons')
 const { wildCardWith, escapeId } = require('./mysql_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -11,7 +11,7 @@ class FilterParser {
     transform(filter) {
         const results = this.parseFilter(filter)
         if (results.length === 0) {
-            return EMPTY_FILTER
+            return EmptyFilter
         }
         return {
             filterExpr: `WHERE ${results[0].filterExpr}`,
@@ -116,13 +116,13 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return EMPTY_SORT
+            return EmptySort
         }
 
         const results = sort.flatMap( this.parseSort )
 
         if (results.length === 0) {
-            return EMPTY_SORT
+            return EmptySort
         }
 
         return {
@@ -191,7 +191,7 @@ class FilterParser {
     extractFilterExprAndParams(havingFilter) {
         return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
                                                                      parameters: parameters }))
-                           .concat(EMPTY_FILTER)[0]
+                           .concat(EmptyFilter)[0]
     }
 
     adapterFunction2Sql(f) {

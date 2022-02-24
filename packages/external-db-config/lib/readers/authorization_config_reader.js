@@ -1,6 +1,6 @@
-const { checkRequiredKeys, isJson, EMPTY_ROLE_CONFIG, configPattern, collectionConfigPattern } = require('../utils/config_utils')
+const { checkRequiredKeys, isJson, EmptyRoleConfig, configPattern, collectionConfigPattern } = require('../utils/config_utils')
 const Avj = require('ajv')
-const ajv = new Avj()
+const ajv = new Avj({ strict: false })
 
 class AuthorizationConfigReader {
   constructor() {
@@ -10,7 +10,7 @@ class AuthorizationConfigReader {
 
   async readConfig() {
     const { ROLE_CONFIG: roleConfig } = process.env
-    const { collectionLevelConfig } = isJson(roleConfig) ? JSON.parse(roleConfig) : EMPTY_ROLE_CONFIG
+    const { collectionLevelConfig } = isJson(roleConfig) ? JSON.parse(roleConfig) : EmptyRoleConfig
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
 

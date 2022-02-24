@@ -30,8 +30,8 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        const { LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, DESCRIBE_COLLECTION } = SchemaOperations
-        return [LIST, LIST_HEADERS, CREATE, DROP, ADD_COLUMN, DESCRIBE_COLLECTION]
+        const { List, ListHeaders, Create, Drop, AddColumn, Describe } = SchemaOperations
+        return [ List, ListHeaders, Create, Drop, AddColumn, Describe ]
     }
 
     async create(collectionName) {

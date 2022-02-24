@@ -1,5 +1,5 @@
 const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, SchemaOperations, errors } = require('velo-external-db-commons')
-const { CREATE, ADD_COLUMN, REMOVE_COLUMN } = SchemaOperations
+const { Create, AddColumn, RemoveColumn } = SchemaOperations
 
 class SchemaService {
     constructor(storage, schemaInformation) {
@@ -27,21 +27,21 @@ class SchemaService {
     }
 
     async create(collectionName) {
-        await this.validateOperation(CREATE)
+        await this.validateOperation(Create)
         await this.storage.create(collectionName)
         await this.schemaInformation.refresh()
         return {}
     }
 
     async addColumn(collectionName, column) {
-        await this.validateOperation(ADD_COLUMN)
+        await this.validateOperation(AddColumn)
         await this.storage.addColumn(collectionName, column)
         await this.schemaInformation.refresh()
         return {}
     }
 
     async removeColumn(collectionName, columnName) {
-        await this.validateOperation(REMOVE_COLUMN)
+        await this.validateOperation(RemoveColumn)
         await this.storage.removeColumn(collectionName, columnName)
         await this.schemaInformation.refresh()
         return {}

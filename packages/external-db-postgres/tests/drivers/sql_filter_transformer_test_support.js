@@ -1,4 +1,4 @@
-const { EMPTY_SORT } = require('velo-external-db-commons')
+const { EmptySort } = require('velo-external-db-commons')
 const { when } = require('jest-when')
 const { escapeIdentifier } = require('../../lib/postgres_utils')
 
@@ -22,7 +22,7 @@ const stubEmptyFilterFor = (filter) => {
 
 const stubEmptyOrderByFor = (sort) => {
     when(filterParser.orderBy).calledWith(sort)
-                              .mockReturnValue(EMPTY_SORT)
+                              .mockReturnValue(EmptySort)
 }
 
 const givenOrderByFor = (column, sort) => {

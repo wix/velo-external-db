@@ -10,7 +10,7 @@ const validateTable = collection => {
     }
 }
 
-const EMPTY_FILTER = { filterExpr: {} }
+const EmptyFilter = { filterExpr: {} }
 const notConnectedPool = err => ( {
         pool: { db: () => { throw err } },
         cleanup: () => { }
@@ -34,4 +34,4 @@ const unpackIdFieldForItem = item => {
     return item
 }
 
-module.exports = { EMPTY_FILTER, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor, validateTable, SystemTable }
+module.exports = { EmptyFilter, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor, validateTable, SystemTable }

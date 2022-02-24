@@ -1,6 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EMPTY_SORT, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter } = require('velo-external-db-commons')
-const { EMPTY_FILTER } = require('./mongo_utils')
+const { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter } = require('velo-external-db-commons')
+const { EmptyFilter } = require('./mongo_utils')
 const { string_begins, string_ends, string_contains, urlized } = AdapterOperators
 const { count } = AdapterFunctions
 
@@ -11,7 +11,7 @@ class FilterParser {
     transform(filter) {
         const results = this.parseFilter(filter)
         if (results.length === 0) {
-            return EMPTY_FILTER
+            return EmptyFilter
         }
         return {
             filterExpr: results[0].filterExpr
@@ -123,12 +123,12 @@ class FilterParser {
 
     orderBy(sort) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
-            return EMPTY_SORT
+            return EmptySort
         }
 
         const results = sort.flatMap(this.parseSort)
         if (results.length === 0) {
-            return EMPTY_SORT
+            return EmptySort
         }
         return {
             sortExpr: { sort: results.map(result => result.expr) }

@@ -1,4 +1,4 @@
-const { EMPTY_FILTER } = require('../../lib/converters/utils')
+const { EmptyFilter } = require('../../lib/converters/utils')
 const { when } = require('jest-when')
 const { AdapterFunctions } = require('velo-external-db-commons')
 
@@ -8,7 +8,7 @@ const filterTransformer = {
 
 const stubEmptyFilterFor = (filter) => {
     when(filterTransformer.transform).calledWith(filter)
-        .mockReturnValue(EMPTY_FILTER)
+        .mockReturnValue(EmptyFilter)
 }
 
 const givenFilterByIdWith = (id, filter) => {
