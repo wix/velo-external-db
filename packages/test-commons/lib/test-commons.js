@@ -13,7 +13,17 @@ const removeColumnNotIn = (supportedOperations) => !supportedOperations.includes
 
 const addColumnNotIn = (supportedOperations) => !supportedOperations.includes(AddColumn)
 
-const passTest = () =>  expect(true).toBe(true)
+const testIfSchemaSupportsAddColumn = async({ schemaOperations }, f) => {
+    if (!addColumnNotIn(schemaOperations)) {
+        return await f()
+    }
+}
+
+const testIfSchemaSupportsRemoveColumn = async({ schemaOperations }, f) => {
+    if (!removeColumnNotIn(schemaOperations)) {
+        return await f()
+    }
+}
 
 module.exports = { shouldNotRunOn, shouldRunOnlyOn, sleep, Uninitialized, 
-    removeColumnNotIn, addColumnNotIn, passTest }
+    testIfSchemaSupportsAddColumn, testIfSchemaSupportsRemoveColumn }
