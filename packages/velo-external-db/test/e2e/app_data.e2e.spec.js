@@ -24,7 +24,7 @@ describe(`Velo External DB Data REST API: ${testedSuit().name}`,  () => {
         await dbTeardown()
     }, 20000)
 
-    if (shouldNotRunOn(['DynamoDb', 'Google-sheet'], name)) { //todo: create another test without sort for these implementations
+    if (shouldNotRunOn(['DynamoDb', 'Google-sheet'], testedSuit().name)) { //todo: create another test without sort for these implementations
         test('find api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
