@@ -1,5 +1,5 @@
 const { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, errors } = require('velo-external-db-commons')
-const { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes } = require('./sql_exception_translator')
+const { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes, removeColumnTranslateErrorCodes } = require('./sql_exception_translator')
 const { escapeIdentifier } = require('./bigquery_utils')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 class SchemaProvider {
@@ -53,7 +53,7 @@ class SchemaProvider {
         await validateSystemFields(columnName)
         const fullCollectionName = `${this.projectId}.${this.databaseId}.${collectionName}`
         await this.pool.query(`CREATE OR REPLACE TABLE ${escapeIdentifier(fullCollectionName)} AS SELECT * EXCEPT (${escapeIdentifier(columnName)}) FROM ${escapeIdentifier(fullCollectionName)}`)
-                       .catch(translateErrorCodes)
+                       .catch(removeColumnTranslateErrorCodes)
     }
 
     async describeCollection(collectionName) {

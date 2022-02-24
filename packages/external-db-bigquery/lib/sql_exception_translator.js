@@ -1,4 +1,4 @@
-const { CollectionDoesNotExists, FieldAlreadyExists } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {
@@ -10,6 +10,7 @@ const notThrowingTranslateErrorCodes = err => {
 }
 
 const translateErrorCodes = err => {
+    console.log(err)
     throw notThrowingTranslateErrorCodes(err)
 }
 
@@ -30,6 +31,14 @@ const addColumnTranslateErrorCodes = err => {
         throw notThrowingTranslateErrorCodes(err)
 }
 
+const removeColumnTranslateErrorCodes = err => {
+    if (err.code === 400)
+        throw new FieldDoesNotExist(err.message)
+    else
+        throw notThrowingTranslateErrorCodes(err)
+}
+
 module.exports = { notThrowingTranslateErrorCodes, translateErrorCodes,
-    createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes }
+    createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes,
+    removeColumnTranslateErrorCodes }
 
