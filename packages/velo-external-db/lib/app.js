@@ -12,7 +12,7 @@ const { createRouter, initServices } = require('./router')
 const { create, readCommonConfig } = require('external-db-config')
 
 let started = false
-let server, _cleanup
+let server, _schemaProvider, _cleanup
 
 const load = async() => {
     const { vendor, type: adapterType } = readCommonConfig()
@@ -36,6 +36,9 @@ const load = async() => {
         await cleanup()
         schemaInformation.cleanup()
     }
+
+    _schemaProvider = schemaProvider
+
     return { secretKey }
 }
 
@@ -61,7 +64,7 @@ load().then(({ secretKey }) => {
     started = true
 })
 
-const internals = () => ({ server: server, cleanup: _cleanup, started: started, reload: load })
+const internals = () => ({ server: server, schemaProvider: _schemaProvider, cleanup: _cleanup, started: started, reload: load })
 
 
 module.exports = { internals }
