@@ -1,12 +1,7 @@
 const { SchemaOperations } = require('velo-external-db-commons')
 const { ADD_COLUMN, REMOVE_COLUMN } = SchemaOperations
 
-const suitDef = (name, setup) => {
-    return {
-        name,
-        setup,
-    }
-}
+const suitDef = (name, setup) => ( { name, setup } )
 
 const Uninitialized = null
 
