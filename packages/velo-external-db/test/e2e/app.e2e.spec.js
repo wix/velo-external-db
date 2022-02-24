@@ -1,14 +1,13 @@
 const { authOwner } = require('../drivers/auth_test_support')
-const { initApp, teardownApp, dbTeardown } = require('../resources/e2e_resources')
-const { name, setup } = require('../resources/e2e_resources').testedSuit()
+const { initApp, teardownApp, dbTeardown, testedSuit } = require('../resources/e2e_resources')
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
 
-describe(`Velo External DB: ${name}`,  () => {
+describe(`Velo External DB: ${testedSuit().name}`,  () => {
     beforeAll(async() => {
-        await setup()
+        await testedSuit().setup()
 
         await initApp()
     }, 20000)

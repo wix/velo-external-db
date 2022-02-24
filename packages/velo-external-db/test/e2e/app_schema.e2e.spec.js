@@ -3,17 +3,16 @@ const schema = require('../drivers/schema_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
 const { authOwner } = require('../drivers/auth_test_support')
 const Chance = require('chance')
-const { initApp, teardownApp, dbTeardown } = require('../resources/e2e_resources')
-const { name, setup } = require('../resources/e2e_resources').testedSuit()
+const { initApp, teardownApp, dbTeardown, testedSuit } = require('../resources/e2e_resources')
 const chance = Chance()
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
 
-describe(`Velo External DB Schema REST API: ${name}`,  () => {
+describe(`Velo External DB Schema REST API: ${testedSuit().name}`,  () => {
     beforeAll(async() => {
-        await setup()
+        await testedSuit().setup()
 
         await initApp()
     }, 20000)

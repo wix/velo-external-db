@@ -1,13 +1,12 @@
 const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
 const Chance = require('chance')
-const { env, dbTeardown } = require('../resources/provider_resources')
-const { name, setup } = require('../resources/provider_resources').testedSuit()
+const { env, dbTeardown, testedSuit } = require('../resources/provider_resources')
 const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers')
 const chance = new Chance()
 
-describe(`Data API: ${name}`, () => {
+describe(`Data API: ${testedSuit().name}`, () => {
     beforeAll(async() => {
-        await setup()
+        await testedSuit().setup()
     }, 20000)
 
     afterAll(async() => {
