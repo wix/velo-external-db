@@ -1,5 +1,5 @@
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { SystemFields, validateSystemFields, AllSchemaOperations } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, SchemaOperations } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 
 const axios = require('axios')
@@ -33,8 +33,10 @@ class SchemaProvider {
         return response.data.tables.map(rs => rs.name)
     }
 
-    supportedOperations() {
-        return AllSchemaOperations
+    supportedOperations()  {
+        const { List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately } = SchemaOperations
+
+        return [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately ]
     }
 
 

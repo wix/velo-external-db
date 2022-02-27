@@ -18,6 +18,7 @@ const env = {
     secretKey: Uninitialized,
     app: Uninitialized,
     internals: Uninitialized,
+    schemaOperations: Uninitialized,
 }
 
 const initApp = async() => {
@@ -32,6 +33,7 @@ const initApp = async() => {
         await waitUntil(() => env.internals().started)
     }
     env.app = env.internals()
+    env.schemaOperations = env.app.schemaProvider.supportedOperations()
 }
 
 const teardownApp = async() => {

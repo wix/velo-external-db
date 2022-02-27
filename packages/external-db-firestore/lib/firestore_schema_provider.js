@@ -1,4 +1,4 @@
-const { SystemFields, validateSystemFields, AllSchemaOperations } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, SchemaOperations } = require('velo-external-db-commons')
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
 
 const SystemTable = '_descriptor'
@@ -30,8 +30,11 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return AllSchemaOperations
+        const { List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately } = SchemaOperations
+
+        return [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately ]
     }
+
 
     async create(collectionName, columns) {
         const coll = await this.database.collection(SystemTable)

@@ -1,4 +1,4 @@
-const { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, errors } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData, SchemaOperations, errors } = require('velo-external-db-commons')
 const { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes, removeColumnTranslateErrorCodes } = require('./sql_exception_translator')
 const { escapeIdentifier } = require('./bigquery_utils')
 const SchemaColumnTranslator = require('./sql_schema_translator')
@@ -26,7 +26,9 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return AllSchemaOperations
+        const { List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, FindWithSort, Aggregate, BulkDelete, Truncate } = SchemaOperations
+
+        return [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, FindWithSort, Aggregate, BulkDelete, Truncate ]
     }
 
     async create(collectionName, _columns) {
