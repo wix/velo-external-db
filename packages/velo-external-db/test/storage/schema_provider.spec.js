@@ -1,16 +1,16 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('velo-external-db-commons').errors
 const { Uninitialized, gen, testIfSchemaSupportsAddColumn, testIfSchemaSupportsRemoveColumn } = require('test-commons')
 const Chance = require('chance')
-const { env, dbTeardown, testedSuit } = require('../resources/provider_resources')
+const { env, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/provider_resources')
 const { collectionWithDefaultFields, hasSameSchemaFieldsLike } = require('../drivers/schema_provider_matchers')
 const chance = new Chance()
 const { SystemFields } = require('velo-external-db-commons')
 
 
 
-describe(`Schema API: ${testedSuit().name}`, () => {
+describe(`Schema API: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {
-        await testedSuit().setup()
+        await setupDb()
     }, 20000)
 
     afterAll(async() => {

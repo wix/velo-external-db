@@ -1,12 +1,12 @@
 const { DbConnectionError } = require('velo-external-db-commons').errors
-const { env, testedSuit } = require('../resources/operations_resources')
+const { env, setupDb, currentDbImplementationName } = require('../resources/operations_resources')
 
-describe(`Check Pool Connection: ${testedSuit().name}`, () => {
+describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {
-        testedSuit().setup()
+        setupDb()
     })
 
-    if (testedSuit().name !== 'Bigquery') {
+    if (currentDbImplementationName() !== 'Bigquery') {
         test('pool connection with wrong password will return DbConnectionError.', async() => {
             const dbOperation = await env.driver.dbOperationWithMisconfiguredPassword()
 
@@ -17,7 +17,7 @@ describe(`Check Pool Connection: ${testedSuit().name}`, () => {
         })
     }
 
-    if (testedSuit().name !== 'Firestore') {
+    if (currentDbImplementationName() !== 'Firestore') {
         test('pool connection with wrong database will return DbConnectionError.', async() => {
             const dbOperation = await env.driver.dbOperationWithMisconfiguredDatabase()
 
@@ -28,7 +28,7 @@ describe(`Check Pool Connection: ${testedSuit().name}`, () => {
         })
     }
 
-    if (testedSuit().name !== 'Bigquery' && testedSuit().name !== 'Firestore') {
+    if (currentDbImplementationName() !== 'Bigquery' && currentDbImplementationName() !== 'Firestore') {
         test('pool connection with wrong host will return DbConnectionError.', async() => {
             const dbOperation = await env.driver.dbOperationWithMisconfiguredHost()
             const validateConnection = await dbOperation.validateConnection()

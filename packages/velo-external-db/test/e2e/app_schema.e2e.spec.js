@@ -3,16 +3,16 @@ const schema = require('../drivers/schema_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
 const { authOwner } = require('../drivers/auth_test_support')
 const Chance = require('chance')
-const { initApp, teardownApp, dbTeardown, testedSuit } = require('../resources/e2e_resources')
+const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/e2e_resources')
 const chance = Chance()
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
 
-describe(`Velo External DB Schema REST API: ${testedSuit().name}`,  () => {
+describe(`Velo External DB Schema REST API: ${currentDbImplementationName()}`,  () => {
     beforeAll(async() => {
-        await testedSuit().setup()
+        await setupDb()
 
         await initApp()
     }, 20000)
@@ -51,7 +51,7 @@ describe(`Velo External DB Schema REST API: ${testedSuit().name}`,  () => {
         await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseHasField( ctx.column ) )
     })
 
-    if (shouldNotRunOn(['Google-sheet'], testedSuit().name)) {
+    if (shouldNotRunOn(['Google-sheet'], currentDbImplementationName())) {
         test('remove column', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
