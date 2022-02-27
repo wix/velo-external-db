@@ -1,4 +1,5 @@
-const { Uninitialized, gen, shouldNotRunOn, testIfSchemaSupportsUpdateImmediately, testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate, testIfSchemaSupportsAggregate } = require('test-commons')
+const { Uninitialized, gen } = require('test-commons')
+const { testIfSchemaSupportsUpdateImmediately, testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate, testIfSchemaSupportsAggregate, testIfSchemaSupportsFindWithSort } = require('test-commons')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
@@ -26,18 +27,19 @@ describe('Velo External DB Data REST API',  () => {
             await dbTeardown()
         }, 20000)
 
-        if (shouldNotRunOn(['DynamoDb', 'Google-sheet'], name)) { //todo: create another test without sort for these implementations
-            test('find api', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-                await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
-                await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authVisitor) ).resolves.toEqual(
-                    expect.objectContaining({ data: {
-                            items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
-                            totalCount: 2
-                        } }))
-            })
-        }
+
+        test('find api', async() => testIfSchemaSupportsFindWithSort(env, async() => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+            await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
+            await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authVisitor) ).resolves.toEqual(
+                expect.objectContaining({ data: {
+                        items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
+                        totalCount: 2
+                    } }))
+        }))
+
+        //todo: create another test without sort for these implementations
 
         test('insert api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)

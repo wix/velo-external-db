@@ -1,5 +1,5 @@
 const { SchemaOperations } = require('velo-external-db-commons')
-const { AddColumn, RemoveColumn, UpdateImmediately, DeleteImmediately, Truncate, Aggregate } = SchemaOperations
+const { AddColumn, RemoveColumn, UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort } = SchemaOperations
 
 const Uninitialized = null
 
@@ -20,6 +20,8 @@ const deleteImmediatelyIn = (supportedOperations) => supportedOperations.include
 const truncateIn = (supportedOperations) => supportedOperations.includes(Truncate)
 
 const aggregateIn = (supportedOperations) => supportedOperations.includes(Aggregate)
+
+const findWithSortIn = (supportedOperations) => supportedOperations.includes(FindWithSort)
 
 const testIfSchemaSupportsAddColumn = async({ schemaOperations }, f) => {
     if (addColumnIn(schemaOperations)) {
@@ -57,6 +59,13 @@ const testIfSchemaSupportsAggregate = async({ schemaOperations }, f) => {
     }
 }
 
+const testIfSchemaSupportsFindWithSort = async({ schemaOperations }, f) => {
+    if (findWithSortIn(schemaOperations)) {
+        return await f()
+    }
+}
+
 module.exports = { shouldNotRunOn, shouldRunOnlyOn, sleep, Uninitialized, 
     testIfSchemaSupportsAddColumn, testIfSchemaSupportsRemoveColumn, testIfSchemaSupportsUpdateImmediately,
-    testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate, testIfSchemaSupportsAggregate }
+    testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate, 
+    testIfSchemaSupportsAggregate, testIfSchemaSupportsFindWithSort }
