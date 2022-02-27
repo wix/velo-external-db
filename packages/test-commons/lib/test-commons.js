@@ -1,5 +1,5 @@
 const { SchemaOperations } = require('velo-external-db-commons')
-const { AddColumn, RemoveColumn, UpdateImmediately, DeleteImmediately, Truncate } = SchemaOperations
+const { AddColumn, RemoveColumn, UpdateImmediately, DeleteImmediately, Truncate, Aggregate } = SchemaOperations
 
 const Uninitialized = null
 
@@ -18,6 +18,8 @@ const updateImmediatelyIn = (supportedOperations) => supportedOperations.include
 const deleteImmediatelyIn = (supportedOperations) => supportedOperations.includes(DeleteImmediately)
 
 const truncateIn = (supportedOperations) => supportedOperations.includes(Truncate)
+
+const aggregateIn = (supportedOperations) => supportedOperations.includes(Aggregate)
 
 const testIfSchemaSupportsAddColumn = async({ schemaOperations }, f) => {
     if (addColumnIn(schemaOperations)) {
@@ -49,6 +51,12 @@ const testIfSchemaSupportsTruncate = async({ schemaOperations }, f) => {
     }
 }
 
+const testIfSchemaSupportsAggregate = async({ schemaOperations }, f) => {
+    if (aggregateIn(schemaOperations)) {
+        return await f()
+    }
+}
+
 module.exports = { shouldNotRunOn, shouldRunOnlyOn, sleep, Uninitialized, 
     testIfSchemaSupportsAddColumn, testIfSchemaSupportsRemoveColumn, testIfSchemaSupportsUpdateImmediately,
-    testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate }
+    testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate, testIfSchemaSupportsAggregate }

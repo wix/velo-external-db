@@ -1,4 +1,4 @@
-const { Uninitialized, gen, shouldNotRunOn, testIfSchemaSupportsUpdateImmediately, testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate } = require('test-commons')
+const { Uninitialized, gen, shouldNotRunOn, testIfSchemaSupportsUpdateImmediately, testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate, testIfSchemaSupportsAggregate } = require('test-commons')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
@@ -55,9 +55,7 @@ describe('Velo External DB Data REST API',  () => {
         })
 
 
-
-        if ( shouldNotRunOn(['Firestore', 'Airtable', 'DynamoDb', 'Google-sheet'], name) ) {
-        test('aggregate api', async() => {
+        test('aggregate api', async() => testIfSchemaSupportsAggregate(env, async() => {
             await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
             await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
 
@@ -85,8 +83,7 @@ describe('Velo External DB Data REST API',  () => {
                     },
                 }, authAdmin) ).resolves.toEqual(matchers.responseWith({ items: [ { _id: ctx.numberItem._id, _owner: ctx.numberItem._owner, myAvg: ctx.numberItem[ctx.numberColumns[0].name], mySum: ctx.numberItem[ctx.numberColumns[1].name] } ],
                 totalCount: 0 }))
-        })
-    }
+        }))
 
         test('delete one api', async() => testIfSchemaSupportsDeleteImmediately(env, async() => { 
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
