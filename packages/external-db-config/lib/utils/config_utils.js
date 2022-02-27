@@ -6,10 +6,30 @@ const supportedDBs = ['postgres', 'spanner', 'firestore', 'mssql', 'mysql', 'mon
 
 const supportedVendors = ['gcp', 'aws', 'azure']
 
-const isJson = (str) => { try { JSON.parse(str); return true } catch (e) { return false } }
+const veloRoles = ['OWNER', 'BACKEND_CODE', 'VISITOR', 'MEMBER']
 
-const EMPTY_ROLE_CONFIG = {
-    collectionLevelRoleConfig: []
+const collectionConfigPattern = {
+    type: 'object',
+    properties: {
+        id: { type: 'string' },
+        readPolicies: { type: 'array', items: { enum: veloRoles } },
+        writePolicies: { type: 'array', items: { enum: veloRoles } },
+    },
+    required: ['id']
 }
 
-module.exports = { checkRequiredKeys, supportedDBs, supportedVendors, isJson, EMPTY_ROLE_CONFIG }
+const configPattern = {
+    type: 'object',
+    properties: {
+        collectionLevelConfig: { items: collectionConfigPattern }
+    },
+    required: ['collectionLevelConfig']
+}
+
+const isJson = (str) => { try { JSON.parse(str); return true } catch (e) { return false } }
+
+const EmptyRoleConfig = {
+    collectionLevelConfig: []
+}
+
+module.exports = { checkRequiredKeys, supportedDBs, supportedVendors, isJson, EmptyRoleConfig, configPattern, collectionConfigPattern }

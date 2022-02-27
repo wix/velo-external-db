@@ -1,10 +1,10 @@
 const moment = require('moment')
 
-const EMPTY_SORT = {
+const EmptySort = {
     sortExpr: '',
 }
 
-const EMPTY_FILTER = {
+const EmptyFilter = {
     filterExpr: '',
     parameters: [],
     offset: 1
@@ -74,6 +74,6 @@ const extractGroupByNames = (projection) =>  projection.filter(f => !f.function)
 
 const extractProjectionFunctionsObjects = (projection) => projection.filter(f => f.function)
 
-module.exports = { EMPTY_FILTER, EMPTY_SORT, patchDateTime, asParamArrays, isObject, isDate,
+module.exports = { EmptyFilter, EmptySort, patchDateTime, asParamArrays, isObject, isDate,
                      updateFieldsFor, isEmptyFilter, AdapterOperators, AdapterFunctions,
                      extractGroupByNames, extractProjectionFunctionsObjects }

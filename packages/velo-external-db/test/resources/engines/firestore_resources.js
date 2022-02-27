@@ -4,9 +4,9 @@ const { runImage, stopImage } = require('./docker_support')
 const setEmulatorOn = () => process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8082'
 
 const connection = () => {
-    const { connection, cleanup } = init(['test-project'])
+    const { connection, schemaProvider, cleanup } = init(['test-project'])
 
-    return { pool: connection, cleanup }
+    return { pool: connection, schemaProvider, cleanup }
 }
 
 const cleanup = async() => {

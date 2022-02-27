@@ -1,7 +1,7 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { Uninitialized } = require('test-commons')
 const gen = require('../../test/gen')
-const { EMPTY_FILTER } = require ('../converters/utils')
+const { EmptyFilter } = require ('../converters/utils')
 const { queryAdapterOperatorsFor } = require ('./query_validator_utils')
 const QueryValidator = require ('./query_validator')
 const Chance = require('chance')
@@ -75,7 +75,7 @@ describe('Query Validator', () => {
         test('will not throw if projection fields exist', () => {
             const aggregation = {
                 projection: [{ name: ctx.fieldName }],
-                postFilter: EMPTY_FILTER
+                postFilter: EmptyFilter
             }
             expect ( () => env.queryValidator.validateAggregation([{ field: ctx.fieldName, type: ctx.type }], aggregation)).not.toThrow()
 
@@ -84,7 +84,7 @@ describe('Query Validator', () => {
         test('will not throw with projection on alias', () => {
             const aggregation = {
                 projection: [{ name: ctx.fieldName, alias: ctx.anotherFieldName }],
-                postFilter: EMPTY_FILTER
+                postFilter: EmptyFilter
             }
             expect ( () => env.queryValidator.validateAggregation([{ field: ctx.fieldName, type: ctx.type }], aggregation)).not.toThrow()
         })
@@ -128,7 +128,7 @@ describe('Query Validator', () => {
         test('will throw Invalid Query with projection with non exist field', () => {
             const aggregation = {
                 projection: [{ name: 'wrong' }],
-                postFilter: EMPTY_FILTER
+                postFilter: EmptyFilter
             }
             expect ( () => env.queryValidator.validateAggregation([{ field: ctx.fieldName, type: ctx.type }], aggregation)).toThrow(InvalidQuery)
         })

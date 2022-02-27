@@ -3,8 +3,8 @@ const { init, mockServer } = require('external-db-google-sheets')
 let _server, port = 1502
 
 const connection = async() => {
-    const { connection, cleanup } = await init({ sheetId: 'test-sheet-id' })
-    return { pool: connection, cleanup: cleanup }
+    const { connection, schemaProvider, cleanup } = await init({ sheetId: 'test-sheet-id' })
+    return { pool: connection, schemaProvider, cleanup: cleanup }
 }   
 
 const cleanup = async() => {

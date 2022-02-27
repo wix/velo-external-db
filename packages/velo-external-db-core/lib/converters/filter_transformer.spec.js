@@ -1,7 +1,7 @@
 const { Uninitialized } = require('test-commons')
 const gen2 = require('../../test/gen')
 const FilterTransformer = require('./filter_transformer')
-const { EMPTY_FILTER } = require('./utils')
+const { EmptyFilter } = require('./utils')
 const Chance = require('chance')
 const chance = Chance()
 const each = require('jest-each').default
@@ -43,16 +43,16 @@ describe('Filter Transformer', () => {
     })
 
     test('handles undefined filter', () => {
-        expect(env.FilterTransformer.transform('')).toEqual(EMPTY_FILTER)
-        expect(env.FilterTransformer.transform(undefined)).toEqual(EMPTY_FILTER)
-        expect(env.FilterTransformer.transform(null)).toEqual(EMPTY_FILTER)
-        expect(env.FilterTransformer.transform(555)).toEqual(EMPTY_FILTER)
+        expect(env.FilterTransformer.transform('')).toEqual(EmptyFilter)
+        expect(env.FilterTransformer.transform(undefined)).toEqual(EmptyFilter)
+        expect(env.FilterTransformer.transform(null)).toEqual(EmptyFilter)
+        expect(env.FilterTransformer.transform(555)).toEqual(EmptyFilter)
 
     })
 
     test('handles empty filter', () => {
-        expect(env.FilterTransformer.transform({})).toEqual(EMPTY_FILTER)
-        expect(env.FilterTransformer.transform([])).toEqual(EMPTY_FILTER)
+        expect(env.FilterTransformer.transform({})).toEqual(EmptyFilter)
+        expect(env.FilterTransformer.transform([])).toEqual(EmptyFilter)
     })
 
     describe('handle single field operator', () => {

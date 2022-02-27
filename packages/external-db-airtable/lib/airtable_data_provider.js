@@ -1,4 +1,4 @@
-const { minifyAndFixDates, DEFAULT_MAX_RECORDS, EMPTY_SORT } = require('./airtable_utils')
+const { minifyAndFixDates, DEFAULT_MAX_RECORDS, EmptySort } = require('./airtable_utils')
 
 class DataProvider {
     constructor(base, filterParser) {
@@ -63,7 +63,7 @@ class DataProvider {
         const limit = limitExpr?.maxRecords ? limitExpr : { maxRecords: DEFAULT_MAX_RECORDS }
         limit.maxRecords += skip 
 
-        const sort = EMPTY_SORT
+        const sort = EmptySort
         if (sortExpr && sortExpr.sort) Object.assign (sort, sortExpr)
         await this.base(collectionName)
                   .select({ ...filterByFormula, ...limitExpr, ...sort })

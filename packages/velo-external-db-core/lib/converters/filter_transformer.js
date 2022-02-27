@@ -1,5 +1,5 @@
 const { AdapterOperators, isObject } = require('velo-external-db-commons')
-const { EMPTY_FILTER } = require ('./utils')
+const { EmptyFilter } = require ('./utils')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 
 class FilterTransformer {
@@ -8,7 +8,7 @@ class FilterTransformer {
     }
 
     transform(filter) {
-        if (this.isEmptyFilter(filter)) return EMPTY_FILTER
+        if (this.isEmptyFilter(filter)) return EmptyFilter
 
         if(this.isMultipleFieldOperator(filter)) {
             const wixOperator = Object.keys(filter)[0]

@@ -18,9 +18,9 @@ const extraOptions = {
 }
 
 const connection = async() => {
-    const { connection, cleanup } = await init(testEnvConfig, extraOptions)
+    const { connection, schemaProvider, cleanup } = await init(testEnvConfig, extraOptions)
 
-    return { pool: connection, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
 const cleanup = async() => {

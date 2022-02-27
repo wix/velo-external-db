@@ -1,6 +1,6 @@
 const { Uninitialized } = require('test-commons')
 const AggregationTransformer = require('./aggregation_transformer')
-const { EMPTY_FILTER } = require ('./utils')
+const { EmptyFilter } = require ('./utils')
 const Chance = require('chance')
 const chance = Chance()
 const each = require('jest-each').default
@@ -36,7 +36,7 @@ describe('Aggregation Transformer', () => {
 
         expect(env.AggregationTransformer.transform({ processingStep, postFilteringStep })).toEqual({
             projection: [{ name: ctx.fieldName }],
-            postFilter: EMPTY_FILTER
+            postFilter: EmptyFilter
         })
     })
 
@@ -56,7 +56,7 @@ describe('Aggregation Transformer', () => {
                             { name: ctx.fieldName },
                             { name: ctx.anotherFieldName }
                         ],
-            postFilter: EMPTY_FILTER
+            postFilter: EmptyFilter
         })
     })
 
@@ -76,7 +76,7 @@ describe('Aggregation Transformer', () => {
                             { name: ctx.fieldName }, 
                             { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg }
                         ],
-            postFilter: EMPTY_FILTER
+            postFilter: EmptyFilter
         })
     })
 
@@ -96,7 +96,7 @@ describe('Aggregation Transformer', () => {
                             { name: ctx.fieldName }, 
                             { alias: ctx.fieldAlias, function: AdapterFunctions.count, name: '*' }
                         ],
-            postFilter: EMPTY_FILTER
+            postFilter: EmptyFilter
         })
     })
     
@@ -120,7 +120,7 @@ describe('Aggregation Transformer', () => {
                             { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg },
                             { name: ctx.moreFieldName, alias: ctx.anotherFieldAlias, function: AdapterFunctions.sum }
                         ],
-            postFilter: EMPTY_FILTER
+            postFilter: EmptyFilter
         })
     })
 

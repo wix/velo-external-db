@@ -4,8 +4,8 @@ const { runImage, stopImage } = require('./docker_support')
 const setEmulatorOn = () => process.env.SPANNER_EMULATOR_HOST = 'localhost:9010'
 
 const connection = () => {
-    const { connection, cleanup } = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
-    return { pool: connection, cleanup: cleanup }
+    const { connection, schemaProvider, cleanup } = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
+    return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
 const cleanup = async() => {

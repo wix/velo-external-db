@@ -2,9 +2,9 @@ const { init } = require('external-db-dynamodb')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = async() => {
-    const { connection, cleanup } = await init(connectionConfig(), accessOptions())
+    const { connection, schemaProvider, cleanup } = await init(connectionConfig(), accessOptions())
 
-    return { pool: connection, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
 const cleanup = async() => {

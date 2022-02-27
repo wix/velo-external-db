@@ -2,7 +2,7 @@ const { Uninitialized } = require('test-commons')
 const { extractFieldsAndOperators, queryAdapterOperatorsFor } = require ('./query_validator_utils')
 const { AdapterOperators } = require('velo-external-db-commons')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, urlized, and } = AdapterOperators
-const { EMPTY_FILTER } = require('./utils')
+const { EmptyFilter } = require('./utils')
 const gen2 = require('../../test/gen')
 const Chance = require('chance')
 const chance = Chance()
@@ -10,7 +10,7 @@ const chance = Chance()
 describe('Query Validator utils spec', () => {
     describe('extractFieldsAndOperators', () => {
         test('should return empty array when called with empty filter', () => {
-            expect(extractFieldsAndOperators(EMPTY_FILTER)).toEqual([])
+            expect(extractFieldsAndOperators(EmptyFilter)).toEqual([])
         })
         
         test('correctly extract fields and operators with single field filter', () => {
