@@ -1,4 +1,4 @@
-const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
+const { Uninitialized, gen, shouldNotRunOn, testIfSchemaSupportsUpdateImmediately, testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate } = require('test-commons')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
@@ -6,7 +6,7 @@ const { authAdmin, authOwner, authVisitor } = require('../drivers/auth_test_supp
 const authorization = require ('../drivers/authorization_test_support')
 const Chance = require('chance')
 const each = require('jest-each').default
-const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
+const { env, initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
 
 const chance = Chance()
 
@@ -88,59 +88,48 @@ describe('Velo External DB Data REST API',  () => {
         })
     }
 
-
-    if (shouldNotRunOn(['BigQuery'], name)) {    
-        test('delete one api', async() => {
+        test('delete one api', async() => testIfSchemaSupportsDeleteImmediately(env, async() => { 
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
                 await axios.post('/data/remove', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin)
 
             await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
-        })
-    }
-
-    if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
-        test('bulk delete api', async() => {
+        }))
+    
+        test('bulk delete api', async() => testIfSchemaSupportsDeleteImmediately(env, async() => { 
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 
             await axios.post('/data/remove/bulk', { collectionName: ctx.collectionName, itemIds: ctx.items.map(i => i._id) }, authAdmin)
 
             await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
-        })
-    }
-
-    if (shouldNotRunOn(['BigQuery'], name)) {
+        }))
+    
         test('get by id api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
             await expect( axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin) ).resolves.toEqual(matchers.responseWith({ item: ctx.item }))
         })
-    }
+
+        test('update api', async() => testIfSchemaSupportsUpdateImmediately(env, async() => { 
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+
+            await axios.post('/data/update', { collectionName: ctx.collectionName, item: ctx.modifiedItem }, authAdmin)
+
+        await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ctx.modifiedItem], totalCount: 1 })
+        }))
         
-        if (shouldNotRunOn(['BigQuery'], name)) {
-            test('update api', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+        test('bulk update api', async() => testIfSchemaSupportsUpdateImmediately(env, async() => { 
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 
-                await axios.post('/data/update', { collectionName: ctx.collectionName, item: ctx.modifiedItem }, authAdmin)
+            await axios.post('/data/update/bulk', { collectionName: ctx.collectionName, items: ctx.modifiedItems }, authAdmin)
 
-            await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ctx.modifiedItem], totalCount: 1 })
-            })
-        }
-
-        if (shouldNotRunOn(['BigQuery', 'Google-sheet'], name)) {
-            test('bulk update api', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
-
-                await axios.post('/data/update/bulk', { collectionName: ctx.collectionName, items: ctx.modifiedItems }, authAdmin)
-
-            await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual( { items: expect.arrayContaining(ctx.modifiedItems), totalCount: ctx.modifiedItems.length })
-            })
-        }
+        await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual( { items: expect.arrayContaining(ctx.modifiedItems), totalCount: ctx.modifiedItems.length })
+        }))
 
         test('count api', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
@@ -149,16 +138,16 @@ describe('Velo External DB Data REST API',  () => {
             await expect( axios.post('/data/count', { collectionName: ctx.collectionName, filter: '' }, authAdmin) ).resolves.toEqual(matchers.responseWith( { totalCount: 2 } ))
         })
 
-        if (shouldNotRunOn(['Google-sheet'], name)) {
-            test('truncate api', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
 
-                await axios.post('/data/truncate', { collectionName: ctx.collectionName }, authAdmin)
+        test('truncate api', async() => testIfSchemaSupportsTruncate(env, async() => { 
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
 
-                await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
-            })
-        }
+            await axios.post('/data/truncate', { collectionName: ctx.collectionName }, authAdmin)
+
+            await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
+        }))
+        
 
     })
 
