@@ -42,7 +42,7 @@ const testSuits = {
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
-const setupDb = () => testedSuit().setup
+const setupDb = () => testedSuit().setup()
 const currentDbImplementationName = () => testedSuit().name
 
 module.exports = { env, setupDb, currentDbImplementationName }
