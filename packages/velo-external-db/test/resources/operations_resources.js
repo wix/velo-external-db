@@ -1,4 +1,5 @@
-const { Uninitialized, suitDef } = require('test-commons')
+const { Uninitialized } = require('test-commons')
+const { suiteDef } = require('test_suite_definition')
 const mysql = require('external-db-mysql')
 const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')
@@ -30,15 +31,15 @@ const dynamoTestEnvInit = async() => await init(dynamo)
 const bigqueryTestEnvInit = async() => await init(bigquery)
 
 const testSuits = {
-    mysql: suitDef('MySql', mysqlTestEnvInit),
-    postgres: suitDef('Postgres', postgresTestEnvInit),
-    spanner: suitDef('Spanner', spannerTestEnvInit),
-    firestore: suitDef('Firestore', firestoreTestEnvInit),
-    mssql: suitDef('Sql Server', mssqlTestEnvInit),
-    mongo: suitDef('Mongo', mongoTestEnvInit),
-    airtable: suitDef('Airtable', airTableTestEnvInit),
-    dynamodb: suitDef('DynamoDb', dynamoTestEnvInit),
-    bigquery: suitDef('BigQuery', bigqueryTestEnvInit),
+    mysql: suiteDef('MySql', mysqlTestEnvInit),
+    postgres: suiteDef('Postgres', postgresTestEnvInit),
+    spanner: suiteDef('Spanner', spannerTestEnvInit),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit),
+    mssql: suiteDef('Sql Server', mssqlTestEnvInit),
+    mongo: suiteDef('Mongo', mongoTestEnvInit),
+    airtable: suiteDef('Airtable', airTableTestEnvInit),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]

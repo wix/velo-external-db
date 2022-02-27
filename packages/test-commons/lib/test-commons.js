@@ -1,8 +1,6 @@
 const { SchemaOperations } = require('velo-external-db-commons')
 const { AddColumn, RemoveColumn } = SchemaOperations
 
-const suitDef = (name, setup) => ( { name, setup } )
-
 const Uninitialized = null
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -28,4 +26,4 @@ const testIfSchemaSupportsRemoveColumn = async({ schemaOperations }, f) => {
 }
 
 module.exports = { shouldNotRunOn, shouldRunOnlyOn, sleep, Uninitialized, 
-    testIfSchemaSupportsAddColumn, testIfSchemaSupportsRemoveColumn, suitDef }
+    testIfSchemaSupportsAddColumn, testIfSchemaSupportsRemoveColumn }

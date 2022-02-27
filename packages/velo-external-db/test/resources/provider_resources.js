@@ -1,4 +1,5 @@
-const { Uninitialized, suitDef } = require('test-commons')
+const { Uninitialized } = require('test-commons')
+const { suiteDef } = require('test_suite_definition')
 
 const mysql = require('external-db-mysql')
 const mysqlTestEnv = require('./engines/mysql_resources')
@@ -72,16 +73,16 @@ const bigqueryTestEnvInit = async() => await dbInit(bigqueryTestEnv, bigquery)
 const googleSheetTestEnvInit = async() => await dbInit(googleSheetTestEnv, googleSheet)
 
 const testSuits = {
-    mysql: suitDef('MySql', mysqlTestEnvInit),
-    postgres: suitDef('Postgres', postgresTestEnvInit),
-    spanner: suitDef('Spanner', spannerTestEnvInit),
-    firestore: suitDef('Firestore', firestoreTestEnvInit),
-    mssql: suitDef('Sql Server', mssqlTestEnvInit),
-    mongo: suitDef('Mongo', mongoTestEnvInit),
-    airtable: suitDef('Airtable', airTableTestEnvInit),
-    dynamodb: suitDef('DynamoDb', dynamoTestEnvInit),
-    bigquery: suitDef('BigQuery', bigqueryTestEnvInit),
-    'google-sheet': suitDef('Google-Sheet', googleSheetTestEnvInit),
+    mysql: suiteDef('MySql', mysqlTestEnvInit),
+    postgres: suiteDef('Postgres', postgresTestEnvInit),
+    spanner: suiteDef('Spanner', spannerTestEnvInit),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit),
+    mssql: suiteDef('Sql Server', mssqlTestEnvInit),
+    mongo: suiteDef('Mongo', mongoTestEnvInit),
+    airtable: suiteDef('Airtable', airTableTestEnvInit),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
+    'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
