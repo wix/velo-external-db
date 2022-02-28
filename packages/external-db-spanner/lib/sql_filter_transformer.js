@@ -116,7 +116,7 @@ class FilterParser {
 
         if (this.isSingleFieldStringOperator(operator)) {
             return [{
-                filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} LIKE ${validateLiteral(fieldName)}`,
+                filterExpr: `LOWER(${this.inlineVariableIfNeeded(fieldName, inlineFields)}) LIKE LOWER(${validateLiteral(fieldName)})`,
                 parameters: { [fieldName]: this.valueForStringOperator(operator, value) }
             }]
         }
