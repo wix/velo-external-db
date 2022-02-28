@@ -1,4 +1,5 @@
 const { Uninitialized, sleep } = require('test-commons')
+const { suiteDef } = require('./test_suite_definition')
 const { authInit } = require('../drivers/auth_test_support')
 const { waitUntil } = require('async-wait-until')
 
@@ -57,23 +58,26 @@ const firestoreTestEnvInit = async() => await dbInit(firestore)
 const mssqlTestEnvInit = async() => await dbInit(mssql)
 const mongoTestEnvInit = async() => await dbInit(mongo)
 const googleSheetTestEnvInit = async() => await dbInit(googleSheet)
-const airtableTestEnvInit = async() => await dbInit(airtable)
+const airTableTestEnvInit = async() => await dbInit(airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 
+const testSuits = {
+    mysql: suiteDef('MySql', mysqlTestEnvInit),
+    postgres: suiteDef('Postgres', postgresTestEnvInit),
+    spanner: suiteDef('Spanner', spannerTestEnvInit),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit),
+    mssql: suiteDef('Sql Server', mssqlTestEnvInit),
+    mongo: suiteDef('Mongo', mongoTestEnvInit),
+    airtable: suiteDef('Airtable', airTableTestEnvInit),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
+    'google-sheet': suiteDef('Google-sheet', googleSheetTestEnvInit),
+}
 
-const testSuits = () => [
-    ['MySql', mysqlTestEnvInit],
-    ['Postgres', postgresTestEnvInit],
-    ['Spanner', spannerTestEnvInit],
-    ['Firestore', firestoreTestEnvInit],
-    ['Sql Server', mssqlTestEnvInit],
-    ['Mongo', mongoTestEnvInit],
-    ['Google-sheet', googleSheetTestEnvInit],
-    ['Airtable', airtableTestEnvInit],
-    ['DynamoDb', dynamoTestEnvInit],
-    ['BigQuery', bigqueryTestEnvInit]
-].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
+const testedSuit = () => testSuits[process.env.TEST_ENGINE]
+const setupDb = () => testedSuit().setup()
+const currentDbImplementationName = () => testedSuit().name
 
 
-module.exports = { env, initApp, teardownApp, dbTeardown, testSuits }
+module.exports = { env, initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName }
