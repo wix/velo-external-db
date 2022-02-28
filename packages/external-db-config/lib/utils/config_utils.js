@@ -6,7 +6,7 @@ const supportedDBs = ['postgres', 'spanner', 'firestore', 'mssql', 'mysql', 'mon
 
 const supportedVendors = ['gcp', 'aws', 'azure']
 
-const veloRoles = ['OWNER', 'BACKEND_CODE', 'VISITOR', 'MEMBER']
+const veloRoles = ['Admin', 'Member', 'Visitor']
 
 const collectionConfigPattern = {
     type: 'object',
