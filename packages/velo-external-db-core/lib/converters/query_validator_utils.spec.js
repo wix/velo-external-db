@@ -1,8 +1,9 @@
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized } = require('test-commons')
 const { extractFieldsAndOperators, queryAdapterOperatorsFor } = require ('./query_validator_utils')
 const { AdapterOperators } = require('velo-external-db-commons')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, urlized, and } = AdapterOperators
 const { EmptyFilter } = require('./utils')
+const gen = require('../../test/gen')
 const Chance = require('chance')
 const chance = Chance()
 

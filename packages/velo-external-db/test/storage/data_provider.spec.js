@@ -1,5 +1,6 @@
-const { Uninitialized, gen, shouldNotRunOn } = require('test-commons')
+const { Uninitialized, shouldNotRunOn } = require('test-commons')
 const Chance = require('chance')
+const gen = require('../gen')
 const { env, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/provider_resources')
 const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers')
 const chance = new Chance()

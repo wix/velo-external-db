@@ -1,7 +1,6 @@
 const Chance = require('chance')
-const { SystemFields, AllSchemaOperations } = require('velo-external-db-commons')
-const { AdapterOperators } = require('../../velo-external-db-core/node_modules/velo-external-db-commons/lib')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators //TODO: extract
+const {  AdapterOperators } = require('velo-external-db-commons')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators 
 
 const chance = Chance()
 
@@ -19,15 +18,6 @@ const randomEntities = (columns) => {
     const arr = []
     for (let i = 0; i < num; i++) {
         arr.push(randomEntity(columns))
-    }
-    return arr
-}
-
-const randomDbEntities = (columns) => {
-    const num = chance.natural({ min: 2, max: 20 })
-    const arr = []
-    for (let i = 0; i < num; i++) {
-        arr.push(randomDbEntity(columns))
     }
     return arr
 }
@@ -53,32 +43,10 @@ const randomElementsFromArray = (arr) => {
 }
 
 const randomCollectionName = () => chance.word({ length: 5 })
+
 const randomCollections = () => randomArrayOf( randomCollectionName )
 
 const randomFieldName = () => chance.word({ length: 5 })
-
-const randomDbField = () => ( { field: chance.word(), type: randomWixDataType(), subtype: chance.word(), isPrimary: chance.bool() } )
-
-const randomDbFields = () => randomArrayOf( randomDbField )
-
-const systemFieldsWith = fields => {
-    const systemFields = SystemFields.map(({ name, type, subtype, isPrimary }) => ({ field: name, type, subtype, isPrimary }))
-    return fields.reduce((pV, cV) =>
-        [...pV, 
-        {
-            field: cV.name,
-            type: cV.type,
-            subtype: cV.subtype,
-            isPrimary: cV.isPrimary
-        }]
-        , systemFields)
-}
-
-const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
-const randomNumberColumns = () => {
-    return [ { name: chance.word(), type: 'number', subtype: 'int', isPrimary: false },
-             { name: chance.word(), type: 'number', subtype: 'decimal', precision: '10,2', isPrimary: false } ]
-}
 
 const randomEntity = (columns) => {
     const entity = {
@@ -96,51 +64,11 @@ const randomEntity = (columns) => {
     return entity
 }
 
-const randomDbEntity = (columns) => {
-    const entity = {
-        _id: chance.guid(),
-        _createdDate: newDate(),
-        _updatedDate: newDate(),
-        _owner: chance.guid(),
-    }
+const veloDate = () => ( { $date: newDate().toISOString() } )
 
-    const _columns = columns || []
+const randomObjectFromArray = (array) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
-    _columns.forEach(column => entity[column] = chance.word())
-
-    return entity
-}
-
-const randomNumberDbEntity = (columns) => {
-    const entity = {
-        _id: chance.guid(),
-        _createdDate: newDate(),
-        _updatedDate: newDate(),
-        _owner: chance.guid(),
-    }
-
-    const _columns = columns || []
-
-    _columns.forEach(column => {
-        if (column.type === 'number' && column.subtype === 'int') {
-            entity[column.name] = chance.integer({ min: 0, max: 10000 })
-        } else if (column.type === 'number' && column.subtype === 'decimal') {
-            entity[column.name] = chance.floating({ min: 0, max: 10000, fixed: 2 })
-        }
-    })
-
-    return entity
-}
-
-
-const randomFilter = () => {
-    const op = randomOperator()
-    const fieldName = chance.word()
-    const value = op === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
-    return {
-        [fieldName]: { [op]: value } 
-    }
-}
+const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
 
 const randomWrappedFilter = () => {
     const operator = randomAdapterOperator()
@@ -153,78 +81,9 @@ const randomWrappedFilter = () => {
     }
 }
 
-const idFilter = () => {
-    const operator = randomAdapterOperator()
-    const value = operator === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
-    return {
-        fieldName: '_id',
-        operator,
-        value
-    }
-}
-
-const randomOperator = () => (chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith']))
-
-const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
-
-const veloDate = () => ( { $date: newDate().toISOString() } )
-
-const randomDb = () => ( { id: randomCollectionName(),
-                           fields: randomDbFields() })
-
-const randomDbs = () => randomArrayOf( randomDb )
-
-const randomDbsWithIdColumn = () => randomDbs().map(i => ({ ...i, fields: [ ...i.fields, { field: '_id', type: 'text' }] }))
-
-const randomObjectFromArray = (array) => array[chance.integer({ min: 0, max: array.length - 1 })]
-
-const randomKeyObject = (obj) => {
-    const objectKeys = Object.keys(obj)
-    const selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
-    return selectedKey
-}
-
-const deleteRandomKeyObject = (obj) => {
-    const deletedKey = randomKeyObject(obj)
-    delete obj[deletedKey]
-    return { deletedKey, newObject: obj }
-}
-
-const clearRandomKeyObject = (obj) => {
-    const newObject = { ...obj }
-    const clearedKey = randomKeyObject(newObject)
-    newObject[clearedKey] = ''
-    return { clearedKey, newObject }
-}
-
-
-const randomConfig = () => ({
-    host: chance.url(),
-    user: chance.first(),
-    password: chance.guid(),
-    secretKey: chance.guid(),
-    db: chance.word(),
-})
-
-
-const randomWixType = () => randomObjectFromArray(['number', 'text', 'boolean', 'url', 'datetime', 'object'])
-
-const invalidOperatorForType = (validOperators) => randomObjectFromArray (
-                                                                Object.values(AdapterOperators).filter(x => !validOperators.includes(x))
-                                                            )
-
-const randomSchemaOperation = () => (chance.pickone(AllSchemaOperations))
-
-const randomSchemaOperations = () => randomElementsFromArray(AllSchemaOperations)
-
-const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'url', 'datetime', 'image', 'object' ])
-
-
-module.exports = { randomEntities, randomEntity, randomFilter, idFilter, veloDate, randomObject, randomDbs,
-                   randomDbEntity, randomDbEntities, randomColumn, randomCollectionName, randomNumberDbEntity, randomObjectFromArray,
-                   randomCollections, randomNumberColumns, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
-                   systemFieldsWith, randomFieldName, randomOperator, randomAdapterOperator, randomWrappedFilter, randomWixType,
-                   invalidOperatorForType, randomSchemaOperation, randomSchemaOperations, randomDbsWithIdColumn, randomArrayOf,
-                   randomElementsFromArray }
+module.exports = { randomEntities, randomEntity, veloDate, randomObject, 
+                   randomCollectionName, randomObjectFromArray, randomCollections,
+                   randomFieldName, randomAdapterOperator, randomWrappedFilter,
+                   randomArrayOf, randomElementsFromArray }
 
 

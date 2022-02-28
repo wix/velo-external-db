@@ -1,7 +1,8 @@
 const ConfigReader = require('./config_reader')
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized } = require('test-commons')
 const driver = require('../../test/drivers/external_db_config_test_support')
 const matchers = require('./config_reader_matchers')
+const gen = require('../../test/gen')
 const Chance = require('chance')
 const chance = new Chance()
 

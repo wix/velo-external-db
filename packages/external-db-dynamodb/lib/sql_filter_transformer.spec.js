@@ -2,6 +2,7 @@ const FilterParser = require('./sql_filter_transformer')
 const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { AdapterOperators } = require('velo-external-db-commons')
+const { idFilter } = require('../tests/gen')
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()
@@ -266,7 +267,7 @@ describe('Sql Parser', () => {
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
         ctx.filter = gen.randomWrappedFilter()
-        ctx.idFilter = gen.idFilter()
+        ctx.idFilter = idFilter()
         ctx.anotherFilter = gen.randomWrappedFilter()
     })
 
