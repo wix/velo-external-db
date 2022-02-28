@@ -9,8 +9,12 @@
             "roles": ["OWNER"]
         },
         {
-            "pathPrefix": "/schemas",
+            "pathPrefix": "/schemas/list",
             "roles": ["OWNER", "BACKEND_CODE", "MEMBER"]
+        },
+        {
+            "pathPrefix": "/schemas/find",
+            "roles": ["OWNER", "BACKEND_CODE", "MEMBER", "VISITOR"]
         }
     ]
 }

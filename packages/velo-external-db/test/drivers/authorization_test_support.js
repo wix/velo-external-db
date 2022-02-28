@@ -1,6 +1,6 @@
 const { dbTeardown, initApp } = require('../resources/e2e_resources')
 
-const DefaultPolicies = ['OWNER', 'BACKEND_CODE']
+const DefaultPolicies = ['Admin']
 
 const authRoleConfig = (collectionName, readPolicies, writePolicies) => {
     const config = {
@@ -17,7 +17,7 @@ const authRoleConfig = (collectionName, readPolicies, writePolicies) => {
 
 const givenCollectionWithVisitorReadPolicy = async(collectionName) => {
     await dbTeardown()
-    authRoleConfig(collectionName, ['VISITOR'], [])
+    authRoleConfig(collectionName, ['Visitor'], [])
     await initApp()
 }
 

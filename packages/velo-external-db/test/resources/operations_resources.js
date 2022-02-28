@@ -1,4 +1,5 @@
 const { Uninitialized } = require('test-commons')
+const { suiteDef } = require('./test_suite_definition')
 const mysql = require('external-db-mysql')
 const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')
@@ -25,21 +26,24 @@ const spannerTestEnvInit = async() => await init(spanner)
 const firestoreTestEnvInit = async() => await init(firestore)
 const mssqlTestEnvInit = async() => await init(mssql)
 const mongoTestEnvInit = async() => await init(mongo)
-const airtableTestEnvInit = async() => await init(airtable)
+const airTableTestEnvInit = async() => await init(airtable)
 const dynamoTestEnvInit = async() => await init(dynamo)
 const bigqueryTestEnvInit = async() => await init(bigquery)
 
-const testSuits = () => [
-    ['MySql', mysqlTestEnvInit],
-    ['Postgres', postgresTestEnvInit],
-    ['Spanner', spannerTestEnvInit],
-    ['Firestore', firestoreTestEnvInit],
-    ['Sql Server', mssqlTestEnvInit],
-    ['Mongo', mongoTestEnvInit],
-    ['Airtable', airtableTestEnvInit],
-    ['DynamoDb', dynamoTestEnvInit],
-    ['Bigquery', bigqueryTestEnvInit]
-].filter( ([name]) => name.toLowerCase() === process.env.TEST_ENGINE || (name === 'Sql Server' && process.env.TEST_ENGINE === 'mssql') )
+const testSuits = {
+    mysql: suiteDef('MySql', mysqlTestEnvInit),
+    postgres: suiteDef('Postgres', postgresTestEnvInit),
+    spanner: suiteDef('Spanner', spannerTestEnvInit),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit),
+    mssql: suiteDef('Sql Server', mssqlTestEnvInit),
+    mongo: suiteDef('Mongo', mongoTestEnvInit),
+    airtable: suiteDef('Airtable', airTableTestEnvInit),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
+}
 
+const testedSuit = () => testSuits[process.env.TEST_ENGINE]
+const setupDb = () => testedSuit().setup()
+const currentDbImplementationName = () => testedSuit().name
 
-module.exports = { env, testSuits }
+module.exports = { env, setupDb, currentDbImplementationName }

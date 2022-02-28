@@ -2,7 +2,7 @@ const { Uninitialized, shouldNotRunOn } = require('test-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const gen = require('../gen')
-const { env, testSuits, dbTeardown } = require('../resources/provider_resources')
+const { env, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/provider_resources')
 const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers')
 const chance = new Chance()
 

@@ -1,59 +1,55 @@
 const { DbConnectionError } = require('velo-external-db-commons').errors
-const each = require('jest-each').default
-const { env, testSuits } = require('../resources/operations_resources')
+const { env, setupDb, currentDbImplementationName } = require('../resources/operations_resources')
 
-describe('Check Pool Connection', () => {
-    each(testSuits()).describe('%s', (dbType, setup) => {
+describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
+    beforeAll(async() => {
+        setupDb()
+    })
 
-        beforeAll(async() => {
-            setup()
+    if (currentDbImplementationName() !== 'Bigquery') {
+        test('pool connection with wrong password will return DbConnectionError.', async() => {
+            const dbOperation = await env.driver.dbOperationWithMisconfiguredPassword()
+
+            const validateConnection = await dbOperation.validateConnection()
+
+            expect(validateConnection.valid).toBeFalsy()
+            expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
         })
-        
-        if (dbType !== 'Bigquery') {
-            test('pool connection with wrong password will return DbConnectionError.', async() => {
-                const dbOperation = await env.driver.dbOperationWithMisconfiguredPassword()
-                
-                const validateConnection = await dbOperation.validateConnection()
-                
-                expect(validateConnection.valid).toBeFalsy()
-                expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
-            })
-        }
-            
-        if (dbType !== 'Firestore') {
-            test('pool connection with wrong database will return DbConnectionError.', async() => {
-                const dbOperation = await env.driver.dbOperationWithMisconfiguredDatabase()
+    }
 
-                const validateConnection = await dbOperation.validateConnection()
+    if (currentDbImplementationName() !== 'Firestore') {
+        test('pool connection with wrong database will return DbConnectionError.', async() => {
+            const dbOperation = await env.driver.dbOperationWithMisconfiguredDatabase()
 
-                expect(validateConnection.valid).toBeFalsy()
-                expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
-            })
-        }
+            const validateConnection = await dbOperation.validateConnection()
 
-        if (dbType !== 'Bigquery' && dbType !== 'Firestore') {
-            test('pool connection with wrong host will return DbConnectionError.', async() => {
-                const dbOperation = await env.driver.dbOperationWithMisconfiguredHost()
-                const validateConnection = await dbOperation.validateConnection()
-
-                expect(validateConnection.valid).toBeFalsy()
-                expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
-            })
-        }
-        
-        test('pool connection with valid DB will return object with without error', async() => {
-            const { dbOperations, cleanup } = await env.driver.dbOperationWithValidDB()
-
-            const validateConnection = await dbOperations.validateConnection()
-
-            expect(validateConnection.valid).toBeTruthy()
-            expect(validateConnection.error).not.toBeDefined()
-            await cleanup()
+            expect(validateConnection.valid).toBeFalsy()
+            expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
         })
+    }
 
-        afterEach(() => {
-            env.driver.resetEnv?.()
+    if (currentDbImplementationName() !== 'Bigquery' && currentDbImplementationName() !== 'Firestore') {
+        test('pool connection with wrong host will return DbConnectionError.', async() => {
+            const dbOperation = await env.driver.dbOperationWithMisconfiguredHost()
+            const validateConnection = await dbOperation.validateConnection()
+
+            expect(validateConnection.valid).toBeFalsy()
+            expect(validateConnection.error).toBeInstanceOf(DbConnectionError)
         })
+    }
+
+    test('pool connection with valid DB will return object with without error', async() => {
+        const { dbOperations, cleanup } = await env.driver.dbOperationWithValidDB()
+
+        const validateConnection = await dbOperations.validateConnection()
+
+        expect(validateConnection.valid).toBeTruthy()
+        expect(validateConnection.error).not.toBeDefined()
+        await cleanup()
+    })
+
+    afterEach(() => {
+        env.driver.resetEnv?.()
     })
 
 })

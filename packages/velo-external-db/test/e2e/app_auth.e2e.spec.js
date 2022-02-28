@@ -1,32 +1,30 @@
 const { Uninitialized, gen } = require('test-commons')
 const { authVisitor } = require('../drivers/auth_test_support')
 const each = require('jest-each').default
-const { initApp, teardownApp, dbTeardown, testSuits } = require('../resources/e2e_resources')
+const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/e2e_resources')
+
 
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
 
-describe('Velo External DB authorization', () => {
-    each(testSuits()).describe('%s', (name, setup) => {
-        beforeAll(async() => {
-            await setup()
+describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () => {
+    beforeAll(async() => {
+        await setupDb()
 
-            await initApp()
-        }, 20000)
+        await initApp()
+    }, 20000)
 
-        afterAll(async() => {
-            await dbTeardown()
-        }, 20000)
-        
-        each(['data/find', 'data/aggregate', 'data/insert', 'data/insert/bulk', 'data/get', 'data/update',
-              'data/update/bulk', 'data/remove', 'data/remove/bulk', 'data/count'])
-        .test('should throw 401 on a request to %s without the appropriate role', async(api) => {
-                return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
-        })
+    afterAll(async() => {
+        await dbTeardown()
+    }, 20000)
+
+    each(['data/find', 'data/aggregate', 'data/insert', 'data/insert/bulk', 'data/get', 'data/update',
+          'data/update/bulk', 'data/remove', 'data/remove/bulk', 'data/count'])
+    .test('should throw 401 on a request to %s without the appropriate role', async(api) => {
+            return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
     })
-
 
     const ctx = {
         collectionName: Uninitialized,
