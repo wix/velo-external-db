@@ -5,7 +5,7 @@ const { Uninitialized } = require('test-commons')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')
 const matchers = require('../../test/drivers/schema_matchers')
-const gen2 = require('../../test/gen')
+const gen = require('../../test/gen')
 const { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor  } = matchers
 const chance = Chance()
 
@@ -88,12 +88,12 @@ describe('Schema Service', () => {
         driver.reset()
         schema.reset()
 
-        ctx.dbsWithoutIdColumn = gen2.randomDbs()
-        ctx.dbsWithIdColumn = gen2.randomDbsWithIdColumn()
+        ctx.dbsWithoutIdColumn = gen.randomDbs()
+        ctx.dbsWithIdColumn = gen.randomDbsWithIdColumn()
 
-        ctx.collections = gen2.randomCollections()
-        ctx.collectionName = gen2.randomCollectionName()
-        ctx.column = gen2.randomColumn()
+        ctx.collections = gen.randomCollections()
+        ctx.collectionName = gen.randomCollectionName()
+        ctx.column = gen.randomColumn()
 
         ctx.invalidOperations = [chance.word(), chance.word()]
         

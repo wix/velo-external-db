@@ -80,4 +80,19 @@ const systemFieldsWith = fields => {
         , systemFields)
 }
 
-module.exports = { randomDbEntities, randomDbEntity, randomNumberDbEntity, randomNumberColumns, randomColumn, randomCollectionName, systemFieldsWith }
+
+const randomKeyObject = (obj) => {
+    const objectKeys = Object.keys(obj)
+    const selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
+    return selectedKey
+}
+
+const deleteRandomKeyObject = (obj) => {
+    const deletedKey = randomKeyObject(obj)
+    delete obj[deletedKey]
+    return { deletedKey, newObject: obj }
+}
+
+
+
+module.exports = { randomDbEntities, randomDbEntity, randomNumberDbEntity, randomNumberColumns, randomColumn, randomCollectionName, systemFieldsWith, deleteRandomKeyObject }

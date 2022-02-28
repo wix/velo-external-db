@@ -43,10 +43,10 @@ const randomElementsFromArray = (arr) => {
 }
 
 const randomCollectionName = () => chance.word({ length: 5 })
+
 const randomCollections = () => randomArrayOf( randomCollectionName )
 
 const randomFieldName = () => chance.word({ length: 5 })
-
 
 const randomEntity = (columns) => {
     const entity = {
@@ -68,34 +68,6 @@ const veloDate = () => ( { $date: newDate().toISOString() } )
 
 const randomObjectFromArray = (array) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
-const randomKeyObject = (obj) => {
-    const objectKeys = Object.keys(obj)
-    const selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
-    return selectedKey
-}
-
-const deleteRandomKeyObject = (obj) => {
-    const deletedKey = randomKeyObject(obj)
-    delete obj[deletedKey]
-    return { deletedKey, newObject: obj }
-}
-
-const clearRandomKeyObject = (obj) => {
-    const newObject = { ...obj }
-    const clearedKey = randomKeyObject(newObject)
-    newObject[clearedKey] = ''
-    return { clearedKey, newObject }
-}
-
-
-const randomConfig = () => ({
-    host: chance.url(),
-    user: chance.first(),
-    password: chance.guid(),
-    secretKey: chance.guid(),
-    db: chance.word(),
-})
-
 const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
 
 const randomWrappedFilter = () => {
@@ -110,10 +82,8 @@ const randomWrappedFilter = () => {
 }
 
 module.exports = { randomEntities, randomEntity, veloDate, randomObject, 
-                   randomCollectionName, randomObjectFromArray,
-                   randomCollections, randomKeyObject, deleteRandomKeyObject, clearRandomKeyObject, randomConfig,
+                   randomCollectionName, randomObjectFromArray, randomCollections,
                    randomFieldName, randomAdapterOperator, randomWrappedFilter,
-                   randomArrayOf,
-                   randomElementsFromArray }
+                   randomArrayOf, randomElementsFromArray }
 
 

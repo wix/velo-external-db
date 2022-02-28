@@ -1,7 +1,7 @@
 const { Uninitialized } = require('test-commons')
 const SchemaInformation = require('./schema_information')
 const driver = require('../../test/drivers/schema_provider_test_support')
-const gen2 = require('../../test/gen')
+const gen = require('../../test/gen')
 const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
 
 describe('Schema Information Service', () => {
@@ -61,7 +61,7 @@ describe('Schema Information Service', () => {
         driver.reset()
         env.schemaInformation.clear()
 
-        ctx.dbs = gen2.randomDbs()
-        ctx.collectionName = gen2.randomCollectionName()
+        ctx.dbs = gen.randomDbs()
+        ctx.collectionName = gen.randomCollectionName()
     })
 })

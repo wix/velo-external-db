@@ -1,4 +1,4 @@
-const { gen } = require('test-commons')
+const gen = require('../gen')
 const { when } = require('jest-when')
 
 const operationService = {
