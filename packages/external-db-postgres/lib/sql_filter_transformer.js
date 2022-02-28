@@ -128,7 +128,7 @@ class FilterParser {
 
         if (this.isSingleFieldStringOperator(operator)) {
             return [{
-                filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} LIKE $${offset}`,
+                filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} ILIKE $${offset}`,
                 filterColumns: [],
                 offset: offset + 1,
                 parameters: [this.valueForStringOperator(operator, value)]
