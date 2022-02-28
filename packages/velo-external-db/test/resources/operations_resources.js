@@ -1,5 +1,5 @@
 const { Uninitialized } = require('test-commons')
-const { suiteDef } = require('test_suite_definition')
+const { suiteDef } = require('./test_suite_definition')
 const mysql = require('external-db-mysql')
 const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')

@@ -1,5 +1,5 @@
 const { Uninitialized, sleep } = require('test-commons')
-const { suiteDef } = require('test_suite_definition')
+const { suiteDef } = require('./test_suite_definition')
 const { authInit } = require('../drivers/auth_test_support')
 const { waitUntil } = require('async-wait-until')
 
