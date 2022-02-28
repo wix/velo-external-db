@@ -32,6 +32,12 @@ const SchemaOperations = Object.freeze({
     AddColumn: 'addColumn',
     RemoveColumn: 'removeColumn',
     Describe: 'describeCollection',
+    FindWithSort: 'findWithSort', 
+    Aggregate: 'aggregate',
+    BulkDelete: 'bulkDelete',
+    Truncate: 'truncate',
+    UpdateImmediately: 'updateImmediately',
+    DeleteImmediately: 'deleteImmediately',
 })
 
 const AllSchemaOperations = Object.values(SchemaOperations)
