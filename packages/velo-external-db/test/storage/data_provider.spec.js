@@ -1,4 +1,4 @@
-const { Uninitialized, shouldNotRunOn, shouldRunOnlyOn } = require('test-commons')
+const { Uninitialized, shouldNotRunOn } = require('test-commons')
 const Chance = require('chance')
 const gen = require('../gen')
 const { env, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/provider_resources')
@@ -53,7 +53,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         })
     }
 
-    if (shouldRunOnlyOn(['Postgres', 'MySql', 'Spanner', 'Sql Server', 'BigQuery', 'Mongo', 'DynamoDb'], currentDbImplementationName())) {
+    if (shouldNotRunOn(['Firestore', 'Google-Sheet'], currentDbImplementationName())) {
         test('search with startsWith operator will return data', async() => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
             const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
