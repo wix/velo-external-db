@@ -1,8 +1,8 @@
-const { Uninitialized, shouldNotRunOn } = require('test-commons')
+const { Uninitialized, shouldNotRunOn, shouldRunOnlyOn } = require('test-commons')
 const Chance = require('chance')
 const gen = require('../gen')
 const { env, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/provider_resources')
-const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers')
+const { entitiesWithOwnerFieldOnly, toggleCase } = require ('../drivers/data_provider_matchers') //todo: move toggleCase to utils
 const chance = new Chance()
 
 describe(`Data API: ${currentDbImplementationName()}`, () => {
@@ -50,6 +50,16 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
             env.driver.givenOrderByFor('_owner', ctx.sort)
             env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
             await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 1, 1, ctx.projection) ).resolves.toEqual([ctx.anotherEntity, ctx.entity].sort((a, b) => (a._owner < b._owner) ? 1 : -1).slice(0, 1))
+        })
+    }
+
+    if (shouldRunOnlyOn(['Postgres'], currentDbImplementationName())) {
+        test('startsWith operator will return data and be case-insensitive', async() => {
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
+            env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, toggleCase(ctx.entity[ctx.column.name][0]))
+            env.driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
         })
     }
 
