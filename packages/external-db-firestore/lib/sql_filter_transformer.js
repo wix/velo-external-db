@@ -50,7 +50,7 @@ class FilterParser {
         return [ne, lt, lte, gt, gte, include, eq, string_begins, string_ends].includes(operator)
     }
     
-    isUnsupportedOperator(operator) {
+    isUnsupportedOperator(operator) {   
         return [or, urlized, string_contains, not].includes(operator)
     }
     
@@ -128,6 +128,10 @@ class FilterParser {
             }
         }
         return fieldName
+    }
+
+    selectFieldsFor(projection) { 
+        return projection
     }
 }
 

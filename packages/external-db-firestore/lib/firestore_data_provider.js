@@ -7,15 +7,19 @@ class DataProvider {
         this.database = database
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, _projection) {
         const filterOperations = this.filterParser.transform(filter)
         const sortOperations = this.filterParser.orderBy(sort)
 
+        const projection = this.filterParser.selectFieldsFor(_projection)
+    
         const collectionRef = filterOperations.reduce((c, { fieldName, opStr, value }) => c.where(fieldName, opStr, value), this.database.collection(collectionName))
 
         const collectionRef2 = sortOperations.reduce((c, { fieldName, direction }) => c = c.orderBy(fieldName, direction), collectionRef)
 
-        const docs = (await collectionRef2.limit(limit).offset(skip).get()).docs
+        const projectedCollectionRef = projection ? collectionRef2.select(...projection) : collectionRef2
+
+        const docs = (await projectedCollectionRef.limit(limit).offset(skip).get()).docs
 
         return docs.map(doc => asEntity(doc))
     }
