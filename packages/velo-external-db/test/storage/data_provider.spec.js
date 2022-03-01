@@ -53,7 +53,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         })
     }
 
-    if (shouldRunOnlyOn(['Postgres'], currentDbImplementationName())) {
+    if (shouldRunOnlyOn(['Postgres', 'MySql'], currentDbImplementationName())) {
         test('startsWith operator will return data and be case-insensitive', async() => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
             env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, toggleCase(ctx.entity[ctx.column.name][0]))
