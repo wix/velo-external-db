@@ -110,7 +110,7 @@ class FilterParser {
 
         if (this.isSingleFieldStringOperator(operator)) {
             return [{
-                filterExpr: `${escapeIdentifier(fieldName)} LIKE ?`,
+                filterExpr: `LOWER(${escapeIdentifier(fieldName)}) LIKE LOWER(?)`,
                 parameters: [this.valueForStringOperator(operator, value)]
             }]
         }

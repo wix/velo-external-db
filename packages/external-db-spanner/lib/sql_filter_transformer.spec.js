@@ -171,7 +171,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `${escapeId(ctx.fieldName)} LIKE @${ctx.fieldName}`,
+                        filterExpr: `LOWER(${escapeId(ctx.fieldName)}) LIKE LOWER(@${ctx.fieldName})`,
                         parameters: { [ctx.fieldName]: `%${ctx.fieldValue}%` }
                     }])
                 })
@@ -184,7 +184,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `${escapeId(ctx.fieldName)} LIKE @${ctx.fieldName}`,
+                        filterExpr: `LOWER(${escapeId(ctx.fieldName)}) LIKE LOWER(@${ctx.fieldName})`,
                         parameters: { [ctx.fieldName]: `${ctx.fieldValue}%` }
                     }])
                 })
@@ -197,7 +197,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `${escapeId(ctx.fieldName)} LIKE @${ctx.fieldName}`,
+                        filterExpr: `LOWER(${escapeId(ctx.fieldName)}) LIKE LOWER(@${ctx.fieldName})`,
                         parameters: { [ctx.fieldName]: `%${ctx.fieldValue}` }
                     }])
                 })

@@ -175,7 +175,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
-                        filterExpr: `${escapeIdentifier(ctx.fieldName)} LIKE $${ctx.offset}`,
+                        filterExpr: `${escapeIdentifier(ctx.fieldName)} ILIKE $${ctx.offset}`,
                         filterColumns: [],
                         offset: ctx.offset + 1,
                         parameters: [`%${ctx.fieldValue}%`]
@@ -190,7 +190,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
-                        filterExpr: `${escapeIdentifier(ctx.fieldName)} LIKE $${ctx.offset}`,
+                        filterExpr: `${escapeIdentifier(ctx.fieldName)} ILIKE $${ctx.offset}`,
                         filterColumns: [],
                         offset: ctx.offset + 1,
                         parameters: [`${ctx.fieldValue}%`]
@@ -205,7 +205,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
-                        filterExpr: `${escapeIdentifier(ctx.fieldName)} LIKE $${ctx.offset}`,
+                        filterExpr: `${escapeIdentifier(ctx.fieldName)} ILIKE $${ctx.offset}`,
                         filterColumns: [],
                         offset: ctx.offset + 1,
                         parameters: [`%${ctx.fieldValue}`]
