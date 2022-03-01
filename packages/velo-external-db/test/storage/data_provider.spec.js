@@ -53,11 +53,11 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         })
     }
 
-    if (shouldRunOnlyOn(['Postgres', 'MySql', 'Spanner'], currentDbImplementationName())) {
+    if (shouldRunOnlyOn(['Postgres', 'MySql', 'Spanner', 'Sql Server'], currentDbImplementationName())) {
         test('search with startsWith operator will return data', async() => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
             const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
-            
+
             env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, firstHalfOfValue)
             env.driver.stubEmptyOrderByFor(ctx.sort)
             env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
