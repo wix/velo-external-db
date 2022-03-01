@@ -2,7 +2,7 @@ const { Uninitialized, shouldNotRunOn, shouldRunOnlyOn } = require('test-commons
 const Chance = require('chance')
 const gen = require('../gen')
 const { env, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/provider_resources')
-const { entitiesWithOwnerFieldOnly, toggleCase } = require ('../drivers/data_provider_matchers') //todo: move toggleCase to utils
+const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers') //todo: move toggleCase to utils
 const chance = new Chance()
 
 describe(`Data API: ${currentDbImplementationName()}`, () => {
@@ -54,9 +54,20 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
     }
 
     if (shouldRunOnlyOn(['Postgres', 'MySql'], currentDbImplementationName())) {
-        test('startsWith operator will return data and be case-insensitive', async() => {
+        test('search with  startsWith operator will return data', async() => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
-            env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, toggleCase(ctx.entity[ctx.column.name][0]))
+            env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, ctx.entity[ctx.column.name][0])
+            env.driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
+        })
+
+        test('search with startsWith operator will return data and be case-insensitive', async() => {
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
+            const firstChar = ctx.entity[ctx.column.name][0]
+            const firstCharToggledCase = firstChar.toUpperCase() === firstChar ? firstChar.toLowerCase() : firstChar.toUpperCase()
+
+            env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, firstCharToggledCase)
             env.driver.stubEmptyOrderByFor(ctx.sort)
             env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
             await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
