@@ -1,3 +1,5 @@
+const { authOwner } = require('../drivers/auth_test_support')
+
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
@@ -9,6 +11,14 @@ const givenCollection = async(name, columns, auth) => {
     }
 }
 
+const retrieveSchemaOperations = async() => {
+    const tempCollectionName = 'tempCollection'
+    await axios.post('/schemas/create', { collectionName: tempCollectionName }, authOwner)
+    const  { schemas }   = (await axios.post('/schemas/find', { schemaIds: [ tempCollectionName ] }, authOwner)).data
+    const { allowedSchemaOperations } = schemas[0]
+    return allowedSchemaOperations
+}
+
 const retrieveSchemaFor = async(collectionName, auth) => axios.post('/schemas/find', { schemaIds: [collectionName] }, auth)
 
-module.exports = { givenCollection, retrieveSchemaFor }
+module.exports = { givenCollection, retrieveSchemaFor, retrieveSchemaOperations }

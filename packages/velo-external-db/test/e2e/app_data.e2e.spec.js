@@ -20,6 +20,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await setupDb()
 
         await initApp()
+        env.schemaOperations = await schema.retrieveSchemaOperations()
     }, 20000)
 
     afterAll(async() => {
