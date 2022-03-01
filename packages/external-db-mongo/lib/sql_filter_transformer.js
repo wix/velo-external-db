@@ -67,7 +67,7 @@ class FilterParser {
         }
 
         if (this.isSingleFieldStringOperator(operator)) {
-            return [{ filterExpr: { [fieldName]: { $regex: this.valueForStringOperator(operator, value) } } }]
+            return [{ filterExpr: { [fieldName]: { $regex: this.valueForStringOperator(operator, value), $options: 'i' } } }]
         }
 
         if (operator === urlized) {
@@ -86,11 +86,11 @@ class FilterParser {
     valueForStringOperator(operator, value) {
         switch (operator) {
             case string_contains:
-                return `/${value}/i`
+                return value
             case string_begins:
-                return `/^${value}/i`
+                return `^${value}`
             case string_ends:
-                return `/${value}$/i`
+                return `${value}$`
         }
     }
 

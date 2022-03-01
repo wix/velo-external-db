@@ -64,7 +64,7 @@ const givenProjectionExprFor = (projection) =>
 
 const givenStartsWithFilterFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: { [column]: { $regex: `/^${value}/i` } } })
+                                .mockReturnValue({ filterExpr: { [column]: { $regex: `^${value}`, $options: 'i' } } })
 
 const reset = () => {
     filterParser.transform.mockClear()

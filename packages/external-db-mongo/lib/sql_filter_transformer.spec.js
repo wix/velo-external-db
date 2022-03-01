@@ -155,7 +155,7 @@ describe('Sql Parser', () => {
                         value: ctx.fieldValue
                     }
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
-                        filterExpr: { [ctx.fieldName]: { $regex: `/${ctx.fieldValue}/i` } }
+                        filterExpr: { [ctx.fieldName]: { $regex: `${ctx.fieldValue}`, $options: 'i' } }
                     }])
                 })
 
@@ -167,7 +167,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
-                        filterExpr: { [ctx.fieldName]: { $regex: `/^${ctx.fieldValue}/i` } }
+                        filterExpr: { [ctx.fieldName]: { $regex: `^${ctx.fieldValue}`, $options: 'i' } }
                     }])
                 })
 
@@ -179,7 +179,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
-                        filterExpr: { [ctx.fieldName]: { $regex: `/${ctx.fieldValue}$/i` } }
+                        filterExpr: { [ctx.fieldName]: { $regex: `${ctx.fieldValue}$`, $options: 'i' } }
                     }])
                 })
 
