@@ -53,8 +53,8 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         })
     }
 
-    if (shouldRunOnlyOn(['Postgres', 'MySql'], currentDbImplementationName())) {
-        test('search with  startsWith operator will return data', async() => {
+    if (shouldRunOnlyOn(['Postgres', 'MySql', 'Spanner'], currentDbImplementationName())) {
+        test('search with startsWith operator will return data', async() => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
             const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
             
