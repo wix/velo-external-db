@@ -78,7 +78,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         }
     }
 
-    if(shouldNotRunOn(['Firestore', 'Google-Sheet'], currentDbImplementationName())) {
+    if(shouldNotRunOn(['Firestore', 'Google-Sheet', 'Airtable'], currentDbImplementationName())) {
         test('search with projection will return the specified fields', async() => {
             const projection = ['_owner']
             await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)
