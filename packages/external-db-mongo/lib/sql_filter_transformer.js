@@ -86,11 +86,11 @@ class FilterParser {
     valueForStringOperator(operator, value) {
         switch (operator) {
             case string_contains:
-                return value
+                return `/${value}/i`
             case string_begins:
-                return `^${value}`
+                return `/^${value}/i`
             case string_ends:
-                return `${value}$`
+                return `/${value}$/i`
         }
     }
 
