@@ -61,6 +61,18 @@ const givenProjectionExprFor = (projection) =>
 // eslint-disable-next-line no-unused-vars
 const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {}
 
+const givenStartsWithFilterFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: {
+                                    FilterExpression: `begins_with (#${column}, :${column})`,
+                                    ExpressionAttributeNames: {
+                                        [`#${column}`]: column
+                                    },
+                                    ExpressionAttributeValues: {
+                                        [`:${column}`]: value
+                                    }
+                                }
+                            })
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -71,5 +83,5 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, stubEmptyOrderByFor, stubEmptyFilterFor,
                    givenFilterByIdWith, filterParser, reset, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor
+                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor
 }

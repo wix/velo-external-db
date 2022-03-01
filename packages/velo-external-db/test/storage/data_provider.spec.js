@@ -53,7 +53,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         })
     }
 
-    if (shouldRunOnlyOn(['Postgres', 'MySql', 'Spanner', 'Sql Server', 'BigQuery', 'Mongo'], currentDbImplementationName())) {
+    if (shouldRunOnlyOn(['Postgres', 'MySql', 'Spanner', 'Sql Server', 'BigQuery', 'Mongo', 'DynamoDb'], currentDbImplementationName())) {
         test('search with startsWith operator will return data', async() => {
             await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
             const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
@@ -64,16 +64,18 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
             await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
         })
 
-        test('search with startsWith operator will return data and be case-insensitive', async() => {
-            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
-            const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
-            const firstHalfOfValueToggled = firstHalfOfValue.toUpperCase() === firstHalfOfValue ? firstHalfOfValue.toLowerCase() : firstHalfOfValue.toUpperCase()
+        if (shouldNotRunOn(['DynamoDb'], currentDbImplementationName())) {
+            test('search with startsWith operator will return data and be case-insensitive', async() => {
+                await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
+                const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
+                const firstHalfOfValueToggled = firstHalfOfValue.toUpperCase() === firstHalfOfValue ? firstHalfOfValue.toLowerCase() : firstHalfOfValue.toUpperCase()
 
-            env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, firstHalfOfValueToggled)
-            env.driver.stubEmptyOrderByFor(ctx.sort)
-            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
-            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
-        })
+                env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, firstHalfOfValueToggled)
+                env.driver.stubEmptyOrderByFor(ctx.sort)
+                env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
+            })
+        }
     }
 
     if(shouldNotRunOn(['Firestore', 'Google-Sheet'], currentDbImplementationName())) {
