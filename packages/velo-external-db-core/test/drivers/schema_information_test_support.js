@@ -14,6 +14,9 @@ const givenDefaultSchemaFor = collectionName => {
 const expectSchemaRefresh = () =>
     when(schemaInformation.refresh).mockResolvedValue()
 
+const givenSchemaFieldsResultFor = (dbs) =>
+    dbs.forEach(db => when(schemaInformation.schemaFieldsFor).calledWith(db.id).mockResolvedValue(db.fields) )
+
 
 const reset = () => {
     schemaInformation.schemaFieldsFor.mockClear()
@@ -21,6 +24,6 @@ const reset = () => {
 }
 
 module.exports = {
-    givenDefaultSchemaFor, expectSchemaRefresh,
+    givenDefaultSchemaFor, expectSchemaRefresh, givenSchemaFieldsResultFor,
     schemaInformation, reset
 }
