@@ -34,7 +34,6 @@ const load = async() => {
     
     _cleanup = async() => {
         await cleanup()
-        schemaInformation.cleanup()
     }
 
     _schemaProvider = schemaProvider

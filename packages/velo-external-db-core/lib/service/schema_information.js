@@ -1,8 +1,6 @@
 const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
 const NodeCache = require('node-cache')
 
-const CacheKey = 'schema'
-
 const FiveMinutes = 5 * 60
 
 class CacheableSchemaInformation {
@@ -14,45 +12,35 @@ class CacheableSchemaInformation {
             await this.refresh()
                       .catch( console.log )
         }
-        this.timer = setInterval(refreshFunc, FiveMinutes * 1000)
         setImmediate(refreshFunc)
     }
-
-    async schemaFor(collectionName) {
-        const schema = await this.schema()
-        if (!schema.some(s => s.id === collectionName)) {
-            throw new CollectionDoesNotExists('Collection does not exists')
-        }
-
-        return schema.find(s => s.id === collectionName)
-    }
-
+    
     async schemaFieldsFor(collectionName) {
-        const s = await this.schemaFor(collectionName)
-        return s.fields
-    }
-
-    async schema() {
-        const schema = this.cache.get(CacheKey)
-        if ( schema === undefined ) {
-            await this.refresh()
-            return this.cache.get(CacheKey) || []
+        const schema = this.cache.get(collectionName)
+        if ( !schema ) {
+            await this.update(collectionName)
+            return this.cache.get(collectionName) 
         }
         return schema
     }
 
+    async update(collectionName) {
+        const collection = await this.schemaProvider.describeCollection(collectionName)
+        if (!collection) throw new CollectionDoesNotExists('Collection does not exists')
+        this.cache.set(collectionName, collection, FiveMinutes)
+    }
+
     async refresh() {
         const schema = await this.schemaProvider.list()
-        this.cache.set(CacheKey, schema, FiveMinutes)
+        schema?.forEach(collection => {
+            this.cache.set(collection.id, collection.fields, FiveMinutes)
+        })
     }
 
     async clear() {
         this.cache.flushAll()
     }
 
-    cleanup() {
-        this.timer.unref()
-    }
 }
 
 module.exports = CacheableSchemaInformation
