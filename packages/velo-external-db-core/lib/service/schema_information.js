@@ -14,7 +14,6 @@ class CacheableSchemaInformation {
             await this.refresh()
                       .catch( console.log )
         }
-        this.timer = setInterval(refreshFunc, FiveMinutes * 1000)
         setImmediate(refreshFunc)
     }
 
@@ -50,9 +49,6 @@ class CacheableSchemaInformation {
         this.cache.flushAll()
     }
 
-    cleanup() {
-        this.timer.unref()
-    }
 }
 
 module.exports = CacheableSchemaInformation
