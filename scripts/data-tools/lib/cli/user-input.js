@@ -2,6 +2,7 @@ const inquirer = require('inquirer')
 const { isNumber, nonEmpty } = require('../utils/utils')
 
 const defaultSettings = {
+    numberOfCollection: 1,
     collectionName: 'my_collection',
     columnCount: 3,
     rowCount: 10000
@@ -22,8 +23,14 @@ const askForAdapterDetails = async() => {
     ])
 }
 
-const askForAdvancedSettings = async() => {
+const askForAdvancedSettings = async() => { 
     return await inquirer.prompt([
+        {
+            name: 'numberOfCollection',
+            message: 'Number of collections:',
+            validate: nonEmpty,
+            default: defaultSettings.numberOfCollection
+        },
         {
             name: 'collectionName',
             message: 'Collection Name',

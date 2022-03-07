@@ -20,7 +20,7 @@ class SchemaService {
     }
 
     async find(collectionNames) {
-        const dbs = await Promise.all(collectionNames.map(async collectionName => ({ id: collectionName, fields: await this.storage.describeCollection(collectionName) })))
+        const dbs = await Promise.all(collectionNames.map(async collectionName => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
         const dbsWithAllowedOperations = this.appendAllowedOperationsTo(dbs)
 
         return { schemas: dbsWithAllowedOperations.map( asWixSchema ) }

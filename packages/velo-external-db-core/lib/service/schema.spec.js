@@ -27,7 +27,7 @@ describe('Schema Service', () => {
 
     test('retrieve collections by ids from provider', async() => {
         driver.givenAllSchemaOperations()
-        driver.givenFindResults(ctx.dbsWithIdColumn)
+        schema.givenSchemaFieldsResultFor(ctx.dbsWithIdColumn)
 
         await expect( env.schemaService.find(ctx.dbsWithIdColumn.map(db => db.id)) ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
     })
