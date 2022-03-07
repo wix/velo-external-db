@@ -1,0 +1,11 @@
+{
+  "name": "terraform",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start:azure": "terraform -chdir=./azure init && terraform -chdir=./azure apply",
+    "test": ""
+  },
+  "author": "",
+  "license": "ISC"
+}
