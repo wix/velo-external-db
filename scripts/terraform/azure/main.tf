@@ -13,6 +13,10 @@ provider "azurerm" {
 
 data "azurerm_client_config" "current" {}
 
+resource "random_id" "random" {
+    byte_length = 5
+}
+
 resource "azurerm_resource_group" "resourceGroup" {
   name     = var.resourceGroupName
   location = var.region
@@ -56,7 +60,7 @@ resource "azurerm_mysql_server" "mySqlServer" {
   resource_group_name          = azurerm_resource_group.resourceGroup.name
   sku_name                     = "GP_Gen5_2"
   version                      = "5.7"
-  ssl_enforcement              = "Disabled"
+  ssl_enforcement_enabled      = false
   storage_mb                   = 51200
   administrator_login          = var.databaseUserName
   administrator_login_password = var.databasePassword
@@ -76,7 +80,7 @@ resource "azurerm_mysql_database" "velo_db" {
 resource "azurerm_key_vault" "veloKeyVault" {
     depends_on = [azurerm_resource_group.resourceGroup]
 
-    name                = "veloKeyVault55"
+    name                = "veloKeyVault-${random_id.random.id}"
     location            = azurerm_resource_group.resourceGroup.location
     resource_group_name = azurerm_resource_group.resourceGroup.name
     tenant_id           = data.azurerm_client_config.current.tenant_id
