@@ -34,8 +34,9 @@ class AwsConfigReader {
 }
 
   class AwsDynamoConfigReader {
-    constructor(region) {
+    constructor(region, secretId) {
       this.region = region
+      this.secretId = secretId
      }
 
      async readExternalConfig() {
