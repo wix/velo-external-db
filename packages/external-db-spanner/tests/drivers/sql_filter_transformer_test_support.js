@@ -1,6 +1,6 @@
 const { EmptySort } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const { escapeId, escapeFieldId } = require('../../lib/spanner_utils')
+const { escapeId, escapeFieldId, validateLiteral } = require('../../lib/spanner_utils')
 
 const filterParser = {
     transform: jest.fn(),
@@ -63,6 +63,10 @@ const givenProjectionExprFor = (projection) =>
     when(filterParser.selectFieldsFor).calledWith(projection)
                                       .mockReturnValue(projection.map(escapeFieldId).join(', '))
 
+const givenStartsWithFilterFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: `WHERE LOWER(${escapeFieldId(column)}) LIKE LOWER(${validateLiteral(column)})`, parameters: { [column]: `${value}%` } })
+
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -73,6 +77,6 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                    givenAllFieldsProjectionFor, givenProjectionExprFor,
+                    givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
                    filterParser, reset
 }

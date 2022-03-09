@@ -62,6 +62,9 @@ const givenProjectionExprFor = (projection) =>
                                     { ...pV, [cV]: 1 }
                                 ), { _id: 0 }))
 
+const givenStartsWithFilterFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: { [column]: { $regex: `^${value}`, $options: 'i' } } })
 
 const reset = () => {
     filterParser.transform.mockClear()
@@ -73,6 +76,6 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor,
+                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
                    filterParser, reset
 }

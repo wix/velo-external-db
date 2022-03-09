@@ -55,6 +55,10 @@ const givenProjectionExprFor = (projection) =>
     when(filterParser.selectFieldsFor).calledWith(projection)
                                  .mockReturnValue(projection.map(escapeIdentifier).join(', '))
 
+const givenStartsWithFilterFor = (filter, column, value) => 
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeIdentifier(column)} ILIKE $1`, parameters: [`${value}%`], offset: 2 })
+
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -64,6 +68,6 @@ const reset = () => {
 }
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor, stubEmptyFilterFor, 
-                   givenFilterByIdWith, givenAggregateQueryWith, givenAllFieldsProjectionFor, givenProjectionExprFor,
+                   givenFilterByIdWith, givenAggregateQueryWith, givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
                    filterParser, reset
 }

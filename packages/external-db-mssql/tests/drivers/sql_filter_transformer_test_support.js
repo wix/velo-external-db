@@ -55,6 +55,9 @@ const givenProjectionExprFor = (projection) =>
     when(filterParser.selectFieldsFor).calledWith(projection)
                                       .mockReturnValue(projection.map(escapeId).join(', '))
 
+const givenStartsWithFilterFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeId(column)} LIKE ${validateLiteral(column)}`, parameters: { [patchFieldName(column)]: `${value}%` } })
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -65,6 +68,6 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor,
+                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
                    filterParser, reset
 }

@@ -67,7 +67,7 @@ class FilterParser {
         }
 
         if (this.isSingleFieldStringOperator(operator)) {
-            return [{ filterExpr: { [fieldName]: { $regex: this.valueForStringOperator(operator, value) } } }]
+            return [{ filterExpr: { [fieldName]: { $regex: this.valueForStringOperator(operator, value), $options: 'i' } } }]
         }
 
         if (operator === urlized) {

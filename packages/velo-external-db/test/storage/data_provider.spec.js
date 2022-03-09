@@ -2,7 +2,7 @@ const { Uninitialized, shouldNotRunOn } = require('test-commons')
 const Chance = require('chance')
 const gen = require('../gen')
 const { env, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/provider_resources')
-const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers')
+const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers') //todo: move toggleCase to utils
 const chance = new Chance()
 
 describe(`Data API: ${currentDbImplementationName()}`, () => {
@@ -53,7 +53,32 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         })
     }
 
-    if(shouldNotRunOn(['Firestore', 'Google-Sheet'], currentDbImplementationName())) {
+    if (shouldNotRunOn(['Firestore', 'Google-Sheet', 'Airtable'], currentDbImplementationName())) {
+        test('search with startsWith operator will return data', async() => {
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
+            const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
+
+            env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, firstHalfOfValue)
+            env.driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
+        })
+
+        if (shouldNotRunOn(['DynamoDb'], currentDbImplementationName())) {
+            test('search with startsWith operator will return data and be case-insensitive', async() => {
+                await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
+                const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
+                const firstHalfOfValueToggled = firstHalfOfValue.toUpperCase() === firstHalfOfValue ? firstHalfOfValue.toLowerCase() : firstHalfOfValue.toUpperCase()
+
+                env.driver.givenStartsWithFilterFor(ctx.filter, ctx.column.name, firstHalfOfValueToggled)
+                env.driver.stubEmptyOrderByFor(ctx.sort)
+                env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+                await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
+            })
+        }
+    }
+
+    if(shouldNotRunOn(['Firestore', 'Google-Sheet', 'Airtable'], currentDbImplementationName())) {
         test('search with projection will return the specified fields', async() => {
             const projection = ['_owner']
             await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)

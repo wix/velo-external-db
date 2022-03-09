@@ -20,7 +20,8 @@ class DataProvider {
 
         const expressionAttributeNames = { ...filterExpr.ExpressionAttributeNames, ...projectionAttributeNames }
 
-        const filterExprWithProjection = { ...filterExpr, ProjectionExpression: projectionExpr, ExpressionAttributeNames: expressionAttributeNames }
+        const filterExprWithProjection = { ...filterExpr, ExpressionAttributeNames: expressionAttributeNames }
+        if (projectionExpr !== '') Object.assign(filterExprWithProjection, { ProjectionExpression: projectionExpr })
 
         const { Items } = await this.query(dynamoRequests.findCommand(collectionName, filterExprWithProjection, limit), queryable)
 
