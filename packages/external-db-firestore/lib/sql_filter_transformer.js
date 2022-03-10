@@ -1,5 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { isObject, AdapterOperators, isEmptyFilter } = require('velo-external-db-commons')
+const { lastLetterCode } = require('./firestore_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 
 class FilterParser {
@@ -143,7 +144,7 @@ class FilterParser {
         {
             fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
             opStr: '<',
-            value: value + String.fromCharCode(65535)
+            value: value + lastLetterCode
         }]
     }
 

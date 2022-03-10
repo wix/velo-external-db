@@ -1,5 +1,6 @@
 const { Timestamp } = require('@google-cloud/firestore')
 
+const lastLetterCode = String.fromCharCode(65535)
 
 const fixDates = (value) => {
     if (value instanceof Timestamp) {
@@ -16,4 +17,6 @@ const asEntity = (docEntity) => {
   }.bind(this), {})
 }
 
-module.exports = { fixDates, asEntity }
+
+
+module.exports = { fixDates, asEntity, lastLetterCode }
