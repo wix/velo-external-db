@@ -32,9 +32,10 @@ class CacheableSchemaInformation {
 
     async refresh() {
         const schema = await this.schemaProvider.list()
-        schema?.forEach(collection => {
-            this.cache.set(collection.id, collection.fields, FiveMinutes)
-        })
+        if (schema && schema.length) 
+            schema.forEach(collection => {
+                this.cache.set(collection.id, collection.fields, FiveMinutes)
+            })
     }
 
     async clear() {
