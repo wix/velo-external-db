@@ -28,22 +28,22 @@ class DataService {
 
     async insert(collectionName, item, fields) {
         const resp = await this.bulkInsert(collectionName, [item], fields)
-        return { item: resp.items[0] }
+        return { item: asWixData(resp.items[0]) }
     }
 
     async bulkInsert(collectionName, items, fields) {
         await this.storage.insert(collectionName, items, fields)
-        return { items }
+        return { items: items.map( asWixData ) }
     }
 
     async update(collectionName, item) {
         const resp = await this.bulkUpdate(collectionName, [item])
-        return { item: resp.items[0] }
+        return { item: asWixData(resp.items[0]) }
     }
 
     async bulkUpdate(collectionName, items) {
         await this.storage.update(collectionName, items)
-        return { items }
+        return { items: items.map( asWixData ) }
     }
 
     async delete(collectionName, itemId) {
