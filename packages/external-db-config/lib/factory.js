@@ -20,7 +20,7 @@ const create = () => {
       authorizationConfigReader = new AwsAuthorizationConfigReader(region, secretId)
       switch(type) {
         case 'dynamodb':
-          internalConfigReader = new aws.AwsDynamoConfigReader(region) 
+          internalConfigReader = new aws.AwsDynamoConfigReader(region, secretId) 
           break
         case 'mongo':
           internalConfigReader = new aws.AwsMongoConfigReader(region, secretId)

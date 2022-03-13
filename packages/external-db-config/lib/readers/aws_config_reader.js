@@ -34,8 +34,9 @@ class AwsConfigReader {
 }
 
   class AwsDynamoConfigReader {
-    constructor(region) {
+    constructor(region, secretId) {
       this.region = region
+      this.secretId = secretId
      }
 
      async readExternalConfig() {
@@ -51,13 +52,16 @@ class AwsConfigReader {
       const cfg = await this.readExternalConfig()
                             .catch(() => (EmptyConfig))
   
-      const { SECRET_KEY } = cfg
-      return { region: this.region, secretKey: SECRET_KEY }
+      return { region: this.region, secretKey: cfg.SECRET_KEY }
     }
 
-    validate() {
-      return {
-        missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['SECRET_KEY']) 
+    async validate() {
+      try {
+        const cfg = process.env.NODE_ENV !== 'test' ? await this.readExternalConfig() : process.env
+        return { missingRequiredSecretsKeys: checkRequiredKeys(cfg, ['SECRET_KEY']) }
+        
+      } catch (err) {
+        return { configReadError: err.message, missingRequiredSecretsKeys: ['SECRET_KEY'] }
       }
     }
   }
