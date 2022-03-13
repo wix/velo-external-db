@@ -2,6 +2,7 @@ const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client
 const { checkRequiredKeys } = require('../utils/config_utils')
 
 const EmptyAWSConfig = { host: '', username: '', password: '', DB: '', SECRET_KEY: '', error: true }
+const EmptyConfig = { error: true }
 
 class AwsConfigReader {
   constructor(secretId, region) {
@@ -48,7 +49,7 @@ class AwsConfigReader {
         return { region: this.region, secretKey: process.env.SECRET_KEY, endpoint: process.env.ENDPOINT_URL }
       }
       const cfg = await this.readExternalConfig()
-                            .catch(() => EmptyAWSConfig)
+                            .catch(() => (EmptyConfig))
   
       const { SECRET_KEY } = cfg
       return { region: this.region, secretKey: SECRET_KEY }
@@ -61,4 +62,34 @@ class AwsConfigReader {
     }
   }
 
-module.exports = { AwsConfigReader, AwsDynamoConfigReader }
+  class AwsMongoConfigReader {
+    constructor(region, secretId) {
+      this.region = region
+      this.secretId = secretId
+     }
+
+     async readExternalConfig() {
+      const client = new SecretsManagerClient({ region: this.region })
+      const data = await client.send(new GetSecretValueCommand({ SecretId: this.secretId }))
+      return JSON.parse(data.SecretString)
+    }
+
+    async readConfig() {
+      const cfg = await this.readExternalConfig()
+                            .catch(() => (EmptyConfig))
+
+      const { SECRET_KEY, URI } = cfg
+      return { region: this.region, secretKey: SECRET_KEY, connectionUri: URI }
+    }
+
+    async validate() {
+      try {
+        const cfg = await this.readExternalConfig()
+        return { missingRequiredSecretsKeys: checkRequiredKeys(cfg, ['URI', 'SECRET_KEY']) }
+      } catch (err) {
+        return { configReadError: err.message, missingRequiredSecretsKeys: [] }
+      }
+    }
+  }
+
+module.exports = { AwsConfigReader, AwsDynamoConfigReader, AwsMongoConfigReader }
