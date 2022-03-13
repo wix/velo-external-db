@@ -23,6 +23,35 @@ class ItemTransformer {
          return this.unpackDates(fields.reduce((pv, f) => f.field in item ? ({ ...pv, [f.field]: item[f.field] }) : pv, {}))
     }
     
+    patchItemsBooleanFields(items, fields) { 
+        return items.map(i => this.patchBoolean(i, fields.filter(f => f.type === 'boolean')))
+    }
+
+    patchBoolean(item, fields) {
+        const i = { ...item }
+    
+        fields.forEach(f => {
+            if (f.field in i) {
+                i[f.field] = this.booleanValueFor(i[f.field])
+            }
+        })
+        return i
+    }
+
+    booleanValueFor(value) {
+        switch (value) {
+            case 'true':
+            case '1':
+            case 1:
+                return true
+            case 'false':
+            case '0':
+            case 0:
+                return false
+            default: 
+                return value
+        }
+    }
     defaultValueFor(f) {
         switch (f.type) {
             case 'number':

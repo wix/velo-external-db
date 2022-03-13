@@ -1,6 +1,7 @@
 const rewire = require('rewire')
 const validate = require('uuid-validate')
 const { Uninitialized, gen } = require('test-commons')
+const { truthyValue, falsyValue } = require ('../../test/gen')
 const Chance = require('chance')
 const chance = Chance()
 const rewiredItemTransformer = rewire('./item_transformer')
@@ -83,6 +84,38 @@ describe('Item Transformer', () => {
             const objWithVeloDates = { ...ctx.obj, [ctx.property]: ctx.veloDate, [ctx.anotherProperty]: ctx.veloDate }
     
             expect(env.itemTransformer.unpackDates(objWithVeloDates)).toEqual( { ...ctx.obj, [ctx.property]: new Date(ctx.veloDate.$date), [ctx.anotherProperty]: new Date(ctx.veloDate.$date) } )
+        })
+    })
+    
+    describe('patchItemsBooleanFields', () => {
+        test('patchItemsBooleanFields will patch boolean fields to boolean truthy to true', async() => {
+            const objWithBooleanFields = { ...ctx.obj, [ctx.property]: truthyValue() }
+            expect(env.itemTransformer.patchItemsBooleanFields([objWithBooleanFields], [...ctx.objSchemaFields, { field: ctx.property, type: 'boolean' }]))
+                                      .toEqual( [{ ...ctx.obj, [ctx.property]: true }])
+        })
+
+        test('patchItemsBooleanFields will patch boolean fields to boolean falsy to false', async() => {
+            const objWithBooleanFields = { ...ctx.obj, [ctx.property]: falsyValue() }
+            expect(env.itemTransformer.patchItemsBooleanFields([objWithBooleanFields], [...ctx.objSchemaFields, { field: ctx.property, type: 'boolean' }]))
+                                      .toEqual( [{ ...ctx.obj, [ctx.property]: false }])
+        })
+
+        test('patchItemsBooleanFields will patch boolean fields to boolean with multiple items', async() => {
+            const objWithBooleanFields = { ...ctx.obj, [ctx.property]: truthyValue() }
+            expect(env.itemTransformer.patchItemsBooleanFields([objWithBooleanFields, objWithBooleanFields], [...ctx.objSchemaFields, { field: ctx.property, type: 'boolean' }]))
+                                      .toEqual( [{ ...ctx.obj, [ctx.property]: true }, { ...ctx.obj, [ctx.property]: true }])
+        })
+
+        test ('patchItemsBooleanFields will not change the value of null on boolean fields', () => {
+            const objWithBooleanFields = { ...ctx.obj, [ctx.property]: null }
+            expect(env.itemTransformer.patchItemsBooleanFields([objWithBooleanFields], [...ctx.objSchemaFields, { field: ctx.property, type: 'boolean' }]))
+                                      .toEqual( [{ ...ctx.obj, [ctx.property]: null }])
+        })
+
+        test('patchItemsBooleanFields will not change items without boolean value', () => {
+            const objWithoutBooleanFields = ctx.obj
+            expect(env.itemTransformer.patchItemsBooleanFields([objWithoutBooleanFields], ctx.objSchemaFields))
+                                      .toEqual( [objWithoutBooleanFields])
         })
     })
 
