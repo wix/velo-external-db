@@ -16,6 +16,10 @@ const notConnectedPool = err => ( {
         cleanup: () => { }
     } )
 
+const emptyClient = () => ( {
+        connect: async() => { console.log('No URI was provided') }
+    } )
+
 const isConnected = (client) => {
     return  client && client.topology && client.topology.isConnected()
 }
@@ -34,4 +38,4 @@ const unpackIdFieldForItem = item => {
     return item
 }
 
-module.exports = { EmptyFilter, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor, validateTable, SystemTable }
+module.exports = { EmptyFilter, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor, validateTable, SystemTable, emptyClient }

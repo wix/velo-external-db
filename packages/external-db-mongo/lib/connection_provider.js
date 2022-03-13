@@ -3,10 +3,10 @@ const SchemaProvider = require('./mongo_schema_provider')
 const DataProvider = require('./mongo_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mongo_operations')
-const { notConnectedPool } = require('./mongo_utils')
+const { notConnectedPool, emptyClient } = require('./mongo_utils')
 
 const init = async(cfg) => {
-    const client = new MongoClient(cfg.connectionUri)
+    const client = cfg.connectionUri ? new MongoClient(cfg.connectionUri) : emptyClient()
 
     const { pool, cleanup } = await client.connect()
                                           .then((res) => {
