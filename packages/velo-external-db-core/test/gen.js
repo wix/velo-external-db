@@ -50,5 +50,7 @@ const randomDbs = () => randomArrayOf( randomDb )
 
 const randomDbsWithIdColumn = () => randomDbs().map(i => ({ ...i, fields: [ ...i.fields, { field: '_id', type: 'text' }] }))
 
+const truthyValue = () => chance.pickone(['true', '1', 1, true])
+const falsyValue = () => chance.pickone(['false', '0', 0, false])
 
-module.exports = { randomOperator, randomFilter, randomWixType, invalidOperatorForType, randomObjectFromArray, randomColumn, randomDb, randomDbsWithIdColumn, randomCollections, randomDbs, randomCollectionName }
+module.exports = { randomOperator, randomFilter, randomWixType, invalidOperatorForType, randomObjectFromArray, randomColumn, randomDb, randomDbsWithIdColumn, randomCollections, randomDbs, randomCollectionName, truthyValue, falsyValue }

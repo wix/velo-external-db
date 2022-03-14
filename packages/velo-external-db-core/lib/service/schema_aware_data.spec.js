@@ -14,9 +14,10 @@ describe ('Schema Aware Data Service', () => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.transformedFilter) 
         data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultFields)  
+        patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities)
 
         return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({
-                                                                                                                        items: ctx.entities,
+                                                                                                                        items: ctx.patchedEntities,
                                                                                                                         totalCount: ctx.totalCount
                                                                                                                     })
     })
@@ -104,6 +105,7 @@ describe ('Schema Aware Data Service', () => {
         entity: Uninitialized,
         preparedEntity: Uninitialized,
         preparedEntities: Uninitialized,
+        patchedEntities: Uninitialized,
         itemId: Uninitialized,
         itemIds: Uninitialized,
         entitiesWithoutId: Uninitialized,
@@ -134,6 +136,8 @@ describe ('Schema Aware Data Service', () => {
         ctx.preparedEntity = gen.randomEntity()
         ctx.entities = gen.randomEntities()
         ctx.preparedEntities = gen.randomEntities()
+        ctx.patchedEntities = gen.randomEntities()
+
         const e = gen.randomEntity()
         delete e._id
         ctx.entityWithoutId = e
