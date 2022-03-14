@@ -1,5 +1,6 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { isObject, AdapterOperators, isEmptyFilter } = require('velo-external-db-commons')
+const { LastLetterCoder } = require('./firestore_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 
 class FilterParser {
@@ -27,6 +28,10 @@ class FilterParser {
             throw new InvalidQuery(`${operator} operator cant be used in firebase`)
         }
 
+        if(this.isStringBeginsOperator(operator)) {
+            return this.parseStringBegins(fieldName, inlineFields, value)
+        }
+        
         if (this.isSingleFieldOperator(operator)) {
             const _value = this.valueForOperator(value, operator)
     
@@ -49,9 +54,13 @@ class FilterParser {
     isSingleFieldOperator(operator) {
         return [ne, lt, lte, gt, gte, include, eq, string_begins, string_ends].includes(operator)
     }
+
+    isStringBeginsOperator(operator) {
+        return operator === string_begins
+    }
     
     isUnsupportedOperator(operator) {   
-        return [or, urlized, string_contains, not].includes(operator)
+        return [or, urlized, string_contains, not, string_ends].includes(operator)
     }
     
     isMultipleFiledOperator(operator) {
@@ -87,10 +96,6 @@ class FilterParser {
                 return '>='
             case include:
                 return 'in'
-            case string_begins: // TODO: fix string_begins, string_ends, shouldn't work like this
-                return '>='
-            case string_ends:
-                return '<'
         }
     }
     
@@ -128,6 +133,19 @@ class FilterParser {
             }
         }
         return fieldName
+    }
+
+    parseStringBegins(fieldName, inlineFields, value) {
+        return [{
+            fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
+            opStr: '>=',
+            value,
+        },
+        {
+            fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
+            opStr: '<',
+            value: value + LastLetterCoder
+        }]
     }
 
     selectFieldsFor(projection) { 
