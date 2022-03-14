@@ -36,12 +36,23 @@ variable "image_url" {
 variable "secret_key" {
   description = "Secret Key for Velo External DB adapter service"
   type        = string
-  default = "myKey"
-  
+  default = "myKey" 
 }
 
 variable "database_name" {
   description = "Database name for Velo External DB adapter service"
   type        = string
   default = "myDatabase"
+}
+
+variable "database_user_name" {
+  description = "Database user name for Velo External DB adapter service"
+  type        = string
+  default = "root"
+}
+
+variable "database_password" {
+  description = "Database password for Velo External DB adapter service"
+  type        = string
+  sensitive   = true
 }

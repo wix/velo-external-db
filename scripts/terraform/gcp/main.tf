@@ -17,12 +17,6 @@ resource "random_integer" "random_suffix" {
   max = 10000
 }
 
-resource "random_password" "user_db_password" {
-  length  = 12
-  special = true
-}
-
-
 resource "google_project_service" "run_api" {
   service            = "run.googleapis.com"
   disable_on_destroy = false
@@ -34,7 +28,6 @@ resource "google_project_service" "secretmanager" {
 
 # ------- Database setup ------- 
 
-# change the name of the db
 resource "google_sql_database_instance" "instance" {
   name             = "${var.db_name}-${random_integer.random_suffix.result}"
   region           = var.adapter_location
@@ -48,9 +41,9 @@ resource "google_sql_database_instance" "instance" {
 
 resource "google_sql_user" "root_user" {
   project    = var.project_id
-  name       = "root"
+  name       = var.database_user_name
   instance   = google_sql_database_instance.instance.name
-  password   = random_password.user_db_password.result
+  password   = var.database_password
   depends_on = [google_sql_database_instance.instance]
 }
 
@@ -90,7 +83,7 @@ resource "google_secret_manager_secret" "password_secret" {
 
 resource "google_secret_manager_secret_version" "password_secret_version_data" {
   secret      = google_secret_manager_secret.password_secret.id
-  secret_data = random_password.user_db_password.result
+  secret_data = var.database_password
   depends_on  = [google_secret_manager_secret.password_secret, google_sql_database_instance.instance, google_sql_user.root_user]
 }
 
