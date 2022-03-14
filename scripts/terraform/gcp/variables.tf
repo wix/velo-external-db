@@ -4,10 +4,16 @@ variable "project_id" {
   type        = string
 }
 
-variable "location" {
+variable "adapter_location" {
   description = "Velo External DB adapter service deployment location"
   type        = string
-  default = "us-central1"
+  default = "us-east4"
+}
+
+variable "db_location" {
+  description = "Database location"
+  type        = string
+  default = "us-east4"
 }
 
 variable "adapter_name" {
@@ -26,6 +32,7 @@ variable "secret_key" {
   description = "Secret Key for Velo External DB adapter service"
   type        = string
   default = "myKey"
+  
 }
 
 variable "database_name" {

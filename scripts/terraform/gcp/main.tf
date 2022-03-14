@@ -22,7 +22,7 @@ resource "google_project_service" "run_api" {
 # change the name of the db
 resource "google_sql_database_instance" "instance" {
   name             = "cloudrun-sql"
-  region           = "us-east1"
+  region           = var.adapter_location
   database_version = "MYSQL_5_7"
   settings {
     tier = "db-f1-micro"
@@ -99,7 +99,7 @@ resource "google_project_iam_member" "firestore_owner_binding2" {
 
 resource "google_cloud_run_service" "run_service" {
   name = var.adapter_name
-  location = var.location
+  location = var.adapter_location
 
   template {
     spec {
