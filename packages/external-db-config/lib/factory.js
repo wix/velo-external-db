@@ -95,7 +95,7 @@ const create = () => {
     break
   }
 
-  return new ConfigReader(internalConfigReader || new StubConfigReader, common, authorizationConfigReader)
+  return new ConfigReader(internalConfigReader || new StubConfigReader, common, authorizationConfigReader || new StubConfigReader)
 }
 
 module.exports = { create }
