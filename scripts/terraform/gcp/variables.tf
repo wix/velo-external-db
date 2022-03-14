@@ -15,6 +15,11 @@ variable "db_location" {
   type        = string
   default = "us-east4"
 }
+variable "db_name" {
+  description = "The name of the database to be created"
+  type        = string
+  default = "velo-mysql-db"
+}
 
 variable "adapter_name" {
   description = "The name of the Velo External DB adapter service to create"
