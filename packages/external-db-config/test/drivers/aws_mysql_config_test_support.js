@@ -1,11 +1,13 @@
 const { AwsConfigReader } = require('../../lib/readers/aws_config_reader')
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
 const mockClient = require('aws-sdk-client-mock')
-const mockedAwsSdk = mockClient.mockClient(SecretsManagerClient)
+let mockedAwsSdk 
 const { validAuthorizationConfig } = require ('../test_utils')
 
 const Chance = require('chance')
 const chance = new Chance()
+
+const init = () => mockedAwsSdk = mockClient.mockClient(SecretsManagerClient)
 
 const defineValidConfig = (config) => {
     const awsConfig = { }
@@ -56,31 +58,29 @@ const validConfigWithAuthConfig = () => ({
     } 
 })
 
-const ExpectedProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'clientDomain', 'ROLE_CONFIG']
+const ExpectedProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY', 'ROLE_CONFIG']
+const RequiredProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY']
 
-const reset = () => mockedAwsSdk.reset()
+const reset = () => { 
+    mockedAwsSdk.reset()
+    ExpectedProperties.forEach(p => delete process.env[p])
+    delete process.env['USER']
+}
 
 const defineErroneousConfig = (msg) => mockedAwsSdk.on(GetSecretValueCommand).rejects(new Error(msg || chance.word()))
 
-const defaultConfig = {
-    host: '',
-    user: '',
-    password: '',
-    db: '',
-    secretKey: '',
-}
-
 module.exports = {
+    init,
     defineValidConfig,
     validConfigWithAuthConfig,
     validConfigWithAuthorization,
     defineInvalidConfig,
     defineErroneousConfig,
     validConfig,
-    defaultConfig,
     reset,
     hasReadErrors: true,
     ExpectedProperties,
+    RequiredProperties,
     configReaderProvider: new AwsConfigReader()
 }
 
