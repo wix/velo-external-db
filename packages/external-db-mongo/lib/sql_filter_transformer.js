@@ -113,12 +113,7 @@ class FilterParser {
     }
 
     adapterOperatorToMongoOperator(operator) {
-        switch (operator) {
-            case '$hasSome':
-                return '$in'
-            default:
-                return `$${operator}`
-        }
+        return `$${operator}`
     }
 
     orderBy(sort) {
