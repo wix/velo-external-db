@@ -1,6 +1,7 @@
 const { Uninitialized } = require('test-commons')
 const { create } = require('../../lib/factory')
 const awsMySql = require('./aws_mysql_config_test_support')
+const awsMongo = require('./aws_mongo_config_test_support')
 const azureMySql = require('./azure_mysql_config_test_support')
 const gcpMySql = require('./gcp_mysql_config_test_support')
 const gcpSpanner = require('./gcp_spanner_config_test_support')
@@ -13,6 +14,13 @@ const env = {
 const initDriver = (vendor, engine) => {
     switch (vendor.toLowerCase()) {
         case 'aws':
+            switch(engine) {
+                case 'mysql':
+                case 'postgres':
+                    return awsMySql
+                case 'mongo':
+                    return awsMongo
+            }
             return awsMySql
         case 'azure':
             return azureMySql

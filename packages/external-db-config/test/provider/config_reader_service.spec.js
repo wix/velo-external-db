@@ -7,6 +7,7 @@ const gcpSpannerDriver = require('../drivers/gcp_spanner_config_test_support')
 const gcpFirestoreDriver = require('../drivers/gcp_firestore_config_test_support')
 const azureDriver = require('../drivers/gcp_mysql_config_test_support')
 const awsDriver = require('../drivers/aws_mysql_config_test_support')
+const awsMongoDriver = require('../drivers/aws_mongo_config_test_support')
 const commonDriver = require('../drivers/common_config_test_support')
 
 describe('External DB config client', () => {
@@ -16,6 +17,7 @@ describe('External DB config client', () => {
     ['Vendor: GCP, DB: Firestore', gcpFirestoreDriver],
     ['Vendor: Azure, DB: MySql/Postgres', azureDriver],
     ['Vendor: AWS, DB: MySql/Postgres', awsDriver],
+    ['Vendor: AWS, DB: Mongo', awsMongoDriver],
     ['Vendor: All, Common Config Reader', commonDriver],
   ]).describe('%s', (name, driver) => {
 
