@@ -35,6 +35,7 @@ const initEnv = (vendor, engine) => {
 
     env.configReader = create()
     env.driver = initDriver(vendor, engine)
+    env.driver.init?.()
 }
 
 const ExpectedProperties = ['CLOUD_VENDOR', 'TYPE']
