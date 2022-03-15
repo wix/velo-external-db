@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "start:azure": "terraform -chdir=./azure init && terraform -chdir=./azure apply",
+    "start:gcp": "terraform -chdir=./gcp init && terraform -chdir=./gcp apply",
     "test": ""
   },
   "author": "",
