@@ -68,6 +68,14 @@ describe('External DB config client', () => {
 
           expect(expected).toEqual({ secretMangerError: ctx.error, missingRequiredSecretsKeys: driver.RequiredProperties })
       })
+
+      test('read config when part of the config from secret manager and other part from process.env', async() => {
+        driver.defineSplittedConfig(ctx.config)
+
+        const expected = await env.configReaderProvider.readConfig()
+
+        expect(expected).toEqual(ctx.config)
+      })
     }
 
     const ctx = {

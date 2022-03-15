@@ -2,7 +2,7 @@ const { AwsConfigReader } = require('../../lib/readers/aws_config_reader')
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
 const mockClient = require('aws-sdk-client-mock')
 let mockedAwsSdk 
-const { validAuthorizationConfig } = require ('../test_utils')
+const { validAuthorizationConfig, splitConfig } = require ('../test_utils')
 
 const Chance = require('chance')
 const chance = new Chance()
@@ -31,6 +31,34 @@ const defineValidConfig = (config) => {
     }
     mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(awsConfig) })
 }
+
+const defineLocalEnvs = (config) => {
+    if (config.host) {
+        process.env['HOST'] = config.host
+    }
+    if (config.user) {
+        process.env['USER'] = config.user
+    }
+    if (config.password) {
+        process.env['PASSWORD'] = config.password
+    }
+    if (config.db) {
+        process.env['DB'] = config.db
+    }
+    if (config.secretKey) {
+        process.env['SECRET_KEY'] = config.secretKey
+    }
+    if (config.authorization) {
+        process.env['ROLE_CONFIG'] = JSON.stringify({ collectionLevelConfig: config.authorization })
+    }
+}
+
+const defineSplittedConfig = (config) => {
+    const { firstPart: localConfigPart, secondPart: secretMangerPart } = splitConfig(config)
+    defineValidConfig(localConfigPart)
+    defineLocalEnvs(secretMangerPart)
+}
+
 
 const defineInvalidConfig = () => defineValidConfig({})
 
@@ -72,6 +100,7 @@ const defineErroneousConfig = (msg) => mockedAwsSdk.on(GetSecretValueCommand).re
 module.exports = {
     init,
     defineValidConfig,
+    defineSplittedConfig,
     validConfigWithAuthConfig,
     validConfigWithAuthorization,
     defineInvalidConfig,
