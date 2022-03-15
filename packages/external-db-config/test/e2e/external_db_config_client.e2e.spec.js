@@ -6,7 +6,7 @@ const { invalidConfigStatusResponse } = require('./external_db_config_client_mat
 each(
 [
        ['AZURE', ['mysql', 'postgres']],
-       ['AWS', ['mysql', 'postgres']],
+       ['AWS', ['mysql', 'postgres', 'mongo']],
        ['GCP', ['mysql', 'postgres', 'spanner', 'firestore']]
       ]
 ).describe('Config Reader for %s', (vendor, engines) => {
