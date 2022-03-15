@@ -55,8 +55,8 @@ const defineLocalEnvs = (config) => {
 
 const defineSplittedConfig = (config) => {
     const { firstPart: localConfigPart, secondPart: secretMangerPart } = splitConfig(config)
-    defineValidConfig(localConfigPart)
-    defineLocalEnvs(secretMangerPart)
+    defineValidConfig(secretMangerPart)
+    defineLocalEnvs(localConfigPart)
 }
 
 
