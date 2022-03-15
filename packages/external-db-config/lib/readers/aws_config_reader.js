@@ -42,7 +42,9 @@ class AwsDynamoConfigReader {
 
     async readConfig() {
       const { config } = await this.getExternalAndLocalEnvs()
-  
+      if (process.env.NODE_ENV === 'test') {
+        return { region: this.region, secretKey: config.SECRET_KEY, endpoint: process.env.ENDPOINT_URL }
+      }
       return { region: this.region, secretKey: config.SECRET_KEY }
     }
     
