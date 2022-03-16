@@ -2,7 +2,7 @@ const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client
 const { checkRequiredKeys, isJson, EmptyRoleConfig, configPattern, collectionConfigPattern } = require('../utils/config_utils')
 const Avj = require('ajv')
 const ajv = new Avj({ strict: false })
-const EmptyAWSAuthConfig = { ROLE_CONFIG: EmptyRoleConfig }
+const emptyConfig = (err) => ({ secretMangerError: err.message })
 
 class AwsAuthorizationConfigReader {
   constructor(region, secretId) {
@@ -13,9 +13,9 @@ class AwsAuthorizationConfigReader {
   }
 
   async readConfig() {
-    const { ROLE_CONFIG: roleConfig } = await this.readExternalConfig()
-                          .catch(() => EmptyAWSAuthConfig)
-    
+    const { config } = await this.getExternalAndLocalEnvs()
+    const { ROLE_CONFIG: roleConfig } = config
+
     const { collectionLevelConfig } = isJson(roleConfig) ? JSON.parse(roleConfig) : EmptyRoleConfig
     
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
@@ -27,16 +27,25 @@ class AwsAuthorizationConfigReader {
     return JSON.parse(data.SecretString)
   }
 
+  async getExternalAndLocalEnvs() {
+    const externalConfig = await this.readExternalConfig().catch(emptyConfig)
+    const { ROLE_CONFIG } = { ...process.env, ...externalConfig }
+    const config = { ROLE_CONFIG }
+    return { config, secretMangerError: externalConfig.secretMangerError }
+  }
+
   async validate() {
     try{
-        const { ROLE_CONFIG: roleConfig } = await this.readExternalConfig()
+        const { config, secretMangerError } = await this.getExternalAndLocalEnvs()
+
+        const { ROLE_CONFIG: roleConfig } = config
 
         const valid = isJson(roleConfig) && this.configValidator(JSON.parse(roleConfig))
 
         let message 
         
     
-        if (checkRequiredKeys(process.env, ['ROLE_CONFIG']).length)  
+        if (checkRequiredKeys(config, ['ROLE_CONFIG']).length)  
           message = 'Role config is not defined, using default'
         else if (!isJson(roleConfig)) 
           message = 'Role config is not valid JSON'
@@ -45,7 +54,7 @@ class AwsAuthorizationConfigReader {
         else 
           message = 'Authorization Config read successfully'
       
-        return { valid, message }
+        return { valid, message, secretMangerError }
     }
 
     catch(err) {
