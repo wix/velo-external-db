@@ -59,7 +59,8 @@ const AdapterOperators = {
     and: 'and',
     or: 'or',
     not: 'not',
-    urlized: 'urlized'
+    urlized: 'urlized',
+    matches: 'matches'
 }
 
 const AdapterFunctions = { 

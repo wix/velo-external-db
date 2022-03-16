@@ -1,7 +1,7 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, isNull  } = require('velo-external-db-commons')
 const { wildCardWith, escapeId } = require('./mysql_utils')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 
 class FilterParser {
@@ -64,10 +64,17 @@ class FilterParser {
                 parameters: [value.map(s => s.toLowerCase()).join('[- ]')]
             }]
         }
+        
+        if (operator === matches) {
+            const ignoreCase = value.ignoreCase ? 'LOWER' : ''
+            return [{
+                filterExpr: `${ignoreCase}(${escapeId(fieldName)}) RLIKE ?`,
+                parameters: [this.specArrayToRegex(value.spec, value.ignoreCase)]
+            }]
+        }   
 
         return []
     }
-
 
     isSingleFieldOperator(operator) {
         return [ne, lt, lte, gt, gte, include, eq].includes(operator)
@@ -215,6 +222,21 @@ class FilterParser {
 
     selectFieldsFor(projection) {
         return projection.map(escapeId).join(', ')
+    }
+
+    specArrayToRegex(spec, ignoreCase) {
+        if (!Array.isArray(spec)) {
+            throw InvalidQuery('$matches must have array - spec property')
+        }
+
+        return spec.map(spec => {
+            if (spec.type === 'literal') {
+                return ignoreCase ? spec.value.toLowerCase() : spec.value
+            }
+            if (spec.type === 'anyOf') {
+                return ignoreCase ? `[${spec.value.toLowerCase()}]` : `[${spec.value}]`
+            }
+        }).join('')
     }
 }
 
