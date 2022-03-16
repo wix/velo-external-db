@@ -1,3 +1,3 @@
-const suiteDef = (name, setup) => ( { name, setup } )
+const suiteDef = (name, setup, misconfiguredDbOperations) => ( { name, setup, misconfiguredDbOperations } )
 
 module.exports = { suiteDef }

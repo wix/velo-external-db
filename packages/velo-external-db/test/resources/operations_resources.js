@@ -20,6 +20,8 @@ const init = async impl => {
     env.driver = driver
 }
 
+const misconfiguredDbOperation = impl => (impl.opsDriver().misconfiguredDbOperationOptions())
+
 const postgresTestEnvInit = async() => await init(postgres)
 const mysqlTestEnvInit = async() => await init(mysql)
 const spannerTestEnvInit = async() => await init(spanner)
@@ -31,7 +33,7 @@ const dynamoTestEnvInit = async() => await init(dynamo)
 const bigqueryTestEnvInit = async() => await init(bigquery)
 
 const testSuits = {
-    mysql: suiteDef('MySql', mysqlTestEnvInit),
+    mysql: suiteDef('MySql', mysqlTestEnvInit, misconfiguredDbOperation(mysql)),
     postgres: suiteDef('Postgres', postgresTestEnvInit),
     spanner: suiteDef('Spanner', spannerTestEnvInit),
     firestore: suiteDef('Firestore', firestoreTestEnvInit),
@@ -45,5 +47,6 @@ const testSuits = {
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 const setupDb = () => testedSuit().setup()
 const currentDbImplementationName = () => testedSuit().name
+const misconfiguredDbOperationOptions = () => testedSuit().misconfiguredDbOperations
 
-module.exports = { env, setupDb, currentDbImplementationName }
+module.exports = { env, setupDb, currentDbImplementationName, misconfiguredDbOperationOptions }
