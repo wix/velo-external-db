@@ -21,7 +21,7 @@ const dbOperationWithValidDB = () => {
     return { dbOperations: databaseOperations, cleanup }
 }
 
-const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong projectId.', () => dbOperationWithMisconfiguredProjectId()],
+const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong projectId', () => dbOperationWithMisconfiguredProjectId()],
                                             ['pool connection with wrong databaseId', () => dbOperationWithMisconfiguredDatabaseId()],
                                             ['pool connection with wrong instanceId', () => dbOperationWithMisconfiguredInstanceId()]
                                         ])
