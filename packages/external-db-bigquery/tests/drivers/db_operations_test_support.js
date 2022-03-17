@@ -7,7 +7,7 @@ const createPool = modify => {
     return { connection, cleanup }
 }
 
-const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool({ databaseId: 'wrong' }).connection)
+const dbOperationWithMisconfiguredDatabaseId = () => new DatabaseOperations(createPool({ databaseId: 'wrong' }).connection)
 
 const dbOperationWithValidDB = () => {
     const { connection, cleanup } = createPool({ databaseId: 'testDB' })
@@ -15,7 +15,8 @@ const dbOperationWithValidDB = () => {
     return { dbOperations, cleanup: cleanup }
 }
 
+const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong databaseId', () => dbOperationWithMisconfiguredDatabaseId()]])
+
 module.exports = {
-    dbOperationWithMisconfiguredDatabase,
-    dbOperationWithValidDB
+    misconfiguredDbOperationOptions, dbOperationWithValidDB
 }

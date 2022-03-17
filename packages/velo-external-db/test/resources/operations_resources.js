@@ -40,8 +40,8 @@ const testSuits = {
     mssql: suiteDef('Sql Server', mssqlTestEnvInit, misconfiguredDbOperation(mssql)),
     mongo: suiteDef('Mongo', mongoTestEnvInit, misconfiguredDbOperation(mongo)),
     airtable: suiteDef('Airtable', airTableTestEnvInit, misconfiguredDbOperation(airtable)),
-    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
-    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, misconfiguredDbOperation(dynamo)),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, misconfiguredDbOperation(bigquery)),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
