@@ -1,5 +1,6 @@
 const each = require('jest-each').default
 const { DbConnectionError } = require('velo-external-db-commons').errors
+const { shouldRunOnlyOn, shouldNotRunOn } = require('test-commons')
 const { env, setupDb, currentDbImplementationName, misconfiguredDbOperationOptions } = require('../resources/operations_resources')
 
 describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
@@ -7,7 +8,7 @@ describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
         setupDb()
     })
 
-    if (currentDbImplementationName() === 'MySql') {
+    if (shouldRunOnlyOn(['MySql', 'Postgres', 'Spanner'], currentDbImplementationName())) {
         each(misconfiguredDbOperationOptions())
         .test('%s will return DbConnectionError', async(message, givenMisconfiguredDbOperation) => {
             const dbOperation = await givenMisconfiguredDbOperation()
@@ -28,7 +29,7 @@ describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
             await cleanup()
         })
     }
-
+    if (shouldNotRunOn(['MySql', 'Postgres', 'Spanner'], currentDbImplementationName())) {
     if (currentDbImplementationName() !== 'Bigquery') {
         test('pool connection with wrong password will return DbConnectionError.', async() => {
             const dbOperation = await env.driver.dbOperationWithMisconfiguredPassword()
@@ -70,7 +71,7 @@ describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
         expect(validateConnection.error).not.toBeDefined()
         await cleanup()
     })
-
+    }
     afterEach(() => {
         env.driver.resetEnv?.()
     })
