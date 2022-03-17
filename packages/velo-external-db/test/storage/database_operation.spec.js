@@ -8,7 +8,7 @@ describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
         setupDb()
     })
 
-    if (shouldRunOnlyOn(['MySql', 'Postgres', 'Spanner', 'Firestore', 'Sql Server', 'Mongo'], currentDbImplementationName())) {
+    if (shouldRunOnlyOn(['MySql', 'Postgres', 'Spanner', 'Firestore', 'Sql Server', 'Mongo', 'Airtable'], currentDbImplementationName())) {
         each(misconfiguredDbOperationOptions())
         .test('%s will return DbConnectionError', async(message, givenMisconfiguredDbOperation) => {
             const dbOperation = await givenMisconfiguredDbOperation()
@@ -29,7 +29,7 @@ describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
             await cleanup()
         })
     }
-    if (shouldNotRunOn(['MySql', 'Postgres', 'Spanner', 'Firestore', 'Sql Server', 'Mongo'], currentDbImplementationName())) {
+    if (shouldNotRunOn(['MySql', 'Postgres', 'Spanner', 'Firestore', 'Sql Server', 'Mongo', 'Airtable'], currentDbImplementationName())) {
     if (currentDbImplementationName() !== 'Bigquery') {
         test('pool connection with wrong password will return DbConnectionError.', async() => {
             const dbOperation = await env.driver.dbOperationWithMisconfiguredPassword()

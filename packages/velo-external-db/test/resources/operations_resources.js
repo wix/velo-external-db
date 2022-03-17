@@ -39,7 +39,7 @@ const testSuits = {
     firestore: suiteDef('Firestore', firestoreTestEnvInit, misconfiguredDbOperation(firestore)),
     mssql: suiteDef('Sql Server', mssqlTestEnvInit, misconfiguredDbOperation(mssql)),
     mongo: suiteDef('Mongo', mongoTestEnvInit, misconfiguredDbOperation(mongo)),
-    airtable: suiteDef('Airtable', airTableTestEnvInit),
+    airtable: suiteDef('Airtable', airTableTestEnvInit, misconfiguredDbOperation(airtable)),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
     bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
 }

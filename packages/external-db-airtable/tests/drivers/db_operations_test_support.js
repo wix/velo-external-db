@@ -13,11 +13,10 @@ const createPool =  modify => {
     return airtableBase
 }
 
-const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool({ apiPrivateKey: 'wrong' }))
+const dbOperationWithMisconfiguredApiPrivateKey = () => new DatabaseOperations(createPool({ apiPrivateKey: 'wrong' }))
 
-const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool({ baseId: 'wrong' }))
+const dbOperationWithMisconfiguredBaseId = () => new DatabaseOperations(createPool({ baseId: 'wrong' }))
 
-const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool({ apiPrivateKey: 'wrong' }))
 
 const dbOperationWithValidDB = () => {
     const airtableBase = createPool({})
@@ -25,7 +24,10 @@ const dbOperationWithValidDB = () => {
     return { dbOperations, cleanup: () => { } }
 }
 
+const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong apiPrivateKey', () => dbOperationWithMisconfiguredApiPrivateKey()],
+                                            ['pool connection with wrong baseId', () => dbOperationWithMisconfiguredBaseId()],
+                                        ])
+
 module.exports = {
-    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-    dbOperationWithMisconfiguredHost, dbOperationWithValidDB
+    misconfiguredDbOperationOptions, dbOperationWithValidDB
 }
