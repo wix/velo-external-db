@@ -36,7 +36,7 @@ const testSuits = {
     mysql: suiteDef('MySql', mysqlTestEnvInit, misconfiguredDbOperation(mysql)),
     postgres: suiteDef('Postgres', postgresTestEnvInit, misconfiguredDbOperation(postgres)),
     spanner: suiteDef('Spanner', spannerTestEnvInit, misconfiguredDbOperation(spanner)),
-    firestore: suiteDef('Firestore', firestoreTestEnvInit),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit, misconfiguredDbOperation(firestore)),
     mssql: suiteDef('Sql Server', mssqlTestEnvInit),
     mongo: suiteDef('Mongo', mongoTestEnvInit),
     airtable: suiteDef('Airtable', airTableTestEnvInit),
