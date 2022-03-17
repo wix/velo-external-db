@@ -32,6 +32,5 @@ const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong 
                                         ])
 
 module.exports = {
-    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-    dbOperationWithMisconfiguredHost, dbOperationWithValidDB, misconfiguredDbOperationOptions
+    dbOperationWithValidDB, misconfiguredDbOperationOptions
 }
