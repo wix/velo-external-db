@@ -77,7 +77,7 @@ const testSuits = {
     firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.supportedOperations),
     mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.supportedOperations),
     mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.supportedOperations),
-    airtable: suiteDef('Airtable', airTableTestEnvInit),
+    airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.supportedOperations),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
     bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.supportedOperations),
     'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),

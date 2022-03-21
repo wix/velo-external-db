@@ -4,6 +4,7 @@ const FilterParser = require('./sql_filter_transformer')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const init = require('./connection_provider')
 const { app: mockServer } = require('../tests/drivers/mock_air_table')
+const { supportedOperations } = require('./supported_operations')
 
 const DatabaseOperations = require('./airtable_operations')
 
@@ -11,4 +12,4 @@ const driver = () => require('../tests/drivers/sql_filter_transformer_test_suppo
 const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 
 module.exports = { SchemaProvider, DataProvider, FilterParser, SchemaColumnTranslator, driver,
-                    init, opsDriver, DatabaseOperations, mockServer }
+                    init, opsDriver, DatabaseOperations, mockServer, supportedOperations }
