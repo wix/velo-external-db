@@ -2,6 +2,9 @@ const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client
 const { checkRequiredKeys } = require('../utils/config_utils')
 
 const emptyConfig = (err) => ({ secretMangerError: err.message })
+const DefaultRequiredKeys = ['host', 'username', 'password', 'DB', 'SECRET_KEY']
+const DynamoRequiredKeys = ['SECRET_KEY']
+const MongoRequiredKeys = ['URI', 'SECRET_KEY']
 
 class AwsConfigReader {
   constructor(secretId, region) {
@@ -30,7 +33,7 @@ class AwsConfigReader {
 
   async validate() {
       const { config, secretMangerError } = await this.getExternalAndLocalEnvs()
-      return { missingRequiredSecretsKeys: checkRequiredKeys(config, ['host', 'username', 'password', 'DB', 'SECRET_KEY']), secretMangerError }
+      return { missingRequiredSecretsKeys: checkRequiredKeys(config, DefaultRequiredKeys), secretMangerError }
   }
 }
 
@@ -64,7 +67,7 @@ class AwsDynamoConfigReader {
 
   async validate() {
     const { config, secretMangerError } = await this.getExternalAndLocalEnvs()
-    return { missingRequiredSecretsKeys: checkRequiredKeys(config, ['SECRET_KEY']), secretMangerError }
+    return { missingRequiredSecretsKeys: checkRequiredKeys(config, DynamoRequiredKeys), secretMangerError }
   }
 }
 
@@ -98,7 +101,7 @@ class AwsMongoConfigReader {
 
   async validate() {
       const { config, secretMangerError } = await this.getExternalAndLocalEnvs()
-      return { missingRequiredSecretsKeys: checkRequiredKeys(config, ['URI', 'SECRET_KEY']), secretMangerError }
+      return { missingRequiredSecretsKeys: checkRequiredKeys(config, MongoRequiredKeys), secretMangerError }
   }
 }
 
