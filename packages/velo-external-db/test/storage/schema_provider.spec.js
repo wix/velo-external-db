@@ -108,7 +108,7 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
             })
     })
 
-    testIfSchemaSupportsRemoveColumn()('drop column on a an existing collection', async() => {
+    testIfSchemaSupportsRemoveColumn(supportedOperations)('drop column on a an existing collection', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
         await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
         await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
@@ -116,12 +116,12 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
     })
 
 
-    testIfSchemaSupportsRemoveColumn()('drop column on a a non existing collection', async() => {
+    testIfSchemaSupportsRemoveColumn(supportedOperations)('drop column on a a non existing collection', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
         await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
     })
 
-    testIfSchemaSupportsRemoveColumn()('drop system column will fail', async() => {
+    testIfSchemaSupportsRemoveColumn(supportedOperations)('drop system column will fail', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
         SystemFields.map(f => f.name)
             .forEach(async f => {
