@@ -63,7 +63,7 @@ const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 const testSuits = {
     mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.supportedOperations),
     postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.supportedOperations),
-    spanner: suiteDef('Spanner', spannerTestEnvInit),
+    spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.supportedOperations),
     firestore: suiteDef('Firestore', firestoreTestEnvInit),
     mssql: suiteDef('Sql Server', mssqlTestEnvInit),
     mongo: suiteDef('Mongo', mongoTestEnvInit),
