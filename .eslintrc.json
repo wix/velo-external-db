@@ -74,6 +74,9 @@
         "jest/no-conditional-expect": [
             "off"
         ],
+        "jest/no-identical-title": [
+            "off"
+        ],
         "no-unused-vars": [
             "error",
             { "ignoreRestSiblings": true }

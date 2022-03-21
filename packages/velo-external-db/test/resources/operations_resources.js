@@ -1,5 +1,4 @@
 const { Uninitialized } = require('test-commons')
-const { suiteDef } = require('./test_suite_definition')
 const mysql = require('external-db-mysql')
 const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')
@@ -10,6 +9,8 @@ const airtable = require ('external-db-airtable')
 const dynamo = require ('external-db-dynamodb')
 const bigquery = require ('external-db-bigquery')
 
+const suiteDef = (name, setup, misconfiguredDbOperations) => ( { name, setup, misconfiguredDbOperations } )
+
 const env = {
     driver: Uninitialized,
 }
@@ -19,6 +20,8 @@ const init = async impl => {
 
     env.driver = driver
 }
+
+const misconfiguredDbOperation = impl => (impl.opsDriver().misconfiguredDbOperationOptions())
 
 const postgresTestEnvInit = async() => await init(postgres)
 const mysqlTestEnvInit = async() => await init(mysql)
@@ -31,19 +34,20 @@ const dynamoTestEnvInit = async() => await init(dynamo)
 const bigqueryTestEnvInit = async() => await init(bigquery)
 
 const testSuits = {
-    mysql: suiteDef('MySql', mysqlTestEnvInit),
-    postgres: suiteDef('Postgres', postgresTestEnvInit),
-    spanner: suiteDef('Spanner', spannerTestEnvInit),
-    firestore: suiteDef('Firestore', firestoreTestEnvInit),
-    mssql: suiteDef('Sql Server', mssqlTestEnvInit),
-    mongo: suiteDef('Mongo', mongoTestEnvInit),
-    airtable: suiteDef('Airtable', airTableTestEnvInit),
-    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
-    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
+    mysql: suiteDef('MySql', mysqlTestEnvInit, misconfiguredDbOperation(mysql)),
+    postgres: suiteDef('Postgres', postgresTestEnvInit, misconfiguredDbOperation(postgres)),
+    spanner: suiteDef('Spanner', spannerTestEnvInit, misconfiguredDbOperation(spanner)),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit, misconfiguredDbOperation(firestore)),
+    mssql: suiteDef('Sql Server', mssqlTestEnvInit, misconfiguredDbOperation(mssql)),
+    mongo: suiteDef('Mongo', mongoTestEnvInit, misconfiguredDbOperation(mongo)),
+    airtable: suiteDef('Airtable', airTableTestEnvInit, misconfiguredDbOperation(airtable)),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, misconfiguredDbOperation(dynamo)),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, misconfiguredDbOperation(bigquery)),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 const setupDb = () => testedSuit().setup()
 const currentDbImplementationName = () => testedSuit().name
+const misconfiguredDbOperationOptions = () => testedSuit().misconfiguredDbOperations
 
-module.exports = { env, setupDb, currentDbImplementationName }
+module.exports = { env, setupDb, currentDbImplementationName, misconfiguredDbOperationOptions }

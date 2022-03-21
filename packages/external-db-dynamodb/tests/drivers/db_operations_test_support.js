@@ -11,17 +11,17 @@ const createConnection = (_config) => {
     return { connection, cleanup }
 }
 
-const dbOperationWithMisconfiguredPassword = () => {
+const dbOperationWithMisconfiguredAwsAccessKeyId = () => {
     delete process.env.AWS_ACCESS_KEY_ID
     return new DatabaseOperations(createConnection(config()).connection)
 }
 
-const dbOperationWithMisconfiguredDatabase = () => {
+const dbOperationWithMisconfiguredAwsSecretAccessKey = () => {
     delete process.env.AWS_SECRET_ACCESS_KEY
     return new DatabaseOperations(createConnection(config()).connection)
 } 
 
-const dbOperationWithMisconfiguredHost = () => { 
+const dbOperationWithMisconfiguredRegion = () => { 
     const _config = config()
     delete _config.region
     return new DatabaseOperations(createConnection(_config).connection)
@@ -34,6 +34,11 @@ const dbOperationWithValidDB = () => {
     return { dbOperations, cleanup }
 }
 
+const misconfiguredDbOperationOptions = () => ([   ['pool connection without AWS_ACCESS_KEY_ID', () => dbOperationWithMisconfiguredAwsAccessKeyId()],
+                                            ['pool connection without AWS_SECRET_ACCESS_KEY', () => dbOperationWithMisconfiguredAwsSecretAccessKey()],
+                                            ['pool connection without region', () => dbOperationWithMisconfiguredRegion()]
+                                        ])
+
 const resetEnv = () => {
     process.env.AWS_SECRET_ACCESS_KEY = 'TEST_SECRET_ACCESS_KEY'
     process.env.AWS_ACCESS_KEY_ID = 'TEST_ACCESS_KEY_ID'
@@ -41,6 +46,5 @@ const resetEnv = () => {
 
 
 module.exports = {
-    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-    dbOperationWithMisconfiguredHost, dbOperationWithValidDB, resetEnv
+    misconfiguredDbOperationOptions, dbOperationWithValidDB, resetEnv
 }

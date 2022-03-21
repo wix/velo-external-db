@@ -26,7 +26,11 @@ const dbOperationWithValidDB = () => {
     return { dbOperations, cleanup }
 }
 
+const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong password', () => dbOperationWithMisconfiguredPassword()],
+                                            ['pool connection with wrong database', () => dbOperationWithMisconfiguredDatabase()],
+                                            ['pool connection with wrong host', () => dbOperationWithMisconfiguredHost()]
+                                        ])
+
 module.exports = {
-    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-    dbOperationWithMisconfiguredHost, dbOperationWithValidDB
+    dbOperationWithValidDB, misconfiguredDbOperationOptions
 }

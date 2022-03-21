@@ -10,18 +10,23 @@ const createPool = modify => {
     return init({ ...config, ...modify }, { min: 0, size: 1 })
 }
 
-const dbOperationWithMisconfiguredPassword = () => createPool( { projectId: 'wrong' } ).databaseOperations
+const dbOperationWithMisconfiguredProjectId = () => createPool( { projectId: 'wrong' } ).databaseOperations
 
-const dbOperationWithMisconfiguredDatabase = () => createPool( { databaseId: 'wrong' } ).databaseOperations
+const dbOperationWithMisconfiguredDatabaseId = () => createPool( { databaseId: 'wrong' } ).databaseOperations
 
-const dbOperationWithMisconfiguredHost = () => createPool( { instanceId: 'wrong' } ).databaseOperations
+const dbOperationWithMisconfiguredInstanceId = () => createPool( { instanceId: 'wrong' } ).databaseOperations
 
 const dbOperationWithValidDB = () => {
     const { databaseOperations, cleanup } = createPool({ } )
     return { dbOperations: databaseOperations, cleanup }
 }
 
+const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong projectId', () => dbOperationWithMisconfiguredProjectId()],
+                                            ['pool connection with wrong databaseId', () => dbOperationWithMisconfiguredDatabaseId()],
+                                            ['pool connection with wrong instanceId', () => dbOperationWithMisconfiguredInstanceId()]
+                                        ])
+
+
 module.exports = {
-    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-    dbOperationWithMisconfiguredHost, dbOperationWithValidDB
+     dbOperationWithValidDB, misconfiguredDbOperationOptions
 }

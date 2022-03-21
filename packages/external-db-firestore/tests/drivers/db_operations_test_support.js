@@ -12,16 +12,11 @@ const unplugEmulator = () => delete process.env.FIRESTORE_EMULATOR_HOST
 
 const setWrongCredentials = () => process.env.GOOGLE_APPLICATION_CREDENTIALS='../../packages/external-db-firestore/tests/drivers/broken_creds.json'
 
-const dbOperationWithMisconfiguredPassword = () => {
+const dbOperationWithMisconfiguredProjectId = () => {
     unplugEmulator()
     setWrongCredentials()
     return createPool( { projectId: 'wrong' } ).databaseOperations
 }
-
-const unsupported = () => { throw new Error('not supported') }
-
-const dbOperationWithMisconfiguredDatabase = () => unsupported()
-const dbOperationWithMisconfiguredHost = () => unsupported()
 
 const dbOperationWithValidDB = () => {
     process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8082'
@@ -29,7 +24,8 @@ const dbOperationWithValidDB = () => {
     return { dbOperations: databaseOperations, cleanup }
 }
 
+const misconfiguredDbOperationOptions = () => ([['pool connection with wrong projectId.', () => dbOperationWithMisconfiguredProjectId()]])
+
 module.exports = {
-    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-    dbOperationWithMisconfiguredHost, dbOperationWithValidDB
+    dbOperationWithValidDB, misconfiguredDbOperationOptions 
 }

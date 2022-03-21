@@ -29,11 +29,11 @@ const dbOperationWithValidDB = () => {
     return { dbOperations, cleanup: async() => await connection.close() }
 }
 
-const dbOperationWithMisconfiguredConfig = [() => dbOperationWithMisconfiguredPassword(),
-                                            () => dbOperationWithMisconfiguredDatabase(),
-                                            () => dbOperationWithMisconfiguredHost()]
+const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong password', () => dbOperationWithMisconfiguredPassword()],
+                                            ['pool connection with wrong database', () => dbOperationWithMisconfiguredDatabase()],
+                                            ['pool connection with wrong host', () => dbOperationWithMisconfiguredHost()]
+                                        ])
 
 module.exports = {
-    dbOperationWithMisconfiguredPassword, dbOperationWithMisconfiguredDatabase,
-    dbOperationWithMisconfiguredHost, dbOperationWithValidDB, dbOperationWithMisconfiguredConfig
+    misconfiguredDbOperationOptions, dbOperationWithValidDB
 }
