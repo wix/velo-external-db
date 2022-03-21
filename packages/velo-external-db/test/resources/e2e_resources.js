@@ -61,7 +61,7 @@ const dynamoTestEnvInit = async() => await dbInit(dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 
 const testSuits = {
-    mysql: suiteDef('MySql', mysqlTestEnvInit),
+    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.supportedOperations),
     postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.supportedOperations),
     spanner: suiteDef('Spanner', spannerTestEnvInit),
     firestore: suiteDef('Firestore', firestoreTestEnvInit),
