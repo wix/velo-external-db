@@ -70,7 +70,7 @@ const testSuits = {
     airtable: suiteDef('Airtable', airTableTestEnvInit),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
     bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.supportedOperations),
-    'google-sheet': suiteDef('Google-sheet', googleSheetTestEnvInit),
+    'google-sheet': suiteDef('Google-sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
