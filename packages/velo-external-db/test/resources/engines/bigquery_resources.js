@@ -1,4 +1,4 @@
-const { init } = require('external-db-bigquery')
+const { init, supportedOperations } = require('external-db-bigquery')
 
 const databaseId = 'testDB'
 const projectId = 'corvid-managed-cfe9809c'
@@ -28,4 +28,4 @@ const shutdownEnv = async() => {
 
 const schemaProviderTestVariables = () => ({ projectId, databaseId })
 
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaProviderTestVariables }
+module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaProviderTestVariables, supportedOperations }
