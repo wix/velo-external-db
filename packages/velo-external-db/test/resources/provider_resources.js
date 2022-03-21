@@ -76,7 +76,7 @@ const testSuits = {
     spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.supportedOperations),
     firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.supportedOperations),
     mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.supportedOperations),
-    mongo: suiteDef('Mongo', mongoTestEnvInit),
+    mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.supportedOperations),
     airtable: suiteDef('Airtable', airTableTestEnvInit),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
     bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.supportedOperations),
