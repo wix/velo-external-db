@@ -19,7 +19,6 @@ const env = {
     secretKey: Uninitialized,
     app: Uninitialized,
     internals: Uninitialized,
-    schemaOperations: Uninitialized,
 }
 
 const initApp = async() => {
@@ -75,10 +74,10 @@ const testSuits = {
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
-env.schemaOperations = testedSuit().supportedOperations
+const supportedOperations = testedSuit().supportedOperations
 
 const setupDb = () => testedSuit().setup()
 const currentDbImplementationName = () => testedSuit().name
 
 
-module.exports = { env, initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName }
+module.exports = { env, initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations }

@@ -23,40 +23,14 @@ const aggregateIn = (supportedOperations) => supportedOperations.includes(Aggreg
 
 const findWithSortIn = (supportedOperations) => supportedOperations.includes(FindWithSort)
 
-const testIfSchemaSupportsAddColumn = async({ schemaOperations }, f) => {
-    if (addColumnIn(schemaOperations)) {
-        return await f()
-    }
-}
 
-const testIfSchemaSupportsRemoveColumn = async({ schemaOperations }, f) => {
-    if (removeColumnIn(schemaOperations)) {
-        return await f()
-    }
-}
-
-const testIfSchemaSupportsUpdateImmediately = async({ schemaOperations }, f) => {
-    if (updateImmediatelyIn(schemaOperations)) {
-        return await f()
-    }
-}
-
-const testIfSchemaSupportsDeleteImmediately = ({ schemaOperations }) => deleteImmediatelyIn(schemaOperations) ? test : test.skip
-
-
-const testIfSchemaSupportsTruncate = async({ schemaOperations }, f) => {
-    if (truncateIn(schemaOperations)) {
-        return await f()
-    }
-}
-
-const testIfSchemaSupportsAggregate = async({ schemaOperations }, f) => {
-    if (aggregateIn(schemaOperations)) {
-        return await f()
-    }
-}
-
-const testIfSchemaSupportsFindWithSort = ({ schemaOperations }) => findWithSortIn(schemaOperations) ? test : test.skip
+const testIfSchemaSupportsAddColumn = ( schemaOperations ) => addColumnIn(schemaOperations) ? test : test.skip
+const testIfSchemaSupportsRemoveColumn = ( schemaOperations ) => removeColumnIn(schemaOperations) ? test : test.skip
+const testIfSchemaSupportsUpdateImmediately = ( schemaOperations ) => updateImmediatelyIn(schemaOperations) ? test : test.skip
+const testIfSchemaSupportsDeleteImmediately = ( schemaOperations ) => deleteImmediatelyIn(schemaOperations) ? test : test.skip
+const testIfSchemaSupportsTruncate = ( schemaOperations ) => truncateIn(schemaOperations) ? test : test.skip
+const testIfSchemaSupportsAggregate = ( schemaOperations ) => aggregateIn(schemaOperations) ? test : test.skip
+const testIfSchemaSupportsFindWithSort = ( schemaOperations ) => findWithSortIn(schemaOperations) ? test : test.skip
 
 module.exports = { shouldNotRunOn, shouldRunOnlyOn, sleep, Uninitialized, 
     testIfSchemaSupportsAddColumn, testIfSchemaSupportsRemoveColumn, testIfSchemaSupportsUpdateImmediately,
