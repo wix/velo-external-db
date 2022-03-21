@@ -34,7 +34,6 @@ const initApp = async() => {
         await waitUntil(() => env.internals().started)
     }
     env.app = env.internals()
-    env.schemaOperations = env.app.schemaProvider.supportedOperations()
 }
 
 const teardownApp = async() => {
@@ -70,12 +69,14 @@ const testSuits = {
     mssql: suiteDef('Sql Server', mssqlTestEnvInit),
     mongo: suiteDef('Mongo', mongoTestEnvInit),
     airtable: suiteDef('Airtable', airTableTestEnvInit),
-    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
-    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.supportedOperations),
     'google-sheet': suiteDef('Google-sheet', googleSheetTestEnvInit),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
+env.schemaOperations = testedSuit().supportedOperations
+
 const setupDb = () => testedSuit().setup()
 const currentDbImplementationName = () => testedSuit().name
 

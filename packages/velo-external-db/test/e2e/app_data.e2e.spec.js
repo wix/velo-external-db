@@ -26,7 +26,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await dbTeardown()
     }, 20000)
 
-    test('find api', async() => testIfSchemaSupportsFindWithSort(env, async() => {
+    testIfSchemaSupportsFindWithSort(env)('find api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
         await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
@@ -35,7 +35,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
                     items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
                     totalCount: 2
                 } }))
-    }))
+    })
 
     //todo: create another test without sort for these implementations
 
@@ -94,14 +94,14 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
     }))
 
-    test('bulk delete api', async() => testIfSchemaSupportsDeleteImmediately(env, async() => {
+    testIfSchemaSupportsDeleteImmediately(env)('bulk delete api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 
         await axios.post('/data/remove/bulk', { collectionName: ctx.collectionName, itemIds: ctx.items.map(i => i._id) }, authAdmin)
 
         await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
-    }))
+    })
 
     test('get by id api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)

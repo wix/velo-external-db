@@ -41,11 +41,8 @@ const testIfSchemaSupportsUpdateImmediately = async({ schemaOperations }, f) => 
     }
 }
 
-const testIfSchemaSupportsDeleteImmediately = async({ schemaOperations }, f) => {
-    if (deleteImmediatelyIn(schemaOperations)) {
-        return await f()
-    }
-}
+const testIfSchemaSupportsDeleteImmediately = ({ schemaOperations }) => deleteImmediatelyIn(schemaOperations) ? test : test.skip
+
 
 const testIfSchemaSupportsTruncate = async({ schemaOperations }, f) => {
     if (truncateIn(schemaOperations)) {
@@ -59,11 +56,7 @@ const testIfSchemaSupportsAggregate = async({ schemaOperations }, f) => {
     }
 }
 
-const testIfSchemaSupportsFindWithSort = async({ schemaOperations }, f) => {
-    if (findWithSortIn(schemaOperations)) {
-        return await f()
-    }
-}
+const testIfSchemaSupportsFindWithSort = ({ schemaOperations }) => findWithSortIn(schemaOperations) ? test : test.skip
 
 module.exports = { shouldNotRunOn, shouldRunOnlyOn, sleep, Uninitialized, 
     testIfSchemaSupportsAddColumn, testIfSchemaSupportsRemoveColumn, testIfSchemaSupportsUpdateImmediately,
