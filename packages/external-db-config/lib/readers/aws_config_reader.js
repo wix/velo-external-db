@@ -13,7 +13,7 @@ class AwsConfigReader {
   }
 
   async readConfig() {
-    const { config } = await this.getExternalAndLocalEnvs()
+    const { config } = await this.readExternalAndLocalConfig()
     const { host, username, password, DB, SECRET_KEY } = config
     return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY }
   }
@@ -28,7 +28,7 @@ class AwsConfigReader {
     }
   }
 
-  async getExternalAndLocalEnvs() { 
+  async readExternalAndLocalConfig() { 
     const { externalConfig, secretMangerError } = await this.readExternalConfig()
     const { host, username, password, DB, SECRET_KEY, HOST, PASSWORD, USER } = { ...process.env, ...externalConfig }
     const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, SECRET_KEY }
@@ -36,7 +36,7 @@ class AwsConfigReader {
   }
 
   async validate() {
-      const { config, secretMangerError } = await this.getExternalAndLocalEnvs()
+      const { config, secretMangerError } = await this.readExternalAndLocalConfig()
       return { missingRequiredSecretsKeys: checkRequiredKeys(config, DefaultRequiredKeys), secretMangerError }
   }
 }
@@ -48,14 +48,14 @@ class AwsDynamoConfigReader {
     }
 
     async readConfig() {
-      const { config } = await this.getExternalAndLocalEnvs()
+      const { config } = await this.readExternalAndLocalConfig()
       if (process.env.NODE_ENV === 'test') {
         return { region: this.region, secretKey: config.SECRET_KEY, endpoint: process.env.ENDPOINT_URL }
       }
       return { region: this.region, secretKey: config.SECRET_KEY }
     }
     
-    async getExternalAndLocalEnvs() { 
+    async readExternalAndLocalConfig() { 
       const { externalConfig, secretMangerError } = await this.readExternalConfig()
       const { SECRET_KEY } = { ...process.env, ...externalConfig }
       const config = { SECRET_KEY }
@@ -74,7 +74,7 @@ class AwsDynamoConfigReader {
   }
 
   async validate() {
-    const { config, secretMangerError } = await this.getExternalAndLocalEnvs()
+    const { config, secretMangerError } = await this.readExternalAndLocalConfig()
     return { missingRequiredSecretsKeys: checkRequiredKeys(config, DynamoRequiredKeys), secretMangerError }
   }
 }
@@ -95,7 +95,7 @@ class AwsMongoConfigReader {
       }
     }
 
-  async getExternalAndLocalEnvs() { 
+  async readExternalAndLocalConfig() { 
     const { externalConfig, secretMangerError } = await this.readExternalConfig()
     const { SECRET_KEY, URI } = { ...process.env, ...externalConfig }
     const config = { SECRET_KEY, URI }
@@ -104,7 +104,7 @@ class AwsMongoConfigReader {
   }
 
   async readConfig() {
-    const { config } = await this.getExternalAndLocalEnvs()
+    const { config } = await this.readExternalAndLocalConfig()
 
     const { SECRET_KEY, URI } = config
 
@@ -112,7 +112,7 @@ class AwsMongoConfigReader {
   }
 
   async validate() {
-      const { config, secretMangerError } = await this.getExternalAndLocalEnvs()
+      const { config, secretMangerError } = await this.readExternalAndLocalConfig()
       return { missingRequiredSecretsKeys: checkRequiredKeys(config, MongoRequiredKeys), secretMangerError }
   }
 }
