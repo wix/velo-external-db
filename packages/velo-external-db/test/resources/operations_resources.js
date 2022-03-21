@@ -1,5 +1,4 @@
 const { Uninitialized } = require('test-commons')
-const { suiteDef } = require('./test_suite_definition')
 const mysql = require('external-db-mysql')
 const spanner = require('external-db-spanner')
 const postgres = require('external-db-postgres')
@@ -9,6 +8,8 @@ const mongo = require ('external-db-mongo')
 const airtable = require ('external-db-airtable')
 const dynamo = require ('external-db-dynamodb')
 const bigquery = require ('external-db-bigquery')
+
+const suiteDef = (name, setup, misconfiguredDbOperations) => ( { name, setup, misconfiguredDbOperations } )
 
 const env = {
     driver: Uninitialized,
