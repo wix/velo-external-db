@@ -65,7 +65,7 @@ const testSuits = {
     postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.supportedOperations),
     spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.supportedOperations),
     firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.supportedOperations),
-    mssql: suiteDef('Sql Server', mssqlTestEnvInit),
+    mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.supportedOperations),
     mongo: suiteDef('Mongo', mongoTestEnvInit),
     airtable: suiteDef('Airtable', airTableTestEnvInit),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
