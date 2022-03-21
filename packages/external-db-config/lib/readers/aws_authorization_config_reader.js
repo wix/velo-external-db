@@ -2,7 +2,7 @@ const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client
 const { checkRequiredKeys, isJson, EmptyRoleConfig, configPattern, collectionConfigPattern } = require('../utils/config_utils')
 const Avj = require('ajv')
 const ajv = new Avj({ strict: false })
-const emptyConfig = (err) => ({ secretMangerError: err.message })
+const emptyExternalDbConfig = (err) => ({ externalConfig: {}, secretMangerError: err.message })
 
 class AwsAuthorizationConfigReader {
   constructor(region, secretId) {
@@ -13,7 +13,7 @@ class AwsAuthorizationConfigReader {
   }
 
   async readConfig() {
-    const { config } = await this.getExternalAndLocalEnvs()
+    const { config } = await this.readExternalAndLocalConfig()
     const { ROLE_CONFIG: roleConfig } = config
 
     const { collectionLevelConfig } = isJson(roleConfig) ? JSON.parse(roleConfig) : EmptyRoleConfig
@@ -21,22 +21,26 @@ class AwsAuthorizationConfigReader {
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
 
-  async readExternalConfig() {  
-    const client = new SecretsManagerClient({ region: this.region })
-    const data = await client.send(new GetSecretValueCommand({ SecretId: this.secretId }))
-    return JSON.parse(data.SecretString)
+  async readExternalConfig() { 
+    try {
+      const client = new SecretsManagerClient({ region: this.region })
+      const data = await client.send(new GetSecretValueCommand({ SecretId: this.secretId }))
+      return { externalConfig: JSON.parse(data.SecretString) }
+    } catch (err) {
+      return emptyExternalDbConfig(err)
+    }
   }
 
-  async getExternalAndLocalEnvs() {
-    const externalConfig = await this.readExternalConfig().catch(emptyConfig)
+  async readExternalAndLocalConfig() {
+    const { externalConfig, secretMangerError } = await this.readExternalConfig()
     const { ROLE_CONFIG } = { ...process.env, ...externalConfig }
     const config = { ROLE_CONFIG }
-    return { config, secretMangerError: externalConfig.secretMangerError }
+    return { config, secretMangerError: secretMangerError }
   }
 
   async validate() {
     try{
-        const { config, secretMangerError } = await this.getExternalAndLocalEnvs()
+        const { config, secretMangerError } = await this.readExternalAndLocalConfig()
 
         const { ROLE_CONFIG: roleConfig } = config
 
