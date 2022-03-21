@@ -37,18 +37,16 @@ const env = {
     schemaColumnTranslator: Uninitialized,
     cleanup: Uninitialized,
     driver: Uninitialized,
-    schemaOperations: Uninitialized,
 }
 
 const dbInit = async(testEnv, impl) => {
     await testEnv.cleanup()
 
-    const { pool, cleanup, schemaProvider } = await testEnv.connection()
+    const { pool, cleanup } = await testEnv.connection()
     const driver = impl.driver()
         
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
     env.schemaProvider = new impl.SchemaProvider(pool, testEnv.schemaProviderTestVariables?.() )
-    env.schemaOperations = schemaProvider.supportedOperations()
     env.driver = driver
     env.cleanup = cleanup
 }
@@ -73,20 +71,21 @@ const bigqueryTestEnvInit = async() => await dbInit(bigqueryTestEnv, bigquery)
 const googleSheetTestEnvInit = async() => await dbInit(googleSheetTestEnv, googleSheet)
 
 const testSuits = {
-    mysql: suiteDef('MySql', mysqlTestEnvInit),
-    postgres: suiteDef('Postgres', postgresTestEnvInit),
+    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.supportedOperations),
+    postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.supportedOperations),
     spanner: suiteDef('Spanner', spannerTestEnvInit),
     firestore: suiteDef('Firestore', firestoreTestEnvInit),
     mssql: suiteDef('Sql Server', mssqlTestEnvInit),
     mongo: suiteDef('Mongo', mongoTestEnvInit),
     airtable: suiteDef('Airtable', airTableTestEnvInit),
-    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
-    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
-    'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.supportedOperations),
+    'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
+const supportedOperations = testedSuit().supportedOperations
 const setupDb = () => testedSuit().setup()
 const currentDbImplementationName = () => testedSuit().name
 
-module.exports = { env, dbTeardown, setupDb, currentDbImplementationName }
+module.exports = { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations }

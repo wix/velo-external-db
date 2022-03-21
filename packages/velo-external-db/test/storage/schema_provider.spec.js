@@ -1,7 +1,7 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('velo-external-db-commons').errors
 const { Uninitialized, gen, testIfSchemaSupportsAddColumn, testIfSchemaSupportsRemoveColumn } = require('test-commons')
 const Chance = require('chance')
-const { env, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/provider_resources')
+const { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/provider_resources')
 const { collectionWithDefaultFields, hasSameSchemaFieldsLike } = require('../drivers/schema_provider_matchers')
 const chance = new Chance()
 const { SystemFields } = require('velo-external-db-commons')
@@ -27,6 +27,7 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
         await expect( env.schemaProvider.listHeaders() ).resolves.toEqual([ctx.collectionName])
     })
 
+    // TODO: remove this test if supportedOperations method will be removed from schema provider
     test('supported operations is defined', async() => {
         expect( env.schemaProvider.supportedOperations() ).not.toEqual([])
     })
@@ -84,11 +85,11 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
     })
 
 
-    test('add column on a an existing collection', async() => testIfSchemaSupportsAddColumn(env, async() => {
+    testIfSchemaSupportsAddColumn(supportedOperations)('add column on a an existing collection', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
         await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
         await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName  }]))
-    }))
+    })
 
     test('add duplicate column will fail', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
@@ -107,26 +108,26 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
             })
     })
 
-    test('drop column on a an existing collection', async() => testIfSchemaSupportsRemoveColumn(env, async() => {
+    testIfSchemaSupportsRemoveColumn()('drop column on a an existing collection', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
         await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
         await env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)
         await expect(env.schemaProvider.describeCollection(ctx.collectionName)).resolves.not.toEqual(hasSameSchemaFieldsLike([{ field: ctx.columnName, type: 'datetime' }]))
-    }))
+    })
 
 
-    test('drop column on a a non existing collection', async() => testIfSchemaSupportsRemoveColumn(env, async() => {
+    testIfSchemaSupportsRemoveColumn()('drop column on a a non existing collection', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
         await expect(env.schemaProvider.removeColumn(ctx.collectionName, ctx.columnName)).rejects.toThrow(FieldDoesNotExist)
-    }))
+    })
 
-    test('drop system column will fail', async() => testIfSchemaSupportsRemoveColumn(env, async() => {
+    testIfSchemaSupportsRemoveColumn()('drop system column will fail', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
         SystemFields.map(f => f.name)
             .forEach(async f => {
                 await expect(env.schemaProvider.removeColumn(ctx.collectionName, f)).rejects.toThrow(CannotModifySystemField)
         })
-    }))
+    })
 
     const ctx = {
         collectionName: Uninitialized,
