@@ -1,5 +1,6 @@
 const { Uninitialized, gen: genCommon } = require('test-commons')
-const { testIfSchemaSupportsUpdateImmediately, testIfSchemaSupportsDeleteImmediately, testIfSchemaSupportsTruncate, testIfSchemaSupportsAggregate, testIfSchemaSupportsFindWithSort } = require('test-commons')
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort } = require('velo-external-db-commons').SchemaOperations
+const { testIfSupportedOperationsIncludes } = require('test-commons')
 const gen = require('../gen')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
@@ -26,7 +27,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await dbTeardown()
     }, 20000)
 
-    testIfSchemaSupportsFindWithSort(supportedOperations)('find api', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ FindWithSort ])('find api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
         await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
@@ -54,8 +55,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect( data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual( { items: expect.arrayContaining(ctx.items), totalCount: ctx.items.length })
     })
 
-
-    testIfSchemaSupportsAggregate(supportedOperations)('aggregate api', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api', async() => {
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
         await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
 
@@ -85,7 +85,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             totalCount: 0 }))
     })
 
-    testIfSchemaSupportsDeleteImmediately(supportedOperations)('delete one api', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('delete one api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
@@ -94,7 +94,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
     })
 
-    testIfSchemaSupportsDeleteImmediately(supportedOperations)('bulk delete api', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('bulk delete api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 
@@ -110,7 +110,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect( axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin) ).resolves.toEqual(matchers.responseWith({ item: ctx.item }))
     })
 
-    testIfSchemaSupportsUpdateImmediately(supportedOperations)('update api', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
@@ -119,7 +119,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ctx.modifiedItem], totalCount: 1 })
     })
 
-    testIfSchemaSupportsUpdateImmediately(supportedOperations)('bulk update api', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('bulk update api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 
@@ -136,7 +136,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
 
 
-    testIfSchemaSupportsTruncate(supportedOperations)('truncate api', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ Truncate ])('truncate api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
 
