@@ -1,10 +1,11 @@
-const { Uninitialized, gen: genCommon, shouldNotRunOn } = require('test-commons')
+const { Uninitialized, gen: genCommon, testIfSupportedOperationsIncludes } = require('test-commons')
+const { RemoveColumn } = require('velo-external-db-commons').SchemaOperations
 const schema = require('../drivers/schema_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')
 const { authOwner } = require('../drivers/auth_test_support')
 const gen = require('../gen')
 const Chance = require('chance')
-const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/e2e_resources')
+const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/e2e_resources')
 const chance = Chance()
 
 const axios = require('axios').create({
@@ -52,15 +53,13 @@ describe(`Velo External DB Schema REST API: ${currentDbImplementationName()}`,  
         await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.toEqual( matchers.collectionResponseHasField( ctx.column ) )
     })
 
-    if (shouldNotRunOn(['Google-sheet'], currentDbImplementationName())) {
-        test('remove column', async() => {
-            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+    testIfSupportedOperationsIncludes(supportedOperations, [ RemoveColumn ])('remove column', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-            await axios.post('/schemas/column/remove', { collectionName: ctx.collectionName, columnName: ctx.column.name }, authOwner)
+        await axios.post('/schemas/column/remove', { collectionName: ctx.collectionName, columnName: ctx.column.name }, authOwner)
 
-            await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.not.toEqual( matchers.collectionResponseHasField( ctx.column ) )
-        })
-    }
+        await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.not.toEqual( matchers.collectionResponseHasField( ctx.column ) )
+    })
 
 
     const ctx = {

@@ -19,7 +19,6 @@ const env = {
     secretKey: Uninitialized,
     app: Uninitialized,
     internals: Uninitialized,
-    schemaOperations: Uninitialized,
 }
 
 const initApp = async() => {
@@ -34,7 +33,6 @@ const initApp = async() => {
         await waitUntil(() => env.internals().started)
     }
     env.app = env.internals()
-    env.schemaOperations = env.app.schemaProvider.supportedOperations()
 }
 
 const teardownApp = async() => {
@@ -63,21 +61,23 @@ const dynamoTestEnvInit = async() => await dbInit(dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 
 const testSuits = {
-    mysql: suiteDef('MySql', mysqlTestEnvInit),
-    postgres: suiteDef('Postgres', postgresTestEnvInit),
-    spanner: suiteDef('Spanner', spannerTestEnvInit),
-    firestore: suiteDef('Firestore', firestoreTestEnvInit),
-    mssql: suiteDef('Sql Server', mssqlTestEnvInit),
-    mongo: suiteDef('Mongo', mongoTestEnvInit),
-    airtable: suiteDef('Airtable', airTableTestEnvInit),
-    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit),
-    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit),
-    'google-sheet': suiteDef('Google-sheet', googleSheetTestEnvInit),
+    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.supportedOperations),
+    postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.supportedOperations),
+    spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.supportedOperations),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.supportedOperations),
+    mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.supportedOperations),
+    mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.supportedOperations),
+    airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.supportedOperations),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.supportedOperations),
+    'google-sheet': suiteDef('Google-sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
+const supportedOperations = testedSuit().supportedOperations
+
 const setupDb = () => testedSuit().setup()
 const currentDbImplementationName = () => testedSuit().name
 
 
-module.exports = { env, initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName }
+module.exports = { env, initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations }
