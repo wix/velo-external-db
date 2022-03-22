@@ -23,6 +23,7 @@ const create = () => {
           internalConfigReader = new aws.AwsDynamoConfigReader(region, secretId) 
           break
         case 'mongo':
+        case 'documentdb':
           internalConfigReader = new aws.AwsMongoConfigReader(region, secretId)
           break
         default:

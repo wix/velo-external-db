@@ -53,6 +53,10 @@ const init = async(_type, vendor, config) => {
             const { init } = require('external-db-bigquery')
             return append(await init(cfg), cfg.secretKey)
         }
+        case 'documentdb': {
+            const { init } = require('external-db-mongo')
+            return append(await init({ ...cfg, documentDb: true }), cfg.secretKey)
+        }
         default: {
             const init = require('./stub-db/init')
             return append(await init(type), cfg.secretKey)
