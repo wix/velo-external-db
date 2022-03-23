@@ -1,4 +1,4 @@
-const { asWixData } = require('../converters/data_utils')
+const { asWixData, aggregationAsWixData } = require('../converters/data_utils')
 const { getByIdFilterFor } = require ('../utils/data_utils')
 
 class DataService {
@@ -63,7 +63,7 @@ class DataService {
     async aggregate(collectionName, filter, aggregation) {
         return {
             items: (await this.storage.aggregate(collectionName, filter, aggregation))
-                                      .map( asWixData ),
+                                      .map( aggregationAsWixData ),
             totalCount: 0
         }
     }
