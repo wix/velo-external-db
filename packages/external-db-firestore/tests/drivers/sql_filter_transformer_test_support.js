@@ -1,4 +1,5 @@
 const { when } = require('jest-when')
+const { LastLetterCoder } = require('../../lib/firestore_utils')
 const escapeId = x => x
 
 const EmptySort = []
@@ -63,6 +64,21 @@ const givenProjectionExprFor = (projection) =>
                                       .mockReturnValue(projection)
 
 
+const givenStartsWithFilterFor = (filter, column, value) => 
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue([{
+                                    fieldName: column,
+                                    opStr: '>=',
+                                    value,
+                                },
+                                {
+                                    fieldName: column,
+                                    opStr: '<',
+                                    value: value + LastLetterCoder
+                                }])
+
+
+
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -73,6 +89,6 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor,
+                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
                    filterParser, reset
                 }
