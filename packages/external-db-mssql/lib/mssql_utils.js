@@ -13,7 +13,7 @@ const SqlServerSystemTables = ['syblicenseslog', 'sysalternates', 'sysaltusages'
 
 const isSystemTable = collectionId => SqlServerSystemTables.includes(collectionId.trim().toLowerCase())
 
-const escapeId = s => SqlString.escapeId(s)
+const escapeId = s => s === '*' ? '*' : SqlString.escapeId(s)
 const escape = s => SqlString.escape(s)
 const escapeTable = s => {
     if (s && ( s.indexOf('.') !== -1 || isSystemTable(s) )) {
