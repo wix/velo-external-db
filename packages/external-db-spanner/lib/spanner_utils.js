@@ -26,7 +26,7 @@ const validateLiteral = l => {
     return `@${l}`
 }
 
-const escapeFieldId = f => escapeId(patchFieldName(f))
+const escapeFieldId = f => f=== '*' ? '*' : escapeId(patchFieldName(f))
 
 
 const patchFloat = (item, floatFields) => {
