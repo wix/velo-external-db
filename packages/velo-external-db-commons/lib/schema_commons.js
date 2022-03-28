@@ -38,6 +38,9 @@ const SchemaOperations = Object.freeze({
     Truncate: 'truncate',
     UpdateImmediately: 'updateImmediately',
     DeleteImmediately: 'deleteImmediately',
+    StartWithCaseSensitive: 'startWithCaseSensitive',
+    StartWithCaseInsensitive: 'startWithCaseInsensitive',
+    Projection: 'projection',
 })
 
 const AllSchemaOperations = Object.values(SchemaOperations)
