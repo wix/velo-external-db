@@ -1,4 +1,4 @@
-const errorMiddleware = (err, req, res) => {
+const errorMiddleware = (err, req, res, _next) => {
   if (process.env.NODE_ENV !== 'test') {
     console.error(err)
   }
