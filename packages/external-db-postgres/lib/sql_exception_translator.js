@@ -1,4 +1,4 @@
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists } = require('velo-external-db-commons').errors
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {
@@ -6,6 +6,8 @@ const notThrowingTranslateErrorCodes = err => {
             return new FieldDoesNotExist('Collection does not contain a field with this name')
         case '42701':
             return new FieldAlreadyExists('Collection already has a field with the same name')
+        case '23505':
+            return new ItemAlreadyExists(`Item already exists: ${err.message}`)
         case '42P01':
             return new CollectionDoesNotExists('Collection does not exists')
         case '28P01':
