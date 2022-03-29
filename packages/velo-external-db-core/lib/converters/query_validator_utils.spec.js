@@ -46,7 +46,7 @@ describe('Query Validator utils spec', () => {
         })
         
         test('return right operators for type [text]', () => {
-            expect(queryAdapterOperatorsFor('text')).toEqual([eq, ne, string_contains, string_begins, string_ends, include, urlized])
+            expect(queryAdapterOperatorsFor('text')).toEqual([eq, ne, string_contains, string_begins, string_ends, include, urlized, gt, gte, lt, lte])
         })
 
         test('return right operators for type [boolean]', () => {
