@@ -77,15 +77,17 @@ jobs:
           docker push $DOCKERHUB_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
           echo "::set-output name=image::$DOCKERHUB_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG"
 
-      # - name: Google Auth
+      #  Authenticate to Google Cloud
       - id: auth
+        name: Authenticate to Google Cloud
         if: github.event.inputs.gcp == 'true'
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-      # Setup gcloud CLI
-      - uses: google-github-actions/setup-gcloud@v0
+      # Set up Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
         if: github.event.inputs.gcp == 'true'
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
