@@ -10,6 +10,7 @@ const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const { createRouter, initServices } = require('./router')
 const { create, readCommonConfig } = require('external-db-config')
+const { errorMiddleware } = require('./web/error-middleware')
 
 let started = false
 let server, _schemaProvider, _cleanup
@@ -56,6 +57,7 @@ load().then(({ secretKey }) => {
     const router = createRouter()
 
     app.use('/', router)
+    app.use(errorMiddleware)
 
     const port = process.env.PORT || 8080
     server = app.listen(port)
