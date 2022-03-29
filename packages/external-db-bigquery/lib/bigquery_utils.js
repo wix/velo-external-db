@@ -1,6 +1,6 @@
 
 // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
-const escapeIdentifier = (str) => `\`${(str || '').replace(/"/g, '""')}\``
+const escapeIdentifier = (str) => str==='*' ? '*' : `\`${(str || '').replace(/"/g, '""')}\``
 const wildCardWith = (n, char) => Array(n).fill(char, 0, n).join(', ')
 
 const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/

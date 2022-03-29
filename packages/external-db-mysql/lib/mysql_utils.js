@@ -10,4 +10,5 @@ const escapeTable = t => {
     return escapeId(t)
 }
 
-module.exports = { wildCardWith, escapeId, escapeTable }
+const escapeIdField = f => f === '*' ? '*' : escapeId(f)
+module.exports = { wildCardWith, escapeId: escapeIdField, escapeTable }

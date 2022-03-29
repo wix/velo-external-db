@@ -362,7 +362,7 @@ describe('Sql Parser', () => {
                     }
                     
                     expect(env.filterParser.parseAggregation(aggregation) ).toEqual({
-                        fieldsStatement: `${escapeIdentifier(ctx.fieldName)}, COUNT(${escapeIdentifier('*')}) AS ${escapeIdentifier(ctx.moreFieldName)}`,
+                        fieldsStatement: `${escapeIdentifier(ctx.fieldName)}, COUNT(*) AS ${escapeIdentifier(ctx.moreFieldName)}`,
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
                         parameters: [],

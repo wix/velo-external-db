@@ -24,13 +24,12 @@ class QueryValidator {
     
     validateAggregation(fields, aggregation) {
         const fieldsWithAliases = aggregation.projection.reduce((pV, cV) => {
+            if (cV.name === '*') return pV
             if (cV.alias) return [...pV, { field: cV.alias, type: fields.find(f => f.field === cV.name).type }]
             return pV
         }, fields)
-
         const fieldNames = fieldsWithAliases.map(f => f.field)
-        const projectionFields = aggregation.projection.map(f => [f.name, f.alias]).flat().filter(f => f !== undefined)
-        
+        const projectionFields = aggregation.projection.filter(f => f.name !== '*').map(f => [f.name, f.alias]).flat().filter(f => f !== undefined)        
         this.validateFilter(fieldsWithAliases, aggregation.postFilter)
         this.validateFieldsExists(fieldNames, projectionFields)
     }
