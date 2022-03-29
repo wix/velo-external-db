@@ -14,8 +14,6 @@ const notThrowingTranslateErrorCodes = err => {
             case 2714:
                 return new CollectionAlreadyExists('Collection already exists')
             default:
-                console.log(err.number)
-                console.log(err)
                 return new Error(`default ${err.message}`)
         }
     }
