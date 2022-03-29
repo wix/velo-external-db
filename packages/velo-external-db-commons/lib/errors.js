@@ -29,6 +29,12 @@ class FieldAlreadyExists extends BaseHttpError {
     }
 }
 
+class ItemAlreadyExists extends BaseHttpError {
+    constructor(message) {
+        super(message, 400)
+    }
+}
+
 class FieldDoesNotExist extends BaseHttpError {
     constructor(message) {
         super(message, 404)
@@ -77,4 +83,4 @@ class UnsupportedDatabase extends BaseHttpError {
 }
 
 module.exports = { UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField, InvalidQuery,
-                   CollectionAlreadyExists, DbConnectionError, InvalidRequest, ItemNotFound, UnsupportedOperation, UnsupportedDatabase }
+                   CollectionAlreadyExists, DbConnectionError, InvalidRequest, ItemNotFound, UnsupportedOperation, UnsupportedDatabase, ItemAlreadyExists }

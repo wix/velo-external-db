@@ -1,3 +1,4 @@
+const { translateErrorCodes } = require('./exception_translator.js')
 const { unpackIdFieldForItem, updateExpressionFor, validateTable } = require('./mongo_utils')
 
 class DataProvider {
@@ -32,6 +33,7 @@ class DataProvider {
         const result = await this.client.db()
                                         .collection(collectionName)
                                         .insertMany(items)
+                                        .catch(translateErrorCodes)
         return result.insertedCount
     }
 

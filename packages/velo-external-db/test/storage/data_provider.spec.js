@@ -106,7 +106,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.entity])
     })
 
-    test('bulk insert data into collection name and query all of it', async() => {
+    test('bulk insert data into collection name and query all of it', async() => { 
         env.driver.stubEmptyFilterAndSortFor('', '')
         env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 

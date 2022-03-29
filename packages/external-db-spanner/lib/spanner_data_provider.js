@@ -1,4 +1,5 @@
 const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, patchFloat, extractFloatFields } = require('./spanner_utils')
+const { translateErrorCodes } = require('./sql_exception_translator')
 
 class DataProvider {
     constructor(database, filterParser) {
@@ -44,7 +45,7 @@ class DataProvider {
                             .insert(
                                 (items.map(item => patchFloat(item, floatFields)))
                                         .map(this.asDBEntity.bind(this))
-                            )
+                            ).catch(translateErrorCodes)
         return items.length
     }
 

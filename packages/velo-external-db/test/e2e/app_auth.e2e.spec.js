@@ -1,5 +1,5 @@
 const { Uninitialized, gen } = require('test-commons')
-const { authVisitor } = require('../drivers/auth_test_support')
+const { authVisitor, authOwnerWithoutSecretKey, errorResponseWith } = require('../drivers/auth_test_support')
 const each = require('jest-each').default
 const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/e2e_resources')
 
@@ -24,6 +24,10 @@ describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () 
           'data/update/bulk', 'data/remove', 'data/remove/bulk', 'data/count'])
     .test('should throw 401 on a request to %s without the appropriate role', async(api) => {
             return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
+    })
+
+    test('wrong secretKey will throw an appropriate error with the right format', async() => {
+        return expect(() => axios.post('/schemas/list', {}, authOwnerWithoutSecretKey)).rejects.toMatchObject(errorResponseWith(401, 'You are not authorized'))
     })
 
     const ctx = {

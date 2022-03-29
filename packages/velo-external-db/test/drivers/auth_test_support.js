@@ -32,6 +32,12 @@ const authVisitor = { transformRequest: axios.defaults
                                       .transformRequest
                                       .concat( appendSecretKeyToRequest, appendRoleToRequest('VISITOR' ) ) }
 
+const authOwnerWithoutSecretKey = { transformRequest: axios.defaults
+                                      .transformRequest
+                                      .concat( appendRoleToRequest('OWNER' ) ) }
 
-module.exports = { authInit, authAdmin, authOwner, authVisitor }
+const errorResponseWith = (status, message) => ({ response: { data: { message: expect.stringContaining(message) }, status } })
+
+
+module.exports = { authInit, authAdmin, authOwner, authVisitor, authOwnerWithoutSecretKey, errorResponseWith }
 
