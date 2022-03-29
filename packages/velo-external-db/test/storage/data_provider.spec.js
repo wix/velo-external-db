@@ -106,7 +106,14 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.entity])
     })
 
-    test('bulk insert data into collection name and query all of it', async() => {
+    test('insert the same object twice should throw', () => {
+        env.driver.stubEmptyFilterAndSortFor('', '')
+        env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+
+        return expect( env.dataProvider.insert(ctx.collectionName, [ctx.entity, ctx.entity], ctx.entityFields) ).rejects.toThrow()
+    })
+
+    test('bulk insert data into collection name and query all of it', async() => { 
         env.driver.stubEmptyFilterAndSortFor('', '')
         env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
