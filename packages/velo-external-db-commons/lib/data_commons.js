@@ -74,6 +74,8 @@ const extractGroupByNames = (projection) =>  projection.filter(f => !f.function)
 
 const extractProjectionFunctionsObjects = (projection) => projection.filter(f => f.function)
 
+const isNull = (value) => (value === null || value === undefined)
+
 module.exports = { EmptyFilter, EmptySort, patchDateTime, asParamArrays, isObject, isDate,
                      updateFieldsFor, isEmptyFilter, AdapterOperators, AdapterFunctions,
-                     extractGroupByNames, extractProjectionFunctionsObjects }
+                     extractGroupByNames, extractProjectionFunctionsObjects, isNull }
