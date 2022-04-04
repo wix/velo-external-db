@@ -42,7 +42,7 @@ describe('Query Validator utils spec', () => {
 
     describe ('queryAdapterOperatorsFor', () => {
         test ('return right operators for type [number]', () => {
-            expect(queryAdapterOperatorsFor('number')).toEqual([eq, ne, gt, gte, lt, lte, include])
+            expect(queryAdapterOperatorsFor('number')).toEqual([eq, ne, gt, gte, lt, lte, include, urlized])
         })
         
         test('return right operators for type [text]', () => {
