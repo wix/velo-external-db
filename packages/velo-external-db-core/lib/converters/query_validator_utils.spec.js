@@ -1,7 +1,7 @@
 const { Uninitialized } = require('test-commons')
 const { extractFieldsAndOperators, queryAdapterOperatorsFor } = require ('./query_validator_utils')
 const { AdapterOperators } = require('velo-external-db-commons')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, urlized, and } = AdapterOperators
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, urlized, and, matches } = AdapterOperators
 const { EmptyFilter } = require('./utils')
 const gen = require('../../test/gen')
 const Chance = require('chance')
@@ -42,11 +42,11 @@ describe('Query Validator utils spec', () => {
 
     describe ('queryAdapterOperatorsFor', () => {
         test ('return right operators for type [number]', () => {
-            expect(queryAdapterOperatorsFor('number')).toEqual([eq, ne, gt, gte, lt, lte, include])
+            expect(queryAdapterOperatorsFor('number')).toEqual([eq, ne, gt, gte, lt, lte, include, urlized])
         })
         
         test('return right operators for type [text]', () => {
-            expect(queryAdapterOperatorsFor('text')).toEqual([eq, ne, string_contains, string_begins, string_ends, include, urlized])
+            expect(queryAdapterOperatorsFor('text')).toEqual([eq, ne, string_contains, string_begins, string_ends, include, urlized, matches])
         })
 
         test('return right operators for type [boolean]', () => {
