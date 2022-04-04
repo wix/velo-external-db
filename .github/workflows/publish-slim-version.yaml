@@ -60,7 +60,7 @@ jobs:
         if: github.event.inputs.aws == 'true'
         id: aws-push-image
         run: |
-          docker tag $IMAGE_NAME:$IMAGE_TAG $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
+          docker tag $IMAGE_NAME $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
           echo "Pushing image to ECR..."
           docker push $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
           echo "::set-output name=image::$PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG"
@@ -101,5 +101,5 @@ jobs:
         if: github.event.inputs.gcp == 'true'
         run: |
           gcloud auth configure-docker -q
-          docker tag $IMAGE_NAME:$IMAGE_TAG gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER
+          docker tag $IMAGE_NAME gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:$IMAGE_TAG
           docker push gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:$IMAGE_TAG
