@@ -135,11 +135,13 @@ describe('Sql Parser', () => {
                 expect( () => env.filterParser.parseFilter(filter, ctx.offset) ).toThrow(InvalidQuery)
             })
 
-            test('correctly transform operator [eq] with null value', () => {
+            each([
+                undefined, null
+            ]).test('correctly transform operator [eq] with null value [%s]', (value) => {
                 const filter = {
                     operator: eq,
                     fieldName: ctx.fieldName,
-                    value: undefined                    
+                    value
                 }
 
                 expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -149,7 +151,24 @@ describe('Sql Parser', () => {
                     parameters: []
                 }])
             })
+            
+            each([
+                undefined, null
+            ]).test('correctly transform operator [ne] with null value [%s]', (value) => {
+                const filter = {
+                    operator: ne,
+                    fieldName: ctx.fieldName,
+                    value
+                }
 
+                expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
+                    filterExpr: `${escapeIdentifier(ctx.fieldName)} IS NOT NULL`,
+                    filterColumns: [],
+                    offset: ctx.offset,
+                    parameters: []
+                }])
+            })
+            
             test('correctly transform operator [eq] with boolean value', () => {
                 const value = chance.bool()
                 const filter = {

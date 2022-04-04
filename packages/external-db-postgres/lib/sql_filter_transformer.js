@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter } = require('velo-external-db-commons')
+const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull } = require('velo-external-db-commons')
 const { escapeIdentifier } = require('./postgres_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -121,7 +121,7 @@ class FilterParser {
                 filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} ${this.adapterOperatorToMySqlOperator(operator, value)} ${params.sql}`.trim(),
                 filterColumns: [],
                 offset: params.offset,
-                parameters: value !== undefined ? [].concat( this.patchTrueFalseValue(value) ) : []
+                parameters: !isNull(value) ? [].concat( this.patchTrueFalseValue(value) ) : []
             }]
         }
 
@@ -181,7 +181,7 @@ class FilterParser {
                 sql: `(${this.prepareStatementVariables(value.length, offset)})`,
                 offset: offset + value.length
             }
-        } else if (operator === eq && value === undefined) {
+        } else if ((operator === eq || operator === ne) && isNull(value)) {
             return {
                 sql: '',
                 offset: offset
@@ -197,12 +197,15 @@ class FilterParser {
     adapterOperatorToMySqlOperator(operator, value) {
         switch (operator) {
             case eq:
-                if (value !== undefined) {
+                if (!isNull(value)) {
                     return '='
                 }
                 return 'IS NULL'
             case ne:
-                return '<>'
+                if (!isNull(value)) {
+                    return '<>'
+                }
+                return 'IS NOT NULL'
             case lt:
                 return '<'
             case lte:
