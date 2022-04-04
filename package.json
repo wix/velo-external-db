@@ -4,6 +4,7 @@
   "scripts": {
     "start": "lerna exec --scope velo-external-db \"npm run start\"",
     "build:dev": "lerna bootstrap --hoist",
+    "build:full-image": "docker build --target full_version -t velo-external-db .",
     "lint": "eslint --cache ./",
     "lint:fix": "eslint --cache --fix ./",
     "test": "npm run test:core; npm run test:postgres; npm run test:spanner; npm run test:mysql; npm run test:mssql; npm run test:firestore; npm run test:mongo; npm run test:airtable; npm run test:dynamodb; npm run test:bigquery",
