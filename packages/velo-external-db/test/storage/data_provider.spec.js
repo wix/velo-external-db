@@ -1,4 +1,4 @@
-const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('test-commons')
+const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn, shouldRunOnlyOn } = require('test-commons')
 const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, NotOperator } = require('velo-external-db-commons').SchemaOperations
 const Chance = require('chance')
 const gen = require('../gen')
@@ -174,7 +174,18 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
     })
-    
+
+    if (shouldRunOnlyOn(['MySql'], currentDbImplementationName())) {
+        test('matches operator should return data', async() => {
+            await givenCollectionWith([ctx.matchesEntity], ctx.collectionName, ctx.entityFields)
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+            env.driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.givenMatchesFilterFor(ctx.filter, ctx.column.name, ctx.matchesEntity[ctx.column.name])
+            
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 0, 50, ctx.projection) ).resolves.toEqual([ctx.matchesEntity])
+        })
+    }
+
     test('truncate will remove all data from collection', async() => {
         await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
         env.driver.stubEmptyFilterAndSortFor('', '')
@@ -238,6 +249,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         anotherNumberEntity: Uninitialized,
         modifiedEntity: Uninitialized,
         anotherEntity: Uninitialized,
+        matchesEntity: Uninitialized,
         entities: Uninitialized,
         modifiedEntities: Uninitialized,
         numberEntityFields: Uninitialized,
@@ -264,6 +276,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         ctx.numberEntity = gen.randomNumberDbEntity(ctx.numericColumns)
         ctx.numberEntityFields = gen.systemFieldsWith(ctx.numericColumns)
         ctx.anotherNumberEntity = gen.randomNumberDbEntity(ctx.numericColumns)
+        ctx.matchesEntity =  { ...ctx.entity, [ctx.column.name]: gen.randomMatchesValueWithDashes() }
 
         await env.schemaProvider.create(ctx.collectionName, [ctx.column])
     })
