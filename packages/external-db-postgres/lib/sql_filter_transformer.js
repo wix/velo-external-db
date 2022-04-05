@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull } = require('velo-external-db-commons')
+const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } = require('velo-external-db-commons')
 const { escapeIdentifier } = require('./postgres_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -141,7 +141,7 @@ class FilterParser {
                 filterExpr: `${ignoreCase}(${escapeIdentifier(fieldName)}) ~ $${offset}`,
                 filterColumns: [],
                 offset: offset + 1,
-                parameters: [this.specArrayToRegex(value.spec, value.ignoreCase)]
+                parameters: [specArrayToRegex(value.spec, value.ignoreCase)]
             }]
         }
 
@@ -269,20 +269,6 @@ class FilterParser {
         return escapeIdentifier(fieldName)
     }
 
-    specArrayToRegex(spec, ignoreCase) {
-        if (!Array.isArray(spec)) {
-            throw new InvalidQuery('$matches must have array - spec property')
-        }
-
-        return spec.map(spec => {
-            if (spec.type === 'literal') {
-                return ignoreCase ? spec.value.toLowerCase() : spec.value
-            }
-            if (spec.type === 'anyOf') {
-                return ignoreCase ? `[${spec.value.toLowerCase()}]` : `[${spec.value}]`
-            }
-        }).join('')
-    }
 }
 
 module.exports = FilterParser

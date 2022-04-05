@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, isNull  } = require('velo-external-db-commons')
+const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, isNull, specArrayToRegex  } = require('velo-external-db-commons')
 const { wildCardWith, escapeId } = require('./mysql_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -69,7 +69,7 @@ class FilterParser {
             const ignoreCase = value.ignoreCase ? 'LOWER' : ''
             return [{
                 filterExpr: `${ignoreCase}(${escapeId(fieldName)}) RLIKE ?`,
-                parameters: [this.specArrayToRegex(value.spec, value.ignoreCase)]
+                parameters: [specArrayToRegex(value.spec, value.ignoreCase)]
             }]
         }   
 
@@ -222,21 +222,6 @@ class FilterParser {
 
     selectFieldsFor(projection) {
         return projection.map(escapeId).join(', ')
-    }
-
-    specArrayToRegex(spec, ignoreCase) {
-        if (!Array.isArray(spec)) {
-            throw new InvalidQuery('$matches must have array - spec property')
-        }
-
-        return spec.map(spec => {
-            if (spec.type === 'literal') {
-                return ignoreCase ? spec.value.toLowerCase() : spec.value
-            }
-            if (spec.type === 'anyOf') {
-                return ignoreCase ? `[${spec.value.toLowerCase()}]` : `[${spec.value}]`
-            }
-        }).join('')
     }
 }
 
