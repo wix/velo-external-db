@@ -226,7 +226,7 @@ class FilterParser {
 
     specArrayToRegex(spec, ignoreCase) {
         if (!Array.isArray(spec)) {
-            throw InvalidQuery('$matches must have array - spec property')
+            throw new InvalidQuery('$matches must have array - spec property')
         }
 
         return spec.map(spec => {
