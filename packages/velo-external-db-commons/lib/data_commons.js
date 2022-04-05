@@ -79,16 +79,16 @@ const extractProjectionFunctionsObjects = (projection) => projection.filter(f =>
 
 const isNull = (value) => (value === null || value === undefined)
 
-const specArrayToRegex = (spec, ignoreCase) => {
+const specArrayToRegex = (spec) => {
     if (!Array.isArray(spec)) {
         throw new InvalidQuery('$matches must have array - spec property')
     }
     return spec.map(spec => {
         if (spec.type === 'literal') {
-            return ignoreCase ? spec.value.toLowerCase() : spec.value
+            return spec.value
         }
         if (spec.type === 'anyOf') {
-            return ignoreCase ? `[${spec.value.toLowerCase()}]` : `[${spec.value}]`
+            return `[${spec.value}]`
         }
     }).join('')
 }

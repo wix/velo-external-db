@@ -138,10 +138,10 @@ class FilterParser {
         if (operator === matches) {
             const ignoreCase = value.ignoreCase ? 'LOWER' : ''
             return [{
-                filterExpr: `${ignoreCase}(${escapeIdentifier(fieldName)}) ~ $${offset}`,
+                filterExpr: `${ignoreCase}(${escapeIdentifier(fieldName)}) ~ ${ignoreCase}($${offset})`,
                 filterColumns: [],
                 offset: offset + 1,
-                parameters: [specArrayToRegex(value.spec, value.ignoreCase)]
+                parameters: [specArrayToRegex(value.spec)]
             }]
         }
 

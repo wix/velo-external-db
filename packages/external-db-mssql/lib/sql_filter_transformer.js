@@ -134,8 +134,8 @@ class FilterParser {
         if (operator === matches) {
             const ignoreCase = value.ignoreCase ? 'LOWER' : ''
             return [{
-                filterExpr: `${ignoreCase}(${escapeId(fieldName)}) LIKE ${validateLiteral(fieldName)}`,
-                parameters: { [patchFieldName(fieldName)]: specArrayToRegex(value.spec, value.ignoreCase) }
+                filterExpr: `${ignoreCase}(${escapeId(fieldName)}) LIKE ${ignoreCase}(${validateLiteral(fieldName)})`,
+                parameters: { [patchFieldName(fieldName)]: specArrayToRegex(value.spec) }
             }]
         }
 

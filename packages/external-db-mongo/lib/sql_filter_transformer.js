@@ -79,7 +79,7 @@ class FilterParser {
         if (operator === matches) {
             const ignoreCase = value.ignoreCase ? 'i' : ''
             return [{
-                filterExpr: { [fieldName]: { $regex: specArrayToRegex(value.spec, false), $options: `${ignoreCase}` } }
+                filterExpr: { [fieldName]: { $regex: specArrayToRegex(value.spec), $options: `${ignoreCase}` } }
             }]
         }
 

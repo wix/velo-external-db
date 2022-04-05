@@ -70,11 +70,11 @@ const givenNotFilterQueryFor = (filter, column, value) =>
 
 const givenMatchesFilterFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE ${escapeId(column)} LIKE ${validateLiteral(column)}`, 
+                                .mockReturnValue({ filterExpr: `WHERE LOWER(${escapeId(column)}) LIKE LOWER(${validateLiteral(column)})`, 
                                                    parameters: { 
                                                         [patchFieldName(column)]: 
                                                             value.split('-').map((v, i, array) => 
-                                                            i === array.length-1 ? `${v.toLowerCase()}`: `${v.toLowerCase()}[ \t\n-]`)
+                                                            i === array.length-1 ? v: `${v}[ \t\n-]`)
                                                             .join('') 
                                                     } 
                                                 })

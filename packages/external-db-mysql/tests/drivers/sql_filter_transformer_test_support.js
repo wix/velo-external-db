@@ -72,9 +72,9 @@ const givenNotFilterQueryFor = (filter, column, value) =>
 
 const givenMatchesFilterFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)
-                                .mockReturnValue({ filterExpr: `WHERE LOWER(${escapeId(column)}) RLIKE ?`, parameters: [
+                                .mockReturnValue({ filterExpr: `WHERE LOWER(${escapeId(column)}) RLIKE LOWER(?)`, parameters: [
                                     value.split('-').map((v, i, array) => 
-                                        i === array.length-1 ? `${v.toLowerCase()}`: `${v.toLowerCase()}[ \t\n-]`)
+                                        i === array.length-1 ? v: `${v}[ \t\n-]`)
                                         .join('')
                                 ] })
 

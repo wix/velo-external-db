@@ -246,10 +246,10 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
-                        filterExpr: `LOWER(${escapeIdentifier(ctx.fieldName)}) ~ $${ctx.offset}`,
+                        filterExpr: `LOWER(${escapeIdentifier(ctx.fieldName)}) ~ LOWER($${ctx.offset})`,
                         filterColumns: [],
                         offset: ctx.offset + 1,
-                        parameters: [`${ctx.fieldValue.toLowerCase()}[${ctx.anotherValue.toLowerCase()}]${ctx.moreValue.toLowerCase()}`]
+                        parameters: [`${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}`]
                     }])   
                 })
 
@@ -268,7 +268,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
-                        filterExpr: `(${escapeIdentifier(ctx.fieldName)}) ~ $${ctx.offset}`,
+                        filterExpr: `(${escapeIdentifier(ctx.fieldName)}) ~ ($${ctx.offset})`,
                         filterColumns: [],
                         offset: ctx.offset + 1,
                         parameters: [`${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}`]

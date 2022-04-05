@@ -70,10 +70,10 @@ const givenNotFilterQueryFor = (filter, column, value) =>
 const givenMatchesFilterFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({
-                                    filterExpr: `WHERE ${escapeIdentifier(column)} ~ $1`,
+                                    filterExpr: `WHERE LOWER(${escapeIdentifier(column)}) ~ LOWER($1)`,
                                     parameters: [
                                         value.split('-').map((v, i, array) => 
-                                        i === array.length-1 ? `${v.toLowerCase()}`: `${v.toLowerCase()}[ \t\n-]`)
+                                        i === array.length-1 ? v: `${v}[ \t\n-]`)
                                         .join('')
                                     ],
                                     offset: 2
