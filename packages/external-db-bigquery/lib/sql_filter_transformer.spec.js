@@ -6,7 +6,7 @@ const each = require('jest-each').default
 const Chance = require('chance')
 const { escapeIdentifier: escapeId, escapeIdentifier } = require('./bigquery_utils')
 const chance = Chance()
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 
 describe('Sql Parser', () => {
@@ -213,6 +213,46 @@ describe('Sql Parser', () => {
                         parameters: [ctx.fieldListValue.map(s => s.toLowerCase()).join('[- ]')]
                     }])
                 })
+
+                test('correctly transform operator [matches] with ignoreCase', () => {
+                    const filter = {
+                        operator: matches,
+                        fieldName: ctx.fieldName,
+                        value: {
+                            ignoreCase: true,
+                            spec: [ 
+                                { type: 'literal', value: ctx.fieldValue },
+                                { type: 'anyOf', value: ctx.anotherValue },
+                                { type: 'literal', value: ctx.moreValue },
+                            ]
+                        }
+                    }
+
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                        filterExpr: `REGEXP_CONTAINS(LOWER(${escapeId(ctx.fieldName)}), LOWER(?))`,
+                        parameters: [`${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}`]
+                    }])   
+                })
+                
+                test('correctly transform operator [matches] without ignoreCase', () => {
+                    const filter = {
+                        operator: matches,
+                        fieldName: ctx.fieldName,
+                        value: {
+                            ignoreCase: false,
+                            spec: [ 
+                                { type: 'literal', value: ctx.fieldValue },
+                                { type: 'anyOf', value: ctx.anotherValue },
+                                { type: 'literal', value: ctx.moreValue },
+                            ]
+                        }
+                    }
+
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                        filterExpr: `REGEXP_CONTAINS((${escapeId(ctx.fieldName)}), (?))`,
+                        parameters: [`${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}`]
+                    }])   
+                })
             })
         })
         describe('handle multi field operator', () => {
@@ -358,6 +398,8 @@ describe('Sql Parser', () => {
     const ctx = {
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
+        anotherValue: Uninitialized,
+        moreValue: Uninitialized,
         fieldListValue: Uninitialized,
         anotherFieldName: Uninitialized,
         moreFieldName: Uninitialized,
@@ -375,6 +417,8 @@ describe('Sql Parser', () => {
         ctx.moreFieldName = chance.word()
 
         ctx.fieldValue = chance.word()
+        ctx.anotherValue = chance.word()
+        ctx.moreValue = chance.word()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
         ctx.filter = gen.randomWrappedFilter()

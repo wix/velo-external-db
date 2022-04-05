@@ -68,6 +68,15 @@ const givenNotFilterQueryFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: `WHERE NOT (${escapeIdentifier(column)} = ?)`, parameters: [value] })
 
+const givenMatchesFilterFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({
+                                    filterExpr: `WHERE REGEXP_CONTAINS (LOWER(${escapeIdentifier(column)}), LOWER(?))`,
+                                    parameters: [value.split('-').map((v, i, array) =>
+                                            i === array.length - 1 ? v : `${v}[ \t\n-]`)
+                                            .join('')]
+                                })
+
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -79,6 +88,6 @@ const reset = () => {
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
                    givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
-                   givenGreaterThenFilterFor, givenNotFilterQueryFor,
+                   givenGreaterThenFilterFor, givenNotFilterQueryFor, givenMatchesFilterFor,
                    filterParser, reset
 }
