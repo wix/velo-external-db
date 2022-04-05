@@ -1,7 +1,7 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull } = require('velo-external-db-commons')
+const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } = require('velo-external-db-commons')
 const { escapeId, validateLiteral, patchFieldName } = require('./mssql_utils')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 
 class FilterParser {
@@ -128,6 +128,14 @@ class FilterParser {
             return [{
                 filterExpr: `LOWER(${escapeId(fieldName)}) LIKE ${validateLiteral(fieldName)}`,
                 parameters: { [patchFieldName(fieldName)]: value.map(s => s.toLowerCase()).join('[- ]') }
+            }]
+        }
+
+        if (operator === matches) {
+            const ignoreCase = value.ignoreCase ? 'LOWER' : ''
+            return [{
+                filterExpr: `${ignoreCase}(${escapeId(fieldName)}) LIKE ${validateLiteral(fieldName)}`,
+                parameters: { [patchFieldName(fieldName)]: specArrayToRegex(value.spec, value.ignoreCase) }
             }]
         }
 

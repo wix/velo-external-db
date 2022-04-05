@@ -1,4 +1,6 @@
 const moment = require('moment')
+const { InvalidQuery } = require('./errors')
+
 
 const EmptySort = {
     sortExpr: '',
@@ -77,6 +79,20 @@ const extractProjectionFunctionsObjects = (projection) => projection.filter(f =>
 
 const isNull = (value) => (value === null || value === undefined)
 
+const specArrayToRegex = (spec, ignoreCase) => {
+    if (!Array.isArray(spec)) {
+        throw new InvalidQuery('$matches must have array - spec property')
+    }
+    return spec.map(spec => {
+        if (spec.type === 'literal') {
+            return ignoreCase ? spec.value.toLowerCase() : spec.value
+        }
+        if (spec.type === 'anyOf') {
+            return ignoreCase ? `[${spec.value.toLowerCase()}]` : `[${spec.value}]`
+        }
+    }).join('')
+}
+
 module.exports = { EmptyFilter, EmptySort, patchDateTime, asParamArrays, isObject, isDate,
                      updateFieldsFor, isEmptyFilter, AdapterOperators, AdapterFunctions,
-                     extractGroupByNames, extractProjectionFunctionsObjects, isNull }
+                     extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex }
