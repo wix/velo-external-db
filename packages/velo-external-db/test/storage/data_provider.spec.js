@@ -1,4 +1,4 @@
-const { Uninitialized, testIfSupportedOperationsIncludes } = require('test-commons')
+const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('test-commons')
 const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection } = require('velo-external-db-commons').SchemaOperations
 const Chance = require('chance')
 const gen = require('../gen')
@@ -61,7 +61,19 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
         await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
     })
-    
+
+    if (shouldNotRunOn(['Airtable'], currentDbImplementationName())) {
+        test('[gt] operator on string should return rows if bigger', async() => {
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
+            const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
+
+            env.driver.givenGreaterThenFilterFor(ctx.filter, ctx.column.name, firstHalfOfValue)
+            env.driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
+        })
+    }    
+
     testIfSupportedOperationsIncludes(supportedOperations, [ StartWithCaseInsensitive ])('search with startsWith operator will return data and be case-insensitive', async() => {
         await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
         const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
@@ -245,7 +257,6 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         ctx.skip = 0
         ctx.limit = 10
         ctx.projection = chance.word()
-
         ctx.entity = gen.randomDbEntity([ctx.column.name])
         ctx.entityFields = Object.keys(ctx.entity).map(f => ({ field: f }))
         ctx.modifiedEntity = { ...ctx.entity, [ctx.column.name]: chance.word() }

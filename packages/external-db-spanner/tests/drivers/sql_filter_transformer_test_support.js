@@ -67,6 +67,10 @@ const givenStartsWithFilterFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: `WHERE LOWER(${escapeFieldId(column)}) LIKE LOWER(${validateLiteral(column)})`, parameters: { [column]: `${value}%` } })
 
+const givenGreaterThenFilterFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: `WHERE ${escapeFieldId(column)} > ${validateLiteral(column)}`, parameters: { [column]: value } })
+
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -77,6 +81,6 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                    givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
+                    givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor, givenGreaterThenFilterFor,
                    filterParser, reset
 }
