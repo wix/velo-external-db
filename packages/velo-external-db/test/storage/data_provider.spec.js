@@ -175,7 +175,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
     })
 
-    if (shouldRunOnlyOn(['MySql', 'Postgres', 'Sql Server'], currentDbImplementationName())) {
+    if (shouldRunOnlyOn(['MySql', 'Postgres', 'Sql Server', 'Mongo'], currentDbImplementationName())) {
         test('matches operator should return data', async() => {
             await givenCollectionWith([ctx.matchesEntity], ctx.collectionName, ctx.entityFields)
             env.driver.givenAllFieldsProjectionFor?.(ctx.projection)

@@ -1,7 +1,7 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter } = require('velo-external-db-commons')
+const { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } = require('velo-external-db-commons')
 const { EmptyFilter } = require('./mongo_utils')
-const { string_begins, string_ends, string_contains, urlized } = AdapterOperators
+const { string_begins, string_ends, string_contains, urlized, matches } = AdapterOperators
 const { count } = AdapterFunctions
 
 class FilterParser {
@@ -75,8 +75,15 @@ class FilterParser {
                 filterExpr: { [fieldName]: { $regex: `/${value.map(s => s.toLowerCase()).join('.*')}/i` } }
             }]
         }
-        return [{ filterExpr: { [fieldName]: { [mongoOp]: this.valueForOperator(value, mongoOp) } } }]
 
+        if (operator === matches) {
+            const ignoreCase = value.ignoreCase ? 'i' : ''
+            return [{
+                filterExpr: { [fieldName]: { $regex: specArrayToRegex(value.spec, false), $options: `${ignoreCase}` } }
+            }]
+        }
+
+        return [{ filterExpr: { [fieldName]: { [mongoOp]: this.valueForOperator(value, mongoOp) } } }]
     }
 
     isMultipleFieldOperator(operator) {
