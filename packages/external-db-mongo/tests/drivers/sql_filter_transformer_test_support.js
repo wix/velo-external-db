@@ -100,6 +100,6 @@ const reset = () => {
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
                    givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
-                   givenGreaterThenFilterFor, givenNotFilterQueryFor, givenMatchesFilterFor
+                   givenGreaterThenFilterFor, givenNotFilterQueryFor, givenMatchesFilterFor,
                    filterParser, reset
 }
