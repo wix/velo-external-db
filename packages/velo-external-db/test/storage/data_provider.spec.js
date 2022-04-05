@@ -62,18 +62,6 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
     })
 
-    if (shouldNotRunOn(['Airtable'], currentDbImplementationName())) {
-        test('[gt] operator on string should return rows if bigger', async() => {
-            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
-            const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
-
-            env.driver.givenGreaterThenFilterFor(ctx.filter, ctx.column.name, firstHalfOfValue)
-            env.driver.stubEmptyOrderByFor(ctx.sort)
-            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
-            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
-        })
-    }    
-
     testIfSupportedOperationsIncludes(supportedOperations, [ StartWithCaseInsensitive ])('search with startsWith operator will return data and be case-insensitive', async() => {
         await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
         const firstHalfOfValue = ctx.entity[ctx.column.name].substring(0, ctx.column.name.length / 2)
@@ -93,7 +81,18 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         env.driver.givenProjectionExprFor(projection)
         await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 0, 50, projection) ).resolves.toEqual(entitiesWithOwnerFieldOnly(ctx.entities))
     })
-    
+
+    if (shouldNotRunOn(['Airtable'], currentDbImplementationName())) {
+        test('[gt] operator on string should return rows if bigger', async() => {
+            await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
+            const smallerString = String.fromCharCode(ctx.entity[ctx.column.name].charCodeAt(0) - 1)
+
+            env.driver.givenGreaterThenFilterFor(ctx.filter, ctx.column.name, smallerString)
+            env.driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
+        })
+    }    
 
     test('count will run query', async() => {
         await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)
