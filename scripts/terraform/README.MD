@@ -21,7 +21,12 @@ Using Terraform to provision the adapter in Azure/ GCP / AWS.
 To get started, you'll need:
 1. Install [azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 2. Authenticate with Azure: Run ``` az login ``` and log in your azure user.
-4. Run ``` npm start:azure ``` 
+
+**MySql**
+- Run ``` npm run start:azure-mysql ``` 
+
+**Postgres**
+- Run ``` npm run start:azure-postgres ``` 
 
 ### GCP
 To get started, you'll need:
