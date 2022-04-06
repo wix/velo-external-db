@@ -51,31 +51,27 @@ resource "azurerm_subnet" "veloSubnet" {
   }
 }
 
-
-resource "azurerm_mysql_server" "mySqlServer" {
-  depends_on = [azurerm_resource_group.resourceGroup]
-
+resource "azurerm_postgresql_server" "postgresServer" {
   name                         = var.databaseName
   location                     = azurerm_resource_group.resourceGroup.location
   resource_group_name          = azurerm_resource_group.resourceGroup.name
   sku_name                     = "GP_Gen5_2"
-  version                      = "5.7"
+  version                      = "11"
   ssl_enforcement_enabled      = false
   storage_mb                   = 51200
   administrator_login          = var.databaseUserName
-  administrator_login_password = var.databasePassword
+  administrator_login_password = var.databasePassword 
 }
 
-resource "azurerm_mysql_database" "velo_db" {
-  name                = "velo_db"
+resource "azurerm_postgresql_database" "velo_db" {
+  depends_on = [azurerm_postgresql_server.postgresServer]
+
+  name                = "velodb"
   resource_group_name = azurerm_resource_group.resourceGroup.name
-  server_name         = azurerm_mysql_server.mySqlServer.name
-  charset             = "utf8"
-  collation           = "utf8_unicode_ci"
+  server_name         = azurerm_postgresql_server.postgresServer.name
+  charset             = "UTF8"
+  collation           = "English_United States.1252"
 }
-
-
-
 
 resource "azurerm_key_vault" "veloKeyVault" {
     depends_on = [azurerm_resource_group.resourceGroup]
@@ -108,15 +104,15 @@ resource "azurerm_key_vault_secret" "host" {
   depends_on = [azurerm_key_vault.veloKeyVault]
 
   name         = "HOST"
-  value        = azurerm_mysql_server.mySqlServer.fqdn
+  value        = azurerm_postgresql_server.postgresServer.fqdn
   key_vault_id = azurerm_key_vault.veloKeyVault.id
 }
 
 resource "azurerm_key_vault_secret" "user" {
-  depends_on   = [azurerm_key_vault.veloKeyVault, azurerm_mysql_server.mySqlServer]
+  depends_on   = [azurerm_key_vault.veloKeyVault, azurerm_postgresql_server.postgresServer]
 
   name         = "USER"
-  value        = "${azurerm_mysql_server.mySqlServer.administrator_login}@${azurerm_mysql_server.mySqlServer.name}"
+  value        = "${azurerm_postgresql_server.postgresServer.administrator_login}@${azurerm_postgresql_server.postgresServer.name}"
   key_vault_id = azurerm_key_vault.veloKeyVault.id
 }
 
@@ -124,7 +120,7 @@ resource "azurerm_key_vault_secret" "password" {
   depends_on = [azurerm_key_vault.veloKeyVault]
 
   name         = "PASSWORD"
-  value        = azurerm_mysql_server.mySqlServer.administrator_login_password
+  value        = azurerm_postgresql_server.postgresServer.administrator_login_password
   key_vault_id = azurerm_key_vault.veloKeyVault.id
 }
 
@@ -132,7 +128,7 @@ resource "azurerm_key_vault_secret" "db" {
   depends_on = [azurerm_key_vault.veloKeyVault]
 
   name         = "DB"
-  value        = azurerm_mysql_database.velo_db.name
+  value        = azurerm_postgresql_database.velo_db.name
   key_vault_id = azurerm_key_vault.veloKeyVault.id
 }
 
@@ -144,12 +140,12 @@ resource "azurerm_key_vault_secret" "secretKey" {
   key_vault_id = azurerm_key_vault.veloKeyVault.id
 }
 
-resource "azurerm_mysql_virtual_network_rule" "myRule" {
-    depends_on = [azurerm_mysql_server.mySqlServer, azurerm_subnet.veloSubnet]
+resource "azurerm_postgresql_virtual_network_rule" "myRule" {
+    depends_on = [azurerm_postgresql_server.postgresServer, azurerm_subnet.veloSubnet]
 
     name                = "myRule"
     resource_group_name = azurerm_resource_group.resourceGroup.name
-    server_name         = azurerm_mysql_server.mySqlServer.name
+    server_name         = azurerm_postgresql_server.postgresServer.name
     subnet_id           = azurerm_subnet.veloSubnet.id
 }
 
@@ -170,7 +166,7 @@ resource "azurerm_app_service_plan" "veloAppServicePlan" {
 }
 
 resource "azurerm_app_service" "veloAppService" {
-    depends_on = [azurerm_resource_group.resourceGroup, azurerm_app_service_plan.veloAppServicePlan]
+    depends_on = [azurerm_resource_group.resourceGroup, azurerm_app_service_plan.veloAppServicePlan, azurerm_key_vault.veloKeyVault]
 
     name                = var.adapterName
     location            = azurerm_resource_group.resourceGroup.location
@@ -186,7 +182,7 @@ resource "azurerm_app_service" "veloAppService" {
 
     app_settings = {
         CLOUD_VENDOR = "azure"
-        TYPE         = "mysql"
+        TYPE         = "postgres"
         HOST         = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.veloKeyVault.name};SecretName=${azurerm_key_vault_secret.host.name})"
         USER         = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.veloKeyVault.name};SecretName=${azurerm_key_vault_secret.user.name})"
         PASSWORD     = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.veloKeyVault.name};SecretName=${azurerm_key_vault_secret.password.name})"
