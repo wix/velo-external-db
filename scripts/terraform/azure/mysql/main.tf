@@ -14,7 +14,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 resource "random_id" "random" {
-    byte_length = 5
+    byte_length = 6
 }
 
 resource "azurerm_resource_group" "resourceGroup" {
@@ -71,7 +71,7 @@ resource "azurerm_mysql_database" "velo_db" {
   resource_group_name = azurerm_resource_group.resourceGroup.name
   server_name         = azurerm_mysql_server.mySqlServer.name
   charset             = "utf8"
-  collation           = "utf8_unicode_ci"
+  collation           = "de_DE.utf8"
 }
 
 
