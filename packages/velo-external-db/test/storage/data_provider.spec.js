@@ -85,8 +85,10 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
     if (shouldNotRunOn(['Airtable'], currentDbImplementationName())) {
         test('[gt] operator on string should return rows if bigger', async() => {
             await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
-            
-            env.driver.givenGreaterThenFilterFor(ctx.filter, ctx.column.name, 'a')
+            const smallerString = ctx.entity[ctx.column.name][0] !== 'a' ? String.fromCharCode(ctx.entity[ctx.column.name].charCodeAt(0) - 1) : 'a'
+            console.log(smallerString)
+            console.log(ctx.entity[ctx.column.name][0])
+            env.driver.givenGreaterThenFilterFor(ctx.filter, ctx.column.name, smallerString)
             env.driver.stubEmptyOrderByFor(ctx.sort)
             env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
             await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
