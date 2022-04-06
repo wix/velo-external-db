@@ -17,7 +17,7 @@ class DataProvider {
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
         const sql = `SELECT ${projectionExpr} FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
-        console.log({ sql, parameters: [...parameters, skip, limit] })
+
         const resultset = await this.query(sql, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultset
