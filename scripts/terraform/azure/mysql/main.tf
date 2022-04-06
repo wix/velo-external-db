@@ -71,7 +71,7 @@ resource "azurerm_mysql_database" "velo_db" {
   resource_group_name = azurerm_resource_group.resourceGroup.name
   server_name         = azurerm_mysql_server.mySqlServer.name
   charset             = "utf8"
-  collation           = "de_DE.utf8"
+  collation           = "utf8_unicode_ci"
 }
 
 
