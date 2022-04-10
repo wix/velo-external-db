@@ -213,6 +213,21 @@ describe('Sql Parser', () => {
                     filterExpr: { [`$${o}`]: [filter1.filterExpr, filter2.filterExpr] }
                 }])
             })
+            
+            each([
+                and, or
+            ]).test('correctly transform operator [%s] with only one filter', (o) => {
+                const filter = {
+                    operator: o,
+                    value: [ctx.filter, {}]
+                }
+
+                const filter1 = env.filterParser.parseFilter(ctx.filter)[0]
+
+                expect(env.filterParser.parseFilter(filter)).toEqual([{
+                    filterExpr: { [`$${o}`]: [filter1.filterExpr, {}] }
+                }])
+            })
 
             test('correctly transform operator [not]', () => {
                 const filter = {

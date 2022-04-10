@@ -58,7 +58,7 @@ class FilterParser {
 
         if (this.isMultipleFieldOperator(mongoOp)) {
             const res = value.map( this.parseFilter.bind(this) )
-            return [{ filterExpr: { [mongoOp]: res.map(r => r[0].filterExpr) } }]
+            return [{ filterExpr: { [mongoOp]: res.map(r => r[0]?.filterExpr || EmptyFilter.filterExpr) } }]
         }
 
         if (mongoOp === '$not') {
