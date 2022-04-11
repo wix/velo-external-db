@@ -35,6 +35,9 @@ class SchemaColumnTranslator {
 
             case 'tinyint':
                 return 'boolean'
+                
+            case 'json':
+                return 'object'
 
             default:
                 console.log(type)

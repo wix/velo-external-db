@@ -49,6 +49,9 @@ class SchemaColumnTranslator {
             case 'boolean':
                 return 'boolean'
 
+            case 'json':
+                return 'object'    
+
             default:
                 console.log(type)
                 throw Error(type)
@@ -100,6 +103,9 @@ class SchemaColumnTranslator {
 
             case 'boolean_':
                 return 'boolean'
+
+            case 'object_':
+                return 'json'
 
             default:
                 throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)
