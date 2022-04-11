@@ -71,6 +71,8 @@ class ItemTransformer {
                 return dateTimeProvider.currentDateTime()
             case 'boolean':
                 return false
+            case 'object':
+                return null
         }
     }
 
