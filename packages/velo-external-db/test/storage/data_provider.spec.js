@@ -1,4 +1,4 @@
-const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn, shouldRunOnlyOn } = require('test-commons')
+const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('test-commons')
 const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection } = require('velo-external-db-commons').SchemaOperations
 const Chance = require('chance')
 const gen = require('../gen')
@@ -72,17 +72,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
         await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
     })
-    
-    if (shouldRunOnlyOn(['Mongo', 'DynamoDb', 'MySql', 'Postgres', 'Spanner', 'Sql Server'], currentDbImplementationName())) {
-    test('query with not operator filter will return data', async() => { 
-        await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
-        env.driver.givenNotFilterQueryFor(ctx.filter, ctx.column.name, ctx.entity[ctx.column.name])
-        env.driver.stubEmptyOrderByFor(ctx.sort)
-        env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
-        await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 0, 50, ctx.projection) ).resolves.toEqual([ctx.anotherEntity])
-    })
-    }
     testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('search with projection will return the specified fields', async() => {
         const projection = ['_owner']
         await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)
@@ -101,6 +91,15 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
             env.driver.stubEmptyOrderByFor(ctx.sort)
             env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
             await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
+        })
+
+        test('query with not operator filter will return data', async() => { 
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
+            env.driver.givenNotFilterQueryFor(ctx.filter, ctx.column.name, ctx.entity[ctx.column.name])
+            env.driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+    
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 0, 50, ctx.projection) ).resolves.toEqual([ctx.anotherEntity])
         })
     }    
 
