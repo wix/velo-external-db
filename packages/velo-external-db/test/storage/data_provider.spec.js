@@ -105,7 +105,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
     }    
 
     test('count will run query', async() => {
-        await givenCollectionWith(ctx.entities, ctx.zcollectionName, ctx.entityFields)
+        await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)
         env.driver.stubEmptyFilterFor(ctx.filter)
 
         await expect( env.dataProvider.count(ctx.collectionName, ctx.filter) ).resolves.toEqual(ctx.entities.length)
