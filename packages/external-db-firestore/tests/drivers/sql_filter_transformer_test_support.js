@@ -77,7 +77,13 @@ const givenStartsWithFilterFor = (filter, column, value) =>
                                     value: value + LastLetterCoder
                                 }])
 
-
+const givenGreaterThenFilterFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue([{
+                                    fieldName: column,
+                                    opStr: '>',
+                                    value,
+                                }])
 
 const reset = () => {
     filterParser.transform.mockClear()
@@ -89,6 +95,6 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
+                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor, givenGreaterThenFilterFor,
                    filterParser, reset
                 }

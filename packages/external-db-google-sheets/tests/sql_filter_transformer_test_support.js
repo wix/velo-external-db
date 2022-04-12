@@ -36,7 +36,9 @@ const givenFilterByIdWith = (id, filter) => {
                                 .mockReturnValue({ filterExpr: `_id = "${id}"` })
 }
 
-
+const givenGreaterThenFilterFor = (filter, column, value) => 
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: `${column} > ?`, parameters: [value] })
 
 const reset = () => {
     filterParser.transform.mockClear()
@@ -45,6 +47,6 @@ const reset = () => {
     filterParser.parseFilter.mockClear()
 }
 
-module.exports = { stubEmptyOrderByFor, stubEmptyFilterFor, givenFilterByIdWith, givenOrderByFor, stubEmptyFilterAndSortFor,
+module.exports = { stubEmptyOrderByFor, stubEmptyFilterFor, givenFilterByIdWith, givenOrderByFor, stubEmptyFilterAndSortFor, givenGreaterThenFilterFor,
     
      filterParser, reset }

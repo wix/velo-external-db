@@ -66,6 +66,10 @@ const givenStartsWithFilterFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: { [column]: { $regex: `^${value}`, $options: 'i' } } })
 
+const givenGreaterThenFilterFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: { [column]: { $gt: value } } })
+
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -76,6 +80,6 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
+                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor, givenGreaterThenFilterFor,
                    filterParser, reset
 }

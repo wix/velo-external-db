@@ -16,7 +16,7 @@ const SystemFields = [
 
 const QueryOperatorsByFieldType = {
     number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome', 'urlized'],
-    text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'urlized', 'matches'],
+    text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'urlized', 'matches', 'gt', 'gte', 'lt', 'lte'],
     boolean: ['eq'],
     url: ['eq', 'ne', 'contains', 'hasSome', 'urlized'],
     datetime: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'],
