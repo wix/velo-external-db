@@ -73,8 +73,8 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
     })
     
-    if (shouldRunOnlyOn(['Mongo', 'DynamoDb', 'MySql'], currentDbImplementationName())) {
-    test('query with not operator filter, will return data', async() => { 
+    if (shouldRunOnlyOn(['Mongo', 'DynamoDb', 'MySql', 'Postgres'], currentDbImplementationName())) {
+    test('query with not operator filter will return data', async() => { 
         await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
         env.driver.givenNotFilterQueryFor(ctx.filter, ctx.column.name, ctx.entity[ctx.column.name])
         env.driver.stubEmptyOrderByFor(ctx.sort)
