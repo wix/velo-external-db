@@ -63,7 +63,7 @@ class FilterParser {
 
         if (mongoOp === '$not') {
             const res = this.parseFilter(value[0])
-            return [{ filterExpr: { [mongoOp]: res[0].filterExpr } }]
+            return [{ filterExpr: { $nor: [res[0].filterExpr] } }]
         }
 
         if (this.isSingleFieldStringOperator(operator)) {

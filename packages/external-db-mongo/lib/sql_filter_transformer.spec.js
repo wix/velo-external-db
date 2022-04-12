@@ -236,7 +236,7 @@ describe('Sql Parser', () => {
                 }
 
                 expect(env.filterParser.parseFilter(filter)).toEqual([{
-                    filterExpr: { $not: env.filterParser.parseFilter(ctx.filter)[0].filterExpr }
+                    filterExpr: { $nor: [env.filterParser.parseFilter(ctx.filter)[0].filterExpr] }
                 }])
             })
         })
