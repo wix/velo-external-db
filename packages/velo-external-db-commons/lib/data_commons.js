@@ -83,14 +83,16 @@ const specArrayToRegex = (spec) => {
     if (!Array.isArray(spec)) {
         throw new InvalidQuery('$matches must have array - spec property')
     }
-    return spec.map(spec => {
-        if (spec.type === 'literal') {
-            return spec.value
-        }
-        if (spec.type === 'anyOf') {
-            return `[${spec.value}]`
-        }
-    }).join('')
+    return spec.map(specItemToRegex).join('')
+}
+
+const specItemToRegex = (spec) => {
+    if (spec.type === 'literal') {
+        return spec.value
+    }
+    if (spec.type === 'anyOf') {
+        return `[${spec.value}]`
+    }
 }
 
 module.exports = { EmptyFilter, EmptySort, patchDateTime, asParamArrays, isObject, isDate,
