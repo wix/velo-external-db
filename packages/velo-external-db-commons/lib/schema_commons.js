@@ -31,7 +31,7 @@ const QueryOperationsByFieldType = {
     url: [...QueryOperatorsByFieldType.url, 'urlized'],
     datetime: [...QueryOperatorsByFieldType.datetime],
     image: QueryOperatorsByFieldType.image,
-    object: QueryOperatorsByFieldType.object,
+    object: [...QueryOperatorsByFieldType.object, 'isEmpty', 'isNotEmpty'],
 }
 
 
