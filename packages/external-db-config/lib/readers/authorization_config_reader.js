@@ -10,7 +10,8 @@ class AuthorizationConfigReader {
 
   async readConfig() {
     const { ROLE_CONFIG: roleConfig } = process.env
-    const { collectionLevelConfig } = isJson(roleConfig) ? JSON.parse(roleConfig) : EmptyRoleConfig
+    const { collectionLevelConfig } = (isJson(roleConfig) && Array.isArray( (JSON.parse(roleConfig)).collectionLevelConfig ) ) ? JSON.parse(roleConfig) : EmptyRoleConfig
+
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
 

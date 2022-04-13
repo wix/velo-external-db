@@ -21,7 +21,7 @@ const collectionConfigPattern = {
 const configPattern = {
     type: 'object',
     properties: {
-        collectionLevelConfig: { items: collectionConfigPattern }
+        collectionLevelConfig: { type: 'array', items: collectionConfigPattern }
     },
     required: ['collectionLevelConfig']
 }
