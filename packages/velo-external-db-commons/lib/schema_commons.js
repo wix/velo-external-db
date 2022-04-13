@@ -21,7 +21,7 @@ const QueryOperatorsByFieldType = {
     url: ['eq', 'ne', 'contains', 'hasSome'],
     datetime: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'],
     image: [],
-    object: ['eq', 'ne', 'contains'],
+    object: ['eq', 'ne'],
 }
 
 const QueryOperationsByFieldType = {
