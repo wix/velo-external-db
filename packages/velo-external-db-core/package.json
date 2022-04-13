@@ -24,6 +24,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "ajv": "^8.11.0",
+    "external-db-config": "^0.0.0",
+    "external-db-security": "^0.0.0",
     "node-cache": "^5.1.2",
     "uuid": "^8.3.2",
     "velo-external-db-commons": "^0.0.0"
@@ -36,7 +39,6 @@
     "jest-when": "^3.5.1",
     "rewire": "^6.0.0",
     "test-commons": "^0.0.0",
-
     "uuid-validate": "^0.0.3"
   },
   "bugs": {

@@ -5,8 +5,28 @@ const SchemaColumnTranslator = require('./sql_schema_translator')
 const init = require('./connection_provider')
 const DatabaseOperations = require('./mysql_operations')
 const { supportedOperations } = require('./supported_operations')
+const { MySqlConfigValidator } = require ('./config_validator')
 
 const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 
-module.exports = { SchemaProvider, DataProvider, FilterParser, SchemaColumnTranslator, driver, init, opsDriver, DatabaseOperations, supportedOperations }
+
+class MySqlConnector {
+    constructor(config, options) {
+        this.config = config
+        this.options = options
+        this.configValidator = new MySqlConfigValidator(config)  
+    }
+
+    async initProviders() {
+        const { dataProvider, schemaProvider, databaseOperations, connection, cleanup } = await init(this.config, this.options)
+        this.dataProvider = dataProvider
+        this.schemaProvider = schemaProvider
+        this.databaseOperations = databaseOperations
+        this.connection = connection
+        this.cleanup = cleanup
+        return { dataProvider, schemaProvider, databaseOperations, connection, cleanup }
+    }    
+}
+
+module.exports = { SchemaProvider, DataProvider, FilterParser, SchemaColumnTranslator, driver, init, opsDriver, DatabaseOperations, supportedOperations, MySqlConnector }
