@@ -15,14 +15,26 @@ const SystemFields = [
     }]
 
 const QueryOperatorsByFieldType = {
-    number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome', 'urlized'],
-    text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'urlized', 'matches', 'gt', 'gte', 'lt', 'lte'],
+    number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'],
+    text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'matches', 'gt', 'gte', 'lt', 'lte'],
     boolean: ['eq'],
-    url: ['eq', 'ne', 'contains', 'hasSome', 'urlized'],
+    url: ['eq', 'ne', 'contains', 'hasSome'],
     datetime: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'],
     image: [],
     object: ['eq', 'ne', 'contains'],
 }
+
+const QueryOperationsByFieldType = {
+    number: [...QueryOperatorsByFieldType.number, 'urlized'],
+    text: [...QueryOperatorsByFieldType.text, 'urlized', 'isEmpty', 'isNotEmpty'],
+    boolean: QueryOperatorsByFieldType.boolean,
+    url: [...QueryOperatorsByFieldType.url, 'urlized'],
+    datetime: [...QueryOperatorsByFieldType.datetime],
+    image: QueryOperatorsByFieldType.image,
+    object: QueryOperatorsByFieldType.object,
+}
+
+
 
 const SchemaOperations = Object.freeze({
     List: 'list',
@@ -89,7 +101,7 @@ const parseTableData = data => data.reduce((o, r) => {
 
 const allowedOperationsFor = ({ fields }) => fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
 
-const appendQueryOperatorsTo = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperatorsByFieldType[f.type] }))
+const appendQueryOperatorsTo = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
 
 module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
                     asWixSchemaHeaders, SchemaOperations, AllSchemaOperations,
