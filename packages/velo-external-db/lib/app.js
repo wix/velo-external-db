@@ -13,7 +13,6 @@ const initMySqlConnector = async() => {
     
     const { host, user, password, db, authorization } = mySqlConfig
 
-    console.log(authorization)
     const mySqlConnector = new MySqlConnector({ host, user, password, db })
     await mySqlConnector.initProviders()
     const connectorRouter = new ConnectorRouter(mySqlConnector, { authorization: { roleConfig: { collectionLevelConfig: authorization } }, secretKey: process.env.SECRET_KEY })
