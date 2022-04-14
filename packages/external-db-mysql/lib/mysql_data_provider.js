@@ -23,7 +23,7 @@ class DataProvider {
         return resultset
     }
 
-    async count(collectionName, filter) {
+    async count(collectionName, filter) { 
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const sql = `SELECT COUNT(*) AS num FROM ${escapeTable(collectionName)} ${filterExpr}`
         const resultset = await this.query(sql, parameters)
