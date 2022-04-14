@@ -1,7 +1,7 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, isEmptyFilter, extractGroupByNames, extractProjectionFunctionsObjects, isNull } = require('velo-external-db-commons')
+const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, isEmptyFilter, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } = require('velo-external-db-commons')
 const { escapeId, validateLiteral, patchFieldName, escapeFieldId } = require('./spanner_utils')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 
 class FilterParser {
@@ -125,6 +125,14 @@ class FilterParser {
             return [{
                 filterExpr: `LOWER(${escapeId(fieldName)}) RLIKE ${validateLiteral(fieldName)}`,
                 parameters: { [fieldName]: value.map(s => s.toLowerCase()).join('[- ]') }
+            }]
+        }
+        
+        if (operator === matches) {
+            const ignoreCase = value.ignoreCase ? 'LOWER' : ''
+            return [{
+                filterExpr: `REGEXP_CONTAINS (${ignoreCase}(${escapeId(fieldName)}), ${ignoreCase}(${validateLiteral(fieldName)}))`,
+                parameters: { [fieldName]: specArrayToRegex(value.spec) }
             }]
         }
 
