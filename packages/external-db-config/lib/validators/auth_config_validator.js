@@ -1,4 +1,4 @@
-const { checkRequiredKeys, EmptyRoleConfig, configPattern, collectionConfigPattern } = require('external-db-config/lib/utils/config_utils')
+const { EmptyRoleConfig, configPattern, collectionConfigPattern } = require('../utils/config_utils')
 const Avj = require('ajv')
 const ajv = new Avj({ strict: false })
 
@@ -21,8 +21,7 @@ class AuthorizationConfigValidator {
     const valid = this.configValidator(roleConfig)
     let message 
     
-
-    if (checkRequiredKeys(process.env, ['ROLE_CONFIG']).length)  
+    if (!this.config || !this.config.roleConfig)  
       message = 'Role config is not defined, using default'
     else if (!valid)
       message = this.configValidator.errors.map(err => (`Error in ${err.instancePath}: ${err.message}`)).join(', ')

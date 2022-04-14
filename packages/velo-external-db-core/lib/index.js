@@ -11,10 +11,8 @@ const SchemaAwareDataService = require ('./service/schema_aware_data')
 const ItemTransformer = require('./converters/item_transformer')
 const { initServices, createRouter } = require('./router')
 const { RoleAuthorizationService } = require ('external-db-security')
+const { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } = require ('external-db-config')
 
-const { ConfigValidator } = require ('./config_validator')
-const { AuthorizationConfigValidator } = require('./auth_config_validator')
-const { CommonConfigValidator } = require('./common_config_validator')
 
 class ConnectorRouter {
     constructor(connector, config) {
@@ -33,16 +31,10 @@ class ConnectorRouter {
         this.roleAuthorizationService = new RoleAuthorizationService(connector.authorization)
         this.cleanup = connector.cleanup
         
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, config, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService)
         this.router = createRouter()
     }
 }
-
-
-
-
-
-
 
 
 module.exports = { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, ConnectorRouter }

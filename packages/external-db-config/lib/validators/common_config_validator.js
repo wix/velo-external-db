@@ -1,4 +1,4 @@
-const { checkRequiredKeys } = require('external-db-config/lib/utils/config_utils')
+const { checkRequiredKeys } = require('../utils/config_utils')
 
 class CommonConfigValidator {
     constructor(config) {

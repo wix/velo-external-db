@@ -41,9 +41,8 @@ const createRouter = () => {
     })
 
     router.post('/provision', (req, res) => {
-        //todo : fix this
-        const { secretKey, ...maskedCfg } = cfg
-        res.json({ ...maskedCfg, protocolVersion: 2 })
+        const { type, vendor } = cfg
+        res.json({ type, vendor, protocolVersion: 2 })
     })
 
     // *************** Data API **********************
