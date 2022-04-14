@@ -1,94 +1,94 @@
 name: CI
 
-on:
-  push:
-    branches: "*"
+# on:
+#   push:
+#     branches: "*"
 
-  workflow_dispatch:
+#   workflow_dispatch:
 
-jobs:
-  test_main:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 16
-        uses: actions/setup-node@v2
-        with:
-          node-version: lts/*
+# jobs:
+#   test_main:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Use Node.js 16
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: lts/*
 
-      - name: Restore Dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+#       - name: Restore Dependencies
+#         uses: actions/cache@v2
+#         with:
+#           path: |
+#             node_modules
+#             */*/node_modules
+#           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
-      - name: Installing Dependencies
-        run: npm install
+#       - name: Installing Dependencies
+#         run: npm install
 
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
+#       - name: Install dependencies of the homemade packages.
+#         run: npm run build:dev
 
-      - name: Testing
-        run: npm run test:core
+#       - name: Testing
+#         run: npm run test:core
 
-  test_databases:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        database: ["postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
-                   "spanner",
-                   "mysql", "mysql5",
-                   "mssql", "mssql17",
-                   "mongo", "mongo4",
-                   "firestore",
-                   "airtable",
-                   "dynamodb",
-                   "google-sheets"]
+#   test_databases:
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         database: ["postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
+#                    "spanner",
+#                    "mysql", "mysql5",
+#                    "mssql", "mssql17",
+#                    "mongo", "mongo4",
+#                    "firestore",
+#                    "airtable",
+#                    "dynamodb",
+#                    "google-sheets"]
 
-    steps:
-      - uses: actions/checkout@v2
+#     steps:
+#       - uses: actions/checkout@v2
 
-      - name: Use Node.js 16
-        uses: actions/setup-node@v2
-        with:
-          node-version: lts/*
+#       - name: Use Node.js 16
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: lts/*
 
-      - name: Restore Dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+#       - name: Restore Dependencies
+#         uses: actions/cache@v2
+#         with:
+#           path: |
+#             node_modules
+#             */*/node_modules
+#           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
           
-      - name: Downloading Image
-        if: ${{ ( matrix.database != 'google-sheets') }}
-        run: |
-          cd packages/velo-external-db/test/resources
-          docker compose pull --quiet ${{ matrix.database }}
+#       - name: Downloading Image
+#         if: ${{ ( matrix.database != 'google-sheets') }}
+#         run: |
+#           cd packages/velo-external-db/test/resources
+#           docker compose pull --quiet ${{ matrix.database }}
 
-      - name: Start Container
-        if: ${{ ( matrix.database != 'google-sheets') }}
-        run: |
-          cd packages/velo-external-db/test/resources
-          docker compose up --detach ${{ matrix.database }}
+#       - name: Start Container
+#         if: ${{ ( matrix.database != 'google-sheets') }}
+#         run: |
+#           cd packages/velo-external-db/test/resources
+#           docker compose up --detach ${{ matrix.database }}
 
-      - name: Installing Dependencies
-        run: npm install
+#       - name: Installing Dependencies
+#         run: npm install
 
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
+#       - name: Install dependencies of the homemade packages.
+#         run: npm run build:dev
 
-      - name: Testing
-        run: npm run test:${{ matrix.database }}
+#       - name: Testing
+#         run: npm run test:${{ matrix.database }}
 
-      - name: Stop Container
-        if: ${{ ( matrix.database != 'google-sheets') }}
-        run: |
-          cd packages/velo-external-db/test/resources
-          docker compose down
+#       - name: Stop Container
+#         if: ${{ ( matrix.database != 'google-sheets') }}
+#         run: |
+#           cd packages/velo-external-db/test/resources
+#           docker compose down
 
   # test_bigquery:
   #   runs-on: ubuntu-latest
