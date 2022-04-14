@@ -1,5 +1,5 @@
 const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('test-commons')
-const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection } = require('velo-external-db-commons').SchemaOperations
+const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, NotOperator } = require('velo-external-db-commons').SchemaOperations
 const Chance = require('chance')
 const gen = require('../gen')
 const { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/provider_resources')
@@ -92,6 +92,15 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
             env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
             await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.projection) ).resolves.toEqual(expect.arrayContaining([ctx.entity]))
         })
+
+        testIfSupportedOperationsIncludes(supportedOperations, [ NotOperator])('query with not operator filter will return data', async() => { 
+            await givenCollectionWith([ctx.entity, ctx.anotherEntity], ctx.collectionName, ctx.entityFields)
+            env.driver.givenNotFilterQueryFor(ctx.filter, ctx.column.name, ctx.entity[ctx.column.name])
+            env.driver.stubEmptyOrderByFor(ctx.sort)
+            env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+    
+            await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 0, 50, ctx.projection) ).resolves.toEqual([ctx.anotherEntity])
+        })
     }    
 
     test('count will run query', async() => {
@@ -166,16 +175,6 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
     })
     
-
-    // testt('if update does not have and updatable fields, do nothing', async () => {
-    //     await givenCollectionWith([ctx.entity], ctx.collectionName)
-    //     delete ctx.modifiedEntity[ctx.column.name]
-    //
-    //     expect( await env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).toEqual(0)
-    //
-    //     expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50) ).toEqual([ctx.entity]);
-    // });
-
     test('truncate will remove all data from collection', async() => {
         await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
         env.driver.stubEmptyFilterAndSortFor('', '')

@@ -53,6 +53,7 @@ const SchemaOperations = Object.freeze({
     StartWithCaseSensitive: 'startWithCaseSensitive',
     StartWithCaseInsensitive: 'startWithCaseInsensitive',
     Projection: 'projection',
+    NotOperator: 'not',
 })
 
 const AllSchemaOperations = Object.values(SchemaOperations)
