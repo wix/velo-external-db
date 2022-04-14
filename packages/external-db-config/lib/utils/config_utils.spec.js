@@ -1,6 +1,6 @@
 const Chance = require('chance')
 const chance = Chance()
-const { checkRequiredKeys } = require('../utils/config_utils')
+const { checkRequiredKeys, jsonParser } = require('../utils/config_utils')
 const { gen } = require('test-commons')
 
 
@@ -35,4 +35,13 @@ describe('Check Required Keys Function', () => {
     test('property detect non empty string prop', () => {
         expect(checkRequiredKeys({ prop: chance.word() }, ['prop'])).toEqual([])
     })
+
+    test('jsonParser should return json object on quoted string', () => {
+        expect(jsonParser('{}')).toEqual({})
+    })
+
+    test('jsonParser should return json object on double quoted string', () => {
+        expect(jsonParser('"{}"')).toEqual({})
+    })
+
 })

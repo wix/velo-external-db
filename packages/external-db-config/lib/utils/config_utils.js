@@ -28,8 +28,14 @@ const configPattern = {
 
 const isJson = (str) => { try { JSON.parse(str); return true } catch (e) { return false } }
 
+const jsonParser = (str) => {
+    let parsed = JSON.parse(str)
+    if (typeof parsed === 'string') parsed = jsonParser(parsed)
+    return parsed
+ }
+
 const EmptyRoleConfig = {
     collectionLevelConfig: []
 }
 
-module.exports = { checkRequiredKeys, supportedDBs, supportedVendors, isJson, EmptyRoleConfig, configPattern, collectionConfigPattern }
+module.exports = { checkRequiredKeys, supportedDBs, supportedVendors, isJson, jsonParser, EmptyRoleConfig, configPattern, collectionConfigPattern }
