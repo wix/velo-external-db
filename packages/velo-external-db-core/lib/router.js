@@ -8,7 +8,7 @@ const compression = require('compression')
 const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
-
+const path = require('path')
 
 let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer, roleAuthorizationService
 
@@ -25,14 +25,12 @@ const initServices = (_schemaAwareDataService, _schemaService, _operationService
 
 const createRouter = () => {
     const router = express.Router()
-    // router.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     router.use(express.json())
-    router.use(unless(['/', '/provision', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: cfg.secretKey })))
-    config.forEach( ( { pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
-
     router.use(compression())
-    // router.set('view engine', 'ejs')
-
+    router.use('/assets', express.static(path.join(__dirname, 'assets')))
+    router.use(unless(['/', '/provision', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: cfg.secretKey })))
+    
+    config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
     // *************** INFO **********************
     router.get('/', async(req, res) => {

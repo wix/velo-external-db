@@ -2,8 +2,6 @@ const express = require('express')
 const { create } = require('external-db-config')
 const { MySqlConnector } = require('external-db-mysql')
 const { ConnectorRouter } = require ('velo-external-db-core')
-const path = require('path')
-
 
 
 const initMySqlConnector = async() => {
@@ -18,8 +16,6 @@ const initMySqlConnector = async() => {
     const connectorRouter = new ConnectorRouter(mySqlConnector, { authorization: { roleConfig: { collectionLevelConfig: authorization } }, secretKey: process.env.SECRET_KEY })
 
     const app = express()
-    
-    app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
     app.set('view engine', 'ejs')
 
     app.use(connectorRouter.router)
