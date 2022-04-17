@@ -66,9 +66,28 @@ const givenStartsWithFilterFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: { [column]: { $regex: `^${value}`, $options: 'i' } } })
 
+
 const givenGreaterThenFilterFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: { [column]: { $gt: value } } })
+
+const givenNotFilterQueryFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: { $nor: [{ [column]: { $eq: value } }] } })
+
+const givenMatchesFilterFor = (filter, column, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({
+                                    filterExpr: {
+                                        [column]: {
+                                            $regex: 
+                                                value.split('-').map((v, i, array) => 
+                                                    i === array.length-1 ? `${v.toLowerCase()}`: `${v.toLowerCase()}[ \t\n-]`)
+                                                    .join(''),
+                                            $options: 'i'
+                                        }
+                                    }
+                                })
 
 const reset = () => {
     filterParser.transform.mockClear()
@@ -80,6 +99,7 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor, givenGreaterThenFilterFor,
+                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
+                   givenGreaterThenFilterFor, givenNotFilterQueryFor, givenMatchesFilterFor,
                    filterParser, reset
 }

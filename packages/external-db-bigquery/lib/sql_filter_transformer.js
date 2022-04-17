@@ -1,7 +1,7 @@
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { escapeIdentifier, wildCardWith } = require('./bigquery_utils')
-const { EmptyFilter, EmptySort, isObject, isEmptyFilter, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects, isNull } = require('velo-external-db-commons')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
+const { EmptyFilter, EmptySort, isObject, isEmptyFilter, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } = require('velo-external-db-commons')
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 
 class FilterParser {
@@ -119,6 +119,14 @@ class FilterParser {
             return [{
                 filterExpr: `LOWER(${escapeIdentifier(fieldName)}) RLIKE ?`,
                 parameters: [value.map(s => s.toLowerCase()).join('[- ]')]
+            }]
+        }
+
+        if (operator === matches) {
+            const ignoreCase = value.ignoreCase ? 'LOWER' : ''
+            return [{
+                filterExpr: `REGEXP_CONTAINS(${ignoreCase}(${escapeIdentifier(fieldName)}), ${ignoreCase}(?))`,
+                parameters: [specArrayToRegex(value.spec)]
             }]
         }
 

@@ -93,6 +93,16 @@ const deleteRandomKeyObject = (obj) => {
     return { deletedKey, newObject: obj }
 }
 
+const randomMatchesValueWithDashes = () => {
+    const num = chance.natural({ min: 2, max: 5 })
+    const arr = []
+    for (let i = 0; i < num; i++) {
+        arr.push(chance.word())
+    }
+    return arr.join('-')
+}
 
-
-module.exports = { randomDbEntities, randomDbEntity, randomNumberDbEntity, randomNumberColumns, randomColumn, randomCollectionName, systemFieldsWith, deleteRandomKeyObject }
+module.exports = {
+    randomDbEntities, randomDbEntity, randomNumberDbEntity, randomNumberColumns, randomColumn, randomCollectionName,
+    systemFieldsWith, deleteRandomKeyObject, randomMatchesValueWithDashes
+}

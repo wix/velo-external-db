@@ -5,7 +5,7 @@ const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators //TODO: extract
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 
 describe('Sql Parser', () => {
@@ -194,6 +194,52 @@ describe('Sql Parser', () => {
                         filterExpr: { [ctx.fieldName]: { $regex: `/${ctx.fieldListValue.map(s => s.toLowerCase()).join('.*')}/i` } }
                     }])
                 })
+
+                test('correctly transform operator [matches] with ignoreCase', () => {
+                    const filter = {
+                        operator: matches,
+                        fieldName: ctx.fieldName,
+                        value: {
+                            ignoreCase: true,
+                            spec: [ 
+                                { type: 'literal', value: ctx.fieldValue },
+                                { type: 'anyOf', value: ctx.anotherValue },
+                                { type: 'literal', value: ctx.moreValue },
+                            ]
+                        }
+                    }
+
+                    expect(env.filterParser.parseFilter(filter)).toEqual([{
+                        filterExpr: { [ctx.fieldName]: { 
+                                                            $regex: `${ctx.fieldValue.toLowerCase()}[${ctx.anotherValue.toLowerCase()}]${ctx.moreValue.toLowerCase()}`, 
+                                                            $options: 'i' 
+                                                       } 
+                                    }
+                    }])
+                })
+                
+                test('correctly transform operator [matches] with ignoreCase', () => {
+                    const filter = {
+                        operator: matches,
+                        fieldName: ctx.fieldName,
+                        value: {
+                            ignoreCase: false,
+                            spec: [ 
+                                { type: 'literal', value: ctx.fieldValue },
+                                { type: 'anyOf', value: ctx.anotherValue },
+                                { type: 'literal', value: ctx.moreValue },
+                            ]
+                        }
+                    }
+
+                    expect(env.filterParser.parseFilter(filter)).toEqual([{
+                        filterExpr: { [ctx.fieldName]: { 
+                                                            $regex: `${ctx.fieldValue.toLowerCase()}[${ctx.anotherValue.toLowerCase()}]${ctx.moreValue.toLowerCase()}`, 
+                                                            $options: '' 
+                                                       } 
+                                    }
+                    }])
+                })
             })
         })
 
@@ -377,6 +423,8 @@ describe('Sql Parser', () => {
     const ctx = {
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
+        anotherValue: Uninitialized,
+        moreValue: Uninitialized,
         fieldListValue: Uninitialized,
         anotherFieldName: Uninitialized,
         moreFieldName: Uninitialized,
@@ -395,6 +443,8 @@ describe('Sql Parser', () => {
         ctx.moreFieldName = chance.word()
 
         ctx.fieldValue = chance.word()
+        ctx.anotherValue = chance.word()
+        ctx.moreValue = chance.word()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
         ctx.filter = gen.randomWrappedFilter()

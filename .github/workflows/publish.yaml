@@ -39,7 +39,7 @@ jobs:
       # Build docker image
       - name: Build Docker image
         id: build-image
-        run:  docker build -t $IMAGE_NAME .
+        run:  docker build  --target full_version  -t $IMAGE_NAME .
 
       # Login to Public ECR
       - name: Login to Public ECR
