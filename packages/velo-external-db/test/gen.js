@@ -58,12 +58,29 @@ const randomNumberDbEntity = (columns) => {
     return entity
 }
 
+const randomObjectDbEntity = (columns) => {
+    const entity = {
+        _id: chance.guid(),
+        _createdDate: newDate(),
+        _updatedDate: newDate(),
+        _owner: chance.guid(),
+    }
+
+    const _columns = columns || []
+
+    _columns.forEach(column => entity[column.name] = ({ [chance.word()]: chance.word() }) )
+
+    return entity
+}
+
 const randomNumberColumns = () => {
     return [ { name: chance.word(), type: 'number', subtype: 'int', isPrimary: false },
              { name: chance.word(), type: 'number', subtype: 'decimal', precision: '10,2', isPrimary: false } ]
 }
 
 const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
+
+const randomObjectColumn = () => ( { name: chance.word(), type: 'object' } )
 
 const randomCollectionName = () => chance.word({ length: 5 })
 
@@ -104,5 +121,5 @@ const randomMatchesValueWithDashes = () => {
 
 module.exports = {
     randomDbEntities, randomDbEntity, randomNumberDbEntity, randomNumberColumns, randomColumn, randomCollectionName,
-    systemFieldsWith, deleteRandomKeyObject, randomMatchesValueWithDashes
+    systemFieldsWith, deleteRandomKeyObject, randomMatchesValueWithDashes, randomObjectColumn, randomObjectDbEntity
 }
