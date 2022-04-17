@@ -1,14 +1,28 @@
 const { escapeId } = require('mysql')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { errors, patchDateTime } = require('velo-external-db-commons')
 
 const wildCardWith = (n, char) => Array(n).fill(char, 0, n).join(', ')
 
 const escapeTable = t => {
     if(t && t.indexOf('.') !== -1) {
-        throw new InvalidQuery('Illegal table name')
+        throw new errors.InvalidQuery('Illegal table name')
     }
     return escapeId(t)
 }
 
 const escapeIdField = f => f === '*' ? '*' : escapeId(f)
-module.exports = { wildCardWith, escapeId: escapeIdField, escapeTable }
+
+const patchObjectField = (item) => Object.entries(item).reduce((acc, [key, value]) => {
+        acc[key] = typeof value === 'object' ? JSON.stringify(value) : value
+        return acc
+    }, {})
+
+
+const patchItem = (item) => {
+    const itemWithPatchedDateTime = patchDateTime(item)
+    const itemWithPatchedObject = patchObjectField(itemWithPatchedDateTime)
+
+    return itemWithPatchedObject
+}
+
+module.exports = { wildCardWith, escapeId: escapeIdField, escapeTable, patchItem }
