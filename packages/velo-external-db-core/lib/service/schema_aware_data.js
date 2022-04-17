@@ -13,7 +13,7 @@ class SchemaAwareDataService {
         const projection = await this.schemaFieldNamesFor(collectionName, fields)
 
         const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection)
-        return { items: this.itemTransformer.patchItemsBooleanFields(items, fields), totalCount }
+        return { items: this.itemTransformer.patchItems(items, fields), totalCount }
     }
 
     async getById(collectionName, itemId) {
