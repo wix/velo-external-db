@@ -15,7 +15,8 @@ const { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } =
 
 
 class ConnectorRouter {
-    constructor(connector, config) {
+    constructor({ connector, config, hooks }) {
+        this.isInitialized(connector)
         this.connector = connector
         this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), new CommonConfigValidator(config))
         
@@ -32,7 +33,13 @@ class ConnectorRouter {
         this.cleanup = connector.cleanup
         
         initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService)
-        this.router = createRouter()
+        this.router = createRouter(hooks)
+    }
+
+    isInitialized(connector) {
+        if (!connector.initialized) {
+            throw new Error('Connector must be initialized before being used')
+        }
     }
 }
 
