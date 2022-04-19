@@ -1,7 +1,8 @@
 const { translateErrorCodes, notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeId, escapeTable } = require('./mssql_utils')
-const { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData } = require('velo-external-db-commons')
+const { supportedOperations } = require('./supported_operations')
 const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
 class SchemaProvider {
     constructor(pool) {
@@ -32,7 +33,7 @@ class SchemaProvider {
     }
 
     supportedOperations() {
-        return AllSchemaOperations
+        return supportedOperations
     }
 
     async create(collectionName, columns) {

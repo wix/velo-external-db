@@ -4,7 +4,7 @@ const { SystemFields } = require('velo-external-db-commons')
 const itemTransformer = {
     prepareItemsForInsert: jest.fn(),
     prepareItemsForUpdate: jest.fn(),
-    patchItemsBooleanFields: jest.fn()
+    patchItems: jest.fn()
 }
 
 const systemFields = SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) )
@@ -18,13 +18,13 @@ const givenPreparedItemsForUpdateWith = (prepared, items) =>
                                            .mockReturnValue(prepared)
 
 const givenPatchedBooleanFieldsWith = (patched, items) =>
-    when(itemTransformer.patchItemsBooleanFields).calledWith(items, systemFields)
+    when(itemTransformer.patchItems).calledWith(items, systemFields)
                                       .mockReturnValue(patched)
 
 const reset = () => {
     itemTransformer.prepareItemsForInsert.mockClear()
     itemTransformer.prepareItemsForUpdate.mockClear()
-    itemTransformer.patchItemsBooleanFields.mockClear()
+    itemTransformer.patchItems.mockClear()
 }
 
 module.exports = { itemTransformer, givenPreparedItemsForInsertWith, givenPreparedItemsForUpdateWith, givenPatchedBooleanFieldsWith, reset }

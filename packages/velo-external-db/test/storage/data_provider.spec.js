@@ -1,10 +1,10 @@
 const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('test-commons')
-const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator } = require('velo-external-db-commons').SchemaOperations
+const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator, FindObject } = require('velo-external-db-commons').SchemaOperations
 
 const Chance = require('chance')
 const gen = require('../gen')
 const { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/provider_resources')
-const { entitiesWithOwnerFieldOnly } = require ('../drivers/data_provider_matchers') //todo: move toggleCase to utils
+const { entitiesWithOwnerFieldOnly, entityWithObjectField } = require ('../drivers/data_provider_matchers') //todo: move toggleCase to utils
 const chance = new Chance()
 
 describe(`Data API: ${currentDbImplementationName()}`, () => {
@@ -145,6 +145,16 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         await expect( env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.numberEntity])
     })
+    
+    testIfSupportedOperationsIncludes(supportedOperations, [ FindObject ])('insert entity with object', async() => {
+        await env.schemaProvider.create(ctx.objectCollectionName, [ctx.objectColumn])
+        env.driver.stubEmptyFilterAndSortFor('', '')
+        env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
+        
+        await expect( env.dataProvider.insert(ctx.objectCollectionName, [ctx.objectEntity], ctx.objectEntityFields)).resolves.toEqual(1)
+        await expect( env.dataProvider.find(ctx.objectCollectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual(entityWithObjectField(ctx.objectEntity, ctx.objectEntityFields))
+    })
+
 
     testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('delete data from collection', async() => {
         await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)
@@ -233,6 +243,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
     const ctx = {
         collectionName: Uninitialized,
         numericCollectionName: Uninitialized,
+        objectCollectionName: Uninitialized,
         filter: Uninitialized,
         aggregation: Uninitialized,
         sort: Uninitialized,
@@ -241,10 +252,12 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         projection: Uninitialized,
         column: Uninitialized,
         numericColumns: Uninitialized,
+        objectColumn: Uninitialized,
         aliasColumns: Uninitialized,
         entity: Uninitialized,
         entityFields: Uninitialized,
         numberEntity: Uninitialized,
+        objectEntity: Uninitialized,
         anotherNumberEntity: Uninitialized,
         modifiedEntity: Uninitialized,
         anotherEntity: Uninitialized,
@@ -252,13 +265,16 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         entities: Uninitialized,
         modifiedEntities: Uninitialized,
         numberEntityFields: Uninitialized,
+        objectEntityFields: Uninitialized,
     }
 
     beforeEach(async() => {
         ctx.collectionName = gen.randomCollectionName()
         ctx.numericCollectionName = gen.randomCollectionName()
+        ctx.objectCollectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
         ctx.numericColumns = gen.randomNumberColumns()
+        ctx.objectColumn = gen.randomObjectColumn()
         ctx.aliasColumns = ctx.numericColumns.map(() => chance.word())
         ctx.filter = chance.word()
         ctx.aggregation = { processingStep: chance.word(), postFilteringStep: chance.word() }
@@ -273,7 +289,9 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         ctx.entities = gen.randomDbEntities([ctx.column.name])
         ctx.modifiedEntities = ctx.entities.map(e => ( { ...e, [ctx.column.name]: chance.word() } ))
         ctx.numberEntity = gen.randomNumberDbEntity(ctx.numericColumns)
+        ctx.objectEntity = gen.randomObjectDbEntity([ctx.objectColumn])
         ctx.numberEntityFields = gen.systemFieldsWith(ctx.numericColumns)
+        ctx.objectEntityFields = gen.systemFieldsWith([ctx.objectColumn])
         ctx.anotherNumberEntity = gen.randomNumberDbEntity(ctx.numericColumns)
         ctx.matchesEntity =  { ...ctx.entity, [ctx.column.name]: gen.randomMatchesValueWithDashes() }
 

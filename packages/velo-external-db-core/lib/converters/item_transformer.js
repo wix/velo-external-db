@@ -27,6 +27,28 @@ class ItemTransformer {
         return items.map(i => this.patchBoolean(i, fields.filter(f => f.type === 'boolean')))
     }
 
+    patchItems(items, fields) {
+        const patchedBooleanItems = items.map(i => this.patchBoolean(i, fields.filter(f => f.type === 'boolean')))
+        const patchedObjectItems = patchedBooleanItems.map(i => this.patchObject(i, fields.filter(f => f.type === 'object')))
+        return patchedObjectItems
+    }
+
+    patchObject(item, fields) {
+        const patchedItem = { ...item }
+
+        fields.forEach(({ field, type }) => {
+            if (type === 'object' && typeof(patchedItem[field]) !== 'object' ) {
+                try {
+                    patchedItem[field] = JSON.parse(patchedItem[field])
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+        })
+
+        return patchedItem 
+    }
+
     patchBoolean(item, fields) {
         const i = { ...item }
     
@@ -71,6 +93,8 @@ class ItemTransformer {
                 return dateTimeProvider.currentDateTime()
             case 'boolean':
                 return false
+            case 'object':
+                return null
         }
     }
 

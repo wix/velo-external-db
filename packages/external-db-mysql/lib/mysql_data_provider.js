@@ -1,6 +1,6 @@
-const { escapeId, escapeTable } = require('./mysql_utils')
+const { escapeId, escapeTable, patchItem } = require('./mysql_utils')
 const { promisify } = require('util')
-const { asParamArrays, patchDateTime, updateFieldsFor } = require('velo-external-db-commons')
+const { asParamArrays, updateFieldsFor } = require('velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 const { wildCardWith } = require('./mysql_utils')
 
@@ -35,7 +35,7 @@ class DataProvider {
         const escapedFieldsNames = fields.map( f => escapeId(f.field)).join(', ')
         const sql = `INSERT INTO ${escapeTable(collectionName)} (${escapedFieldsNames}) VALUES ?`
         
-        const data = items.map(item => asParamArrays( patchDateTime(item) ) )
+        const data = items.map(item => asParamArrays( patchItem(item) ) )
         const resultset = await this.query(sql, [data])
                                     .catch( translateErrorCodes )
         return resultset.affectedRows
@@ -46,7 +46,7 @@ class DataProvider {
         const queries = items.map(() => `UPDATE ${escapeTable(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ?`).join(', ')} WHERE _id = ?` )
                              .join(';')
         const updatables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
-                                .map(u => asParamArrays( patchDateTime(u) ))
+                                .map(u => asParamArrays( patchItem(u) ))
         const resultset = await this.query(queries, [].concat(...updatables))
                                     .catch( translateErrorCodes )
 

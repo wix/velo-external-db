@@ -21,7 +21,7 @@ const QueryOperatorsByFieldType = {
     url: ['eq', 'ne', 'contains', 'hasSome'],
     datetime: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'],
     image: [],
-    object: ['eq', 'ne', 'contains'],
+    object: ['eq', 'ne'],
 }
 
 const QueryOperationsByFieldType = {
@@ -31,7 +31,7 @@ const QueryOperationsByFieldType = {
     url: [...QueryOperatorsByFieldType.url, 'urlized'],
     datetime: [...QueryOperatorsByFieldType.datetime],
     image: QueryOperatorsByFieldType.image,
-    object: QueryOperatorsByFieldType.object,
+    object: [...QueryOperatorsByFieldType.object, 'isEmpty', 'isNotEmpty'],
 }
 
 
@@ -53,6 +53,7 @@ const SchemaOperations = Object.freeze({
     StartWithCaseSensitive: 'startWithCaseSensitive',
     StartWithCaseInsensitive: 'startWithCaseInsensitive',
     Projection: 'projection',
+    FindObject: 'findObject',
     Matches: 'matches',
     NotOperator: 'not',
 })
