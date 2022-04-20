@@ -23,7 +23,34 @@ const initServices = (_schemaAwareDataService, _schemaService, _operationService
     roleAuthorizationService = _roleAuthorizationService
 }
 
-const createRouter = () => {
+const opt = {
+    schemaAwareDataService
+}
+
+const hookBeforeAction = async(actionName, req, res, hooks) => {
+    if (hooks[actionName]) {
+        try{
+            await hooks[actionName](req, req, opt)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+}
+
+const hookAfterAction = async(actionName, res, req, data, hooks) => {
+    if (hooks[actionName]) {
+        try {
+            const dataAfterHook = await hooks[actionName](res, req, data, opt)
+            return dataAfterHook || data
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    return data
+}
+
+const createRouter = (hooks) => {
     const router = express.Router()
     router.use(express.json())
     router.use(compression())
@@ -38,18 +65,23 @@ const createRouter = () => {
         res.render('index', appInfo)
     })
 
-    router.post('/provision', (req, res) => {
+    router.post('/provision', async(req, res) => {
         const { type, vendor } = cfg
-        res.json({ type, vendor, protocolVersion: 2 })
+        await hookBeforeAction('provisionBefore', req, res, hooks)
+        const data = { type, vendor, protocolVersion: 2 }
+        const dataAfterAction = await hookAfterAction('provisionAfter', req, res, data, hooks)
+        res.json(dataAfterAction)
     })
 
     // *************** Data API **********************
     router.post('/data/find', async(req, res, next) => {
         try {
+            await hookBeforeAction('dataFindBefore', req, res, hooks)
             const { collectionName, filter, sort, skip, limit } = req.body
             await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), sort, skip, limit)
-            res.json(data)
+            const dataAfterAction = await hookAfterAction('dataFindAfter', req, res, data, hooks)
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }

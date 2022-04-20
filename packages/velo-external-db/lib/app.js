@@ -20,7 +20,10 @@ const initMySqlConnector = async() => {
             secretKey: process.env.SECRET_KEY
         },
         hooks: {
-            
+            // <HookBeforeAction>: async(req, res, opt) => {
+            // },
+            // <HookAfterAction>: async(req, res, data, opt) => {
+            // },
         }
     })
 
