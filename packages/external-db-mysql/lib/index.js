@@ -14,6 +14,7 @@ const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 class MySqlConnector {
     constructor(config, options) {
         this.type = 'mysql'
+        this.initialized = false
         this.config = config
         this.options = options
         this.configValidator = new MySqlConfigValidator(config)  
@@ -26,6 +27,7 @@ class MySqlConnector {
         this.databaseOperations = databaseOperations
         this.connection = connection
         this.cleanup = cleanup
+        this.initialized = true
         return { dataProvider, schemaProvider, databaseOperations, connection, cleanup }
     }    
 }
