@@ -1,6 +1,6 @@
 const { Uninitialized, gen: genCommon } = require('test-commons')
 const { appInfoFor, maskSensitiveData } = require ('./app_info')
-const driver = require('../../test/drivers/app_info_test_support')
+const driver = require('../../../velo-external-db/test/drivers/app_info_test_support') //TODO: change driver location
 
 describe('App info Function', () => {
     test('get app info will retrieve valid config and will create app info object', async() => {
