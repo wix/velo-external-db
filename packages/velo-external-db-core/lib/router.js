@@ -30,17 +30,20 @@ const opt = {
 const hookBeforeAction = async(actionName, req, res, hooks) => {
     if (hooks[actionName]) {
         try{
-            await hooks[actionName](req, req, opt)
+            await hooks[actionName](req, res, opt)
         } catch (e) {
             console.error(e)
         }
     }
 }
 
-const hookAfterAction = async(actionName, res, req, data, hooks) => {
+const hookAfterAction = async(actionName, req, res, data, hooks) => {
+    const opt = {
+        schemaAwareDataService
+    }
     if (hooks[actionName]) {
         try {
-            const dataAfterHook = await hooks[actionName](res, req, data, opt)
+            const dataAfterHook = await hooks[actionName](req, res, data, opt)
             return dataAfterHook || data
         } catch (e) {
             console.error(e)
