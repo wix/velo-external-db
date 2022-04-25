@@ -1,42 +1,86 @@
 const express = require('express')
-const { create } = require('external-db-config')
-const { MySqlConnector } = require('external-db-mysql')
-const { ConnectorRouter } = require ('velo-external-db-core')
+const { create, readCommonConfig } = require('external-db-config')
+// const { MySqlConnector } = require('external-db-mysql')
+const { ConnectorRouter } = require('velo-external-db-core')
+const { engineConnectorFor } = require('./storage/factory')
 
+let started = false
+let server, _schemaProvider, _cleanup
 
-const initMySqlConnector = async() => {
+const initConnector = async() => {
+    const { vendor, type: adapterType } = readCommonConfig()
     const configReader = create()
-    const mySqlConfig = await configReader.readConfig()
-    
-    
-    const { host, user, password, db, authorization } = mySqlConfig
+    const config = await configReader.readConfig()
 
-    const mySqlConnector = new MySqlConnector({ host, user, password, db })
-    await mySqlConnector.initProviders()
+    const engineConnector = engineConnectorFor(adapterType, config)
+
+    const { schemaProvider, cleanup } = await engineConnector.initProviders()
+
     const connectorRouter = new ConnectorRouter({
-        connector: mySqlConnector,
+        connector: engineConnector,
         config: {
-            authorization: { roleConfig: { collectionLevelConfig: authorization } },
-            secretKey: process.env.SECRET_KEY
+            authorization: {
+                roleConfig: {
+                    collectionLevelConfig: config.authorization
+                }
+            },
+            secretKey: config.secretKey,
+            vendor
         },
-        hooks: {
-            // <HookBeforeAction>: async(req, res, opt) => {
-            // },
-            // <HookAfterAction>: async(req, res, data, opt) => {
-            // },
-        }
+        hooks: {}
     })
 
+    _cleanup = async() => {
+        await cleanup()
+    }
+    _schemaProvider = schemaProvider
+    
+    return { router: connectorRouter.router }
+}
+
+initConnector().then(({ router }) => {
     const app = express()
     app.set('view engine', 'ejs')
 
-    app.use(connectorRouter.router)
-    
-    app.listen(8080, () => console.log('MySql connector listening on port 8080'))
-}
+    app.use(router)
+
+    server = app.listen(8080, () => console.log('Connector listening on port 8080'))
+
+    started = true
+})
+
+const internals = () => ({ server, schemaProvider: _schemaProvider, cleanup: _cleanup, started, reload: initConnector })
+
+// const initMySqlConnector = async () => {
+//     const configReader = create()
+//     const mySqlConfig = await configReader.readConfig()
 
 
-initMySqlConnector()
+//     const { host, user, password, db, authorization } = mySqlConfig
+
+//     const mySqlConnector = new MySqlConnector({ host, user, password, db })
+//     await mySqlConnector.initProviders()
+//     const connectorRouter = new ConnectorRouter({
+//         connector: mySqlConnector,
+//         config: {
+//             authorization: { roleConfig: { collectionLevelConfig: authorization } },
+//             secretKey: process.env.SECRET_KEY
+//         },
+//         hooks: {
+//             // <HookBeforeAction>: async(req, res, opt) => {
+//             // },
+//             // <HookAfterAction>: async(req, res, data, opt) => {
+//             // },
+//         }
+//     })
+
+//     const app = express()
+//     app.set('view engine', 'ejs')
+
+//     app.use(connectorRouter.router)
+
+//     app.listen(8080, () => console.log('MySql connector listening on port 8080'))
+// }
 
 
-module.exports = {  }
+module.exports = { internals }

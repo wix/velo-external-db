@@ -1,5 +1,46 @@
 const append = (res, secretKey) => ( { ...res, secretKey: secretKey } )
 
+
+const engineConnectorFor = (type, config) => {
+    switch ( type.toLowerCase() ) {
+        case 'postgres': {
+            return require('external-db-postgres')
+        }
+        case 'spanner': {
+            return require('external-db-spanner')
+        }
+        case 'firestore': {
+            return require('external-db-firestore')
+        }
+        case 'mssql': {
+            return require('external-db-mssql')
+        }
+        case 'mysql': {
+            const { MySqlConnector } = require('external-db-mysql')
+            return new MySqlConnector(config)
+        }
+        case 'mongo': {
+            return require('external-db-mongo')
+        }
+        case 'google-sheet': {
+            return require('external-db-google-sheets')
+        }
+        case 'airtable': {
+            return require('external-db-airtable')
+        }
+        case 'dynamodb': {
+            return require('external-db-dynamodb')
+        }
+        case 'bigquery': {
+            return require('external-db-bigquery')
+        }
+        default: {
+            return require('./stub-db/init')
+        }
+    }
+}
+
+
 const init = async(_type, vendor, config) => {
     const type = _type || ''
     console.log(`INIT: ${vendor + '/' + type}`)
@@ -60,4 +101,4 @@ const init = async(_type, vendor, config) => {
     }
 }
 
-module.exports = { init }
+module.exports = { init, engineConnectorFor }

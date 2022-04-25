@@ -29,7 +29,8 @@ class ConnectorRouter {
         this.itemTransformer = new ItemTransformer()
         this.schemaAwareDataService = new SchemaAwareDataService(this.dataService, this.queryValidator, this.schemaInformation, this.itemTransformer)
         this.schemaService = new SchemaService(connector.schemaProvider, this.schemaInformation)
-        this.roleAuthorizationService = new RoleAuthorizationService(connector.authorization)
+        //TODO: get only the collection level config object and change the authorization validator
+        this.roleAuthorizationService = new RoleAuthorizationService(config.authorization?.roleConfig?.collectionLevelConfig) 
         this.cleanup = connector.cleanup
         
         initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService)
