@@ -1,7 +1,7 @@
 const express = require('express')
 const { create, readCommonConfig } = require('external-db-config')
 // const { MySqlConnector } = require('external-db-mysql')
-const { ConnectorRouter } = require('velo-external-db-core')
+const { ExternalDbRouter } = require('velo-external-db-core')
 const { engineConnectorFor } = require('./storage/factory')
 
 let started = false
@@ -16,7 +16,7 @@ const initConnector = async() => {
 
     const { schemaProvider, cleanup } = await engineConnector.initialize(config)
 
-    const connectorRouter = new ConnectorRouter({
+    const externalDbRouter = new ExternalDbRouter({
         connector: engineConnector,
         config: {
             authorization: {
@@ -35,7 +35,7 @@ const initConnector = async() => {
     }
     _schemaProvider = schemaProvider
     
-    return { router: connectorRouter.router }
+    return { router: externalDbRouter.router }
 }
 
 initConnector().then(({ router }) => {
@@ -60,7 +60,7 @@ const internals = () => ({ server, schemaProvider: _schemaProvider, cleanup: _cl
 
 //     const mySqlConnector = new MySqlConnector({ host, user, password, db })
 //     await mySqlConnector.initProviders()
-//     const connectorRouter = new ConnectorRouter({
+//     const externalDbRouter = new ExternalDbRouter({
 //         connector: mySqlConnector,
 //         config: {
 //             authorization: { roleConfig: { collectionLevelConfig: authorization } },
@@ -77,7 +77,7 @@ const internals = () => ({ server, schemaProvider: _schemaProvider, cleanup: _cl
 //     const app = express()
 //     app.set('view engine', 'ejs')
 
-//     app.use(connectorRouter.router)
+//     app.use(externalDbRouter.router)
 
 //     app.listen(8080, () => console.log('MySql connector listening on port 8080'))
 // }

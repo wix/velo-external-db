@@ -14,7 +14,7 @@ const { RoleAuthorizationService } = require ('external-db-security')
 const { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } = require ('external-db-config')
 
 
-class ConnectorRouter {
+class ExternalDbRouter {
     constructor({ connector, config, hooks }) {
         this.isInitialized(connector)
         this.connector = connector
@@ -45,4 +45,4 @@ class ConnectorRouter {
 }
 
 
-module.exports = { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, ConnectorRouter }
+module.exports = { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, ExternalDbRouter }
