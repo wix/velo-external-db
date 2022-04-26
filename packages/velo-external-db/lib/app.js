@@ -27,7 +27,8 @@ const initConnector = async() => {
             secretKey: config.secretKey,
             vendor
         },
-        hooks: {}
+        hooks: {
+        }
     })
 
     _cleanup = async() => {
