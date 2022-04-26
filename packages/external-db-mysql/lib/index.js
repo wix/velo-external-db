@@ -12,21 +12,19 @@ const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 
 
 class MySqlConnector {
-    constructor(config, options) {
+    constructor() {
         this.type = 'mysql'
         this.initialized = false
-        this.config = config
-        this.options = options
-        this.configValidator = new MySqlConfigValidator(config)  
     }
-
-    async initProviders() {
-        const { dataProvider, schemaProvider, databaseOperations, connection, cleanup } = await init(this.config, this.options)
+    
+    async initialize(config, options) {
+        const { dataProvider, schemaProvider, databaseOperations, connection, cleanup } = await init(config, options)
         this.dataProvider = dataProvider
         this.schemaProvider = schemaProvider
         this.databaseOperations = databaseOperations
         this.connection = connection
         this.cleanup = cleanup
+        this.configValidator = new MySqlConfigValidator(config)  
         this.initialized = true
         return { dataProvider, schemaProvider, databaseOperations, connection, cleanup }
     }    

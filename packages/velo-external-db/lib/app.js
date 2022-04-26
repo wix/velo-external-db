@@ -12,9 +12,9 @@ const initConnector = async() => {
     const configReader = create()
     const config = await configReader.readConfig()
 
-    const engineConnector = engineConnectorFor(adapterType, config)
+    const engineConnector = engineConnectorFor(adapterType)
 
-    const { schemaProvider, cleanup } = await engineConnector.initProviders()
+    const { schemaProvider, cleanup } = await engineConnector.initialize(config)
 
     const connectorRouter = new ConnectorRouter({
         connector: engineConnector,
