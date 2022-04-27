@@ -1,7 +1,7 @@
 const append = (res, secretKey) => ( { ...res, secretKey: secretKey } )
 
 
-const engineConnectorFor = (type) => {
+const engineConnectorFor = async(type, config) => {
     switch ( type.toLowerCase() ) {
         case 'postgres': {
             const { PostgresConnector } = require('external-db-postgres')
@@ -17,8 +17,8 @@ const engineConnectorFor = (type) => {
             return require('external-db-mssql')
         }
         case 'mysql': {
-            const { MySqlConnector } = require('external-db-mysql')
-            return new MySqlConnector()
+            const { mySqlFactory } = require('external-db-mysql')
+            return await mySqlFactory(config)
         }
         case 'mongo': {
             return require('external-db-mongo')

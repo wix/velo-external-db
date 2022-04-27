@@ -30,4 +30,11 @@ class MySqlConnector {
     }    
 }
 
-module.exports = { SchemaProvider, DataProvider, FilterParser, SchemaColumnTranslator, driver, init, opsDriver, DatabaseOperations, supportedOperations, MySqlConnector }
+const mySqlFactory = async(config, options) => {
+    const connector = new MySqlConnector()
+    const { connection, cleanup, ...providers } = await connector.initialize(config, options)
+    return { connector, connection, providers, cleanup }
+} 
+
+
+module.exports = { SchemaProvider, DataProvider, FilterParser, SchemaColumnTranslator, driver, init, opsDriver, DatabaseOperations, supportedOperations, MySqlConnector, mySqlFactory }

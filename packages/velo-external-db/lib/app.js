@@ -12,9 +12,7 @@ const initConnector = async() => {
     const configReader = create()
     const config = await configReader.readConfig()
 
-    const engineConnector = await engineConnectorFor(adapterType)
-
-    const { schemaProvider, cleanup } = await engineConnector.initialize(config)
+    const { connector: engineConnector, providers, cleanup } = await engineConnectorFor(adapterType, config)
 
     const externalDbRouter = new ExternalDbRouter({
         connector: engineConnector,
@@ -34,7 +32,7 @@ const initConnector = async() => {
     _cleanup = async() => {
         await cleanup()
     }
-    _schemaProvider = schemaProvider
+    _schemaProvider = providers.schemaProvider
     
     return { externalDbRouter }
 }
