@@ -12,7 +12,7 @@ const initConnector = async() => {
     const configReader = create()
     const config = await configReader.readConfig()
 
-    const engineConnector = engineConnectorFor(adapterType)
+    const engineConnector = await engineConnectorFor(adapterType)
 
     const { schemaProvider, cleanup } = await engineConnector.initialize(config)
 
@@ -53,13 +53,14 @@ const internals = () => ({ server, schemaProvider: _schemaProvider, cleanup: _cl
 // const initMySqlConnector = async () => {
 //     const configReader = create()
 //     const mySqlConfig = await configReader.readConfig()
-
+//     const mySqlFactory = new MySqlFactory()
 
 //     const { host, user, password, db, authorization } = mySqlConfig
 
-//     const mySqlConnector = new MySqlConnector({ host, user, password, db })
-//     await mySqlConnector.initProviders()
-//     const externalDbRouter = new ExternalDbRouter({
+//     const mySqlConnector = await mySqlFactory.create(config)
+//     // const mySqlConnector = new MySqlConnector({ host, user, password, db })
+//     // await mySqlConnector.initProviders()
+//     const externalDbRouter = new ExternalDb({
 //         connector: mySqlConnector,
 //         config: {
 //             authorization: { roleConfig: { collectionLevelConfig: authorization } },

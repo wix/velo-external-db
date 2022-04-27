@@ -7,8 +7,6 @@ const maskSensitiveData = (cfg) => {
 
 const appInfoFor = async(operationService, configReaderClient) => {
     const connectionStatus = await operationService.connectionStatus()
-    // const config = await configReaderClient.readConfig()
-    // console.log(configReaderClient);
     const { message: configReaderStatus, authorizationMessage: authorizationConfigStatus } = await configReaderClient.configStatus()
     
     return {

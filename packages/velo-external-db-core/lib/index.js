@@ -49,5 +49,4 @@ class ExternalDbRouter {
     }
 }
 
-
 module.exports = { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, ExternalDbRouter }
