@@ -104,7 +104,6 @@ const createRouter = (hooks) => {
     router.post('/data/insert', async(req, res, next) => {
         try {
             await hookBeforeAction('beforeInsert', req, res, hooks)
-            console.log('here after before action hook')
             const { collectionName, item } = req.body
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.insert(collectionName, item)
@@ -142,7 +141,6 @@ const createRouter = (hooks) => {
     router.post('/data/update', async(req, res, next) => {
         try {
             await hookBeforeAction('beforeUpdate', req, res, hooks)
-            console.log('here after before update action hook')
             const { collectionName, item } = req.body
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.update(collectionName, item)

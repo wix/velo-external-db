@@ -37,6 +37,11 @@ class ExternalDbRouter {
         this.router = createRouter(hooks)
     }
 
+    applyDefaultConfiguration(app) {
+        app.set('view engine', 'ejs')
+        app.use(this.router)
+    }
+
     isInitialized(connector) {
         if (!connector.initialized) {
             throw new Error('Connector must be initialized before being used')

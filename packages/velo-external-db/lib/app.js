@@ -36,14 +36,12 @@ const initConnector = async() => {
     }
     _schemaProvider = schemaProvider
     
-    return { router: externalDbRouter.router }
+    return { externalDbRouter }
 }
 
-initConnector().then(({ router }) => {
+initConnector().then(({ externalDbRouter }) => {
     const app = express()
-    app.set('view engine', 'ejs')
-
-    app.use(router)
+    externalDbRouter.applyDefaultConfiguration(app)
 
     server = app.listen(8080, () => console.log('Connector listening on port 8080'))
 
