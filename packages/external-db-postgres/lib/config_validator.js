@@ -1,4 +1,4 @@
-const { checkRequiredKeys } = require('../../velo-external-db-core/node_modules/external-db-config/lib/utils/config_utils')
+const { checkRequiredKeys } = require('velo-external-db-commons')
 
 class PostgresConfigValidator {
     constructor(config) {
