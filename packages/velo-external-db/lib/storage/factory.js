@@ -4,8 +4,8 @@ const append = (res, secretKey) => ( { ...res, secretKey: secretKey } )
 const engineConnectorFor = async(type, config) => {
     switch ( type.toLowerCase() ) {
         case 'postgres': {
-            const { PostgresConnector } = require('external-db-postgres')
-            return new PostgresConnector()
+            const { postgresFactory } = require('external-db-postgres')
+            return await postgresFactory(config)
         }
         case 'spanner': {
             return require('external-db-spanner')
