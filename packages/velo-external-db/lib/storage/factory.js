@@ -8,7 +8,8 @@ const engineConnectorFor = async(type, config) => {
             return await postgresFactory(config)
         }
         case 'spanner': {
-            return require('external-db-spanner')
+            const { spannerFactory } = require('external-db-spanner')
+            return await spannerFactory(config)
         }
         case 'firestore': {
             return require('external-db-firestore')
