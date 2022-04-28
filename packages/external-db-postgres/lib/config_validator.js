@@ -1,7 +1,8 @@
-const { checkRequiredKeys } = require('velo-external-db-commons')
-
+const { checkRequiredKeys, checkThatHasAtLestOneRequiredKeys } = require('velo-external-db-commons')
 class PostgresConfigValidator {
     constructor(config) {
+        this.requiredKeys = ['user', 'password', 'db'] 
+        this.hostKeyOptions = ['host', 'cloudSqlConnectionName']
         this.config = config
     }
 
@@ -10,8 +11,10 @@ class PostgresConfigValidator {
     }
 
     validate() {
+        const missingRequiredKeys = checkRequiredKeys(this.config, this.requiredKeys) 
+        const missingRequiredHostKey = checkThatHasAtLestOneRequiredKeys(this.config, this.hostKeyOptions)
         return {
-          missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['host', 'user', 'password', 'db'])
+          missingRequiredSecretsKeys: [...missingRequiredKeys, ...missingRequiredHostKey ]
         }
     }
 }
