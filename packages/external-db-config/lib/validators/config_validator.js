@@ -19,7 +19,6 @@ class ConfigValidator {
         let message
         
         if (missingRequiredConnectorEnvs.length || missingRequiredCommonEnvs.length) {
-            console.log(missingRequiredConnectorEnvs)
             message = `Missing props: ${[...missingRequiredConnectorEnvs, ...missingRequiredCommonEnvs].join(', ')}`
         }
         else
