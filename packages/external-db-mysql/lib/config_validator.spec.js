@@ -1,6 +1,6 @@
 const each = require('jest-each').default
 const { Uninitialized } = require('test-commons')
-const { MySqlConfigValidator } = require('./config_validator')
+const { MySqlConfigValidator } = require('./mysql_config_validator')
 const gen = require('../tests/gen')
 
 describe('MySqlConfigValidator', () => {

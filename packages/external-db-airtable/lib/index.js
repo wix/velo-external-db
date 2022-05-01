@@ -5,7 +5,7 @@ const SchemaColumnTranslator = require('./sql_schema_translator')
 const init = require('./connection_provider')
 const { app: mockServer } = require('../tests/drivers/mock_air_table')
 const { supportedOperations } = require('./supported_operations')
-const { AirtableConfigValidator } = require('./config_validator')
+const { AirtableConfigValidator } = require('./airtable_config_validator')
 const DatabaseOperations = require('./airtable_operations')
 const { DbConnector } = require('velo-external-db-commons')
 

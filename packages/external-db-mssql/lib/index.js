@@ -5,7 +5,7 @@ const SchemaColumnTranslator = require('./sql_schema_translator')
 const init = require('./connection_provider')
 const DatabaseOperations = require('./mssql_operations')
 const { supportedOperations } = require('./supported_operations')
-const { MSSQLConfigValidator } = require('./config_validator')
+const { MSSQLConfigValidator } = require('./mssql_config_validator')
 const { DbConnector } = require('velo-external-db-commons')
 
 const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')

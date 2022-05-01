@@ -1,6 +1,6 @@
 const each = require('jest-each').default
 const { Uninitialized } = require('test-commons')
-const { PostgresConfigValidator } = require('./config_validator')
+const { PostgresConfigValidator } = require('./postgres_config_validator')
 const gen = require('../tests/gen')
 
 describe('PostgresConfigValidator', () => {

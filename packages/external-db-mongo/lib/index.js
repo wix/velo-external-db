@@ -5,7 +5,7 @@ const init = require('./connection_provider')
 const DatabaseOperations = require('./mongo_operations')
 const { supportedOperations } = require('./supported_operations')
 const { DbConnector } = require ('velo-external-db-commons')
-const { MongoConfigValidator } = require('./config_validator')
+const { MongoConfigValidator } = require('./mongo_config_validator')
 
 const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 const opsDriver = () => require('../tests/drivers/db_operations_test_support')

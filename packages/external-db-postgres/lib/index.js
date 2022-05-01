@@ -5,7 +5,7 @@ const SchemaColumnTranslator = require('./sql_schema_translator')
 const init = require('./connection_provider')
 const DatabaseOperations = require('./postgres_operations')
 const { supportedOperations } = require('./supported_operations')
-const { PostgresConfigValidator } = require('./config_validator')
+const { PostgresConfigValidator } = require('./postgres_config_validator')
 const { DbConnector } = require('velo-external-db-commons')
 
 const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
