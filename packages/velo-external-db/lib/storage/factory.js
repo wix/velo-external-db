@@ -36,7 +36,8 @@ const engineConnectorFor = async(type, config) => {
             return await airtableFactory(config)
         }
         case 'dynamodb': {
-            return require('external-db-dynamodb')
+            const { dynamoDbFactory } = require('external-db-dynamodb')
+            return await dynamoDbFactory(config)
         }
         case 'bigquery': {
             return require('external-db-bigquery')
