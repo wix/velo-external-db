@@ -23,7 +23,8 @@ const engineConnectorFor = async(type, config) => {
             return await mySqlFactory(config)
         }
         case 'mongo': {
-            return require('external-db-mongo')
+            const { mongoFactory } = require('external-db-mongo')
+            return await mongoFactory(config)
         }
         case 'google-sheet': {
             return require('external-db-google-sheets')

@@ -42,7 +42,7 @@ jobs:
                    "spanner",
                    "mysql", "mysql5",
                    "mssql", "mssql17",
-                  #  "mongo", "mongo4",
+                   "mongo", "mongo4",
                   #  "firestore",
                   #  "airtable",
                   #  "dynamodb",
