@@ -40,7 +40,8 @@ const engineConnectorFor = async(type, config) => {
             return await dynamoDbFactory(config)
         }
         case 'bigquery': {
-            return require('external-db-bigquery')
+            const { bigqueryFactory } = require('external-db-bigquery')
+            return await bigqueryFactory(config)
         }
         default: {
             return require('./stub-db/init')
