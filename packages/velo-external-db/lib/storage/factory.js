@@ -28,7 +28,8 @@ const engineConnectorFor = async(type, config) => {
             return await mongoFactory(config)
         }
         case 'google-sheet': {
-            return require('external-db-google-sheets')
+            const { googleSheetFactory } = require('external-db-google-sheets')
+            return await googleSheetFactory(config)
         }
         case 'airtable': {
             const { airtableFactory } = require('external-db-airtable')
