@@ -30,7 +30,8 @@ const engineConnectorFor = async(type, config) => {
             return require('external-db-google-sheets')
         }
         case 'airtable': {
-            return require('external-db-airtable')
+            const { airtableFactory } = require('external-db-airtable')
+            return await airtableFactory(config)
         }
         case 'dynamodb': {
             return require('external-db-dynamodb')
