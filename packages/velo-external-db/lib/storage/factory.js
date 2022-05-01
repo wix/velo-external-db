@@ -15,7 +15,8 @@ const engineConnectorFor = async(type, config) => {
             return require('external-db-firestore')
         }
         case 'mssql': {
-            return require('external-db-mssql')
+            const { mssqlFactory } = require('external-db-mssql')
+            return await mssqlFactory(config)
         }
         case 'mysql': {
             const { mySqlFactory } = require('external-db-mysql')
