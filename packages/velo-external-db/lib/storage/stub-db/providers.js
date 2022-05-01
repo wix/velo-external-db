@@ -1,6 +1,23 @@
+const { checkRequiredKeys } = require('velo-external-db-commons')
 const { UnsupportedDatabase } = require('velo-external-db-commons').errors
 
 class StubDataProvider {}
+
+class StubConfigValidator {
+    constructor(config) {
+        this.config = config
+    }
+
+    readConfig() {
+        return this.config
+    }
+
+    validate() {
+        return {
+          missingRequiredSecretsKeys: checkRequiredKeys(this.config, [])
+        }
+    }
+}
 
 class StubDatabaseOperations {
     constructor(type) {
@@ -21,4 +38,4 @@ class StubSchemaProvider {
     }
 }
 
-module.exports = { StubDataProvider, StubDatabaseOperations, StubSchemaProvider }
+module.exports = { StubDataProvider, StubDatabaseOperations, StubSchemaProvider, StubConfigValidator }

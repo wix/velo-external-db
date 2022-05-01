@@ -1,7 +1,8 @@
 const append = (res, secretKey) => ( { ...res, secretKey: secretKey } )
 
 
-const engineConnectorFor = async(type, config) => {
+const engineConnectorFor = async(_type, config) => {
+    const type = _type || ''
     switch ( type.toLowerCase() ) {
         case 'postgres': {
             const { postgresFactory } = require('external-db-postgres')
@@ -44,7 +45,8 @@ const engineConnectorFor = async(type, config) => {
             return await bigqueryFactory(config)
         }
         default: {
-            return require('./stub-db/init')
+            const { stubFactory } = require('./stub-db/stub-connector')
+            return await stubFactory(type, config)
         }
     }
 }
