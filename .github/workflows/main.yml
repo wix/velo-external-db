@@ -43,10 +43,10 @@ jobs:
                    "mysql", "mysql5",
                    "mssql", "mssql17",
                    "mongo", "mongo4",
-                  #  "firestore",
+                   "firestore",
                    "airtable",
-                  #  "dynamodb",
-                  #  "google-sheets"
+                   "dynamodb",
+                   "google-sheets"
                    ]
 
     steps:
