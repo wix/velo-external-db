@@ -1,6 +1,5 @@
 const express = require('express')
 const { create, readCommonConfig } = require('external-db-config')
-// const { MySqlConnector } = require('external-db-mysql')
 const { ExternalDbRouter } = require('velo-external-db-core')
 const { engineConnectorFor } = require('./storage/factory')
 
@@ -39,7 +38,8 @@ const initConnector = async() => {
 
 initConnector().then(({ externalDbRouter }) => {
     const app = express()
-    externalDbRouter.applyDefaultConfiguration(app)
+    app.use(externalDbRouter.router)
+    externalDbRouter.enableAppInfo(app)
 
     server = app.listen(8080, () => console.log('Connector listening on port 8080'))
 

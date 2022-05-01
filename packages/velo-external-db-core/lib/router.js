@@ -12,6 +12,9 @@ const path = require('path')
 
 let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer, roleAuthorizationService
 
+let appInfoEnabled = false
+const enableAppInfo = () => appInfoEnabled = true
+
 const initServices = (_schemaAwareDataService, _schemaService, _operationService, _externalDbConfigClient, _cfg, _filterTransformer, _aggregationTransformer, _roleAuthorizationService) => {
     schemaService = _schemaService
     operationService = _operationService
@@ -65,7 +68,7 @@ const createRouter = (hooks) => {
     // *************** INFO **********************
     router.get('/', async(req, res) => {
         const appInfo = await appInfoFor(operationService, externalDbConfigClient)
-        res.render('index', appInfo)
+        appInfoEnabled ? res.render('index', appInfo): res.json(appInfo)
     })
 
     router.post('/provision', async(req, res) => {
@@ -274,4 +277,4 @@ const createRouter = (hooks) => {
 
     return router
 }
-module.exports = { createRouter, initServices }
+module.exports = { createRouter, initServices, enableAppInfo }

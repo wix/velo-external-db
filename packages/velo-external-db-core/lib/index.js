@@ -9,7 +9,7 @@ const AggregationTransformer = require ('./converters/aggregation_transformer')
 const QueryValidator = require ('./converters/query_validator')
 const SchemaAwareDataService = require ('./service/schema_aware_data')
 const ItemTransformer = require('./converters/item_transformer')
-const { initServices, createRouter } = require('./router')
+const { initServices, createRouter, enableAppInfo } = require('./router')
 const { RoleAuthorizationService } = require ('external-db-security')
 const { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } = require ('external-db-config')
 
@@ -29,7 +29,7 @@ class ExternalDbRouter {
         this.itemTransformer = new ItemTransformer()
         this.schemaAwareDataService = new SchemaAwareDataService(this.dataService, this.queryValidator, this.schemaInformation, this.itemTransformer)
         this.schemaService = new SchemaService(connector.schemaProvider, this.schemaInformation)
-        //TODO: get only the collection level config object and change the authorization validator
+
         this.roleAuthorizationService = new RoleAuthorizationService(config.authorization?.roleConfig?.collectionLevelConfig) 
         this.cleanup = connector.cleanup
         
@@ -37,9 +37,10 @@ class ExternalDbRouter {
         this.router = createRouter(hooks)
     }
 
-    applyDefaultConfiguration(app) {
+    enableAppInfo(app) {
+        app.set('views', `${__dirname}/views`)
         app.set('view engine', 'ejs')
-        app.use(this.router)
+        enableAppInfo()
     }
 
     isInitialized(connector) {
