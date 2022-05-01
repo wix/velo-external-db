@@ -39,7 +39,7 @@ jobs:
       matrix:
         database: [
                    "postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
-                  #  "spanner",
+                   "spanner",
                    "mysql", "mysql5",
                   #  "mssql", "mssql17",
                   #  "mongo", "mongo4",
