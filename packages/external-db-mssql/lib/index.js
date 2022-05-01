@@ -6,26 +6,15 @@ const init = require('./connection_provider')
 const DatabaseOperations = require('./mssql_operations')
 const { supportedOperations } = require('./supported_operations')
 const { MSSQLConfigValidator } = require('./config_validator')
+const { DbConnector } = require('velo-external-db-commons')
 
 const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 
-class MSSQLConnector {
+class MSSQLConnector extends DbConnector {
     constructor() {
+        super(MSSQLConfigValidator, init)
         this.type = 'mssql'
-        this.initialized = false
-    }
-
-    async initialize(config, options) {
-        const { dataProvider, schemaProvider, databaseOperations, connection, cleanup } = await init(config, options)
-        this.dataProvider = dataProvider
-        this.schemaProvider = schemaProvider
-        this.databaseOperations = databaseOperations
-        this.connection = connection
-        this.cleanup = cleanup
-        this.configValidator = new MSSQLConfigValidator(config)
-        this.initialized = true
-        return { dataProvider, schemaProvider, databaseOperations, connection, cleanup }
     }
 }
 

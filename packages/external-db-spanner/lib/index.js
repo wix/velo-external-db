@@ -6,27 +6,16 @@ const DatabaseOperations = require('./spanner_operations')
 const ConfigValidator = require ('./spanner_config_validator')
 const init = require('./connection_provider')
 const { supportedOperations } = require('./supported_operations')
+const { DbConnector } = require('velo-external-db-commons')
 
 const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 
-class SpannerConnector {
+class SpannerConnector extends DbConnector {
     constructor() {
+        super(ConfigValidator, init)
         this.type = 'spanner'
-        this.initialized = false
     }
-    
-    async initialize(config, options) {
-        const { dataProvider, schemaProvider, databaseOperations, connection, cleanup } = init(config, options)
-        this.dataProvider = dataProvider
-        this.schemaProvider = schemaProvider
-        this.databaseOperations = databaseOperations
-        this.connection = connection
-        this.cleanup = cleanup
-        this.configValidator = new ConfigValidator(config)  
-        this.initialized = true
-        return { dataProvider, schemaProvider, databaseOperations, connection, cleanup }
-    }    
 }
 
 const spannerFactory = async(config, options) => {
