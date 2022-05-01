@@ -12,7 +12,8 @@ const engineConnectorFor = async(type, config) => {
             return await spannerFactory(config)
         }
         case 'firestore': {
-            return require('external-db-firestore')
+            const { firestoreFactory } = require('external-db-firestore')
+            return await firestoreFactory(config)
         }
         case 'mssql': {
             const { mssqlFactory } = require('external-db-mssql')
