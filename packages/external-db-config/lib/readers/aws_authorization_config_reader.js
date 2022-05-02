@@ -44,7 +44,7 @@ class AwsAuthorizationConfigReader {
 
         const { ROLE_CONFIG: roleConfig } = config
 
-        const valid = isJson(roleConfig) && this.configValidator(JSON.parse(roleConfig))
+        const valid = isJson(roleConfig) && this.configValidator(jsonParser(roleConfig))
 
         let message 
         
