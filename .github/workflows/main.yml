@@ -37,7 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        database: ["postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
+        database: [
+                   "postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
                    "spanner",
                    "mysql", "mysql5",
                    "mssql", "mssql17",
@@ -45,7 +46,8 @@ jobs:
                    "firestore",
                    "airtable",
                    "dynamodb",
-                   "google-sheets"]
+                   "google-sheets"
+                   ]
 
     steps:
       - uses: actions/checkout@v2

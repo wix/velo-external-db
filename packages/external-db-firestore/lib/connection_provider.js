@@ -4,7 +4,7 @@ const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./firestore_operations')
 const Firestore = require('@google-cloud/firestore')
 
-const init = ([projectId]) => {
+const init = ({ projectId }) => {
     const firestore = new Firestore({
         projectId: projectId,
     })

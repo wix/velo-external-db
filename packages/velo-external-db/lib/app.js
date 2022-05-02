@@ -1,71 +1,51 @@
 const express = require('express')
-const path = require('path')
-const { config } = require('../roles-config.json')
-const compression = require('compression')
-const { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer } = require('velo-external-db-core')
-const { RoleAuthorizationService } = require ('external-db-security')
-const { init } = require('./storage/factory')
-const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
-const { authRoleMiddleware } = require('./web/auth-role-middleware')
-const { unless, includes } = require('./web/middleware-support')
-const { createRouter, initServices } = require('./router')
 const { create, readCommonConfig } = require('external-db-config')
-const { errorMiddleware } = require('./web/error-middleware')
+const { ExternalDbRouter } = require('velo-external-db-core')
+const { engineConnectorFor } = require('./storage/factory')
 
 let started = false
 let server, _schemaProvider, _cleanup
 
-const load = async() => {
+const initConnector = async() => {
     const { vendor, type: adapterType } = readCommonConfig()
     const configReader = create()
-    const { authorization } = await configReader.readConfig()
-    const { dataProvider, schemaProvider, cleanup, databaseOperations, secretKey } = await init(adapterType, vendor, configReader)
-    const operationService = new OperationService(databaseOperations)
-    const schemaInformation = new CacheableSchemaInformation(schemaProvider)
-    const filterTransformer = new FilterTransformer()
-    const aggregationTransformer = new AggregationTransformer(filterTransformer)
-    const queryValidator = new QueryValidator()
-    const dataService = new DataService(dataProvider)
-    const itemTransformer = new ItemTransformer()
-    const schemaAwareDataService = new SchemaAwareDataService(dataService, queryValidator, schemaInformation, itemTransformer)
-    const schemaService = new SchemaService(schemaProvider, schemaInformation)
-    const roleAuthorizationService = new RoleAuthorizationService(authorization)
-    
-    initServices(schemaAwareDataService, schemaService, operationService, configReader, { vendor, type: adapterType }, filterTransformer, aggregationTransformer, roleAuthorizationService)
-    
+    const config = await configReader.readConfig()
+
+    const { connector: engineConnector, providers, cleanup } = await engineConnectorFor(adapterType, config)
+
+    const externalDbRouter = new ExternalDbRouter({
+        connector: engineConnector,
+        config: {
+            authorization: {
+                roleConfig: {
+                    collectionLevelConfig: config.authorization
+                }
+            },
+            secretKey: config.secretKey,
+            vendor
+        },
+        hooks: {
+        }
+    })
+
     _cleanup = async() => {
         await cleanup()
     }
-
-    _schemaProvider = schemaProvider
-
-    return { secretKey }
+    _schemaProvider = providers.schemaProvider
+    
+    return { externalDbRouter }
 }
 
-
-load().then(({ secretKey }) => {
+initConnector().then(({ externalDbRouter }) => {
     const app = express()
+    app.use(externalDbRouter.router)
+    externalDbRouter.enableAppInfo(app)
 
-    app.use('/assets', express.static(path.join(__dirname, '..', 'assets')))
-    app.use(express.json())
-    app.use(unless(['/', '/provision', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: secretKey })))
-    config.forEach( ( { pathPrefix, roles }) => app.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
-
-    app.use(compression())
-    app.set('view engine', 'ejs')
-
-    const router = createRouter()
-
-    app.use('/', router)
-    app.use(errorMiddleware)
-
-    const port = process.env.PORT || 8080
-    server = app.listen(port)
+    server = app.listen(8080, () => console.log('Connector listening on port 8080'))
 
     started = true
 })
 
-const internals = () => ({ server: server, schemaProvider: _schemaProvider, cleanup: _cleanup, started: started, reload: load })
-
+const internals = () => ({ server, schemaProvider: _schemaProvider, cleanup: _cleanup, started, reload: initConnector })
 
 module.exports = { internals }

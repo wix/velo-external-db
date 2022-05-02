@@ -3,8 +3,17 @@ const { errorMiddleware } = require('./web/error-middleware')
 const { appInfoFor } = require ('./health/app_info')
 const { InvalidRequest, ItemNotFound } = require('velo-external-db-commons').errors
 const { extractRole } = require('./web/auth-role-middleware')
+const { config } = require('../roles-config.json')
+const compression = require('compression')
+const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
+const { authRoleMiddleware } = require('./web/auth-role-middleware')
+const { unless, includes } = require('./web/middleware-support')
+const path = require('path')
 
 let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer, roleAuthorizationService
+
+let appInfoEnabled = false
+const enableAppInfo = () => appInfoEnabled = true
 
 const initServices = (_schemaAwareDataService, _schemaService, _operationService, _externalDbConfigClient, _cfg, _filterTransformer, _aggregationTransformer, _roleAuthorizationService) => {
     schemaService = _schemaService
@@ -17,26 +26,68 @@ const initServices = (_schemaAwareDataService, _schemaService, _operationService
     roleAuthorizationService = _roleAuthorizationService
 }
 
-const createRouter = () => {
+const opt = {
+    schemaAwareDataService
+}
+
+const hookBeforeAction = async(actionName, req, res, hooks) => {
+    if (hooks[actionName]) {
+        try{
+            await hooks[actionName](req, res, opt)
+        } catch (e) {
+            throw({ status: 400, message: e })
+        }
+    }
+}
+
+const hookAfterAction = async(actionName, req, res, data, hooks) => {
+    const opt = {
+        schemaAwareDataService
+    }
+    if (hooks[actionName]) {
+        try {
+            const dataAfterHook = await hooks[actionName](req, res, data, opt)
+            return dataAfterHook || data
+        } catch (e) {
+            throw({ status: 400, message: e })
+        }
+    }
+
+    return data
+}
+
+const createRouter = (hooks) => {
     const router = express.Router()
+    router.use(express.json())
+    router.use(compression())
+    router.use('/assets', express.static(path.join(__dirname, 'assets')))
+    router.use(unless(['/', '/provision', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: cfg.secretKey })))
+    
+    config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
     // *************** INFO **********************
     router.get('/', async(req, res) => {
         const appInfo = await appInfoFor(operationService, externalDbConfigClient)
-        res.render('index', appInfo)
+        appInfoEnabled ? res.render('index', appInfo): res.json(appInfo)
     })
 
-    router.post('/provision', (req, res) => {
-        res.json({ ...cfg, protocolVersion: 2 })
+    router.post('/provision', async(req, res) => {
+        const { type, vendor } = cfg
+        await hookBeforeAction('provisionBefore', req, res, hooks)
+        const data = { type, vendor, protocolVersion: 2 }
+        const dataAfterAction = await hookAfterAction('provisionAfter', req, res, data, hooks)
+        res.json(dataAfterAction)
     })
 
     // *************** Data API **********************
     router.post('/data/find', async(req, res, next) => {
         try {
+            await hookBeforeAction('dataFindBefore', req, res, hooks)
             const { collectionName, filter, sort, skip, limit } = req.body
             await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), sort, skip, limit)
-            res.json(data)
+            const dataAfterAction = await hookAfterAction('dataFindAfter', req, res, data, hooks)
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
@@ -55,6 +106,7 @@ const createRouter = () => {
 
     router.post('/data/insert', async(req, res, next) => {
         try {
+            await hookBeforeAction('beforeInsert', req, res, hooks)
             const { collectionName, item } = req.body
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.insert(collectionName, item)
@@ -91,6 +143,7 @@ const createRouter = () => {
 
     router.post('/data/update', async(req, res, next) => {
         try {
+            await hookBeforeAction('beforeUpdate', req, res, hooks)
             const { collectionName, item } = req.body
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.update(collectionName, item)
@@ -224,4 +277,4 @@ const createRouter = () => {
 
     return router
 }
-module.exports = { createRouter, initServices }
+module.exports = { createRouter, initServices, enableAppInfo }

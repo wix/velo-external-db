@@ -8,7 +8,7 @@
     "lint": "eslint --cache ./",
     "lint:fix": "eslint --cache --fix ./",
     "test": "npm run test:core; npm run test:postgres; npm run test:spanner; npm run test:mysql; npm run test:mssql; npm run test:firestore; npm run test:mongo; npm run test:airtable; npm run test:dynamodb; npm run test:bigquery",
-    "test:core": "lerna exec --scope '{external-db-config,velo-external-db-core,velo-external-db,external-db-security}' \"npm test\"",
+    "test:core": "lerna exec --scope '{external-db-config,velo-external-db-core,external-db-security}' \"npm test\"",
     "test:postgres": "lerna exec --scope external-db-postgres \"npm test\" && lerna exec --scope velo-external-db \"npm run test:postgres\"",
     "test:postgres13": "npm run test:postgres",
     "test:postgres12": "npm run test:postgres",

@@ -1,0 +1,20 @@
+{
+    "config": [
+        {
+            "pathPrefix": "/schemas/column",
+            "roles": ["OWNER"]
+        },
+        {
+            "pathPrefix": "/schemas/create",
+            "roles": ["OWNER"]
+        },
+        {
+            "pathPrefix": "/schemas/list",
+            "roles": ["OWNER", "BACKEND_CODE", "MEMBER"]
+        },
+        {
+            "pathPrefix": "/schemas/find",
+            "roles": ["OWNER", "BACKEND_CODE", "MEMBER", "VISITOR"]
+        }
+    ]
+}

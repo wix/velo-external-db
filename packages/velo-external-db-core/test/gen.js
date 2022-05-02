@@ -53,4 +53,16 @@ const randomDbsWithIdColumn = () => randomDbs().map(i => ({ ...i, fields: [ ...i
 const truthyValue = () => chance.pickone(['true', '1', 1, true])
 const falsyValue = () => chance.pickone(['false', '0', 0, false])
 
-module.exports = { randomOperator, randomFilter, randomWixType, invalidOperatorForType, randomObjectFromArray, randomColumn, randomDb, randomDbsWithIdColumn, randomCollections, randomDbs, randomCollectionName, truthyValue, falsyValue }
+const randomKeyObject = (obj) => {
+    const objectKeys = Object.keys(obj)
+    const selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
+    return selectedKey
+}
+
+const deleteRandomKeyObject = (obj) => {
+    const deletedKey = randomKeyObject(obj)
+    delete obj[deletedKey]
+    return { deletedKey, newObject: obj }
+}
+
+module.exports = { randomOperator, randomFilter, randomWixType, invalidOperatorForType, randomObjectFromArray, randomColumn, randomDb, randomDbsWithIdColumn, randomCollections, randomDbs, randomCollectionName, truthyValue, falsyValue, deleteRandomKeyObject }

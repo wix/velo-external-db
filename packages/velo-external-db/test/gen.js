@@ -97,19 +97,6 @@ const systemFieldsWith = fields => {
         , systemFields)
 }
 
-
-const randomKeyObject = (obj) => {
-    const objectKeys = Object.keys(obj)
-    const selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
-    return selectedKey
-}
-
-const deleteRandomKeyObject = (obj) => {
-    const deletedKey = randomKeyObject(obj)
-    delete obj[deletedKey]
-    return { deletedKey, newObject: obj }
-}
-
 const randomMatchesValueWithDashes = () => {
     const num = chance.natural({ min: 2, max: 5 })
     const arr = []
@@ -119,7 +106,6 @@ const randomMatchesValueWithDashes = () => {
     return arr.join('-')
 }
 
-module.exports = {
-    randomDbEntities, randomDbEntity, randomNumberDbEntity, randomNumberColumns, randomColumn, randomCollectionName,
-    systemFieldsWith, deleteRandomKeyObject, randomMatchesValueWithDashes, randomObjectColumn, randomObjectDbEntity
-}
+
+
+module.exports = { randomDbEntities, randomDbEntity, randomNumberDbEntity, randomNumberColumns, randomColumn, randomCollectionName, systemFieldsWith, randomMatchesValueWithDashes, randomObjectColumn, randomObjectDbEntity }

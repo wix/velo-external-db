@@ -1,6 +1,6 @@
 const { Uninitialized } = require('test-commons')
 const { secretKeyAuthMiddleware } = require('./auth-middleware')
-const driver = require('../../test/drivers/auth_middleware_test_support')
+const driver = require('../../test/drivers/auth_middleware_test_support') //TODO: change driver location
 const { UnauthorizedError } = require('velo-external-db-commons').errors
 const Chance = require('chance')
 const chance = Chance()
