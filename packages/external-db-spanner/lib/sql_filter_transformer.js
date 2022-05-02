@@ -171,7 +171,7 @@ class FilterParser {
 
     prepareStatementVariables(n, fieldName) {
 
-        return Array.from({ length: n }, (_, i) => validateLiteral(`${patchFieldName(fieldName)}${i + 1}`) )
+        return Array.from({ length: n }, (_, i) => validateLiteral(`${(fieldName)}${i + 1}`) )
                     .join(', ')
     }
 

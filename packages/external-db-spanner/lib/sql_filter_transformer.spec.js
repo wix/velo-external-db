@@ -1,6 +1,6 @@
 const FilterParser = require('./sql_filter_transformer')
 const { EmptySort, AdapterOperators, AdapterFunctions } = require('velo-external-db-commons')
-const { escapeId } = require('./spanner_utils')
+const { escapeId, escapeFieldId } = require('./spanner_utils')
 const { Uninitialized, gen } = require('test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
@@ -114,13 +114,32 @@ describe('Sql Parser', () => {
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `${escapeId(ctx.fieldName)} IN (@${ctx.fieldName}1, @${ctx.fieldName}2, @${ctx.fieldName}3, @${ctx.fieldName}4, @${ctx.fieldName}5)`,
+                    filterExpr: `${escapeFieldId(ctx.fieldName)} IN (@${ctx.fieldName}1, @${ctx.fieldName}2, @${ctx.fieldName}3, @${ctx.fieldName}4, @${ctx.fieldName}5)`,
                     parameters: {
                         [`${ctx.fieldName}1`]: ctx.fieldListValue[0],
                         [`${ctx.fieldName}2`]: ctx.fieldListValue[1],
                         [`${ctx.fieldName}3`]: ctx.fieldListValue[2],
                         [`${ctx.fieldName}4`]: ctx.fieldListValue[3],
                         [`${ctx.fieldName}5`]: ctx.fieldListValue[4],
+                    }
+                }])
+            })
+
+            test('correctly transform operator [include] with _id field', () => {
+                const filter = {
+                    operator: include,
+                    fieldName: '_id',
+                    value: ctx.fieldListValue
+                }
+
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    filterExpr: `${escapeFieldId(filter.fieldName)} IN (@${filter.fieldName}1, @${filter.fieldName}2, @${filter.fieldName}3, @${filter.fieldName}4, @${filter.fieldName}5)`,
+                    parameters: {
+                        [`${filter.fieldName}1`]: ctx.fieldListValue[0],
+                        [`${filter.fieldName}2`]: ctx.fieldListValue[1],
+                        [`${filter.fieldName}3`]: ctx.fieldListValue[2],
+                        [`${filter.fieldName}4`]: ctx.fieldListValue[3],
+                        [`${filter.fieldName}5`]: ctx.fieldListValue[4],
                     }
                 }])
             })
