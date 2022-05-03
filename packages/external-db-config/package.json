@@ -1,26 +1,29 @@
 {
 	"name": "external-db-config",
 	"version": "0.0.0",
-	"description": "> TODO: description",
-	"author": "Max Polsky <maxim.polski@gmail.com>",
-	"homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
-	"license": "ISC",
+	"description": "",
+	"homepage": "https://github.com/wix/velo-external-db#readme",
+	"license": "MIT",
 	"main": "lib/index.js",
+	"directories": {
+		"lib": "lib",
+		"test": "tests"
+	},
+	"files": [ "lib" ],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/wix/velo-external-db.git",
+		"directory": "packages/external-db-config"
+	},
+	"bugs": {
+		"url": "https://github.com/wix/velo-external-db/issues"
+	},
 	"scripts": {
 		"test": "jest"
 	},
-	"directories": {
-		"lib": "lib"
-	},
-	"files": [
-		"lib"
-	],
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/wix-private/noam-external-db-poc.git"
-	},
-	"bugs": {
-		"url": "https://github.com/wix-private/noam-external-db-poc/issues"
+	"dependencies": {
+		"@aws-sdk/client-secrets-manager": "^3.53.0",
+		"ajv": "^8.10.0"
 	},
 	"devDependencies": {
 		"aws-sdk-client-mock": "^0.6.0",
@@ -28,11 +31,6 @@
 		"jest": "^27.5.1",
 		"jest-each": "^27.4.6",
 		"jest-when": "^3.5.1",
-
 		"test-commons": "^0.0.0"
-	},
-	"dependencies": {
-		"@aws-sdk/client-secrets-manager": "^3.53.0",
-		"ajv": "^8.10.0"
 	}
 }
