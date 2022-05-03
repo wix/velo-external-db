@@ -1,4 +1,4 @@
-const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn, shouldRunOnlyOn } = require('test-commons')
+const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('test-commons')
 const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator, FindObject } = require('velo-external-db-commons').SchemaOperations
 
 const Chance = require('chance')
@@ -155,7 +155,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         await expect( env.dataProvider.find(ctx.objectCollectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual(entityWithObjectField(ctx.objectEntity, ctx.objectEntityFields))
     })
 
-    if (shouldRunOnlyOn(['MySql', 'Spanner', 'Postgres', 'Sql Server', 'BigQuery', 'DynamoDb', 'Firestore'], currentDbImplementationName())) {
+    if (shouldNotRunOn(['Google-Sheet', 'Airtable'], currentDbImplementationName())) {
         test('include operator on _id field', async() => { 
         await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
         env.driver.givenIncludeFilterFor_idColumn(ctx.filter, ctx.entity._id)
