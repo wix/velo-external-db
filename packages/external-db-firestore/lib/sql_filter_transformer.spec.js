@@ -1,29 +1,19 @@
 const FilterParser = require('./sql_filter_transformer')
 const { Uninitialized } = require('test-commons')
+const { LastLetterCoder } = require('./firestore_utils')
+const { randomSupportedFilter } = require('../tests/gen')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()
 const { AdapterOperators } = require('velo-external-db-commons')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, urlized } = AdapterOperators
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_contains, and, urlized } = AdapterOperators
 
 const EmptySort = []
-
-const randomFilter = () => {
-    const operator = chance.pickone([ne, lt, lte, gt, gte, include, eq, string_begins, string_ends])
-    const fieldName = chance.word()
-    const value = operator === include ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
-    return {
-        fieldName,
-        operator,
-        value
-    }
-}
 
 describe('Fire Store Parser', () => {
 
     describe('sort parser', () => {
-
         // todo: should we even check for valid input or should we let the validation library to handle this ?
         test('handles undefined sort', () => {
             expect( env.filterParser.orderBy('') ).toEqual(EmptySort)
@@ -67,8 +57,7 @@ describe('Fire Store Parser', () => {
         })
     })
 
-    describe('filter parser', () => {
-
+    describe('filter parser', () => {})
         test('handles undefined filter', () => {
             expect( env.filterParser.parseFilter('') ).toEqual([])
             expect( env.filterParser.parseFilter(undefined) ).toEqual([])
@@ -84,8 +73,7 @@ describe('Fire Store Parser', () => {
                 value: env.filterParser.parseFilter(ctx.filter)[0].value
             }])
         })
-        
-        })
+
 
         describe('handle single field operator', () => {
             each([
@@ -175,64 +163,56 @@ describe('Fire Store Parser', () => {
                     value
                 }])
             })
-
-            describe('handle string operators', () => {
-                test('operator [string_contains] will throw an exception', () => {
-                    const filter = {
-                        operator: string_contains,
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldValue
-                    }
-
-                    expect(() => env.filterParser.parseFilter(filter)).toThrow(InvalidQuery)
-                })
-
-                each([
-                    string_begins, string_ends,
-                ]).test('correctly transform operator [%s]', (o) => {
-                    const filter = {
-                        operator: o,
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldValue
-                    }
-
-                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        fieldName: ctx.fieldName,
-                        opStr: env.filterParser.adapterOperatorToFirestoreOperator(o, ctx.fieldValue),
-                        value: ctx.fieldValue,
-                    }])
-
-                })
-
-                test('operator [urlized] will throw an exception', () => {
-                    const filter = {
-                        operator: urlized,
-                        fieldName: ctx.fieldName,
-                        value: ctx.fieldListValue
-                    }
-
-                    expect(() => env.filterParser.parseFilter(filter)).toThrow(InvalidQuery)
-
-                })
-            
         })
 
-        describe('handle multi field operator', () => {
-            each([
-                and
-            ]).test('correctly transform operator [%s]', (o) => {
-                const filter = {
-                    operator: o,
-                    value: [ctx.filter, ctx.anotherFilter]
-                }
+    describe('handle string operators', () => {
+        test('operator [string_contains] will throw an exception', () => {
+            const filter = {
+                operator: string_contains,
+                fieldName: ctx.fieldName,
+                value: ctx.fieldValue
+            }
+            expect(() => env.filterParser.parseFilter(filter)).toThrow(InvalidQuery)
+        })
+            
+        test('correctly transform operator [begins]', () => {
+            const filter = {
+                operator: string_begins,
+                fieldName: ctx.fieldName,
+                value: ctx.fieldValue
+            }
 
-                const filter1 = env.filterParser.parseFilter(ctx.filter)[0]
-                const filter2 = env.filterParser.parseFilter(ctx.anotherFilter)[0]
-                expect( env.filterParser.parseFilter(filter) ).toEqual([
-                    filter1,
-                    filter2
-                ])
-            })
+            expect( env.filterParser.parseFilter(filter) ).toEqual([
+                { fieldName: ctx.fieldName, opStr: '>=', value: ctx.fieldValue, },
+                { fieldName: ctx.fieldName, opStr: '<', value: ctx.fieldValue + LastLetterCoder }
+            ])
+        })
+
+        test('operator [urlized] will throw an exception', () => {
+            const filter = {
+                operator: urlized,
+                fieldName: ctx.fieldName,
+                value: ctx.fieldListValue
+            }
+
+            expect(() => env.filterParser.parseFilter(filter)).toThrow(InvalidQuery)
+
+        })
+    })
+
+    describe('handle multi field operator', () => {
+        each([ and ]).test('correctly transform operator [%s]', (o) => {
+            const filter = {
+                operator: o,
+                value: [ctx.filter, ctx.anotherFilter]
+            }
+
+            const filter1 = env.filterParser.parseFilter(ctx.filter)[0]
+            const filter2 = env.filterParser.parseFilter(ctx.anotherFilter)[0]
+            expect( env.filterParser.parseFilter(filter) ).toEqual([
+                filter1,
+                filter2
+            ])
         })
     })
 
@@ -259,8 +239,8 @@ describe('Fire Store Parser', () => {
         ctx.fieldValue = chance.word()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
-        ctx.filter = randomFilter()
-        ctx.anotherFilter = randomFilter()
+        ctx.filter = randomSupportedFilter()
+        ctx.anotherFilter = randomSupportedFilter()
 
         ctx.offset = chance.natural({ min: 2, max: 20 })
     })
@@ -269,5 +249,6 @@ describe('Fire Store Parser', () => {
         env.filterParser = new FilterParser
     })
 
-
 })
+
+
