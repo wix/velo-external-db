@@ -91,7 +91,8 @@ describe('Sql Parser', () => {
                     filterExpr: {
                         FilterExpression: `#${ctx.fieldName} IN (:0, :1, :2, :3, :4)`,
                         ExpressionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName },
-                        ExpressionAttributeValues: { ...ctx.fieldListValue } 
+                        ExpressionAttributeValues: { ':0': ctx.fieldListValue[0], ':1': ctx.fieldListValue[1], ':2': ctx.fieldListValue[2],
+                                                     ':3': ctx.fieldListValue[3], ':4': ctx.fieldListValue[4] } 
                     }
                 }])
             })
