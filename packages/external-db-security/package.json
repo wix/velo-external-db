@@ -1,26 +1,25 @@
 {
   "name": "external-db-security",
   "version": "0.0.0",
-  "description": "> external-db-security",
-  "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
-  "license": "ISC",
+  "description": "",
+  "homepage": "https://github.com/wix/velo-external-db#readme",
+  "license": "MIT",
   "main": "lib/index.js",
   "directories": {
     "lib": "lib",
-    "test": "test"
+    "test": "tests"
   },
-  "files": [
-    "lib"
-  ],
+  "files": [ "lib" ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
+    "url": "git+https://github.com/wix/velo-external-db.git",
+    "directory": "packages/external-db-security"
+  },
+  "bugs": {
+    "url": "https://github.com/wix/velo-external-db/issues"
   },
   "scripts": {
     "test": "jest"
-  },
-  "bugs": {
-    "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.47.0",
