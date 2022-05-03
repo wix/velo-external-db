@@ -89,17 +89,13 @@ class FilterParser {
             if (value === undefined || value.length === 0)
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
 
-            const filterExpressionVariables = { ...value }
-
             return [{
                 filterExpr: {
-                    FilterExpression: `#${fieldName} IN (${Object.keys(filterExpressionVariables).map(f => `:${f}`).join(', ')})`,
+                    FilterExpression: `#${fieldName} IN (${value.map((_v, i) => `:${i}`).join(', ')})`,
                     ExpressionAttributeNames: {
                         [`#${fieldName}`]: fieldName
                     },
-                    ExpressionAttributeValues: {
-                        ...filterExpressionVariables
-                    }
+                    ExpressionAttributeValues: value.reduce((pV, cV, i) => ({ ...pV, [`:${i}`]: cV }), {})                 
                 }
             }] 
 
