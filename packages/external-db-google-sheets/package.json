@@ -1,16 +1,22 @@
 {
   "name": "external-db-google-sheets",
   "version": "0.0.0",
-  "license": "ISC",
+  "description": "",
+  "homepage": "https://github.com/wix/velo-external-db#readme",
+  "license": "MIT",
   "main": "lib/index.js",
   "directories": {
-    "lib": "lib"
+    "lib": "lib",
+    "test": "tests"
   },
-  "files": [
-    "lib"
-  ],
+  "files": [ "lib" ],
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/wix/velo-external-db.git",
+    "directory": "packages/external-db-google-sheets"
+  },
+  "bugs": {
+    "url": "https://github.com/wix/velo-external-db/issues"
   },
   "scripts": {
     "test": ""
@@ -24,7 +30,6 @@
   "devDependencies": {
     "jest": "^27.5.1",
     "test-commons": "^0.0.0",
-
     "jest-when": "^3.5.1"
   }
 }
