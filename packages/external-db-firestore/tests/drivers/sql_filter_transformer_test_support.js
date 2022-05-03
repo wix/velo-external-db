@@ -85,6 +85,14 @@ const givenGreaterThenFilterFor = (filter, column, value) =>
                                     value,
                                 }])
 
+const givenIncludeFilterFor_idColumn = (filter, value) => 
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue([{
+                                    fieldName: '_id',
+                                    opStr: 'in',
+                                    value: [value],
+                                }])
+
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -95,6 +103,6 @@ const reset = () => {
 
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor, givenGreaterThenFilterFor,
+                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor, givenGreaterThenFilterFor, givenIncludeFilterFor_idColumn,
                    filterParser, reset
                 }
