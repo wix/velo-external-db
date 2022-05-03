@@ -56,6 +56,7 @@ const SchemaOperations = Object.freeze({
     FindObject: 'findObject',
     Matches: 'matches',
     NotOperator: 'not',
+    IncludeOperator: 'include',
 })
 
 const AllSchemaOperations = Object.values(SchemaOperations)

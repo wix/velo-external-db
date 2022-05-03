@@ -1,5 +1,5 @@
 const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('test-commons')
-const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator, FindObject } = require('velo-external-db-commons').SchemaOperations
+const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator, FindObject, IncludeOperator } = require('velo-external-db-commons').SchemaOperations
 
 const Chance = require('chance')
 const gen = require('../gen')
@@ -155,8 +155,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         await expect( env.dataProvider.find(ctx.objectCollectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual(entityWithObjectField(ctx.objectEntity, ctx.objectEntityFields))
     })
 
-    if (shouldNotRunOn(['Google-Sheet', 'Airtable'], currentDbImplementationName())) {
-        test('include operator on _id field', async() => { 
+    testIfSupportedOperationsIncludes(supportedOperations, [ IncludeOperator ])('include operator on _id field', async() => {
         await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
         env.driver.givenIncludeFilterFor_idColumn(ctx.filter, ctx.entity._id)
         env.driver.stubEmptyOrderByFor(ctx.sort)
@@ -164,7 +163,6 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         await expect( env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 0, 50, ctx.projection) ).resolves.toEqual([ctx.entity])
     })
-    }
 
     testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('delete data from collection', async() => {
         await givenCollectionWith(ctx.entities, ctx.collectionName, ctx.entityFields)
