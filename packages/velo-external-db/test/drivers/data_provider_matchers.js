@@ -1,3 +1,6 @@
+const matchers = require ('jest-extended')
+expect.extend(matchers)
+
 const entitiesWithOwnerFieldOnly = (entities) => expect.arrayContaining(entities.map(e => ({ _owner: e._owner })))
 
 const entityWithObjectField = (entity, entityFields) => {
