@@ -155,7 +155,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         await expect( env.dataProvider.find(ctx.objectCollectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual(entityWithObjectField(ctx.objectEntity, ctx.objectEntityFields))
     })
 
-    if (shouldRunOnlyOn(['MySql', 'Spanner', 'Postgres', 'Sql Server'], currentDbImplementationName())) {
+    if (shouldRunOnlyOn(['MySql', 'Spanner', 'Postgres', 'Sql Server', 'BigQuery'], currentDbImplementationName())) {
         test('include operator on _id field', async() => { 
         await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
         env.driver.givenIncludeFilterFor_idColumn(ctx.filter, ctx.entity._id)
