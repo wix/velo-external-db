@@ -1,29 +1,25 @@
 {
   "name": "test-commons",
   "version": "0.0.0",
-  "description": "> TODO: description",
-  "author": "Noam Almog <noama@wix.com>",
-  "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
-  "license": "ISC",
+  "description": "",
+  "homepage": "https://github.com/wix/velo-external-db#readme",
+  "license": "MIT",
   "main": "lib/index.js",
   "directories": {
-    "lib": "lib"
+    "lib": "lib",
+    "test": "tests"
   },
-  "files": [
-    "lib"
-  ],
-  "publishConfig": {
-    "registry": "http://npm.dev.wixpress.com"
-  },
+  "files": [ "lib" ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
+    "url": "git+https://github.com/wix/velo-external-db.git",
+    "directory": "packages/test-commons"
+  },
+  "bugs": {
+    "url": "https://github.com/wix/velo-external-db/issues"
   },
   "scripts": {
     "test": ""
-  },
-  "bugs": {
-    "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
   "dependencies": {
     "velo-external-db-commons": "^0.0.0",

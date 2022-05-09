@@ -2,7 +2,22 @@
   "name": "velo-external-db",
   "version": "1.0.0",
   "description": "",
+  "homepage": "https://github.com/wix/velo-external-db#readme",
+  "license": "MIT",
   "main": "lib/app.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "files": [ "lib" ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wix/velo-external-db.git",
+    "directory": "packages/velo-external-db"
+  },
+  "bugs": {
+    "url": "https://github.com/wix/velo-external-db/issues"
+  },
   "scripts": {
     "test": "jest lib",
     "test:mysql": "TEST_ENGINE=mysql jest --runInBand ./test",
@@ -19,8 +34,6 @@
     "start": "node lib/app.js",
     "deploy": "gcloud app deploy ./app.yaml"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "compression": "^1.7.4",
     "express": "^4.17.3",

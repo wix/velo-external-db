@@ -1,29 +1,25 @@
 {
   "name": "external-db-airtable",
   "version": "0.0.0",
-  "description": "> TODO: description",
-  "author": "Noam Almog <noama@wix.com>",
-  "homepage": "https://github.com/wix-private/noam-external-db-poc#readme",
-  "license": "ISC",
+  "description": "",
+  "homepage": "https://github.com/wix/velo-external-db#readme",
+  "license": "MIT",
   "main": "lib/index.js",
   "directories": {
-    "lib": "lib"
+    "lib": "lib",
+    "test": "tests"
   },
-  "files": [
-    "lib"
-  ],
-  "publishConfig": {
-    "registry": "http://npm.dev.wixpress.com"
-  },
+  "files": [ "lib" ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wix-private/noam-external-db-poc.git"
+    "url": "git+https://github.com/wix/velo-external-db.git",
+    "directory": "packages/external-db-airtable"
+  },
+  "bugs": {
+    "url": "https://github.com/wix/velo-external-db/issues"
   },
   "scripts": {
     "test": "jest"
-  },
-  "bugs": {
-    "url": "https://github.com/wix-private/noam-external-db-poc/issues"
   },
   "dependencies": {
     "airtable": "^0.11.2",
@@ -35,7 +31,6 @@
     "chance": "^1.1.8",
     "jest": "^27.5.1",
     "test-commons": "^0.0.0",
-
     "jest-when": "^3.5.1"
   }
 }
