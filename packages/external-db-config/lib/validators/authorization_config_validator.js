@@ -10,14 +10,16 @@ class AuthorizationConfigValidator {
     this.collectionValidator = ajv.compile(collectionConfigPattern)
   }
 
-  async readConfig() {
+  readConfig() {
     const { roleConfig } = this.config
     const { collectionLevelConfig } = roleConfig ? roleConfig : EmptyRoleConfig
+
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
 
   validate() {
     const { roleConfig } = this.config
+    
     const valid = this.configValidator(roleConfig)
     let message 
     
