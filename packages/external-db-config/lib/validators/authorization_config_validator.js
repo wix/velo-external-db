@@ -4,7 +4,7 @@ const ajv = new Avj({ strict: false })
 
 class AuthorizationConfigValidator {
   constructor(config) {
-    this.config = config
+    this.config = config || EmptyRoleConfig
 
     this.configValidator = ajv.compile(configPattern)
     this.collectionValidator = ajv.compile(collectionConfigPattern)
