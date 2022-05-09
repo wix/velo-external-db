@@ -20,7 +20,7 @@ const defineValidConfig = (config) => {
         process.env.SECRET_KEY = config.secretKey
     }
     if (config.authorization) {
-        process.env.ROLE_CONFIG = JSON.stringify({ collectionLevelConfig: config.authorization })
+        process.env.ROLE_CONFIG = JSON.stringify( config.authorization )
     }
     if (config.auth?.clientId) {
         process.env.clientId = config.auth.clientId
@@ -43,7 +43,7 @@ const validConfig = () => ({
 
 const validConfigWithAuthorization = () => ({
     ...validConfig(),
-    authorization: validAuthorizationConfig.collectionLevelConfig 
+    authorization: validAuthorizationConfig 
 })
 
 const validConfigWithAuthConfig = () => ({

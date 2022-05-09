@@ -18,7 +18,7 @@ const defineValidConfig = (config) => {
         awsConfig.SECRET_KEY = config.secretKey
     }
     if (config.authorization) {
-        awsConfig.ROLE_CONFIG = JSON.stringify({ collectionLevelConfig: config.authorization })
+        awsConfig.ROLE_CONFIG = JSON.stringify( config.authorization )
     }
     mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(awsConfig) })
 }
@@ -31,7 +31,7 @@ const defineLocalEnvs = (config) => {
         process.env['SECRET_KEY'] = config.secretKey
     }
     if (config.authorization) {
-        process.env['ROLE_CONFIG'] = JSON.stringify({ collectionLevelConfig: config.authorization })
+        process.env['ROLE_CONFIG'] = JSON.stringify( config.authorization )
     }
 }
 

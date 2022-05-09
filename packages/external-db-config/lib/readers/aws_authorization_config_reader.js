@@ -1,5 +1,5 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
-const { checkRequiredKeys, isJson, EmptyRoleConfig, configPattern, collectionConfigPattern, jsonParser } = require('../utils/config_utils')
+const { checkRequiredKeys, isJson, configPattern, collectionConfigPattern, jsonParser } = require('../utils/config_utils')
 const Avj = require('ajv')
 const ajv = new Avj({ strict: false })
 const emptyExternalDbConfig = (err) => ({ externalConfig: {}, secretMangerError: err.message })
@@ -16,9 +16,7 @@ class AwsAuthorizationConfigReader {
     const { config } = await this.readExternalAndLocalConfig()
     const { ROLE_CONFIG: roleConfig } = config
 
-    const { collectionLevelConfig } = (isJson(roleConfig) && Array.isArray( (jsonParser(roleConfig)).collectionLevelConfig ) ) ? jsonParser(roleConfig) : EmptyRoleConfig
-    
-    return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
+    return isJson(roleConfig) ? jsonParser(roleConfig) : roleConfig
   }
 
   async readExternalConfig() { 
