@@ -9,19 +9,17 @@ let server, _schemaProvider, _cleanup
 const initConnector = async() => {
     const { vendor, type: adapterType } = readCommonConfig()
     const configReader = create()
-    const config = await configReader.readConfig()
+    const { authorization, secretKey, ...dbConfig } = await configReader.readConfig()
 
-    const { connector: engineConnector, providers, cleanup } = await engineConnectorFor(adapterType, config)
+    const { connector: engineConnector, providers, cleanup } = await engineConnectorFor(adapterType, dbConfig)
 
     const externalDbRouter = new ExternalDbRouter({
         connector: engineConnector,
         config: {
             authorization: {
-                roleConfig: {
-                    collectionLevelConfig: config.authorization
-                }
+                roleConfig: authorization
             },
-            secretKey: config.secretKey,
+            secretKey,
             vendor
         },
         hooks: {

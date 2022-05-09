@@ -6,7 +6,7 @@ class ConfigValidator {
     }
 
     readConfig() { 
-        return { ...this.connectorValidator.readConfig(), ...this.commonValidator.readConfig() }
+        return { ...this.connectorValidator.readConfig(), ...this.commonValidator.readConfig(), authorization: this.authValidator.readConfig() }
     }
 
     configStatus() {

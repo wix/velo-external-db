@@ -12,7 +12,7 @@ class AuthorizationConfigValidator {
 
   readConfig() {
     const { roleConfig } = this.config
-    const { collectionLevelConfig } = roleConfig ? roleConfig : EmptyRoleConfig
+    const { collectionLevelConfig } = roleConfig && roleConfig.collectionLevelConfig ? roleConfig : EmptyRoleConfig
 
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
