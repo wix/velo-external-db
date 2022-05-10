@@ -33,8 +33,8 @@ class ExternalDbRouter {
         this.roleAuthorizationService = new RoleAuthorizationService(config.authorization?.roleConfig?.collectionPermissions) 
         this.cleanup = connector.cleanup
         
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService)
-        this.router = createRouter(hooks)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
+        this.router = createRouter()
     }
 
     enableAppInfo(app) {
