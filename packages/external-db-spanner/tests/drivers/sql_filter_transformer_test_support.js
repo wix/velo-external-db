@@ -86,7 +86,7 @@ const givenMatchesFilterFor = (filter, column, value) =>
                                     }
                                 })
 
-const givenIncludeFilterFor_idColumn = (filter, id) => 
+const givenIncludeFilterForIdColumn = (filter, id) => 
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: `WHERE ${escapeFieldId('_id')} IN (${validateLiteral('_id')})`, parameters: {
                                     _id: id
@@ -103,6 +103,6 @@ const reset = () => {
 module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
                    stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
                     givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
-                    givenGreaterThenFilterFor, givenNotFilterQueryFor, givenMatchesFilterFor, givenIncludeFilterFor_idColumn,
+                    givenGreaterThenFilterFor, givenNotFilterQueryFor, givenMatchesFilterFor, givenIncludeFilterForIdColumn,
                     filterParser, reset
 }

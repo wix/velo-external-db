@@ -157,7 +157,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
     testIfSupportedOperationsIncludes(supportedOperations, [ IncludeOperator ])('include operator on _id field', async() => {
         await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
-        env.driver.givenIncludeFilterFor_idColumn(ctx.filter, ctx.entity._id)
+        env.driver.givenIncludeFilterForIdColumn(ctx.filter, ctx.entity._id)
         env.driver.stubEmptyOrderByFor(ctx.sort)
         env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
