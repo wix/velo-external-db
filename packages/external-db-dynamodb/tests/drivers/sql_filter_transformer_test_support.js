@@ -101,6 +101,19 @@ const givenNotFilterQueryFor = (filter, column, value) =>
                                 }
                             })
 
+const givenIncludeFilterForIdColumn = (filter, value) =>
+    when(filterParser.transform).calledWith(filter)
+                                .mockReturnValue({ filterExpr: {
+                                    FilterExpression: '#_id IN (:0)',
+                                    ExpressionAttributeNames: {
+                                        ['#_id']: '_id'
+                                    },
+                                    ExpressionAttributeValues: {
+                                        [':0']: value
+                                    }
+                                }
+                            })
+
 const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
@@ -112,5 +125,5 @@ const reset = () => {
 module.exports = { stubEmptyFilterAndSortFor, stubEmptyOrderByFor, stubEmptyFilterFor,
                    givenFilterByIdWith, filterParser, reset, givenAggregateQueryWith,
                    givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
-                   givenGreaterThenFilterFor, givenNotFilterQueryFor
+                   givenGreaterThenFilterFor, givenNotFilterQueryFor, givenIncludeFilterForIdColumn
 }
