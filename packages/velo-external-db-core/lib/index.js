@@ -18,7 +18,7 @@ class ExternalDbRouter {
     constructor({ connector, config, hooks }) {
         this.isInitialized(connector)
         this.connector = connector
-        this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), new CommonConfigValidator(config))
+        this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), new CommonConfigValidator({ secretKey: config.secretKey, vendor: config.vendor }))
         
         this.operationService = new OperationService(connector.databaseOperations)
         this.schemaInformation = new CacheableSchemaInformation(connector.schemaProvider)

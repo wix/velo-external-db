@@ -20,7 +20,7 @@ const defineValidConfig = (config) => {
         process.env.SECRET_KEY = config.secretKey
     }
     if (config.authorization) {
-        process.env.ROLE_CONFIG = JSON.stringify({ collectionLevelConfig: config.authorization })
+        process.env.ROLE_CONFIG = JSON.stringify( config.authorization )
     }
     if (config.auth?.callbackUrl) {
         process.env.callbackUrl = config.auth.callbackUrl

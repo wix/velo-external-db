@@ -15,6 +15,7 @@ const collectionConfigPattern = {
         readPolicies: { type: 'array', items: { enum: veloRoles } },
         writePolicies: { type: 'array', items: { enum: veloRoles } },
     },
+    additionalProperties: false,
     required: ['id']
 }
 

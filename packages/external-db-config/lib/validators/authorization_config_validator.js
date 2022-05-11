@@ -4,20 +4,22 @@ const ajv = new Avj({ strict: false })
 
 class AuthorizationConfigValidator {
   constructor(config) {
-    this.config = config
+    this.config = config || EmptyRoleConfig
 
     this.configValidator = ajv.compile(configPattern)
     this.collectionValidator = ajv.compile(collectionConfigPattern)
   }
 
-  async readConfig() {
+  readConfig() {
     const { roleConfig } = this.config
-    const { collectionLevelConfig } = roleConfig ? roleConfig : EmptyRoleConfig
+    const { collectionLevelConfig } = roleConfig && roleConfig.collectionLevelConfig ? roleConfig : EmptyRoleConfig
+
     return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
   }
 
   validate() {
     const { roleConfig } = this.config
+    
     const valid = this.configValidator(roleConfig)
     let message 
     
