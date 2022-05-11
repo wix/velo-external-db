@@ -1,6 +1,6 @@
 const { authOwner, errorResponseWith } = require('../drivers/auth_test_support')
 const each = require('jest-each').default
-const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } = require('../resources/e2e_resources')
+const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } = require('../resources/e2e_resources')
 const gen = require('../gen')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
@@ -34,6 +34,9 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                 ['afterBulkRemove', '/data/remove/bulk']
             ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                if (!['afterInsert', 'afterBulkInsert'].includes(hookName)) {
+                    await data.givenItems(ctx.items, ctx.collectionName, authOwner)
+                }
 
                 env.externalDbRouter.reloadHooks({
                     afterAll: (payload, _requestContext, _serviceContext) => {
@@ -59,7 +62,10 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                 ['afterFind', '/data/find'],
                 ['afterAggregate', '/data/aggregate'],
                 ['afterCount', '/data/count']
-            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
+            ]).test.only('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
+                if (hooks.skipAggregationIfNotSupported(hookName, supportedOperations))
+                    return
+
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems(ctx.items, ctx.collectionName, authOwner)
 
@@ -233,6 +239,9 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
 
             each(['beforeAll', 'beforeRead', 'beforeAggregate'])
                 .test('%s should able to change payload /data/aggregate', async(hookName) => {
+                    if (hooks.skipAggregationIfNotSupported(hookName, supportedOperations))
+                        return
+                    
                     await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                     await data.givenItems([ctx.item], ctx.collectionName, authOwner)
 

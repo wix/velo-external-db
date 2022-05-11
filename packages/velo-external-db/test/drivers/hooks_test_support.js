@@ -1,3 +1,6 @@
+const { Aggregate } = require('velo-external-db-commons').SchemaOperations
+
+
 const resetHooks = (externalDbRouter) => externalDbRouter.reloadHooks()
 
 const writeRequestBodyWith = (collectionName, items) => ({
@@ -20,4 +23,8 @@ const aggregateRequestBodyWith = (collectionName, filter) => ({
     collectionName, filter, processingStep: { _id: { field1: '$_id' } }, postFilteringStep: {}
 })
 
-module.exports = { writeRequestBodyWith, readRequestBodyWith, resetHooks, findRequestBodyWith, getRequestBodyWith, aggregateRequestBodyWith }
+const skipAggregationIfNotSupported = (hookName, supportedOperations) => {
+    return (hookName.includes('Aggregate') && !supportedOperations.includes(Aggregate))
+}
+
+module.exports = { writeRequestBodyWith, readRequestBodyWith, resetHooks, findRequestBodyWith, getRequestBodyWith, aggregateRequestBodyWith, skipAggregationIfNotSupported }
