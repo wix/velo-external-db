@@ -37,6 +37,10 @@ class ExternalDbRouter {
         this.router = createRouter()
     }
 
+    reloadHooks(hooks) {
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
+    }
+
     enableAppInfo(app) {
         app.set('views', `${__dirname}/views`)
         app.set('view engine', 'ejs')
