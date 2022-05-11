@@ -22,13 +22,13 @@ class AuthorizationConfigReader {
     
 
     if (checkRequiredKeys(process.env, ['PERMISSIONS']).length)  
-      message = 'Role config is not defined, using default'
+      message = 'Permissions config not defined, using default'
     else if (!isJson(roleConfig)) 
-      message = 'Role config is not valid JSON'
+      message = 'Permissions config value is not a valid JSON'
     else if (!valid)
       message = this.configValidator.errors.map(err => (`Error in ${err.instancePath}: ${err.message}`)).join(', ')
     else 
-      message = 'Authorization Config read successfully'
+      message = 'Permissions config read successfully'
 
     return { valid, message }
   }

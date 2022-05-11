@@ -66,11 +66,11 @@ const givenInvalidDBType = () =>
 
 const givenValidAuthorizationConfig = () => 
     when(authorizationConfigReader.validate).calledWith()
-                                            .mockReturnValue({ valid: true, message: 'Authorization Config read successfully' })
+                                            .mockReturnValue({ valid: true, message: 'Permissions config read successfully' })
 
 const givenEmptyAuthorizationConfig = () =>
     when(authorizationConfigReader.validate).calledWith()
-                                            .mockReturnValue({ valid: false, message: 'Role config is not defined, using default' })
+                                            .mockReturnValue({ valid: false, message: 'Permissions config not defined, using default' })
 
 const givenInvalidAuthorizationConfig = () => 
     when(authorizationConfigReader.validate).calledWith()
