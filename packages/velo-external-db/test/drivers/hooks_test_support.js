@@ -8,4 +8,16 @@ const readRequestBodyWith = (collectionName, items) => ({
     collectionName, filter: {}, processingStep: { _id: { field1: '$_id' } }, postFilteringStep: {}, itemId: items[0]._id, skip: 0, limit: 10
 })
 
-module.exports = { writeRequestBodyWith, readRequestBodyWith, resetHooks }
+const findRequestBodyWith = (collectionName, filter) => ({
+    collectionName, filter, skip: 0, limit: 10, sort: { _id: 1 }
+})
+
+const getRequestBodyWith = (collectionName, itemId) => ({
+    collectionName, itemId
+})
+
+const aggregateRequestBodyWith = (collectionName, filter) => ({
+    collectionName, filter, processingStep: { _id: { field1: '$_id' } }, postFilteringStep: {}
+})
+
+module.exports = { writeRequestBodyWith, readRequestBodyWith, resetHooks, findRequestBodyWith, getRequestBodyWith, aggregateRequestBodyWith }

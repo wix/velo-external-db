@@ -113,10 +113,8 @@ const createRouter = () => {
             const data = await schemaAwareDataService.insert(collectionName, item)
 
             const dataAfterAction = await executeHooksFor(Actions.AfterInsert, data, requestContextFor(INSERT, req.body))
-            console.log(dataAfterAction)
             res.json(dataAfterAction)
         } catch (e) {
-            console.log(e)
             next(e)
         }
     })
