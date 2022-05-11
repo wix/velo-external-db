@@ -16,12 +16,12 @@ const hooksForAction = (action) => {
         afterRemove: ['afterAll', 'afterWrite', 'afterRemove'],
         beforeBulkRemove: ['beforeAll', 'beforeWrite', 'beforeBulkRemove'],
         afterBulkRemove: ['afterAll', 'afterWrite', 'afterBulkRemove'],
-        beforeAggregate: ['beforeAll', 'beforeRead', 'BeforeAggregate'],
-        afterAggregate: ['afterAll', 'afterRead', 'AfterAggregate'],
-        beforeCount: ['beforeAll', 'beforeRead', 'BeforeCount'],
-        afterCount: ['afterAll', 'afterRead', 'AfterCount'],
-        beforeGetById: ['beforeAll', 'beforeRead', 'BeforeGetById'],
-        afterGetById: ['afterAll', 'afterRead', 'AfterGetById'],
+        beforeAggregate: ['beforeAll', 'beforeRead', 'beforeAggregate'],
+        afterAggregate: ['afterAll', 'afterRead', 'afterAggregate'],
+        beforeCount: ['beforeAll', 'beforeRead', 'beforeCount'],
+        afterCount: ['afterAll', 'afterRead', 'afterCount'],
+        beforeGetById: ['beforeAll', 'beforeRead', 'beforeGetById'],
+        afterGetById: ['afterAll', 'afterRead', 'afterGetById'],
     }
     return hooksForAction[action]
 }
@@ -78,29 +78,17 @@ const payloadFor = (operation, body) => {
                 sort: body.sort
             }
         case Operations.INSERT:
-            return {
-                item: body.item
-            }
+            return body.item
         case Operations.BULK_INSERT:
-            return {
-                items: body.items
-            }
+            return body.items
         case Operations.UPDATE:
-            return {
-                item: body.item
-            }
+            return body.item
         case Operations.BULK_UPDATE:
-            return {
-                items: body.items
-            }
+                return body.items
         case Operations.REMOVE:
-            return {
-                itemId: body.itemId
-            }
+            return body.itemId
         case Operations.BULK_REMOVE:
-            return {
-                itemIds: body.itemIds
-            }
+            return body.itemIds
         case Operations.AGGREGATE:
             return {
                 filter: body.filter,
@@ -108,13 +96,9 @@ const payloadFor = (operation, body) => {
                 postFilteringStep: body.postFilteringStep
             }
         case Operations.COUNT:
-            return {
-                filter: body.filter
-            }
+            return body.filter
         case Operations.GET:
-            return {
-                itemId: body.itemId
-            }
+            return body.itemId
         default:
             return body
     }
