@@ -6,16 +6,16 @@ const veloRoles = ['Admin', 'Member', 'Visitor']
 
 const collectionConfigEntity = () => ({
     id: chance.word(),
-    readPolicies: gen.randomElementsFromArray(veloRoles),
-    writePolicies: gen.randomElementsFromArray(veloRoles)
+    read: gen.randomElementsFromArray(veloRoles),
+    write: gen.randomElementsFromArray(veloRoles)
 })
 
 const authorizationConfig = () => gen.randomArrayOf( collectionConfigEntity )
 
 const collectionNameFrom = (config) => gen.randomObjectFromArray(config).id
 
-const readRolesFor = (collectionName, config) => config.find(c => c.id = collectionName).readPolicies
-const writeRolesFor = (collectionName, config) => config.find(c => c.id = collectionName).writePolicies
+const readRolesFor = (collectionName, config) => config.find(c => c.id = collectionName).read
+const writeRolesFor = (collectionName, config) => config.find(c => c.id = collectionName).write
 
 const authorizedReadRoleFor = (collectionName, config) => veloRoleToData(gen.randomObjectFromArray(readRolesFor(collectionName, config)))
 

@@ -50,7 +50,7 @@ const defineSplittedConfig = (config) => {
 
 const validConfigWithAuthorization = () => ({
     ...validConfig(),
-    authorization: validAuthorizationConfig.collectionLevelConfig 
+    authorization: validAuthorizationConfig.collectionPermissions 
 })
 
 const ExpectedProperties = ['URI', 'SECRET_KEY', 'PERMISSIONS']

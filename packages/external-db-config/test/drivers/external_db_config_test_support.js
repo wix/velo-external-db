@@ -74,7 +74,7 @@ const givenEmptyAuthorizationConfig = () =>
 
 const givenInvalidAuthorizationConfig = () => 
     when(authorizationConfigReader.validate).calledWith()
-                                            .mockReturnValue({ valid: false, message: 'Error in /collectionLevelConfig/0/readPolicies/0: must be equal to one of the allowed values' })
+                                            .mockReturnValue({ valid: false, message: 'Error in /collectionPermissions/0/read/0: must be equal to one of the allowed values' })
 const reset = () => {
     configReader.readConfig.mockClear()
     configReader.validate.mockClear()

@@ -39,7 +39,7 @@ const validConfig = () => ({
 
 const validConfigWithAuthorization = () => ({
     ...validConfig(),
-    authorization: validAuthorizationConfig.collectionLevelConfig 
+    authorization: validAuthorizationConfig.collectionPermissions 
 })
 
 const validConfigWithAuthConfig = () => ({
