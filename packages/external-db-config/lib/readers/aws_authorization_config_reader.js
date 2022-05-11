@@ -14,7 +14,7 @@ class AwsAuthorizationConfigReader {
 
   async readConfig() {
     const { config } = await this.readExternalAndLocalConfig()
-    const { ROLE_CONFIG: roleConfig } = config
+    const { PERMISSIONS: roleConfig } = config
 
     return isJson(roleConfig) ? jsonParser(roleConfig) : roleConfig
   }
@@ -31,8 +31,8 @@ class AwsAuthorizationConfigReader {
 
   async readExternalAndLocalConfig() {
     const { externalConfig, secretMangerError } = await this.readExternalConfig()
-    const { ROLE_CONFIG } = { ...process.env, ...externalConfig }
-    const config = { ROLE_CONFIG }
+    const { PERMISSIONS } = { ...process.env, ...externalConfig }
+    const config = { PERMISSIONS }
     return { config, secretMangerError: secretMangerError }
   }
 
@@ -40,21 +40,21 @@ class AwsAuthorizationConfigReader {
     try{
         const { config, secretMangerError } = await this.readExternalAndLocalConfig()
 
-        const { ROLE_CONFIG: roleConfig } = config
+        const { PERMISSIONS: roleConfig } = config
 
         const valid = isJson(roleConfig) && this.configValidator(jsonParser(roleConfig))
 
         let message 
         
     
-        if (checkRequiredKeys(config, ['ROLE_CONFIG']).length)  
-          message = 'Role config is not defined, using default'
+        if (checkRequiredKeys(config, ['PERMISSIONS']).length)  
+          message = 'Permissions config not defined, using default'
         else if (!isJson(roleConfig)) 
-          message = 'Role config is not valid JSON'
+          message = 'Permissions config value is not a valid JSON'
         else if (!valid)
           message = this.configValidator.errors.map(err => (`Error in ${err.instancePath}: ${err.message}`)).join(', ')
         else 
-          message = 'Authorization Config read successfully'
+          message = 'Permissions config read successfully'
       
         return { valid, message, secretMangerError }
     }

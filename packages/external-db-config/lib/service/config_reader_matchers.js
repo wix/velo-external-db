@@ -25,7 +25,7 @@ const invalidDbTypeConfigStatusResponse = () => expect.objectContaining({
 
 const emptyAuthorizationConfigStatusResponse = () => expect.objectContaining({
     validAuthorization: false,
-    authorizationMessage: expect.stringContaining('Role config is not defined, using default') 
+    authorizationMessage: expect.stringContaining('Permissions config not defined, using default') 
 })
 
 const invalidAuthorizationConfigStatusResponse = () => expect.objectContaining({

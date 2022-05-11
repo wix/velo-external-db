@@ -12,8 +12,8 @@ const collectionConfigPattern = {
     type: 'object',
     properties: {
         id: { type: 'string' },
-        readPolicies: { type: 'array', items: { enum: veloRoles } },
-        writePolicies: { type: 'array', items: { enum: veloRoles } },
+        read: { type: 'array', items: { enum: veloRoles } },
+        write: { type: 'array', items: { enum: veloRoles } },
     },
     additionalProperties: false,
     required: ['id']
@@ -22,9 +22,9 @@ const collectionConfigPattern = {
 const configPattern = {
     type: 'object',
     properties: {
-        collectionLevelConfig: { type: 'array', items: collectionConfigPattern }
+        collectionPermissions: { type: 'array', items: collectionConfigPattern }
     },
-    required: ['collectionLevelConfig']
+    required: ['collectionPermissions']
 }
 
 const isJson = (str) => { try { JSON.parse(str); return true } catch (e) { return false } }
@@ -36,7 +36,7 @@ const jsonParser = (str) => {
  }
 
 const EmptyRoleConfig = {
-    collectionLevelConfig: []
+    collectionPermissions: []
 }
 
 module.exports = { checkRequiredKeys, supportedDBs, supportedVendors, isJson, jsonParser, EmptyRoleConfig, configPattern, collectionConfigPattern }

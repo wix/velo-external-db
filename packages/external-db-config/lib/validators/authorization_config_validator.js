@@ -12,9 +12,9 @@ class AuthorizationConfigValidator {
 
   readConfig() {
     const { roleConfig } = this.config
-    const { collectionLevelConfig } = roleConfig && roleConfig.collectionLevelConfig ? roleConfig : EmptyRoleConfig
+    const { collectionPermissions } = roleConfig && roleConfig.collectionPermissions ? roleConfig : EmptyRoleConfig
 
-    return collectionLevelConfig.filter(collection => this.collectionValidator(collection))
+    return collectionPermissions.filter(collection => this.collectionValidator(collection))
   }
 
   validate() {
@@ -24,11 +24,11 @@ class AuthorizationConfigValidator {
     let message 
     
     if (!this.config || !this.config.roleConfig)  
-      message = 'Role config is not defined, using default'
+      message = 'Permissions config not defined, using default'
     else if (!valid)
       message = this.configValidator.errors.map(err => (`Error in ${err.instancePath}: ${err.message}`)).join(', ')
     else 
-      message = 'Authorization Config read successfully'
+      message = 'Permissions config read successfully'
 
     return { valid, message }
   }

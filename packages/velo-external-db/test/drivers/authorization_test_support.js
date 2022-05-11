@@ -2,17 +2,17 @@ const { dbTeardown, initApp } = require('../resources/e2e_resources')
 
 const DefaultPolicies = ['Admin']
 
-const authRoleConfig = (collectionName, readPolicies, writePolicies) => {
+const authRoleConfig = (collectionName, read, write) => {
     const config = {
-        collectionLevelConfig: [
+        collectionPermissions: [
             {
                 id: collectionName,
-                readPolicies: [...DefaultPolicies, ...readPolicies],
-                writePolicies: [...DefaultPolicies, ...writePolicies]
+                read: [...DefaultPolicies, ...read],
+                write: [...DefaultPolicies, ...write]
             }
         ]
     }
-    process.env.ROLE_CONFIG = JSON.stringify(config)
+    process.env.PERMISSIONS = JSON.stringify(config)
 }
 
 const givenCollectionWithVisitorReadPolicy = async(collectionName) => {

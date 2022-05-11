@@ -3,11 +3,11 @@ const Chance = require('chance')
 const chance = new Chance()
 const { randomElementsFromArray } = require ('test-commons').gen
 const validAuthorizationConfig = {
-    collectionLevelConfig: [
+    collectionPermissions: [
         {
             id: chance.word(),
-            readPolicies: ['Admin'],
-            writePolicies: ['Admin'],
+            read: ['Admin'],
+            write: ['Admin'],
         }
     ]
 }

@@ -11,9 +11,9 @@
 const connectionColor =  dbConnectionStatus === 'Connected to database successfully' ? 'success': 'danger' 
 const configStatusColor = configReaderStatus === 'External DB Config read successfully' ? 'success' : 'danger'
 let authorizationStatusColor
-if (authorizationConfigStatus === 'Authorization Config read successfully') {
+if (authorizationConfigStatus === 'Permissions config read successfully') {
 	authorizationStatusColor = 'success'
-} else if (authorizationConfigStatus === 'Role config is not defined, using default') {
+} else if (authorizationConfigStatus === 'Permissions config not defined, using default') {
 	authorizationStatusColor = 'warning'
 } else {
 	authorizationStatusColor = 'danger'
@@ -37,7 +37,7 @@ if (authorizationConfigStatus === 'Authorization Config read successfully') {
 		  </svg>
 		<div class="d-flex gap-2 w-100 justify-content-between">
 			<div>
-				<h6 class="mb-0">Config Status</h6>
+				<h6 class="mb-0">DB Config Status</h6>
 				<p class="mb-0 opacity-75">
 					<%= configReaderStatus %>
 				</p>
@@ -60,7 +60,7 @@ if (authorizationConfigStatus === 'Authorization Config read successfully') {
 		  </svg>
 		<div class="d-flex gap-2 w-100 justify-content-between">
 			<div>
-				<h6 class="mb-0">Authorization Config Status</h6>
+				<h6 class="mb-0">Permissions Config Status</h6>
 				<p class="mb-0 opacity-75">
 					<%= authorizationConfigStatus %>
 				</p>

@@ -27,11 +27,11 @@ class RoleAuthorizationService {
     }
 
     readPoliciesFor(collectionName) {
-        return this.policiesFor(collectionName)?.readPolicies || DefaultPolicies
+        return this.policiesFor(collectionName)?.read || DefaultPolicies
     }
 
     writePoliciesFor(collectionName) {
-        return this.policiesFor(collectionName)?.writePolicies || DefaultPolicies
+        return this.policiesFor(collectionName)?.write || DefaultPolicies
     }
 
     dataToVeloRole(role) { 

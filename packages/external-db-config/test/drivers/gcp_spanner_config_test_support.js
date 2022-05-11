@@ -17,7 +17,7 @@ const defineValidConfig = (config) => {
         process.env.SECRET_KEY = config.secretKey
     }
     if (config.authorization) {
-        process.env.ROLE_CONFIG = JSON.stringify( config.authorization )
+        process.env.PERMISSIONS = JSON.stringify( config.authorization )
     }
     if (config.auth?.callbackUrl) {
         process.env.callbackUrl = config.auth.callbackUrl
@@ -39,7 +39,7 @@ const validConfig = () => ({
 
 const validConfigWithAuthorization = () => ({
     ...validConfig(),
-    authorization: validAuthorizationConfig.collectionLevelConfig 
+    authorization: validAuthorizationConfig.collectionPermissions 
 })
 
 const validConfigWithAuthConfig = () => ({
@@ -55,7 +55,7 @@ const validConfigWithAuthConfig = () => ({
 
 const defineInvalidConfig = () => defineValidConfig({})
 
-const ExpectedProperties = ['PROJECT_ID', 'INSTANCE_ID', 'DATABASE_ID', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'ROLE_CONFIG']
+const ExpectedProperties = ['PROJECT_ID', 'INSTANCE_ID', 'DATABASE_ID', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'PERMISSIONS']
 
 const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 
