@@ -1,7 +1,24 @@
 {
   "packages": [
     "apps/*",
-    "libs/*"
+    
+    "libs/external-db-airtable",
+    "libs/external-db-bigquery",
+    "libs/external-db-config",
+    "libs/external-db-dynamodb",
+    "libs/external-db-firestore",
+    "libs/external-db-google-sheets",
+    "libs/external-db-mongo",
+    "libs/external-db-mssql",
+    "libs/external-db-mysql",
+    "libs/external-db-postgres",
+    "libs/external-db-security",
+    "libs/external-db-spanner",
+    "libs/test-commons",
+    "libs/velo-external-db-core",
+
+
+    "dist/libs/*"
   ],
   "version": "0.0.0"
 }

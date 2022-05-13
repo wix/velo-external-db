@@ -80,6 +80,9 @@ jobs:
       - name: Installing Dependencies
         run: npm install
 
+      - name: Build Dependencies
+        run: nx run-many --target=build --all
+
       - name: Install dependencies of the homemade packages.
         run: npm run build:dev
 
