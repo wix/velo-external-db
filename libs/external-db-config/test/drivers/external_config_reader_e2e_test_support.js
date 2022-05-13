@@ -1,5 +1,5 @@
 const { Uninitialized } = require('test-commons')
-const { create } = require('../../lib/factory')
+const { create } = require('../../src/factory')
 const awsMySql = require('./aws_mysql_config_test_support')
 const awsMongo = require('./aws_mongo_config_test_support')
 const azureMySql = require('./azure_mysql_config_test_support')

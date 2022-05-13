@@ -1,5 +1,5 @@
-const DatabaseOperations = require('../../lib/mysql_operations')
-const init = require('../../lib/connection_provider')
+const DatabaseOperations = require('../../src/mysql_operations')
+const init = require('../../src/connection_provider')
 
 const createPool = modify => {
     const config = {

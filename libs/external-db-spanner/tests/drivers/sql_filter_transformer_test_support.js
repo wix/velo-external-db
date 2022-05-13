@@ -1,6 +1,6 @@
 const { EmptySort } = require('velo-external-db-commons')
 const { when } = require('jest-when')
-const { escapeId, escapeFieldId, validateLiteral } = require('../../lib/spanner_utils')
+const { escapeId, escapeFieldId, validateLiteral } = require('../../src/spanner_utils')
 
 const filterParser = {
     transform: jest.fn(),

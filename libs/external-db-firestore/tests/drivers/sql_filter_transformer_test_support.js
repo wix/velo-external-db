@@ -1,5 +1,5 @@
 const { when } = require('jest-when')
-const { LastLetterCoder } = require('../../lib/firestore_utils')
+const { LastLetterCoder } = require('../../src/firestore_utils')
 const escapeId = x => x
 
 const EmptySort = []

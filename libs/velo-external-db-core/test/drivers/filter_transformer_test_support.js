@@ -1,4 +1,4 @@
-const { EmptyFilter } = require('../../lib/converters/utils')
+const { EmptyFilter } = require('../../src/converters/utils')
 const { when } = require('jest-when')
 const { AdapterFunctions } = require('velo-external-db-commons')
 

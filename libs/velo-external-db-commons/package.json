@@ -1,27 +1,5 @@
 {
   "name": "velo-external-db-commons",
   "version": "0.0.0",
-  "description": "",
-  "homepage": "https://github.com/wix/velo-external-db#readme",
-  "license": "MIT",
-  "main": "src/index.js",
-  "directories": {
-    "src": "src",
-    "test": "tests"
-  },
-  "files": [ "src" ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wix/velo-external-db.git",
-    "directory": "packages/velo-external-db-commons"
-  },
-  "bugs": {
-    "url": "https://github.com/wix/velo-external-db/issues"
-  },
-  "scripts": {
-    "test": ""
-  },
-  "dependencies": {
-    "moment": "^2.29.1"
-  }
+  "type": "commonjs"
 }

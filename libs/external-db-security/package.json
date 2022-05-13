@@ -6,8 +6,7 @@
   "license": "MIT",
   "main": "src/index.js",
   "directories": {
-    "src": "src",
-    "test": "tests"
+    "src": "src"
   },
   "files": [ "src" ],
   "repository": {

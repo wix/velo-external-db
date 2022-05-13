@@ -1,5 +1,5 @@
-const DatabaseOperations = require('../../lib/dynamo_operations')
-const init = require('../../lib/connection_provider')
+const DatabaseOperations = require('../../src/dynamo_operations')
+const init = require('../../src/connection_provider')
 
 const config = () => ({
     region: 'us-west-2',

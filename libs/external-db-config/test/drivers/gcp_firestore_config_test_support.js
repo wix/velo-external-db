@@ -1,4 +1,4 @@
-const { GcpFirestoreConfigReader } = require('../../lib/readers/gcp_config_reader')
+const { GcpFirestoreConfigReader } = require('../../src/readers/gcp_config_reader')
 const Chance = require('chance')
 const chance = new Chance()
 const { validAuthorizationConfig } = require ('../test_utils')

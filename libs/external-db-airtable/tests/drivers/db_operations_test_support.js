@@ -1,4 +1,4 @@
-const DatabaseOperations = require('../../lib/airtable_operations')
+const DatabaseOperations = require('../../src/airtable_operations')
 const Airtable = require('airtable')
 
 const createPool =  modify => {

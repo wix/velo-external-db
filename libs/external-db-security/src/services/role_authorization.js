@@ -1,4 +1,4 @@
-const { UnauthorizedError } = require('velo-external-db-commons/lib/errors')
+const { UnauthorizedError } = require('velo-external-db-commons/src/errors')
 const DefaultPolicies = ['Admin']
 
 class RoleAuthorizationService {

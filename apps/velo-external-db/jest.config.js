@@ -1,7 +1,7 @@
 module.exports = {
     clearMocks: true,
     verbose: true,
-    roots: ['<rootDir>/lib', '<rootDir>/test'],
+    roots: ['<rootDir>/src', '<rootDir>/test'],
     testRegex: '(.*\\.spec\\.)js$',
     testEnvironment: 'node',
     globalSetup: './test/env/env.db.setup.js',

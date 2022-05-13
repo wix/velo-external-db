@@ -1,5 +1,5 @@
 // const { ConnectionPool } = require('mongodb')
-const DatabaseOperations = require('../../lib/mongo_operations')
+const DatabaseOperations = require('../../src/mongo_operations')
 const { MongoClient } = require('mongodb')
 
 

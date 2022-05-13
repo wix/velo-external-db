@@ -1,4 +1,4 @@
-const { AwsMongoConfigReader } = require('../../lib/readers/aws_config_reader')
+const { AwsMongoConfigReader } = require('../../src/readers/aws_config_reader')
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
 const mockClient = require('aws-sdk-client-mock')
 let mockedAwsSdk

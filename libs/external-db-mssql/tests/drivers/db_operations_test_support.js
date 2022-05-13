@@ -1,5 +1,5 @@
 const { ConnectionPool } = require('mssql')
-const DatabaseOperations = require('../../lib/mssql_operations')
+const DatabaseOperations = require('../../src/mssql_operations')
 
 const createPool = async modify => {
     const config = {

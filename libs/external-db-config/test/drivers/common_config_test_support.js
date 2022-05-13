@@ -1,4 +1,4 @@
-const CommonConfigReader = require('../../lib/readers/common_config_reader')
+const CommonConfigReader = require('../../src/readers/common_config_reader')
 const Chance = require('chance')
 const chance = new Chance()
 
