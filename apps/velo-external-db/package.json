@@ -4,12 +4,12 @@
   "description": "",
   "homepage": "https://github.com/wix/velo-external-db#readme",
   "license": "MIT",
-  "main": "lib/app.js",
+  "main": "src/app.js",
   "directories": {
-    "lib": "lib",
+    "src": "src",
     "test": "tests"
   },
-  "files": [ "lib" ],
+  "files": [ "src" ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wix/velo-external-db.git",
