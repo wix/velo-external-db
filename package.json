@@ -2,7 +2,7 @@
   "name": "velo-external-database-adapter",
   "scripts": {
     "start": "lerna exec --scope velo-external-db \"npm run start\"",
-    "build:dev": "lerna bootstrap --hoist",
+    "build:dev": "nx run-many --target=build --all && lerna bootstrap --hoist",
     "build:full-image": "docker build --target full_version -t velo-external-db .",
     "lint": "eslint --cache ./",
     "lint:fix": "eslint --cache --fix ./",
