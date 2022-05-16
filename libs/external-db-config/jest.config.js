@@ -1,7 +1,18 @@
 module.exports = {
+    displayName: 'external-db-config',
+    preset: '../../jest.preset.js',
+    globals: {
+      'ts-jest': {
+        tsconfig: '<rootDir>/tsconfig.spec.json',
+      },
+    },
+    transform: {
+      '^.+\\.[tj]s$': 'ts-jest',
+    },
+    moduleFileExtensions: ['ts', 'js', 'html'],
+    coverageDirectory: '../../coverage/libs/velo-external-db-commons',
     clearMocks: true,
     verbose: true,
-    roots: ['<rootDir>/src', '<rootDir>/test'],
-    testRegex: '(.*\\.spec\\.)js$',
-    testEnvironment: 'node'
-}
+    // testRegex: '(.*\\.spec\\.)js$',
+  };
+  
