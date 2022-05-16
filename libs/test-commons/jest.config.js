@@ -1,6 +1,6 @@
 /* eslint-disable */
 module.exports = {
-  displayName: 'velo-external-db-commons',
+  displayName: 'test-commons',
   preset: '../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -11,5 +11,5 @@ module.exports = {
     '^.+\\.[tj]s$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/libs/velo-external-db-commons',
+  coverageDirectory: '../../coverage/libs/test-commons',
 };
