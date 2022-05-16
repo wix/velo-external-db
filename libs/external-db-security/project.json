@@ -1,4 +1,46 @@
 {
-  "tags": [],
-  "targets": {}
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/external-db-security/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/external-db-security",
+        "main": "libs/external-db-security/src/index.js",
+        "tsConfig": "libs/external-db-security/tsconfig.lib.json",
+        "assets": ["libs/external-db-security/*.md"],
+        "buildableProjectDepsInPackageJsonType": "dependencies"
+      }
+    },
+    "publish": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs external-db-security {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/external-db-security/**/*.js"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/external-db-security"],
+      "options": {
+        "jestConfig": "libs/external-db-security/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
 }
