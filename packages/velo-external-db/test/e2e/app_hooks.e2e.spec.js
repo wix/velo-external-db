@@ -1,6 +1,7 @@
 const { authOwner, errorResponseWith } = require('../drivers/auth_test_support')
 const each = require('jest-each').default
 const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } = require('../resources/e2e_resources')
+const { Aggregate } = require('velo-external-db-commons').SchemaOperations
 const gen = require('../gen')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
@@ -237,23 +238,25 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                     expect(response.data.totalCount).toEqual(1)
                 })
 
-            each(['beforeAll', 'beforeRead', 'beforeAggregate'])
-                .test('%s should able to change payload /data/aggregate', async(hookName) => {
-                    if (hooks.skipAggregationIfNotSupported(hookName, supportedOperations))
-                        return
-                    
-                    await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                    await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+            if (supportedOperations.includes(Aggregate)) {
+                each(['beforeAll', 'beforeRead', 'beforeAggregate'])
+                    .test('%s should able to change payload /data/aggregate', async(hookName) => {
+                        if (hooks.skipAggregationIfNotSupported(hookName, supportedOperations))
+                            return
 
-                    env.externalDbRouter.reloadHooks({
-                        [hookName]: (query, _requestContext, _serviceContext) => {
-                            return { ...query, filter: { _id: { $eq: ctx.item._id } } }
-                        }
+                        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                        await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+
+                        env.externalDbRouter.reloadHooks({
+                            [hookName]: (query, _requestContext, _serviceContext) => {
+                                return { ...query, filter: { _id: { $eq: ctx.item._id } } }
+                            }
+                        })
+
+                        const response = await axios.post('/data/aggregate', hooks.aggregateRequestBodyWith(ctx.collectionName, { $filter: { _id: { $ne: ctx.item._id } } }), authOwner)
+                        expect(response.data.items).toEqual([{ _id: ctx.item._id }])
                     })
-
-                    const response = await axios.post('/data/aggregate', hooks.aggregateRequestBodyWith(ctx.collectionName, { $filter: { _id: { $ne: ctx.item._id } } }), authOwner)
-                    expect(response.data.items).toEqual([{ _id: ctx.item._id }])
-                })
+            }
         })
     })
     const ctx = {
