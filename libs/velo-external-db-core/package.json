@@ -1,45 +1,5 @@
 {
   "name": "velo-external-db-core",
   "version": "0.0.0",
-  "description": "",
-  "homepage": "https://github.com/wix/velo-external-db#readme",
-  "license": "MIT",
-  "main": "src/index.js",
-  "directories": {
-    "src": "src",
-    "test": "tests"
-  },
-  "files": [ "src" ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wix/velo-external-db.git",
-    "directory": "packages/velo-external-db-core"
-  },
-  "bugs": {
-    "url": "https://github.com/wix/velo-external-db/issues"
-  },
-  "scripts": {
-    "test": "jest"
-  },
-  "dependencies": {
-    "compression": "^1.7.4",
-    "express": "^4.17.3",
-    "ajv": "^8.11.0",
-    "external-db-config": "^0.0.0",
-    "external-db-security": "^0.0.0",
-    "node-cache": "^5.1.2",
-    "uuid": "^8.3.2",
-    "nested-property": "^4.0.0",
-    "velo-external-db-commons": "^0.0.0"
-  },
-  "devDependencies": {
-    "chance": "^1.1.8",
-    "jest": "^27.5.1",
-    "jest-each": "^27.4.6",
-    "jest-extended": "^2.0.0",
-    "jest-when": "^3.5.1",
-    "rewire": "^6.0.0",
-    "test-commons": "^0.0.0",
-    "uuid-validate": "^0.0.3"
-  }
+	"type": "commonjs"
 }

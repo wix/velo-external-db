@@ -8,11 +8,11 @@ class CacheableSchemaInformation {
         this.schemaProvider = schemaProvider
         this.cache = new NodeCache( { checkperiod: FiveMinutes + 10 } )
 
-        const refreshFunc = async() => {
-            await this.refresh()
-                      .catch( console.log )
-        }
-        setImmediate(refreshFunc)
+        // const refreshFunc = async() => {
+        //     await this.refresh()
+        //               .catch( console.log )
+        // }
+        // setImmediate(refreshFunc)
     }
     
     async schemaFieldsFor(collectionName) {

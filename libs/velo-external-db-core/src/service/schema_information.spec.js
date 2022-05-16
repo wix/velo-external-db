@@ -5,7 +5,6 @@ const gen = require('../../test/gen')
 const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
 
 describe('Schema Information Service', () => {
-
     test('will automatically refresh and return schema for collection when queried', async() => {
         driver.givenFindResults(ctx.dbs)
 

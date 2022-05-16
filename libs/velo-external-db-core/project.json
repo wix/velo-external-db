@@ -1,4 +1,46 @@
 {
-  "tags": [],
-  "targets": {}
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/velo-external-db-core/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/velo-external-db-core",
+        "main": "libs/velo-external-db-core/src/index.js",
+        "tsConfig": "libs/velo-external-db-core/tsconfig.lib.json",
+        "assets": ["libs/velo-external-db-core/*.md"],
+        "buildableProjectDepsInPackageJsonType": "dependencies"
+      }
+    },
+    "publish": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs velo-external-db-core {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/velo-external-db-core/**/*.js"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/velo-external-db-core"],
+      "options": {
+        "jestConfig": "libs/velo-external-db-core/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
 }
