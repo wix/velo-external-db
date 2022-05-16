@@ -15,7 +15,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "velo-external-db-commons": ["libs/velo-external-db-commons/src/index.js"]
+      "velo-external-db-commons": ["libs/velo-external-db-commons/src/index.js"],
+      "velo-external-db-core": ["libs/velo-external-db-core/src/index.js"],
+      "test-commons": ["libs/test-commons/src/index.js"],
+      "external-db-security": ["libs/external-db-security/src/index.js"],
+      "external-db-config": ["libs/external-db-config/src/index.js"]
     }
   },
   "exclude": ["node_modules", "tmp"]

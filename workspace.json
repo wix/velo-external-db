@@ -1,7 +1,11 @@
 {
     "version": 2,
     "projects": {
+
+        "velo-external-db-core": "libs/velo-external-db-core",
         "velo-external-db-commons": "libs/velo-external-db-commons",
+        "external-db-security": "libs/external-db-security",
+        "external-db-config": "libs/external-db-config",
         "test-commons": "libs/test-commons"
     }
 }

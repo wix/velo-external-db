@@ -7,7 +7,7 @@
     "lint": "eslint --cache ./",
     "lint:fix": "eslint --cache --fix ./",
     "test": "npm run test:core; npm run test:postgres; npm run test:spanner; npm run test:mysql; npm run test:mssql; npm run test:firestore; npm run test:mongo; npm run test:airtable; npm run test:dynamodb; npm run test:bigquery",
-    "test:core": "lerna exec --scope '{external-db-config,velo-external-db-core,external-db-security}' \"npm test\"",
+    "test:core": "nx run-many --target=test --projects=external-db-config,velo-external-db-core,external-db-security",
     "test:postgres": "lerna exec --scope external-db-postgres \"npm test\" && lerna exec --scope velo-external-db \"npm run test:postgres\"",
     "test:postgres13": "npm run test:postgres",
     "test:postgres12": "npm run test:postgres",
@@ -32,9 +32,20 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "express": "4.17.2",
+    "@aws-sdk/client-cognito-identity-provider": "^3.87.0",
+    "@aws-sdk/client-secrets-manager": "^3.89.0",
+    "ajv": "^6.12.6",
+    "compression": "^1.7.4",
+    "express": "^4.17.2",
     "moment": "^2.29.3",
-    "tslib": "^2.3.0"
+    "nested-property": "^4.0.0",
+    "node-cache": "^5.1.2",
+    "passport-azure-ad-oauth2": "^0.0.4",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "passport-oauth2": "^1.6.1",
+    "tslib": "^2.3.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@nrwl/cli": "14.1.5",
@@ -49,18 +60,25 @@
     "@types/node": "16.11.7",
     "@typescript-eslint/eslint-plugin": "~5.18.0",
     "@typescript-eslint/parser": "~5.18.0",
+    "aws-sdk-client-mock": "^0.6.2",
+    "chance": "^1.1.8",
     "eslint": "~8.12.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-jest": "^25.3.0",
     "husky": "^7.0.4",
     "jest": "27.5.1",
+    "jest-each": "^28.1.0",
+    "jest-extended": "^2.0.0",
+    "jest-when": "^3.5.1",
     "lerna": "^4.0.0",
     "lint-staged": "^12.1.2",
     "nx": "14.1.5",
     "prettier": "^2.5.1",
+    "rewire": "^6.0.0",
     "ts-jest": "27.1.4",
     "ts-node": "9.1.1",
-    "typescript": "~4.6.2"
+    "typescript": "~4.6.2",
+    "uuid-validate": "^0.0.3"
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix"
