@@ -62,7 +62,7 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                 ['afterFind', '/data/find'],
                 ['afterAggregate', '/data/aggregate'],
                 ['afterCount', '/data/count']
-            ]).test.only('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
+            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
                 if (hooks.skipAggregationIfNotSupported(hookName, supportedOperations))
                     return
 
