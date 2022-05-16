@@ -78,13 +78,12 @@ const payloadFor = (operation, body) => {
                 sort: body.sort
             }
         case Operations.INSERT:
-            return body.item
-        case Operations.BULK_INSERT:
-            return body.items
         case Operations.UPDATE:
             return body.item
+        case Operations.BULK_INSERT:
         case Operations.BULK_UPDATE:
-                return body.items
+            return body.items
+        case Operations.GET:
         case Operations.REMOVE:
             return body.itemId
         case Operations.BULK_REMOVE:
@@ -97,8 +96,6 @@ const payloadFor = (operation, body) => {
             }
         case Operations.COUNT:
             return body.filter
-        case Operations.GET:
-            return body.itemId
         default:
             return body
     }
