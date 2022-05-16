@@ -1,4 +1,46 @@
 {
-  "tags": [],
-  "targets": {}
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/test-commons/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/test-commons",
+        "main": "libs/test-commons/src/index.js",
+        "tsConfig": "libs/test-commons/tsconfig.lib.json",
+        "assets": ["libs/test-commons/*.md"],
+        "buildableProjectDepsInPackageJsonType": "dependencies"
+      }
+    },
+    "publish": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs test-commons {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/test-commons/**/*.js"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/test-commons"],
+      "options": {
+        "jestConfig": "libs/test-commons/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
 }

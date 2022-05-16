@@ -14,7 +14,6 @@
     "libs/external-db-postgres",
     "libs/external-db-security",
     "libs/external-db-spanner",
-    "libs/test-commons",
     "libs/velo-external-db-core",
 
 

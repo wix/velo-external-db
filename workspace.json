@@ -1,7 +1,8 @@
 {
     "version": 2,
     "projects": {
-        "velo-external-db-commons": "libs/velo-external-db-commons"
+        "velo-external-db-commons": "libs/velo-external-db-commons",
+        "test-commons": "libs/test-commons"
     }
 }
   
