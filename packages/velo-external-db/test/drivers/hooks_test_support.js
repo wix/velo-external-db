@@ -1,5 +1,5 @@
 const { Aggregate } = require('velo-external-db-commons').SchemaOperations
-
+const { gen: genCommon } = require('test-commons')
 
 const resetHooks = (externalDbRouter) => externalDbRouter.reloadHooks()
 
@@ -27,4 +27,11 @@ const skipAggregationIfNotSupported = (hookName, supportedOperations) => {
     return (hookName.includes('Aggregate') && !supportedOperations.includes(Aggregate))
 }
 
-module.exports = { writeRequestBodyWith, readRequestBodyWith, resetHooks, findRequestBodyWith, getRequestBodyWith, aggregateRequestBodyWith, skipAggregationIfNotSupported }
+const givenBodyWith = (obj) => ({
+    ...genCommon.randomObject(),
+    ...obj
+})
+
+module.exports = {
+    writeRequestBodyWith, readRequestBodyWith, resetHooks, findRequestBodyWith, givenBodyWith, getRequestBodyWith, aggregateRequestBodyWith, skipAggregationIfNotSupported,
+}
