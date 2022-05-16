@@ -33,6 +33,7 @@ const initApp = async() => {
         await waitUntil(() => env.internals().started)
     }
     env.app = env.internals()
+    env.externalDbRouter = env.app.externalDbRouter
 }
 
 const teardownApp = async() => {

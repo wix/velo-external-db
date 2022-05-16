@@ -5,15 +5,16 @@ const { engineConnectorFor } = require('./storage/factory')
 
 let started = false
 let server, _schemaProvider, _cleanup
+let externalDbRouter
 
-const initConnector = async() => {
+const initConnector = async(hooks) => {
     const { vendor, type: adapterType } = readCommonConfig()
     const configReader = create()
     const { authorization, secretKey, ...dbConfig } = await configReader.readConfig()
 
     const { connector: engineConnector, providers, cleanup } = await engineConnectorFor(adapterType, dbConfig)
 
-    const externalDbRouter = new ExternalDbRouter({
+    externalDbRouter = new ExternalDbRouter({
         connector: engineConnector,
         config: {
             authorization: {
@@ -22,8 +23,7 @@ const initConnector = async() => {
             secretKey,
             vendor
         },
-        hooks: {
-        }
+        hooks
     })
 
     _cleanup = async() => {
@@ -44,6 +44,6 @@ initConnector().then(({ externalDbRouter }) => {
     started = true
 })
 
-const internals = () => ({ server, schemaProvider: _schemaProvider, cleanup: _cleanup, started, reload: initConnector })
+const internals = () => ({ server, schemaProvider: _schemaProvider, cleanup: _cleanup, started, reload: initConnector, externalDbRouter })
 
 module.exports = { internals }
