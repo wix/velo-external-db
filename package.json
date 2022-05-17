@@ -15,7 +15,7 @@
     "test:postgres10": "npm run test:postgres",
     "test:postgres9": "npm run test:postgres",
     "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
-    "test:mysql": "lerna exec --scope external-db-mysql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mysql\"",
+    "test:mysql": "TEST_ENGINE=mysql nx run-many --target=test --projects=external-db-mysql,velo-external-db",
     "test:mysql5": "npm run test:mysql",
     "test:mssql": "lerna exec --scope external-db-mssql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mssql\"",
     "test:mssql17": "npm run test:mssql",
