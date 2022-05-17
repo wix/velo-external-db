@@ -1,12 +1,12 @@
 {
-    "version": 2,
-    "projects": {
-
-        "velo-external-db-core": "libs/velo-external-db-core",
-        "velo-external-db-commons": "libs/velo-external-db-commons",
-        "external-db-security": "libs/external-db-security",
-        "external-db-config": "libs/external-db-config",
-        "test-commons": "libs/test-commons"
-    }
+  "version": 2,
+  "projects": {
+    "external-db-config": "libs/external-db-config",
+    "external-db-postgres": "libs/external-db-postgres",
+    "external-db-security": "libs/external-db-security",
+    "test-commons": "libs/test-commons",
+    "velo-external-db": "apps/velo-external-db",
+    "velo-external-db-commons": "libs/velo-external-db-commons",
+    "velo-external-db-core": "libs/velo-external-db-core"
+  }
 }
-  

@@ -1,4 +1,4 @@
-const { Pool, types } = require('pg')
+import { Pool, types } from 'pg'
 const { builtins } = require('pg-types')
 const SchemaProvider = require('./postgres_schema_provider')
 const DataProvider = require('./postgres_data_provider')
