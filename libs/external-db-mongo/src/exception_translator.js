@@ -1,4 +1,5 @@
-const { ItemAlreadyExists } = require('velo-external-db-commons/src/errors')
+const { errors } = require('velo-external-db-commons')
+const { ItemAlreadyExists } = errors
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {
