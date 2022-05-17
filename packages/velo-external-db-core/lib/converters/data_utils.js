@@ -3,6 +3,8 @@ const crypto = require('crypto')
 
 const asWixData = e => generateIdsIfNeeded(packDates(e))
 
+const aggregationAsWixData = e => packDates(e)
+
 const generateIdsIfNeeded = item => {
     if ('_id' in item)
         return item
@@ -14,4 +16,4 @@ const generateIdsIfNeeded = item => {
 const packDates = item => Object.entries(item)
                                 .reduce((o, [k, v]) => ({ ...o, [k]: isDate(v) ? { $date: new Date(v).toISOString() } : v }), {})
 
-module.exports = { asWixData, generateIdsIfNeeded }
+module.exports = { asWixData, generateIdsIfNeeded, aggregationAsWixData }
