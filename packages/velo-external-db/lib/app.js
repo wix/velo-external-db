@@ -23,7 +23,10 @@ const initConnector = async(hooks) => {
             secretKey,
             vendor
         },
-        hooks
+        hooks: {
+            dataHooks: hooks?.dataHooks,
+            schemaHooks: hooks?.schemaHooks,
+        }
     })
 
     _cleanup = async() => {

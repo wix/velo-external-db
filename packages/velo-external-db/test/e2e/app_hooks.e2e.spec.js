@@ -40,14 +40,16 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                 }
 
                 env.externalDbRouter.reloadHooks({
-                    afterAll: (payload, _requestContext, _serviceContext) => {
-                        return { ...payload, [hookName]: false, afterAll: true, afterWrite: false }
-                    },
-                    afterWrite: (payload, _requestContext, _serviceContext) => {
-                        return { ...payload, [hookName]: false, afterWrite: true }
-                    },
-                    [hookName]: (payload, _requestContext, _serviceContext) => {
-                        return { ...payload, [hookName]: true }
+                    dataHooks: {
+                        afterAll: (payload, _requestContext, _serviceContext) => {
+                            return { ...payload, [hookName]: false, afterAll: true, afterWrite: false }
+                        },
+                        afterWrite: (payload, _requestContext, _serviceContext) => {
+                            return { ...payload, [hookName]: false, afterWrite: true }
+                        },
+                        [hookName]: (payload, _requestContext, _serviceContext) => {
+                            return { ...payload, [hookName]: true }
+                        }
                     }
                 })
 
@@ -71,14 +73,16 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                 await data.givenItems(ctx.items, ctx.collectionName, authOwner)
 
                 env.externalDbRouter.reloadHooks({
-                    afterAll: (payload, _requestContext, _serviceContext) => {
-                        return { ...payload, afterAll: true, [hookName]: false }
-                    },
-                    afterRead: (payload, _requestContext, _serviceContext) => {
-                        return { ...payload, afterAll: false, [hookName]: false }
-                    },
-                    [hookName]: (payload, _requestContext, _serviceContext) => {
-                        return { ...payload, [hookName]: true }
+                    dataHooks: {
+                        afterAll: (payload, _requestContext, _serviceContext) => {
+                            return { ...payload, afterAll: true, [hookName]: false }
+                        },
+                        afterRead: (payload, _requestContext, _serviceContext) => {
+                            return { ...payload, afterAll: false, [hookName]: false }
+                        },
+                        [hookName]: (payload, _requestContext, _serviceContext) => {
+                            return { ...payload, [hookName]: true }
+                        }
                     }
                 })
 
@@ -101,15 +105,17 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                 }
 
                 env.externalDbRouter.reloadHooks({
-                    beforeAll: (item, _requestContext, _serviceContext) => (
-                        { ...item, beforeAll: true, beforeWrite: false, beforeHook: false }
-                    ),
-                    beforeWrite: (item, _requestContext, _serviceContext) => (
-                        { ...item, beforeWrite: true, beforeHook: false }
-                    ),
-                    [hookName]: (item, _requestContext, _serviceContext) => (
-                        { ...item, beforeHook: true }
-                    )
+                    dataHooks: {
+                        beforeAll: (item, _requestContext, _serviceContext) => (
+                            { ...item, beforeAll: true, beforeWrite: false, beforeHook: false }
+                        ),
+                        beforeWrite: (item, _requestContext, _serviceContext) => (
+                            { ...item, beforeWrite: true, beforeHook: false }
+                        ),
+                        [hookName]: (item, _requestContext, _serviceContext) => (
+                            { ...item, beforeHook: true }
+                        )
+                    }
                 })
 
                 await expect(axios.post(api, hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).resolves.toEqual(
@@ -133,15 +139,17 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                 }
 
                 env.externalDbRouter.reloadHooks({
-                    beforeAll: (items, _requestContext, _serviceContext) => (
-                        items.map(item => ({ ...item, beforeAll: true, beforeWrite: false, beforeHook: false }))
-                    ),
-                    beforeWrite: (items, _requestContext, _serviceContext) => (
-                        items.map(item => ({ ...item, beforeWrite: true, beforeHook: false }))
-                    ),
-                    [hookName]: (items, _requestContext, _serviceContext) => (
-                        items.map(item => ({ ...item, beforeHook: true }))
-                    )
+                    dataHooks: {
+                        beforeAll: (items, _requestContext, _serviceContext) => (
+                            items.map(item => ({ ...item, beforeAll: true, beforeWrite: false, beforeHook: false }))
+                        ),
+                        beforeWrite: (items, _requestContext, _serviceContext) => (
+                            items.map(item => ({ ...item, beforeWrite: true, beforeHook: false }))
+                        ),
+                        [hookName]: (items, _requestContext, _serviceContext) => (
+                            items.map(item => ({ ...item, beforeHook: true }))
+                        )
+                    }
                 })
 
                 await expect(axios.post(api, hooks.writeRequestBodyWith(ctx.collectionName, ctx.items), authOwner)).resolves.toEqual(
@@ -161,9 +169,11 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                     await data.givenItems([ctx.item], ctx.collectionName, authOwner)
 
                     env.externalDbRouter.reloadHooks({
-                        [hookName]: (itemId, _requestContext, _serviceContext) => {
-                            if (itemId === ctx.item._id) {
-                                throw ('Should not be removed')
+                        dataHooks: {
+                            [hookName]: (itemId, _requestContext, _serviceContext) => {
+                                if (itemId === ctx.item._id) {
+                                    throw ('Should not be removed')
+                                }
                             }
                         }
                     })
@@ -179,9 +189,11 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                     await data.givenItems(ctx.items, ctx.collectionName, authOwner)
 
                     env.externalDbRouter.reloadHooks({
-                        [hookName]: (itemIds, _requestContext, _serviceContext) => {
-                            if (itemIds[0] === ctx.items[0]._id) {
-                                throw ('Should not be removed')
+                        dataHooks: {
+                            [hookName]: (itemIds, _requestContext, _serviceContext) => {
+                                if (itemIds[0] === ctx.items[0]._id) {
+                                    throw ('Should not be removed')
+                                }
                             }
                         }
                     })
@@ -199,9 +211,11 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                     await data.givenItems([ctx.item], ctx.collectionName, authOwner)
 
                     env.externalDbRouter.reloadHooks({
-                        [hookName]: (query, _requestContext, _serviceContext) => {
-                            return { ...query, filter: { _id: { $eq: ctx.item._id } } }
-                        },
+                        dataHooks: {
+                            [hookName]: (query, _requestContext, _serviceContext) => {
+                                return { ...query, filter: { _id: { $eq: ctx.item._id } } }
+                            },
+                        }
                     })
 
                     const response = await axios.post('/data/find', hooks.findRequestBodyWith(ctx.collectionName, { _id: { $ne: ctx.item._id } }), authOwner)
@@ -214,8 +228,10 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                     await data.givenItems([ctx.item], ctx.collectionName, authOwner)
 
                     env.externalDbRouter.reloadHooks({
-                        [hookName]: (_id, _requestContext, _serviceContext) => {
-                            return ctx.item._id
+                        dataHooks: {
+                            [hookName]: (_id, _requestContext, _serviceContext) => {
+                                return ctx.item._id
+                            }
                         }
                     })
 
@@ -229,8 +245,10 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                     await data.givenItems([ctx.item], ctx.collectionName, authOwner)
 
                     env.externalDbRouter.reloadHooks({
-                        [hookName]: (filter, _requestContext, _serviceContext) => {
-                            return { ...filter, _id: { $eq: ctx.item._id } }
+                        dataHooks: {
+                            [hookName]: (filter, _requestContext, _serviceContext) => {
+                                return { ...filter, _id: { $eq: ctx.item._id } }
+                            }
                         }
                     })
 
@@ -248,8 +266,10 @@ describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
                         await data.givenItems([ctx.item], ctx.collectionName, authOwner)
 
                         env.externalDbRouter.reloadHooks({
-                            [hookName]: (query, _requestContext, _serviceContext) => {
-                                return { ...query, filter: { _id: { $eq: ctx.item._id } } }
+                            dataHooks: {
+                                [hookName]: (query, _requestContext, _serviceContext) => {
+                                    return { ...query, filter: { _id: { $eq: ctx.item._id } } }
+                                }
                             }
                         })
 
