@@ -3,8 +3,7 @@ module.exports = {
     clearMocks: true,
     verbose: true,
     roots: ['<rootDir>/src'],
-    // testRegex: '(.*\\.spec\\.)js$',
-    // testEnvironment: 'node',
+    testEnvironment: 'node',
     preset: '../../jest.preset.js',
     globals: {
       'ts-jest': {
@@ -16,5 +15,5 @@ module.exports = {
     },
     moduleFileExtensions: ['ts', 'js', 'html'],
     coverageDirectory: '../../coverage/libs/velo-external-db-core',
-    // setupFilesAfterEnv: ['jest-extended/all'],
+    setupFilesAfterEnv: ['jest-extended/all'],
 }
