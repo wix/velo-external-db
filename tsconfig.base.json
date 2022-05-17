@@ -17,6 +17,7 @@
     "paths": {
       "external-db-config": [ "libs/external-db-config/src/index.js" ],
       "external-db-postgres": [ "libs/external-db-postgres/src/index.js" ],
+      "external-db-mysql": [ "libs/external-db-mysql/src/index.js" ],
       "external-db-security": [ "libs/external-db-security/src/index.js" ],
       "test-commons": [ "libs/test-commons/src/index.js" ],
       "velo-external-db": [ "apps/velo-external-db/src/app.js" ],
