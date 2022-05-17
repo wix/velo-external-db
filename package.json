@@ -17,7 +17,7 @@
     "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
     "test:mysql": "TEST_ENGINE=mysql nx run-many --target=test --projects=external-db-mysql,velo-external-db",
     "test:mysql5": "npm run test:mysql",
-    "test:mssql": "lerna exec --scope external-db-mssql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mssql\"",
+    "test:mssql": "TEST_ENGINE=mssql nx run-many --target=test --projects=external-db-mssql,velo-external-db",
     "test:mssql17": "npm run test:mssql",
     "test:firestore": "lerna exec --scope external-db-firestore \"npm test\" && lerna exec --scope velo-external-db \"npm run test:firestore\"",
     "test:mongo": "lerna exec --scope external-db-mongo \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mongo\"",
@@ -41,6 +41,7 @@
     "docker-compose": "^0.23.17",
     "express": "^4.17.2",
     "moment": "^2.29.3",
+    "mssql": "^8.1.0",
     "mysql": "^2.18.1",
     "nested-property": "^4.0.0",
     "node-cache": "^5.1.2",
@@ -51,6 +52,7 @@
     "pg": "^8.7.3",
     "pg-escape": "^0.2.0",
     "tslib": "^2.3.0",
+    "tsqlstring": "^1.0.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

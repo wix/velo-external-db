@@ -4,6 +4,7 @@
     "external-db-config": "libs/external-db-config",
     "external-db-postgres": "libs/external-db-postgres",
     "external-db-mysql": "libs/external-db-mysql",
+    "external-db-mssql": "libs/external-db-mssql",
     "external-db-security": "libs/external-db-security",
     "test-commons": "libs/test-commons",
     "velo-external-db": "apps/velo-external-db",
