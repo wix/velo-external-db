@@ -1,37 +1,5 @@
 {
-  "name": "external-db-spanner",
+  "name": "external-db-sapnner",
   "version": "0.0.0",
-  "description": "",
-  "homepage": "https://github.com/wix/velo-external-db#readme",
-  "license": "MIT",
-  "main": "src/index.js",
-  "directories": {
-    "src": "src",
-    "test": "tests"
-  },
-  "files": [ "src" ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/wix/velo-external-db.git",
-    "directory": "packages/external-db-spanner"
-  },
-  "bugs": {
-    "url": "https://github.com/wix/velo-external-db/issues"
-  },
-  "scripts": {
-    "test": "jest"
-  },
-  "dependencies": {
-    "@google-cloud/spanner": "^5.16.3",
-    "sqlstring": "^2.3.2",
-    "test-commons": "^0.0.0",
-    "velo-external-db-commons": "^0.0.0"
-  },
-  "devDependencies": {
-    "chance": "^1.1.8",
-    "jest": "^27.5.1",
-    "jest-each": "^27.4.6",
-    "jest-when": "^3.5.1",
-    "test-commons": "^0.0.0"
-  }
+	"type": "commonjs"
 }
