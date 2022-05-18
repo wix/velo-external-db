@@ -14,6 +14,6 @@ module.exports = {
       '^.+\\.[tj]s$': 'ts-jest',
     },
     moduleFileExtensions: ['ts', 'js', 'html'],
-    coverageDirectory: '../../coverage/libs/external-db-mssql',
+    coverageDirectory: '../../coverage/libs/external-db-firestore',
     testEnvironment: 'node'
 }

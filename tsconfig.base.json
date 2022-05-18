@@ -22,6 +22,7 @@
       "external-db-spanner": [ "libs/external-db-spanner/src/index.js" ],
       "external-db-mongo": [ "libs/external-db-mongo/src/index.js" ],
       "external-db-firestore": [ "libs/external-db-firestore/src/index.js" ],
+      "external-db-dynamodb": [ "libs/external-db-dynamodb/src/index.js" ],
       "external-db-security": [ "libs/external-db-security/src/index.js" ],
       "test-commons": [ "libs/test-commons/src/index.js" ],
       "velo-external-db": [ "apps/velo-external-db/src/app.js" ],
