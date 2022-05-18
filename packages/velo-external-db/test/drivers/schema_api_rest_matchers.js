@@ -22,6 +22,8 @@ const collectionResponseWithNoCollections = () => responseWith(toHaveNoCollectio
 
 const collectionResponseWithCollections = (collections) => responseWith( toHaveCollections(collections) )
 
+const listResponseWithCollection = (collectionName) => responseWith( listToHaveCollection(collectionName) )
+
 const collectionHasField = field => expect.objectContaining( {
     schemas: expect.arrayContaining( [ schemaWithFields( [field] ) ] )
 } )
@@ -34,4 +36,9 @@ const toHaveCollections = (collections) => expect.objectContaining( {
     schemas: collections.map( asWixSchemaHeaders )
 } )
 
-module.exports = { collectionResponseWithDefaultFieldsFor, collectionResponseHasField, collectionResponseWithNoCollections, responseWith, collectionResponseWithCollections }
+const listToHaveCollection = (collectionName) => expect.objectContaining( {
+    schemas: expect.arrayContaining( [ expect.objectContaining( { id: collectionName } ) ] )
+} )
+
+module.exports = { collectionResponseWithDefaultFieldsFor, collectionResponseHasField, collectionResponseWithNoCollections, responseWith, 
+    collectionResponseWithCollections, listResponseWithCollection }
