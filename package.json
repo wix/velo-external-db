@@ -34,6 +34,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.87.0",
     "@aws-sdk/client-secrets-manager": "^3.89.0",
+    "@google-cloud/firestore": "^5.0.2",
     "@google-cloud/spanner": "^5.18.0",
     "ajv": "^6.12.6",
     "async-wait-until": "^2.0.12",

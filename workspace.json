@@ -7,6 +7,7 @@
     "external-db-mssql": "libs/external-db-mssql",
     "external-db-spanner": "libs/external-db-spanner",
     "external-db-mongo": "libs/external-db-mongo",
+    "external-db-firestore": "libs/external-db-firestore",
     "external-db-security": "libs/external-db-security",
     "test-commons": "libs/test-commons",
     "velo-external-db": "apps/velo-external-db",

@@ -1,4 +1,48 @@
 {
-  "tags": [],
-  "targets": {}
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/external-db-firestore/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": [ "{options.outputPath}" ],
+      "options": {
+        "outputPath": "dist/libs/external-db-firestore",
+        "main": "libs/external-db-firestore/src/index.js",
+        "tsConfig": "libs/external-db-firestore/tsconfig.lib.json",
+        "assets": [ "libs/external-db-firestore/*.md" ],
+        "buildableProjectDepsInPackageJsonType": "dependencies"
+      }
+    },
+    "publish": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs external-db-firestore {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [ "libs/external-db-firestore/**/*.js" ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [ "coverage/libs/external-db-firestore" ],
+      "options": {
+        "jestConfig": "libs/external-db-firestore/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
 }
