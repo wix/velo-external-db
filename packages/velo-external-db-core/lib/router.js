@@ -49,7 +49,7 @@ const executeDataHooksFor = async(action, payload, requestContext) => {
 const executeDataHook = async(actionName, payload, requestContext) => {
     if (dataHooks[actionName]) {
         try {
-            const payloadAfterHook = await dataHooks[actionName](payload, requestContext, serviceContext()())
+            const payloadAfterHook = await dataHooks[actionName](payload, requestContext, serviceContext())
             return payloadAfterHook || payload
         } catch (e) {
             throw ({ status: 400, message: e })
