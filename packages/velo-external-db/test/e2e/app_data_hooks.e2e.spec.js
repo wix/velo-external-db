@@ -13,7 +13,7 @@ const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
 
-describe(`Velo External DB hooks: ${currentDbImplementationName()}`, () => {
+describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {
         await setupDb()
 
