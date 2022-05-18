@@ -3,7 +3,7 @@ const Chance = require('chance')
 const chance = Chance()
 const { Uninitialized } = require('test-commons')
 const { givenBodyWith } = require('../../velo-external-db/test/drivers/hooks_test_support')
-const { hooksForAction, Operations, payloadFor, Actions } = require('./hooks_utils')
+const { hooksForAction, Operations, payloadFor, Actions } = require('./data_hooks_utils')
 
 describe('Hooks Utils', () => {
     describe('Hooks For Action', () => {

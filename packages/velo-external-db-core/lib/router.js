@@ -9,7 +9,7 @@ const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const path = require('path')
-const { hooksForAction: dataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./hooks_utils')
+const { hooksForAction: dataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./data_hooks_utils')
 const { hooksForAction: schemaHooksForAction, Operations: SchemaOperations, payloadFor: schemaPayloadFor, Actions: SchemaActions } = require ('./schema_hooks_utils')
 
 const { FIND, INSERT, BULK_INSERT, UPDATE, BULK_UPDATE, REMOVE, BULK_REMOVE, AGGREGATE, COUNT, GET } = dataOperations
