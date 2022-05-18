@@ -50,7 +50,6 @@ const Actions = {
 const payloadFor = (operation, body) => {
     switch (operation) {
         case Operations.LIST:
-            return null
         case Operations.LIST_HEADERS:
             return null
         case Operations.FIND:
