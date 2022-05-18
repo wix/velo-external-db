@@ -41,35 +41,23 @@ const serviceContext = () => ({
 const executeDataHooksFor = async(action, payload, requestContext) => {
     let result = payload
     for (const hook of dataHooksForAction(action)) {
-        result = await executeDataHook(hook, result, requestContext)
+        result = await executeHook(dataHooks, hook, result, requestContext)
     }
     return result
-}
-
-const executeDataHook = async(actionName, payload, requestContext) => {
-    if (dataHooks[actionName]) {
-        try {
-            const payloadAfterHook = await dataHooks[actionName](payload, requestContext, serviceContext())
-            return payloadAfterHook || payload
-        } catch (e) {
-            throw ({ status: 400, message: e })
-        }
-    }
-    return payload
 }
 
 const executeSchemaHooksFor = async(action, payload, requestContext) => {
     let result = payload
     for (const hook of schemaHooksForAction(action)) {
-        result = await executeSchemaHook(hook, result, requestContext)
+        result = await executeHook(schemaHooks, hook, result, requestContext)
     }
     return result
 }
 
-const executeSchemaHook = async(actionName, payload, requestContext) => {
-    if (schemaHooks[actionName]) {
+const executeHook = async(hooks, actionName, payload, requestContext) => {
+    if (hooks[actionName]) {
         try {
-            const payloadAfterHook = await schemaHooks[actionName](payload, requestContext, serviceContext())
+            const payloadAfterHook = await hooks[actionName](payload, requestContext, serviceContext())
             return payloadAfterHook || payload
         } catch (e) {
             throw ({ status: 400, message: e })
