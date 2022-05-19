@@ -260,7 +260,6 @@ const createRouter = () => {
             const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterList, data, requestContextFor(SchemaOperations.LIST, req.body))
             res.json(dataAfterAction)
         } catch (e) {
-            console.log(e)
             next(e)
         }
     })
@@ -301,7 +300,6 @@ const createRouter = () => {
 
             res.json(dataAfterAction)
         } catch (e) {
-            console.log(e)
             next(e)
         }
     })
@@ -317,7 +315,6 @@ const createRouter = () => {
 
             res.json(dataAfterAction)
         } catch (e) {
-            console.log(e)
             next(e)
         }
     })
