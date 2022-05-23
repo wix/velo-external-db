@@ -89,9 +89,9 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 .test('Before create collection %s hook should change payload', async(hookName) => {
                     env.externalDbRouter.reloadHooks({
                         schemaHooks: {
-                            [hookName]: (_collectionName, requestContext, _serviceContext) => {
+                            [hookName]: (payload, requestContext, _serviceContext) => {
                                 if (requestContext.operation === 'create')
-                                    return ctx.anotherCollectionName
+                                    return { ...payload, collectionName: ctx.anotherCollectionName }
                             }
                         }
                     })
@@ -107,9 +107,9 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
 
                     env.externalDbRouter.reloadHooks({
                         schemaHooks: {
-                            [hookName]: (_column, requestContext, _serviceContext) => {
+                            [hookName]: (payload, requestContext, _serviceContext) => {
                                 if (requestContext.operation === 'columnAdd')
-                                    return ctx.anotherColumn
+                                    return { ...payload, column: ctx.anotherColumn }
                             }
                         }
                     })
@@ -125,7 +125,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
 
                     env.externalDbRouter.reloadHooks({
                         schemaHooks: {
-                            [hookName]: (columnName, _requestContext, _serviceContext) => {
+                            [hookName]: ({ columnName }, _requestContext, _serviceContext) => {
                                 if (columnName === ctx.column.name) {
                                     throw ('Should not be removed')
                                 }
@@ -145,9 +145,9 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                     await schema.givenCollection(ctx.anotherCollectionName, [], authOwner)
                     env.externalDbRouter.reloadHooks({
                         schemaHooks: {
-                            [hookName]: (_collectionName, requestContext, _serviceContext) => {
+                            [hookName]: (payload, requestContext, _serviceContext) => {
                                 if (requestContext.operation === 'find')
-                                    return [ctx.anotherCollectionName]
+                                    return { ...payload, schemaIds: [ctx.anotherCollectionName] }
                             }
                         }
                     })

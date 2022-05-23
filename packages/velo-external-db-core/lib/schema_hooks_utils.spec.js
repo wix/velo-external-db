@@ -36,19 +36,19 @@ describe('Hooks Utils', () => {
     describe('Payload For', () => {
         each([Operations.List, Operations.ListHeaders])
             .test('Payload for %s should return null', (operation) => {
-                expect(payloadFor(operation, givenBodyWith({}))).toEqual(null)
+                expect(payloadFor(operation, givenBodyWith({}))).toEqual({})
             })
         test('Payload for Find should return schemaIds', () => {
-            expect(payloadFor(Operations.Find, givenBodyWith({ schemaIds: ctx.schemaIds }))).toEqual(ctx.schemaIds)
+            expect(payloadFor(Operations.Find, givenBodyWith({ schemaIds: ctx.schemaIds }))).toEqual({ schemaIds: ctx.schemaIds })
         })
         test('Payload for Create should return collectionName', () => {
-            expect(payloadFor(Operations.Create, givenBodyWith({ collectionName: ctx.collectionName }))).toEqual(ctx.collectionName)
+            expect(payloadFor(Operations.Create, givenBodyWith({ collectionName: ctx.collectionName }))).toEqual({ collectionName: ctx.collectionName })
         })
         test('Payload for ColumnAdd should return column', () => {
-            expect(payloadFor(Operations.ColumnAdd, givenBodyWith({ column: ctx.column }))).toEqual(ctx.column)
+            expect(payloadFor(Operations.ColumnAdd, givenBodyWith({ column: ctx.column }))).toEqual({ column: ctx.column })
         })
         test('Payload for ColumnRemove should return columnName', () => {
-            expect(payloadFor(Operations.ColumnRemove, givenBodyWith({ columnName: ctx.columnName }))).toEqual(ctx.columnName)
+            expect(payloadFor(Operations.ColumnRemove, givenBodyWith({ columnName: ctx.columnName }))).toEqual({ columnName: ctx.columnName })
         })
     })
 

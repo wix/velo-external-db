@@ -48,15 +48,15 @@ const payloadFor = (operation, body) => {
     switch (operation) {
         case Operations.List:
         case Operations.ListHeaders:
-            return null
+            return {}
         case Operations.Find:
-            return body.schemaIds
+            return { schemaIds: body.schemaIds }
         case Operations.Create:
-            return body.collectionName
+            return { collectionName: body.collectionName }
         case Operations.ColumnAdd:
-            return body.column
+            return { column: body.column }
         case Operations.ColumnRemove:
-            return body.columnName
+            return { columnName: body.columnName }
         default:
             return body
     }
