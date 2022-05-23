@@ -11,6 +11,7 @@ const { unless, includes } = require('./web/middleware-support')
 const path = require('path')
 const { hooksForAction: dataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./data_hooks_utils')
 const { hooksForAction: schemaHooksForAction, Operations: SchemaOperations, payloadFor: schemaPayloadFor, Actions: SchemaActions } = require ('./schema_hooks_utils')
+const { clone } = require('velo-external-db-commons')
 
 const { FIND, INSERT, BULK_INSERT, UPDATE, BULK_UPDATE, REMOVE, BULK_REMOVE, AGGREGATE, COUNT, GET } = dataOperations
 
@@ -39,19 +40,19 @@ const serviceContext = () => ({
 
 
 const executeDataHooksFor = async(action, payload, requestContext) => {
-    let result = payload
+    let lastHookResult = clone(payload)
     for (const hook of dataHooksForAction(action)) {
-        result = await executeHook(dataHooks, hook, result, requestContext)
+        lastHookResult = await executeHook(dataHooks, hook, lastHookResult, requestContext)
     }
-    return result
+    return lastHookResult
 }
 
 const executeSchemaHooksFor = async(action, payload, requestContext) => {
-    let result = payload
+    let lastHookResult = clone(payload)
     for (const hook of schemaHooksForAction(action)) {
-        result = await executeHook(schemaHooks, hook, result, requestContext)
+        lastHookResult = await executeHook(schemaHooks, hook, lastHookResult, requestContext)
     }
-    return result
+    return lastHookResult
 }
 
 const executeHook = async(hooks, actionName, payload, requestContext) => {

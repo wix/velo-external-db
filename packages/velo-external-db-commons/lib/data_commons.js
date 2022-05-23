@@ -95,6 +95,14 @@ const specItemToRegex = (spec) => {
     }
 }
 
+const clone = (data) => {
+    if (Array.isArray(data))
+        return [...data]
+    if (isObject(data))
+        return { ...data }
+    return data
+}
+
 module.exports = { EmptyFilter, EmptySort, patchDateTime, asParamArrays, isObject, isDate,
                      updateFieldsFor, isEmptyFilter, AdapterOperators, AdapterFunctions,
-                     extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex }
+                     extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex, clone }
