@@ -3,32 +3,32 @@ const Chance = require('chance')
 const chance = Chance()
 const { Uninitialized } = require('test-commons')
 const { givenBodyWith } = require('../../velo-external-db/test/drivers/hooks_test_support')
-const { hooksForAction, Operations, payloadFor, Actions } = require('./data_hooks_utils')
+const { HooksForAction, Operations, payloadFor, Actions } = require('./data_hooks_utils')
 
 describe('Hooks Utils', () => {
     describe('Hooks For Action', () => {
         describe('Before Read', () => {
             each([Actions.BeforeFind, Actions.BeforeAggregate, Actions.BeforeCount, Actions.BeforeGetById])
                 .test('Hooks action for %s should return appropriate array', (action) => {
-                    expect(hooksForAction(action)).toEqual(['beforeAll', 'beforeRead', action])
+                    expect(HooksForAction[action]).toEqual(['beforeAll', 'beforeRead', action])
                 })
         })
         describe('After Read', () => {
             each([Actions.AfterFind, Actions.AfterAggregate, Actions.AfterCount, Actions.AfterGetById])
                 .test('Hooks action for %s should return appropriate array', (action) => {
-                    expect(hooksForAction(action)).toEqual(['afterAll', 'afterRead', action])
+                    expect(HooksForAction[action]).toEqual(['afterAll', 'afterRead', action])
                 })
         })
         describe('Before Write', () => {
             each([Actions.BeforeInsert, Actions.BeforeBulkInsert, Actions.BeforeUpdate, Actions.BeforeBulkUpdate, Actions.BeforeRemove, Actions.BeforeBulkRemove])
                 .test('Hooks action for %s should return appropriate array', (action) => {
-                    expect(hooksForAction(action)).toEqual(['beforeAll', 'beforeWrite', action])
+                    expect(HooksForAction[action]).toEqual(['beforeAll', 'beforeWrite', action])
                 })
         })
         describe('After Write', () => {
             each([Actions.AfterInsert, Actions.AfterBulkInsert, Actions.AfterUpdate, Actions.AfterBulkUpdate, Actions.AfterRemove, Actions.AfterBulkRemove])
                 .test('Hooks action for %s should return appropriate array', (action) => {
-                    expect(hooksForAction(action)).toEqual(['afterAll', 'afterWrite', action])
+                    expect(HooksForAction[action]).toEqual(['afterAll', 'afterWrite', action])
                 })
         })
     })

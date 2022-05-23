@@ -1,29 +1,26 @@
 
 
-const hooksForAction = (action) => {
-    const hooksForAction = {
-        beforeFind: ['beforeAll', 'beforeRead', 'beforeFind'],
-        afterFind: ['afterAll', 'afterRead', 'afterFind'],
-        beforeInsert: ['beforeAll', 'beforeWrite', 'beforeInsert'],
-        afterInsert: ['afterAll', 'afterWrite', 'afterInsert'],
-        beforeBulkInsert: ['beforeAll', 'beforeWrite', 'beforeBulkInsert'],
-        afterBulkInsert: ['afterAll', 'afterWrite', 'afterBulkInsert'],
-        beforeUpdate: ['beforeAll', 'beforeWrite', 'beforeUpdate'],
-        afterUpdate: ['afterAll', 'afterWrite', 'afterUpdate'],
-        beforeBulkUpdate: ['beforeAll', 'beforeWrite', 'beforeBulkUpdate'],
-        afterBulkUpdate: ['afterAll', 'afterWrite', 'afterBulkUpdate'],
-        beforeRemove: ['beforeAll', 'beforeWrite', 'beforeRemove'],
-        afterRemove: ['afterAll', 'afterWrite', 'afterRemove'],
-        beforeBulkRemove: ['beforeAll', 'beforeWrite', 'beforeBulkRemove'],
-        afterBulkRemove: ['afterAll', 'afterWrite', 'afterBulkRemove'],
-        beforeAggregate: ['beforeAll', 'beforeRead', 'beforeAggregate'],
-        afterAggregate: ['afterAll', 'afterRead', 'afterAggregate'],
-        beforeCount: ['beforeAll', 'beforeRead', 'beforeCount'],
-        afterCount: ['afterAll', 'afterRead', 'afterCount'],
-        beforeGetById: ['beforeAll', 'beforeRead', 'beforeGetById'],
-        afterGetById: ['afterAll', 'afterRead', 'afterGetById'],
-    }
-    return hooksForAction[action]
+const HooksForAction = {
+    beforeFind: ['beforeAll', 'beforeRead', 'beforeFind'],
+    afterFind: ['afterAll', 'afterRead', 'afterFind'],
+    beforeInsert: ['beforeAll', 'beforeWrite', 'beforeInsert'],
+    afterInsert: ['afterAll', 'afterWrite', 'afterInsert'],
+    beforeBulkInsert: ['beforeAll', 'beforeWrite', 'beforeBulkInsert'],
+    afterBulkInsert: ['afterAll', 'afterWrite', 'afterBulkInsert'],
+    beforeUpdate: ['beforeAll', 'beforeWrite', 'beforeUpdate'],
+    afterUpdate: ['afterAll', 'afterWrite', 'afterUpdate'],
+    beforeBulkUpdate: ['beforeAll', 'beforeWrite', 'beforeBulkUpdate'],
+    afterBulkUpdate: ['afterAll', 'afterWrite', 'afterBulkUpdate'],
+    beforeRemove: ['beforeAll', 'beforeWrite', 'beforeRemove'],
+    afterRemove: ['afterAll', 'afterWrite', 'afterRemove'],
+    beforeBulkRemove: ['beforeAll', 'beforeWrite', 'beforeBulkRemove'],
+    afterBulkRemove: ['afterAll', 'afterWrite', 'afterBulkRemove'],
+    beforeAggregate: ['beforeAll', 'beforeRead', 'beforeAggregate'],
+    afterAggregate: ['afterAll', 'afterRead', 'afterAggregate'],
+    beforeCount: ['beforeAll', 'beforeRead', 'beforeCount'],
+    afterCount: ['afterAll', 'afterRead', 'afterCount'],
+    beforeGetById: ['beforeAll', 'beforeRead', 'beforeGetById'],
+    afterGetById: ['afterAll', 'afterRead', 'afterGetById'],
 }
 
 const Operations = {
@@ -103,4 +100,4 @@ const payloadFor = (operation, body) => {
 
 const requestContextFor = (operation, body) => ({ operation, collection: body.collection })
 
-module.exports = { hooksForAction, Operations, payloadFor, Actions, requestContextFor }
+module.exports = { HooksForAction, Operations, payloadFor, Actions, requestContextFor }

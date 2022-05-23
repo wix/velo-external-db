@@ -9,8 +9,8 @@ const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const path = require('path')
-const { hooksForAction: dataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./data_hooks_utils')
-const { hooksForAction: schemaHooksForAction, Operations: SchemaOperations, payloadFor: schemaPayloadFor, Actions: SchemaActions } = require ('./schema_hooks_utils')
+const { HooksForAction: DataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./data_hooks_utils')
+const { HooksForAction: SchemaHooksForAction, Operations: SchemaOperations, payloadFor: schemaPayloadFor, Actions: SchemaActions } = require ('./schema_hooks_utils')
 const { clone } = require('velo-external-db-commons')
 
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = dataOperations
@@ -41,7 +41,7 @@ const serviceContext = () => ({
 
 const executeDataHooksFor = async(action, payload, requestContext) => {
     let lastHookResult = clone(payload)
-    for (const hook of dataHooksForAction(action)) {
+    for (const hook of DataHooksForAction[action]) {
         lastHookResult = await executeHook(dataHooks, hook, lastHookResult, requestContext)
     }
     return lastHookResult
@@ -49,7 +49,7 @@ const executeDataHooksFor = async(action, payload, requestContext) => {
 
 const executeSchemaHooksFor = async(action, payload, requestContext) => {
     let lastHookResult = clone(payload)
-    for (const hook of schemaHooksForAction(action)) {
+    for (const hook of SchemaHooksForAction[action]) {
         lastHookResult = await executeHook(schemaHooks, hook, lastHookResult, requestContext)
     }
     return lastHookResult

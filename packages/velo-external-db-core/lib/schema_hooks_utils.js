@@ -1,20 +1,17 @@
 
-const hooksForAction = (action) => {
-    const hooksForAction = {
-        beforeList: ['beforeAll', 'beforeRead', 'beforeList'],
-        afterList: ['afterAll', 'afterRead', 'afterList'],
-        beforeListHeaders: ['beforeAll', 'beforeRead', 'beforeListHeaders'],
-        afterListHeaders: ['afterAll', 'afterRead', 'afterListHeaders'],
-        beforeFind: ['beforeAll', 'beforeRead', 'beforeFind'],
-        afterFind: ['afterAll', 'afterRead', 'afterFind'],
-        beforeCreate: ['beforeAll', 'beforeWrite', 'beforeCreate'],
-        afterCreate: ['afterAll', 'afterWrite', 'afterCreate'],
-        beforeColumnAdd: ['beforeAll', 'beforeWrite', 'beforeColumnAdd'],
-        afterColumnAdd: ['afterAll', 'afterWrite', 'afterColumnAdd'],
-        beforeColumnRemove: ['beforeAll', 'beforeWrite', 'beforeColumnRemove'],
-        afterColumnRemove: ['afterAll', 'afterWrite', 'afterColumnRemove']
-    }
-    return hooksForAction[action]
+const HooksForAction = {
+    beforeList: ['beforeAll', 'beforeRead', 'beforeList'],
+    afterList: ['afterAll', 'afterRead', 'afterList'],
+    beforeListHeaders: ['beforeAll', 'beforeRead', 'beforeListHeaders'],
+    afterListHeaders: ['afterAll', 'afterRead', 'afterListHeaders'],
+    beforeFind: ['beforeAll', 'beforeRead', 'beforeFind'],
+    afterFind: ['afterAll', 'afterRead', 'afterFind'],
+    beforeCreate: ['beforeAll', 'beforeWrite', 'beforeCreate'],
+    afterCreate: ['afterAll', 'afterWrite', 'afterCreate'],
+    beforeColumnAdd: ['beforeAll', 'beforeWrite', 'beforeColumnAdd'],
+    afterColumnAdd: ['afterAll', 'afterWrite', 'afterColumnAdd'],
+    beforeColumnRemove: ['beforeAll', 'beforeWrite', 'beforeColumnRemove'],
+    afterColumnRemove: ['afterAll', 'afterWrite', 'afterColumnRemove']
 }
 
 const Operations = {
@@ -65,4 +62,4 @@ const payloadFor = (operation, body) => {
     }
 }
 
-module.exports = { hooksForAction, Operations, payloadFor, Actions }
+module.exports = { HooksForAction, Operations, payloadFor, Actions }
