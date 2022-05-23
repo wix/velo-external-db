@@ -76,15 +76,15 @@ const payloadFor = (operation, body) => {
             }
         case Operations.Insert:
         case Operations.Update:
-            return body.item
+            return { item: body.item }
         case Operations.BulkInsert:
         case Operations.BulkUpdate:
-            return body.items
+            return { items: body.items }
         case Operations.Get:
         case Operations.Remove:
-            return body.itemId
+            return { itemId: body.itemId }
         case Operations.BulkRemove:
-            return body.itemIds
+            return { itemIds: body.itemIds }
         case Operations.Aggregate:
             return {
                 filter: body.filter,
@@ -92,7 +92,7 @@ const payloadFor = (operation, body) => {
                 postFilteringStep: body.postFilteringStep
             }
         case Operations.Count:
-            return body.filter
+            return { filter: body.filter }
         default:
             return body
     }

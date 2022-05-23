@@ -106,15 +106,15 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                 env.externalDbRouter.reloadHooks({
                     dataHooks: {
-                        beforeAll: (item, _requestContext, _serviceContext) => (
-                            { ...item, beforeAll: true, beforeWrite: false, beforeHook: false }
+                        beforeAll: (payload, _requestContext, _serviceContext) => (
+                            { ...payload, item: { ...payload.item, beforeAll: true, beforeWrite: false, beforeHook: false } }
                         ),
-                        beforeWrite: (item, _requestContext, _serviceContext) => (
-                            { ...item, beforeWrite: true, beforeHook: false }
+                        beforeWrite: (payload, _requestContext, _serviceContext) => (
+                            { ...payload, item: { ...payload.item, beforeWrite: true, beforeHook: false } }
                         ),
-                        [hookName]: (item, _requestContext, _serviceContext) => (
-                            { ...item, beforeHook: true }
-                        )
+                        [hookName]: ({ item }, _requestContext, _serviceContext) => ({
+                            item: { ...item, beforeHook: true }
+                        })
                     }
                 })
 
@@ -140,15 +140,15 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                 env.externalDbRouter.reloadHooks({
                     dataHooks: {
-                        beforeAll: (items, _requestContext, _serviceContext) => (
-                            items.map(item => ({ ...item, beforeAll: true, beforeWrite: false, beforeHook: false }))
+                        beforeAll: (payload, _requestContext, _serviceContext) => (
+                            { ...payload, items: payload.items.map(item => ({ ...item, beforeAll: true, beforeWrite: false, beforeHook: false })) }
                         ),
-                        beforeWrite: (items, _requestContext, _serviceContext) => (
-                            items.map(item => ({ ...item, beforeWrite: true, beforeHook: false }))
+                        beforeWrite: (payload, _requestContext, _serviceContext) => (
+                            { ...payload, items: payload.items.map(item => ({ ...item, beforeWrite: true, beforeHook: false })) }
                         ),
-                        [hookName]: (items, _requestContext, _serviceContext) => (
-                            items.map(item => ({ ...item, beforeHook: true }))
-                        )
+                        [hookName]: ({ items }, _requestContext, _serviceContext) => ({
+                            items: items.map(item => ({ ...item, beforeHook: true }))
+                        })
                     }
                 })
 
@@ -170,8 +170,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                     env.externalDbRouter.reloadHooks({
                         dataHooks: {
-                            [hookName]: (itemId, _requestContext, _serviceContext) => {
-                                if (itemId === ctx.item._id) {
+                            [hookName]: (payload, _requestContext, _serviceContext) => {
+                                if (payload.itemId === ctx.item._id) {
                                     throw ('Should not be removed')
                                 }
                             }
@@ -190,8 +190,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                     env.externalDbRouter.reloadHooks({
                         dataHooks: {
-                            [hookName]: (itemIds, _requestContext, _serviceContext) => {
-                                if (itemIds[0] === ctx.items[0]._id) {
+                            [hookName]: (payload, _requestContext, _serviceContext) => {
+                                if (payload.itemIds[0] === ctx.items[0]._id) {
                                     throw ('Should not be removed')
                                 }
                             }
@@ -212,8 +212,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                     env.externalDbRouter.reloadHooks({
                         dataHooks: {
-                            [hookName]: (query, _requestContext, _serviceContext) => {
-                                return { ...query, filter: { _id: { $eq: ctx.item._id } } }
+                            [hookName]: (payload, _requestContext, _serviceContext) => {
+                                return { ...payload, filter: { _id: { $eq: ctx.item._id } } }
                             },
                         }
                     })
@@ -229,9 +229,9 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                     env.externalDbRouter.reloadHooks({
                         dataHooks: {
-                            [hookName]: (_id, _requestContext, _serviceContext) => {
-                                return ctx.item._id
-                            }
+                            [hookName]: (_payload, _requestContext, _serviceContext) => ({
+                                itemId: ctx.item._id
+                            })
                         }
                     })
 
@@ -246,8 +246,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                     env.externalDbRouter.reloadHooks({
                         dataHooks: {
-                            [hookName]: (filter, _requestContext, _serviceContext) => {
-                                return { ...filter, _id: { $eq: ctx.item._id } }
+                            [hookName]: (payload, _requestContext, _serviceContext) => {
+                                return { ...payload, filter: { _id: { $eq: ctx.item._id } } }
                             }
                         }
                     })
@@ -267,8 +267,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                         env.externalDbRouter.reloadHooks({
                             dataHooks: {
-                                [hookName]: (query, _requestContext, _serviceContext) => {
-                                    return { ...query, filter: { _id: { $eq: ctx.item._id } } }
+                                [hookName]: (payload, _requestContext, _serviceContext) => {
+                                    return { ...payload, filter: { _id: { $eq: ctx.item._id } } }
                                 }
                             }
                         })

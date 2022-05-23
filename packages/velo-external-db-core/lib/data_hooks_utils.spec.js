@@ -43,28 +43,28 @@ describe('Hooks Utils', () => {
             })
         })
         test('Payload for Insert should return item', () => {
-            expect(payloadFor(Operations.Insert, givenBodyWith({ item: ctx.item }))).toEqual(ctx.item)
+            expect(payloadFor(Operations.Insert, givenBodyWith({ item: ctx.item }))).toEqual({ item: ctx.item })
         })
         test('Payload for BulkInsert should return items', () => {
-            expect(payloadFor(Operations.BulkInsert, givenBodyWith({ items: ctx.items }))).toEqual(ctx.items)
+            expect(payloadFor(Operations.BulkInsert, givenBodyWith({ items: ctx.items }))).toEqual({ items: ctx.items })
         })
         test('Payload for Update should return item', () => {
-            expect(payloadFor(Operations.Update, givenBodyWith({ item: ctx.item }))).toEqual(ctx.item)
+            expect(payloadFor(Operations.Update, givenBodyWith({ item: ctx.item }))).toEqual({ item: ctx.item })
         })
         test('Payload for BulkUpdate should return items', () => {
-            expect(payloadFor(Operations.BulkUpdate, givenBodyWith({ items: ctx.items }))).toEqual(ctx.items)
+            expect(payloadFor(Operations.BulkUpdate, givenBodyWith({ items: ctx.items }))).toEqual({ items: ctx.items })
         })
         test('Payload for Remove should return item id', () => {
-            expect(payloadFor(Operations.Remove, givenBodyWith({ itemId: ctx.itemId }))).toEqual(ctx.itemId)
+            expect(payloadFor(Operations.Remove, givenBodyWith({ itemId: ctx.itemId }))).toEqual({ itemId: ctx.itemId })
         })
         test('Payload for BulkRemove should return item ids', () => {
-            expect(payloadFor(Operations.BulkRemove, givenBodyWith({ itemIds: ctx.itemIds }))).toEqual(ctx.itemIds)
+            expect(payloadFor(Operations.BulkRemove, givenBodyWith({ itemIds: ctx.itemIds }))).toEqual({ itemIds: ctx.itemIds })
         })
         test('Payload for Count should return filter', () => {
-            expect(payloadFor(Operations.Count, givenBodyWith({ filter: ctx.filter }))).toEqual(ctx.filter)
+            expect(payloadFor(Operations.Count, givenBodyWith({ filter: ctx.filter }))).toEqual({ filter: ctx.filter })
         })
         test('Payload for Get should return item id', () => {
-            expect(payloadFor(Operations.Get, givenBodyWith({ itemId: ctx.itemId }))).toEqual(ctx.itemId)
+            expect(payloadFor(Operations.Get, givenBodyWith({ itemId: ctx.itemId }))).toEqual({ itemId: ctx.itemId })
         })
         test('Payload for Aggregate should return Aggregation query', () => {
             expect(payloadFor(Operations.Aggregate, givenBodyWith({ filter: ctx.filter, processingStep: ctx.processingStep, postFilteringStep: ctx.postFilteringStep })))
