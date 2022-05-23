@@ -18,12 +18,12 @@ const hooksForAction = (action) => {
 }
 
 const Operations = {
-    LIST: 'list',
-    LIST_HEADERS: 'listHeaders',
-    FIND: 'find',
-    CREATE: 'create',
-    COLUMN_ADD: 'columnAdd',
-    COLUMN_REMOVE: 'columnRemove',
+    List: 'list',
+    ListHeaders: 'listHeaders',
+    Find: 'find',
+    Create: 'create',
+    ColumnAdd: 'columnAdd',
+    ColumnRemove: 'columnRemove',
 }
 
 const Actions = {
@@ -49,16 +49,16 @@ const Actions = {
 
 const payloadFor = (operation, body) => {
     switch (operation) {
-        case Operations.LIST:
-        case Operations.LIST_HEADERS:
+        case Operations.List:
+        case Operations.ListHeaders:
             return null
-        case Operations.FIND:
+        case Operations.Find:
             return body.schemaIds
-        case Operations.CREATE:
+        case Operations.Create:
             return body.collectionName
-        case Operations.COLUMN_ADD:
+        case Operations.ColumnAdd:
             return body.column
-        case Operations.COLUMN_REMOVE:
+        case Operations.ColumnRemove:
             return body.columnName
         default:
             return body

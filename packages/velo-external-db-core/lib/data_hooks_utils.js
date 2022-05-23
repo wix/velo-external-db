@@ -27,16 +27,16 @@ const hooksForAction = (action) => {
 }
 
 const Operations = {
-    FIND: 'find',
-    INSERT: 'insert',
-    BULK_INSERT: 'bulkInsert',
-    UPDATE: 'update',
-    BULK_UPDATE: 'bulkUpdate',
-    REMOVE: 'remove',
-    BULK_REMOVE: 'bulkRemove',
-    AGGREGATE: 'aggregate',
-    COUNT: 'count',
-    GET: 'getById',
+    Find: 'find',
+    Insert: 'insert',
+    BulkInsert: 'bulkInsert',
+    Update: 'update',
+    BulkUpdate: 'bulkUpdate',
+    Remove: 'remove',
+    BulkRemove: 'bulkRemove',
+    Aggregate: 'aggregate',
+    Count: 'count',
+    Get: 'getById',
 }
 
 const Actions = {
@@ -70,31 +70,31 @@ const Actions = {
 
 const payloadFor = (operation, body) => {
     switch (operation) {
-        case Operations.FIND:
+        case Operations.Find:
             return {
                 filter: body.filter,
                 limit: body.limit,
                 skip: body.skip,
                 sort: body.sort
             }
-        case Operations.INSERT:
-        case Operations.UPDATE:
+        case Operations.Insert:
+        case Operations.Update:
             return body.item
-        case Operations.BULK_INSERT:
-        case Operations.BULK_UPDATE:
+        case Operations.BulkInsert:
+        case Operations.BulkUpdate:
             return body.items
-        case Operations.GET:
-        case Operations.REMOVE:
+        case Operations.Get:
+        case Operations.Remove:
             return body.itemId
-        case Operations.BULK_REMOVE:
+        case Operations.BulkRemove:
             return body.itemIds
-        case Operations.AGGREGATE:
+        case Operations.Aggregate:
             return {
                 filter: body.filter,
                 processingStep: body.processingStep,
                 postFilteringStep: body.postFilteringStep
             }
-        case Operations.COUNT:
+        case Operations.Count:
             return body.filter
         default:
             return body
