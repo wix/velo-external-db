@@ -5,9 +5,7 @@
   "targets": {
     "build": {
       "executor": "@nrwl/node:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": [ "{options.outputPath}" ],
       "options": {
         "outputPath": "dist/apps/velo-external-db",
         "main": "apps/velo-external-db/src/app.js",
@@ -23,14 +21,9 @@
       "configurations": {
         "production": {
           "optimization": true,
-          "extractLicenses": true,
           "inspect": false,
-          "generatePackageJson": true,
           "fileReplacements": [
-            {
-              "replace": "apps/velo-external-db/src/environments/environment.js",
-              "with": "apps/velo-external-db/src/environments/environment.prod.js"
-            }
+            { "replace": "apps/velo-external-db/src/environments/environment.js", "with": "apps/velo-external-db/src/environments/environment.prod.js" }
           ]
         }
       }
