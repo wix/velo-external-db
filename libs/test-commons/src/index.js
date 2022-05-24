@@ -1,4 +1,4 @@
-const testCommons = require('./test-commons')
-const gen = require('./gen')
+const testCommons = require('./libs/test-commons')
+const gen = require('./libs/gen')
 
 module.exports = { ...testCommons, gen }
