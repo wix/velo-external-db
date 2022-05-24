@@ -43,7 +43,7 @@ const shutdownEnv = async(testEngine) => {
             await dynamo.shutdownEnv()
             break
 
-        case 'mongo':
+        case 'mongo': 
             await mongo.shutdownEnv()
             break
     }

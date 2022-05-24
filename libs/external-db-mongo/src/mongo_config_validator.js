@@ -11,7 +11,7 @@ class MongoConfigValidator {
 
     validate() {
         return {
-          missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['URI'])
+            missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['connectionUri'])
         }
     }
 }
