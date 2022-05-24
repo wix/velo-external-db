@@ -1,4 +1,78 @@
 {
-  "tags": [],
-  "targets": {}
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/velo-external-db/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:webpack",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/apps/velo-external-db",
+        "main": "apps/velo-external-db/src/app.js",
+        "tsConfig": "apps/velo-external-db/tsconfig.app.json",
+        "generatePackageJson": true,
+        "progress": true,
+        "buildLibsFromSource": true,
+        "assets": [
+          { "glob": "**/*", "input": "libs/velo-external-db-core/src/views", "output": "./views" },
+          { "glob": "**/*", "input": "libs/velo-external-db-core/src/assets", "output": "./assets" }
+        ]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "generatePackageJson": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/velo-external-db/src/environments/environment.js",
+              "with": "apps/velo-external-db/src/environments/environment.prod.js"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:node",
+      "options": {
+        "buildTarget": "velo-external-db:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [
+          "apps/velo-external-db/**/*.js"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [
+        "coverage/apps/velo-external-db"
+      ],
+      "options": {
+        "jestConfig": "apps/velo-external-db/jest.config.js",
+        "passWithNoTests": true
+      }
+    }, 
+
+    "build-image": {
+      "builder": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "nx run velo-external-db:build",
+          "docker build -f ./apps/velo-external-db/Dockerfile . -t velo-external-db"
+        ],
+        "parallel": false
+      }
+    }
+  },
+  "tags": []
 }

@@ -28,8 +28,8 @@ const dynamoTestEnv = require ('./engines/dynamodb_resources.js')
 const bigquery = require('external-db-bigquery')
 const bigqueryTestEnv = require('./engines/bigquery_resources')
 
-const googleSheet = require('external-db-google-sheets')
-const googleSheetTestEnv = require('./engines/google_sheets_resources')
+// const googleSheet = require('external-db-google-sheets')
+// const googleSheetTestEnv = require('./engines/google_sheets_resources')
 
 const env = {
     dataProvider: Uninitialized,
@@ -68,7 +68,7 @@ const mongoTestEnvInit = async() => await dbInit(mongoTestEnv, mongo)
 const airTableTestEnvInit = async() => await dbInit(airtableEnv, airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamoTestEnv, dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigqueryTestEnv, bigquery)
-const googleSheetTestEnvInit = async() => await dbInit(googleSheetTestEnv, googleSheet)
+// const googleSheetTestEnvInit = async() => await dbInit(googleSheetTestEnv, googleSheet)
 
 const testSuits = {
     mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.supportedOperations),
@@ -80,7 +80,7 @@ const testSuits = {
     airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.supportedOperations),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
     bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.supportedOperations),
-    'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
+    // 'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]

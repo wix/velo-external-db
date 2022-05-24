@@ -14,8 +14,8 @@ const cleanup = async() => {
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
 }
 
-const initEnv = async() => {
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const initEnv = async() => {}
 
 const setActive = () => {
     process.env.TYPE = 'bigquery'
@@ -23,6 +23,7 @@ const setActive = () => {
     process.env.DATABASE_ID = databaseId
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 const shutdownEnv = async() => {
 }
 

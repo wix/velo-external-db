@@ -1,3 +1,10 @@
+// path aliases within jest global setup/teardown
+import { registerTsProject } from 'nx/src/utils/register'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line no-unused-vars
+const cleanupRegisteredPaths = registerTsProject('.', 'tsconfig.base.json')
+
+
 const postgres = require('../resources/engines/postgres_resources')
 const mysql = require('../resources/engines/mysql_resources')
 const spanner = require('../resources/engines/spanner_resources')

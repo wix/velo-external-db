@@ -6,6 +6,7 @@ const mssql = require('../resources/engines/mssql_resources')
 const googleSheet = require('../resources/engines/google_sheets_resources')
 const airtable = require('../resources/engines/airtable_resources')
 const dynamo = require('../resources/engines/dynamodb_resources')
+const mongo = require ('../resources/engines/mongo_resources')
 const ci = require('./ci_utils')
 
 const shutdownEnv = async(testEngine) => {
@@ -40,6 +41,10 @@ const shutdownEnv = async(testEngine) => {
         
         case 'dynamodb':
             await dynamo.shutdownEnv()
+            break
+
+        case 'mongo':
+            await mongo.shutdownEnv()
             break
     }
 }

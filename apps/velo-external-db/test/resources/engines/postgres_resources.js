@@ -1,4 +1,4 @@
-const { init, supportedOperations } = require('external-db-postgres')
+import { init, supportedOperations } from 'external-db-postgres'
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = () => {

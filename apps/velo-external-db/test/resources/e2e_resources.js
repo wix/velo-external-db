@@ -9,7 +9,7 @@ const spanner = require('./engines/spanner_resources')
 const firestore = require('./engines/firestore_resources')
 const mssql = require('./engines/mssql_resources')
 const mongo = require('./engines/mongo_resources')
-const googleSheet = require('./engines/google_sheets_resources')
+// const googleSheet = require('./engines/google_sheets_resources')
 const airtable = require ('./engines/airtable_resources')
 const dynamo = require ('./engines/dynamodb_resources')
 const bigquery = require ('./engines/bigquery_resources')
@@ -28,7 +28,7 @@ const initApp = async() => {
         await env.app.reload()
     } else {
         env.secretKey = authInit()
-        env.internals = require('../..').internals
+        env.internals = require('../../src/app').internals
 
         await waitUntil(() => env.internals().started)
     }
@@ -55,7 +55,7 @@ const spannerTestEnvInit = async() => await dbInit(spanner)
 const firestoreTestEnvInit = async() => await dbInit(firestore)
 const mssqlTestEnvInit = async() => await dbInit(mssql)
 const mongoTestEnvInit = async() => await dbInit(mongo)
-const googleSheetTestEnvInit = async() => await dbInit(googleSheet)
+// const googleSheetTestEnvInit = async() => await dbInit(googleSheet)
 const airTableTestEnvInit = async() => await dbInit(airtable)
 const dynamoTestEnvInit = async() => await dbInit(dynamo)
 const bigqueryTestEnvInit = async() => await dbInit(bigquery)
@@ -70,7 +70,7 @@ const testSuits = {
     airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.supportedOperations),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
     bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.supportedOperations),
-    'google-sheet': suiteDef('Google-sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
+    // 'google-sheet': suiteDef('Google-sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
