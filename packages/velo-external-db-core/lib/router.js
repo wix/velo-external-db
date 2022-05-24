@@ -9,10 +9,13 @@ const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const path = require('path')
-const { hooksForAction, Operations, payloadFor, Actions, requestContextFor } = require('./hooks_utils')
-const { FIND, INSERT, BULK_INSERT, UPDATE, BULK_UPDATE, REMOVE, BULK_REMOVE, AGGREGATE, COUNT, GET } = Operations
+const { HooksForAction: DataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./data_hooks_utils')
+const { HooksForAction: SchemaHooksForAction, Operations: SchemaOperations, payloadFor: schemaPayloadFor, Actions: SchemaActions } = require('./schema_hooks_utils')
+const { clone } = require('velo-external-db-commons')
 
-let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer, roleAuthorizationService, hooks
+const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = dataOperations
+
+let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer, roleAuthorizationService, dataHooks, schemaHooks
 
 let appInfoEnabled = false
 const enableAppInfo = () => appInfoEnabled = true
@@ -26,27 +29,36 @@ const initServices = (_schemaAwareDataService, _schemaService, _operationService
     filterTransformer = _filterTransformer
     aggregationTransformer = _aggregationTransformer
     roleAuthorizationService = _roleAuthorizationService
-    hooks = _hooks || {}
+    dataHooks = _hooks?.dataHooks || {}
+    schemaHooks = _hooks?.schemaHooks || {}
 }
 
-const serviceContext = {
+const serviceContext = () => ({
     schemaAwareDataService,
     schemaService
-}
+})
 
 
-const executeHooksFor = async(action, payload, requestContext) => {
-    let result = payload
-    for (const hook of hooksForAction(action)) {
-        result = await executeHook(hook, result, requestContext)
+const executeDataHooksFor = async(action, payload, requestContext) => {
+    let lastHookResult = clone(payload)
+    for (const hook of DataHooksForAction[action]) {
+        lastHookResult = await executeHook(dataHooks, hook, lastHookResult, requestContext)
     }
-    return result
+    return lastHookResult
 }
 
-const executeHook = async(actionName, payload, requestContext) => {
+const executeSchemaHooksFor = async(action, payload, requestContext) => {
+    let lastHookResult = clone(payload)
+    for (const hook of SchemaHooksForAction[action]) {
+        lastHookResult = await executeHook(schemaHooks, hook, lastHookResult, requestContext)
+    }
+    return lastHookResult
+}
+
+const executeHook = async(hooks, actionName, payload, requestContext) => {
     if (hooks[actionName]) {
         try {
-            const payloadAfterHook = await hooks[actionName](payload, requestContext, serviceContext)
+            const payloadAfterHook = await hooks[actionName](payload, requestContext, serviceContext())
             return payloadAfterHook || payload
         } catch (e) {
             throw ({ status: 400, message: e })
@@ -80,11 +92,12 @@ const createRouter = () => {
         try {
             const { collectionName } = req.body
 
-            const { filter, sort, skip, limit } = await executeHooksFor(Actions.BeforeFind, payloadFor(FIND, req.body), requestContextFor(FIND, req.body))
+            const { filter, sort, skip, limit } = await executeDataHooksFor(DataActions.BeforeFind, dataPayloadFor(FIND, req.body), requestContextFor(FIND, req.body))
+
             await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), sort, skip, limit)
 
-            const dataAfterAction = await executeHooksFor(Actions.AfterFind, data, requestContextFor(FIND, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterFind, data, requestContextFor(FIND, req.body))
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -94,10 +107,10 @@ const createRouter = () => {
     router.post('/data/aggregate', async(req, res, next) => {
         try {
             const { collectionName } = req.body
-            const { filter, processingStep, postFilteringStep } = await executeHooksFor(Actions.BeforeAggregate, payloadFor(AGGREGATE, req.body), requestContextFor(AGGREGATE, req.body))
+            const { filter, processingStep, postFilteringStep } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(AGGREGATE, req.body), requestContextFor(AGGREGATE, req.body))
             await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.aggregate(collectionName, filterTransformer.transform(filter), aggregationTransformer.transform({ processingStep, postFilteringStep }))
-            const dataAfterAction = await executeHooksFor(Actions.AfterAggregate, data, requestContextFor(AGGREGATE, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(AGGREGATE, req.body))
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -108,11 +121,11 @@ const createRouter = () => {
     router.post('/data/insert', async(req, res, next) => {
         try {
             const { collectionName } = req.body
-            const item = await executeHooksFor(Actions.BeforeInsert, payloadFor(INSERT, req.body), requestContextFor(INSERT, req.body))
+            const { item } = await executeDataHooksFor(DataActions.BeforeInsert, dataPayloadFor(INSERT, req.body), requestContextFor(INSERT, req.body))
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.insert(collectionName, item)
 
-            const dataAfterAction = await executeHooksFor(Actions.AfterInsert, data, requestContextFor(INSERT, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, data, requestContextFor(INSERT, req.body))
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -122,12 +135,12 @@ const createRouter = () => {
     router.post('/data/insert/bulk', async(req, res, next) => {
         try {
             const { collectionName } = req.body
-            const items = await executeHooksFor(Actions.BeforeBulkInsert, payloadFor(BULK_INSERT, req.body), requestContextFor(BULK_INSERT, req.body))
+            const { items } = await executeDataHooksFor(DataActions.BeforeBulkInsert, dataPayloadFor(BULK_INSERT, req.body), requestContextFor(BULK_INSERT, req.body))
 
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.bulkInsert(collectionName, items)
 
-            const dataAfterAction = await executeHooksFor(Actions.AfterBulkInsert, data, requestContextFor(BULK_INSERT, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterBulkInsert, data, requestContextFor(BULK_INSERT, req.body))
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -138,11 +151,11 @@ const createRouter = () => {
         try {
             const { collectionName } = req.body
 
-            const itemId = await executeHooksFor(Actions.BeforeGetById, payloadFor(GET, req.body), requestContextFor(GET, req.body))
+            const { itemId } = await executeDataHooksFor(DataActions.BeforeGetById, dataPayloadFor(GET, req.body), requestContextFor(GET, req.body))
             await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.getById(collectionName, itemId, '', 0, 1)
 
-            const dataAfterAction = await executeHooksFor(Actions.AfterGetById, data, requestContextFor(GET, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterGetById, data, requestContextFor(GET, req.body))
             if (!dataAfterAction.item) {
                 throw new ItemNotFound('Item not found')
             }
@@ -156,11 +169,11 @@ const createRouter = () => {
         try {
             const { collectionName } = req.body
 
-            const item = await executeHooksFor(Actions.BeforeUpdate, payloadFor(UPDATE, req.body), requestContextFor(UPDATE, req.body))
+            const { item } = await executeDataHooksFor(DataActions.BeforeUpdate, dataPayloadFor(UPDATE, req.body), requestContextFor(UPDATE, req.body))
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.update(collectionName, item)
 
-            const dataAfterAction = await executeHooksFor(Actions.AfterUpdate, data, requestContextFor(UPDATE, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterUpdate, data, requestContextFor(UPDATE, req.body))
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -171,11 +184,11 @@ const createRouter = () => {
         try {
             const { collectionName } = req.body
 
-            const items = await executeHooksFor(Actions.BeforeBulkUpdate, payloadFor(BULK_UPDATE, req.body), requestContextFor(BULK_UPDATE, req.body))
+            const { items } = await executeDataHooksFor(DataActions.BeforeBulkUpdate, dataPayloadFor(BULK_UPDATE, req.body), requestContextFor(BULK_UPDATE, req.body))
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.bulkUpdate(collectionName, items)
 
-            const dataAfterAction = await executeHooksFor(Actions.AfterBulkUpdate, data, requestContextFor(BULK_UPDATE, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterBulkUpdate, data, requestContextFor(BULK_UPDATE, req.body))
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -186,11 +199,11 @@ const createRouter = () => {
         try {
             const { collectionName } = req.body
 
-            const itemId = await executeHooksFor(Actions.BeforeRemove, payloadFor(REMOVE, req.body), requestContextFor(REMOVE, req.body))
+            const { itemId } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(REMOVE, req.body), requestContextFor(REMOVE, req.body))
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.delete(collectionName, itemId)
 
-            const dataAfterAction = await executeHooksFor(Actions.AfterRemove, data, requestContextFor(REMOVE, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterRemove, data, requestContextFor(REMOVE, req.body))
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -201,11 +214,11 @@ const createRouter = () => {
         try {
             const { collectionName } = req.body
 
-            const itemIds = await executeHooksFor(Actions.BeforeBulkRemove, payloadFor(BULK_REMOVE, req.body), requestContextFor(BULK_REMOVE, req.body))
+            const { itemIds } = await executeDataHooksFor(DataActions.BeforeBulkRemove, dataPayloadFor(BULK_REMOVE, req.body), requestContextFor(BULK_REMOVE, req.body))
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.bulkDelete(collectionName, itemIds)
 
-            const dataAfterAction = await executeHooksFor(Actions.AfterBulkRemove, data, requestContextFor(BULK_REMOVE, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterBulkRemove, data, requestContextFor(BULK_REMOVE, req.body))
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -216,11 +229,11 @@ const createRouter = () => {
         try {
             const { collectionName } = req.body
 
-            const filter = await executeHooksFor(Actions.BeforeCount, payloadFor(COUNT, req.body), requestContextFor(COUNT, req.body))
+            const { filter } = await executeDataHooksFor(DataActions.BeforeCount, dataPayloadFor(COUNT, req.body), requestContextFor(COUNT, req.body))
             await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.count(collectionName, filterTransformer.transform(filter))
 
-            const dataAfterAction = await executeHooksFor(Actions.AfterCount, data, requestContextFor(COUNT, req.body))
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterCount, data, requestContextFor(COUNT, req.body))
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -243,8 +256,11 @@ const createRouter = () => {
     // *************** Schema API **********************
     router.post('/schemas/list', async(req, res, next) => {
         try {
+            await executeSchemaHooksFor(SchemaActions.BeforeList, schemaPayloadFor(SchemaOperations.List, req.body), requestContextFor(SchemaOperations.List, req.body))
             const data = await schemaService.list()
-            res.json(data)
+
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterList, data, requestContextFor(SchemaOperations.List, req.body))
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
@@ -252,8 +268,11 @@ const createRouter = () => {
 
     router.post('/schemas/list/headers', async(req, res, next) => {
         try {
+            await executeSchemaHooksFor(SchemaActions.BeforeListHeaders, schemaPayloadFor(SchemaOperations.ListHeaders, req.body), requestContextFor(SchemaOperations.ListHeaders, req.body))
             const data = await schemaService.listHeaders()
-            res.json(data)
+
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterListHeaders, data, requestContextFor(SchemaOperations.ListHeaders, req.body))
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
@@ -261,12 +280,14 @@ const createRouter = () => {
 
     router.post('/schemas/find', async(req, res, next) => {
         try {
-            const { schemaIds } = req.body
+            const { schemaIds } = await executeSchemaHooksFor(SchemaActions.BeforeFind, schemaPayloadFor(SchemaOperations.Find, req.body), requestContextFor(SchemaOperations.Find, req.body))
+
             if (schemaIds && schemaIds.length > 10) {
                 throw new InvalidRequest()
             }
             const data = await schemaService.find(schemaIds)
-            res.json(data)
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterFind, data, requestContextFor(SchemaOperations.Find, req.body))
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
@@ -274,9 +295,12 @@ const createRouter = () => {
 
     router.post('/schemas/create', async(req, res, next) => {
         try {
-            const { collectionName } = req.body
+            const { collectionName } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(SchemaOperations.Create, req.body), requestContextFor(SchemaOperations.Create, req.body))
             const data = await schemaService.create(collectionName)
-            res.json(data)
+
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterCreate, data, requestContextFor(SchemaOperations.Create, req.body))
+
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
@@ -284,9 +308,14 @@ const createRouter = () => {
 
     router.post('/schemas/column/add', async(req, res, next) => {
         try {
-            const { collectionName, column } = req.body
+            const { collectionName } = req.body
+            const { column } = await executeSchemaHooksFor(SchemaActions.BeforeColumnAdd, schemaPayloadFor(SchemaOperations.ColumnAdd, req.body), requestContextFor(SchemaOperations.ColumnAdd, req.body))
+
             const data = await schemaService.addColumn(collectionName, column)
-            res.json(data)
+
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterColumnAdd, data, requestContextFor(SchemaOperations.ColumnAdd, req.body))
+
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
@@ -294,9 +323,13 @@ const createRouter = () => {
 
     router.post('/schemas/column/remove', async(req, res, next) => {
         try {
-            const { collectionName, columnName } = req.body
+            const { collectionName } = req.body
+            const { columnName } = await executeSchemaHooksFor(SchemaActions.BeforeColumnRemove, schemaPayloadFor(SchemaOperations.ColumnRemove, req.body), requestContextFor(SchemaOperations.ColumnRemove, req.body))
+
             const data = await schemaService.removeColumn(collectionName, columnName)
-            res.json(data)
+
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterColumnRemove, data, requestContextFor(SchemaOperations.ColumnRemove, req.body))
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }

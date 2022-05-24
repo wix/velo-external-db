@@ -32,6 +32,15 @@ const givenBodyWith = (obj) => ({
     ...obj
 })
 
+const writeSchemaRequestBodyWith = (collectionName, columnToRemove, columnToCreate) => ({
+    collectionName, column: columnToCreate, columnName: columnToRemove.name
+})
+
+const readSchemaRequestBodyWith = (collectionName) => ({
+    schemaIds: [collectionName]
+})
+
 module.exports = {
-    writeRequestBodyWith, readRequestBodyWith, resetHooks, findRequestBodyWith, givenBodyWith, getRequestBodyWith, aggregateRequestBodyWith, skipAggregationIfNotSupported,
+    writeRequestBodyWith, readRequestBodyWith, resetHooks, findRequestBodyWith, givenBodyWith, getRequestBodyWith, aggregateRequestBodyWith,
+    skipAggregationIfNotSupported, writeSchemaRequestBodyWith, readSchemaRequestBodyWith
 }
