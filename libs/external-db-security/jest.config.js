@@ -13,11 +13,9 @@ module.exports = {
     },
     moduleFileExtensions: ['ts', 'js', 'html'],
     coverageDirectory: '../../coverage/libs/external-db-security',
-    clearMocks: true,
-    verbose: true,
     // testRegex: '(.*\\.spec\\.)js$',
     // roots: ['<rootDir>/src'],
     // testRegex: '(.*\\.spec\\.)js$',
     // testEnvironment: 'node',
-  };
+}
   
