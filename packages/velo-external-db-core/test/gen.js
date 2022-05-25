@@ -1,6 +1,6 @@
 const Chance = require('chance')
 const { AdapterOperators } = require('velo-external-db-commons')
-
+const { gen: genCommon } = require('test-commons')
 const chance = Chance()
 
 const invalidOperatorForType = (validOperators) => randomObjectFromArray (
@@ -65,4 +65,12 @@ const deleteRandomKeyObject = (obj) => {
     return { deletedKey, newObject: obj }
 }
 
-module.exports = { randomOperator, randomFilter, randomWixType, invalidOperatorForType, randomObjectFromArray, randomColumn, randomDb, randomDbsWithIdColumn, randomCollections, randomDbs, randomCollectionName, truthyValue, falsyValue, deleteRandomKeyObject }
+const randomBodyWith = (obj) => ({
+    ...genCommon.randomObject(),
+    ...obj
+})
+
+module.exports = {
+    randomOperator, randomFilter, randomWixType, invalidOperatorForType, randomObjectFromArray, randomColumn, randomDb, randomDbsWithIdColumn, randomCollections,
+    randomDbs, randomCollectionName, truthyValue, falsyValue, deleteRandomKeyObject, randomBodyWith
+}

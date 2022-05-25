@@ -1,5 +1,4 @@
 const { Aggregate } = require('velo-external-db-commons').SchemaOperations
-const { gen: genCommon } = require('test-commons')
 
 const resetHooks = (externalDbRouter) => externalDbRouter.reloadHooks()
 
@@ -27,10 +26,6 @@ const skipAggregationIfNotSupported = (hookName, supportedOperations) => {
     return (hookName.includes('Aggregate') && !supportedOperations.includes(Aggregate))
 }
 
-const givenBodyWith = (obj) => ({
-    ...genCommon.randomObject(),
-    ...obj
-})
 
 const writeSchemaRequestBodyWith = (collectionName, columnToRemove, columnToCreate) => ({
     collectionName, column: columnToCreate, columnName: columnToRemove.name
@@ -41,6 +36,6 @@ const readSchemaRequestBodyWith = (collectionName) => ({
 })
 
 module.exports = {
-    writeRequestBodyWith, readRequestBodyWith, resetHooks, findRequestBodyWith, givenBodyWith, getRequestBodyWith, aggregateRequestBodyWith,
+    writeRequestBodyWith, readRequestBodyWith, resetHooks, findRequestBodyWith, getRequestBodyWith, aggregateRequestBodyWith,
     skipAggregationIfNotSupported, writeSchemaRequestBodyWith, readSchemaRequestBodyWith
 }
