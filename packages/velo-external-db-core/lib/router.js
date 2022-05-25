@@ -34,7 +34,7 @@ const initServices = (_schemaAwareDataService, _schemaService, _operationService
 }
 
 const serviceContext = () => ({
-    schemaAwareDataService,
+    dataService: schemaAwareDataService,
     schemaService
 })
 
