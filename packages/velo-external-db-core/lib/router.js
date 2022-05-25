@@ -9,9 +9,9 @@ const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const path = require('path')
+const Promise = require('bluebird')
 const { HooksForAction: DataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./data_hooks_utils')
 const { HooksForAction: SchemaHooksForAction, Operations: SchemaOperations, payloadFor: schemaPayloadFor, Actions: SchemaActions } = require('./schema_hooks_utils')
-const { clone } = require('velo-external-db-commons')
 
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = dataOperations
 
@@ -40,19 +40,15 @@ const serviceContext = () => ({
 
 
 const executeDataHooksFor = async(action, payload, requestContext) => {
-    let lastHookResult = clone(payload)
-    for (const hook of DataHooksForAction[action]) {
-        lastHookResult = await executeHook(dataHooks, hook, lastHookResult, requestContext)
-    }
-    return lastHookResult
+    return Promise.reduce(DataHooksForAction[action], async(lastHookResult, hook) => {
+        return await executeHook(dataHooks, hook, lastHookResult, requestContext)
+    }, payload)
 }
 
 const executeSchemaHooksFor = async(action, payload, requestContext) => {
-    let lastHookResult = clone(payload)
-    for (const hook of SchemaHooksForAction[action]) {
-        lastHookResult = await executeHook(schemaHooks, hook, lastHookResult, requestContext)
-    }
-    return lastHookResult
+    return Promise.reduce(SchemaHooksForAction[action], async(lastHookResult, hook) => {
+        return await executeHook(schemaHooks, hook, lastHookResult, requestContext)
+    }, payload)
 }
 
 const executeHook = async(hooks, actionName, payload, requestContext) => {
