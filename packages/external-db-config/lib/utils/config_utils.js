@@ -2,7 +2,7 @@ const objectContainsKey = (obj, key) => typeof obj[key] === 'string' && obj[key]
 
 const checkRequiredKeys = (obj, requiredKeys) => requiredKeys.filter(key => !objectContainsKey(obj, key))
 
-const supportedDBs = ['postgres', 'spanner', 'firestore', 'mssql', 'mysql', 'mongo', 'airtable', 'dynamodb', 'bigquery', 'google-sheets']
+const supportedDBs = ['postgres', 'spanner', 'firestore', 'mssql', 'mysql', 'mongo', 'airtable', 'dynamodb', 'bigquery', 'google-sheets', 'documentdb']
 
 const supportedVendors = ['gcp', 'aws', 'azure']
 

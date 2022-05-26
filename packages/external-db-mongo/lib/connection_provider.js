@@ -4,9 +4,11 @@ const DataProvider = require('./mongo_data_provider')
 const FilterParser = require('./sql_filter_transformer')
 const DatabaseOperations = require('./mongo_operations')
 const { notConnectedPool, emptyClient } = require('./mongo_utils')
+const { documentDBConnectionOptions } = require('./documentdb_utils')
 
 const init = async(cfg) => {
-    const client = cfg.connectionUri ? new MongoClient(cfg.connectionUri) : emptyClient()
+    const { connectionUri, options } = cfg.documentDb ? await documentDBConnectionOptions(cfg, __dirname) : { connectionUri: cfg.connectionUri, options: {} }
+    const client = connectionUri ? new MongoClient(connectionUri, options) : emptyClient()
 
     const { pool, cleanup } = await client.connect()
                                           .then((res) => {
