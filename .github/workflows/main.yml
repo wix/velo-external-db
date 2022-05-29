@@ -89,7 +89,7 @@ jobs:
       - name: Stop Container
         if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
-          cd packages/velo-external-db/test/resources
+          cd apps/velo-external-db/test/resources
           docker compose down
 
   # test_bigquery:
