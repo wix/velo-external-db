@@ -45,8 +45,7 @@ jobs:
                    "mongo", "mongo4",
                    "firestore",
                    "airtable",
-                   "dynamodb",
-                   "google-sheets"
+                   "dynamodb"
                    ]
 
     steps:
