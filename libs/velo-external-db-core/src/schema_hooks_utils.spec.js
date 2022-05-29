@@ -2,7 +2,7 @@ const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()
 const { Uninitialized } = require('test-commons')
-const { givenBodyWith } = require('../../velo-external-db/test/drivers/hooks_test_support')
+const { randomBodyWith } = require ('../test/gen')
 const { HooksForAction, Operations, payloadFor, Actions } = require('./schema_hooks_utils')
 
 describe('Hooks Utils', () => {
@@ -36,19 +36,19 @@ describe('Hooks Utils', () => {
     describe('Payload For', () => {
         each([Operations.List, Operations.ListHeaders])
             .test('Payload for %s should return null', (operation) => {
-                expect(payloadFor(operation, givenBodyWith({}))).toEqual({})
+                expect(payloadFor(operation, randomBodyWith({}))).toEqual({})
             })
         test('Payload for Find should return schemaIds', () => {
-            expect(payloadFor(Operations.Find, givenBodyWith({ schemaIds: ctx.schemaIds }))).toEqual({ schemaIds: ctx.schemaIds })
+            expect(payloadFor(Operations.Find, randomBodyWith({ schemaIds: ctx.schemaIds }))).toEqual({ schemaIds: ctx.schemaIds })
         })
         test('Payload for Create should return collectionName', () => {
-            expect(payloadFor(Operations.Create, givenBodyWith({ collectionName: ctx.collectionName }))).toEqual({ collectionName: ctx.collectionName })
+            expect(payloadFor(Operations.Create, randomBodyWith({ collectionName: ctx.collectionName }))).toEqual({ collectionName: ctx.collectionName })
         })
         test('Payload for ColumnAdd should return column', () => {
-            expect(payloadFor(Operations.ColumnAdd, givenBodyWith({ column: ctx.column }))).toEqual({ column: ctx.column })
+            expect(payloadFor(Operations.ColumnAdd, randomBodyWith({ column: ctx.column }))).toEqual({ column: ctx.column })
         })
         test('Payload for ColumnRemove should return columnName', () => {
-            expect(payloadFor(Operations.ColumnRemove, givenBodyWith({ columnName: ctx.columnName }))).toEqual({ columnName: ctx.columnName })
+            expect(payloadFor(Operations.ColumnRemove, randomBodyWith({ columnName: ctx.columnName }))).toEqual({ columnName: ctx.columnName })
         })
     })
 
