@@ -9,7 +9,9 @@
     "lib": "lib",
     "test": "tests"
   },
-  "files": [ "lib" ],
+  "files": [
+    "lib"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wix/velo-external-db.git",
@@ -22,14 +24,15 @@
     "test": "jest"
   },
   "dependencies": {
+    "ajv": "^8.11.0",
+    "bluebird": "^3.7.2",
     "compression": "^1.7.4",
     "express": "^4.17.3",
-    "ajv": "^8.11.0",
     "external-db-config": "^0.0.0",
     "external-db-security": "^0.0.0",
+    "nested-property": "^4.0.0",
     "node-cache": "^5.1.2",
     "uuid": "^8.3.2",
-    "nested-property": "^4.0.0",
     "velo-external-db-commons": "^0.0.0"
   },
   "devDependencies": {
