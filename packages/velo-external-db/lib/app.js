@@ -37,7 +37,6 @@ const initConnector = async(hooks) => {
 initConnector().then(({ externalDbRouter }) => {
     const app = express()
     app.use(externalDbRouter.router)
-    externalDbRouter.enableAppInfo(app)
 
     server = app.listen(8080, () => console.log('Connector listening on port 8080'))
 

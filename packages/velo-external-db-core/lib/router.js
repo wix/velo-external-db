@@ -9,6 +9,8 @@ const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
 const path = require('path')
+const fs = require('fs').promises
+const ejs = require('ejs')
 const Promise = require('bluebird')
 const { HooksForAction: DataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./data_hooks_utils')
 const { HooksForAction: SchemaHooksForAction, Operations: SchemaOperations, payloadFor: schemaPayloadFor, Actions: SchemaActions } = require('./schema_hooks_utils')
@@ -17,8 +19,14 @@ const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, Bul
 
 let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer, roleAuthorizationService, dataHooks, schemaHooks
 
-let appInfoEnabled = false
-const enableAppInfo = () => appInfoEnabled = true
+let AppInfoTemplate
+
+const getAppInfoTemplate = async() => {
+    if (!AppInfoTemplate) {
+        AppInfoTemplate = await fs.readFile(path.join(__dirname, 'views', 'index.ejs'), 'utf8')
+    }
+    return AppInfoTemplate
+}
 
 const initServices = (_schemaAwareDataService, _schemaService, _operationService, _externalDbConfigClient, _cfg, _filterTransformer, _aggregationTransformer, _roleAuthorizationService, _hooks) => {
     schemaService = _schemaService
@@ -75,7 +83,10 @@ const createRouter = () => {
     // *************** INFO **********************
     router.get('/', async(req, res) => {
         const appInfo = await appInfoFor(operationService, externalDbConfigClient)
-        appInfoEnabled ? res.render('index', appInfo) : res.json(appInfo)
+        const appInfoTemplate = await getAppInfoTemplate()
+        const appInfoPage = ejs.render(appInfoTemplate, appInfo )
+
+        res.send(appInfoPage)
     })
 
     router.post('/provision', async(req, res) => {
@@ -336,4 +347,4 @@ const createRouter = () => {
 
     return router
 }
-module.exports = { createRouter, initServices, enableAppInfo }
+module.exports = { createRouter, initServices }

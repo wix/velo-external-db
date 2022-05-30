@@ -9,7 +9,7 @@ const AggregationTransformer = require ('./converters/aggregation_transformer')
 const QueryValidator = require ('./converters/query_validator')
 const SchemaAwareDataService = require ('./service/schema_aware_data')
 const ItemTransformer = require('./converters/item_transformer')
-const { initServices, createRouter, enableAppInfo } = require('./router')
+const { initServices, createRouter } = require('./router')
 const { RoleAuthorizationService } = require ('@wix-velo/external-db-security')
 const { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } = require ('@wix-velo/external-db-config')
 
@@ -39,12 +39,6 @@ class ExternalDbRouter {
 
     reloadHooks(hooks) {
         initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
-    }
-
-    enableAppInfo(app) {
-        app.set('views', `${__dirname}/views`)
-        app.set('view engine', 'ejs')
-        enableAppInfo()
     }
 
     isInitialized(connector) {
