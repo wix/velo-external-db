@@ -19,13 +19,13 @@ const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, Bul
 
 let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer, roleAuthorizationService, dataHooks, schemaHooks
 
-let AppInfoTemplate
+let appInfoTemplate
 
 const getAppInfoTemplate = async() => {
-    if (!AppInfoTemplate) {
-        AppInfoTemplate = await fs.readFile(path.join(__dirname, 'views', 'index.ejs'), 'utf8')
+    if (!appInfoTemplate) {
+        appInfoTemplate = await fs.readFile(path.join(__dirname, 'views', 'index.ejs'), 'utf8')
     }
-    return AppInfoTemplate
+    return appInfoTemplate
 }
 
 const initServices = (_schemaAwareDataService, _schemaService, _operationService, _externalDbConfigClient, _cfg, _filterTransformer, _aggregationTransformer, _roleAuthorizationService, _hooks) => {
