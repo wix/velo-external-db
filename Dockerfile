@@ -1,29 +1,27 @@
-FROM node:lts-slim as full_version
+# Compile stage
+FROM node:lts-slim 
 WORKDIR /usr/lib/app
 
-COPY package.json .
+# Copy the project dir
+COPY . .
 
-RUN npm install -g lerna
+# Install NX and project dependencies
+RUN npm install -g nx
+RUN npm install 
 
-COPY packages ./packages/
-COPY lerna.json .
+# Build the JS files
+RUN nx run-many --target=build --all
 
-RUN lerna bootstrap -- --production
 
-CMD [ "npm", "--prefix", "packages/velo-external-db", "start" ]
+FROM node:lts-alpine
 
-FROM node:lts-slim
-ARG TYPE
 WORKDIR /usr/lib/app
 
-COPY --from=full_version /usr/lib/app/packages/external-db-config/ ./packages/external-db-config/
-COPY --from=full_version /usr/lib/app/packages/velo-external-db/ ./packages/velo-external-db/
-COPY --from=full_version /usr/lib/app/packages/velo-external-db-core/ ./packages/velo-external-db-core/
-COPY --from=full_version /usr/lib/app/packages/external-db-security/ ./packages/external-db-security/
-COPY --from=full_version /usr/lib/app/packages/velo-external-db-commons/ ./packages/velo-external-db-commons/
+# Copy the compiled JS files from the compile stage
+COPY --from=0 /usr/lib/app/dist/apps/velo-external-db .
 
-COPY --from=full_version /usr/lib/app/packages/external-db-${TYPE}/ ./packages/external-db-${TYPE}/
+# Install dependencies
+RUN npm install --production
 
-ENV TYPE=${TYPE}
-
-CMD [ "npm", "--prefix", "packages/velo-external-db", "start" ]
+# Run the app
+CMD node ./main.js
