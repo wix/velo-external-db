@@ -1,7 +1,7 @@
 const { Uninitialized } = require('test-commons')
 const mysql = require('@wix-velo/external-db-mysql')
 const spanner = require('external-db-spanner')
-const postgres = require('external-db-postgres')
+const postgres = require('@wix-velo/external-db-postgres')
 const firestore = require('@wix-velo/external-db-firestore')
 const mssql = require('@wix-velo/external-db-mssql')
 const mongo = require ('@wix-velo/external-db-mongo')

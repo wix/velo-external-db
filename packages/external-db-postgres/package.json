@@ -1,6 +1,6 @@
 {
-  "name": "external-db-postgres",
-  "version": "0.0.0",
+  "name": "@wix-velo/external-db-postgres",
+  "version": "1.0.0",
   "description": "",
   "homepage": "https://github.com/wix/velo-external-db#readme",
   "license": "MIT",

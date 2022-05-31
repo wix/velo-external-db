@@ -48,7 +48,7 @@
     "@wix-velo/external-db-mongo": "^1.0.0",
     "@wix-velo/external-db-mssql": "^1.0.0",
     "@wix-velo/external-db-mysql": "^1.0.0",
-    "external-db-postgres": "^0.0.0",
+    "@wix-velo/external-db-postgres": "^1.0.0",
     "external-db-spanner": "^0.0.0",
     "nested-property": "^4.0.0",
     "velo-external-db-commons": "^0.0.0",

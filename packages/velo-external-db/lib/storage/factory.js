@@ -5,7 +5,7 @@ const engineConnectorFor = async(_type, config) => {
     const type = _type || ''
     switch ( type.toLowerCase() ) {
         case 'postgres': {
-            const { postgresFactory } = require('external-db-postgres')
+            const { postgresFactory } = require('@wix-velo/external-db-postgres')
             return await postgresFactory(config)
         }
         case 'spanner': {
@@ -58,7 +58,7 @@ const init = async(_type, vendor, config) => {
     const cfg = await config.readConfig()
     switch ( type.toLowerCase() ) {
         case 'postgres': {
-            const { init } = require('external-db-postgres')
+            const { init } = require('@wix-velo/external-db-postgres')
 
             return append(init(cfg), cfg.secretKey)
         }

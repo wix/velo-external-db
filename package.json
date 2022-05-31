@@ -8,7 +8,7 @@
     "lint:fix": "eslint --cache --fix ./",
     "test": "npm run test:core; npm run test:postgres; npm run test:spanner; npm run test:mysql; npm run test:mssql; npm run test:firestore; npm run test:mongo; npm run test:airtable; npm run test:dynamodb; npm run test:bigquery",
     "test:core": "lerna exec --scope '{@wix-velo/external-db-config,velo-external-db-core,external-db-security}' \"npm test\"",
-    "test:postgres": "lerna exec --scope external-db-postgres \"npm test\" && lerna exec --scope velo-external-db \"npm run test:postgres\"",
+    "test:postgres": "lerna exec --scope @wix-velo/external-db-postgres \"npm test\" && lerna exec --scope velo-external-db \"npm run test:postgres\"",
     "test:postgres13": "npm run test:postgres",
     "test:postgres12": "npm run test:postgres",
     "test:postgres11": "npm run test:postgres",
@@ -27,7 +27,7 @@
     "test:dynamodb": "lerna exec --scope @wix-velo/external-db-dynamodb \"npm test\" && lerna exec --scope velo-external-db \"npm run test:dynamodb\"",
     "test:bigquery": "lerna exec --scope @wix-velo/external-db-bigquery \"npm test\" && lerna exec --scope velo-external-db \"npm run test:bigquery\"",
     "release": "lerna version --no-push",
-    "outdated:all": "lerna exec --scope '{@wix-velo/external-db-config,@wix-velo/external-db-firestore,@wix-velo/external-db-mongo,@wix-velo/external-db-mssql,@wix-velo/external-db-mysql,external-db-postgres,external-db-spanner,@wix-velo/external-db-google-sheets,@wix-velo/external-db-airtable,@wix-velo/external-db-dynamodb,velo-external-db,velo-external-db-core,external-db-security }' \"npm outdated\"",
+    "outdated:all": "lerna exec --scope '{@wix-velo/external-db-config,@wix-velo/external-db-firestore,@wix-velo/external-db-mongo,@wix-velo/external-db-mssql,@wix-velo/external-db-mysql,@wix-velo/external-db-postgres,external-db-spanner,@wix-velo/external-db-google-sheets,@wix-velo/external-db-airtable,@wix-velo/external-db-dynamodb,velo-external-db,velo-external-db-core,external-db-security }' \"npm outdated\"",
     "ci:publish": "lerna publish -y from-git",
     "prepare": "husky install"
   },

@@ -7,7 +7,7 @@ const mysqlTestEnv = require('./engines/mysql_resources')
 const spanner = require('external-db-spanner')
 const spannerTestEnv = require('./engines/spanner_resources')
 
-const postgres = require('external-db-postgres')
+const postgres = require('@wix-velo/external-db-postgres')
 const postgresTestEnv = require('./engines/postgres_resources')
 
 const firestore = require('@wix-velo/external-db-firestore')
