@@ -1,5 +1,5 @@
 {
-  "name": "velo-external-db",
+  "name": "@wix-velo/velo-external-db",
   "version": "1.0.0",
   "description": "",
   "homepage": "https://github.com/wix/velo-external-db#readme",
