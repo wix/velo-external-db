@@ -9,7 +9,7 @@ const engineConnectorFor = async(_type, config) => {
             return await postgresFactory(config)
         }
         case 'spanner': {
-            const { spannerFactory } = require('external-db-spanner')
+            const { spannerFactory } = require('@wix-velo/external-db-spanner')
             return await spannerFactory(config)
         }
         case 'firestore': {
@@ -63,7 +63,7 @@ const init = async(_type, vendor, config) => {
             return append(init(cfg), cfg.secretKey)
         }
         case 'spanner': {
-            const { init } = require('external-db-spanner')
+            const { init } = require('@wix-velo/external-db-spanner')
 
             return append(init(cfg), cfg.secretKey)
         }
