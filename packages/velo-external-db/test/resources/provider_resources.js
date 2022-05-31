@@ -25,7 +25,7 @@ const airtableEnv = require ('./engines/airtable_resources')
 const dynamo = require ('external-db-dynamodb')
 const dynamoTestEnv = require ('./engines/dynamodb_resources.js')
 
-const bigquery = require('external-db-bigquery')
+const bigquery = require('@wix-velo/external-db-bigquery')
 const bigqueryTestEnv = require('./engines/bigquery_resources')
 
 const googleSheet = require('external-db-google-sheets')

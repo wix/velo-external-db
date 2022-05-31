@@ -7,7 +7,7 @@ const mssql = require('external-db-mssql')
 const mongo = require ('external-db-mongo')
 const airtable = require ('@wix-velo/external-db-airtable')
 const dynamo = require ('external-db-dynamodb')
-const bigquery = require ('external-db-bigquery')
+const bigquery = require ('@wix-velo/external-db-bigquery')
 
 const suiteDef = (name, setup, misconfiguredDbOperations) => ( { name, setup, misconfiguredDbOperations } )
 

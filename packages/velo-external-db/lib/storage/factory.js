@@ -41,7 +41,7 @@ const engineConnectorFor = async(_type, config) => {
             return await dynamoDbFactory(config)
         }
         case 'bigquery': {
-            const { bigqueryFactory } = require('external-db-bigquery')
+            const { bigqueryFactory } = require('@wix-velo/external-db-bigquery')
             return await bigqueryFactory(config)
         }
         default: {
@@ -102,7 +102,7 @@ const init = async(_type, vendor, config) => {
             return append(await init(cfg), cfg.secretKey)
         }
         case 'bigquery': {
-            const { init } = require('external-db-bigquery')
+            const { init } = require('@wix-velo/external-db-bigquery')
             return append(await init(cfg), cfg.secretKey)
         }
         default: {
