@@ -1,5 +1,5 @@
 const express = require('express')
-const { create, readCommonConfig } = require('external-db-config')
+const { create, readCommonConfig } = require('@wix-velo/external-db-config')
 const { ExternalDbRouter } = require('velo-external-db-core')
 const { engineConnectorFor } = require('./storage/factory')
 

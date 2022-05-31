@@ -28,7 +28,7 @@
     "bluebird": "^3.7.2",
     "compression": "^1.7.4",
     "express": "^4.17.3",
-    "external-db-config": "^0.0.0",
+    "@wix-velo/external-db-config": "^1.0.0",
     "external-db-security": "^0.0.0",
     "nested-property": "^4.0.0",
     "node-cache": "^5.1.2",
