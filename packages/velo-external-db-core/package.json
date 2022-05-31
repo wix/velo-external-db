@@ -29,7 +29,7 @@
     "compression": "^1.7.4",
     "express": "^4.17.3",
     "@wix-velo/external-db-config": "^1.0.0",
-    "external-db-security": "^0.0.0",
+    "@wix-velo/external-db-security": "^1.0.0",
     "nested-property": "^4.0.0",
     "node-cache": "^5.1.2",
     "uuid": "^8.3.2",

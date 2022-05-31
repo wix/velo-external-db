@@ -39,7 +39,7 @@
     "express": "^4.17.3",
     "ejs": "^3.1.7",
     "@wix-velo/external-db-airtable": "^1.0.0",
-    "external-db-security": "^0.0.0",
+    "@wix-velo/external-db-security": "^1.0.0",
     "@wix-velo/external-db-bigquery": "^1.0.0",
     "@wix-velo/external-db-config": "^1.0.0",
     "@wix-velo/external-db-dynamodb": "^1.0.0",
