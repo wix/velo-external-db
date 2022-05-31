@@ -21,6 +21,9 @@
   "bugs": {
     "url": "https://github.com/wix/velo-external-db/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@google-cloud/bigquery": "^5.9.1",
     "@wix-velo/velo-external-db-commons": "^1.0.0"

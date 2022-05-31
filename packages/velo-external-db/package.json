@@ -18,6 +18,9 @@
   "bugs": {
     "url": "https://github.com/wix/velo-external-db/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "jest lib",
     "test:mysql": "TEST_ENGINE=mysql jest --runInBand ./test",
