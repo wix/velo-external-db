@@ -53,7 +53,8 @@
       "external-db-bigquery",
       "velo-external-db",
       "velo-external-db-core",
-      "external-db-security"
+      "external-db-security",
+      "test-commons"
     ]
   },
   "lint-staged": {

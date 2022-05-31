@@ -42,7 +42,7 @@
     "jest-extended": "^2.0.0",
     "jest-when": "^3.5.1",
     "rewire": "^6.0.0",
-    "test-commons": "^0.0.0",
+    "@wix-velo/test-commons": "^1.0.0",
     "uuid-validate": "^0.0.3"
   }
 }

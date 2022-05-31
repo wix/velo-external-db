@@ -1,5 +1,5 @@
 const each = require('jest-each').default
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const { MySqlConfigValidator } = require('./mysql_config_validator')
 const gen = require('../tests/gen')
 

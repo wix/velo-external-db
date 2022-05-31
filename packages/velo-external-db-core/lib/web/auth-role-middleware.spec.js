@@ -1,4 +1,4 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const { authRoleMiddleware } = require('./auth-role-middleware')
 const driver = require('../../test/drivers/auth_middleware_test_support')
 const { UnauthorizedError } = require('velo-external-db-commons').errors

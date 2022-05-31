@@ -1,6 +1,6 @@
 const rewire = require('rewire')
 const validate = require('uuid-validate')
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen } = require('@wix-velo/test-commons')
 const { truthyValue, falsyValue } = require ('../../test/gen')
 const Chance = require('chance')
 const chance = Chance()

@@ -1,7 +1,7 @@
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const { randomBodyWith } = require ('../test/gen')
 const { HooksForAction, Operations, payloadFor, Actions } = require('./schema_hooks_utils')
 

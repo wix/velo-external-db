@@ -1,5 +1,5 @@
 const OperationService = require('./operation')
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen } = require('@wix-velo/test-commons')
 const driver = require('../../test/drivers/operation_provider_test_support')
 const { DbConnectionError } = require('velo-external-db-commons').errors
 

@@ -1,4 +1,4 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const AggregationTransformer = require('./aggregation_transformer')
 const { EmptyFilter } = require ('./utils')
 const Chance = require('chance')

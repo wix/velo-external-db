@@ -1,7 +1,7 @@
 const { patchFloat, extractFloatFields } = require('./spanner_utils')
 const { Spanner } = require ('@google-cloud/spanner')
 const { Chance } = require('chance')
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 
 const chance = Chance()
 

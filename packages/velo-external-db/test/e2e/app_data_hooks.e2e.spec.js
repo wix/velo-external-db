@@ -7,7 +7,7 @@ const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
 const hooks = require('../drivers/hooks_test_support')
 
-const { Uninitialized, gen: genCommon } = require('test-commons')
+const { Uninitialized, gen: genCommon } = require('@wix-velo/test-commons')
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'

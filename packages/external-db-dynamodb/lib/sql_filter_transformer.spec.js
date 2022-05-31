@@ -1,5 +1,5 @@
 const FilterParser = require('./sql_filter_transformer')
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen } = require('@wix-velo/test-commons')
 const { InvalidQuery } = require('velo-external-db-commons').errors
 const { AdapterOperators } = require('velo-external-db-commons')
 const { idFilter } = require('../tests/gen')

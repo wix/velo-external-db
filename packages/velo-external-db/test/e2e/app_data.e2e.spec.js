@@ -1,6 +1,6 @@
-const { Uninitialized, gen: genCommon } = require('test-commons')
+const { Uninitialized, gen: genCommon } = require('@wix-velo/test-commons')
 const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort } = require('velo-external-db-commons').SchemaOperations
-const { testIfSupportedOperationsIncludes } = require('test-commons')
+const { testIfSupportedOperationsIncludes } = require('@wix-velo/test-commons')
 const gen = require('../gen')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')

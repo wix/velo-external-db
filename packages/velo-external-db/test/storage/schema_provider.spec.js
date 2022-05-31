@@ -1,5 +1,5 @@
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('velo-external-db-commons').errors
-const { Uninitialized, gen, testIfSupportedOperationsIncludes } = require('test-commons')
+const { Uninitialized, gen, testIfSupportedOperationsIncludes } = require('@wix-velo/test-commons')
 const { RemoveColumn } = require('velo-external-db-commons').SchemaOperations
 const Chance = require('chance')
 const { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/provider_resources')

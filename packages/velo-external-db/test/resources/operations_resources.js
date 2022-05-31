@@ -1,4 +1,4 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const mysql = require('@wix-velo/external-db-mysql')
 const spanner = require('@wix-velo/external-db-spanner')
 const postgres = require('@wix-velo/external-db-postgres')

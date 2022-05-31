@@ -1,4 +1,4 @@
-const { Uninitialized, sleep } = require('test-commons')
+const { Uninitialized, sleep } = require('@wix-velo/test-commons')
 const { suiteDef } = require('./test_suite_definition')
 const { authInit } = require('../drivers/auth_test_support')
 const { waitUntil } = require('async-wait-until')

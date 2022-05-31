@@ -62,7 +62,7 @@
     "jest": "^27.5.1",
     "jest-each": "^27.4.6",
     "jest-when": "^3.5.1",
-    "test-commons": "^0.0.0",
+    "@wix-velo/test-commons": "^1.0.0",
     "jest-extended": "^2.0.0"
   }
 }

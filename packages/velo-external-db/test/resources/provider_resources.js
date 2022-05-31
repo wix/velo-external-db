@@ -1,4 +1,4 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const { suiteDef } = require('./test_suite_definition')
 
 const mysql = require('@wix-velo/external-db-mysql')

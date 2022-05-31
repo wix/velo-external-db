@@ -1,4 +1,4 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const gen = require('../../test/gen')
 const FilterTransformer = require('./filter_transformer')
 const { EmptyFilter } = require('./utils')

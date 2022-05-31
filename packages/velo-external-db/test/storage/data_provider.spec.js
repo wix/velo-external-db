@@ -1,4 +1,4 @@
-const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('test-commons')
+const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('@wix-velo/test-commons')
 const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator, FindObject, IncludeOperator } = require('velo-external-db-commons').SchemaOperations
 
 const Chance = require('chance')

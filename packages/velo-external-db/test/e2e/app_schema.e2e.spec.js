@@ -1,4 +1,4 @@
-const { Uninitialized, gen: genCommon, testIfSupportedOperationsIncludes } = require('test-commons')
+const { Uninitialized, gen: genCommon, testIfSupportedOperationsIncludes } = require('@wix-velo/test-commons')
 const { RemoveColumn } = require('velo-external-db-commons').SchemaOperations
 const schema = require('../drivers/schema_api_rest_test_support')
 const matchers = require('../drivers/schema_api_rest_matchers')

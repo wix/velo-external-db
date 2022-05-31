@@ -1,5 +1,5 @@
 const FilterParser = require('./sql_filter_transformer')
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const { LastLetterCoder } = require('./firestore_utils')
 const { randomSupportedFilter } = require('../tests/gen')
 const { InvalidQuery } = require('velo-external-db-commons').errors
