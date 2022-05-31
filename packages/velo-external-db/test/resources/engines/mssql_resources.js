@@ -1,4 +1,4 @@
-const { init, supportedOperations } = require('external-db-mssql')
+const { init, supportedOperations } = require('@wix-velo/external-db-mssql')
 const { runImage, stopImage } = require('./docker_support')
 
 const testEnvConfig = {

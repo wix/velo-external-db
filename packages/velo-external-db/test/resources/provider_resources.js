@@ -13,7 +13,7 @@ const postgresTestEnv = require('./engines/postgres_resources')
 const firestore = require('@wix-velo/external-db-firestore')
 const firestoreTestEnv = require('./engines/firestore_resources')
 
-const mssql = require('external-db-mssql')
+const mssql = require('@wix-velo/external-db-mssql')
 const mssqlTestEnv = require('./engines/mssql_resources')
 
 const mongo = require('@wix-velo/external-db-mongo')
