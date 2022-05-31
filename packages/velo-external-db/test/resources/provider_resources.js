@@ -1,7 +1,7 @@
 const { Uninitialized } = require('test-commons')
 const { suiteDef } = require('./test_suite_definition')
 
-const mysql = require('external-db-mysql')
+const mysql = require('@wix-velo/external-db-mysql')
 const mysqlTestEnv = require('./engines/mysql_resources')
 
 const spanner = require('external-db-spanner')

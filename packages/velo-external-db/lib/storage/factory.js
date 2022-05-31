@@ -21,7 +21,7 @@ const engineConnectorFor = async(_type, config) => {
             return await mssqlFactory(config)
         }
         case 'mysql': {
-            const { mySqlFactory } = require('external-db-mysql')
+            const { mySqlFactory } = require('@wix-velo/external-db-mysql')
             return await mySqlFactory(config)
         }
         case 'mongo': {
@@ -80,7 +80,7 @@ const init = async(_type, vendor, config) => {
             return append(res, cfg.secretKey)
         }
         case 'mysql': {
-            const { init } = require('external-db-mysql')
+            const { init } = require('@wix-velo/external-db-mysql')
 
             return append(init(cfg), cfg.secretKey)
         }

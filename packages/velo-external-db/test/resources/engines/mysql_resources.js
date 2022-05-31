@@ -1,4 +1,4 @@
-const { init, supportedOperations } = require('external-db-mysql')
+const { init, supportedOperations } = require('@wix-velo/external-db-mysql')
 const { runImage, stopImage } = require('./docker_support')
 const { waitUntil } = require('async-wait-until')
 

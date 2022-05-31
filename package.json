@@ -15,7 +15,7 @@
     "test:postgres10": "npm run test:postgres",
     "test:postgres9": "npm run test:postgres",
     "test:spanner": "lerna exec --scope external-db-spanner \"npm test\" && lerna exec --scope velo-external-db \"npm run test:spanner\"",
-    "test:mysql": "lerna exec --scope external-db-mysql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mysql\"",
+    "test:mysql": "lerna exec --scope @wix-velo/external-db-mysql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mysql\"",
     "test:mysql5": "npm run test:mysql",
     "test:mssql": "lerna exec --scope @wix-velo/external-db-mssql \"npm test\" && lerna exec --scope velo-external-db \"npm run test:mssql\"",
     "test:mssql17": "npm run test:mssql",
@@ -27,7 +27,7 @@
     "test:dynamodb": "lerna exec --scope @wix-velo/external-db-dynamodb \"npm test\" && lerna exec --scope velo-external-db \"npm run test:dynamodb\"",
     "test:bigquery": "lerna exec --scope @wix-velo/external-db-bigquery \"npm test\" && lerna exec --scope velo-external-db \"npm run test:bigquery\"",
     "release": "lerna version --no-push",
-    "outdated:all": "lerna exec --scope '{@wix-velo/external-db-config,@wix-velo/external-db-firestore,@wix-velo/external-db-mongo,@wix-velo/external-db-mssql,external-db-mysql,external-db-postgres,external-db-spanner,@wix-velo/external-db-google-sheets,@wix-velo/external-db-airtable,@wix-velo/external-db-dynamodb,velo-external-db,velo-external-db-core,external-db-security }' \"npm outdated\"",
+    "outdated:all": "lerna exec --scope '{@wix-velo/external-db-config,@wix-velo/external-db-firestore,@wix-velo/external-db-mongo,@wix-velo/external-db-mssql,@wix-velo/external-db-mysql,external-db-postgres,external-db-spanner,@wix-velo/external-db-google-sheets,@wix-velo/external-db-airtable,@wix-velo/external-db-dynamodb,velo-external-db,velo-external-db-core,external-db-security }' \"npm outdated\"",
     "ci:publish": "lerna publish -y from-git",
     "prepare": "husky install"
   },
