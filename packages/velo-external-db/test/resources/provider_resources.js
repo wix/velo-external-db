@@ -22,7 +22,7 @@ const mongoTestEnv = require('./engines/mongo_resources')
 const airtable = require ('@wix-velo/external-db-airtable')
 const airtableEnv = require ('./engines/airtable_resources')
 
-const dynamo = require ('external-db-dynamodb')
+const dynamo = require ('@wix-velo/external-db-dynamodb')
 const dynamoTestEnv = require ('./engines/dynamodb_resources.js')
 
 const bigquery = require('@wix-velo/external-db-bigquery')

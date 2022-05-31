@@ -42,7 +42,7 @@
     "external-db-security": "^0.0.0",
     "@wix-velo/external-db-bigquery": "^1.0.0",
     "@wix-velo/external-db-config": "^1.0.0",
-    "external-db-dynamodb": "^0.0.0",
+    "@wix-velo/external-db-dynamodb": "^1.0.0",
     "external-db-firestore": "^0.0.0",
     "external-db-google-sheets": "^0.0.0",
     "external-db-mongo": "^0.0.0",

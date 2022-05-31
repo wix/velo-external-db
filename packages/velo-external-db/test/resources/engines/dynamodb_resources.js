@@ -1,4 +1,4 @@
-const { init, supportedOperations } = require('external-db-dynamodb')
+const { init, supportedOperations } = require('@wix-velo/external-db-dynamodb')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = async() => {

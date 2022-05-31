@@ -37,7 +37,7 @@ const engineConnectorFor = async(_type, config) => {
             return await airtableFactory(config)
         }
         case 'dynamodb': {
-            const { dynamoDbFactory } = require('external-db-dynamodb')
+            const { dynamoDbFactory } = require('@wix-velo/external-db-dynamodb')
             return await dynamoDbFactory(config)
         }
         case 'bigquery': {
@@ -98,7 +98,7 @@ const init = async(_type, vendor, config) => {
             return append(await init(cfg), cfg.secretKey)
         }
         case 'dynamodb': {
-            const { init } = require('external-db-dynamodb')
+            const { init } = require('@wix-velo/external-db-dynamodb')
             return append(await init(cfg), cfg.secretKey)
         }
         case 'bigquery': {
