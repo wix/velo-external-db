@@ -28,7 +28,7 @@ const dynamoTestEnv = require ('./engines/dynamodb_resources.js')
 const bigquery = require('@wix-velo/external-db-bigquery')
 const bigqueryTestEnv = require('./engines/bigquery_resources')
 
-const googleSheet = require('external-db-google-sheets')
+const googleSheet = require('@wix-velo/external-db-google-sheets')
 const googleSheetTestEnv = require('./engines/google_sheets_resources')
 
 const env = {

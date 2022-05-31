@@ -44,7 +44,7 @@
     "@wix-velo/external-db-config": "^1.0.0",
     "@wix-velo/external-db-dynamodb": "^1.0.0",
     "@wix-velo/external-db-firestore": "^1.0.0",
-    "external-db-google-sheets": "^0.0.0",
+    "@wix-velo/external-db-google-sheets": "^1.0.0",
     "external-db-mongo": "^0.0.0",
     "external-db-mssql": "^0.0.0",
     "external-db-mysql": "^0.0.0",
