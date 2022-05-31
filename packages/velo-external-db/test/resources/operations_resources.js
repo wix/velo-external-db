@@ -5,7 +5,7 @@ const postgres = require('external-db-postgres')
 const firestore = require('external-db-firestore')
 const mssql = require('external-db-mssql')
 const mongo = require ('external-db-mongo')
-const airtable = require ('external-db-airtable')
+const airtable = require ('@wix-velo/external-db-airtable')
 const dynamo = require ('external-db-dynamodb')
 const bigquery = require ('external-db-bigquery')
 

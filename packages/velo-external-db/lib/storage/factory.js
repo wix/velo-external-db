@@ -33,7 +33,7 @@ const engineConnectorFor = async(_type, config) => {
             return await googleSheetFactory(config)
         }
         case 'airtable': {
-            const { airtableFactory } = require('external-db-airtable')
+            const { airtableFactory } = require('@wix-velo/external-db-airtable')
             return await airtableFactory(config)
         }
         case 'dynamodb': {
@@ -94,7 +94,7 @@ const init = async(_type, vendor, config) => {
             return append(await init(cfg), cfg.secretKey)
         }
         case 'airtable': {
-            const { init } = require('external-db-airtable')
+            const { init } = require('@wix-velo/external-db-airtable')
             return append(await init(cfg), cfg.secretKey)
         }
         case 'dynamodb': {

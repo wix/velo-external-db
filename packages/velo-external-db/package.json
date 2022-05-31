@@ -38,7 +38,7 @@
     "compression": "^1.7.4",
     "express": "^4.17.3",
     "ejs": "^3.1.7",
-    "external-db-airtable": "^0.0.0",
+    "@wix-velo/external-db-airtable": "^1.0.0",
     "external-db-security": "^0.0.0",
     "external-db-bigquery": "^0.0.0",
     "external-db-config": "^0.0.0",
