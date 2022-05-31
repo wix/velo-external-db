@@ -16,7 +16,7 @@ const firestoreTestEnv = require('./engines/firestore_resources')
 const mssql = require('external-db-mssql')
 const mssqlTestEnv = require('./engines/mssql_resources')
 
-const mongo = require('external-db-mongo')
+const mongo = require('@wix-velo/external-db-mongo')
 const mongoTestEnv = require('./engines/mongo_resources')
 
 const airtable = require ('@wix-velo/external-db-airtable')

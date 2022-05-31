@@ -25,7 +25,7 @@ const engineConnectorFor = async(_type, config) => {
             return await mySqlFactory(config)
         }
         case 'mongo': {
-            const { mongoFactory } = require('external-db-mongo')
+            const { mongoFactory } = require('@wix-velo/external-db-mongo')
             return await mongoFactory(config)
         }
         case 'google-sheet': {
@@ -85,7 +85,7 @@ const init = async(_type, vendor, config) => {
             return append(init(cfg), cfg.secretKey)
         }
         case 'mongo': {
-            const { init } = require('external-db-mongo')
+            const { init } = require('@wix-velo/external-db-mongo')
 
             return append(await init(cfg), cfg.secretKey)
         }
