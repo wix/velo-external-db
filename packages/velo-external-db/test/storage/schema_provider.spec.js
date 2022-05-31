@@ -1,11 +1,11 @@
-const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('@wix-velo/velo-external-db-commons').errors
 const { Uninitialized, gen, testIfSupportedOperationsIncludes } = require('@wix-velo/test-commons')
-const { RemoveColumn } = require('velo-external-db-commons').SchemaOperations
+const { RemoveColumn } = require('@wix-velo/velo-external-db-commons').SchemaOperations
 const Chance = require('chance')
 const { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/provider_resources')
 const { collectionWithDefaultFields, hasSameSchemaFieldsLike } = require('../drivers/schema_provider_matchers')
 const chance = new Chance()
-const { SystemFields } = require('velo-external-db-commons')
+const { SystemFields } = require('@wix-velo/velo-external-db-commons')
 
 
 

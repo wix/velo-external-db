@@ -27,7 +27,7 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "passport-oauth2": "^1.6.1",
-    "velo-external-db-commons": "^0.0.0"
+    "@wix-velo/velo-external-db-commons": "^1.0.0"
   },
   "devDependencies": {
     "@wix-velo/test-commons": "^1.0.0",

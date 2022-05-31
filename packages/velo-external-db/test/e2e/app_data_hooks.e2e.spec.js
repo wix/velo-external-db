@@ -1,7 +1,7 @@
 const { authOwner, errorResponseWith } = require('../drivers/auth_test_support')
 const each = require('jest-each').default
 const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } = require('../resources/e2e_resources')
-const { Aggregate } = require('velo-external-db-commons').SchemaOperations
+const { Aggregate } = require('@wix-velo/velo-external-db-commons').SchemaOperations
 const gen = require('../gen')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')

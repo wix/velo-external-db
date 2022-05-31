@@ -54,7 +54,8 @@
       "velo-external-db",
       "velo-external-db-core",
       "external-db-security",
-      "test-commons"
+      "test-commons",
+      "velo-external-db-commons"
     ]
   },
   "lint-staged": {

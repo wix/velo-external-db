@@ -1,7 +1,7 @@
 const express = require('express')
 const { errorMiddleware } = require('./web/error-middleware')
 const { appInfoFor } = require('./health/app_info')
-const { InvalidRequest, ItemNotFound } = require('velo-external-db-commons').errors
+const { InvalidRequest, ItemNotFound } = require('@wix-velo/velo-external-db-commons').errors
 const { extractRole } = require('./web/auth-role-middleware')
 const { config } = require('./roles-config.json')
 const compression = require('compression')

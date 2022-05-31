@@ -1,5 +1,5 @@
-const { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } = require('velo-external-db-commons')
-const { CollectionDoesNotExists, CollectionAlreadyExists } = require('velo-external-db-commons').errors
+const { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } = require('@wix-velo/velo-external-db-commons')
+const { CollectionDoesNotExists, CollectionAlreadyExists } = require('@wix-velo/velo-external-db-commons').errors
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
 const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, escapeFieldId } = require('./spanner_utils')

@@ -1,5 +1,5 @@
 const { sheetFor, headersFrom, findRowById } = require('./google_sheet_utils')
-const { eq } = require('velo-external-db-commons').AdapterOperators
+const { eq } = require('@wix-velo/velo-external-db-commons').AdapterOperators
 
 class DataProvider {
     constructor(doc, filterParser) {

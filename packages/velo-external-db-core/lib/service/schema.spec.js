@@ -1,6 +1,6 @@
 const Chance = require('chance')
 const SchemaService = require('./schema')
-const { AllSchemaOperations, errors } = require('velo-external-db-commons')
+const { AllSchemaOperations, errors } = require('@wix-velo/velo-external-db-commons')
 const { Uninitialized } = require('@wix-velo/test-commons')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const schema = require('../../test/drivers/schema_information_test_support')

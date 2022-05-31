@@ -1,4 +1,4 @@
-const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, SchemaOperations, errors } = require('velo-external-db-commons')
+const { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, SchemaOperations, errors } = require('@wix-velo/velo-external-db-commons')
 const { Create, AddColumn, RemoveColumn } = SchemaOperations
 
 class SchemaService {

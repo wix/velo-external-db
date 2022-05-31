@@ -1,6 +1,6 @@
 const Chance = require('chance')
 const chance = Chance()
-const { AdapterOperators } = require('velo-external-db-commons')
+const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
 const { eq, gt, gte, include, lt, lte, ne } = AdapterOperators
 
 

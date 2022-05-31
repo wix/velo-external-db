@@ -1,4 +1,4 @@
-const { UnauthorizedError } = require('velo-external-db-commons/lib/errors')
+const { UnauthorizedError } = require('@wix-velo/velo-external-db-commons/lib/errors')
 const DefaultPolicies = ['Admin']
 
 class RoleAuthorizationService {

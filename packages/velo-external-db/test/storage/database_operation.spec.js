@@ -1,5 +1,5 @@
 const each = require('jest-each').default
-const { DbConnectionError } = require('velo-external-db-commons').errors
+const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
 const { env, setupDb, currentDbImplementationName, misconfiguredDbOperationOptions } = require('../resources/operations_resources')
 
 describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {

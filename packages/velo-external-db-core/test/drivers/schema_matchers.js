@@ -1,4 +1,4 @@
-const { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders, ReadOnlyOperations } = require('velo-external-db-commons')
+const { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders, ReadOnlyOperations } = require('@wix-velo/velo-external-db-commons')
 
 const appendAllowedOperationsToDbs = (dbs, allowedSchemaOperations) => {
     return dbs.map( db => ({

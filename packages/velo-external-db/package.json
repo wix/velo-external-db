@@ -51,7 +51,7 @@
     "@wix-velo/external-db-postgres": "^1.0.0",
     "@wix-velo/external-db-spanner": "^1.0.0",
     "nested-property": "^4.0.0",
-    "velo-external-db-commons": "^0.0.0",
+    "@wix-velo/velo-external-db-commons": "^1.0.0",
     "@wix-velo/velo-external-db-core": "^1.0.0"
   },
   "devDependencies": {

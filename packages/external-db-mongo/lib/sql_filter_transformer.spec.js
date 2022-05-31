@@ -1,7 +1,7 @@
 const FilterParser = require('./sql_filter_transformer')
-const { EmptySort, AdapterOperators, AdapterFunctions } = require('velo-external-db-commons')
+const { EmptySort, AdapterOperators, AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
 const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()

@@ -1,5 +1,5 @@
-const { SystemFields, validateSystemFields, AllSchemaOperations } = require('velo-external-db-commons')
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
+const { SystemFields, validateSystemFields, AllSchemaOperations } = require('@wix-velo/velo-external-db-commons')
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('@wix-velo/velo-external-db-commons').errors
 const { validateTable, SystemTable } = require ('./mongo_utils')
 
 class SchemaProvider {

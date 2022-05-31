@@ -1,4 +1,4 @@
-const { SystemFields } = require('velo-external-db-commons')
+const { SystemFields } = require('@wix-velo/velo-external-db-commons')
 const { when } = require('jest-when')
 
 const systemFields = SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) )

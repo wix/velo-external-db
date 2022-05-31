@@ -1,4 +1,4 @@
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 const { unpackIdFieldForItem, validateTable } = require('./mongo_utils')
 
 describe('Mongo Utils', () => {

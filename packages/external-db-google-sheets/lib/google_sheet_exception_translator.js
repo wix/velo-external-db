@@ -1,4 +1,4 @@
-const { FieldAlreadyExists } = require('velo-external-db-commons').errors
+const { FieldAlreadyExists } = require('@wix-velo/velo-external-db-commons').errors
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.code) {

@@ -1,5 +1,5 @@
 /* eslint-disable */
-const { DbConnectionError } = require('velo-external-db-commons').errors
+const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
 
 
 const notThrowingTranslateErrorCodes = err => {

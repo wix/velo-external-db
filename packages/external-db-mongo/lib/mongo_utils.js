@@ -1,5 +1,5 @@
-const { isObject } = require('velo-external-db-commons')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { isObject } = require('@wix-velo/velo-external-db-commons')
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 
 const SystemTable = '_descriptor'
 const isSystemTable = collectionId => SystemTable === collectionId.trim().toLowerCase()

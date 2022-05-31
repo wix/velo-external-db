@@ -1,5 +1,5 @@
 const { escapeIdentifier, prepareStatementVariables  } = require('./postgres_utils')
-const { asParamArrays, patchDateTime, updateFieldsFor } = require('velo-external-db-commons')
+const { asParamArrays, patchDateTime, updateFieldsFor } = require('@wix-velo/velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 
 class DataProvider {

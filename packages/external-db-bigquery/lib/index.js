@@ -1,4 +1,4 @@
-const { DbConnector } = require ('velo-external-db-commons')
+const { DbConnector } = require ('@wix-velo/velo-external-db-commons')
 const SchemaProvider = require('./bigquery_schema_provider')
 const DataProvider = require('./bigquery_data_provider')
 const ConfigValidator = require('./bigquery_config_validator')

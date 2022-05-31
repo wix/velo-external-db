@@ -2,11 +2,11 @@ const FilterParser = require('./sql_filter_transformer')
 const { Uninitialized } = require('@wix-velo/test-commons')
 const { LastLetterCoder } = require('./firestore_utils')
 const { randomSupportedFilter } = require('../tests/gen')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()
-const { AdapterOperators } = require('velo-external-db-commons')
+const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_contains, and, urlized } = AdapterOperators
 
 const EmptySort = []

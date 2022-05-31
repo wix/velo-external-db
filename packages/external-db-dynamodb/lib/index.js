@@ -1,4 +1,4 @@
-const { DbConnector } = require ('velo-external-db-commons')
+const { DbConnector } = require ('@wix-velo/velo-external-db-commons')
 const SchemaProvider = require('./dynamo_schema_provider')
 const DataProvider = require('./dynamo_data_provider')
 const ConfigValidator = require('./dynamo_config_validator')

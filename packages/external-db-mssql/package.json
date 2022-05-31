@@ -24,7 +24,7 @@
   "dependencies": {
     "mssql": "^8.0.2",
     "tsqlstring": "^1.0.1",
-    "velo-external-db-commons": "^0.0.0"
+    "@wix-velo/velo-external-db-commons": "^1.0.0"
   },
   "devDependencies": {
     "jest": "^27.5.1",

@@ -1,4 +1,4 @@
-const { patchDateTime } = require('velo-external-db-commons')
+const { patchDateTime } = require('@wix-velo/velo-external-db-commons')
 const { DynamoDBDocument }  = require ('@aws-sdk/lib-dynamodb')
 const { validateTable, patchFixDates } = require('./dynamo_utils')
 const dynamoRequests = require ('./dynamo_data_requests_utils')

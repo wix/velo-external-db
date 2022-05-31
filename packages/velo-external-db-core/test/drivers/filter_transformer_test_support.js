@@ -1,6 +1,6 @@
 const { EmptyFilter } = require('../../lib/converters/utils')
 const { when } = require('jest-when')
-const { AdapterFunctions } = require('velo-external-db-commons')
+const { AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
 
 const filterTransformer = {
     transform: jest.fn(),

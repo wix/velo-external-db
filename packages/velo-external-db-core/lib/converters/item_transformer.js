@@ -1,6 +1,6 @@
 
 const { v4: uuidv4 } = require('uuid')
-const { isObject } = require('velo-external-db-commons')
+const { isObject } = require('@wix-velo/velo-external-db-commons')
 let dateTimeProvider = require('../utils/date_time_provider')
 
 class ItemTransformer {

@@ -4,9 +4,9 @@ const { EmptyFilter } = require ('./utils')
 const Chance = require('chance')
 const chance = Chance()
 const each = require('jest-each').default
-const { AdapterFunctions } = require('velo-external-db-commons')
+const { AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
 const driver = require ('../../test/drivers/filter_transformer_test_support')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 
 describe('Aggregation Transformer', () => {
     beforeAll(() => {
