@@ -1,4 +1,4 @@
-const { init, supportedOperations } = require('external-db-firestore')
+const { init, supportedOperations } = require('@wix-velo/external-db-firestore')
 const { runImage, stopImage } = require('./docker_support')
 
 const setEmulatorOn = () => process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8082'

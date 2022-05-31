@@ -10,7 +10,7 @@ const spannerTestEnv = require('./engines/spanner_resources')
 const postgres = require('external-db-postgres')
 const postgresTestEnv = require('./engines/postgres_resources')
 
-const firestore = require('external-db-firestore')
+const firestore = require('@wix-velo/external-db-firestore')
 const firestoreTestEnv = require('./engines/firestore_resources')
 
 const mssql = require('external-db-mssql')

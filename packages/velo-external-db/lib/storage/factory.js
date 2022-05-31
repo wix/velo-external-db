@@ -13,7 +13,7 @@ const engineConnectorFor = async(_type, config) => {
             return await spannerFactory(config)
         }
         case 'firestore': {
-            const { firestoreFactory } = require('external-db-firestore')
+            const { firestoreFactory } = require('@wix-velo/external-db-firestore')
             return await firestoreFactory(config)
         }
         case 'mssql': {
@@ -68,7 +68,7 @@ const init = async(_type, vendor, config) => {
             return append(init(cfg), cfg.secretKey)
         }
         case 'firestore': {
-            const { init } = require('external-db-firestore')
+            const { init } = require('@wix-velo/external-db-firestore')
 
             const { projectId, secretKey } = cfg
             return append(init([projectId]), secretKey)
