@@ -1,32 +1,22 @@
+const path = require('path')
+const Promise = require('bluebird')
 const express = require('express')
+const compression = require('compression')
 const { errorMiddleware } = require('./web/error-middleware')
 const { appInfoFor } = require('./health/app_info')
 const { InvalidRequest, ItemNotFound } = require('@wix-velo/velo-external-db-commons').errors
 const { extractRole } = require('./web/auth-role-middleware')
 const { config } = require('./roles-config.json')
-const compression = require('compression')
 const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
 const { authRoleMiddleware } = require('./web/auth-role-middleware')
 const { unless, includes } = require('./web/middleware-support')
-const path = require('path')
-const fs = require('fs').promises
-const ejs = require('ejs')
-const Promise = require('bluebird')
+const { getAppInfoPage } = require('./utils/router_utils')
 const { HooksForAction: DataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./data_hooks_utils')
 const { HooksForAction: SchemaHooksForAction, Operations: SchemaOperations, payloadFor: schemaPayloadFor, Actions: SchemaActions } = require('./schema_hooks_utils')
 
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = dataOperations
 
 let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer, roleAuthorizationService, dataHooks, schemaHooks
-
-let appInfoTemplate
-
-const getAppInfoTemplate = async() => {
-    if (!appInfoTemplate) {
-        appInfoTemplate = await fs.readFile(path.join(__dirname, 'views', 'index.ejs'), 'utf8')
-    }
-    return appInfoTemplate
-}
 
 const initServices = (_schemaAwareDataService, _schemaService, _operationService, _externalDbConfigClient, _cfg, _filterTransformer, _aggregationTransformer, _roleAuthorizationService, _hooks) => {
     schemaService = _schemaService
@@ -83,9 +73,8 @@ const createRouter = () => {
     // *************** INFO **********************
     router.get('/', async(req, res) => {
         const appInfo = await appInfoFor(operationService, externalDbConfigClient)
-        const appInfoTemplate = await getAppInfoTemplate()
-        const appInfoPage = ejs.render(appInfoTemplate, appInfo )
-
+        const appInfoPage = await getAppInfoPage(appInfo)
+        
         res.send(appInfoPage)
     })
 
