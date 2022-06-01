@@ -1,4 +1,4 @@
-const { UnauthorizedError } = require('velo-external-db-commons').errors
+const { UnauthorizedError } = require('@wix-velo/velo-external-db-commons').errors
 const { has, get } = require('nested-property')
 
 const unless = function(path, middleware) {

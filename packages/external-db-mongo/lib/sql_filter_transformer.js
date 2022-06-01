@@ -1,5 +1,5 @@
-const { InvalidQuery } = require('velo-external-db-commons').errors
-const { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } = require('velo-external-db-commons')
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+const { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } = require('@wix-velo/velo-external-db-commons')
 const { EmptyFilter } = require('./mongo_utils')
 const { string_begins, string_ends, string_contains, urlized, matches } = AdapterOperators
 const { count } = AdapterFunctions

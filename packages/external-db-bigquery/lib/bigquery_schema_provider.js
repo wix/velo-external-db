@@ -1,4 +1,4 @@
-const { SystemFields, validateSystemFields, parseTableData, SchemaOperations, errors } = require('velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData, SchemaOperations, errors } = require('@wix-velo/velo-external-db-commons')
 const { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes, removeColumnTranslateErrorCodes } = require('./sql_exception_translator')
 const { escapeIdentifier } = require('./bigquery_utils')
 const SchemaColumnTranslator = require('./sql_schema_translator')

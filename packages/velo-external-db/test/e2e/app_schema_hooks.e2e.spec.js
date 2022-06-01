@@ -6,7 +6,7 @@ const matchers = require('../drivers/schema_api_rest_matchers')
 const schema = require('../drivers/schema_api_rest_test_support')
 const hooks = require('../drivers/hooks_test_support')
 
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'

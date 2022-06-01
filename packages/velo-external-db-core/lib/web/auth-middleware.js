@@ -1,5 +1,5 @@
 const { property } = require('./middleware-support')
-const { UnauthorizedError } = require('velo-external-db-commons').errors
+const { UnauthorizedError } = require('@wix-velo/velo-external-db-commons').errors
 
 const extractSecretKey = body => property('requestContext.settings.secretKey', body)
 

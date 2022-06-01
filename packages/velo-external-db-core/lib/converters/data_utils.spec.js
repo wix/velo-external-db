@@ -1,5 +1,5 @@
 const { asWixData, generateIdsIfNeeded } = require ('./data_utils')
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen } = require('@wix-velo/test-commons')
 const Chance = require('chance')
 const chance = Chance()
 const dateTimeProvider = require('../../test/drivers/date_time_provider_test_support')

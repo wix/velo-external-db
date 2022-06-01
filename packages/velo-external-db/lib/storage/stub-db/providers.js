@@ -1,5 +1,5 @@
-const { checkRequiredKeys } = require('velo-external-db-commons')
-const { UnsupportedDatabase } = require('velo-external-db-commons').errors
+const { checkRequiredKeys } = require('@wix-velo/velo-external-db-commons')
+const { UnsupportedDatabase } = require('@wix-velo/velo-external-db-commons').errors
 
 class StubDataProvider {}
 

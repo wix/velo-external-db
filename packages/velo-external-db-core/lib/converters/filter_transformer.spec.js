@@ -1,12 +1,12 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const gen = require('../../test/gen')
 const FilterTransformer = require('./filter_transformer')
 const { EmptyFilter } = require('./utils')
 const Chance = require('chance')
 const chance = Chance()
 const each = require('jest-each').default
-const { AdapterOperators } = require('velo-external-db-commons')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 
 describe('Filter Transformer', () => {
     beforeAll(() => {

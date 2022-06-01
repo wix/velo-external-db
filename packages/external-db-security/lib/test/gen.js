@@ -1,4 +1,4 @@
-const { gen }  = require('test-commons')
+const { gen }  = require('@wix-velo/test-commons')
 const Chance = require('chance')
 const chance = Chance()
 

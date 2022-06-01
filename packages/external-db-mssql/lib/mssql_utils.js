@@ -1,5 +1,5 @@
 const SqlString = require('tsqlstring')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 
 const SqlServerSystemTables = ['syblicenseslog', 'sysalternates', 'sysaltusages', 'sysattributes', 'sysauditoptions',
                                'sysaudits_01', 'sysaudits_02', 'sysaudits_03', 'sysaudits_04', 'sysaudits_05', 'sysaudits_06', 'sysaudits_07', 'sysaudits_08',

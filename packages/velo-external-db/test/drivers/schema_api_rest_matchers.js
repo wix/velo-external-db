@@ -1,4 +1,4 @@
-const { SystemFields, asWixSchemaHeaders } = require('velo-external-db-commons')
+const { SystemFields, asWixSchemaHeaders } = require('@wix-velo/velo-external-db-commons')
 
 const responseWith = (matcher) => expect.objectContaining( { data: matcher } )
 

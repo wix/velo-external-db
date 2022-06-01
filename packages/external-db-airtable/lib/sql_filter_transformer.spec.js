@@ -1,8 +1,8 @@
 const FilterParser = require('./sql_filter_transformer')
 const { EmptySort } = require ('./airtable_utils')
-const { Uninitialized, gen } = require('test-commons')
-const { InvalidQuery } = require('velo-external-db-commons').errors
-const { AdapterOperators } = require('velo-external-db-commons')
+const { Uninitialized, gen } = require('@wix-velo/test-commons')
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()

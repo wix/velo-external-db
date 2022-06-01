@@ -1,4 +1,4 @@
-const { Aggregate } = require('velo-external-db-commons').SchemaOperations
+const { Aggregate } = require('@wix-velo/velo-external-db-commons').SchemaOperations
 
 const resetHooks = (externalDbRouter) => externalDbRouter.reloadHooks()
 

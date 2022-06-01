@@ -1,34 +1,34 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const { suiteDef } = require('./test_suite_definition')
 
-const mysql = require('external-db-mysql')
+const mysql = require('@wix-velo/external-db-mysql')
 const mysqlTestEnv = require('./engines/mysql_resources')
 
-const spanner = require('external-db-spanner')
+const spanner = require('@wix-velo/external-db-spanner')
 const spannerTestEnv = require('./engines/spanner_resources')
 
-const postgres = require('external-db-postgres')
+const postgres = require('@wix-velo/external-db-postgres')
 const postgresTestEnv = require('./engines/postgres_resources')
 
-const firestore = require('external-db-firestore')
+const firestore = require('@wix-velo/external-db-firestore')
 const firestoreTestEnv = require('./engines/firestore_resources')
 
-const mssql = require('external-db-mssql')
+const mssql = require('@wix-velo/external-db-mssql')
 const mssqlTestEnv = require('./engines/mssql_resources')
 
-const mongo = require('external-db-mongo')
+const mongo = require('@wix-velo/external-db-mongo')
 const mongoTestEnv = require('./engines/mongo_resources')
 
-const airtable = require ('external-db-airtable')
+const airtable = require ('@wix-velo/external-db-airtable')
 const airtableEnv = require ('./engines/airtable_resources')
 
-const dynamo = require ('external-db-dynamodb')
+const dynamo = require ('@wix-velo/external-db-dynamodb')
 const dynamoTestEnv = require ('./engines/dynamodb_resources.js')
 
-const bigquery = require('external-db-bigquery')
+const bigquery = require('@wix-velo/external-db-bigquery')
 const bigqueryTestEnv = require('./engines/bigquery_resources')
 
-const googleSheet = require('external-db-google-sheets')
+const googleSheet = require('@wix-velo/external-db-google-sheets')
 const googleSheetTestEnv = require('./engines/google_sheets_resources')
 
 const env = {

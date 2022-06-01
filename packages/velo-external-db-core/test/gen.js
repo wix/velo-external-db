@@ -1,6 +1,6 @@
 const Chance = require('chance')
-const { AdapterOperators } = require('velo-external-db-commons')
-const { gen: genCommon } = require('test-commons')
+const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
+const { gen: genCommon } = require('@wix-velo/test-commons')
 const chance = Chance()
 
 const invalidOperatorForType = (validOperators) => randomObjectFromArray (

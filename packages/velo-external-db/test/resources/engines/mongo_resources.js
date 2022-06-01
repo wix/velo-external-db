@@ -1,4 +1,4 @@
-const { init, supportedOperations } = require('external-db-mongo')
+const { init, supportedOperations } = require('@wix-velo/external-db-mongo')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = async() => {

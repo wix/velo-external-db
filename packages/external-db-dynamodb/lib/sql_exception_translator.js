@@ -1,4 +1,4 @@
-const { CollectionDoesNotExists, DbConnectionError } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
 
 const notThrowingTranslateErrorCodes = err => {
     switch (err.name) {

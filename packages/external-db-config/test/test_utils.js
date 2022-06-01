@@ -1,7 +1,7 @@
 
 const Chance = require('chance')
 const chance = new Chance()
-const { randomElementsFromArray } = require ('test-commons').gen
+const { randomElementsFromArray } = require ('@wix-velo/test-commons').gen
 const validAuthorizationConfig = {
     collectionPermissions: [
         {

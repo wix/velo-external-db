@@ -1,7 +1,7 @@
 const Chance = require('chance')
 const chance = Chance()
 const { checkRequiredKeys, jsonParser } = require('../utils/config_utils')
-const { gen } = require('test-commons')
+const { gen } = require('@wix-velo/test-commons')
 
 
 describe('Check Required Keys Function', () => {

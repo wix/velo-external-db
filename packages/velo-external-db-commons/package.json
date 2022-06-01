@@ -1,6 +1,6 @@
 {
-  "name": "velo-external-db-commons",
-  "version": "0.0.0",
+  "name": "@wix-velo/velo-external-db-commons",
+  "version": "1.0.2",
   "description": "",
   "homepage": "https://github.com/wix/velo-external-db#readme",
   "license": "MIT",
@@ -9,7 +9,9 @@
     "lib": "lib",
     "test": "tests"
   },
-  "files": [ "lib" ],
+  "files": [
+    "lib"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wix/velo-external-db.git",
@@ -17,6 +19,9 @@
   },
   "bugs": {
     "url": "https://github.com/wix/velo-external-db/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "test": ""

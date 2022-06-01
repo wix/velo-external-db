@@ -1,8 +1,8 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const SchemaInformation = require('./schema_information')
 const driver = require('../../test/drivers/schema_provider_test_support')
 const gen = require('../../test/gen')
-const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists } = require('@wix-velo/velo-external-db-commons').errors
 
 describe('Schema Information Service', () => {
 

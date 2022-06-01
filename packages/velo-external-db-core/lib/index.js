@@ -10,8 +10,8 @@ const QueryValidator = require ('./converters/query_validator')
 const SchemaAwareDataService = require ('./service/schema_aware_data')
 const ItemTransformer = require('./converters/item_transformer')
 const { initServices, createRouter, enableAppInfo } = require('./router')
-const { RoleAuthorizationService } = require ('external-db-security')
-const { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } = require ('external-db-config')
+const { RoleAuthorizationService } = require ('@wix-velo/external-db-security')
+const { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } = require ('@wix-velo/external-db-config')
 
 
 class ExternalDbRouter {

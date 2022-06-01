@@ -1,6 +1,6 @@
-const { isObject, AdapterFunctions } = require('velo-external-db-commons')
+const { isObject, AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
 const { projectionFieldFor, projectionFunctionFor } = require ('./utils')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 
 class AggregationTransformer {
     constructor(filterTransformer) {

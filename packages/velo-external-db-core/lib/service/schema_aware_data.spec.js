@@ -3,9 +3,9 @@ const schema = require ('../../test/drivers/schema_information_test_support')
 const data = require ('../../test/drivers/data_service_test_support')
 const queryValidator = require('../../test/drivers/query_validator_test_support')
 const patcher = require ('../../test/drivers/item_patcher_test_support')
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen } = require('@wix-velo/test-commons')
 const Chance = require('chance')
-const { SystemFields } = require('velo-external-db-commons')
+const { SystemFields } = require('@wix-velo/velo-external-db-commons')
 const chance = new Chance()
 
 describe ('Schema Aware Data Service', () => {

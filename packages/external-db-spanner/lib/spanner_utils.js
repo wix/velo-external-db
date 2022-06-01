@@ -1,5 +1,5 @@
 const { escapeId } = require('sqlstring')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 const { Spanner } = require ('@google-cloud/spanner')
 
 const recordSetToObj = (rows) => rows.map(row => row.toJSON())

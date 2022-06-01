@@ -1,4 +1,4 @@
-const { AdapterFunctions } = require('velo-external-db-commons')
+const { AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
 
 const EmptyFilter = {}
 

@@ -1,4 +1,4 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const { create } = require('../../lib/factory')
 const awsMySql = require('./aws_mysql_config_test_support')
 const awsMongo = require('./aws_mongo_config_test_support')

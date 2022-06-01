@@ -1,4 +1,4 @@
-const { CollectionDoesNotExists } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists } = require('@wix-velo/velo-external-db-commons').errors
 const NodeCache = require('node-cache')
 
 const FiveMinutes = 5 * 60

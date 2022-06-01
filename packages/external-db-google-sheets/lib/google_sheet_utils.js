@@ -1,4 +1,4 @@
-const { errors } = require('velo-external-db-commons')
+const { errors } = require('@wix-velo/velo-external-db-commons')
 
 const loadSheets = async(doc) => {
     try {

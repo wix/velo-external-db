@@ -1,5 +1,5 @@
 const SchemaColumnTranslator = require('./sql_schema_translator')
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const Chance = require('chance')
 const { escapeId } = require('./mssql_utils')
 const chance = Chance()

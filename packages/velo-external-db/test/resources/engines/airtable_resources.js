@@ -1,4 +1,4 @@
-const { init, mockServer, supportedOperations }= require('external-db-airtable')
+const { init, mockServer, supportedOperations }= require('@wix-velo/external-db-airtable')
 
 let _server
 const PORT = 9000

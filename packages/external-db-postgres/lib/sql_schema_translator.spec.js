@@ -1,7 +1,7 @@
 /* eslint-disable jest/no-commented-out-tests */
 const SchemaColumnTranslator = require('./sql_schema_translator')
 const { escapeIdentifier } = require('./postgres_utils')
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const Chance = require('chance')
 const chance = Chance()
 

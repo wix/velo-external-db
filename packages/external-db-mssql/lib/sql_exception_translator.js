@@ -1,4 +1,4 @@
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CollectionAlreadyExists, DbConnectionError, ItemAlreadyExists } = require('velo-external-db-commons').errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CollectionAlreadyExists, DbConnectionError, ItemAlreadyExists } = require('@wix-velo/velo-external-db-commons').errors
 
 const notThrowingTranslateErrorCodes = err => {
     if (err.number) {

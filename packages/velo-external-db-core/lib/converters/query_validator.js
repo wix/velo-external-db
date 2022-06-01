@@ -1,4 +1,4 @@
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 const { extractFieldsAndOperators, queryAdapterOperatorsFor, isBlank } = require ('./query_validator_utils')
 
 

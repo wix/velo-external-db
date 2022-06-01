@@ -1,4 +1,4 @@
-const { Uninitialized, gen } = require('test-commons')
+const { Uninitialized, gen } = require('@wix-velo/test-commons')
 const { authVisitor, authOwnerWithoutSecretKey, errorResponseWith } = require('../drivers/auth_test_support')
 const each = require('jest-each').default
 const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/e2e_resources')

@@ -1,5 +1,5 @@
 const { escapeId, validateLiteral, escape, patchFieldName, escapeTable } = require('./mssql_utils')
-const { updateFieldsFor } = require('velo-external-db-commons')
+const { updateFieldsFor } = require('@wix-velo/velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 
 class DataProvider {

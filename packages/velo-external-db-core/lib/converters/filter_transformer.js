@@ -1,6 +1,6 @@
-const { AdapterOperators, isObject } = require('velo-external-db-commons')
+const { AdapterOperators, isObject } = require('@wix-velo/velo-external-db-commons')
 const { EmptyFilter } = require ('./utils')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 
 class FilterTransformer {
     constructor() {
