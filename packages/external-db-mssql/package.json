@@ -1,6 +1,6 @@
 {
   "name": "@wix-velo/external-db-mssql",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "homepage": "https://github.com/wix/velo-external-db#readme",
   "license": "MIT",
@@ -9,7 +9,9 @@
     "lib": "lib",
     "test": "tests"
   },
-  "files": [ "lib" ],
+  "files": [
+    "lib"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wix/velo-external-db.git",
@@ -25,14 +27,14 @@
     "test": "jest"
   },
   "dependencies": {
+    "@wix-velo/velo-external-db-commons": "^1.0.2",
     "mssql": "^8.0.2",
-    "tsqlstring": "^1.0.1",
-    "@wix-velo/velo-external-db-commons": "^1.0.0"
+    "tsqlstring": "^1.0.1"
   },
   "devDependencies": {
+    "@wix-velo/test-commons": "^1.0.2",
+    "chance": "^1.1.8",
     "jest": "^27.5.1",
-    "jest-when": "^3.5.1",
-    "@wix-velo/test-commons": "^1.0.0",
-    "chance": "^1.1.8"
+    "jest-when": "^3.5.1"
   }
 }

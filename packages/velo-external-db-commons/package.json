@@ -1,6 +1,6 @@
 {
   "name": "@wix-velo/velo-external-db-commons",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "homepage": "https://github.com/wix/velo-external-db#readme",
   "license": "MIT",
@@ -9,7 +9,9 @@
     "lib": "lib",
     "test": "tests"
   },
-  "files": [ "lib" ],
+  "files": [
+    "lib"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wix/velo-external-db.git",

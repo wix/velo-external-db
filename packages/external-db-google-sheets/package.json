@@ -1,6 +1,6 @@
 {
   "name": "@wix-velo/external-db-google-sheets",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "homepage": "https://github.com/wix/velo-external-db#readme",
   "license": "MIT",
@@ -9,7 +9,9 @@
     "lib": "lib",
     "test": "tests"
   },
-  "files": [ "lib" ],
+  "files": [
+    "lib"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wix/velo-external-db.git",
@@ -25,14 +27,14 @@
     "test": ""
   },
   "dependencies": {
+    "@wix-velo/velo-external-db-commons": "^1.0.2",
     "express": "^4.17.3",
     "google-spreadsheet": "^3.2.0",
-    "googleapis": "^95.0.0",
-    "@wix-velo/velo-external-db-commons": "^1.0.0"
+    "googleapis": "^95.0.0"
   },
   "devDependencies": {
+    "@wix-velo/test-commons": "^1.0.2",
     "jest": "^27.5.1",
-    "@wix-velo/test-commons": "^1.0.0",
     "jest-when": "^3.5.1"
   }
 }
