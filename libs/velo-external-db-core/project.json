@@ -10,14 +10,14 @@
         "outputPath": "dist/libs/velo-external-db-core",
         "main": "libs/velo-external-db-core/src/index.js",
         "tsConfig": "libs/velo-external-db-core/tsconfig.lib.json",
-        "assets": ["libs/velo-external-db-core/*.md", "libs/velo-external-db-core/src/assets/*", "libs/velo-external-db-core/src/views/*"],
+        "assets": ["libs/velo-external-db-core/*.md", "libs/velo-external-db-core/src/assets/**/*", "libs/velo-external-db-core/src/views/**/*", "libs/velo-external-db-core/src/*.json"],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
     "publish": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "command": "node tools/scripts/publish.mjs velo-external-db-core {args.ver} {args.tag}"
+        "command": "node tools/scripts/publish.mjs @wix-velo/velo-external-db-core {args.ver} {args.tag}"
       },
       "dependsOn": [
         {
