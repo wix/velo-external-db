@@ -1,8 +1,9 @@
-const RoleAuthorizationService = require('./role_authorization')
-const { Uninitialized } = require('test-commons')
-const gen = require ('../test/gen') 
-const { UnauthorizedError } = require('velo-external-db-commons')
 const each = require('jest-each').default
+const { Uninitialized } = require('@wix-velo/test-commons')
+const { errors } = require('@wix-velo/velo-external-db-commons')
+const RoleAuthorizationService = require('./role_authorization')
+const gen = require ('../test/gen') 
+const { UnauthorizedError } = errors
 
 describe('Authorization Service', () => {
     describe('Authorize read', () => {

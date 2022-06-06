@@ -1,4 +1,4 @@
-const { Uninitialized, gen: genCommon } = require('test-commons')
+const { Uninitialized, gen: genCommon } = require('@wix-velo/test-commons')
 const { appInfoFor, maskSensitiveData } = require ('./app_info')
 const driver = require('../../test/drivers/app_info_test_support') //TODO: change driver location
 

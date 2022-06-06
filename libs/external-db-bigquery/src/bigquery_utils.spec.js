@@ -1,4 +1,4 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const { unPatchDateTime } = require('./bigquery_utils')
 const driver = require('./bigquery_utils_test_support')
 const Chance = require('chance')

@@ -1,21 +1,21 @@
 {
   "version": 2,
   "projects": {
-    "external-db-config": "libs/external-db-config",
-    "external-db-postgres": "libs/external-db-postgres",
-    "external-db-mysql": "libs/external-db-mysql",
-    "external-db-mssql": "libs/external-db-mssql",
-    "external-db-spanner": "libs/external-db-spanner",
-    "external-db-mongo": "libs/external-db-mongo",
-    "external-db-firestore": "libs/external-db-firestore",
-    "external-db-airtable": "libs/external-db-airtable",
-    "external-db-bigquery": "libs/external-db-bigquery",
-    "external-db-dynamodb": "libs/external-db-dynamodb",
-    "external-db-google-sheets": "libs/external-db-google-sheets",
-    "external-db-security": "libs/external-db-security",
-    "test-commons": "libs/test-commons",
-    "velo-external-db": "apps/velo-external-db",
-    "velo-external-db-commons": "libs/velo-external-db-commons",
-    "velo-external-db-core": "libs/velo-external-db-core"
+    "@wix-velo/external-db-config": "libs/external-db-config",
+    "@wix-velo/external-db-postgres": "libs/external-db-postgres",
+    "@wix-velo/external-db-mysql": "libs/external-db-mysql",
+    "@wix-velo/external-db-mssql": "libs/external-db-mssql",
+    "@wix-velo/external-db-spanner": "libs/external-db-spanner",
+    "@wix-velo/external-db-mongo": "libs/external-db-mongo",
+    "@wix-velo/external-db-firestore": "libs/external-db-firestore",
+    "@wix-velo/external-db-airtable": "libs/external-db-airtable",
+    "@wix-velo/external-db-bigquery": "libs/external-db-bigquery",
+    "@wix-velo/external-db-dynamodb": "libs/external-db-dynamodb",
+    "@wix-velo/external-db-google-sheets": "libs/external-db-google-sheets",
+    "@wix-velo/external-db-security": "libs/external-db-security",
+    "@wix-velo/test-commons": "libs/test-commons",
+    "@wix-velo/velo-external-db-commons": "libs/velo-external-db-commons",
+    "@wix-velo/velo-external-db-core": "libs/velo-external-db-core",
+    "velo-external-db": "apps/velo-external-db"
   }
 }

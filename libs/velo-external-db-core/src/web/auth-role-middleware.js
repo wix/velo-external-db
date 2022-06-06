@@ -1,4 +1,4 @@
-const { UnauthorizedError } = require('velo-external-db-commons').errors
+const { UnauthorizedError } = require('@wix-velo/velo-external-db-commons').errors
 const { property } = require('./middleware-support')
 
 const extractRole = body => property('requestContext.role', body)

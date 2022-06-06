@@ -1,4 +1,4 @@
-const { DbConnector } = require ('velo-external-db-commons')
+const { DbConnector } = require ('@wix-velo/velo-external-db-commons')
 const SchemaProvider = require('./google_sheet_schema_provider')
 const DataProvider = require('./google_sheet_data_provider')
 const ConfigValidator = require('./google_sheet_config_validator')

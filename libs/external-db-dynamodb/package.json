@@ -1,5 +1,5 @@
 {
-  "name": "external-db-dynamodb",
-  "version": "0.0.0",
+  "name": "@wix-velo/external-db-dynamodb",
+  "version": "1.0.3",
 	"type": "commonjs"
 }

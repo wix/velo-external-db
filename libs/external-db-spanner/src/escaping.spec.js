@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
 const { testLiteral, validateLiteral } = require('./spanner_utils')
-const { InvalidQuery } = require('velo-external-db-commons').errors
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()

@@ -1,5 +1,5 @@
-const { SystemFields, validateSystemFields, SchemaOperations } = require('velo-external-db-commons')
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('velo-external-db-commons').errors
+const { SystemFields, validateSystemFields, SchemaOperations } = require('@wix-velo/velo-external-db-commons')
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('@wix-velo/velo-external-db-commons').errors
 
 const SystemTable = '_descriptor'
 class SchemaProvider {

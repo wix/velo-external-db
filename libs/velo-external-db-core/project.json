@@ -10,7 +10,7 @@
         "outputPath": "dist/libs/velo-external-db-core",
         "main": "libs/velo-external-db-core/src/index.js",
         "tsConfig": "libs/velo-external-db-core/tsconfig.lib.json",
-        "assets": ["libs/velo-external-db-core/*.md"],
+        "assets": ["libs/velo-external-db-core/*.md", "libs/velo-external-db-core/src/assets/*", "libs/velo-external-db-core/src/views/*"],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },

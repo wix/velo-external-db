@@ -1,8 +1,6 @@
 // path aliases within jest global setup/teardown
 import { registerTsProject } from 'nx/src/utils/register'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// eslint-disable-next-line no-unused-vars
-const cleanupRegisteredPaths = registerTsProject('.', 'tsconfig.base.json')
+registerTsProject('.', 'tsconfig.base.json')
 
 
 const postgres = require('../resources/engines/postgres_resources')
@@ -16,7 +14,7 @@ const airtable = require ('../resources/engines/airtable_resources')
 const dynamoDb = require ('../resources/engines/dynamodb_resources')
 const bigquery = require ('../resources/engines/bigquery_resources')
 
-const { sleep } = require('test-commons')
+const { sleep } = require('@wix-velo/test-commons')
 const ci = require('./ci_utils')
 
 const initEnv = async(testEngine) => {

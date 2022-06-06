@@ -1,4 +1,4 @@
-const { Uninitialized } = require('test-commons')
+const { Uninitialized } = require('@wix-velo/test-commons')
 const { env, initEnv, reset } = require('../drivers/external_config_reader_e2e_test_support')
 const each = require('jest-each').default
 const { invalidConfigStatusResponse } = require('./external_db_config_client_matcher')

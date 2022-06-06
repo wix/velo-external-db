@@ -1,4 +1,4 @@
-import { init, supportedOperations } from 'external-db-postgres'
+const { init, supportedOperations } = require('@wix-velo/external-db-postgres')
 const { runImage, stopImage } = require('./docker_support')
 
 const connection = () => {

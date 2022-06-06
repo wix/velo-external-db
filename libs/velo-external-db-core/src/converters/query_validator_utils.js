@@ -1,4 +1,4 @@
-const { QueryOperatorsByFieldType } = require('velo-external-db-commons') 
+const { QueryOperatorsByFieldType } = require('@wix-velo/velo-external-db-commons') 
 const FilterTransformer = require ('../converters/filter_transformer')
 const { EmptyFilter } = require ('../converters/utils')
 const WixOperatorToAdapterOperator = new FilterTransformer().wixOperatorToAdapterOperator

@@ -1,4 +1,4 @@
-const { init, supportedOperations } = require('external-db-bigquery')
+const { init, supportedOperations } = require('@wix-velo/external-db-bigquery')
 
 const databaseId = 'testDB'
 const projectId = 'corvid-managed-cfe9809c'

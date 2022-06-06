@@ -1,7 +1,7 @@
-const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isEmptyFilter } = require('velo-external-db-commons')
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+const { isEmptyFilter } = require('@wix-velo/velo-external-db-commons')
 const { EmptyFilter } = require('./dynamo_utils')
-const { AdapterOperators } = require('velo-external-db-commons')
+const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
 
 class FilterParser {
@@ -163,8 +163,7 @@ class FilterParser {
         return filter
     }
 
-    // eslint-disable-next-line no-unused-vars
-    canQuery(filterExpr, fields) {
+    canQuery(filterExpr, _fields) {
         // const collectionKeys = fields.filter(f=>f.isPrimary).map(f=>f.name)
         const collectionKeys = ['_id']
 

@@ -1,5 +1,5 @@
-const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('test-commons')
-const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator, FindObject, IncludeOperator } = require('velo-external-db-commons').SchemaOperations
+const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('@wix-velo/test-commons')
+const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator, FindObject, IncludeOperator } = require('@wix-velo/velo-external-db-commons').SchemaOperations
 
 const Chance = require('chance')
 const gen = require('../gen')

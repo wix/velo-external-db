@@ -1,6 +1,6 @@
 const { escapeId, escapeTable, patchItem } = require('./mysql_utils')
 const { promisify } = require('util')
-const { asParamArrays, updateFieldsFor } = require('velo-external-db-commons')
+const { asParamArrays, updateFieldsFor } = require('@wix-velo/velo-external-db-commons')
 const { translateErrorCodes } = require('./sql_exception_translator')
 const { wildCardWith } = require('./mysql_utils')
 

@@ -1,5 +1,5 @@
-const { InvalidQuery } = require('velo-external-db-commons').errors
-const { isObject, AdapterOperators, isEmptyFilter } = require('velo-external-db-commons')
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+const { isObject, AdapterOperators, isEmptyFilter } = require('@wix-velo/velo-external-db-commons')
 const { EmptySort } = require ('./airtable_utils')
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 

@@ -1,5 +1,5 @@
-const { InvalidQuery } = require('velo-external-db-commons').errors
-const { Uninitialized } = require('test-commons')
+const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+const { Uninitialized } = require('@wix-velo/test-commons')
 const gen = require('../../test/gen')
 const { EmptyFilter } = require ('../converters/utils')
 const { queryAdapterOperatorsFor } = require ('./query_validator_utils')

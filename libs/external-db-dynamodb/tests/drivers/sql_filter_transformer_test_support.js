@@ -1,4 +1,4 @@
-const { EmptySort } = require('velo-external-db-commons')
+const { EmptySort } = require('@wix-velo/velo-external-db-commons')
 const { when } = require('jest-when')
 
 const filterParser = {
@@ -58,8 +58,7 @@ const givenProjectionExprFor = (projection) =>
                                             }
                                         )
 
-// eslint-disable-next-line no-unused-vars
-const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {}
+const givenAggregateQueryWith = (_having, _numericColumns, _columnAliases, _groupByColumns, _filter) => {}
 
 const givenStartsWithFilterFor = (filter, column, value) =>
     when(filterParser.transform).calledWith(filter)

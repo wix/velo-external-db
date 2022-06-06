@@ -16,15 +16,17 @@
         "assets": [
           { "glob": "**/*", "input": "libs/velo-external-db-core/src/views", "output": "./views" },
           { "glob": "**/*", "input": "libs/velo-external-db-core/src/assets", "output": "./assets" }
+        ],
+        "fileReplacements": [
+          { "replace": "apps/velo-external-db/src/environments/environment.js", "with": "apps/velo-external-db/src/environments/environment.prod.js" },
+          { "replace": "libs/velo-external-db-core/src/utils/router_utils.js", "with": "libs/velo-external-db-core/src/utils/router_utils.build.js" }
         ]
       },
       "configurations": {
         "production": {
           "optimization": true,
-          "inspect": false,
-          "fileReplacements": [
-            { "replace": "apps/velo-external-db/src/environments/environment.js", "with": "apps/velo-external-db/src/environments/environment.prod.js" }
-          ]
+          "inspect": false
+
         }
       }
     },

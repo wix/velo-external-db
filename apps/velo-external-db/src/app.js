@@ -1,11 +1,14 @@
 const express = require('express')
-const { create, readCommonConfig } = require('external-db-config')
-const { ExternalDbRouter } = require('velo-external-db-core')
+const { create, readCommonConfig } = require('@wix-velo/external-db-config')
+const { ExternalDbRouter } = require('@wix-velo/velo-external-db-core')
 const { engineConnectorFor } = require('./storage/factory')
 
 let started = false
 let server, _schemaProvider, _cleanup
 let externalDbRouter
+
+
+
 
 const initConnector = async(hooks) => {
     const { vendor, type: adapterType } = readCommonConfig()
@@ -37,7 +40,6 @@ const initConnector = async(hooks) => {
 initConnector().then(({ externalDbRouter }) => {
     const app = express()
     app.use(externalDbRouter.router)
-    externalDbRouter.enableAppInfo(app)
 
     server = app.listen(8080, () => console.log('Connector listening on port 8080'))
 

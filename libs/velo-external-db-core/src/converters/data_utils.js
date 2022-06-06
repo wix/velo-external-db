@@ -1,4 +1,4 @@
-const { isDate } = require('velo-external-db-commons')
+const { isDate } = require('@wix-velo/velo-external-db-commons')
 const crypto = require('crypto')
 
 const asWixData = e => generateIdsIfNeeded(packDates(e))

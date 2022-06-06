@@ -1,6 +1,5 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "npmScope": "velo-external-database-adapter",
   "tasksRunnerOptions": {
     "default": {
       "runner": "nx/tasks-runners/default",
@@ -32,10 +31,5 @@
   "affected": {
     "defaultBase": "master"
   },
-  "defaultProject": "velo-external-db",
-  "pluginsConfig": {
-    "@nrwl/js": {
-      "analyzeSourceFiles": true
-    }
-  }
+  "defaultProject": "velo-external-db"
 }

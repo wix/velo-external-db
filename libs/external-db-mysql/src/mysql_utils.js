@@ -1,5 +1,5 @@
 const { escapeId } = require('mysql')
-const { errors, patchDateTime } = require('velo-external-db-commons')
+const { errors, patchDateTime } = require('@wix-velo/velo-external-db-commons')
 
 const wildCardWith = (n, char) => Array(n).fill(char, 0, n).join(', ')
 

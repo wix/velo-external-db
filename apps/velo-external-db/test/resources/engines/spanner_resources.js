@@ -1,4 +1,4 @@
-const { init, supportedOperations } = require('external-db-spanner')
+const { init, supportedOperations } = require('@wix-velo/external-db-spanner')
 const { runImage, stopImage } = require('./docker_support')
 
 const setEmulatorOn = () => process.env.SPANNER_EMULATOR_HOST = 'localhost:9010'

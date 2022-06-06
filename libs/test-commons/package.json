@@ -1,5 +1,5 @@
 {
-  "name": "test-commons",
-  "version": "0.0.0",
+  "name": "@wix-velo/test-commons",
+  "version": "1.0.3",
   "type": "commonjs"
 }

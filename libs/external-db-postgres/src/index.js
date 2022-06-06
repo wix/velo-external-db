@@ -6,7 +6,7 @@ const init = require('./connection_provider')
 const DatabaseOperations = require('./postgres_operations')
 const { supportedOperations } = require('./supported_operations')
 const { PostgresConfigValidator } = require('./postgres_config_validator')
-const { DbConnector } = require('velo-external-db-commons')
+const { DbConnector } = require('@wix-velo/velo-external-db-commons')
 
 const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 const opsDriver = () => require('../tests/drivers/db_operations_test_support')

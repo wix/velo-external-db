@@ -1,5 +1,5 @@
 const { when } = require('jest-when')
-const { SystemFields } = require('velo-external-db-commons')
+const { SystemFields } = require('@wix-velo/velo-external-db-commons')
 
 const dataService = {
     find: jest.fn(),

@@ -1,4 +1,4 @@
-const { AdapterOperators } = require('velo-external-db-commons')
+const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
 
 const getByIdFilterFor = (itemId) => ({
     fieldName: '_id',

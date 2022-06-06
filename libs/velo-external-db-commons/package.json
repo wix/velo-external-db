@@ -1,5 +1,5 @@
 {
-  "name": "velo-external-db-commons",
-  "version": "0.0.0",
+  "name": "@wix-velo/velo-external-db-commons",
+  "version": "1.0.3",
   "type": "commonjs"
 }
