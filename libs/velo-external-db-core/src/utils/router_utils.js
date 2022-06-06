@@ -3,7 +3,7 @@ const ejs = require('ejs')
 const fs = require('fs').promises
 
 const getAppInfoTemplate = async() => {
-    return await fs.readFile(path.join( __dirname, '../views', 'index.ejs'), 'utf8')
+    return await fs.readFile(path.join( __dirname, '..', 'views', 'index.ejs'), 'utf8')
 }
 
 const getAppInfoPage = async(appInfo) => {
@@ -13,6 +13,5 @@ const getAppInfoPage = async(appInfo) => {
 }
 
 module.exports = { getAppInfoPage }
-
 
 
