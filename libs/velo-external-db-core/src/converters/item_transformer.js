@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid')
-const { isObject } = require('@wix-velo/velo-external-db-commons')
 let dateTimeProvider = require('../utils/date_time_provider')
+
+const isObject = (o) => typeof o === 'object' && o !== null
 
 class ItemTransformer {
     constructor() {
