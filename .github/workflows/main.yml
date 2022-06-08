@@ -45,8 +45,7 @@ jobs:
                    "mongo", "mongo4",
                    "firestore",
                    "airtable",
-                   "dynamodb",
-                   "google-sheets"
+                   "dynamodb"
                    ]
 
     steps:
@@ -68,13 +67,13 @@ jobs:
       - name: Downloading Image
         if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
-          cd packages/velo-external-db/test/resources
+          cd apps/velo-external-db/test/resources
           docker compose pull --quiet ${{ matrix.database }}
 
       - name: Start Container
         if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
-          cd packages/velo-external-db/test/resources
+          cd apps/velo-external-db/test/resources
           docker compose up --detach ${{ matrix.database }}
 
       - name: Installing Dependencies
@@ -89,7 +88,7 @@ jobs:
       - name: Stop Container
         if: ${{ ( matrix.database != 'google-sheets') }}
         run: |
-          cd packages/velo-external-db/test/resources
+          cd apps/velo-external-db/test/resources
           docker compose down
 
   # test_bigquery:
