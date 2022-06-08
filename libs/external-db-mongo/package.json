@@ -1,0 +1,5 @@
+{
+  "name": "@wix-velo/external-db-mongo",
+  "version": "1.0.3",
+	"type": "commonjs"
+}

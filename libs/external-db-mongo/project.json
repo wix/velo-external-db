@@ -1,0 +1,48 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/external-db-mongo/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": [ "{options.outputPath}" ],
+      "options": {
+        "outputPath": "dist/libs/external-db-mongo",
+        "main": "libs/external-db-mongo/src/index.js",
+        "tsConfig": "libs/external-db-mongo/tsconfig.lib.json",
+        "assets": [ "libs/external-db-mongo/*.md" ],
+        "buildableProjectDepsInPackageJsonType": "dependencies"
+      }
+    },
+    "publish": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs @wix-velo/external-db-mongo {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [ "libs/external-db-mongo/**/*.js" ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [ "coverage/libs/external-db-mongo" ],
+      "options": {
+        "jestConfig": "libs/external-db-mongo/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

@@ -1,1 +1,25 @@
-packages/**/node_modules
+# FOLDERS
+
+node_modules
+.vscode
+.github
+.husky
+scripts
+tmp
+dist
+tools
+
+
+# FILES
+
+npm-debug.log
+Dockerfile*
+docker-compose*
+.dockerignore
+.git
+.gitignore
+README.md
+LICENSE
+.eslintcache
+.eslintrc.json
+.nvmrc

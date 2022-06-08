@@ -1,5 +1,5 @@
 package-lock.json
-node_modules
+
 config.json
 schemas.json
 .gcloudignore
@@ -9,3 +9,11 @@ schemas.json
 packages/.DS_Store
 .DS_Store
 .eslintcache
+
+# dependencies
+node_modules
+
+# compiled output
+/dist
+/tmp
+/out-tsc
