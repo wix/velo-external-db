@@ -5,12 +5,16 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/external-db-postgres",
         "main": "libs/external-db-postgres/src/index.js",
         "tsConfig": "libs/external-db-postgres/tsconfig.lib.json",
-        "assets": [ "libs/external-db-postgres/*.md" ],
+        "assets": [
+          "libs/external-db-postgres/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
@@ -32,15 +36,25 @@
         "{options.outputFile}"
       ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-postgres/**/*.js" ]
+        "lintFilePatterns": [
+          "libs/external-db-postgres/**/*.js"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-postgres" ],
+      "outputs": [
+        "coverage/libs/external-db-postgres"
+      ],
       "options": {
         "jestConfig": "libs/external-db-postgres/jest.config.js",
         "passWithNoTests": true
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional"
       }
     }
   },

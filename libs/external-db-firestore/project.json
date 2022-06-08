@@ -5,12 +5,16 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/external-db-firestore",
         "main": "libs/external-db-firestore/src/index.js",
         "tsConfig": "libs/external-db-firestore/tsconfig.lib.json",
-        "assets": [ "libs/external-db-firestore/*.md" ],
+        "assets": [
+          "libs/external-db-firestore/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
@@ -32,15 +36,25 @@
         "{options.outputFile}"
       ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-firestore/**/*.js" ]
+        "lintFilePatterns": [
+          "libs/external-db-firestore/**/*.js"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-firestore" ],
+      "outputs": [
+        "coverage/libs/external-db-firestore"
+      ],
       "options": {
         "jestConfig": "libs/external-db-firestore/jest.config.js",
         "passWithNoTests": true
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional"
       }
     }
   },

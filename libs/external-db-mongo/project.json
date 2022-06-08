@@ -5,12 +5,16 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/external-db-mongo",
         "main": "libs/external-db-mongo/src/index.js",
         "tsConfig": "libs/external-db-mongo/tsconfig.lib.json",
-        "assets": [ "libs/external-db-mongo/*.md" ],
+        "assets": [
+          "libs/external-db-mongo/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
@@ -32,15 +36,25 @@
         "{options.outputFile}"
       ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-mongo/**/*.js" ]
+        "lintFilePatterns": [
+          "libs/external-db-mongo/**/*.js"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-mongo" ],
+      "outputs": [
+        "coverage/libs/external-db-mongo"
+      ],
       "options": {
         "jestConfig": "libs/external-db-mongo/jest.config.js",
         "passWithNoTests": true
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional"
       }
     }
   },

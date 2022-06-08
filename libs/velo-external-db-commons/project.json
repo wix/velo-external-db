@@ -5,12 +5,16 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/velo-external-db-commons",
         "main": "libs/velo-external-db-commons/src/index.js",
         "tsConfig": "libs/velo-external-db-commons/tsconfig.lib.json",
-        "assets": ["libs/velo-external-db-commons/*.md"],
+        "assets": [
+          "libs/velo-external-db-commons/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
@@ -28,17 +32,29 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/velo-external-db-commons/**/*.js"]
+        "lintFilePatterns": [
+          "libs/velo-external-db-commons/**/*.js"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/velo-external-db-commons"],
+      "outputs": [
+        "coverage/libs/velo-external-db-commons"
+      ],
       "options": {
         "jestConfig": "libs/velo-external-db-commons/jest.config.js",
         "passWithNoTests": true
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional"
       }
     }
   },

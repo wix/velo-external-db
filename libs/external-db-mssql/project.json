@@ -5,12 +5,16 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/external-db-mssql",
         "main": "libs/external-db-mssql/src/index.js",
         "tsConfig": "libs/external-db-mssql/tsconfig.lib.json",
-        "assets": [ "libs/external-db-mssql/*.md" ],
+        "assets": [
+          "libs/external-db-mssql/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
@@ -32,15 +36,25 @@
         "{options.outputFile}"
       ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-mssql/**/*.js" ]
+        "lintFilePatterns": [
+          "libs/external-db-mssql/**/*.js"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-mssql" ],
+      "outputs": [
+        "coverage/libs/external-db-mssql"
+      ],
       "options": {
         "jestConfig": "libs/external-db-mssql/jest.config.js",
         "passWithNoTests": true
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional"
       }
     }
   },

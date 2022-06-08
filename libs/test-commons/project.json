@@ -5,12 +5,16 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/test-commons",
         "main": "libs/test-commons/src/index.js",
         "tsConfig": "libs/test-commons/tsconfig.lib.json",
-        "assets": ["libs/test-commons/*.md"],
+        "assets": [
+          "libs/test-commons/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
@@ -28,17 +32,29 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/test-commons/**/*.js"]
+        "lintFilePatterns": [
+          "libs/test-commons/**/*.js"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/test-commons"],
+      "outputs": [
+        "coverage/libs/test-commons"
+      ],
       "options": {
         "jestConfig": "libs/test-commons/jest.config.js",
         "passWithNoTests": true
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional"
       }
     }
   },

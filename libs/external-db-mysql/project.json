@@ -5,12 +5,16 @@
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/external-db-mysql",
         "main": "libs/external-db-mysql/src/index.js",
         "tsConfig": "libs/external-db-mysql/tsconfig.lib.json",
-        "assets": [ "libs/external-db-mysql/*.md" ],
+        "assets": [
+          "libs/external-db-mysql/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
@@ -32,15 +36,25 @@
         "{options.outputFile}"
       ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-mysql/**/*.js" ]
+        "lintFilePatterns": [
+          "libs/external-db-mysql/**/*.js"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-mysql" ],
+      "outputs": [
+        "coverage/libs/external-db-mysql"
+      ],
       "options": {
         "jestConfig": "libs/external-db-mysql/jest.config.js",
         "passWithNoTests": true
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional"
       }
     }
   },
