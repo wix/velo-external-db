@@ -1,5 +1,5 @@
 /* eslint-disable */
-module.exports = {
+export default {
   testMatch: ["**/test/it/**/*.spec.ts"],
   displayName: 'velo-external-db-commons',
   preset: '../../jest.preset.js',

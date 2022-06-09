@@ -37,7 +37,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/velo-external-db-commons"],
       "options": {
-        "jestConfig": "libs/velo-external-db-commons/jest.config.js",
+        "jestConfig": "libs/velo-external-db-commons/jest.config.ts",
         "passWithNoTests": true
       }
     }
