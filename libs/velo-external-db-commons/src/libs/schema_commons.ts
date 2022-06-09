@@ -1,4 +1,4 @@
-const { CannotModifySystemField } = require('./errors')
+import { CannotModifySystemField } from './errors'
 
 const SystemFields = [
     {
@@ -24,7 +24,7 @@ const QueryOperatorsByFieldType = {
     object: ['eq', 'ne'],
 }
 
-const QueryOperationsByFieldType = {
+const QueryOperationsByFieldType: any= {
     number: [...QueryOperatorsByFieldType.number, 'urlized'],
     text: [...QueryOperatorsByFieldType.text, 'urlized', 'isEmpty', 'isNotEmpty'],
     boolean: QueryOperatorsByFieldType.boolean,
@@ -44,7 +44,7 @@ const SchemaOperations = Object.freeze({
     AddColumn: 'addColumn',
     RemoveColumn: 'removeColumn',
     Describe: 'describeCollection',
-    FindWithSort: 'findWithSort', 
+    FindWithSort: 'findWithSort',
     Aggregate: 'aggregate',
     BulkDelete: 'bulkDelete',
     Truncate: 'truncate',
@@ -64,7 +64,7 @@ const AllSchemaOperations = Object.values(SchemaOperations)
 const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove']
 const ReadOnlyOperations = ['get']
 
-const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }) => {
+const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }: { [x: string]: any }) => {
     return {
         id,
         displayName: id,
@@ -72,15 +72,17 @@ const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields })
         allowedSchemaOperations,
         maxPageSize: 50,
         ttl: 3600,
-        fields: fields.reduce( (o, r) => ( { ...o, [r.field]: {
+        fields: fields.reduce((o: any, r: { field: any; type: any; queryOperators: any }) => ({
+            ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
                 queryOperators: r.queryOperators,
-            } }), {} )
+            }
+        }), {})
     }
 }
 
-const asWixSchemaHeaders = collectionName => {
+const asWixSchemaHeaders = (collectionName: any) => {
     return {
         id: collectionName,
         displayName: collectionName,
@@ -89,25 +91,27 @@ const asWixSchemaHeaders = collectionName => {
     }
 }
 
-const validateSystemFields = (columnName) => {
+const validateSystemFields = (columnName: string) => {
     if (SystemFields.find(f => f.name === columnName)) {
         throw new CannotModifySystemField('Cannot modify system field')
     }
     return Promise.resolve()
 }
 
-const parseTableData = data => data.reduce((o, r) => {
-                                                    const arr = o[r.table_name] || []
-                                                    arr.push(r)
-                                                    o[r.table_name] = arr
-                                                    return o
-                                                }, {})
+const parseTableData = (data: any[]) => data.reduce((o: { [x: string]: any }, r: { table_name: string | number }) => {
+    const arr = o[r.table_name] || []
+    arr.push(r)
+    o[r.table_name] = arr
+    return o
+}, {})
 
-const allowedOperationsFor = ({ fields }) => fields.find(c => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations 
+const allowedOperationsFor = ({ fields }: any) => fields.find((c: { field: string }) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
 
-const appendQueryOperatorsTo = (fields) => fields.map(f => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
+const appendQueryOperatorsTo = (fields: any[]) => fields.map((f: { type: string | number }) => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
 
-module.exports = { SystemFields, asWixSchema, validateSystemFields, parseTableData,
-                    asWixSchemaHeaders, SchemaOperations, AllSchemaOperations,
-                    allowedOperationsFor, appendQueryOperatorsTo, QueryOperatorsByFieldType,
-                    ReadWriteOperations, ReadOnlyOperations }
+export {
+    SystemFields, asWixSchema, validateSystemFields, parseTableData,
+    asWixSchemaHeaders, SchemaOperations, AllSchemaOperations,
+    allowedOperationsFor, appendQueryOperatorsTo, QueryOperatorsByFieldType,
+    ReadWriteOperations, ReadOnlyOperations
+}

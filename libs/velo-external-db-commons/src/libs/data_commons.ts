@@ -1,5 +1,5 @@
-const moment = require('moment')
-const { InvalidQuery } = require('./errors')
+import moment = require('moment')
+import { InvalidQuery } from './errors'
 
 
 const EmptySort = {
@@ -12,8 +12,8 @@ const EmptyFilter = {
     offset: 1
 }
 
-const patchDateTime = (item) => {
-    const obj = {}
+const patchDateTime = (item: { [x: string]: any }) => {
+    const obj: { [x: string]: any } = {}
     for (const key of Object.keys(item)) {
         const value = item[key]
         const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
@@ -29,29 +29,29 @@ const patchDateTime = (item) => {
     return obj
 }
 
-const asParamArrays = item => Object.values(item)
+const asParamArrays = (item: { [s: string]: unknown } | ArrayLike<unknown>) => Object.values(item)
 
-const isObject = (o) => typeof o === 'object' && o !== null
+const isObject = (o: null) => typeof o === 'object' && o !== null
 
-const isDate = d => {
+const isDate = (d: any) => {
     const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
     return d instanceof Date || Object.prototype.toString.call(d) === '[object Date]' || (typeof d === 'string' && reISO.test(d))
 }
 
-const updateFieldsFor = item => {
+const updateFieldsFor = (item: {}) => {
     return Object.keys(item).filter(f => f !== '_id')
 }
 
 
-const isEmptyFilter = (filter) => {
+const isEmptyFilter = (filter: { operator: any }) => {
     return (!filter || !filter.operator)
-} 
+}
 
 const AdapterOperators = {
     eq: 'eq',
     gt: 'gt',
     gte: 'gte',
-    include: 'in', 
+    include: 'in',
     lt: 'lt',
     lte: 'lte',
     ne: 'ne',
@@ -65,7 +65,7 @@ const AdapterOperators = {
     matches: 'matches'
 }
 
-const AdapterFunctions = { 
+const AdapterFunctions = {
     avg: 'avg',
     max: 'max',
     min: 'min',
@@ -73,20 +73,20 @@ const AdapterFunctions = {
     count: 'count'
 }
 
-const extractGroupByNames = (projection) =>  projection.filter(f => !f.function).map( f => f.name ) 
+const extractGroupByNames = (projection: any[]) => projection.filter((f: { function: any }) => !f.function).map((f: { name: any }) => f.name)
 
-const extractProjectionFunctionsObjects = (projection) => projection.filter(f => f.function)
+const extractProjectionFunctionsObjects = (projection: any[]) => projection.filter((f: { function: any }) => f.function)
 
-const isNull = (value) => (value === null || value === undefined)
+const isNull = (value: null | undefined) => (value === null || value === undefined)
 
-const specArrayToRegex = (spec) => {
+const specArrayToRegex = (spec: any[]) => {
     if (!Array.isArray(spec)) {
         throw new InvalidQuery('$matches must have array - spec property')
     }
     return spec.map(specItemToRegex).join('')
 }
 
-const specItemToRegex = (spec) => {
+const specItemToRegex = (spec: { type: string; value: any }) => {
     if (spec.type === 'literal') {
         return spec.value
     }
@@ -95,7 +95,8 @@ const specItemToRegex = (spec) => {
     }
 }
 
-
-module.exports = { EmptyFilter, EmptySort, patchDateTime, asParamArrays, isObject, isDate,
-                     updateFieldsFor, isEmptyFilter, AdapterOperators, AdapterFunctions,
-                     extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex }
+export {
+    EmptyFilter, EmptySort, patchDateTime, asParamArrays, isObject, isDate,
+    updateFieldsFor, isEmptyFilter, AdapterOperators, AdapterFunctions,
+    extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex
+}
