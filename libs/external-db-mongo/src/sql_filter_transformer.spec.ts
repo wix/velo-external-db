@@ -1,9 +1,9 @@
-const FilterParser = require('./sql_filter_transformer')
-const { EmptySort, AdapterOperators, AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
+import FilterParser from './sql_filter_transformer'
+import { EmptySort, AdapterOperators, AdapterFunctions } from '@wix-velo/velo-external-db-commons'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
 const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 const each = require('jest-each').default
-const Chance = require('chance')
+import Chance = require('chance')
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -73,7 +73,7 @@ describe('Sql Parser', () => {
         describe('handle single field operator', () => {
             each([
                 ne, lt, lte, gt, gte, eq,
-            ]).test('correctly transform operator [%s]', (o) => {
+            ]).test('correctly transform operator [%s]', (o: any) => {
                 const filter = {
                     operator: o,
                     fieldName: ctx.fieldName,
@@ -191,7 +191,7 @@ describe('Sql Parser', () => {
                     }
 
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
-                        filterExpr: { [ctx.fieldName]: { $regex: `/${ctx.fieldListValue.map(s => s.toLowerCase()).join('.*')}/i` } }
+                        filterExpr: { [ctx.fieldName]: { $regex: `/${ctx.fieldListValue.map((s: string) => s.toLowerCase()).join('.*')}/i` } }
                     }])
                 })
 
@@ -246,7 +246,7 @@ describe('Sql Parser', () => {
         describe('handle multi field operator', () => {
             each([
                 and, or,
-            ]).test('correctly transform operator [%s]', (o) => {
+            ]).test('correctly transform operator [%s]', (o: any) => {
                 const filter = {
                     operator: o,
                     value: [ctx.filter, ctx.anotherFilter]
@@ -262,7 +262,7 @@ describe('Sql Parser', () => {
             
             each([
                 and, or
-            ]).test('correctly transform operator [%s] with only one filter', (o) => {
+            ]).test('correctly transform operator [%s] with only one filter', (o: any) => {
                 const filter = {
                     operator: o,
                     value: [ctx.filter, {}]
@@ -373,7 +373,7 @@ describe('Sql Parser', () => {
                     ['$min', min],
                     ['$max', max],
                     ['$sum', sum],
-                ]).test('translate %s function', (mongoFunction, adapterFunction) => {
+                ]).test('translate %s function', (mongoFunction: any, adapterFunction: any) => {
                     const aggregation = {
                         projection: [
                             { name: ctx.fieldName },
@@ -420,7 +420,20 @@ describe('Sql Parser', () => {
 
     })
 
-    const ctx = {
+    interface Context {
+        fieldName: any
+        fieldValue: any
+        anotherValue: any
+        moreValue: any
+        fieldListValue: any
+        anotherFieldName: any
+        moreFieldName: any
+        filter: any
+        anotherFilter: any
+        offset: any
+    }
+
+    const ctx : Context = {
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
         anotherValue: Uninitialized,
@@ -433,7 +446,11 @@ describe('Sql Parser', () => {
         offset: Uninitialized,
     }
 
-    const env = {
+    interface Enviorment {
+        filterParser: any
+    }
+
+    const env : Enviorment= {
         filterParser: Uninitialized,
     }
 

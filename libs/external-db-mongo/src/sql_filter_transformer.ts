@@ -1,14 +1,14 @@
 const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } = require('@wix-velo/velo-external-db-commons')
-const { EmptyFilter } = require('./mongo_utils')
+import { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
+import { EmptyFilter } from './mongo_utils'
 const { string_begins, string_ends, string_contains, urlized, matches } = AdapterOperators
 const { count } = AdapterFunctions
 
-class FilterParser {
+export default class FilterParser {
     constructor() {
     }
 
-    transform(filter) {
+    transform(filter: any) {
         const results = this.parseFilter(filter)
         if (results.length === 0) {
             return EmptyFilter
@@ -18,7 +18,7 @@ class FilterParser {
         }
     }
 
-    parseAggregation(aggregation) {
+    parseAggregation(aggregation: { projection: any; postFilter: any }) {
         
         const groupByFields = extractGroupByNames(aggregation.projection)
 
@@ -34,22 +34,22 @@ class FilterParser {
         }
     }
 
-    createFieldsStatement(projectionFunctions, groupByFields) {
-        const fieldsStatement = projectionFunctions.reduce((pV, cV) => ({ ...pV, ...{ [cV.alias]: this.parseFuncObject(cV.function, cV.name) } }), {})
-        fieldsStatement._id = groupByFields.reduce((pV, cV) => ({ ...pV, ...{ [cV]: `$${cV}` } }), {})
+    createFieldsStatement(projectionFunctions: any[], groupByFields: any[]) {
+        const fieldsStatement = projectionFunctions.reduce((pV: any, cV: { alias: any; function: any; name: any }) => ({ ...pV, ...{ [cV.alias]: this.parseFuncObject(cV.function, cV.name) } }), {})
+        fieldsStatement._id = groupByFields.reduce((pV: any, cV: any) => ({ ...pV, ...{ [cV]: `$${cV}` } }), {})
         return fieldsStatement
     }
 
-    parseFuncObject(func, fieldName) {
+    parseFuncObject(func: string, fieldName: any) {
         if (func === count) return { $sum: 1 }
         return { [this.adapterFunctionToMongo(func)]: `$${fieldName}` }
     }
     
-    adapterFunctionToMongo(func) {
+    adapterFunctionToMongo(func: any) {
         return `$${func}`
     }
 
-    parseFilter(filter) {
+    parseFilter(filter: { operator: any; fieldName: any; value: any }): any {
         if (isEmptyFilter(filter)) {
             return []
         }
@@ -58,7 +58,7 @@ class FilterParser {
 
         if (this.isMultipleFieldOperator(mongoOp)) {
             const res = value.map( this.parseFilter.bind(this) )
-            return [{ filterExpr: { [mongoOp]: res.map(r => r[0]?.filterExpr || EmptyFilter.filterExpr) } }]
+            return [{ filterExpr: { [mongoOp]: res.map((r: { filterExpr: any }[]) => r[0]?.filterExpr || EmptyFilter.filterExpr) } }]
         }
 
         if (mongoOp === '$not') {
@@ -72,7 +72,7 @@ class FilterParser {
 
         if (operator === urlized) {
             return [{
-                filterExpr: { [fieldName]: { $regex: `/${value.map(s => s.toLowerCase()).join('.*')}/i` } }
+                filterExpr: { [fieldName]: { $regex: `/${value.map((s: string) => s.toLowerCase()).join('.*')}/i` } }
             }]
         }
 
@@ -86,11 +86,11 @@ class FilterParser {
         return [{ filterExpr: { [fieldName]: { [mongoOp]: this.valueForOperator(value, mongoOp) } } }]
     }
 
-    isMultipleFieldOperator(operator) {
+    isMultipleFieldOperator(operator: string) {
         return ['$and', '$or'].includes(operator)
     }
 
-    valueForStringOperator(operator, value) {
+    valueForStringOperator(operator: any, value: any) {
         switch (operator) {
             case string_contains:
                 return value
@@ -101,11 +101,11 @@ class FilterParser {
         }
     }
 
-    isSingleFieldStringOperator(operator) {
+    isSingleFieldStringOperator(operator: string) {
         return [string_contains, string_begins, string_ends].includes(operator)
     }
 
-    valueForOperator(value, operator) {
+    valueForOperator(value: string | any[] | undefined, operator: string) {
         if (operator === '$in') {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
@@ -119,11 +119,11 @@ class FilterParser {
         return value
     }
 
-    adapterOperatorToMongoOperator(operator) {
+    adapterOperatorToMongoOperator(operator: any) {
         return `$${operator}`
     }
 
-    orderBy(sort) {
+    orderBy(sort: { fieldName: any; direction: any }[]) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EmptySort
         }
@@ -137,7 +137,7 @@ class FilterParser {
         }
     }
 
-    parseSort({ fieldName, direction }) {
+    parseSort({ fieldName, direction } : { fieldName: any; direction: any }) {
         if (typeof fieldName !== 'string') {
             return []
         }
@@ -150,12 +150,10 @@ class FilterParser {
         }
     }
 
-    selectFieldsFor(projection) {
-        return projection.reduce((pV, cV) => (
+    selectFieldsFor(projection: any[]) {
+        return projection.reduce((pV: any, cV: any) => (
             { ...pV, [cV]: 1 }
         ), { _id: 0 })
     }
 
 }
-
-module.exports = FilterParser

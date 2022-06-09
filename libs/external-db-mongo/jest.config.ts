@@ -3,7 +3,7 @@ module.exports = {
     clearMocks: true,
     verbose: true,
     // roots: ['<rootDir>/src'],
-    // testRegex: '(.*\\.spec\\.)js$',
+    testMatch: ["**/test/it/**/*.spec.ts"],
     preset: '../../jest.preset.js',
     globals: {
       'ts-jest': {

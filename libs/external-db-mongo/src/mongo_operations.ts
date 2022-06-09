@@ -1,7 +1,8 @@
 const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
-const { isConnected } = require ('./mongo_utils')
-class DatabaseOperations {
-    constructor(client) {
+import { isConnected } from './mongo_utils'
+export default class DatabaseOperations {
+    client: any
+    constructor(client: any) {
         this.client = client
     }
 
@@ -18,7 +19,3 @@ class DatabaseOperations {
         }
     }
 }
-
-
-
-module.exports = DatabaseOperations

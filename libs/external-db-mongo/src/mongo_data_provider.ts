@@ -1,13 +1,15 @@
-const { translateErrorCodes } = require('./exception_translator.js')
-const { unpackIdFieldForItem, updateExpressionFor, validateTable } = require('./mongo_utils')
+import { translateErrorCodes } from './exception_translator.js'
+import { unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
 
 class DataProvider {
-    constructor(client, filterParser) {
+    client: any
+    filterParser: any
+    constructor(client: any, filterParser: any) {
         this.client = client
         this.filterParser = filterParser
     }
 
-    async find(collectionName, filter, sort, skip, limit, projection) {
+    async find(collectionName: any, filter: any, sort: any, skip: any, limit: any, projection: any) {
         validateTable(collectionName)
         const { filterExpr } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
@@ -19,7 +21,7 @@ class DataProvider {
                                 .toArray()
     }
 
-    async count(collectionName, filter) {
+    async count(collectionName: any, filter: any) {
         validateTable(collectionName)
         const { filterExpr } = this.filterParser.transform(filter)
 
@@ -28,7 +30,7 @@ class DataProvider {
                                 .count(filterExpr)
     }
 
-    async insert(collectionName, items) {
+    async insert(collectionName: any, items: any) {
         validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)
@@ -37,7 +39,7 @@ class DataProvider {
         return result.insertedCount
     }
 
-    async update(collectionName, items) {
+    async update(collectionName: any, items: any) {
         validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)
@@ -45,7 +47,7 @@ class DataProvider {
         return result.nModified
     }
 
-    async delete(collectionName, itemIds) {
+    async delete(collectionName: any, itemIds: any) {
         validateTable(collectionName)
         const result = await this.client.db()
                                      .collection(collectionName)
@@ -53,14 +55,14 @@ class DataProvider {
         return result.deletedCount
     }
 
-    async truncate(collectionName) {
+    async truncate(collectionName: any) {
         validateTable(collectionName)
         await this.client.db()
                          .collection(collectionName)
                          .deleteMany({})
     }
 
-    async aggregate(collectionName, filter, aggregation) {
+    async aggregate(collectionName: any, filter: any, aggregation: any) {
         validateTable(collectionName)
         const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation)
         const { filterExpr } = this.filterParser.transform(filter)
@@ -76,5 +78,4 @@ class DataProvider {
     }
 }
 
-
-module.exports = DataProvider
+export { DataProvider }
