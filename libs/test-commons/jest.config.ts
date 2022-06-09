@@ -1,5 +1,6 @@
 /* eslint-disable */
 module.exports = {
+  testMatch: ["**/test/it/**/*.spec.ts"],
   displayName: 'test-commons',
   preset: '../../jest.preset.js',
   globals: {
@@ -12,4 +13,5 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/libs/test-commons',
+  verbose: true,
 };
