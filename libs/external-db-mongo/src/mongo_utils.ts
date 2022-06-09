@@ -1,17 +1,17 @@
-const { isObject } = require('@wix-velo/velo-external-db-commons')
+import { isObject } from '@wix-velo/velo-external-db-commons'
 const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
 
 const SystemTable = '_descriptor'
-const isSystemTable = collectionId => SystemTable === collectionId.trim().toLowerCase()
+const isSystemTable = (collectionId: string) => SystemTable === collectionId.trim().toLowerCase()
 
-const validateTable = collection => {
+const validateTable = (collection: any) => {
     if (collection && isSystemTable(collection) ) {
         throw new InvalidQuery('Illegal table name')
     }
 }
 
 const EmptyFilter = { filterExpr: {} }
-const notConnectedPool = err => ( {
+const notConnectedPool = (err: any) => ( {
         pool: { db: () => { throw err } },
         cleanup: () => { }
     } )
@@ -20,16 +20,16 @@ const emptyClient = () => ( {
         connect: async() => { console.log('No URI was provided') }
     } )
 
-const isConnected = (client) => {
+const isConnected = (client: { topology: { isConnected: () => any } }) => {
     return  client && client.topology && client.topology.isConnected()
 }
 
-const updateExpressionForItem = (item) => ( { updateOne: { filter: { _id: item._id },
+const updateExpressionForItem = (item: { _id: any }) => ( { updateOne: { filter: { _id: item._id },
                                                            update: { $set: { ...item } } } } )
 
-const updateExpressionFor = items => items.map( updateExpressionForItem )
+const updateExpressionFor = (items: any[]) => items.map( updateExpressionForItem )
 
-const unpackIdFieldForItem = item => {
+const unpackIdFieldForItem = (item: { _id: any }) => {
     if (isObject(item._id)) {
         const item2 = { ...item, ...item._id }
         if (isObject(item2._id)) delete item2._id
@@ -38,4 +38,4 @@ const unpackIdFieldForItem = item => {
     return item
 }
 
-module.exports = { EmptyFilter, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor, validateTable, SystemTable, emptyClient }
+export { EmptyFilter, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor, validateTable, SystemTable, emptyClient }

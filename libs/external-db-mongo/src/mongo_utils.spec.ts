@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { unpackIdFieldForItem, validateTable } = require('./mongo_utils')
+import { unpackIdFieldForItem, validateTable } from './mongo_utils'
 
 describe('Mongo Utils', () => {
     describe('unpackIdFieldForItem', () => {

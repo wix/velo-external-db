@@ -1,7 +1,8 @@
-const { checkRequiredKeys } = require('@wix-velo/velo-external-db-commons')
+import { checkRequiredKeys } from '@wix-velo/velo-external-db-commons'
 
 class MongoConfigValidator {
-    constructor(config) {
+    config: any
+    constructor(config: any) {
         this.config = config
     }
 
@@ -16,4 +17,4 @@ class MongoConfigValidator {
     }
 }
 
-module.exports = { MongoConfigValidator }
+export { MongoConfigValidator }
