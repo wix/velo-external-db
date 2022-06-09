@@ -77,7 +77,7 @@ const extractGroupByNames = (projection: any[]) => projection.filter((f: { funct
 
 const extractProjectionFunctionsObjects = (projection: any[]) => projection.filter((f: { function: any }) => f.function)
 
-const isNull = (value: null | undefined) => (value === null || value === undefined)
+const isNull = (value: any) => (value === null || value === undefined)
 
 const specArrayToRegex = (spec: any[]) => {
     if (!Array.isArray(spec)) {
