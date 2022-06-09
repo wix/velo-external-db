@@ -8,7 +8,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/velo-external-db-commons",
-        "main": "libs/velo-external-db-commons/src/index.js",
+        "main": "libs/velo-external-db-commons/src/index.ts",
         "tsConfig": "libs/velo-external-db-commons/tsconfig.lib.json",
         "assets": ["libs/velo-external-db-commons/*.md"],
         "buildableProjectDepsInPackageJsonType": "dependencies"
