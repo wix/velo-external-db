@@ -24,7 +24,7 @@ const QueryOperatorsByFieldType = {
     object: ['eq', 'ne'],
 }
 
-const QueryOperationsByFieldType: any= {
+const QueryOperationsByFieldType: any = {
     number: [...QueryOperatorsByFieldType.number, 'urlized'],
     text: [...QueryOperatorsByFieldType.text, 'urlized', 'isEmpty', 'isNotEmpty'],
     boolean: QueryOperatorsByFieldType.boolean,
@@ -35,29 +35,28 @@ const QueryOperationsByFieldType: any= {
 }
 
 
-
-const SchemaOperations = Object.freeze({
-    List: 'list',
-    ListHeaders: 'listHeaders',
-    Create: 'createCollection',
-    Drop: 'dropCollection',
-    AddColumn: 'addColumn',
-    RemoveColumn: 'removeColumn',
-    Describe: 'describeCollection',
-    FindWithSort: 'findWithSort',
-    Aggregate: 'aggregate',
-    BulkDelete: 'bulkDelete',
-    Truncate: 'truncate',
-    UpdateImmediately: 'updateImmediately',
-    DeleteImmediately: 'deleteImmediately',
-    StartWithCaseSensitive: 'startWithCaseSensitive',
-    StartWithCaseInsensitive: 'startWithCaseInsensitive',
-    Projection: 'projection',
-    FindObject: 'findObject',
-    Matches: 'matches',
-    NotOperator: 'not',
-    IncludeOperator: 'include',
-})
+enum SchemaOperations {
+    List = 'list',
+    ListHeaders = 'listHeaders',
+    Create = 'createCollection',
+    Drop = 'dropCollection',
+    AddColumn = 'addColumn',
+    RemoveColumn = 'removeColumn',
+    Describe = 'describeCollection',
+    FindWithSort = 'findWithSort',
+    Aggregate = 'aggregate',
+    BulkDelete = 'bulkDelete',
+    Truncate = 'truncate',
+    UpdateImmediately = 'updateImmediately',
+    DeleteImmediately = 'deleteImmediately',
+    StartWithCaseSensitive = 'startWithCaseSensitive',
+    StartWithCaseInsensitive = 'startWithCaseInsensitive',
+    Projection = 'projection',
+    FindObject = 'findObject',
+    Matches = 'matches',
+    NotOperator = 'not',
+    IncludeOperator = 'include',
+}
 
 const AllSchemaOperations = Object.values(SchemaOperations)
 
@@ -82,7 +81,7 @@ const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }:
     }
 }
 
-const asWixSchemaHeaders = (collectionName: any) => {
+const asWixSchemaHeaders = (collectionName: string) => {
     return {
         id: collectionName,
         displayName: collectionName,
@@ -98,16 +97,16 @@ const validateSystemFields = (columnName: string) => {
     return Promise.resolve()
 }
 
-const parseTableData = (data: any[]) => data.reduce((o: { [x: string]: any }, r: { table_name: string | number }) => {
+const parseTableData = (data: any[]) => data.reduce((o: { [x: string]: any }, r: { table_name: string, [x: string]: any }) => {
     const arr = o[r.table_name] || []
     arr.push(r)
     o[r.table_name] = arr
     return o
 }, {})
 
-const allowedOperationsFor = ({ fields }: any) => fields.find((c: { field: string }) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
+const allowedOperationsFor = ({ fields }: {fields: any[]}) => fields.find((c: { field: string, [x: string]: any }) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
 
-const appendQueryOperatorsTo = (fields: any[]) => fields.map((f: { type: string | number }) => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
+const appendQueryOperatorsTo = (fields: any[]) => fields.map((f: { type: string, [x: string]: any }) => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
 
 export {
     SystemFields, asWixSchema, validateSystemFields, parseTableData,

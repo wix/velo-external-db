@@ -31,7 +31,7 @@ const patchDateTime = (item: { [x: string]: any }) => {
 
 const asParamArrays = (item: { [s: string]: unknown } | ArrayLike<unknown>) => Object.values(item)
 
-const isObject = (o: null) => typeof o === 'object' && o !== null
+const isObject = (o: any) => typeof o === 'object' && o !== null
 
 const isDate = (d: any) => {
     const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
