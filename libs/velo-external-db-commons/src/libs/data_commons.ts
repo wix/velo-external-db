@@ -1,4 +1,4 @@
-import moment = require('moment')
+import * as moment from 'moment'
 import { InvalidQuery } from './errors'
 
 
@@ -86,13 +86,17 @@ const specArrayToRegex = (spec: any[]) => {
     return spec.map(specItemToRegex).join('')
 }
 
-const specItemToRegex = (spec: { type: string; value: any }) => {
+type SpecType = 'literal' | 'anyOf'
+
+const specItemToRegex = (spec: { type: SpecType; value: string | number }) => {
     if (spec.type === 'literal') {
         return spec.value
     }
     if (spec.type === 'anyOf') {
         return `[${spec.value}]`
     }
+    
+    throw new InvalidQuery('spec must have type of literal or anyOf')
 }
 
 export {

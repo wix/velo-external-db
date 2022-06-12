@@ -1,5 +1,18 @@
 import { CannotModifySystemField } from './errors'
 
+
+type Field = {
+    [x: string]: any,
+    field: string,
+    type: string,
+    subtype?: string,
+    precision?: number,
+    isPrimary?: boolean,
+}
+
+type FieldWithQueryOperators = Field & { queryOperators: string[] }
+
+
 const SystemFields = [
     {
         name: '_id', type: 'text', subtype: 'string', precision: '50', isPrimary: true
@@ -24,7 +37,7 @@ const QueryOperatorsByFieldType = {
     object: ['eq', 'ne'],
 }
 
-const QueryOperationsByFieldType: any = {
+const QueryOperationsByFieldType: {[x: string]: any} = {
     number: [...QueryOperatorsByFieldType.number, 'urlized'],
     text: [...QueryOperatorsByFieldType.text, 'urlized', 'isEmpty', 'isNotEmpty'],
     boolean: QueryOperatorsByFieldType.boolean,
@@ -63,7 +76,7 @@ const AllSchemaOperations = Object.values(SchemaOperations)
 const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove']
 const ReadOnlyOperations = ['get']
 
-const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }: { [x: string]: any }) => {
+const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }: { fields: FieldWithQueryOperators[], [x: string]: any }) => {
     return {
         id,
         displayName: id,
@@ -71,7 +84,7 @@ const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }:
         allowedSchemaOperations,
         maxPageSize: 50,
         ttl: 3600,
-        fields: fields.reduce((o: any, r: { field: any; type: any; queryOperators: any }) => ({
+        fields: fields.reduce((o: any, r: FieldWithQueryOperators) => ({
             ...o, [r.field]: {
                 displayName: r.field,
                 type: r.type,
@@ -104,9 +117,9 @@ const parseTableData = (data: any[]) => data.reduce((o: { [x: string]: any }, r:
     return o
 }, {})
 
-const allowedOperationsFor = ({ fields }: {fields: any[]}) => fields.find((c: { field: string, [x: string]: any }) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
+const allowedOperationsFor = ({ fields }: {fields: Field[]}) => fields.find((c: Field) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
 
-const appendQueryOperatorsTo = (fields: any[]) => fields.map((f: { type: string, [x: string]: any }) => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
+const appendQueryOperatorsTo = (fields: Field[]) => fields.map((f: Field) => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
 
 export {
     SystemFields, asWixSchema, validateSystemFields, parseTableData,
