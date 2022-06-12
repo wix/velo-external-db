@@ -1,17 +1,5 @@
 import { CannotModifySystemField } from './errors'
-
-
-type Field = {
-    [x: string]: any,
-    field: string,
-    type: string,
-    subtype?: string,
-    precision?: number,
-    isPrimary?: boolean,
-}
-
-type FieldWithQueryOperators = Field & { queryOperators: string[] }
-
+import { Field, FieldWithQueryOperators, asWixSchemaHeaders, AsWixSchema  } from './types'
 
 const SystemFields = [
     {
@@ -76,7 +64,7 @@ const AllSchemaOperations = Object.values(SchemaOperations)
 const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove']
 const ReadOnlyOperations = ['get']
 
-const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }: { fields: FieldWithQueryOperators[], [x: string]: any }) => {
+const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }: { id: string, allowedOperations: string[], fields: FieldWithQueryOperators[], [x: string]: any }): AsWixSchema => {
     return {
         id,
         displayName: id,
@@ -94,7 +82,7 @@ const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }:
     }
 }
 
-const asWixSchemaHeaders = (collectionName: string) => {
+const asWixSchemaHeaders = (collectionName: string): asWixSchemaHeaders => {
     return {
         id: collectionName,
         displayName: collectionName,
