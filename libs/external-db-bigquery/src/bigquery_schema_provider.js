@@ -11,7 +11,7 @@ class SchemaProvider {
     }
 
     async list() {
-        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.COLUMNS`)
+        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${escapeIdentifier(`${this.projectId}.${this.databaseId}`)}.INFORMATION_SCHEMA.COLUMNS`)
         const tables = parseTableData(res[0])
         return Object.entries(tables)
                         .map(([collectionName, rs]) => ({
@@ -21,7 +21,7 @@ class SchemaProvider {
     }
 
     async listHeaders() {
-        const data = await this.pool.query(`SELECT table_name FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME`)
+        const data = await this.pool.query(`SELECT table_name FROM ${escapeIdentifier(`${this.projectId}.${this.databaseId}`)}.INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME`)
         return data[0].map(rs => rs.table_name )
     }
 
@@ -59,7 +59,7 @@ class SchemaProvider {
     }
 
     async describeCollection(collectionName) {
-        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${this.projectId}.${this.databaseId}.INFORMATION_SCHEMA.COLUMNS WHERE table_name='${collectionName}'`)
+        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${escapeIdentifier(`${this.projectId}.${this.databaseId}`)}.INFORMATION_SCHEMA.COLUMNS WHERE table_name='${collectionName}'`)
                                    .catch(translateErrorCodes)
 
         if (res[0].length === 0) {
