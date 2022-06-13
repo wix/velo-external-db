@@ -76,7 +76,7 @@ interface IDataProvider {
 type TableHeader = {
     id: string
 }
-type Table = TableHeader & { fields: InputField[] | ResponseField[] }
+type Table = TableHeader & { fields: ResponseField[] }
 
 type FieldAttributes = {
     type: string,
