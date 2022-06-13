@@ -10,7 +10,7 @@ let externalDbRouter
 
 
 
-const initConnector = async(hooks) => {
+const initConnector = async(hooks) => { 
     const { vendor, type: adapterType } = readCommonConfig()
     const configReader = create()
     const { authorization, secretKey, ...dbConfig } = await configReader.readConfig()
