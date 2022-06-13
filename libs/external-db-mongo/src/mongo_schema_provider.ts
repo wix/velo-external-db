@@ -24,7 +24,7 @@ export default class SchemaProvider {
         const l = await resp.toArray()
         const tables = l.reduce((o: any, d: { _id: any; fields: any }) => ({ ...o, [d._id]: { fields: d.fields } }), {})
         return Object.entries(tables)
-                     .map(([collectionName, rs]) => ({
+                     .map(([collectionName, rs]: [string, any]) => ({
                          id: collectionName,
                          fields: [...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) )
                      }))

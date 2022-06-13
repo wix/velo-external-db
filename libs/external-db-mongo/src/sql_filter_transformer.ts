@@ -1,6 +1,7 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+import { errors } from '@wix-velo/velo-external-db-commons'
 import { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter } from './mongo_utils'
+const { InvalidQuery } = errors
 const { string_begins, string_ends, string_contains, urlized, matches } = AdapterOperators
 const { count } = AdapterFunctions
 
