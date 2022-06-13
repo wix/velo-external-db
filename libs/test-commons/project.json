@@ -8,7 +8,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/test-commons",
-        "main": "libs/test-commons/src/index.js",
+        "main": "libs/test-commons/src/index.ts",
         "tsConfig": "libs/test-commons/tsconfig.lib.json",
         "assets": ["libs/test-commons/*.md"],
         "buildableProjectDepsInPackageJsonType": "dependencies"
@@ -30,14 +30,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/test-commons/**/*.js"]
+        "lintFilePatterns": ["libs/test-commons/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/test-commons"],
       "options": {
-        "jestConfig": "libs/test-commons/jest.config.js",
+        "jestConfig": "libs/test-commons/jest.config.ts",
         "passWithNoTests": true
       }
     }
