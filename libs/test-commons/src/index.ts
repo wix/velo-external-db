@@ -1,4 +1,2 @@
-export * from './libs/test-commons';
-import * as gen from './libs/gen';
-
-export { gen }
+export * from './libs/test-commons'
+export * as gen from './libs/gen'
