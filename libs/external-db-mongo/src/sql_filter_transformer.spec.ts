@@ -1,8 +1,9 @@
 import FilterParser from './sql_filter_transformer'
 import { EmptySort, AdapterOperators, AdapterFunctions } from '@wix-velo/velo-external-db-commons'
 import { Uninitialized, gen } from '@wix-velo/test-commons'
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const each = require('jest-each').default
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { InvalidQuery } = errors
+import each from 'jest-each'
 import Chance = require('chance')
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators

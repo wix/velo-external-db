@@ -1,7 +1,7 @@
-import { translateErrorCodes } from './exception_translator.js'
+import { translateErrorCodes } from './exception_translator'
 import { unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
 
-class DataProvider {
+export default class DataProvider {
     client: any
     filterParser: any
     constructor(client: any, filterParser: any) {
@@ -77,5 +77,3 @@ class DataProvider {
         return result.map( unpackIdFieldForItem )
     }
 }
-
-export { DataProvider }

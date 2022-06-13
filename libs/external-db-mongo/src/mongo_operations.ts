@@ -14,7 +14,7 @@ export default class DatabaseOperations {
                 const pool = await this.client.connect()
                 return pool ? { valid: true } : { valid: false, error: new DbConnectionError('Connection to database failed') }
             }
-        } catch (err) {
+        } catch (err: any) {
             return { valid: false, error: new DbConnectionError(err.message) }
         }
     }

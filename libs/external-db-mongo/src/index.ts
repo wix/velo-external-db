@@ -1,14 +1,15 @@
-import SchemaProvider = require('./mongo_schema_provider')
-import DataProvider = require('./mongo_data_provider')
-import FilterParser = require('./sql_filter_transformer')
-import init = require('./connection_provider')
-import DatabaseOperations = require('./mongo_operations')
-import { supportedOperations } from './supported_operations'
-import { DbConnector } from '@wix-velo/velo-external-db-commons'
-import { MongoConfigValidator } from './mongo_config_validator'
+export {default as SchemaProvider} from './mongo_schema_provider'
+export {default as DataProvider} from './mongo_data_provider'
+export {default as FilterParser} from './sql_filter_transformer'
+export {default as DatabaseOperations} from './mongo_operations'
+export { supportedOperations } from './supported_operations'
 
-const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
-const opsDriver = () => require('../tests/drivers/db_operations_test_support')
+import init from './connection_provider'
+import { MongoConfigValidator } from './mongo_config_validator'
+import { DbConnector } from '@wix-velo/velo-external-db-commons'
+
+const driver = () => require ('../tests/drivers/sql_filter_transformer_test_support')
+const opsDriver = () => require ('../tests/drivers/db_operations_test_support')
 
 class MongoConnector extends DbConnector {
     type: string
@@ -24,4 +25,4 @@ const mongoFactory = async(config: any, options: any) => {
     return { connector, connection, providers, cleanup }
 }
 
-export { SchemaProvider, DataProvider, FilterParser, driver, init, opsDriver, DatabaseOperations, supportedOperations, MongoConnector, mongoFactory }
+export { driver, init, opsDriver, MongoConnector, mongoFactory }

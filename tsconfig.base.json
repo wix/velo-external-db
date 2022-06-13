@@ -20,7 +20,7 @@
       "@wix-velo/external-db-mysql": [ "libs/external-db-mysql/src/index.js" ],
       "@wix-velo/external-db-mssql": [ "libs/external-db-mssql/src/index.js" ],
       "@wix-velo/external-db-spanner": [ "libs/external-db-spanner/src/index.js" ],
-      "@wix-velo/external-db-mongo": [ "libs/external-db-mongo/src/index.js" ],
+      "@wix-velo/external-db-mongo": [ "libs/external-db-mongo/src/index.ts" ],
       "@wix-velo/external-db-firestore": [ "libs/external-db-firestore/src/index.js" ],
       "@wix-velo/external-db-dynamodb": [ "libs/external-db-dynamodb/src/index.js" ],
       "@wix-velo/external-db-google-sheets": [ "libs/external-db-google-sheets/src/index.js" ],

@@ -1,9 +1,15 @@
-// const { ConnectionPool } = require('mongodb')
-const DatabaseOperations = require('../../src/mongo_operations')
-const { MongoClient } = require('mongodb')
+import DatabaseOperations from '../../src/mongo_operations'
+import { MongoClient } from 'mongodb'
 
+type MongoConfig = {
+    user?: string,
+    password?: string,
+    database?: string,
+    host?: string,
+    uri?: string
+}
 
-const createPool = modify => {
+const createPool = (modify: MongoConfig): MongoClient => {
     const config = {
         user: 'root',
         password: 'pass',
@@ -14,8 +20,8 @@ const createPool = modify => {
     const uri = `mongodb://${modifiedConfig.user}:${modifiedConfig.password}@${modifiedConfig.host}/${modifiedConfig.database}`
     const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 })
     return client
-
 }
+
 const dbOperationWithMisconfiguredPassword = () => new DatabaseOperations(createPool( { password: 'wrong' } ))
 
 const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(createPool( { database: 'wrong' } ))

@@ -1,5 +1,6 @@
 import { isObject } from '@wix-velo/velo-external-db-commons'
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+const { errors } = require('@wix-velo/velo-external-db-commons')
+const { InvalidQuery } = errors
 
 const SystemTable = '_descriptor'
 const isSystemTable = (collectionId: string) => SystemTable === collectionId.trim().toLowerCase()
@@ -29,7 +30,7 @@ const updateExpressionForItem = (item: { _id: any }) => ( { updateOne: { filter:
 
 const updateExpressionFor = (items: any[]) => items.map( updateExpressionForItem )
 
-const unpackIdFieldForItem = (item: { _id: any }) => {
+const unpackIdFieldForItem = (item: { [x: string]: any, _id?: any }) => {
     if (isObject(item._id)) {
         const item2 = { ...item, ...item._id }
         if (isObject(item2._id)) delete item2._id
