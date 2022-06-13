@@ -1,6 +1,9 @@
-const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { DbConnectionError } = errors
 import { isConnected } from './mongo_utils'
-export default class DatabaseOperations {
+import { IDatabaseOperations } from '@wix-velo/velo-external-db-types'
+
+export default class DatabaseOperations implements IDatabaseOperations {
     client: any
     constructor(client: any) {
         this.client = client

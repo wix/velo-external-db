@@ -1,28 +1,29 @@
 import { SystemFields, validateSystemFields, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
+import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table, TableHeader } from '@wix-velo/velo-external-db-types';
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('@wix-velo/velo-external-db-commons').errors
 import { validateTable, SystemTable } from './mongo_utils'
 
-export default class SchemaProvider {
+export default class SchemaProvider implements ISchemaProvider{
     client: any;
     constructor(client: any) {
         this.client = client
     }
 
-    reformatFields(field: { name: any; type: any }) {
+    reformatFields(field: InputField ) {
         return {
             field: field.name,
             type: field.type,
         }
     }
 
-    async list() {
+    async list(): Promise<Table[]> {
         await this.ensureSystemTableExists()
 
         const resp = await this.client.db()
                                       .collection(SystemTable)
                                       .find({})
         const l = await resp.toArray()
-        const tables = l.reduce((o: any, d: { _id: any; fields: any }) => ({ ...o, [d._id]: { fields: d.fields } }), {})
+        const tables = l.reduce((o: any, d: { _id: string; fields: any }) => ({ ...o, [d._id]: { fields: d.fields } }), {})
         return Object.entries(tables)
                      .map(([collectionName, rs]: [string, any]) => ({
                          id: collectionName,
@@ -31,21 +32,21 @@ export default class SchemaProvider {
 
     }
 
-    async listHeaders() {
+    async listHeaders(): Promise<TableHeader[]> {
         await this.ensureSystemTableExists()
 
         const resp = await this.client.db()
                                       .collection(SystemTable)
                                       .find({})
         const data = await resp.toArray()
-        return data.map((rs: { _id: any }) => rs._id)
+        return data.map((rs: { _id: string }) => rs._id)
     }
 
-    supportedOperations() {
+    supportedOperations(): SchemaOperations[] {
         return AllSchemaOperations
     }
 
-    async create(collectionName: any, columns: any) {
+    async create(collectionName: string, columns: InputField[]): Promise<void> {
         validateTable(collectionName)
         const collection = await this.collectionDataFor(collectionName)
         if (!collection) {
@@ -57,7 +58,7 @@ export default class SchemaProvider {
         }
     }
 
-    async addColumn(collectionName: any, column: { name: any }) {
+    async addColumn(collectionName: string, column: InputField): Promise<void> {
         validateTable(collectionName)
         await validateSystemFields(column.name)
 
@@ -67,7 +68,7 @@ export default class SchemaProvider {
         }
         const fields = collection.fields
 
-        if (fields.find((f: { name: any }) => f.name === column.name)) {
+        if (fields.find((f: InputField) => f.name === column.name)) {
             throw new FieldAlreadyExists('Collection already has a field with the same name')
         }
 
@@ -77,7 +78,7 @@ export default class SchemaProvider {
                                     { $addToSet: { fields: column } })
     }
 
-    async removeColumn(collectionName: any, columnName: any) {
+    async removeColumn(collectionName: string, columnName: string): Promise<void> {
         validateTable(collectionName)
         await validateSystemFields(columnName)
 
@@ -87,7 +88,7 @@ export default class SchemaProvider {
         }
         const fields = collection.fields
 
-        if (!fields.find((f: { name: any }) => f.name === columnName)) {
+        if (!fields.find((f: InputField) => f.name === columnName)) {
             throw new FieldDoesNotExist('Collection does not contain a field with this name')
         }
 
@@ -97,7 +98,7 @@ export default class SchemaProvider {
                                     { $pull: { fields: { name: { $eq: columnName } } } } )
     }
 
-    async describeCollection(collectionName: any) {
+    async describeCollection(collectionName: string): Promise<ResponseField[]> {
         validateTable(collectionName)
         const collection = await this.collectionDataFor(collectionName)
         if (!collection) {
@@ -107,7 +108,7 @@ export default class SchemaProvider {
         return [...SystemFields, ...collection.fields].map( this.reformatFields.bind(this) )
     }
 
-    async drop(collectionName: any) {
+    async drop(collectionName: string): Promise<void> {
         validateTable(collectionName)
         const d = await this.client.db()
                                    .collection(SystemTable)
@@ -119,14 +120,14 @@ export default class SchemaProvider {
         }
     }
 
-    async collectionDataFor(collectionName: any) {
+    async collectionDataFor(collectionName: string): Promise<any> { //fixme: any
         validateTable(collectionName)
         return await this.client.db()
                                 .collection(SystemTable)
                                 .findOne({ _id: collectionName })
     }
 
-    async ensureSystemTableExists() {
+    async ensureSystemTableExists(): Promise<void> {
         const systemTable = await this.client.db().listCollections({ name: SystemTable }).toArray()
         if (!systemTable.length) {
             await this.client.db().createCollection(SystemTable)

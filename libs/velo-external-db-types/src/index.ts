@@ -76,26 +76,56 @@ interface IDataProvider {
 type TableHeader = {
     id: string
 }
-type Table = TableHeader & { fields: Field[] }
+type Table = TableHeader & { fields: InputField[] | ResponseField[] }
 
-type Field = {
-    field: string,
+type FieldAttributes = {
     type: string,
     subtype?: string,
     precision?: number,
     isPrimary?: boolean,
 }
 
+
+type InputField = FieldAttributes & { name: string }
+
+type ResponseField = FieldAttributes & { field: string }
+
 interface ISchemaProvider {
     list(): Promise<Table[]>
     listHeaders(): Promise<TableHeader[]>
     supportedOperations(): SchemaOperations[]
-    create(collectionName: string, columns: Field[]): Promise<void>
-    addColumn(collectionName: string, column: Field): Promise<void>
+    create(collectionName: string, columns: InputField[]): Promise<void>
+    addColumn(collectionName: string, column: InputField): Promise<void>
     removeColumn(collectionName: string, columnName: string): Promise<void>
-    describeCollection(collectionName: string): Promise<Field[]>
+    describeCollection(collectionName: string): Promise<ResponseField[]>
     drop(collectionName: string): Promise<void>
-    translateDbTypes?(column: Field): Field
+    translateDbTypes?(column: InputField): ResponseField
 }
 
-export { IDataProvider, ISchemaProvider }
+interface IBaseHttpError extends Error {
+    status: number;
+}
+
+type ValidateConnectionResult = {
+    valid: boolean,
+    error?: IBaseHttpError
+}
+
+interface IDatabaseOperations {
+    validateConnection(): Promise<ValidateConnectionResult>
+}
+
+type DbProviders = {
+    dataProvider: IDataProvider
+    schemaProvider: ISchemaProvider
+    databaseOperations: IDatabaseOperations
+    connection: any
+    cleanup(): void
+}
+
+
+export {
+    IDataProvider, ISchemaProvider, DbProviders, IDatabaseOperations,
+    AdapterOperator, AdapterFilter, Sort, Item, AdapterAggregation, SchemaOperations,
+    TableHeader, Table, ResponseField, InputField, ValidateConnectionResult
+}

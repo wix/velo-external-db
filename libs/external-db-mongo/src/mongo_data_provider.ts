@@ -1,7 +1,8 @@
 import { translateErrorCodes } from './exception_translator'
 import { unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item } from '@wix-velo/velo-external-db-types'
 
-export default class DataProvider {
+export default class DataProvider implements IDataProvider {
     client: any
     filterParser: any
     constructor(client: any, filterParser: any) {
@@ -9,7 +10,7 @@ export default class DataProvider {
         this.filterParser = filterParser
     }
 
-    async find(collectionName: any, filter: any, sort: any, skip: any, limit: any, projection: any) {
+    async find(collectionName: string, filter: Filter, sort: any, skip: any, limit: any, projection: any): Promise<Item[]> {
         validateTable(collectionName)
         const { filterExpr } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
@@ -21,7 +22,7 @@ export default class DataProvider {
                                 .toArray()
     }
 
-    async count(collectionName: any, filter: any) {
+    async count(collectionName: string, filter: Filter): Promise<number> {
         validateTable(collectionName)
         const { filterExpr } = this.filterParser.transform(filter)
 
@@ -30,7 +31,7 @@ export default class DataProvider {
                                 .count(filterExpr)
     }
 
-    async insert(collectionName: any, items: any) {
+    async insert(collectionName: string, items: Item[]): Promise<number> {
         validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)
@@ -39,7 +40,7 @@ export default class DataProvider {
         return result.insertedCount
     }
 
-    async update(collectionName: any, items: any) {
+    async update(collectionName: string, items: Item[]): Promise<number> {
         validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)
@@ -47,7 +48,7 @@ export default class DataProvider {
         return result.nModified
     }
 
-    async delete(collectionName: any, itemIds: any) {
+    async delete(collectionName: string, itemIds: string[]): Promise<number> {
         validateTable(collectionName)
         const result = await this.client.db()
                                      .collection(collectionName)
@@ -55,14 +56,14 @@ export default class DataProvider {
         return result.deletedCount
     }
 
-    async truncate(collectionName: any) {
+    async truncate(collectionName: string): Promise<void> {
         validateTable(collectionName)
         await this.client.db()
                          .collection(collectionName)
                          .deleteMany({})
     }
 
-    async aggregate(collectionName: any, filter: any, aggregation: any) {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<Item[]> {
         validateTable(collectionName)
         const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation)
         const { filterExpr } = this.filterParser.transform(filter)
