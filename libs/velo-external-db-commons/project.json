@@ -8,7 +8,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/velo-external-db-commons",
-        "main": "libs/velo-external-db-commons/src/index.js",
+        "main": "libs/velo-external-db-commons/src/index.ts",
         "tsConfig": "libs/velo-external-db-commons/tsconfig.lib.json",
         "assets": ["libs/velo-external-db-commons/*.md"],
         "buildableProjectDepsInPackageJsonType": "dependencies"
@@ -37,7 +37,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/velo-external-db-commons"],
       "options": {
-        "jestConfig": "libs/velo-external-db-commons/jest.config.js",
+        "jestConfig": "libs/velo-external-db-commons/jest.config.ts",
         "passWithNoTests": true
       }
     }

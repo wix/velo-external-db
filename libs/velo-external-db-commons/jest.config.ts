@@ -1,5 +1,5 @@
 /* eslint-disable */
-module.exports = {
+export default {
   displayName: 'velo-external-db-commons',
   preset: '../../jest.preset.js',
   globals: {
@@ -12,4 +12,5 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/libs/velo-external-db-commons',
+  verbose: true,
 };
