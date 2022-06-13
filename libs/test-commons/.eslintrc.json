@@ -3,14 +3,6 @@
   "ignorePatterns": ["!**/*"],
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx", "*.ts", "*.tsx"],
-      "rules": {}
-    },
-    {
-      "files": ["*.ts", "*.tsx"],
-      "rules": {}
-    },
-    {
       "files": ["*.ts", "*.tsx"],
       "rules": {}
     }
