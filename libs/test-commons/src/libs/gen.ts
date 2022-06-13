@@ -1,5 +1,5 @@
-const Chance = require('chance')
-const {  AdapterOperators } = require('@wix-velo/velo-external-db-commons')
+import * as Chance from 'chance'
+import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators 
 
 const chance = Chance()
@@ -13,7 +13,7 @@ const randomObject = () => {
     return obj
 }
 
-const randomEntities = (columns) => {
+const randomEntities = (columns: any) => {
     const num = chance.natural({ min: 2, max: 20 })
     const arr = []
     for (let i = 0; i < num; i++) {
@@ -28,7 +28,7 @@ const newDate = () => {
     return d
 }
 
-const randomArrayOf = (gen) => {
+const randomArrayOf = (gen: { (): any; (): any }) => {
     const arr = []
     const num = chance.natural({ min: 2, max: 20 })
     for (let i = 0; i < num; i++) {
@@ -37,7 +37,7 @@ const randomArrayOf = (gen) => {
     return arr
 }
 
-const randomElementsFromArray = (arr) => {
+const randomElementsFromArray = (arr: any[]) => {
     const quantity = chance.natural({ min: 1, max: arr.length-1 })
     return chance.pickset(arr, quantity)
 }
@@ -48,8 +48,8 @@ const randomCollections = () => randomArrayOf( randomCollectionName )
 
 const randomFieldName = () => chance.word({ length: 5 })
 
-const randomEntity = (columns) => {
-    const entity = {
+const randomEntity = (columns: any[]) => {
+    const entity : {[x:string]: any} = {
         _id: chance.guid(),
         _createdDate: veloDate(),
         _updatedDate: veloDate(),
@@ -66,7 +66,7 @@ const randomEntity = (columns) => {
 
 const veloDate = () => ( { $date: newDate().toISOString() } )
 
-const randomObjectFromArray = (array) => array[chance.integer({ min: 0, max: array.length - 1 })]
+const randomObjectFromArray = (array: any[]) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
 const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
 
@@ -81,7 +81,7 @@ const randomWrappedFilter = () => {
     }
 }
 
-module.exports = { randomEntities, randomEntity, veloDate, randomObject, 
+export { randomEntities, randomEntity, veloDate, randomObject, 
                    randomCollectionName, randomObjectFromArray, randomCollections,
                    randomFieldName, randomAdapterOperator, randomWrappedFilter,
                    randomArrayOf, randomElementsFromArray }
