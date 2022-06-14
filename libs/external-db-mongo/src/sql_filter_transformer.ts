@@ -1,6 +1,6 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
-import { EmptyFilter } from './mongo_utils'
+import { isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
+import { EmptyFilter, EmptySort } from './mongo_utils'
 import { AdapterAggregation as Aggregation, AdapterFilter as Filter, Sort } from '@wix-velo/velo-external-db-types' 
 import { MongoAggregation, MongoFieldSort, MongoFilter, MongoProjection, MongoSort } from './types'
 const { InvalidQuery } = errors

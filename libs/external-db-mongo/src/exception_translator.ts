@@ -10,10 +10,6 @@ const notThrowingTranslateErrorCodes = (err: any) => {
     }
 }
 
-const translateErrorCodes = (err: any) => {
+export const translateErrorCodes = (err: any) => {
     throw notThrowingTranslateErrorCodes(err)
 }
-
-
-
-export { translateErrorCodes }
