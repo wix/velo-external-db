@@ -2,17 +2,17 @@ import * as moment from 'moment'
 import { InvalidQuery } from './errors'
 
 
-const EmptySort = {
+export const EmptySort = {
     sortExpr: '',
 }
 
-const EmptyFilter = {
+export const EmptyFilter = {
     filterExpr: '',
     parameters: [],
     offset: 1
 }
 
-const patchDateTime = (item: { [x: string]: any }) => {
+export const patchDateTime = (item: { [x: string]: any }) => {
     const obj: { [x: string]: any } = {}
     for (const key of Object.keys(item)) {
         const value = item[key]
@@ -29,25 +29,25 @@ const patchDateTime = (item: { [x: string]: any }) => {
     return obj
 }
 
-const asParamArrays = (item: { [s: string]: unknown } | ArrayLike<unknown>) => Object.values(item)
+export const asParamArrays = (item: { [s: string]: unknown } | ArrayLike<unknown>) => Object.values(item)
 
-const isObject = (o: any) => typeof o === 'object' && o !== null
+export const isObject = (o: any) => typeof o === 'object' && o !== null
 
-const isDate = (d: any) => {
+export const isDate = (d: any) => {
     const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
     return d instanceof Date || Object.prototype.toString.call(d) === '[object Date]' || (typeof d === 'string' && reISO.test(d))
 }
 
-const updateFieldsFor = (item: {}) => {
+export const updateFieldsFor = (item: {}) => {
     return Object.keys(item).filter(f => f !== '_id')
 }
 
 
-const isEmptyFilter = (filter: { operator: any }) => {
+export const isEmptyFilter = (filter: { operator: any }) => {
     return (!filter || !filter.operator)
 }
 
-const AdapterOperators = {
+export const AdapterOperators = {
     eq: 'eq',
     gt: 'gt',
     gte: 'gte',
@@ -65,7 +65,7 @@ const AdapterOperators = {
     matches: 'matches'
 }
 
-const AdapterFunctions = {
+export const AdapterFunctions = {
     avg: 'avg',
     max: 'max',
     min: 'min',
@@ -73,13 +73,13 @@ const AdapterFunctions = {
     count: 'count'
 }
 
-const extractGroupByNames = (projection: any[]) => projection.filter((f: { function: any }) => !f.function).map((f: { name: any }) => f.name)
+export const extractGroupByNames = (projection: any[]) => projection.filter((f: { function: any }) => !f.function).map((f: { name: any }) => f.name)
 
-const extractProjectionFunctionsObjects = (projection: any[]) => projection.filter((f: { function: any }) => f.function)
+export const extractProjectionFunctionsObjects = (projection: any[]) => projection.filter((f: { function: any }) => f.function)
 
-const isNull = (value: any) => (value === null || value === undefined)
+export const isNull = (value: any) => (value === null || value === undefined)
 
-const specArrayToRegex = (spec: any[]) => {
+export const specArrayToRegex = (spec: any[]) => {
     if (!Array.isArray(spec)) {
         throw new InvalidQuery('$matches must have array - spec property')
     }
@@ -97,10 +97,4 @@ const specItemToRegex = (spec: { type: SpecType; value: string | number }) => {
     }
     
     throw new InvalidQuery('spec must have type of literal or anyOf')
-}
-
-export {
-    EmptyFilter, EmptySort, patchDateTime, asParamArrays, isObject, isDate,
-    updateFieldsFor, isEmptyFilter, AdapterOperators, AdapterFunctions,
-    extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex
 }

@@ -1,4 +1,4 @@
-type Field = {
+export type Field = {
     field: string,
     type: string,
     subtype?: string,
@@ -6,19 +6,17 @@ type Field = {
     isPrimary?: boolean,
 }
 
-type FieldWithQueryOperators = Field & { queryOperators: string[] }
+export type FieldWithQueryOperators = Field & { queryOperators: string[] }
 
-interface asWixSchemaHeaders {
+export interface AsWixSchemaHeaders {
     id: string,
     displayName: string,
     maxPageSize: number,
     ttl: number
 }
 
-interface AsWixSchema extends asWixSchemaHeaders {
+export interface AsWixSchema extends AsWixSchemaHeaders {
     allowedOperations: string[],
     allowedSchemaOperations: string[],
     fields: { [field: string]: FieldWithQueryOperators }
 }
-
-export { Field, FieldWithQueryOperators, asWixSchemaHeaders, AsWixSchema }
