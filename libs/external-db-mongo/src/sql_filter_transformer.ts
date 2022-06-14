@@ -1,15 +1,25 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter } from './mongo_utils'
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, Sort } from '@wix-velo/velo-external-db-types' 
+import { MongoAggregation, MongoFieldSort, MongoFilter, MongoProjection, MongoSort } from './types'
 const { InvalidQuery } = errors
 const { string_begins, string_ends, string_contains, urlized, matches } = AdapterOperators
 const { count } = AdapterFunctions
 
-export default class FilterParser {
+export interface MongoFilterParser {
+    transform(filter: Filter): { filterExpr: MongoFilter }
+    parseFilter(filter: Filter): { filterExpr: MongoFilter }[]
+    parseAggregation(aggregation: Aggregation): MongoAggregation
+    orderBy(sort: Sort[]): { sortExpr: MongoSort }
+    selectFieldsFor(projection: string[]): MongoProjection
+}
+
+export default class FilterParser implements MongoFilterParser {
     constructor() {
     }
 
-    transform(filter: any) {
+    transform(filter: Filter) {
         const results = this.parseFilter(filter)
         if (results.length === 0) {
             return EmptyFilter
@@ -19,7 +29,7 @@ export default class FilterParser {
         }
     }
 
-    parseAggregation(aggregation: { projection: any; postFilter: any }) {
+    parseAggregation(aggregation: Aggregation) {
         
         const groupByFields = extractGroupByNames(aggregation.projection)
 
@@ -50,7 +60,7 @@ export default class FilterParser {
         return `$${func}`
     }
 
-    parseFilter(filter: { operator: any; fieldName: any; value: any }): any {
+    parseFilter(filter: { operator: any; fieldName: any; value: any }): { filterExpr: MongoFilter }[] {
         if (isEmptyFilter(filter)) {
             return []
         }
@@ -124,7 +134,7 @@ export default class FilterParser {
         return `$${operator}`
     }
 
-    orderBy(sort: { fieldName: any; direction: any }[]) {
+    orderBy(sort: Sort[]) : { sortExpr: MongoSort } {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EmptySort
         }
@@ -133,12 +143,13 @@ export default class FilterParser {
         if (results.length === 0) {
             return EmptySort
         }
+
         return {
             sortExpr: { sort: results.map(result => result.expr) }
         }
     }
 
-    parseSort({ fieldName, direction } : { fieldName: any; direction: any }) {
+    parseSort({ fieldName, direction }: Sort): { expr: MongoFieldSort } | [] {
         if (typeof fieldName !== 'string') {
             return []
         }
@@ -151,7 +162,7 @@ export default class FilterParser {
         }
     }
 
-    selectFieldsFor(projection: any[]) {
+    selectFieldsFor(projection: string[]) {
         return projection.reduce((pV: any, cV: any) => (
             { ...pV, [cV]: 1 }
         ), { _id: 0 })

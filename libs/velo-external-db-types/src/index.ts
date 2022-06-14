@@ -38,6 +38,7 @@ enum SchemaOperations { //in schema_commons as well
     NotOperator = 'not',
     IncludeOperator = 'include',
 }
+type AnyFixMe = any
 
 type AdapterFilter = {
     operator: AdapterOperator,
@@ -57,6 +58,8 @@ type Item = {
     _created_date?: string,
     _updated_date?: string,
 }
+
+export type ItemWithId = { _id: string } & Item
 
 type AdapterAggregation = {
     projection: string[],
@@ -125,9 +128,14 @@ type DbProviders = {
     cleanup: ConnectionCleanUp
 }
 
+interface IConfigValidator {
+    validate(config: any): { missingRequiredSecretsKeys: string[] }
+    readConfig(): any
+}
 
 export {
     IDataProvider, ISchemaProvider, DbProviders, IDatabaseOperations,
     AdapterOperator, AdapterFilter, Sort, Item, AdapterAggregation, SchemaOperations,
-    TableHeader, Table, ResponseField, InputField, ValidateConnectionResult, ConnectionCleanUp
+    TableHeader, Table, ResponseField, InputField, ValidateConnectionResult, ConnectionCleanUp,
+    IConfigValidator, AnyFixMe
 }

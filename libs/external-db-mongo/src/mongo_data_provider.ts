@@ -1,10 +1,13 @@
 import { translateErrorCodes } from './exception_translator'
 import { unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
-import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item} from '@wix-velo/velo-external-db-types'
+import { MongoFilterParser } from './sql_filter_transformer'
+import { MongoClient } from 'mongodb'
+
 
 export default class DataProvider implements IDataProvider {
-    client: any
-    filterParser: any
+    client: MongoClient
+    filterParser: MongoFilterParser
     constructor(client: any, filterParser: any) {
         this.client = client
         this.filterParser = filterParser
@@ -31,10 +34,11 @@ export default class DataProvider implements IDataProvider {
                                 .count(filterExpr)
     }
 
-    async insert(collectionName: string, items: Item[]): Promise<number> {
+    async insert(collectionName: string, items: Item[] ): Promise<number> {
         validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)
+                                        //@ts-ignore - Type 'string' is not assignable to type 'ObjectId', objectId Can be a 24 character hex string, 12 byte binary Buffer, or a number. and we cant assume that on the _id input
                                         .insertMany(items)
                                         .catch(translateErrorCodes)
         return result.insertedCount

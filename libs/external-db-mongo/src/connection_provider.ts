@@ -7,7 +7,7 @@ import { notConnectedPool, emptyClient, MongoStubPool, MongoStubClient } from '.
 import { ConnectionCleanUp, DbProviders } from '@wix-velo/velo-external-db-types'
 
 
-type MongoConfig = { //should be here?
+type MongoConfig = {
     connectionUri?: string
 }
 

@@ -28,10 +28,6 @@ type MongoStubClient = {
     connect: () => Promise<MongoStubPool>
 }
 
-// const emptyClient = (): MongoStubClient => ({
-//     connect: async () => { console.log('No URI was provided') }
-// })
-
 const emptyClient = (): MongoStubClient => ({
     connect: async () => notConnectedPool(new Error('No URI was provided')),
 })
