@@ -115,17 +115,19 @@ interface IDatabaseOperations {
     validateConnection(): Promise<ValidateConnectionResult>
 }
 
+type ConnectionCleanUp = () => Promise<void> | void
+
 type DbProviders = {
     dataProvider: IDataProvider
     schemaProvider: ISchemaProvider
     databaseOperations: IDatabaseOperations
     connection: any
-    cleanup(): void
+    cleanup: ConnectionCleanUp
 }
 
 
 export {
     IDataProvider, ISchemaProvider, DbProviders, IDatabaseOperations,
     AdapterOperator, AdapterFilter, Sort, Item, AdapterAggregation, SchemaOperations,
-    TableHeader, Table, ResponseField, InputField, ValidateConnectionResult
+    TableHeader, Table, ResponseField, InputField, ValidateConnectionResult, ConnectionCleanUp
 }

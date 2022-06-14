@@ -3,20 +3,23 @@ import SchemaProvider from './mongo_schema_provider'
 import DataProvider from './mongo_data_provider'
 import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './mongo_operations'
-import { notConnectedPool, emptyClient } from './mongo_utils'
-import { DbProviders } from '@wix-velo/velo-external-db-types'
+import { notConnectedPool, emptyClient, MongoStubPool, MongoStubClient } from './mongo_utils'
+import { ConnectionCleanUp, DbProviders } from '@wix-velo/velo-external-db-types'
+
 
 type MongoConfig = { //should be here?
     connectionUri?: string
 }
 
 export default async (cfg: MongoConfig): Promise<DbProviders> => {
-    const client = cfg.connectionUri ? new MongoClient(cfg.connectionUri) : emptyClient()
+    const client: MongoClient | MongoStubClient = cfg.connectionUri ? new MongoClient(cfg.connectionUri) : emptyClient()
 
-    const { pool, cleanup } = await client.connect()
-                                          .then((res: any) => {
-                                              return { pool: res, cleanup: async() => await pool.close() }
-                                          }).catch( notConnectedPool )
+    const { pool, cleanup }: { pool: MongoClient| MongoStubPool, cleanup: ConnectionCleanUp } = await client.connect()
+        .then((res: MongoClient | MongoStubPool) => {
+            return { pool: res, cleanup: async (): Promise<void> => await pool.close() }
+        }).catch(err => {
+            return { pool: notConnectedPool(err), cleanup: async () => { } }
+        })
 
     const databaseOperations = new DatabaseOperations(client)
 

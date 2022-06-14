@@ -1,4 +1,5 @@
 import { isObject } from '@wix-velo/velo-external-db-commons'
+import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 const { errors } = require('@wix-velo/velo-external-db-commons')
 const { InvalidQuery } = errors
 
@@ -6,29 +7,47 @@ const SystemTable = '_descriptor'
 const isSystemTable = (collectionId: string) => SystemTable === collectionId.trim().toLowerCase()
 
 const validateTable = (collection: any) => {
-    if (collection && isSystemTable(collection) ) {
+    if (collection && isSystemTable(collection)) {
         throw new InvalidQuery('Illegal table name')
     }
 }
 
 const EmptyFilter = { filterExpr: {} }
-const notConnectedPool = (err: any) => ( {
-        pool: { db: () => { throw err } },
-        cleanup: () => { }
-    } )
 
-const emptyClient = () => ( {
-        connect: async() => { console.log('No URI was provided') }
-    } )
-
-const isConnected = (client: { topology: { isConnected: () => any } }) => {
-    return  client && client.topology && client.topology.isConnected()
+type MongoStubPool = {
+    db(): any,
+    close: () => Promise<void>,
 }
 
-const updateExpressionForItem = (item: { _id: any }) => ( { updateOne: { filter: { _id: item._id },
-                                                           update: { $set: { ...item } } } } )
+const notConnectedPool = (err: any): MongoStubPool => ({
+    db: () => { throw err } ,
+    close: async () => { },
+})
 
-const updateExpressionFor = (items: any[]) => items.map( updateExpressionForItem )
+type MongoStubClient = {
+    connect: () => Promise<MongoStubPool>
+}
+
+// const emptyClient = (): MongoStubClient => ({
+//     connect: async () => { console.log('No URI was provided') }
+// })
+
+const emptyClient = (): MongoStubClient => ({
+    connect: async () => notConnectedPool(new Error('No URI was provided')),
+})
+
+const isConnected = (client: { topology: { isConnected: () => any } }) => {
+    return client && client.topology && client.topology.isConnected()
+}
+
+const updateExpressionForItem = (item: { _id: any }) => ({
+    updateOne: {
+        filter: { _id: item._id },
+        update: { $set: { ...item } }
+    }
+})
+
+const updateExpressionFor = (items: any[]) => items.map(updateExpressionForItem)
 
 const unpackIdFieldForItem = (item: { [x: string]: any, _id?: any }) => {
     if (isObject(item._id)) {
@@ -39,4 +58,7 @@ const unpackIdFieldForItem = (item: { [x: string]: any, _id?: any }) => {
     return item
 }
 
-export { EmptyFilter, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor, validateTable, SystemTable, emptyClient }
+export {
+    EmptyFilter, notConnectedPool, isConnected, unpackIdFieldForItem, updateExpressionFor,
+    validateTable, SystemTable, emptyClient, MongoStubPool, MongoStubClient
+}
