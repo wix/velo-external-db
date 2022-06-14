@@ -6,84 +6,79 @@ class BaseHttpError extends Error {
     }
 }
 
-class UnauthorizedError extends BaseHttpError {
+export class UnauthorizedError extends BaseHttpError {
     constructor(message: string) {
         super(message, 401)
     }
 }
 
-class CollectionDoesNotExists extends BaseHttpError {
+export class CollectionDoesNotExists extends BaseHttpError {
     constructor(message: string) {
         super(message, 404)
     }
 }
 
-class CollectionAlreadyExists extends BaseHttpError {
+export class CollectionAlreadyExists extends BaseHttpError {
     constructor(message: string) {
         super(message, 400)
     }
 }
 
-class FieldAlreadyExists extends BaseHttpError {
+export class FieldAlreadyExists extends BaseHttpError {
     constructor(message: string) {
         super(message, 400)
     }
 }
 
-class ItemAlreadyExists extends BaseHttpError {
+export class ItemAlreadyExists extends BaseHttpError {
     constructor(message: string) {
         super(message, 400)
     }
 }
 
-class FieldDoesNotExist extends BaseHttpError {
+export class FieldDoesNotExist extends BaseHttpError {
     constructor(message: string) {
         super(message, 404)
     }
 }
 
-class CannotModifySystemField extends BaseHttpError {
+export class CannotModifySystemField extends BaseHttpError {
     constructor(message: string) {
         super(message, 400)
     }
 }
 
-class InvalidQuery extends BaseHttpError {
+export class InvalidQuery extends BaseHttpError {
     constructor(message: string) {
         super(message, 400)
     }
 }
 
-class InvalidRequest extends BaseHttpError {
+export class InvalidRequest extends BaseHttpError {
     constructor(message: string) {
         super(message, 400)
     }
 }
 
-class DbConnectionError extends BaseHttpError {
+export class DbConnectionError extends BaseHttpError {
     constructor(message: string) {
         super(message, 500)
     }
 }
-class ItemNotFound extends BaseHttpError {
+export class ItemNotFound extends BaseHttpError {
     constructor(message: string) {
         super(message, 404)
     }
 }
 
-class UnsupportedOperation extends BaseHttpError {
+export class UnsupportedOperation extends BaseHttpError {
     constructor(message: string) {
         super(message, 405)
     }
 }
 
-class UnsupportedDatabase extends BaseHttpError {
+export class UnsupportedDatabase extends BaseHttpError {
     constructor(message: string) {
         super(message, 405)
     }
-}
-
-export {
-    UnauthorizedError, CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CannotModifySystemField, InvalidQuery,
-    CollectionAlreadyExists, DbConnectionError, InvalidRequest, ItemNotFound, UnsupportedOperation, UnsupportedDatabase, ItemAlreadyExists
 }
