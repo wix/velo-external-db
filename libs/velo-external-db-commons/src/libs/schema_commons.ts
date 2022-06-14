@@ -1,7 +1,7 @@
 import { CannotModifySystemField } from './errors'
-import { Field, FieldWithQueryOperators, asWixSchemaHeaders, AsWixSchema  } from './types'
+import { Field, FieldWithQueryOperators, AsWixSchemaHeaders, AsWixSchema  } from './types'
 
-const SystemFields = [
+export const SystemFields = [
     {
         name: '_id', type: 'text', subtype: 'string', precision: '50', isPrimary: true
     },
@@ -15,7 +15,7 @@ const SystemFields = [
         name: '_owner', type: 'text', subtype: 'string', precision: '50'
     }]
 
-const QueryOperatorsByFieldType = {
+export const QueryOperatorsByFieldType = {
     number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'],
     text: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'matches', 'gt', 'gte', 'lt', 'lte'],
     boolean: ['eq'],
@@ -36,7 +36,7 @@ const QueryOperationsByFieldType: {[x: string]: any} = {
 }
 
 
-enum SchemaOperations {
+export enum SchemaOperations {
     List = 'list',
     ListHeaders = 'listHeaders',
     Create = 'createCollection',
@@ -59,12 +59,12 @@ enum SchemaOperations {
     IncludeOperator = 'include',
 }
 
-const AllSchemaOperations = Object.values(SchemaOperations)
+export const AllSchemaOperations = Object.values(SchemaOperations)
 
-const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove']
-const ReadOnlyOperations = ['get']
+export const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove']
+export const ReadOnlyOperations = ['get']
 
-const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }: { id: string, allowedOperations: string[], fields: FieldWithQueryOperators[], [x: string]: any }): AsWixSchema => {
+export const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }: { id: string, allowedOperations: string[], fields: FieldWithQueryOperators[], [x: string]: any }): AsWixSchema => {
     return {
         id,
         displayName: id,
@@ -82,7 +82,7 @@ const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }:
     }
 }
 
-const asWixSchemaHeaders = (collectionName: string): asWixSchemaHeaders => {
+export const asWixSchemaHeaders = (collectionName: string): AsWixSchemaHeaders => {
     return {
         id: collectionName,
         displayName: collectionName,
@@ -91,27 +91,20 @@ const asWixSchemaHeaders = (collectionName: string): asWixSchemaHeaders => {
     }
 }
 
-const validateSystemFields = (columnName: string) => {
+export const validateSystemFields = (columnName: string) => {
     if (SystemFields.find(f => f.name === columnName)) {
         throw new CannotModifySystemField('Cannot modify system field')
     }
     return Promise.resolve()
 }
 
-const parseTableData = (data: any[]) => data.reduce((o: { [x: string]: any }, r: { table_name: string, [x: string]: any }) => {
+export const parseTableData = (data: any[]) => data.reduce((o: { [x: string]: any }, r: { table_name: string, [x: string]: any }) => {
     const arr = o[r.table_name] || []
     arr.push(r)
     o[r.table_name] = arr
     return o
 }, {})
 
-const allowedOperationsFor = ({ fields }: {fields: Field[]}) => fields.find((c: Field) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
+export const allowedOperationsFor = ({ fields }: {fields: Field[]}) => fields.find((c: Field) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
 
-const appendQueryOperatorsTo = (fields: Field[]) => fields.map((f: Field) => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
-
-export {
-    SystemFields, asWixSchema, validateSystemFields, parseTableData,
-    asWixSchemaHeaders, SchemaOperations, AllSchemaOperations,
-    allowedOperationsFor, appendQueryOperatorsTo, QueryOperatorsByFieldType,
-    ReadWriteOperations, ReadOnlyOperations
-}
+export const appendQueryOperatorsTo = (fields: Field[]) => fields.map((f: Field) => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
