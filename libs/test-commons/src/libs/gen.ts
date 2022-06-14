@@ -4,7 +4,7 @@ const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_co
 
 const chance = Chance()
 
-const randomObject = () => {
+export const randomObject = () => {
     const obj = {}
     const num = chance.natural({ min: 2, max: 20 })
     for (let i = 0; i < num; i++) {
@@ -13,7 +13,7 @@ const randomObject = () => {
     return obj
 }
 
-const randomEntities = (columns: any) => {
+export const randomEntities = (columns: any) => {
     const num = chance.natural({ min: 2, max: 20 })
     const arr = []
     for (let i = 0; i < num; i++) {
@@ -28,7 +28,7 @@ const newDate = () => {
     return d
 }
 
-const randomArrayOf = (gen: { (): any; (): any }) => {
+export const randomArrayOf = (gen: { (): any; (): any }) => {
     const arr = []
     const num = chance.natural({ min: 2, max: 20 })
     for (let i = 0; i < num; i++) {
@@ -37,18 +37,18 @@ const randomArrayOf = (gen: { (): any; (): any }) => {
     return arr
 }
 
-const randomElementsFromArray = (arr: any[]) => {
+export const randomElementsFromArray = (arr: any[]) => {
     const quantity = chance.natural({ min: 1, max: arr.length-1 })
     return chance.pickset(arr, quantity)
 }
 
-const randomCollectionName = () => chance.word({ length: 5 })
+export const randomCollectionName = () => chance.word({ length: 5 })
 
-const randomCollections = () => randomArrayOf( randomCollectionName )
+export const randomCollections = () => randomArrayOf( randomCollectionName )
 
-const randomFieldName = () => chance.word({ length: 5 })
+export const randomFieldName = () => chance.word({ length: 5 })
 
-const randomEntity = (columns: any[]) => {
+export const randomEntity = (columns: any[]) => {
     const entity : {[x:string]: any} = {
         _id: chance.guid(),
         _createdDate: veloDate(),
@@ -64,13 +64,13 @@ const randomEntity = (columns: any[]) => {
     return entity
 }
 
-const veloDate = () => ( { $date: newDate().toISOString() } )
+export const veloDate = () => ( { $date: newDate().toISOString() } )
 
-const randomObjectFromArray = (array: any[]) => array[chance.integer({ min: 0, max: array.length - 1 })]
+export const randomObjectFromArray = (array: any[]) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
-const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
+export const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
 
-const randomWrappedFilter = () => {
+export const randomWrappedFilter = () => {
     const operator = randomAdapterOperator()
     const fieldName = chance.word()
     const value = operator === AdapterOperators.include ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
@@ -80,10 +80,3 @@ const randomWrappedFilter = () => {
         value
     }
 }
-
-export { randomEntities, randomEntity, veloDate, randomObject, 
-                   randomCollectionName, randomObjectFromArray, randomCollections,
-                   randomFieldName, randomAdapterOperator, randomWrappedFilter,
-                   randomArrayOf, randomElementsFromArray }
-
-
