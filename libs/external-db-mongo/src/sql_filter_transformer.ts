@@ -1,14 +1,25 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { EmptySort, isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } = require('@wix-velo/velo-external-db-commons')
-const { EmptyFilter } = require('./mongo_utils')
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
+import { EmptyFilter, EmptySort } from './mongo_utils'
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, Sort } from '@wix-velo/velo-external-db-types' 
+import { MongoAggregation, MongoFieldSort, MongoFilter, MongoProjection, MongoSort } from './types'
+const { InvalidQuery } = errors
 const { string_begins, string_ends, string_contains, urlized, matches } = AdapterOperators
 const { count } = AdapterFunctions
 
-class FilterParser {
+export interface IMongoFilterParser {
+    transform(filter: Filter): { filterExpr: MongoFilter }
+    parseFilter(filter: Filter): { filterExpr: MongoFilter }[]
+    parseAggregation(aggregation: Aggregation): MongoAggregation
+    orderBy(sort: Sort[]): { sortExpr: MongoSort }
+    selectFieldsFor(projection: string[]): MongoProjection
+}
+
+export default class FilterParser implements IMongoFilterParser {
     constructor() {
     }
 
-    transform(filter) {
+    transform(filter: Filter) {
         const results = this.parseFilter(filter)
         if (results.length === 0) {
             return EmptyFilter
@@ -18,7 +29,7 @@ class FilterParser {
         }
     }
 
-    parseAggregation(aggregation) {
+    parseAggregation(aggregation: Aggregation) {
         
         const groupByFields = extractGroupByNames(aggregation.projection)
 
@@ -34,22 +45,22 @@ class FilterParser {
         }
     }
 
-    createFieldsStatement(projectionFunctions, groupByFields) {
-        const fieldsStatement = projectionFunctions.reduce((pV, cV) => ({ ...pV, ...{ [cV.alias]: this.parseFuncObject(cV.function, cV.name) } }), {})
-        fieldsStatement._id = groupByFields.reduce((pV, cV) => ({ ...pV, ...{ [cV]: `$${cV}` } }), {})
+    createFieldsStatement(projectionFunctions: any[], groupByFields: any[]) {
+        const fieldsStatement = projectionFunctions.reduce((pV: any, cV: { alias: any; function: any; name: any }) => ({ ...pV, ...{ [cV.alias]: this.parseFuncObject(cV.function, cV.name) } }), {})
+        fieldsStatement._id = groupByFields.reduce((pV: any, cV: any) => ({ ...pV, ...{ [cV]: `$${cV}` } }), {})
         return fieldsStatement
     }
 
-    parseFuncObject(func, fieldName) {
+    parseFuncObject(func: string, fieldName: any) {
         if (func === count) return { $sum: 1 }
         return { [this.adapterFunctionToMongo(func)]: `$${fieldName}` }
     }
     
-    adapterFunctionToMongo(func) {
+    adapterFunctionToMongo(func: any) {
         return `$${func}`
     }
 
-    parseFilter(filter) {
+    parseFilter(filter: { operator: any; fieldName: any; value: any }): { filterExpr: MongoFilter }[] {
         if (isEmptyFilter(filter)) {
             return []
         }
@@ -58,7 +69,7 @@ class FilterParser {
 
         if (this.isMultipleFieldOperator(mongoOp)) {
             const res = value.map( this.parseFilter.bind(this) )
-            return [{ filterExpr: { [mongoOp]: res.map(r => r[0]?.filterExpr || EmptyFilter.filterExpr) } }]
+            return [{ filterExpr: { [mongoOp]: res.map((r: { filterExpr: any }[]) => r[0]?.filterExpr || EmptyFilter.filterExpr) } }]
         }
 
         if (mongoOp === '$not') {
@@ -72,7 +83,7 @@ class FilterParser {
 
         if (operator === urlized) {
             return [{
-                filterExpr: { [fieldName]: { $regex: `/${value.map(s => s.toLowerCase()).join('.*')}/i` } }
+                filterExpr: { [fieldName]: { $regex: `/${value.map((s: string) => s.toLowerCase()).join('.*')}/i` } }
             }]
         }
 
@@ -86,11 +97,11 @@ class FilterParser {
         return [{ filterExpr: { [fieldName]: { [mongoOp]: this.valueForOperator(value, mongoOp) } } }]
     }
 
-    isMultipleFieldOperator(operator) {
+    isMultipleFieldOperator(operator: string) {
         return ['$and', '$or'].includes(operator)
     }
 
-    valueForStringOperator(operator, value) {
+    valueForStringOperator(operator: any, value: any) {
         switch (operator) {
             case string_contains:
                 return value
@@ -101,11 +112,11 @@ class FilterParser {
         }
     }
 
-    isSingleFieldStringOperator(operator) {
+    isSingleFieldStringOperator(operator: string) {
         return [string_contains, string_begins, string_ends].includes(operator)
     }
 
-    valueForOperator(value, operator) {
+    valueForOperator(value: string | any[] | undefined, operator: string) {
         if (operator === '$in') {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
@@ -119,11 +130,11 @@ class FilterParser {
         return value
     }
 
-    adapterOperatorToMongoOperator(operator) {
+    adapterOperatorToMongoOperator(operator: any) {
         return `$${operator}`
     }
 
-    orderBy(sort) {
+    orderBy(sort: Sort[]) : { sortExpr: MongoSort } {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EmptySort
         }
@@ -132,12 +143,13 @@ class FilterParser {
         if (results.length === 0) {
             return EmptySort
         }
+
         return {
             sortExpr: { sort: results.map(result => result.expr) }
         }
     }
 
-    parseSort({ fieldName, direction }) {
+    parseSort({ fieldName, direction }: Sort): { expr: MongoFieldSort } | [] {
         if (typeof fieldName !== 'string') {
             return []
         }
@@ -150,12 +162,10 @@ class FilterParser {
         }
     }
 
-    selectFieldsFor(projection) {
-        return projection.reduce((pV, cV) => (
+    selectFieldsFor(projection: string[]) {
+        return projection.reduce((pV: any, cV: any) => (
             { ...pV, [cV]: 1 }
         ), { _id: 0 })
     }
 
 }
-
-module.exports = FilterParser

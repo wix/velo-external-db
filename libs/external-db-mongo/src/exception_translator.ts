@@ -1,7 +1,7 @@
-const { errors } = require('@wix-velo/velo-external-db-commons')
+import { errors } from '@wix-velo/velo-external-db-commons'
 const { ItemAlreadyExists } = errors
 
-const notThrowingTranslateErrorCodes = err => {
+const notThrowingTranslateErrorCodes = (err: any) => {
     switch (err.code) {
         case 11000:
             return new ItemAlreadyExists(`Item already exists: ${err.message}`)
@@ -10,9 +10,6 @@ const notThrowingTranslateErrorCodes = err => {
     }
 }
 
-const translateErrorCodes = err => {
+export const translateErrorCodes = (err: any) => {
     throw notThrowingTranslateErrorCodes(err)
 }
-
-
-module.exports = { translateErrorCodes }
