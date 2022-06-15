@@ -2,8 +2,6 @@ export default {
     displayName: 'external-db-spanner',
     clearMocks: true,
     verbose: true,
-    // roots: ['<rootDir>/src'],
-    // testRegex: '(.*\\.spec\\.)js$',
     preset: '../../jest.preset.js',
     globals: {
       'ts-jest': {
