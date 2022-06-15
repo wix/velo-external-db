@@ -14,7 +14,7 @@ export interface IMySqlFilterParser {
     parseAggregation(aggregation: Aggregation): MySqlParsedAggregation
 }
 
-class FilterParser implements IMySqlFilterParser {
+export default class FilterParser implements IMySqlFilterParser {
     constructor() {
     }
     
@@ -238,5 +238,3 @@ class FilterParser implements IMySqlFilterParser {
         return projection.map(escapeId).join(', ')
     }
 }
-
-module.exports = FilterParser
