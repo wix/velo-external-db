@@ -1,4 +1,4 @@
-enum AdapterOperator { //in velo-external-db-core
+export enum AdapterOperator { //in velo-external-db-core
     eq = 'eq',
     gt = 'gt',
     gte = 'gte',
@@ -16,7 +16,7 @@ enum AdapterOperator { //in velo-external-db-core
     matches = 'matches'
 }
 
-enum SchemaOperations { //in schema_commons as well
+export enum SchemaOperations { //in schema_commons as well
     List = 'list',
     ListHeaders = 'listHeaders',
     Create = 'createCollection',
@@ -38,20 +38,20 @@ enum SchemaOperations { //in schema_commons as well
     NotOperator = 'not',
     IncludeOperator = 'include',
 }
-type AnyFixMe = any
+export type AnyFixMe = any
 
-type AdapterFilter = {
+export type AdapterFilter = {
     operator: AdapterOperator,
     fieldName: string,
     value: any
 }
 
-type Sort = {
+export type Sort = {
     fieldName: string,
     direction?: 'asc' | 'desc'
 }
 
-type Item = {
+export type Item = {
     [key: string]: any
     _id?: string,
     _owner?: string,
@@ -61,12 +61,12 @@ type Item = {
 
 export type ItemWithId = { _id: string } & Item
 
-type AdapterAggregation = {
+export type AdapterAggregation = {
     projection: string[],
     postFilter: AdapterFilter,
 }
 
-interface IDataProvider {
+export interface IDataProvider {
     find(collectionName: string, filter: AdapterFilter, sort: Sort, skip: number, limit: number, projection: string[]): Promise<Item[]>;
     count(collectionName: string, filter: AdapterFilter): Promise<number>;
     insert(collectionName: string, items: Item[]): Promise<number>;
@@ -76,24 +76,24 @@ interface IDataProvider {
     aggregate(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation): Promise<Item[]>;
 }
 
-type TableHeader = {
+export type TableHeader = {
     id: string
 }
-type Table = TableHeader & { fields: ResponseField[] }
 
-type FieldAttributes = {
+export type Table = TableHeader & { fields: ResponseField[] }
+
+export type FieldAttributes = {
     type: string,
     subtype?: string,
     precision?: number,
     isPrimary?: boolean,
 }
 
+export type InputField = FieldAttributes & { name: string }
 
-type InputField = FieldAttributes & { name: string }
+export type ResponseField = FieldAttributes & { field: string }
 
-type ResponseField = FieldAttributes & { field: string }
-
-interface ISchemaProvider {
+export interface ISchemaProvider {
     list(): Promise<Table[]>
     listHeaders(): Promise<TableHeader[]>
     supportedOperations(): SchemaOperations[]
@@ -105,37 +105,30 @@ interface ISchemaProvider {
     translateDbTypes?(column: InputField): ResponseField
 }
 
-interface IBaseHttpError extends Error {
+export interface IBaseHttpError extends Error {
     status: number;
 }
 
-type ValidateConnectionResult = {
+export type ValidateConnectionResult = {
     valid: boolean,
     error?: IBaseHttpError
 }
 
-interface IDatabaseOperations {
+export interface IDatabaseOperations {
     validateConnection(): Promise<ValidateConnectionResult>
 }
 
-type ConnectionCleanUp = () => Promise<void> | void
+export type ConnectionCleanUp = () => Promise<void> | void
 
-type DbProviders = {
+export type DbProviders<T> = {
     dataProvider: IDataProvider
     schemaProvider: ISchemaProvider
     databaseOperations: IDatabaseOperations
-    connection: any
+    connection: T
     cleanup: ConnectionCleanUp
 }
 
-interface IConfigValidator {
+export interface IConfigValidator {
     validate(config: any): { missingRequiredSecretsKeys: string[] }
     readConfig(): any
-}
-
-export {
-    IDataProvider, ISchemaProvider, DbProviders, IDatabaseOperations,
-    AdapterOperator, AdapterFilter, Sort, Item, AdapterAggregation, SchemaOperations,
-    TableHeader, Table, ResponseField, InputField, ValidateConnectionResult, ConnectionCleanUp,
-    IConfigValidator, AnyFixMe
 }

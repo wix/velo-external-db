@@ -7,7 +7,7 @@ const { InvalidQuery } = errors
 const { string_begins, string_ends, string_contains, urlized, matches } = AdapterOperators
 const { count } = AdapterFunctions
 
-export interface MongoFilterParser {
+export interface IMongoFilterParser {
     transform(filter: Filter): { filterExpr: MongoFilter }
     parseFilter(filter: Filter): { filterExpr: MongoFilter }[]
     parseAggregation(aggregation: Aggregation): MongoAggregation
@@ -15,7 +15,7 @@ export interface MongoFilterParser {
     selectFieldsFor(projection: string[]): MongoProjection
 }
 
-export default class FilterParser implements MongoFilterParser {
+export default class FilterParser implements IMongoFilterParser {
     constructor() {
     }
 

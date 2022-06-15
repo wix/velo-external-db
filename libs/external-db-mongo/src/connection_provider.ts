@@ -11,7 +11,7 @@ type MongoConfig = {
     connectionUri?: string
 }
 
-export default async (cfg: MongoConfig): Promise<DbProviders> => {
+export default async (cfg: MongoConfig): Promise<DbProviders<MongoClient | MongoStubPool>> => {
     const client: MongoClient | MongoStubClient = cfg.connectionUri ? new MongoClient(cfg.connectionUri) : emptyClient()
 
     const { pool, cleanup }: { pool: MongoClient| MongoStubPool, cleanup: ConnectionCleanUp } = await client.connect()
