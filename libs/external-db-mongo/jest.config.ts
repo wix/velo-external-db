@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'external-db-mongo',
     clearMocks: true,
     verbose: true,
