@@ -1,13 +1,19 @@
-const { translateErrorCodes } = require('./exception_translator.js')
-const { unpackIdFieldForItem, updateExpressionFor, validateTable } = require('./mongo_utils')
+import { translateErrorCodes } from './exception_translator'
+import { unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item} from '@wix-velo/velo-external-db-types'
+import { IMongoFilterParser } from './sql_filter_transformer'
+import { MongoClient } from 'mongodb'
 
-class DataProvider {
-    constructor(client, filterParser) {
+
+export default class DataProvider implements IDataProvider {
+    client: MongoClient
+    filterParser: IMongoFilterParser
+    constructor(client: any, filterParser: any) {
         this.client = client
         this.filterParser = filterParser
     }
 
-    async find(collectionName, filter, sort, skip, limit, projection) {
+    async find(collectionName: string, filter: Filter, sort: any, skip: any, limit: any, projection: any): Promise<Item[]> {
         validateTable(collectionName)
         const { filterExpr } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
@@ -19,7 +25,7 @@ class DataProvider {
                                 .toArray()
     }
 
-    async count(collectionName, filter) {
+    async count(collectionName: string, filter: Filter): Promise<number> {
         validateTable(collectionName)
         const { filterExpr } = this.filterParser.transform(filter)
 
@@ -28,16 +34,17 @@ class DataProvider {
                                 .count(filterExpr)
     }
 
-    async insert(collectionName, items) {
+    async insert(collectionName: string, items: Item[] ): Promise<number> {
         validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)
+                                        //@ts-ignore - Type 'string' is not assignable to type 'ObjectId', objectId Can be a 24 character hex string, 12 byte binary Buffer, or a number. and we cant assume that on the _id input
                                         .insertMany(items)
                                         .catch(translateErrorCodes)
         return result.insertedCount
     }
 
-    async update(collectionName, items) {
+    async update(collectionName: string, items: Item[]): Promise<number> {
         validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)
@@ -45,7 +52,7 @@ class DataProvider {
         return result.nModified
     }
 
-    async delete(collectionName, itemIds) {
+    async delete(collectionName: string, itemIds: string[]): Promise<number> {
         validateTable(collectionName)
         const result = await this.client.db()
                                      .collection(collectionName)
@@ -53,14 +60,14 @@ class DataProvider {
         return result.deletedCount
     }
 
-    async truncate(collectionName) {
+    async truncate(collectionName: string): Promise<void> {
         validateTable(collectionName)
         await this.client.db()
                          .collection(collectionName)
                          .deleteMany({})
     }
 
-    async aggregate(collectionName, filter, aggregation) {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<Item[]> {
         validateTable(collectionName)
         const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation)
         const { filterExpr } = this.filterParser.transform(filter)
@@ -75,6 +82,3 @@ class DataProvider {
         return result.map( unpackIdFieldForItem )
     }
 }
-
-
-module.exports = DataProvider

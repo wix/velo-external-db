@@ -1,9 +1,7 @@
 module.exports = {
-    displayName: 'external-db-spanner',
+    displayName: 'external-db-mongo',
     clearMocks: true,
     verbose: true,
-    // roots: ['<rootDir>/src'],
-    // testRegex: '(.*\\.spec\\.)js$',
     preset: '../../jest.preset.js',
     globals: {
       'ts-jest': {
@@ -14,6 +12,6 @@ module.exports = {
       '^.+\\.[tj]s$': 'ts-jest',
     },
     moduleFileExtensions: ['ts', 'js', 'html'],
-    coverageDirectory: '../../coverage/libs/external-db-mssql',
+    coverageDirectory: '../../coverage/libs/external-db-mongo',
     testEnvironment: 'node'
 }

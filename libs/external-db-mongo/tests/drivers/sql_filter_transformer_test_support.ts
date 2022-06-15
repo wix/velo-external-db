@@ -1,7 +1,8 @@
-const { EmptySort } = require('@wix-velo/velo-external-db-commons')
-const { when } = require('jest-when')
+import { EmptySort } from 'libs/external-db-mongo/src/mongo_utils'
+import { when } from 'jest-when'
+import { jest } from '@jest/globals'
 
-const filterParser = {
+export const filterParser = {
     transform: jest.fn(),
     parseFilter: jest.fn(),
     orderBy: jest.fn(),
@@ -9,36 +10,36 @@ const filterParser = {
     selectFieldsFor: jest.fn()
 }
 
-const stubEmptyFilterAndSortFor = (filter, sort) => {
+export const stubEmptyFilterAndSortFor = (filter: any, sort: any) => {
     stubEmptyFilterFor(filter)
     stubEmptyOrderByFor(sort)
 }
 
-const stubEmptyFilterFor = (filter) => {
+export const stubEmptyFilterFor = (filter: any) => {
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: {} })
 }
 
-const stubEmptyOrderByFor = (sort) => {
+export const stubEmptyOrderByFor = (sort: any) => {
     when(filterParser.orderBy).calledWith(sort)
                               .mockReturnValue(EmptySort)
 }
 
-const givenOrderByFor = (column, sort) => {
+export const givenOrderByFor = (column: any, sort: any) => {
     when(filterParser.orderBy).calledWith(sort)
                                  .mockReturnValue({ sortExpr: { sort: [[`${column}`, 'asc']] } })
 }
 
 
-const givenFilterByIdWith = (id, filter) => {
+export const givenFilterByIdWith = (id: any, filter: any) => {
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: {
                                     _id: id,
                                 } })
 }
 
-const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByColumns, filter) => {
-    const c = numericColumns.map(c => c.name)
+export const givenAggregateQueryWith = (having: any, numericColumns: any[], columnAliases: any[], groupByColumns: any, filter: any) => {
+    const c = numericColumns.map((c: { name: any }) => c.name)
     when(filterParser.parseAggregation).calledWith({ postFilteringStep: filter, processingStep: having })
                                        .mockReturnValue({
                                         fieldsStatement: {
@@ -52,36 +53,36 @@ const givenAggregateQueryWith = (having, numericColumns, columnAliases, groupByC
                                        })
 }
 
-const givenAllFieldsProjectionFor = (projection) => 
+export const givenAllFieldsProjectionFor = (projection: any) => 
     when(filterParser.selectFieldsFor).calledWith(projection)
                                  .mockReturnValue({})
 
-const givenProjectionExprFor = (projection) => 
+export const givenProjectionExprFor = (projection: any[]) => 
     when(filterParser.selectFieldsFor).calledWith(projection)
-                                 .mockReturnValue(projection.reduce((pV, cV) => (
+                                 .mockReturnValue(projection.reduce((pV: any, cV: any) => (
                                     { ...pV, [cV]: 1 }
                                 ), { _id: 0 }))
 
-const givenStartsWithFilterFor = (filter, column, value) =>
+export const givenStartsWithFilterFor = (filter: any, column: any, value: any) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: { [column]: { $regex: `^${value}`, $options: 'i' } } })
 
 
-const givenGreaterThenFilterFor = (filter, column, value) =>
+export const givenGreaterThenFilterFor = (filter: any, column: any, value: any) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: { [column]: { $gt: value } } })
 
-const givenNotFilterQueryFor = (filter, column, value) =>
+export const givenNotFilterQueryFor = (filter: any, column: any, value: any) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: { $nor: [{ [column]: { $eq: value } }] } })
 
-const givenMatchesFilterFor = (filter, column, value) =>
+export const givenMatchesFilterFor = (filter: any, column: any, value: string) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({
                                     filterExpr: {
                                         [column]: {
                                             $regex: 
-                                                value.split('-').map((v, i, array) => 
+                                                value.split('-').map((v: string, i: number, array: string | any[]) => 
                                                     i === array.length-1 ? `${v.toLowerCase()}`: `${v.toLowerCase()}[ \t\n-]`)
                                                     .join(''),
                                             $options: 'i'
@@ -89,21 +90,14 @@ const givenMatchesFilterFor = (filter, column, value) =>
                                     }
                                 })
 
-const givenIncludeFilterForIdColumn = (filter, value) => 
+export const givenIncludeFilterForIdColumn = (filter: any, value: any) => 
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: { _id: { $in: [value] } } })
 
-const reset = () => {
+export const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
     filterParser.parseAggregation.mockClear()
     filterParser.parseFilter.mockClear()
     filterParser.selectFieldsFor.mockClear()
-}
-
-module.exports = { stubEmptyFilterAndSortFor, givenOrderByFor, stubEmptyOrderByFor,
-                   stubEmptyFilterFor, givenFilterByIdWith, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
-                   givenGreaterThenFilterFor, givenNotFilterQueryFor, givenMatchesFilterFor, givenIncludeFilterForIdColumn,
-                   filterParser, reset
 }

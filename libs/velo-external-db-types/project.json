@@ -1,23 +1,27 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/external-db-mongo/src",
+  "sourceRoot": "libs/velo-external-db-types/src",
   "projectType": "library",
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "outputPath": "dist/libs/external-db-mongo",
-        "main": "libs/external-db-mongo/src/index.js",
-        "tsConfig": "libs/external-db-mongo/tsconfig.lib.json",
-        "assets": [ "libs/external-db-mongo/*.md" ],
+        "outputPath": "dist/libs/velo-external-db-types",
+        "main": "libs/velo-external-db-types/src/index.ts",
+        "tsConfig": "libs/velo-external-db-types/tsconfig.lib.json",
+        "assets": [
+          "libs/velo-external-db-types/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
     "publish": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "command": "node tools/scripts/publish.mjs @wix-velo/external-db-mongo {args.ver} {args.tag}"
+        "command": "node tools/scripts/publish.mjs @wix-velo/velo-external-db-types {args.ver} {args.tag}"
       },
       "dependsOn": [
         {
@@ -32,14 +36,18 @@
         "{options.outputFile}"
       ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-mongo/**/*.ts" ]
+        "lintFilePatterns": [
+          "libs/velo-external-db-types/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-mongo" ],
+      "outputs": [
+        "coverage/libs/velo-external-db-types"
+      ],
       "options": {
-        "jestConfig": "libs/external-db-mongo/jest.config.ts",
+        "jestConfig": "libs/velo-external-db-types/jest.config.ts",
         "passWithNoTests": true
       }
     }
