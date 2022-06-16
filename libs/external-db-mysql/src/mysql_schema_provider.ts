@@ -1,11 +1,17 @@
-const { promisify } = require('util')
-const { translateErrorCodes } = require('./sql_exception_translator')
-const SchemaColumnTranslator = require('./sql_schema_translator')
-const { escapeId, escapeTable } = require('./mysql_utils')
-const { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } = require('@wix-velo/velo-external-db-commons')
+import { promisify } from 'util'
+import { translateErrorCodes } from './sql_exception_translator'
+import SchemaColumnTranslator, { IMySqlSchemaColumnTranslator } from './sql_schema_translator'
+import { escapeId, escapeTable } from './mysql_utils'
+import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
+import { Pool as MySqlPool } from 'mysql'
+import { MySqlQuery } from './types'
+import { ResponseField, Table } from '@wix-velo/velo-external-db-types'
 
 class SchemaProvider {
-    constructor(pool) {
+    pool: MySqlPool
+    sqlSchemaTranslator: IMySqlSchemaColumnTranslator
+    query: MySqlQuery
+    constructor(pool: any) {
         this.pool = pool
 
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
@@ -13,7 +19,7 @@ class SchemaProvider {
         this.query = promisify(this.pool.query).bind(this.pool)
     }
 
-    async list() {
+    async list(): Promise<Table[]> {
         const currentDb = this.pool.config.connectionConfig.database
         const data = await this.query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION', currentDb)
         const tables = parseTableData( data )
@@ -27,48 +33,48 @@ class SchemaProvider {
     async listHeaders() {
         const currentDb = this.pool.config.connectionConfig.database
         const data = await this.query('SELECT TABLE_NAME as table_name FROM information_schema.tables WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME', currentDb)
-        return data.map( rs => rs.table_name )
+        return data.map( (rs: { table_name: any }) => rs.table_name )
     }
 
     supportedOperations() {
         return AllSchemaOperations
     }
 
-    async create(collectionName, columns) {
+    async create(collectionName: string, columns: any) {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                        .join(', ')
         const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
 
         await this.query(`CREATE TABLE IF NOT EXISTS ${escapeTable(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
-                         [...(columns || []).map(c => c.name)])
+                         [...(columns || []).map((c: { name: any }) => c.name)])
                   .catch( translateErrorCodes )
     }
 
-    async drop(collectionName) {
+    async drop(collectionName: string) {
         await this.query(`DROP TABLE IF EXISTS ${escapeTable(collectionName)}`)
                   .catch( translateErrorCodes )
     }
 
-    async addColumn(collectionName, column) {
+    async addColumn(collectionName: string, column: { name: string }) {
         await validateSystemFields(column.name)
         await this.query(`ALTER TABLE ${escapeTable(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
                   .catch( translateErrorCodes )
     }
 
-    async removeColumn(collectionName, columnName) {
+    async removeColumn(collectionName: string, columnName: string) {
         await validateSystemFields(columnName)
         return await this.query(`ALTER TABLE ${escapeTable(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
                          .catch( translateErrorCodes )
     }
 
-    async describeCollection(collectionName) {
+    async describeCollection(collectionName: string) {
         const res = await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
                               .catch( translateErrorCodes )
-        return res.map(r => ({ field: r.Field, type: r.Type }))
+        return res.map((r: { Field: string; Type: string }) => ({ field: r.Field, type: r.Type }))
                   .map( this.translateDbTypes.bind(this) )
     }
 
-    translateDbTypes(row) {
+    translateDbTypes(row: ResponseField) {
         row.type = this.sqlSchemaTranslator.translateType(row.type)
         return row
     }

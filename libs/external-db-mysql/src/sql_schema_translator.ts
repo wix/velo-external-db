@@ -2,7 +2,7 @@ import { InputField } from '@wix-velo/velo-external-db-types'
 import { escapeId } from './mysql_utils'
 
 
-interface IMySqlSchemaColumnTranslator {
+export interface IMySqlSchemaColumnTranslator {
     translateType(dbType: string): string
     dbTypeFor(field: InputField): string
     columnToDbColumnSql(field: InputField): string

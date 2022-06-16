@@ -1,11 +1,19 @@
-const mysql = require('mysql')
-const SchemaProvider = require('./mysql_schema_provider')
-const DataProvider  = require('./mysql_data_provider')
-const FilterParser = require('./sql_filter_transformer')
-const DatabaseOperations = require('./mysql_operations')
+import * as mysql from 'mysql'
+import SchemaProvider = require('./mysql_schema_provider')
+import DataProvider from './mysql_data_provider'
+import FilterParser from './sql_filter_transformer'
+import DatabaseOperations from './mysql_operations'
 
-const init = (cfg, _poolOptions) => {
-    const config = {
+type MySqlConfig = {
+    host?: string
+    user: string
+    password: string
+    db: string
+    cloudSqlConnectionName?: string
+}
+
+export default (cfg: MySqlConfig, _poolOptions: {}) => {
+    const config: mysql.PoolConfig = {
         host: cfg.host,
         user: cfg.user,
         password: cfg.password,
@@ -32,5 +40,3 @@ const init = (cfg, _poolOptions) => {
 
     return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations: databaseOperations, connection: pool, cleanup: async() => await pool.end() }
 }
-
-module.exports = init

@@ -9,3 +9,5 @@ export type MySqlParsedAggregation = {
     havingFilter: string,
     parameters: any[]
 }
+
+export type MySqlQuery = (sql: string, values?: any) => Promise<any>

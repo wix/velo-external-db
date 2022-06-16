@@ -1,4 +1,4 @@
-import {Pool as MySqlPool, Query} from 'mysql'
+import { Pool as MySqlPool } from 'mysql'
 import { escapeId, escapeTable, patchItem } from './mysql_utils'
 import { promisify } from 'util'
 import { asParamArrays, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
@@ -6,11 +6,12 @@ import { translateErrorCodes } from './sql_exception_translator'
 import { wildCardWith } from './mysql_utils'
 import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item} from '@wix-velo/velo-external-db-types'
 import { IMySqlFilterParser } from './sql_filter_transformer'
+import { MySqlQuery } from './types'
 
 export default class DataProvider implements IDataProvider {
     filterParser: IMySqlFilterParser
     pool: MySqlPool
-    query: (sql: string, values?: any) => Promise<any>
+    query: MySqlQuery
     constructor(pool: any, filterParser: any) {
         this.filterParser = filterParser
         this.pool = pool
