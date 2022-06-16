@@ -1,14 +1,20 @@
-const { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, patchFloat, extractFloatFields } = require('./spanner_utils')
-const { translateErrorCodes } = require('./sql_exception_translator')
+import { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, patchFloat, extractFloatFields } from './spanner_utils'
+import { translateErrorCodes } from './sql_exception_translator'
+import { ISpannerFilterParser } from './sql_filter_transformer'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item} from '@wix-velo/velo-external-db-types'
+import { Database as SpannerDb } from '@google-cloud/spanner'
 
-class DataProvider {
-    constructor(database, filterParser) {
+
+export default class DataProvider implements IDataProvider {
+    filterParser: ISpannerFilterParser
+    database: SpannerDb
+    constructor(database: any, filterParser: any) {
         this.filterParser = filterParser
 
         this.database = database
     }
 
-    async find(collectionName, filter, sort, skip, limit, projection) {
+    async find(collectionName: string, filter: Filter, sort: any, skip: any, limit: any, projection: any): Promise <Item[]> {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
@@ -26,7 +32,7 @@ class DataProvider {
         return recordSetToObj(rows).map( this.asEntity.bind(this) )
     }
 
-    async count(collectionName, filter) {
+    async count(collectionName: string, filter: Filter): Promise <number> {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const query = {
             sql: `SELECT COUNT(*) AS num FROM ${escapeId(collectionName)} ${filterExpr}`.trim(),
@@ -39,24 +45,24 @@ class DataProvider {
         return objs[0].num
     }
 
-    async insert(collectionName, items, fields) {
+    async insert(collectionName: string, items: Item[], fields: any): Promise <number> {
         const floatFields = extractFloatFields(fields)
         await this.database.table(collectionName)
                             .insert(
-                                (items.map(item => patchFloat(item, floatFields)))
+                                (items.map((item: any) => patchFloat(item, floatFields)))
                                         .map(this.asDBEntity.bind(this))
                             ).catch(translateErrorCodes)
         return items.length
     }
 
-    asDBEntity(item) {
+    asDBEntity(item: Item) {
         return Object.keys(item)
                      .reduce((obj, key) => {
                          return { ...obj, [patchFieldName(key)]: item[key] }
                      }, {})
     }
 
-    fixDates(value) {
+    fixDates(value: any) {
         if (value instanceof Date) {
             // todo: fix this hack !!!
             const date = value.toISOString()
@@ -67,30 +73,31 @@ class DataProvider {
 
     }
 
-    asEntity(dbEntity) {
+    asEntity(dbEntity: Item) {
         return Object.keys(dbEntity)
-                     .reduce(function(obj, key) {
+                     .reduce(function(obj: Item, key: string | number) {
+                        // @ts-ignore
                          return { ...obj, [unpatchFieldName(key)]: this.fixDates(dbEntity[key]) }
                      }.bind(this), {})
     }
 
-    async update(collectionName, items, _fields) {
+    async update(collectionName: string, items: Item[], _fields: any): Promise <number> {
         const floatFields = extractFloatFields(_fields || [])
         await this.database.table(collectionName)
                            .update(
-                               (items.map(item => patchFloat(item, floatFields)))
+                               (items.map((item: any) => patchFloat(item, floatFields)))
                                      .map(this.asDBEntity.bind(this))
                            )
         return items.length
     }
 
-    async delete(collectionName, itemIds) {
+    async delete(collectionName: string, itemIds: string[]): Promise <number> {
         await this.database.table(collectionName)
                            .deleteRows(itemIds)
         return itemIds.length
     }
 
-    async truncate(collectionName) {
+    async truncate(collectionName: string): Promise <void> {
         // todo: properly implement this
         const query = {
             sql: `SELECT * FROM ${escapeId(collectionName)} LIMIT @limit OFFSET @skip`,
@@ -101,12 +108,12 @@ class DataProvider {
         }
 
         const [rows] = await this.database.run(query)
-        const itemIds = recordSetToObj(rows).map( this.asEntity.bind(this) ).map(e => e._id)
+        const itemIds = recordSetToObj(rows).map( this.asEntity.bind(this) ).map((e: { _id: any }) => e._id)
 
         await this.delete(collectionName, itemIds)
     }
 
-    async aggregate(collectionName, filter, aggregation) {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise <Item[]> {
         const { filterExpr: whereFilterExpr, parameters: whereParameters } = this.filterParser.transform(filter)
 
         const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation)
@@ -120,5 +127,3 @@ class DataProvider {
     }
 
 }
-
-module.exports = DataProvider
