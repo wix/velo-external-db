@@ -33,7 +33,7 @@ class SchemaProvider {
 
     async create(collectionName, _columns) {
         const columns = _columns || []
-        const dbColumnsSql = [...SystemFields, ...columns].map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c))
+        const dbColumnsSql = [...SystemFields, ...columns].map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c, { escapeId: false, precision: false }))
         await this.pool.createTable(collectionName, { schema: dbColumnsSql })
                        .catch(createCollectionTranslateErrorCodes)
     }

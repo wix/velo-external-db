@@ -1,28 +1,35 @@
+const { escapeIdentifier } = require('./bigquery_utils')
 class SchemaColumnTranslator {
 
     constructor() {
     }
 
     translateType(dbType) {
-        switch (dbType) {
-            case 'NUMERIC':
-            case 'INTEGER':
-            case 'BIGNUMERIC':
-            case 'FLOAT64':
-            case 'INT64':
+        const type = dbType.toLowerCase()
+                           .split('(')
+                           .shift() 
+        
+        switch (type) {
+            case 'numeric':
+            case 'integer':
+            case 'bignumeric':
+            case 'float64':
+            case 'int64':
+            case 'decimal':
+            case 'bigdecimal':
                 return 'number'
 
-            case 'TIMESTAMP':
-            case 'DATETIME':
-            case 'TIME':
-            case 'DATE':
+            case 'timestamp':
+            case 'datetime':
+            case 'time':
+            case 'date':
                 return 'datetime'
 
-            case 'STRING':
+            case 'string':
                 return 'text'
                 
-            case 'BOOLEAN':
-            case 'BOOL':
+            case 'boolean':
+            case 'bool':
                 return 'boolean'
 
             default:
@@ -30,15 +37,22 @@ class SchemaColumnTranslator {
         }
     }
 
-    columnToDbColumnSql(f) {
-        return { name: f.name, type: this.dbTypeFor(f), mode: f.isPrimary ? 'REQUIRED' : '' }
+    columnToDbColumnSql(f, options = { escapeId: true, precision: true }) {
+        return { 
+            name: options.escapeId ? escapeIdentifier(f.name) : f.name, 
+            type: this.dbTypeFor(f, { precision: options.precision }), 
+            mode: f.isPrimary ? 'REQUIRED' : '' 
+        }
     }
 
-    dbTypeFor(f) {
-        return this.dbType(f.type, f.subtype, f.precision)
+    dbTypeFor(f, options = { precision: true }) {
+        if (options.precision) {
+            return this.dbType(f.type, f.subtype, f.precision)
+        }
+        return this.dbType(f.type, f.subtype)
     }
 
-    dbType(type, subtype) {
+    dbType(type, subtype, precision) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
             case 'number_int':
                 return 'INTEGER'
@@ -46,14 +60,12 @@ class SchemaColumnTranslator {
             case 'number_bigint':
                 return 'BIGINT'
 
-            case 'number_float':
-                return 'DECIMAL'
-
             case 'number_double':
-                return 'BIGDECIMAL'
+                return `BIGDECIMAL${this.parseLength(precision)}`
 
             case 'number_decimal':
-                return 'NUMERIC'
+            case 'number_float':
+                return `NUMERIC${this.parseLength(precision)}`
 
             case 'datetime_date':
                 return 'TIMESTAMP'
@@ -66,7 +78,7 @@ class SchemaColumnTranslator {
                 return 'TIMESTAMP'
 
             case 'text_string':
-                return 'STRING'
+                return `STRING${this.parseLength(precision)}`
 
             case 'text_small':
             case 'text_medium':
@@ -81,6 +93,33 @@ class SchemaColumnTranslator {
 
         }
     }
+
+    parseLength(length = '') {
+        const [precision, maximumScale] = length.split(',')
+        
+        try {
+            const parsedPrecision = parseInt(precision)
+
+            if (isNaN(parsedPrecision) || parsedPrecision <= 0) {
+                return ''
+            }
+
+            if (maximumScale) {
+                const parsedMaximumScale = parseInt(maximumScale)
+
+                if (isNaN(parsedMaximumScale) || parsedMaximumScale <= 0) {
+                    return ''
+                }
+
+                return `(${parsedPrecision},${parsedMaximumScale})`
+            }
+
+            return `(${parsedPrecision})`
+        } catch (e) {
+            return ''
+        }
+    }
+
 
 }
 
