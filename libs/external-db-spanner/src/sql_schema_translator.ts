@@ -2,7 +2,13 @@ import { InputField } from '@wix-velo/velo-external-db-types'
 import { isNumberObject } from 'util/types'
 import { escapeId } from './spanner_utils'
 
-export default class SchemaColumnTranslator {
+
+export interface ISpannerSchemaColumnTranslator {
+    translateType(dbType: string): { type: string, subType?: string }
+    columnToDbColumnSql(column: InputField): string
+}
+
+export default class SchemaColumnTranslator implements ISpannerSchemaColumnTranslator {
 
     constructor() {
     }
