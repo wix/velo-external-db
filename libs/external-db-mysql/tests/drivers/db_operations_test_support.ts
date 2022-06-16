@@ -1,7 +1,9 @@
-const DatabaseOperations = require('../../src/mysql_operations')
-const init = require('../../src/connection_provider')
+import DatabaseOperations from '../../src/mysql_operations'
+import init from '../../src/connection_provider'
+import { MySqlConfig } from '../../src/types'
 
-const createPool = modify => {
+
+const createPool = (modify: MySqlConfig) => {
     const config = {
         host: 'localhost',
         user: 'test-user',
@@ -19,18 +21,14 @@ const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(create
 
 const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong' } ).connection)
 
-const dbOperationWithValidDB = () => {
+export const dbOperationWithValidDB = () => {
     const { connection, cleanup } = createPool({ } )
     const dbOperations = new DatabaseOperations( connection )
 
     return { dbOperations, cleanup }
 }
 
-const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong password', () => dbOperationWithMisconfiguredPassword()],
+export const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong password', () => dbOperationWithMisconfiguredPassword()],
                                             ['pool connection with wrong database', () => dbOperationWithMisconfiguredDatabase()],
                                             ['pool connection with wrong host', () => dbOperationWithMisconfiguredHost()]
                                         ])
-
-module.exports = {
-    dbOperationWithValidDB, misconfiguredDbOperationOptions
-}

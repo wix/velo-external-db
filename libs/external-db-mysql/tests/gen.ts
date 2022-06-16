@@ -1,23 +1,21 @@
-const Chance = require('chance')
+import Chance = require('chance')
 const chance = Chance()
 
-const validConfig = () => ({
+export const validConfig = () => ({
     host: chance.word(),
     password: chance.word(),
     db: chance.word(),
     user: chance.word() 
 })
 
-const validGCPConfig = () => ({
+export const validGCPConfig = () => ({
     cloudSqlConnectionName: chance.word(),
     password: chance.word(),
     db: chance.word(),
     user: chance.word() 
 })
 
-const configWithInvalidHost = () => ({
+export const configWithInvalidHost = () => ({
     ... validConfig(),
     host: chance.natural()
 })
-
-module.exports = { validConfig, validGCPConfig, configWithInvalidHost }
