@@ -7,7 +7,7 @@ import { Database as SpannerDb } from '@google-cloud/spanner'
 import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, TableHeader } from '@wix-velo/velo-external-db-types'
 const { CollectionDoesNotExists, CollectionAlreadyExists } = errors
 
-class SchemaProvider implements ISchemaProvider {
+export default class SchemaProvider implements ISchemaProvider {
     database: SpannerDb
     sqlSchemaTranslator: SchemaColumnTranslator
 
@@ -127,6 +127,3 @@ class SchemaProvider implements ISchemaProvider {
     }
 
 }
-
-
-module.exports = SchemaProvider
