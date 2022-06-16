@@ -10,4 +10,12 @@ export type MySqlParsedAggregation = {
     parameters: any[]
 }
 
+export interface MySqlConfig {
+    host?: string
+    user?: string
+    password?: string
+    db?: string
+    cloudSqlConnectionName?: string
+}
+
 export type MySqlQuery = (sql: string, values?: any) => Promise<any>

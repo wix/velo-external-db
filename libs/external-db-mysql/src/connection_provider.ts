@@ -1,18 +1,13 @@
 import * as mysql from 'mysql'
-import SchemaProvider = require('./mysql_schema_provider')
+import SchemaProvider from './mysql_schema_provider'
 import DataProvider from './mysql_data_provider'
 import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './mysql_operations'
+import { DbProviders } from '@wix-velo/velo-external-db-types'
+import { MySqlConfig } from './types'
 
-type MySqlConfig = {
-    host?: string
-    user: string
-    password: string
-    db: string
-    cloudSqlConnectionName?: string
-}
 
-export default (cfg: MySqlConfig, _poolOptions: {}) => {
+export default (cfg: MySqlConfig, _poolOptions: {}): DbProviders<mysql.Pool>  => {
     const config: mysql.PoolConfig = {
         host: cfg.host,
         user: cfg.user,
@@ -38,5 +33,5 @@ export default (cfg: MySqlConfig, _poolOptions: {}) => {
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations: databaseOperations, connection: pool, cleanup: async() => await pool.end() }
+    return { dataProvider, schemaProvider, databaseOperations, connection: pool, cleanup: async() => await pool.end() }
 }

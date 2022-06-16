@@ -5,9 +5,9 @@ import { escapeId, escapeTable } from './mysql_utils'
 import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
 import { Pool as MySqlPool } from 'mysql'
 import { MySqlQuery } from './types'
-import { ResponseField, Table } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, TableHeader } from '@wix-velo/velo-external-db-types'
 
-class SchemaProvider {
+export default class SchemaProvider implements ISchemaProvider{
     pool: MySqlPool
     sqlSchemaTranslator: IMySqlSchemaColumnTranslator
     query: MySqlQuery
@@ -22,7 +22,7 @@ class SchemaProvider {
     async list(): Promise<Table[]> {
         const currentDb = this.pool.config.connectionConfig.database
         const data = await this.query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION', currentDb)
-        const tables = parseTableData( data )
+        const tables: {[x:string]: {table_name: string, field: string, type: string}[]} = parseTableData( data )
         return Object.entries(tables)
                      .map(([collectionName, rs]) => ({
                          id: collectionName,
@@ -30,17 +30,17 @@ class SchemaProvider {
                      } ))
     }
 
-    async listHeaders() {
+    async listHeaders(): Promise<TableHeader[]> {
         const currentDb = this.pool.config.connectionConfig.database
         const data = await this.query('SELECT TABLE_NAME as table_name FROM information_schema.tables WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME', currentDb)
         return data.map( (rs: { table_name: any }) => rs.table_name )
     }
 
-    supportedOperations() {
+    supportedOperations(): SchemaOperations[] {
         return AllSchemaOperations
     }
 
-    async create(collectionName: string, columns: any) {
+    async create(collectionName: string, columns: InputField[]): Promise<void> {
         const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                        .join(', ')
         const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
@@ -50,34 +50,32 @@ class SchemaProvider {
                   .catch( translateErrorCodes )
     }
 
-    async drop(collectionName: string) {
+    async drop(collectionName: string): Promise<void> {
         await this.query(`DROP TABLE IF EXISTS ${escapeTable(collectionName)}`)
                   .catch( translateErrorCodes )
     }
 
-    async addColumn(collectionName: string, column: { name: string }) {
+    async addColumn(collectionName: string, column: InputField): Promise<void> {
         await validateSystemFields(column.name)
         await this.query(`ALTER TABLE ${escapeTable(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
                   .catch( translateErrorCodes )
     }
 
-    async removeColumn(collectionName: string, columnName: string) {
+    async removeColumn(collectionName: string, columnName: string): Promise<void> {
         await validateSystemFields(columnName)
         return await this.query(`ALTER TABLE ${escapeTable(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
                          .catch( translateErrorCodes )
     }
 
-    async describeCollection(collectionName: string) {
+    async describeCollection(collectionName: string): Promise<ResponseField[]> {
         const res = await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
                               .catch( translateErrorCodes )
         return res.map((r: { Field: string; Type: string }) => ({ field: r.Field, type: r.Type }))
                   .map( this.translateDbTypes.bind(this) )
     }
 
-    translateDbTypes(row: ResponseField) {
+    translateDbTypes(row: ResponseField): ResponseField {
         row.type = this.sqlSchemaTranslator.translateType(row.type)
         return row
     }
 }
-
-module.exports = SchemaProvider
