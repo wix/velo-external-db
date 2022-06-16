@@ -55,7 +55,7 @@ export default class DataProvider implements IDataProvider {
         const updatables: Item[] = items.map((i: Item) => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
                                 .map((u: Item) => asParamArrays( patchItem(u) ))
         
-        // @ts-ignore - why not just updatables
+        // @ts-ignore
         const resultset = await this.query(queries, [].concat(...updatables))
                                     .catch( translateErrorCodes )
 
