@@ -1,7 +1,8 @@
+import { IDatabaseOperations } from '@wix-velo/velo-external-db-types'
 import { promisify } from 'util'
 import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
 
-export default class DatabaseOperations {
+export default class DatabaseOperations implements IDatabaseOperations {
     pool: any
     query: any
     constructor(pool: any) {
