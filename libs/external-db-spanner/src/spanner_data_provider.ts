@@ -42,7 +42,7 @@ export default class DataProvider implements IDataProvider {
         const [rows] = await this.database.run(query)
         const objs = recordSetToObj(rows).map( this.asEntity.bind(this) )
 
-        return objs[0].num
+        return objs[0]['num']
     }
 
     async insert(collectionName: string, items: Item[], fields: any): Promise <number> {
@@ -108,7 +108,7 @@ export default class DataProvider implements IDataProvider {
         }
 
         const [rows] = await this.database.run(query)
-        const itemIds = recordSetToObj(rows).map( this.asEntity.bind(this) ).map((e: { _id: any }) => e._id)
+        const itemIds = recordSetToObj(rows).map( this.asEntity.bind(this) ).map((e: { [x:string]: any }) => e['_id'])
 
         await this.delete(collectionName, itemIds)
     }
@@ -118,7 +118,7 @@ export default class DataProvider implements IDataProvider {
 
         const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation)
         const query = {
-            sql: `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`,
+            sql: `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map(column => escapeId(column)).join(', ')} ${havingFilter}`,
             params: { ...whereParameters, ...parameters },
         }
 
