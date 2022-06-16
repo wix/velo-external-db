@@ -1,5 +1,4 @@
 import { InputField } from '@wix-velo/velo-external-db-types'
-import { isNumberObject } from 'util/types'
 import { escapeId } from './spanner_utils'
 
 
@@ -107,7 +106,7 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
 
     parseLength(length: string | number) {
         try {
-            const parsed = isNumberObject(length)? length: parseInt(length)
+            const parsed = parseInt(length as string)
             if (isNaN(parsed) || parsed <= 0) {
                 return '(2048)'
             }

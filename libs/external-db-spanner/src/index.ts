@@ -6,7 +6,7 @@ export { default as init } from './connection_provider'
 export { default as DatabaseOperations } from './spanner_operations'
 export { supportedOperations } from './supported_operations'
 
-import ConfigValidator = require('./spanner_config_validator')
+import { ConfigValidator } from './spanner_config_validator'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
 import init from './connection_provider'
 

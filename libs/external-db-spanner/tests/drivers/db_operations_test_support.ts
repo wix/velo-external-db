@@ -1,4 +1,4 @@
-const init = require('../../src/connection_provider')
+import init from '../../src/connection_provider'
 
 const createPool = (modify: {[x:string]: any}) => {
     const config = {
