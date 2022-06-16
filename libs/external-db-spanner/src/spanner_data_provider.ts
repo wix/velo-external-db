@@ -75,8 +75,7 @@ export default class DataProvider implements IDataProvider {
 
     asEntity(dbEntity: Item) {
         return Object.keys(dbEntity)
-                     .reduce(function(obj: Item, key: string | number) {
-                        // @ts-ignore
+                     .reduce(function(this: any, obj: Item, key: string) {
                          return { ...obj, [unpatchFieldName(key)]: this.fixDates(dbEntity[key]) }
                      }.bind(this), {})
     }
