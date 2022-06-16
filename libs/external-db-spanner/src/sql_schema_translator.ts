@@ -1,11 +1,13 @@
-const { escapeId } = require('./spanner_utils')
+import { InputField } from '@wix-velo/velo-external-db-types'
+import { isNumberObject } from 'util/types'
+import { escapeId } from './spanner_utils'
 
-class SchemaColumnTranslator {
+export default class SchemaColumnTranslator {
 
     constructor() {
     }
 
-    translateType(dbType) {
+    translateType(dbType: string) {
         const type = dbType.toLowerCase()
             .split('(')
             .shift()
@@ -43,15 +45,15 @@ class SchemaColumnTranslator {
 
 
 
-    dbTypeFor(f) {
+    dbTypeFor(f: InputField) {
         return this.dbType(f.type, f.subtype, f.precision)
     }
 
-    columnToDbColumnSql(f) {
+    columnToDbColumnSql(f: InputField) {
         return `${escapeId(f.name)} ${this.dbTypeFor(f)}`
     }
 
-    dbType(type, subtype, precision) {
+    dbType(type: string, subtype: any, precision: any) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
             case 'number_int':
             case 'number_bigint':
@@ -97,9 +99,9 @@ class SchemaColumnTranslator {
         }
     }
 
-    parseLength(length) {
+    parseLength(length: string | number) {
         try {
-            const parsed = parseInt(length)
+            const parsed = isNumberObject(length)? length: parseInt(length)
             if (isNaN(parsed) || parsed <= 0) {
                 return '(2048)'
             }
@@ -110,5 +112,3 @@ class SchemaColumnTranslator {
     }
 
 }
-
-module.exports = SchemaColumnTranslator
