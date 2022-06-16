@@ -38,6 +38,15 @@ export enum SchemaOperations { //in schema_commons as well
     NotOperator = 'not',
     IncludeOperator = 'include',
 }
+
+export enum AdapterFunctions { //in data_commons as well
+    avg = 'avg',
+    max = 'max',
+    min = 'min',
+    sum = 'sum',
+    count = 'count'
+}
+
 export type AnyFixMe = any
 
 export type AdapterFilter = {
@@ -61,8 +70,21 @@ export type Item = {
 
 export type ItemWithId = { _id: string } & Item
 
+export type FieldProjection = {
+    name: string
+}
+
+export type FunctionProjection = {
+    name: string
+    function: AdapterFunctions
+    alias?: string
+}
+
+export type Projection = FieldProjection | FunctionProjection    
+
+
 export type AdapterAggregation = {
-    projection: string[],
+    projection: Projection[],
     postFilter: AdapterFilter,
 }
 
@@ -85,7 +107,7 @@ export type Table = TableHeader & { fields: ResponseField[] }
 export type FieldAttributes = {
     type: string,
     subtype?: string,
-    precision?: number,
+    precision?: number | string,
     isPrimary?: boolean,
 }
 
@@ -102,7 +124,7 @@ export interface ISchemaProvider {
     removeColumn(collectionName: string, columnName: string): Promise<void>
     describeCollection(collectionName: string): Promise<ResponseField[]>
     drop(collectionName: string): Promise<void>
-    translateDbTypes?(column: InputField): ResponseField
+    translateDbTypes?(column: InputField | ResponseField): ResponseField
 }
 
 export interface IBaseHttpError extends Error {
