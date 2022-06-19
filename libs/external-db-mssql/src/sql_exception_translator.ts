@@ -1,6 +1,7 @@
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CollectionAlreadyExists, DbConnectionError, ItemAlreadyExists } = require('@wix-velo/velo-external-db-commons').errors
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CollectionAlreadyExists, DbConnectionError, ItemAlreadyExists } = errors
 
-const notThrowingTranslateErrorCodes = err => {
+export const notThrowingTranslateErrorCodes = (err: any) => {
     if (err.number) {
         switch (err.number) {
             case 4902:
@@ -29,8 +30,6 @@ const notThrowingTranslateErrorCodes = err => {
     }
 }
 
-const translateErrorCodes = err => {
+export const translateErrorCodes = (err: any) => {
     throw notThrowingTranslateErrorCodes(err)
 }
-
-module.exports = { translateErrorCodes, notThrowingTranslateErrorCodes }
