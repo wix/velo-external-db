@@ -274,7 +274,7 @@ export default class FilterParser implements IMSSQLFilterParser {
         return value
     }
 
-    inlineVariableIfNeeded(fieldName: string | number, inlineFields: { [x: string]: any }) {
+    inlineVariableIfNeeded(fieldName: string, inlineFields: { [x: string]: any }) {
         if (inlineFields) {
             if (inlineFields[fieldName]) {
                 return inlineFields[fieldName]
