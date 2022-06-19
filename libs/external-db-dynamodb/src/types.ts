@@ -3,4 +3,5 @@ export type DynamoParsedFilter = {
     KeyConditionExpression?: string,
     ExpressionAttributeNames?: { [key: string]: string },
     ExpressionAttributeValues?: { [key: string]: any }
+    ProjectionExpression?: { [key: string]: string }
 }

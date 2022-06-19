@@ -1,8 +1,9 @@
-const { updateFieldsFor } = require('@wix-velo/velo-external-db-commons') 
-const { isEmptyObject } = require('./dynamo_utils')
+import { updateFieldsFor } from '@wix-velo/velo-external-db-commons' 
+import { isEmptyObject } from './dynamo_utils'
+import { DynamoParsedFilter } from './types'
 
-const findCommand = (collectionName, filter, limit) => {
-    if (isEmptyObject(filter.ExpressionAttributeNames)) {
+export const findCommand = (collectionName: any, filter: DynamoParsedFilter, limit: any) => {
+    if (filter.ExpressionAttributeNames && isEmptyObject(filter.ExpressionAttributeNames)) {
         delete filter.ExpressionAttributeNames
         delete filter.ProjectionExpression
     }
@@ -13,7 +14,7 @@ const findCommand = (collectionName, filter, limit) => {
     }
 }
 
-const countCommand = (collectionName, filter) => {
+export const countCommand = (collectionName: any, filter: any) => {
     return {
         TableName: collectionName, 
         ...filter,
@@ -21,30 +22,30 @@ const countCommand = (collectionName, filter) => {
     }
 }
 
-const getAllIdsCommand = (collectionName) => ({
+export const getAllIdsCommand = (collectionName: any) => ({
     TableName: collectionName,
     AttributesToGet: ['_id']
 })
 
-const batchPutItemsCommand = (collectionName, items) => ({
+export const batchPutItemsCommand = (collectionName: any, items: any[]) => ({
     RequestItems: {
         [collectionName]: items.map(putSingleItemCommand)
     }
 })
 
-const putSingleItemCommand = (item) => ({
+export const putSingleItemCommand = (item: any) => ({
     PutRequest: {
         Item: item
     }
 })
 
-const batchDeleteItemsCommand = (collectionName, itemIds) => ({
+export const batchDeleteItemsCommand = (collectionName: any, itemIds: any[]) => ({
     RequestItems: {
         [collectionName]: itemIds.map(deleteSingleItemCommand)
         }
 })
 
-const deleteSingleItemCommand = (id) => ({
+export const deleteSingleItemCommand = (id: any) => ({
     DeleteRequest: {
         Key: {
             _id: id
@@ -52,7 +53,7 @@ const deleteSingleItemCommand = (id) => ({
     }
 })
 
-const updateSingleItemCommand = (collectionName, item) =>  {
+export const updateSingleItemCommand = (collectionName: any, item: { [x: string]: any; _id?: any }) =>  {
     const updateFields = updateFieldsFor(item)
     const updateExpression = `SET ${updateFields.map(f => `#${f} = :${f}`).join(', ')}`
     const expressionAttributeNames = updateFields.reduce((pv, cv) => ({ ...pv, [`#${cv}`]: cv }), {})
@@ -70,8 +71,3 @@ const updateSingleItemCommand = (collectionName, item) =>  {
         }
     }
 }
-
-module.exports = { findCommand, countCommand, getAllIdsCommand,
-                   batchPutItemsCommand, putSingleItemCommand, batchDeleteItemsCommand,
-                   deleteSingleItemCommand, updateSingleItemCommand
-                 }

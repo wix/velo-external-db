@@ -1,5 +1,6 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { validateTable } = require('./dynamo_utils')
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { validateTable } from './dynamo_utils'
+const { InvalidQuery } = errors
 
 describe('Dynamo Utils', () => {
     describe('validateTable', () => {
