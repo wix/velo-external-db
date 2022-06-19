@@ -89,6 +89,7 @@
     "@types/uuid": "^8.3.4",
     "@types/uuid-validate": "^0.0.1",
     "@typescript-eslint/eslint-plugin": "~5.18.0",
+    "@types/mssql": "^8.0.2",
     "@typescript-eslint/parser": "~5.18.0",
     "aws-sdk-client-mock": "^0.6.2",
     "chance": "^1.1.8",
