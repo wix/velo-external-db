@@ -18,7 +18,7 @@ const extraOptions  = (cfg: DynamoConfig) => {
 }
 
 
-export default const init = (cfg: DynamoConfig, _cfgOptions: {[x: string]: any}) : DbProviders<DynamoDB> => { 
+export default (cfg: DynamoConfig, _cfgOptions?: {[x: string]: any}) : DbProviders<DynamoDB> => { 
     const options = _cfgOptions || {}
     const client = new DynamoDB({ region: cfg.region, ...extraOptions(cfg), ...options })
     const databaseOperations = new DatabaseOperations(client)
