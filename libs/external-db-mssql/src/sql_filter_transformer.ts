@@ -1,15 +1,27 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } = require('@wix-velo/velo-external-db-commons')
-const { escapeId, validateLiteral, patchFieldName } = require('./mssql_utils')
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
+import { escapeId, validateLiteral, patchFieldName } from './mssql_utils'
+import { AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, AdapterOperator, Sort, FunctionProjection, FieldProjection} from '@wix-velo/velo-external-db-types'
+import { MSSQLParsedAggregation, MSSQLParsedFilter } from './types'
+const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 
-class FilterParser {
+
+export interface IMSSQLFilterParser {
+    transform(filter: Filter): MSSQLParsedFilter
+    orderBy(sort: any): { sortExpr: string }
+    selectFieldsFor(projection: any[]): string
+    parseAggregation(aggregation: Aggregation): MSSQLParsedAggregation
+}
+
+
+export default class FilterParser implements IMSSQLFilterParser {
     constructor() {
     }
 
-    transform(filter) {
-        const results = this.parseFilter(filter, 1, {})
+    transform(filter: Filter) {
+        const results = this.parseFilter(filter, 1)
 
         if (results.length === 0) {
             return EmptyFilter
@@ -21,7 +33,7 @@ class FilterParser {
         }
     }
 
-    adapterFunction2Sql(f) {
+    adapterFunction2Sql(f: any) {
         switch (f) {
             case avg:
                 return 'AVG'
@@ -38,7 +50,7 @@ class FilterParser {
         }
     }
 
-    parseAggregation(aggregation) {
+    parseAggregation(aggregation: Aggregation) {
 
         const groupByColumns = extractGroupByNames(aggregation.projection)
 
@@ -60,11 +72,11 @@ class FilterParser {
     }
 
 
-    createFieldsStatementAndAliases(projectionFunctions, groupByColumns) {
-        const filterColumnsStr = []
-        const aliasToFunction = {}
-        groupByColumns.forEach(f => filterColumnsStr.push(escapeId(f)))
-        projectionFunctions.forEach(f => { 
+    createFieldsStatementAndAliases(projectionFunctions: any[], groupByColumns: any[]) {
+        const filterColumnsStr: string[] = []
+        const aliasToFunction: {[x: string]: string} = {}
+        groupByColumns.forEach((f: any) => filterColumnsStr.push(escapeId(f)))
+        projectionFunctions.forEach((f: FunctionProjection) => { 
             filterColumnsStr.push(`${this.adapterFunction2Sql(f.function)}(${escapeId(f.name)}) AS ${escapeId(f.alias)}`)
             aliasToFunction[f.alias] = `${this.adapterFunction2Sql(f.function)}(${escapeId(f.name)})`
         })
@@ -72,13 +84,13 @@ class FilterParser {
         return { filterColumnsStr, aliasToFunction }
     }
 
-    extractFilterExprAndParams(havingFilter) {
+    extractFilterExprAndParams(havingFilter: { filterExpr: any; parameters: any }[]) {
         return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
                                                               parameters: parameters }))
                         .concat({ filterExpr: '', parameters: {} })[0]
     }
 
-    parseFilter(filter, inlineFields) {
+    parseFilter(filter: Filter, inlineFields: any): MSSQLParsedFilter[] {
         if (isEmptyFilter(filter)) {
             return []
         }
@@ -88,7 +100,7 @@ class FilterParser {
         switch (operator) {
             case and:
             case or:
-                const res = value.reduce((o, f) => {
+                const res = value.reduce((o: { filter: MSSQLParsedFilter[] }, f: any) => {
                     const res = this.parseFilter.bind(this)(f, inlineFields)
                     return {
                         filter: o.filter.concat( ...res ),
@@ -96,8 +108,8 @@ class FilterParser {
                 }, { filter: [] })
                 const op = operator === and ? ' AND ' : ' OR '
                 return [{
-                    filterExpr: res.filter.map(r => r.filterExpr).join( op ),
-                    parameters: res.filter.reduce((o, s) => ( { ...o, ...s.parameters } ), {} )
+                    filterExpr: res.filter.map((r: { filterExpr: any }) => r.filterExpr).join( op ),
+                    parameters: res.filter.reduce((o: any, s: { parameters: any }) => ( { ...o, ...s.parameters } ), {} )
                 }]
             case not:
                 const res2 = this.parseFilter( value[0], inlineFields )
@@ -127,7 +139,7 @@ class FilterParser {
         if (operator === urlized) {
             return [{
                 filterExpr: `LOWER(${escapeId(fieldName)}) LIKE ${validateLiteral(fieldName)}`,
-                parameters: { [patchFieldName(fieldName)]: value.map(s => s.toLowerCase()).join('[- ]') }
+                parameters: { [patchFieldName(fieldName)]: value.map((s: string) => s.toLowerCase()).join('[- ]') }
             }]
         }
 
@@ -142,7 +154,7 @@ class FilterParser {
         return []
     }
 
-    parametersFor(name, value) {
+    parametersFor(name: string, value: any) {
         if (!isNull(value)) {
             if (!Array.isArray(value)) {
                 return { [patchFieldName(name)]: this.patchTrueFalseValue(value) }
@@ -153,7 +165,7 @@ class FilterParser {
         return { }
     }
 
-    valueForStringOperator(operator, value) {
+    valueForStringOperator(operator: AdapterOperator, value: any) {
         switch (operator) {
             case string_contains:
                 return `%${value}%`
@@ -161,24 +173,26 @@ class FilterParser {
                 return `${value}%`
             case string_ends:
                 return `%${value}`
+            default:
+                return value
         }
     }
 
-    isSingleFieldOperator(operator) {
+    isSingleFieldOperator(operator: string) {
         return [ne, lt, lte, gt, gte, include, eq].includes(operator)
     }
 
-    isSingleFieldStringOperator(operator) {
+    isSingleFieldStringOperator(operator: string) {
         return [string_contains, string_begins, string_ends].includes(operator)
     }
 
-    prepareStatementVariables(n, fieldName) {
+    prepareStatementVariables(n: any, fieldName: any) {
         return Array.from({ length: n }, (_, i) => validateLiteral(`${fieldName}${i + 1}`) )
                     .join(', ')
     }
 
 
-    valueForOperator(fieldName, value, operator) {
+    valueForOperator(fieldName: any, value: string | any[], operator: string) {
         if (operator === include) {
             if (isNull(value) || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
@@ -197,7 +211,7 @@ class FilterParser {
         }
     }
 
-    adapterOperatorToMySqlOperator(operator, value) {
+    adapterOperatorToMySqlOperator(operator: AdapterOperator, value: any) {
         switch (operator) {
             case eq:
                 if (!isNull(value)) {
@@ -219,10 +233,12 @@ class FilterParser {
                 return '>='
             case include:
                 return 'IN'
+            default:
+                return ''
         }
     }
 
-    orderBy(sort) {
+    orderBy(sort: Sort[]) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EmptySort
         }
@@ -234,11 +250,11 @@ class FilterParser {
         }
 
         return {
-            sortExpr: `ORDER BY ${results.map( s => s.expr).join(', ')}`
+            sortExpr: `ORDER BY ${results.map((s: {expr: string}) => s.expr).join(', ')}`
         }
     }
 
-    parseSort({ fieldName, direction }) {
+    parseSort({ fieldName, direction }: Sort): { expr: string }[] {
         if (typeof fieldName !== 'string') {
             return []
         }
@@ -251,14 +267,14 @@ class FilterParser {
         }]
     }
 
-    patchTrueFalseValue(value) {
+    patchTrueFalseValue(value: boolean) {
         if (value === true || value === false) {
             return value ? 1 : 0
         }
         return value
     }
 
-    inlineVariableIfNeeded(fieldName, inlineFields) {
+    inlineVariableIfNeeded(fieldName: string | number, inlineFields: { [x: string]: any }) {
         if (inlineFields) {
             if (inlineFields[fieldName]) {
                 return inlineFields[fieldName]
@@ -267,9 +283,7 @@ class FilterParser {
         return escapeId(fieldName)
     }
 
-    selectFieldsFor(projection) {
+    selectFieldsFor(projection: any[]) {
         return projection.map(escapeId).join(', ')
     }
 }
-
-module.exports = FilterParser

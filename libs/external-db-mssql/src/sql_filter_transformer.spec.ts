@@ -1,10 +1,11 @@
-const FilterParser = require('./sql_filter_transformer')
-const { EmptySort, AdapterOperators, AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
-const { escapeId, validateLiteral, patchFieldName } = require('./mssql_utils')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const each = require('jest-each').default
-const Chance = require('chance')
+import FilterParser from './sql_filter_transformer'
+import { EmptySort, AdapterOperators, AdapterFunctions } from '@wix-velo/velo-external-db-commons'
+import { escapeId, validateLiteral, patchFieldName } from './mssql_utils'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import each from 'jest-each'
+import Chance = require('chance')
+const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -229,7 +230,7 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `LOWER(${escapeId(ctx.fieldName)}) LIKE ${validateLiteral(ctx.fieldName)}`,
-                        parameters: { [patchFieldName(ctx.fieldName)]: ctx.fieldListValue.map(s => s.toLowerCase()).join('[- ]') }
+                        parameters: { [patchFieldName(ctx.fieldName)]: ctx.fieldListValue.map((s: string) => s.toLowerCase()).join('[- ]') }
                     }])
                 })
 
@@ -413,7 +414,20 @@ describe('Sql Parser', () => {
 
     })
 
-    const ctx = {
+    interface Context {
+        fieldName: any
+        fieldValue: any
+        anotherValue: any
+        moreValue: any
+        fieldListValue: any
+        anotherFieldName: any
+        moreFieldName: any
+        filter: any
+        anotherFilter: any
+        offset: any
+    }
+
+    const ctx: Context = {
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
         anotherValue: Uninitialized,
@@ -426,7 +440,11 @@ describe('Sql Parser', () => {
         offset: Uninitialized,
     }
 
-    const env = {
+    interface Enviorment {
+        filterParser: any
+    }
+
+    const env: Enviorment = {
         filterParser: Uninitialized,
     }
 
@@ -449,6 +467,4 @@ describe('Sql Parser', () => {
     beforeAll(function() {
         env.filterParser = new FilterParser
     })
-
-
 })
