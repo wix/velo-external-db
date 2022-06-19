@@ -1,10 +1,11 @@
-const FilterParser = require('./sql_filter_transformer')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
-const { idFilter } = require('../tests/gen')
-const each = require('jest-each').default
-const Chance = require('chance')
+import FilterParser from './sql_filter_transformer'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { idFilter } from '../tests/gen'
+import each from 'jest-each'
+import Chance = require('chance')
+const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_contains, and, or, not } = AdapterOperators
 
@@ -243,8 +244,19 @@ describe('Sql Parser', () => {
         })
 
     })
+    
+    interface Context {
+        fieldName: any
+        fieldValue: any
+        fieldListValue: any
+        anotherFieldName: any
+        moreFieldName: any
+        filter: any
+        anotherFilter: any
+        idFilter: any
+    }
 
-    const ctx = {
+    const ctx: Context = {
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
         fieldListValue: Uninitialized,
@@ -254,8 +266,12 @@ describe('Sql Parser', () => {
         idFilter: Uninitialized,
         anotherFilter: Uninitialized,
     }
+    
+    interface Enviorment {
+        filterParser: any
+    }
 
-    const env = {
+    const env: Enviorment = {
         filterParser: Uninitialized,
     }
 

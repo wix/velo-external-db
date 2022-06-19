@@ -1,14 +1,22 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { isEmptyFilter } = require('@wix-velo/velo-external-db-commons')
-const { EmptyFilter } = require('./dynamo_utils')
-const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { isEmptyFilter } from '@wix-velo/velo-external-db-commons'
+import { EmptyFilter } from './dynamo_utils'
+import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { AdapterFilter as Filter, Sort } from '@wix-velo/velo-external-db-types' 
+import { DynamoParsedFilter } from './types'
+const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
 
-class FilterParser {
+export interface IDynamoDBFilterParser {
+    transform(filter: Filter, fields: any): { filterExpr: DynamoParsedFilter, queryable: boolean }
+    selectFieldsFor(projection: string[]): { projectionExpr: string, projectionAttributeNames: {[key: string]: string} }
+}
+
+export default class FilterParser implements IDynamoDBFilterParser{
     constructor() {
     }
 
-    transform(filter, fields) {
+    transform(filter: Filter, fields: any) {
         
         const results = this.parseFilter(filter)
         if (results.length === 0) {
@@ -25,7 +33,7 @@ class FilterParser {
 
 
     
-    parseFilter(filter) {
+    parseFilter(filter: Filter): { filterExpr: DynamoParsedFilter }[] {
         if (isEmptyFilter(filter)) {
             return []
         }
@@ -39,9 +47,9 @@ class FilterParser {
                 const op = operator === and ? ' AND ' : ' OR '
                 return [{
                     filterExpr: {
-                        FilterExpression: res.map(r => r[0].filterExpr.FilterExpression).join( op ),
-                        ExpressionAttributeNames: Object.assign ({}, ...res.map(r => r[0].filterExpr.ExpressionAttributeNames) ),
-                        ExpressionAttributeValues: Object.assign({}, ...res.map(r => r[0].filterExpr.ExpressionAttributeValues) )
+                        FilterExpression: res.map((r: { filterExpr: { FilterExpression: any } }[]) => r[0].filterExpr.FilterExpression).join( op ),
+                        ExpressionAttributeNames: Object.assign ({}, ...res.map((r: { filterExpr: { ExpressionAttributeNames: any } }[]) => r[0].filterExpr.ExpressionAttributeNames) ),
+                        ExpressionAttributeValues: Object.assign({}, ...res.map((r: { filterExpr: { ExpressionAttributeValues: any } }[]) => r[0].filterExpr.ExpressionAttributeValues) )
                     }
                 }]
             case not:
@@ -91,11 +99,11 @@ class FilterParser {
 
             return [{
                 filterExpr: {
-                    FilterExpression: `#${fieldName} IN (${value.map((_v, i) => `:${i}`).join(', ')})`,
+                    FilterExpression: `#${fieldName} IN (${value.map((_v: any, i: any) => `:${i}`).join(', ')})`,
                     ExpressionAttributeNames: {
                         [`#${fieldName}`]: fieldName
                     },
-                    ExpressionAttributeValues: value.reduce((pV, cV, i) => ({ ...pV, [`:${i}`]: cV }), {})                 
+                    ExpressionAttributeValues: value.reduce((pV: any, cV: any, i: any) => ({ ...pV, [`:${i}`]: cV }), {})                 
                 }
             }] 
 
@@ -104,15 +112,15 @@ class FilterParser {
         return []
     }
 
-    isSingleFieldOperator(operator) {
+    isSingleFieldOperator(operator: string) {
         return [ne, lt, lte, gt, gte, eq].includes(operator)
     }
 
-    isSingleFieldStringOperator(operator) {
+    isSingleFieldStringOperator(operator: string) {
         return [ string_contains, string_begins, string_ends].includes(operator)
     }
 
-    valueForOperator(value, operator) {
+    valueForOperator(value: string | any[] | undefined, operator: string) {
         if (operator === include && (value === undefined || value.length === 0)) {
             throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
         }
@@ -123,7 +131,7 @@ class FilterParser {
         return value
     }
 
-    adapterOperatorToDynamoOperator(operator) {
+    adapterOperatorToDynamoOperator(operator: any) {
         switch (operator) {
             case eq:
                 return '='
@@ -145,12 +153,14 @@ class FilterParser {
                 return 'begins_with'
             case string_ends:
                 //not exists maybe use contains and then locally
-                break
+                return 'ends_with'
+            default:
+                return ''
 
         }
     }
 
-    filterExprToQueryIfPossible(filterExpr, fields) {
+    filterExprToQueryIfPossible(filterExpr: DynamoParsedFilter, fields: any): { filterExpr: DynamoParsedFilter, queryable: boolean } {
         const queryable = this.canQuery(filterExpr, fields)
         if (queryable) 
             filterExpr = this.filterExprToQueryExpr(filterExpr)
@@ -158,28 +168,26 @@ class FilterParser {
         return { filterExpr, queryable }     
     }
 
-    filterExprToQueryExpr(filter) {
+    filterExprToQueryExpr(filter: DynamoParsedFilter) {
         delete Object.assign(filter, { ['KeyConditionExpression']: filter['FilterExpression'] })['FilterExpression']
         return filter
     }
 
-    canQuery(filterExpr, _fields) {
+    canQuery(filterExpr: DynamoParsedFilter, _fields: any) {
         // const collectionKeys = fields.filter(f=>f.isPrimary).map(f=>f.name)
         const collectionKeys = ['_id']
 
         if (!filterExpr) return false
-
-        const filterAttributes = Object.values(filterExpr.ExpressionAttributeNames) 
+        
+        const filterAttributes = filterExpr.ExpressionAttributeNames ? Object.values(filterExpr.ExpressionAttributeNames) : []
         return filterAttributes.every(v => collectionKeys.includes(v))
     }
 
-    selectFieldsFor(projection) { 
-        const projectionExpr = projection.map(f => `#${f}`).join(', ')
-        const projectionAttributeNames = projection.reduce((pV, cV) => (
+    selectFieldsFor(projection: any[]) { 
+        const projectionExpr = projection.map((f: any) => `#${f}`).join(', ')
+        const projectionAttributeNames = projection.reduce((pV: any, cV: any) => (
             { ...pV, [`#${cV}`]: cV }
         ), {})
         return { projectionExpr, projectionAttributeNames }
     }
 }
-
-module.exports = FilterParser
