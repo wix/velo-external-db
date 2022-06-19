@@ -12,9 +12,9 @@ export default class SchemaProvider implements ISchemaProvider {
     sql: MSSQLPool
     dbName: string
     sqlSchemaTranslator: IMSSQLSchemaColumnTranslator
-    constructor(pool: any, dbName: string) {
+    constructor(pool: any) {
         this.sql = pool
-        this.dbName = dbName
+        this.dbName = pool.config.database
 
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
     }
@@ -49,9 +49,7 @@ export default class SchemaProvider implements ISchemaProvider {
                                                                        .join(', ')
         const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
         
-        // @ts-ignore - todo: fix this
-        await this.sql.query(`CREATE TABLE ${escapeTable(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
-                                [...(columns || []).map((c: { name: any }) => c.name)])
+        await this.sql.query(`CREATE TABLE ${escapeTable(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`)
                       .catch( (err: any) => {
                           const e = notThrowingTranslateErrorCodes(err)
                           if (!(e instanceof CollectionAlreadyExists)) {

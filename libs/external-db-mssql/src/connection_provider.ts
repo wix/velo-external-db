@@ -57,7 +57,7 @@ export default async (cfg: MSSQLConfig, _poolOptions: { [key: string]: any }) =>
 
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
-    const schemaProvider = new SchemaProvider(pool, cfg.db)
+    const schemaProvider = new SchemaProvider(pool)
 
     return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup }
 }
