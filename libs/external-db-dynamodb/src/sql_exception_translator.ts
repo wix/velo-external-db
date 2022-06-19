@@ -1,6 +1,7 @@
-const { CollectionDoesNotExists, DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { CollectionDoesNotExists, DbConnectionError } = errors
 
-const notThrowingTranslateErrorCodes = err => {
+export const notThrowingTranslateErrorCodes = (err: any) => {
     switch (err.name) {
         case 'ResourceNotFoundException':
             return new CollectionDoesNotExists('Collection does not exists')
@@ -18,9 +19,7 @@ const notThrowingTranslateErrorCodes = err => {
     }
 }
 
-const translateErrorCodes = err => {
+export const translateErrorCodes = (err: any) => {
     throw notThrowingTranslateErrorCodes(err)
     
 }
-
-module.exports = { translateErrorCodes, notThrowingTranslateErrorCodes }
