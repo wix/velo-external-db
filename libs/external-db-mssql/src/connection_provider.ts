@@ -1,11 +1,11 @@
-const { ConnectionPool } = require('mssql')
-const SchemaProvider = require('./mssql_schema_provider')
-const DataProvider = require('./mssql_data_provider')
-const FilterParser = require('./sql_filter_transformer')
-const DatabaseOperations = require('./mssql_operations')
-const { notConnectedPool } = require ('./mssql_utils')
+import { ConnectionPool, config } from 'mssql'
+import SchemaProvider from './mssql_schema_provider'
+import DataProvider from './mssql_data_provider'
+import FilterParser from './sql_filter_transformer'
+import DatabaseOperations from './mssql_operations'
+import { notConnectedPool } from './mssql_utils'
 
-const extraOptions = cfg => {
+const extraOptions = (cfg: MSSQLConfig) => {
     if (cfg.unsecuredEnv === 'true') {
         return {
             options: {
@@ -23,8 +23,17 @@ const extraOptions = cfg => {
     }
 }
 
-const init = async(cfg, _poolOptions) => {
-    const config = {
+export interface MSSQLConfig {
+    user: string
+    password: string
+    db: string
+    host: string
+    unsecuredEnv?: any
+    [key: string]: any
+}
+
+export default async (cfg: MSSQLConfig, _poolOptions: { [key: string]: any }) => {
+    const config: config = {
         user: cfg.user,
         password: cfg.password,
         database: cfg.db,
@@ -39,9 +48,11 @@ const init = async(cfg, _poolOptions) => {
     const poolOptions = _poolOptions || {}
 
     const _pool = new ConnectionPool({ ...config, ...extraOptions(cfg), ...poolOptions })
+
     const { pool, cleanup } = await _pool.connect()
-                                         .then((res) => ({ pool: res, cleanup: async() => await pool.close() }))
-                                         .catch(e => notConnectedPool(_pool, e) )
+                                         .then((res: any) => ({ pool: res, cleanup: async() => await pool.close() }))
+                                         .catch((e: any) => notConnectedPool(_pool, e) )
+    
     const databaseOperations = new DatabaseOperations(pool)
 
     const filterParser = new FilterParser()
@@ -50,5 +61,3 @@ const init = async(cfg, _poolOptions) => {
 
     return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup }
 }
-
-module.exports = init
