@@ -8,7 +8,7 @@ const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
 
 export interface IDynamoDBFilterParser {
-    transform(filter: Filter, fields: any): { filterExpr: DynamoParsedFilter, queryable: boolean }
+    transform(filter: Filter, fields?: any): { filterExpr: DynamoParsedFilter, queryable: boolean }
     selectFieldsFor(projection: string[]): { projectionExpr: string, projectionAttributeNames: {[key: string]: string} }
 }
 
