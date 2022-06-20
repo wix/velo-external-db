@@ -1,10 +1,17 @@
-const SchemaColumnTranslator = require('./sql_schema_translator')
-const { SystemFields, validateSystemFields, SchemaOperations } = require('@wix-velo/velo-external-db-commons')
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('@wix-velo/velo-external-db-commons').errors
+import SchemaColumnTranslator, { IAirtableSchemaColumnTranslator } from './sql_schema_translator'
+import { SystemFields, validateSystemFields } from '@wix-velo/velo-external-db-commons'
+import axios, { Axios } from 'axios'
+import { Base } from 'airtable'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, TableHeader } from '@wix-velo/velo-external-db-types'
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
 
-const axios = require('axios')
-class SchemaProvider {
-    constructor(base, { apiKey, metaApiKey, baseUrl }) {
+export default class SchemaProvider implements ISchemaProvider {
+    base: Base
+    baseId: string
+    sqlSchemaTranslator: IAirtableSchemaColumnTranslator
+    axios: Axios
+    constructor(base: any, { apiKey, metaApiKey, baseUrl }: any) {
         this.base = base
         this.baseId = base.getId()
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
@@ -30,7 +37,7 @@ class SchemaProvider {
 
     async listHeaders() {
         const response = await this.axios.get(`v0/meta/bases/${this.baseId}/tables`)
-        return response.data.tables.map(rs => rs.name)
+        return response.data.tables.map((rs: { name: any }) => rs.name)
     }
 
     supportedOperations()  {
@@ -40,16 +47,16 @@ class SchemaProvider {
     }
 
 
-    async create(collectionName) {
+    async create(collectionName: any) {
         const systemColumnsAsAirTableColumns = SystemFields.map(field => this.sqlSchemaTranslator.wixColumnToAirtableColumn(field))
         await this.axios.post(`v0/meta/bases/${this.baseId}/table`, { collectionName, columns: systemColumnsAsAirTableColumns })
     }
 
-    async drop(collectionName) {
+    async drop(collectionName: any) {
         await this.axios.post(`v0/meta/bases/${this.baseId}/table/drop`, { collectionName })
     }
 
-    async addColumn(collectionName, column) {
+    async addColumn(collectionName: any, column: InputField) {
         await validateSystemFields(column.name)
         const collection = await this.describeCollection(collectionName)
         if (!collection)
@@ -62,7 +69,7 @@ class SchemaProvider {
             { column: this.sqlSchemaTranslator.wixColumnToAirtableColumn(column) })
     }
 
-    async removeColumn(collectionName, columnName) {
+    async removeColumn(collectionName: any, columnName: string) {
         await validateSystemFields(columnName)
         const collection = await this.describeCollection(collectionName)
         if (!collection)
@@ -75,33 +82,31 @@ class SchemaProvider {
     }
 
 
-    async describeCollection(collectionName) {
+    async describeCollection(collectionName: string) {
         const collection = (await this.list()).find(schemas => schemas.id === collectionName)
         if (!collection)
             throw new CollectionDoesNotExists('Collection does not exists')
         return collection.fields
     }
 
-    translateDbTypes(type) {
+    translateDbTypes(type: string) {
         return this.sqlSchemaTranslator.translateType(type)
     }
 
-    extractTableData(data) {
+    extractTableData(data: { tables: any[] }): { [key: string]: { fields: any } } {
         return data.tables
-            .reduce((pV, cV) => ({
+            .reduce((pV: any, cV: { name: any; fields: any[] }) => ({
                 ...pV,
                 [cV.name]: {
                     fields: cV.fields
-                        .map(field => ({ field: field.name, type: this.translateDbTypes(field.type) }))
+                        .map((field: { name: any; type: any }) => ({ field: field.name, type: this.translateDbTypes(field.type) }))
                 }
             }), {})
 
     }
 
-    columnExists(fields, columnName) {
-        return fields.some(f => f.field === columnName)
+    columnExists(fields: any[], columnName: any) {
+        return fields.some((f: { field: any }) => f.field === columnName)
     }
 
 }
-
-module.exports = SchemaProvider

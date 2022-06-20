@@ -1,10 +1,15 @@
+import { InputField } from '@wix-velo/velo-external-db-types'
 
-class SchemaColumnTranslator {
+export interface IAirtableSchemaColumnTranslator {
+    translateType(type: string): string
+    wixColumnToAirtableColumn(wixColumn: InputField): { name: string, type: string }
+}
 
+export default class SchemaColumnTranslator implements IAirtableSchemaColumnTranslator {
     constructor() {
     }
 
-    translateType(dbType) {
+    translateType(dbType: string) {
         const type = dbType.toLowerCase()
             .split('(')
             .shift()
@@ -45,14 +50,12 @@ class SchemaColumnTranslator {
                 throw Error(type)
         }
     }
-    wixColumnToAirtableColumn(column) {
+    wixColumnToAirtableColumn(column: InputField) {
         return { name: column.name, type: this.dbTypeFor(column.type, column.subtype) }
     }
-    dbTypeFor(type, subtype) {
+    
+    dbTypeFor(type: string, subtype?: string): string {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
-            case 'number_int':
-                return { type: 'number', subtype: 'Integer' }
-
             case 'number_bigint':
             case 'number_float':
             case 'number_double':
@@ -77,9 +80,9 @@ class SchemaColumnTranslator {
 
             case 'boolean_':
                 return 'checkbox'
-
+            default: 
+                throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)
         }
 
     }
 }
-module.exports = SchemaColumnTranslator

@@ -143,7 +143,7 @@ export interface ISchemaProvider {
     removeColumn(collectionName: string, columnName: string): Promise<void>
     describeCollection(collectionName: string): Promise<ResponseField[]>
     drop(collectionName: string): Promise<void>
-    translateDbTypes?(column: InputField | ResponseField): ResponseField
+    translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
 }
 
 export interface IBaseHttpError extends Error {
