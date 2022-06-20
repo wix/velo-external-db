@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'external-db-dynamodb',
     clearMocks: true,
     verbose: true,
