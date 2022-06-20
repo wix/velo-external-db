@@ -1,7 +1,9 @@
-const { checkRequiredKeys } = require('@wix-velo/velo-external-db-commons')
+import { IConfigValidator } from '@wix-velo/velo-external-db-types'
+import { checkRequiredKeys } from '@wix-velo/velo-external-db-commons'
 
-class AirtableConfigValidator {
-    constructor(config) {
+export class AirtableConfigValidator implements IConfigValidator {
+    config: any
+    constructor(config: any) {
         this.config = config
     }
 
@@ -15,5 +17,3 @@ class AirtableConfigValidator {
         }
     }
 }
-
-module.exports = { AirtableConfigValidator }
