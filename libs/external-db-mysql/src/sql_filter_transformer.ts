@@ -4,7 +4,7 @@ import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, e
 import { wildCardWith, escapeId } from './mysql_utils'
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, AdapterOperator, Sort} from '@wix-velo/velo-external-db-types'
+import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort} from '@wix-velo/velo-external-db-types'
 import { MySqlParsedFilter, MySqlParsedAggregation } from './types'
 
 export interface IMySqlFilterParser {
@@ -135,7 +135,7 @@ export default class FilterParser implements IMySqlFilterParser {
         }
     }
 
-    orderBy(sort: any) {
+    orderBy(sort: Sort[]) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EmptySort
         }
@@ -147,11 +147,11 @@ export default class FilterParser implements IMySqlFilterParser {
         }
 
         return {
-            sortExpr: `ORDER BY ${results.map( s => s.expr).join(', ')}`
+            sortExpr: `ORDER BY ${results.map( (s: { expr: string }) => s.expr).join(', ')}`
         }
     }
 
-    valueForStringOperator(operator: AdapterOperator, value: any) {
+    valueForStringOperator(operator: AdapterOperator, value: string) {
         switch (operator) {
             case string_contains:
                 return `%${value}%`
@@ -164,7 +164,7 @@ export default class FilterParser implements IMySqlFilterParser {
         }
     }
 
-    parseSort({ fieldName, direction }: Sort) {
+    parseSort({ fieldName, direction }: Sort): { expr: string }[] {
         if (typeof fieldName !== 'string') {
             return []
         }
@@ -217,7 +217,7 @@ export default class FilterParser implements IMySqlFilterParser {
                            .concat(EmptyFilter)[0]
     }
 
-    adapterFunction2Sql(f: any) {
+    adapterFunction2Sql(f: string) {
         switch (f) {
             case avg:
                 return 'AVG'
@@ -234,7 +234,7 @@ export default class FilterParser implements IMySqlFilterParser {
         }
     }
 
-    selectFieldsFor(projection: any[]) {
+    selectFieldsFor(projection: string[]) {
         return projection.map(escapeId).join(', ')
     }
 }

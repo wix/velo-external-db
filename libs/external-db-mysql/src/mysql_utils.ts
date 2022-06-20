@@ -2,7 +2,7 @@ import { escapeId } from 'mysql'
 import { errors, patchDateTime } from '@wix-velo/velo-external-db-commons'
 import { Item } from '@wix-velo/velo-external-db-types'
 
-export const wildCardWith = (n: number, char: any) => Array(n).fill(char, 0, n).join(', ')
+export const wildCardWith = (n: number, char: string) => Array(n).fill(char, 0, n).join(', ')
 
 export const escapeTable = (t: string) => {
     if(t && t.indexOf('.') !== -1) {

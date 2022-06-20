@@ -12,9 +12,9 @@ export type MySqlParsedAggregation = {
 
 export interface MySqlConfig {
     host?: string
-    user?: string
-    password?: string
-    db?: string
+    user: string
+    password: string
+    db: string
     cloudSqlConnectionName?: string
 }
 

@@ -3,7 +3,7 @@ import init from '../../src/connection_provider'
 import { MySqlConfig } from '../../src/types'
 
 
-const createPool = (modify: MySqlConfig) => {
+const createPool = (modify: {[x:string]: string}) => {
     const config = {
         host: 'localhost',
         user: 'test-user',
