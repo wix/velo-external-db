@@ -1,8 +1,7 @@
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { DbConnectionError } = errors
 
-
-const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
-
-const notThrowingTranslateErrorCodes = err => {
+export const notThrowingTranslateErrorCodes = (err: any) => {
     switch (err.error) {
         case 'NOT_FOUND':
             return new DbConnectionError(`Base does not exists: Airtable message : ${err.message}`)
@@ -12,5 +11,3 @@ const notThrowingTranslateErrorCodes = err => {
             return new DbConnectionError(err.message)
     }
 }
-
-module.exports = { notThrowingTranslateErrorCodes }
