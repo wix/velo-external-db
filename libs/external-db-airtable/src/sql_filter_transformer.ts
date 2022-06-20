@@ -6,7 +6,7 @@ const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_co
 const { InvalidQuery } = errors
 
 export interface IAirtableFilterParser {
-    transform(filter: Filter): { filterExpr: string } | never[] // never[] is a hack to make the type checker happy
+    transform(filter: Filter): { filterExpr: string } | any[] // never[] is a hack to make the type checker happy
     orderBy(sort: Sort[]): { sort: { field: string; direction: string }[] }
     selectFieldsFor(projection: any): any
 }
@@ -154,7 +154,7 @@ export default class FilterParser implements IAirtableFilterParser {
         }
     }
 
-    parseSort({ fieldName, direction }: Sort): { field: string; direction: string } | never[] {
+    parseSort({ fieldName, direction }: Sort): { field: string; direction: string } | [] {
         if (typeof fieldName !== 'string') {
             return []
         }
