@@ -114,7 +114,7 @@ export interface IDataProvider {
     update(collectionName: string, items: Item[], fields?: any): Promise<number>;
     delete(collectionName: string, itemIds: string[]): Promise<number>;
     truncate(collectionName: string): Promise<void>;
-    aggregate(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation): Promise<Item[]>;
+    aggregate?(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation): Promise<Item[]>;
 }
 
 export type TableHeader = {
