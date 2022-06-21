@@ -6,8 +6,9 @@ const WixOperatorToAdapterOperator = new FilterTransformer().wixOperatorToAdapte
 
 export const queryAdapterOperatorsFor = (type: string) => ( (QueryOperatorsByFieldType as any)[type].map((op: any) => WixOperatorToAdapterOperator(`$${op}`)) )
 
-export const extractFieldsAndOperators = (filter: AdapterFilter): { name: string, operator: AdapterOperator }[] => { 
-    if (filter === EmptyFilter) return []
+export const extractFieldsAndOperators = (_filter: AdapterFilter | {}): { name: string, operator: AdapterOperator }[] => { 
+    if (_filter === EmptyFilter) return []
+    const filter = _filter as AdapterFilter
     if (filter.fieldName) return [{ name: filter.fieldName, operator: filter.operator as AdapterOperator }]
     return filter.value.map((filter: any) =>  extractFieldsAndOperators(filter)).flat()
 }

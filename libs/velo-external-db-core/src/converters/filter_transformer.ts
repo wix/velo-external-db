@@ -5,7 +5,7 @@ import { AdapterFilter, AdapterOperator, WixDataFilter, WixDataMultiFieldOperato
 const { InvalidQuery } = errors
 
 export interface IFilterTransformer {
-    transform(filter: any): AdapterFilter
+    transform(filter: any): AdapterFilter | {}
     isMultipleFieldOperator(filter: WixDataFilter): boolean
     wixOperatorToAdapterOperator(wixOperator: string): AdapterOperator
     isEmptyFilter(filter: any): boolean
@@ -16,7 +16,7 @@ export default class FilterTransformer implements IFilterTransformer {
 
     }
 
-    transform(filter: any): AdapterFilter {
+    transform(filter: any): AdapterFilter | {} {
         if (this.isEmptyFilter(filter)) return EmptyFilter
 
         if (this.isMultipleFieldOperator(filter)) {

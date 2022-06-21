@@ -50,8 +50,8 @@ export enum AdapterFunctions { //in data_commons as well
 export type AnyFixMe = any
 
 export type AdapterFilter = {
-    operator?: AdapterOperator,
-    fieldName?: string,
+    operator: AdapterOperator,
+    fieldName: string,
     value?: any
 }
 
@@ -85,7 +85,7 @@ export type Projection = FieldProjection | FunctionProjection
 
 export type AdapterAggregation = {
     projection: Projection[],
-    postFilter: AdapterFilter,
+    postFilter: AdapterFilter | {},
 }
 
 export interface IDataProvider {

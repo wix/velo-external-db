@@ -60,10 +60,11 @@ export default class FilterParser implements IMongoFilterParser {
         return `$${func}`
     }
 
-    parseFilter(filter: { operator: any; fieldName: any; value: any }): { filterExpr: MongoFilter }[] {
-        if (isEmptyFilter(filter)) {
+    parseFilter(_filter: Filter | {} ): { filterExpr: MongoFilter }[] {
+        if (isEmptyFilter(_filter)) {
             return []
         }
+        const filter = _filter as Filter
         const { operator, fieldName, value } = filter
         const mongoOp = this.adapterOperatorToMongoOperator(operator)
 
