@@ -1,17 +1,13 @@
-const path = require('path')
-const ejs = require('ejs')
-const fs = require('fs').promises
+import path = require('path')
+import ejs = require('ejs')
+import {promises as fs} from 'fs'
 
 const getAppInfoTemplate = async() => {
     return await fs.readFile(path.join( __dirname, '..', 'views', 'index.ejs'), 'utf8')
 }
 
-const getAppInfoPage = async(appInfo) => {
+export const getAppInfoPage = async(appInfo: any) => {
     const appInfoTemplate = await getAppInfoTemplate()
     const appInfoPage = ejs.render(appInfoTemplate, appInfo)
     return appInfoPage
 }
-
-module.exports = { getAppInfoPage }
-
-
