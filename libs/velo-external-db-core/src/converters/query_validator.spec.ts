@@ -1,11 +1,12 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { Uninitialized } = require('@wix-velo/test-commons')
-const gen = require('../../test/gen')
-const { EmptyFilter } = require ('../converters/utils')
-const { queryAdapterOperatorsFor } = require ('./query_validator_utils')
-const QueryValidator = require ('./query_validator')
-const Chance = require('chance')
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { Uninitialized } from '@wix-velo/test-commons'
+import * as gen from '../../test/gen'
+import { EmptyFilter } from '../converters/utils'
+import { queryAdapterOperatorsFor } from './query_validator_utils'
+import QueryValidator from './query_validator'
+import Chance = require('chance')
 const chance = Chance()
+const { InvalidQuery } = errors
 
 describe('Query Validator', () => {
     beforeAll(() => {
@@ -136,17 +137,34 @@ describe('Query Validator', () => {
         
     })
 
-    const env = {
+    interface Environment {
+        queryValidator: any
+    }
+
+    const env: Environment = {
         queryValidator: Uninitialized
     }
 
-    const ctx = {
+    interface Context {
+        fieldName: any
+        anotherFieldName: any
+        operator: any
+        value: any
+        type: any
+        validOperatorForType: any
+        invalidOperatorForType: any
+        fieldArrWithId: any
+        itemId: any
+    }
+
+    const ctx: Context = {
         fieldName: Uninitialized,
         anotherFieldName: Uninitialized,
         operator: Uninitialized,
         value: Uninitialized,
         type: Uninitialized,
         validOperatorForType: Uninitialized,
+        invalidOperatorForType: Uninitialized,
         fieldArrWithId: Uninitialized,
         itemId: Uninitialized
     }
