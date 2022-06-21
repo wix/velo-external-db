@@ -1,39 +1,46 @@
-const { v4: uuidv4 } = require('uuid')
+import { Item, ResponseField } from '@wix-velo/velo-external-db-types'
+import { v4 as uuidv4 } from 'uuid'
 let dateTimeProvider = require('../utils/date_time_provider')
 
-const isObject = (o) => typeof o === 'object' && o !== null
+const isObject = (o: any) => typeof o === 'object' && o !== null
 
-class ItemTransformer {
+interface IItemTransformer {
+    prepareItemsForInsert(items: Item[], fields: ResponseField[]): Item[]
+    prepareItemsForUpdate(items: Item[], fields: ResponseField[]): Item[]
+    patchItems(items: Item[], fields: ResponseField[]): Item[]
+}
+
+export default class ItemTransformer implements IItemTransformer {
     constructor() {
     }
     
-    prepareItemsForInsert(items, fields) {
-        return items.map(i => this.prepareForInsert(i, fields))
+    prepareItemsForInsert(items: Item[], fields: ResponseField[]) {
+        return items.map((i: Item) => this.prepareForInsert(i, fields))
     }
 
-    prepareItemsForUpdate(items, fields) {
-        return items.map(i => this.prepareForUpdate(i, fields))
+    prepareItemsForUpdate(items: Item[], fields: ResponseField[]) {
+        return items.map((i: Item) => this.prepareForUpdate(i, fields))
     }
 
-    prepareForInsert(item, fields) {        
-        return this.unpackDates(fields.reduce((pv, f) => ({ ...pv, [f.field]: item[f.field] || this.defaultValueFor(f) }), {}))
+    prepareForInsert(item: Item, fields: ResponseField[]) {        
+        return this.unpackDates(fields.reduce((pv: any, f: ResponseField) => ({ ...pv, [f.field]: item[f.field] || this.defaultValueFor(f) }), {}))
     }
 
-    prepareForUpdate(item, fields) {
-         return this.unpackDates(fields.reduce((pv, f) => f.field in item ? ({ ...pv, [f.field]: item[f.field] }) : pv, {}))
+    prepareForUpdate(item: Item, fields: ResponseField[]) {
+         return this.unpackDates(fields.reduce((pv: any, f: ResponseField) => f.field in item ? ({ ...pv, [f.field]: item[f.field] }) : pv, {}))
     }
     
-    patchItemsBooleanFields(items, fields) { 
-        return items.map(i => this.patchBoolean(i, fields.filter(f => f.type === 'boolean')))
+    patchItemsBooleanFields(items: Item[], fields: ResponseField[]) { 
+        return items.map((i: Item) => this.patchBoolean(i, fields.filter((f: ResponseField) => f.type === 'boolean')))
     }
 
-    patchItems(items, fields) {
-        const patchedBooleanItems = items.map(i => this.patchBoolean(i, fields.filter(f => f.type === 'boolean')))
-        const patchedObjectItems = patchedBooleanItems.map(i => this.patchObject(i, fields.filter(f => f.type === 'object')))
+    patchItems(items: Item[], fields: ResponseField[]) {
+        const patchedBooleanItems = items.map((i: Item) => this.patchBoolean(i, fields.filter((f: ResponseField) => f.type === 'boolean')))
+        const patchedObjectItems = patchedBooleanItems.map((i: Item) => this.patchObject(i, fields.filter((f: ResponseField) => f.type === 'object')))
         return patchedObjectItems
     }
 
-    patchObject(item, fields) {
+    patchObject(item: Item, fields: ResponseField[]) {
         const patchedItem = { ...item }
 
         fields.forEach(({ field, type }) => {
@@ -49,10 +56,10 @@ class ItemTransformer {
         return patchedItem 
     }
 
-    patchBoolean(item, fields) {
+    patchBoolean(item: Item, fields: ResponseField[]) {
         const i = { ...item }
     
-        fields.forEach(f => {
+        fields.forEach((f: { field: string }) => {
             if (f.field in i) {
                 i[f.field] = this.booleanValueFor(i[f.field])
             }
@@ -60,7 +67,7 @@ class ItemTransformer {
         return i
     }
 
-    booleanValueFor(value) {
+    booleanValueFor(value: any) {
         switch (value) {
             case 'true':
             case '1':
@@ -74,7 +81,7 @@ class ItemTransformer {
                 return value
         }
     }
-    defaultValueFor(f) {
+    defaultValueFor(f: ResponseField) {
         switch (f.type) {
             case 'number':
                 switch (f.subtype) {
@@ -98,7 +105,7 @@ class ItemTransformer {
         }
     }
 
-    unpackDates(item) {
+    unpackDates(item: Item) {
         const i = { ...item }
     
         Object.keys(i)
@@ -113,5 +120,3 @@ class ItemTransformer {
     }
     
 }
-
-module.exports = ItemTransformer
