@@ -4,7 +4,7 @@ import { errors } from '@wix-velo/velo-external-db-commons'
 import { AdapterFilter, AdapterOperator, WixDataFilter, WixDataMultiFieldOperators, } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
 
-interface IFilterTransformer {
+export interface IFilterTransformer {
     transform(filter: any): AdapterFilter
     isMultipleFieldOperator(filter: WixDataFilter): boolean
     wixOperatorToAdapterOperator(wixOperator: string): AdapterOperator
