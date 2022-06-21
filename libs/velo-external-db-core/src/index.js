@@ -4,9 +4,9 @@ const DataService = require('./service/data')
 const CacheableSchemaInformation = require('./service/schema_information')
 const SchemaService = require('./service/schema')
 const OperationService = require('./service/operation')
-const FilterTransformer = require ('./converters/filter_transformer')
-const AggregationTransformer = require ('./converters/aggregation_transformer')
-const QueryValidator = require ('./converters/query_validator')
+import FilterTransformer from './converters/filter_transformer'
+import AggregationTransformer from './converters/aggregation_transformer'
+import QueryValidator from './converters/query_validator'
 const SchemaAwareDataService = require ('./service/schema_aware_data')
 const ItemTransformer = require('./converters/item_transformer')
 const { initServices, createRouter } = require('./router')
