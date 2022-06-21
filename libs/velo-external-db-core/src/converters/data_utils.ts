@@ -1,9 +1,10 @@
-const { isDate } = require('@wix-velo/velo-external-db-commons')
-const crypto = require('crypto')
+import { isDate } from '@wix-velo/velo-external-db-commons'
+import { Item } from '@wix-velo/velo-external-db-types'
+import * as crypto from 'crypto'
 
-const asWixData = e => generateIdsIfNeeded(packDates(e))
+export const asWixData = (e: any) => generateIdsIfNeeded(packDates(e))
 
-const generateIdsIfNeeded = item => {
+export const generateIdsIfNeeded = (item: Item) => {
     if ('_id' in item)
         return item
     const sha = crypto.createHash('sha1')
@@ -11,7 +12,5 @@ const generateIdsIfNeeded = item => {
     return { ...item, _id: sha.update(fieldsConcat).digest('base64') }
 }
 
-const packDates = item => Object.entries(item)
+const packDates = (item: Item) => Object.entries(item)
                                 .reduce((o, [k, v]) => ({ ...o, [k]: isDate(v) ? { $date: new Date(v).toISOString() } : v }), {})
-
-module.exports = { asWixData, generateIdsIfNeeded }

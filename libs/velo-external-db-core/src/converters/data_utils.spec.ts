@@ -1,8 +1,8 @@
-const { asWixData, generateIdsIfNeeded } = require ('./data_utils')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const Chance = require('chance')
+import { asWixData, generateIdsIfNeeded } from './data_utils'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import * as dateTimeProvider from '../../test/drivers/date_time_provider_test_support'
+import Chance = require('chance')
 const chance = Chance()
-const dateTimeProvider = require('../../test/drivers/date_time_provider_test_support')
 
 describe('Converters', () => {
     test('pack dates will duplicate object and do nothing is date is not there', async() => {
@@ -33,7 +33,15 @@ describe('Converters', () => {
         expect(generateIdsIfNeeded(ctx.obj)._id).not.toEqual(generateIdsIfNeeded(ctx.anotherObj)._id)
     })
 
-    const ctx = {
+    interface Context {
+        obj: any
+        anotherObj: any
+        property: any
+        anotherProperty: any
+        veloDate: any
+    }
+
+    const ctx: Context = {
         obj: Uninitialized,
         anotherObj: Uninitialized,
         property: Uninitialized,
