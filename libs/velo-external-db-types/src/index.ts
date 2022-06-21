@@ -192,3 +192,20 @@ export type WixDataMultipleFieldsFilter = {
 }
 
 export type WixDataFilter = WixDataSingleFieldFilter | WixDataMultipleFieldsFilter
+
+
+export enum WixDataFunction {
+    $avg = '$avg',
+    $max = '$max',
+    $min = '$min',
+    $sum = '$sum',
+}
+
+export type WixDataAggregation = {
+    processingStep: {
+        _id: string |  { [key: string]: any }
+        [key: string]: any
+        // [fieldAlias: string]: {[key in WixDataFunction]: string | number },
+    }
+    postFilteringStep: WixDataFilter
+}
