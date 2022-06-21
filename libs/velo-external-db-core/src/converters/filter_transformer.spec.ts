@@ -1,12 +1,14 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const gen = require('../../test/gen')
-const FilterTransformer = require('./filter_transformer')
-const { EmptyFilter } = require('./utils')
-const Chance = require('chance')
+import { Uninitialized } from '@wix-velo/test-commons'
+import * as gen from '../../test/gen'
+import FilterTransformer from './filter_transformer'
+import { EmptyFilter } from './utils'
+import each from 'jest-each'
+import Chance = require('chance')
+import { errors } from '@wix-velo/velo-external-db-commons'
 const chance = Chance()
-const each = require('jest-each').default
-const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { WixDataFilter, WixDataMultiFieldOperators, WixDataSingleFieldOperators } from '@wix-velo/velo-external-db-types'
+const { InvalidQuery } = errors
 
 describe('Filter Transformer', () => {
     beforeAll(() => {
@@ -16,9 +18,9 @@ describe('Filter Transformer', () => {
         each([
             '$eq', '$ne', '$lt', '$lte', '$gt', '$gte', '$or', '$and', '$not', '$urlized'
         ])
-            .test('correctly transform [%s]', (o) => {
+            .test('correctly transform [%s]', (o: string) => {
                 const adapterOperator = o.substring(1)
-                expect(env.FilterTransformer.wixOperatorToAdapterOperator(o)).toEqual(AdapterOperators[adapterOperator])
+                expect(env.FilterTransformer.wixOperatorToAdapterOperator(o)).toEqual((AdapterOperators as any)[adapterOperator]) 
             })
 
         test('correctly transform [$hasSome]', () => {
@@ -58,7 +60,7 @@ describe('Filter Transformer', () => {
     describe('handle single field operator', () => {
         each([
             '$ne', '$lt', '$lte', '$gt', '$gte', '$eq'
-        ]).test('correctly transform operator [%s]', (o) => {
+        ]).test('correctly transform operator [%s]', (o: any) => {
             expect(env.FilterTransformer.transform(
                 { [ctx.fieldName]: { [o]: ctx.fieldValue } }
             ))
@@ -107,7 +109,7 @@ describe('Filter Transformer', () => {
     describe('handle multi field operator', () => {
         each([
             '$and', '$or'
-        ]).test('correctly transform operator [%s]', (o) => {
+        ]).test('correctly transform operator [%s]', (o: any) => {
             const filter = {
                 [o]: [ctx.filter, ctx.anotherFilter]
             }
@@ -132,13 +134,26 @@ describe('Filter Transformer', () => {
         })
     })
 
+    interface Enviorment {
+        FilterTransformer: any
+    }
 
-    const env = {
+    const env: Enviorment = {
         FilterTransformer: Uninitialized
     }
 
-    const ctx = {
+    interface Context {
+        filter: WixDataFilter | null
+        anotherFilter: WixDataFilter | null
+        fieldName: any
+        fieldValue: any
+        operator: WixDataMultiFieldOperators | WixDataSingleFieldOperators | null
+        fieldListValue: any[] | null
+    }
+
+    const ctx: Context = {
         filter: Uninitialized,
+        anotherFilter: Uninitialized,
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
         operator: Uninitialized,
@@ -150,7 +165,7 @@ describe('Filter Transformer', () => {
         ctx.anotherFilter = gen.randomFilter()
         ctx.fieldName = chance.word()
         ctx.fieldValue = chance.word()
-        ctx.operator = gen.randomOperator()
+        ctx.operator = gen.randomOperator() as WixDataMultiFieldOperators | WixDataSingleFieldOperators
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
     })
 })

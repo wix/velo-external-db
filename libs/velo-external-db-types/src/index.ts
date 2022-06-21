@@ -158,3 +158,37 @@ export interface IConfigValidator {
     validate(config: any): { missingRequiredSecretsKeys: string[] }
     readConfig(): any
 }
+
+export enum WixDataSingleFieldOperators {
+    $eq = '$eq',
+    $gt = '$gt',
+    $gte = '$gte',
+    $hasSome = '$hasSome',
+    $lt = '$lt',
+    $lte = '$lte',
+    $ne = '$ne',
+    $startsWith = '$startsWith',
+    $endsWith = '$endsWith',
+    $contains = '$contains',
+    $and = '$and',
+    $or = '$or',
+    $not = '$not',
+    $urlized = '$urlized',
+    $matches = '$matches'
+}
+
+export enum WixDataMultiFieldOperators {
+    $and = '$and',
+    $or = '$or',
+    $not = '$not',
+}
+
+export type WixDataSingleFieldFilter = {
+    [key: string]: { [key in WixDataSingleFieldOperators]: any }
+}
+
+export type WixDataMultipleFieldsFilter = {
+    [key in WixDataMultiFieldOperators]?: WixDataFilter[]
+}
+
+export type WixDataFilter = WixDataSingleFieldFilter | WixDataMultipleFieldsFilter
