@@ -38,7 +38,7 @@ export const isDate = (d: any) => {
     return d instanceof Date || Object.prototype.toString.call(d) === '[object Date]' || (typeof d === 'string' && reISO.test(d))
 }
 
-export const updateFieldsFor = (item: {}) => {
+export const updateFieldsFor = (item: object) => {
     return Object.keys(item).filter(f => f !== '_id')
 }
 
