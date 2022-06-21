@@ -2,7 +2,7 @@ import { QueryOperatorsByFieldType } from '@wix-velo/velo-external-db-commons'
 import { AdapterFilter, AdapterOperator } from '@wix-velo/velo-external-db-types'
 import FilterTransformer from '../converters/filter_transformer'
 import { EmptyFilter } from '../converters/utils'
-const WixOperatorToAdapterOperator = new FilterTransformer().wixOperatorToAdapterOperator
+const WixOperatorToAdapterOperator = new FilterTransformer().wixOperatorToAdapterOperatorString
 
 export const queryAdapterOperatorsFor = (type: string) => ( (QueryOperatorsByFieldType as any)[type].map((op: any) => WixOperatorToAdapterOperator(`$${op}`)) )
 

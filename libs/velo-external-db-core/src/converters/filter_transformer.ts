@@ -49,7 +49,7 @@ export default class FilterTransformer implements IFilterTransformer {
         return this.wixOperatorToAdapterOperatorString(wixOperator) as AdapterOperator
     }
 
-    private wixOperatorToAdapterOperatorString(operator: string) {
+    wixOperatorToAdapterOperatorString(operator: string) {
         switch (operator) {
             case '$eq':
                 return AdapterOperators.eq
