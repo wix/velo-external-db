@@ -1,10 +1,13 @@
-const FilterParser = require('./sql_filter_transformer')
-const { EmptySort, AdapterOperators, AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
-const { escapeIdentifier } = require('./postgres_utils')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const each = require('jest-each').default
-const Chance = require('chance')
+//@ts-nocheck
+import each from 'jest-each'
+import { EmptySort, AdapterOperators, AdapterFunctions } from '@wix-velo/velo-external-db-commons'
+import FilterParser from './sql_filter_transformer'
+import { escapeIdentifier } from './postgres_utils'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { InvalidQuery } = errors
+import * as Chance from 'chance'
+
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -435,7 +438,9 @@ describe('Sql Parser', () => {
         offset: Uninitialized,
     }
 
-    const env = {
+    const env: {
+        filterParser: FilterParser 
+    } = {
         filterParser: Uninitialized,
     }
 
@@ -457,7 +462,7 @@ describe('Sql Parser', () => {
     })
 
     beforeAll(function() {
-        env.filterParser = new FilterParser
+        env.filterParser = new FilterParser()
     })
 
 

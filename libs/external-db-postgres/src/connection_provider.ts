@@ -1,20 +1,20 @@
 import { Pool, types } from 'pg'
-const { builtins } = require('pg-types')
-const SchemaProvider = require('./postgres_schema_provider')
-const DataProvider = require('./postgres_data_provider')
-const FilterParser = require('./sql_filter_transformer')
-const DatabaseOperations = require ('./postgres_operations')
+import { builtins } from 'pg-types'
+import SchemaProvider from './postgres_schema_provider'
+import DataProvider  from './postgres_data_provider'
+import FilterParser from './sql_filter_transformer'
+import DatabaseOperations from './postgres_operations'
+import { postgresConfig } from './types'
 
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
-const init = (cfg, _poolOptions) => {
+export default (cfg: postgresConfig, _poolOptions: any) => {
     const config = {
         host: cfg.host,
         user: cfg.user,
         password: cfg.password,
         database: cfg.db,
         port: 5432,
-
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
@@ -22,7 +22,7 @@ const init = (cfg, _poolOptions) => {
     const poolOptions = _poolOptions || {}
 
     if (cfg.cloudSqlConnectionName) {
-        config['host'] = `/cloudsql/${cfg.cloudSqlConnectionName}`
+        config.host = `/cloudsql/${cfg.cloudSqlConnectionName}`
     }
 
     const filterParser = new FilterParser()
@@ -32,7 +32,12 @@ const init = (cfg, _poolOptions) => {
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup: async() => await pool.end(() => { }) }
+    return { 
+        dataProvider: dataProvider,
+        schemaProvider: schemaProvider,
+        databaseOperations, 
+        connection: pool, 
+        cleanup: async() => pool.end(() => {}) 
+    }
 }
 
-module.exports = init

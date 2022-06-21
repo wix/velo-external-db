@@ -1,16 +1,21 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } = require('@wix-velo/velo-external-db-commons')
-const { escapeIdentifier } = require('./postgres_utils')
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Sort } from '@wix-velo/velo-external-db-types' 
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
+import { escapeIdentifier } from './postgres_utils'
+import { ParsedFilter } from './types'
+const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 
-class FilterParser {
-    constructor() {
+
+
+export default class FilterParser {
+    public constructor() {
     }
 
-    transform(filter) {
+    transform(filter: Filter) {
         const results = this.parseFilter(filter, 1, {})
-
+        
         if (results.length === 0) {
             return EmptyFilter
         }
@@ -23,7 +28,7 @@ class FilterParser {
         }
     }
 
-    adapterFunction2Sql(f) {
+    adapterFunction2Sql(f: string) {
         switch (f) {
             case avg:
                 return 'AVG'
@@ -40,7 +45,7 @@ class FilterParser {
         }
     }
 
-    parseAggregation(aggregation, offset) {
+    parseAggregation(aggregation: Aggregation, offset: number) {
 
         const groupByColumns = extractGroupByNames(aggregation.projection)
         
@@ -50,7 +55,7 @@ class FilterParser {
 
         const havingFilter = this.parseFilter(aggregation.postFilter, offset, aliasToFunction)
 
-        const { filterExpr, parameters } = this.extractFilterExprAndParams(havingFilter, offset, aliasToFunction)
+        const { filterExpr, parameters } = this.extractFilterExprAndParams(havingFilter)
 
         return {
             fieldsStatement: filterColumnsStr.join(', '),
@@ -60,11 +65,11 @@ class FilterParser {
         }
     }
 
-    createFieldsStatementAndAliases(projectionFunctions, groupByColumns) {
-        const filterColumnsStr = []
-        const aliasToFunction = {}
-        groupByColumns.forEach(f => filterColumnsStr.push(escapeIdentifier(f)))
-        projectionFunctions.forEach(f => { 
+    createFieldsStatementAndAliases(projectionFunctions: AnyFixMe, groupByColumns: AnyFixMe) {
+        const filterColumnsStr: AnyFixMe = []
+        const aliasToFunction: { [key: string]: any } = {}
+        groupByColumns.forEach((f: any) => filterColumnsStr.push(escapeIdentifier(f)))
+        projectionFunctions.forEach((f: any) => { 
             filterColumnsStr.push(`${this.adapterFunction2Sql(f.function)}(${escapeIdentifier(f.name)}) AS ${escapeIdentifier(f.alias)}`)
             aliasToFunction[f.alias] = `${this.adapterFunction2Sql(f.function)}(${escapeIdentifier(f.name)})`
         })
@@ -72,13 +77,13 @@ class FilterParser {
         return { filterColumnsStr, aliasToFunction }
     }
 
-    extractFilterExprAndParams(havingFilter) {
+    extractFilterExprAndParams(havingFilter: any[]) {
         return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
                                                                      parameters: parameters }))
                            .concat(EmptyFilter)[0]
     }
 
-    parseFilter(filter, offset, inlineFields) {
+    parseFilter(filter: Filter, offset: number, inlineFields: { [key: string]: any }) : ParsedFilter[] {
 
         if (isEmptyFilter(filter)) {
             return []
@@ -89,20 +94,20 @@ class FilterParser {
         switch (operator) {
             case and:
             case or:
-                const res = value.reduce((o, f) => {
+                const res: { filter: ParsedFilter[], offset: number } = value.reduce((o: { filter: Filter[], offset: number}, f: Filter) => {
                     const res = this.parseFilter.bind(this)(f, o.offset, inlineFields)
                     return {
-                        filter: o.filter.concat( ...res ),
+                        filter: [ ...o.filter, ...res],
                         offset: res.length === 1 ? res[0].offset : o.offset
                     }
                 }, { filter: [], offset: offset })
 
                 const op = operator === and ? ' AND ' : ' OR '
                 return [{
-                    filterExpr: res.filter.map(r => r.filterExpr).join( op ),
+                    filterExpr: res.filter.map((r: ParsedFilter) => r.filterExpr).join(op),
                     filterColumns: [],
                     offset: res.offset,
-                    parameters: res.filter.map( s => s.parameters ).flat()
+                    parameters: res.filter.map((s: ParsedFilter) => s.parameters).flat()
                 }]
             case not:
                 const res2 = this.parseFilter( value[0], offset, inlineFields )
@@ -148,7 +153,7 @@ class FilterParser {
         return []
     }
 
-    valueForStringOperator(operator, value) {
+    valueForStringOperator(operator: string, value: any) {
         switch (operator) {
             case string_contains:
                 return `%${value}%`
@@ -157,23 +162,25 @@ class FilterParser {
             case string_ends:
                 return `%${value}`
         }
+
+        return 
     }
 
-    isSingleFieldOperator(operator) {
+    isSingleFieldOperator(operator: string) {
         return [ne, lt, lte, gt, gte, include, eq].includes(operator)
     }
 
-    isSingleFieldStringOperator(operator) {
+    isSingleFieldStringOperator(operator: string) {
         return [string_contains, string_begins, string_ends].includes(operator)
     }
 
-    prepareStatementVariables(n, offset) {
+    prepareStatementVariables(n: number, offset: number) {
         return Array.from({ length: n }, (_, i) => `$${offset + i}`)
                     .join(', ')
     }
 
 
-    valueForOperator(value, operator, offset) {
+    valueForOperator(value: string | string[] , operator: string, offset: number) {
         if (operator === include) {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
@@ -195,7 +202,7 @@ class FilterParser {
         }
     }
 
-    adapterOperatorToMySqlOperator(operator, value) {
+    adapterOperatorToMySqlOperator(operator: string, value: any) {
         switch (operator) {
             case eq:
                 if (!isNull(value)) {
@@ -218,9 +225,11 @@ class FilterParser {
             case include:
                 return 'IN'
         }
+
+        return 
     }
 
-    orderBy(sort) {
+    orderBy(sort: Sort[]) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EmptySort
         }
@@ -236,7 +245,7 @@ class FilterParser {
         }
     }
 
-    parseSort({ fieldName, direction }) {
+    parseSort({ fieldName, direction }: Sort) {
         if (typeof fieldName !== 'string') {
             return []
         }
@@ -249,18 +258,18 @@ class FilterParser {
         }]
     }
 
-    selectFieldsFor(projection) {
+    selectFieldsFor(projection: string[]) {
         return projection.map(escapeIdentifier).join(', ')
     }
 
-    patchTrueFalseValue(value) {
+    patchTrueFalseValue(value: any) {
         if (value === true || value === false) {
             return value ? 1 : 0
         }
         return value
     }
 
-    inlineVariableIfNeeded(fieldName, inlineFields) {
+    inlineVariableIfNeeded(fieldName: string, inlineFields: { [key: string]: any }) {
         if (inlineFields) {
             if (inlineFields[fieldName]) {
                 return inlineFields[fieldName]
@@ -271,4 +280,3 @@ class FilterParser {
 
 }
 
-module.exports = FilterParser
