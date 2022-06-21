@@ -6,7 +6,7 @@
         "node": true
     },
 
-    "extends": ["eslint:recommended", "plugin:jest/recommended"],
+    "extends": ["plugin:jest/recommended"],
     "parserOptions": {
         "ecmaVersion": 12
     },
@@ -39,10 +39,10 @@
           "rules": {}
         },
         {
-          "files": ["*.js", "*.jsx"],
+          "files": ["*.js", "*.jsx", "*.ts"],
           "extends": ["plugin:@nrwl/nx/javascript"],
           "rules": {
-            "@typescript-eslint/no-empty-function": ["off"],
+            "@typescript-eslint/no-empty-function": "off",
             "no-case-declarations": "off",
             "linebreak-style": [ "error", "unix" ],
             "quotes": [ "error", "single" ],
@@ -52,15 +52,14 @@
             "space-before-blocks": [ "error", "always" ],
             "eqeqeq": [ "error", "always" ],
             "quote-props": [ "error", "as-needed" ],
-            "no-case-declarations": [ "off" ],
             "key-spacing": [ "error", { "afterColon": true } ],
             "object-curly-spacing": [ "error", "always" ],
             "arrow-spacing": [ "error", { "before": true, "after": true } ],
             "jest/no-standalone-expect": [ "off", { "additionalTestBlockFunctions": ["each.test"] } ],
             "jest/no-conditional-expect": [ "off" ],
             "jest/no-identical-title": [ "off" ],
-            "no-unused-vars": [ "error", { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" } ],
-            "@typescript-eslint/no-unused-vars": [ "error", { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" } ]
+            "@typescript-eslint/no-unused-vars": [ "error", { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" } ],
+            "@typescript-eslint/no-explicit-any": "off"
           }
         }
       ]
