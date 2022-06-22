@@ -20,7 +20,7 @@ export default class SchemaService {
 
     async listHeaders() {
         const collections = await this.storage.listHeaders()
-        return { schemas: collections.map((collection)=> asWixSchemaHeaders(collection.id)) }
+        return { schemas: collections.map((collection)=> asWixSchemaHeaders(collection)) }
     }
 
     async find(collectionNames: string[]) {
