@@ -2,7 +2,7 @@
 
 import DataService from './service/data'
 import CacheableSchemaInformation from './service/schema_information'
-const SchemaService = require('./service/schema')
+import SchemaService from './service/schema'
 import OperationService from './service/operation'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'

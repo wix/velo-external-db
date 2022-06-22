@@ -123,7 +123,7 @@ export interface ISchemaProvider {
     list(): Promise<Table[]>
     listHeaders(): Promise<string[]>
     supportedOperations(): SchemaOperations[]
-    create(collectionName: string, columns: InputField[]): Promise<void>
+    create(collectionName: string, columns?: InputField[]): Promise<void>
     addColumn(collectionName: string, column: InputField): Promise<void>
     removeColumn(collectionName: string, columnName: string): Promise<void>
     describeCollection(collectionName: string): Promise<ResponseField[]>

@@ -1,5 +1,5 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { ISchemaProvider } from '@wix-velo/velo-external-db-types'
+import { ISchemaProvider, ResponseField } from '@wix-velo/velo-external-db-types'
 const { CollectionDoesNotExists } = errors
 import * as NodeCache from 'node-cache'
 
@@ -13,13 +13,13 @@ export default class CacheableSchemaInformation {
         this.cache = new NodeCache( { checkperiod: FiveMinutes + 10 } )
     }
     
-    async schemaFieldsFor(collectionName: string) {
+    async schemaFieldsFor(collectionName: string): Promise<ResponseField[]> {
         const schema = this.cache.get(collectionName)
         if ( !schema ) {
             await this.update(collectionName)
-            return this.cache.get(collectionName) 
+            return this.cache.get(collectionName) as ResponseField[] 
         }
-        return schema
+        return schema as ResponseField[]
     }
 
     async update(collectionName: string) {
