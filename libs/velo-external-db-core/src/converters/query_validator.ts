@@ -15,7 +15,7 @@ export default class QueryValidator {
         this.validateOperators(fields, filterFieldsAndOpsObj)
     }
     
-    validateGetById(fields: ResponseField[], itemId: string) {
+    validateGetById(fields: ResponseField[], itemId?: any) {
         if (isBlank(itemId)) throw new InvalidQuery('A value must be provided for itemId')
         const fieldNames = fields.map((f: ResponseField) => f.field)
         this.validateFieldsExists(fieldNames, ['_id'])

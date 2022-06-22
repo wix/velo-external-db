@@ -34,18 +34,13 @@ describe('Schema Information Service', () => {
         await expect( env.schemaInformation.schemaFieldsFor(ctx.dbs[0].id) ).resolves.toEqual(ctx.dbs[0].fields)
     })
 
-    interface Context {
-        dbs: any
-        collectionName: any
-    }
-
-    const ctx: Context = {
+    const ctx = {
         dbs: Uninitialized,
         collectionName: Uninitialized,
     }
 
     interface Enviorment {
-        schemaInformation: any
+        schemaInformation: SchemaInformation
     }
     
     const env: Enviorment = {

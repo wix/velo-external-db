@@ -67,15 +67,7 @@ describe('Query Validator utils spec', () => {
         })
     })
 
-    interface Context {
-        fieldName: any
-        anotherFieldName: any
-        operator: any
-        anotherOperator: any
-        value: any
-    }
-
-    const ctx: Context = {
+    const ctx = {
         fieldName: Uninitialized,
         anotherFieldName: Uninitialized,
         operator: Uninitialized,

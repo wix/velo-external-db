@@ -43,12 +43,12 @@ export default class DataService implements IDataService {
         return { totalCount: c }
     }
 
-    async insert(collectionName: string, item: Item, fields: ResponseField[]) {
+    async insert(collectionName: string, item: Item, fields?: ResponseField[]) {
         const resp = await this.bulkInsert(collectionName, [item], fields)
         return { item: asWixData(resp.items[0]) }
     }
 
-    async bulkInsert(collectionName: string, items: Item[], fields: ResponseField[]) {
+    async bulkInsert(collectionName: string, items: Item[], fields?: ResponseField[]) {
         await this.storage.insert(collectionName, items, fields)
         return { items: items.map( asWixData ) }
     }

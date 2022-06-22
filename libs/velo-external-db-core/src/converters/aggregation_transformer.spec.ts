@@ -148,7 +148,7 @@ describe('Aggregation Transformer', () => {
 
     interface Enviorment {
         driver: any
-        AggregationTransformer: any 
+        AggregationTransformer: AggregationTransformer 
     }
 
     const env: Enviorment = {
@@ -156,17 +156,7 @@ describe('Aggregation Transformer', () => {
         AggregationTransformer: Uninitialized
     }
 
-    interface Context {
-        fieldName: any
-        anotherFieldName: any
-        moreFieldName: any
-        fieldAlias: any
-        anotherFieldAlias: any
-        filter: any
-        id: any
-    }
-
-    const ctx: Context = {
+    const ctx = {
         fieldName: Uninitialized,
         anotherFieldName: Uninitialized,
         moreFieldName: Uninitialized,

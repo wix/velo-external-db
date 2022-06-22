@@ -119,25 +119,12 @@ describe('Item Transformer', () => {
         })
     })
 
-    interface Enviorment {
-        itemTransformer: any
-        itemTransformerClass: any
-    }
-
-    const env: Enviorment = {
+    const env = {
         itemTransformer: Uninitialized,
         itemTransformerClass: Uninitialized
     }
 
-    interface Context {
-        obj: any
-        objSchemaFields: any
-        property: any
-        anotherProperty: any
-        veloDate: any
-    }
-
-    const ctx: Context = {
+    const ctx = {
         obj: Uninitialized,
         objSchemaFields: Uninitialized,
         property: Uninitialized,

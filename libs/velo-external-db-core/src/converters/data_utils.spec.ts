@@ -33,15 +33,7 @@ describe('Converters', () => {
         expect(generateIdsIfNeeded(ctx.obj)._id).not.toEqual(generateIdsIfNeeded(ctx.anotherObj)._id)
     })
 
-    interface Context {
-        obj: any
-        anotherObj: any
-        property: any
-        anotherProperty: any
-        veloDate: any
-    }
-
-    const ctx: Context = {
+    const ctx = {
         obj: Uninitialized,
         anotherObj: Uninitialized,
         property: Uninitialized,
