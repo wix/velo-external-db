@@ -13,7 +13,7 @@ export const randomObject = () => {
     return obj
 }
 
-export const randomEntities = (columns: any) => {
+export const randomEntities = (columns?: any) => {
     const num = chance.natural({ min: 2, max: 20 })
     const arr = []
     for (let i = 0; i < num; i++) {
@@ -48,7 +48,7 @@ export const randomCollections = () => randomArrayOf( randomCollectionName )
 
 export const randomFieldName = () => chance.word({ length: 5 })
 
-export const randomEntity = (columns: any[]) => {
+export const randomEntity = (columns?: any[]) => {
     const entity : {[x:string]: any} = {
         _id: chance.guid(),
         _createdDate: veloDate(),

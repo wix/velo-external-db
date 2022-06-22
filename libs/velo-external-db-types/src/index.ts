@@ -93,9 +93,9 @@ export type AdapterAggregation = {
 }
 
 export interface IDataProvider {
-    find(collectionName: string, filter: AdapterFilter, sort: Sort[], skip: number, limit: number, projection: string[]): Promise<Item[]>;
+    find(collectionName: string, filter: AdapterFilter, sort: any, skip: number, limit: number, projection: string[]): Promise<Item[]>;
     count(collectionName: string, filter: AdapterFilter): Promise<number>;
-    insert(collectionName: string, items: Item[], fields?: any): Promise<number>;
+    insert(collectionName: string, items: Item[], fields?: ResponseField[]): Promise<number>;
     update(collectionName: string, items: Item[], fields?: any): Promise<number>;
     delete(collectionName: string, itemIds: string[]): Promise<number>;
     truncate(collectionName: string): Promise<void>;
