@@ -4,7 +4,7 @@ import { escapeId, escapeFieldId } from './spanner_utils'
 import { Uninitialized, gen } from '@wix-velo/test-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import each from 'jest-each'
-import Chance = require('chance')
+import * as Chance from 'chance'
 const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators //TODO: extract
@@ -432,20 +432,7 @@ describe('Sql Parser', () => {
 
     })
 
-    interface Context {
-        fieldName: any
-        fieldValue: any
-        anotherValue: any
-        moreValue: any
-        fieldListValue: any
-        anotherFieldName: any
-        moreFieldName: any
-        filter: any
-        anotherFilter: any
-        offset: any
-    }
-
-    const ctx: Context = {
+    const ctx = {
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
         anotherValue: Uninitialized,
@@ -458,11 +445,7 @@ describe('Sql Parser', () => {
         offset: Uninitialized,
     }
 
-    interface Enviorment {
-        filterParser: any
-    }
-
-    const env: Enviorment = {
+    const env = {
         filterParser: Uninitialized,
     }
 

@@ -2,7 +2,7 @@
 import { testLiteral, validateLiteral } from './spanner_utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import each from 'jest-each'
-import Chance = require('chance')
+import * as Chance from 'chance'
 const { InvalidQuery } = errors
 const chance = Chance()
 

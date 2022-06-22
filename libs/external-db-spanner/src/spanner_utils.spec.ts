@@ -23,11 +23,8 @@ describe('Spanner utils', () => {
         field: ctx.text,
       })
     })
-    interface Context {
-      integer: any
-      text: any
-    }
-    const ctx: Context = {
+
+    const ctx = {
       integer: Uninitialized,
       text: Uninitialized
     }
