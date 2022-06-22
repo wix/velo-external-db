@@ -1,7 +1,8 @@
-const OperationService = require('./operation')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const driver = require('../../test/drivers/operation_provider_test_support')
-const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
+import OperationService from './operation'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import driver = require('../../test/drivers/operation_provider_test_support')
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { DbConnectionError } = errors
 
 describe('Operation Service', () => {
 
@@ -15,11 +16,19 @@ describe('Operation Service', () => {
         await expect(env.operationService.validateConnection()).resolves.toEqual({ valid: false, error: ctx.error })
     })
 
-    const ctx = {
+    interface Context {
+        error: any
+    }
+
+    const ctx: Context = {
         error: Uninitialized
     }
 
-    const env = {
+    interface Enviorment {
+        operationService: any
+    }
+
+    const env: Enviorment = {
         operationService: Uninitialized,
     }
 
