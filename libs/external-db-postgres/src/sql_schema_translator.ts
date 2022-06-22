@@ -65,10 +65,10 @@ export default class SchemaColumnTranslator {
     }
 
     dbTypeFor(f: InputField) {
-        return this.dbType(f.type, f.subtype, f.precision)
+        return this.dbType(f.type, f.subtype, f.precision as string)
     }
 
-    dbType(type: string, subtype: string | undefined , precision: string | undefined) {
+    dbType(type: string, subtype: string | undefined, precision: string | undefined) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
             case 'number_int':
                 return 'integer'

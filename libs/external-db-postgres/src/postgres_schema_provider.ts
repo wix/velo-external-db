@@ -65,7 +65,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]>{
+    async describeCollection(collectionName: string): Promise<ResponseField[]> {
         const res = await this.pool.query('SELECT table_name, column_name AS field, data_type, udt_name AS type, character_maximum_length FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2 ORDER BY table_name', ['public', collectionName])
                               .catch( translateErrorCodes )
         if (res.rows.length === 0) {

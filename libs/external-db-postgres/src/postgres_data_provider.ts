@@ -14,7 +14,7 @@ export default class DataProvider implements IDataProvider {
         this.pool = pool
     }
 
-    async find(collectionName: string, filter: AdapterFilter, sort: Sort[], skip: number, limit: number, projection: string[]): Promise<Item[]>{
+    async find(collectionName: string, filter: AdapterFilter, sort: Sort[], skip: number, limit: number, projection: string[]): Promise<Item[]> {
         const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
@@ -33,7 +33,7 @@ export default class DataProvider implements IDataProvider {
     async insert(collectionName: string, items: any[], fields: any[]) {
         const escapedFieldsNames = fields.map( (f: { field: string }) => escapeIdentifier(f.field)).join(', ')
         const res = await Promise.all(
-            items.map(async (item: { [x: string]: any }) => {
+            items.map(async(item: { [x: string]: any }) => {
                 const data = asParamArrays( patchDateTime(item) )
                 const res = await this.pool.query(`INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES (${prepareStatementVariables(fields.length)})`, data)
                                .catch( translateErrorCodes )
@@ -48,7 +48,7 @@ export default class DataProvider implements IDataProvider {
                                 .map((u: { [x: string]: any }) => asParamArrays( patchDateTime(u) ))
 
         const res = await Promise.all(
-                        updatables.map(async (updatable: any) => {
+                        updatables.map(async(updatable: any) => {
                                 const rs = await this.pool.query(`UPDATE ${escapeIdentifier(collectionName)} SET ${updateFields.map((f, i) => `${escapeIdentifier(f)} = $${i + 1}`).join(', ')} WHERE _id = $${updateFields.length + 1}`, updatable)
                                                           .catch( translateErrorCodes )
                                 return rs.rowCount

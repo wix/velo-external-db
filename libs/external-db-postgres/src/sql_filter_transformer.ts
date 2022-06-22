@@ -180,7 +180,7 @@ export default class FilterParser {
     }
 
 
-    valueForOperator(value: string | string[] , operator: string, offset: number) {
+    valueForOperator(value: string | string[], operator: string, offset: number) {
         if (operator === include) {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
