@@ -11,7 +11,7 @@ export interface IDataService {
     update(collectionName: string, item: Item): Promise<{ item: ItemWithId }>
     bulkUpdate(collectionName: string, items: Item[]): Promise<{ items: ItemWithId[] }>
     delete(collectionName: string, itemId: string): Promise<{ item: {} }>
-    bulkDelete(collectionName: string, itemIds: string[]): Promise<{ items: never[] }>
+    bulkDelete(collectionName: string, itemIds: string[]): Promise< { items: [] } >
     truncate(collectionName: string): Promise<void>
     aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<{ items: ItemWithId[], totalCount: number }>
 }
@@ -68,7 +68,7 @@ export default class DataService implements IDataService {
         return { item: {} }
     }
 
-    async bulkDelete(collectionName: string, itemIds: string[]) {
+    async bulkDelete(collectionName: string, itemIds: string[]): Promise<{ items: [] }> {
         await this.storage.delete(collectionName, itemIds)
         return { items: [] }
     }
