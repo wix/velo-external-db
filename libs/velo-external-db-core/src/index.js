@@ -1,9 +1,9 @@
 'use strict'
 
-const DataService = require('./service/data')
-const CacheableSchemaInformation = require('./service/schema_information')
+import DataService from './service/data'
+import CacheableSchemaInformation from './service/schema_information'
 const SchemaService = require('./service/schema')
-const OperationService = require('./service/operation')
+import OperationService from './service/operation'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
 import QueryValidator from './converters/query_validator'

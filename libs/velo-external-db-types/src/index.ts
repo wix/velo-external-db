@@ -135,7 +135,10 @@ export interface IBaseHttpError extends Error {
     status: number;
 }
 
-export type ValidateConnectionResult = {valid: true} | {valid:false, error: IBaseHttpError}
+type ValidConnectionResult = { valid: true }
+type InvalidConnectionResult = { valid: false, error: IBaseHttpError }
+
+export type ValidateConnectionResult = ValidConnectionResult | InvalidConnectionResult
 
 export type connectionStatusResult = {status: string} | {error: string}
 

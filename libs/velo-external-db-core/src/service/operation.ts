@@ -23,7 +23,7 @@ export default class OperationService implements IOperationService {
             }
         }
         return {
-            error: connectionStatus.error.message,
+            error: (connectionStatus as any).error.message //todo: fix this hack
         }
     }
 }
