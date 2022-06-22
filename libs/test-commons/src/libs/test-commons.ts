@@ -1,4 +1,4 @@
-export const Uninitialized = null
+export const Uninitialized: any = null
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -6,5 +6,6 @@ export const shouldNotRunOn = (impl: string[], current: string) => !impl.include
 
 export const shouldRunOnlyOn = (impl: string[], current: string) => impl.includes(current)
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 export const testIfSupportedOperationsIncludes = (supportedOperations: string[], operation: string[]): any => operation.every((o: any) => supportedOperations.includes(o)) ? test : test.skip 
