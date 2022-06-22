@@ -7,7 +7,7 @@ import OperationService from './service/operation'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
 import QueryValidator from './converters/query_validator'
-const SchemaAwareDataService = require ('./service/schema_aware_data')
+import SchemaAwareDataService from './service/schema_aware_data'
 const ItemTransformer = require('./converters/item_transformer')
 const { initServices, createRouter } = require('./router')
 const { RoleAuthorizationService } = require ('@wix-velo/external-db-security')
