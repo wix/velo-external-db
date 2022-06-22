@@ -135,23 +135,14 @@ describe('Filter Transformer', () => {
     })
 
     interface Enviorment {
-        FilterTransformer: any
+        FilterTransformer: FilterTransformer
     }
 
     const env: Enviorment = {
         FilterTransformer: Uninitialized
     }
 
-    interface Context {
-        filter: WixDataFilter | null
-        anotherFilter: WixDataFilter | null
-        fieldName: any
-        fieldValue: any
-        operator: WixDataMultiFieldOperators | WixDataSingleFieldOperators | null
-        fieldListValue: any[] | null
-    }
-
-    const ctx: Context = {
+    const ctx = {
         filter: Uninitialized,
         anotherFilter: Uninitialized,
         fieldName: Uninitialized,

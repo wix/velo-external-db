@@ -18,7 +18,7 @@ export default class AggregationTransformer implements IAggregationTransformer{
         this.filterTransformer = filterTransformer
     }
 
-    transform({ processingStep, postFilteringStep }: WixDataAggregation): AdapterAggregation {        
+    transform({ processingStep, postFilteringStep }: any): AdapterAggregation {        
         const { _id: fields, ...functions } = processingStep
 
         const projectionFields = this.extractProjectionFields(fields)

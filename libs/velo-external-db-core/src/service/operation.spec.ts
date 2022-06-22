@@ -16,16 +16,12 @@ describe('Operation Service', () => {
         await expect(env.operationService.validateConnection()).resolves.toEqual({ valid: false, error: ctx.error })
     })
 
-    interface Context {
-        error: any
-    }
-
-    const ctx: Context = {
+    const ctx = {
         error: Uninitialized
     }
 
     interface Enviorment {
-        operationService: any
+        operationService: OperationService
     }
 
     const env: Enviorment = {

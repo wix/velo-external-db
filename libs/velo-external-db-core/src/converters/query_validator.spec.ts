@@ -138,26 +138,14 @@ describe('Query Validator', () => {
     })
 
     interface Environment {
-        queryValidator: any
+        queryValidator: QueryValidator
     }
 
     const env: Environment = {
         queryValidator: Uninitialized
     }
 
-    interface Context {
-        fieldName: any
-        anotherFieldName: any
-        operator: any
-        value: any
-        type: any
-        validOperatorForType: any
-        invalidOperatorForType: any
-        fieldArrWithId: any
-        itemId: any
-    }
-
-    const ctx: Context = {
+    const ctx = {
         fieldName: Uninitialized,
         anotherFieldName: Uninitialized,
         operator: Uninitialized,

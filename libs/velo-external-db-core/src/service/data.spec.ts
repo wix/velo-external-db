@@ -82,24 +82,8 @@ describe('Data Service', () => {
         return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
     })
 
-    interface Context {
-        collectionName: any
-        filter: any
-        aggregation: any
-        sort: any
-        skip: any
-        limit: any
-        entities: any
-        entity: any
-        entityWithoutId: any
-        entitiesWithoutId: any
-        itemId: any
-        itemIds: any
-        total: any
-        defaultProjection: any
-    }
 
-    const ctx: Context = {
+    const ctx = {
         collectionName: Uninitialized,
         filter: Uninitialized,
         aggregation: Uninitialized,
@@ -117,7 +101,7 @@ describe('Data Service', () => {
     }
 
     interface Enviorment {
-        dataService: any
+        dataService: DataService
     }
 
     const env: Enviorment = {
