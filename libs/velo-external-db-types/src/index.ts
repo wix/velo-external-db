@@ -131,10 +131,9 @@ export interface IBaseHttpError extends Error {
     status: number;
 }
 
-export type ValidateConnectionResult = {
-    valid: boolean,
-    error?: IBaseHttpError
-}
+export type ValidateConnectionResult = {valid: true} | {valid:false, error: IBaseHttpError}
+
+export type connectionStatusResult = {status: string} | {error: string}
 
 export interface IDatabaseOperations {
     validateConnection(): Promise<ValidateConnectionResult>
