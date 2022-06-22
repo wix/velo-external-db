@@ -1,8 +1,9 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const SchemaInformation = require('./schema_information')
-const driver = require('../../test/drivers/schema_provider_test_support')
-const gen = require('../../test/gen')
-const { CollectionDoesNotExists } = require('@wix-velo/velo-external-db-commons').errors
+import { Uninitialized } from '@wix-velo/test-commons'
+import SchemaInformation from './schema_information'
+import * as driver from '../../test/drivers/schema_provider_test_support'
+import * as gen from '../../test/gen'
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { CollectionDoesNotExists } = errors
 
 describe('Schema Information Service', () => {
     test('will automatically refresh and return schema for collection when queried', async() => {
@@ -33,12 +34,21 @@ describe('Schema Information Service', () => {
         await expect( env.schemaInformation.schemaFieldsFor(ctx.dbs[0].id) ).resolves.toEqual(ctx.dbs[0].fields)
     })
 
-    const ctx = {
+    interface Context {
+        dbs: any
+        collectionName: any
+    }
+
+    const ctx: Context = {
         dbs: Uninitialized,
         collectionName: Uninitialized,
     }
 
-    const env = {
+    interface Enviorment {
+        schemaInformation: any
+    }
+    
+    const env: Enviorment = {
         schemaInformation: Uninitialized,
     }
 
