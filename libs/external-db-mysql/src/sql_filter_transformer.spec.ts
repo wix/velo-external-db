@@ -3,7 +3,7 @@ import { EmptySort, AdapterOperators, AdapterFunctions } from '@wix-velo/velo-ex
 import { Uninitialized, gen } from '@wix-velo/test-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import each from 'jest-each'
-import Chance = require('chance')
+import * as Chance from 'chance'
 import { escapeId } from './mysql_utils'
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators //TODO: extract
@@ -408,20 +408,8 @@ describe('Sql Parser', () => {
         })
 
     })
-    
-    interface Context {
-        fieldName: any
-        fieldValue: any
-        fieldListValue: any
-        anotherFieldName: any
-        moreFieldName: any
-        filter: any
-        anotherFilter: any
-        anotherValue: any
-        moreValue: any
-    }
 
-    const ctx: Context = {
+    const ctx = {
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
         fieldListValue: Uninitialized,
@@ -432,12 +420,8 @@ describe('Sql Parser', () => {
         anotherValue: Uninitialized,
         moreValue: Uninitialized
     }
-
-    interface Enviorment {
-        filterParser: any
-    }
-
-    const env: Enviorment = {
+    
+    const env = {
         filterParser: Uninitialized,
     }
 

@@ -1,4 +1,4 @@
-import Chance = require('chance')
+import * as Chance from 'chance'
 const chance = Chance()
 
 export const validConfig = () => ({

@@ -38,23 +38,13 @@ describe('MySqlConfigValidator', () => {
         expect(env.mySqlConfigValidator.validate()).toEqual({ missingRequiredSecretsKeys: ['host/cloudSqlConnectionName'] })
     })
 
-    interface Context {
-        validConfig: any
-        validGCPConfig: any
-        configWithInvalidHost: any
-    }
-
-    const ctx: Context = {
+    const ctx = {
         validConfig: Uninitialized,
         validGCPConfig: Uninitialized,
         configWithInvalidHost: Uninitialized,
     }
     
-    interface Enviorment {
-        mySqlConfigValidator: any
-    }
-
-    const env: Enviorment = {
+    const env = {
         mySqlConfigValidator: Uninitialized,
     }
 
