@@ -85,7 +85,7 @@ export type Projection = FieldProjection | FunctionProjection
 
 export type AdapterAggregation = {
     projection: Projection[],
-    postFilter: AdapterFilter,
+    postFilter: AdapterFilter | {},
 }
 
 export interface IDataProvider {
