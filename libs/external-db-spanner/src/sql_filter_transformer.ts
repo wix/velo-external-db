@@ -87,11 +87,12 @@ export default class FilterParser implements ISpannerFilterParser {
                     .concat({ filterExpr: '', parameters: {} })[0]
     }
 
-    parseFilter(filter: Filter, inlineFields: any): SpannerParsedFilter[]{
+    parseFilter(filter: Filter | {}, inlineFields: any): SpannerParsedFilter[]{
         if (isEmptyFilter(filter)) {
             return []
         }
-        const { operator, fieldName, value } = filter
+
+        const { operator, fieldName, value } = filter as Filter
 
         switch (operator) {
             case and:

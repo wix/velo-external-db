@@ -43,7 +43,7 @@ export const updateFieldsFor = (item: object) => {
 }
 
 
-export const isEmptyFilter = (filter: { operator: any }) => {
+export const isEmptyFilter = (filter: any) => {
     return (!filter || !filter.operator)
 }
 
