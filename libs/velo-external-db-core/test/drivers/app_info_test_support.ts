@@ -1,34 +1,34 @@
-const gen = require('../gen')
-const { when } = require('jest-when')
+import * as gen from '../gen'
+import { when } from 'jest-when'
 
-const operationService = {
+export const operationService = {
     validateConnection: jest.fn(),
     connectionStatus: jest.fn(),
 }
 
-const configReaderClient = {
+export const configReaderClient = {
     readConfig: jest.fn(),
     configStatus: jest.fn(),
 }
 
-const validConfigReaderStatus = 'External DB Config read successfully'
-const validDBConnectionStatus = 'Connected to database successfully'
-const missingRequiredConfigKeys = 'Missing props:'
-const wrongDBConnectionStatus = 'Failed to connect to database'
+export const validConfigReaderStatus = 'External DB Config read successfully'
+export const validDBConnectionStatus = 'Connected to database successfully'
+export const missingRequiredConfigKeys = 'Missing props:'
+export const wrongDBConnectionStatus = 'Failed to connect to database'
 
-const defineValidOperationService = () => {
+export const defineValidOperationService = () => {
     when(operationService.connectionStatus).calledWith()
                                            .mockReturnValue({ status: validDBConnectionStatus })
 }
 
-const defineValidConfigReaderClient = (config) => {
+export const defineValidConfigReaderClient = (config: any) => {
     when(configReaderClient.readConfig).calledWith()
                                            .mockReturnValue(config)
     when(configReaderClient.configStatus).calledWith()
                                            .mockReturnValue({ message: validConfigReaderStatus })
 }
 
-const defineBrokenConfigReaderClient = (config) => {
+export const defineBrokenConfigReaderClient = (config: any) => {
     const { deletedKey, newObject } = gen.deleteRandomKeyObject(config)
     when(configReaderClient.readConfig).calledWith()
                                            .mockReturnValue(newObject)
@@ -36,18 +36,14 @@ const defineBrokenConfigReaderClient = (config) => {
                                            .mockReturnValue({ message: `${missingRequiredConfigKeys}: ${deletedKey}` })
 }
 
-const defineBrokenOperationService = () => {
+export const defineBrokenOperationService = () => {
     when(operationService.connectionStatus).calledWith()
                                            .mockReturnValue({ error: wrongDBConnectionStatus })
 }
 
-const reset = () => {
+export const reset = () => {
     operationService.validateConnection.mockClear() 
     operationService.connectionStatus.mockClear()
     configReaderClient.configStatus.mockClear()
     configReaderClient.readConfig.mockClear()
 }
-
-module.exports = { operationService, configReaderClient, validDBConnectionStatus, validConfigReaderStatus, wrongDBConnectionStatus,
-    defineValidConfigReaderClient, defineValidOperationService, defineBrokenConfigReaderClient, defineBrokenOperationService,
-     missingRequiredConfigKeys, reset }
