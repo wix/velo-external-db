@@ -1,7 +1,7 @@
-const each = require('jest-each').default
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { MySqlConfigValidator } = require('./mysql_config_validator')
-const gen = require('../tests/gen')
+import each from 'jest-each'
+import { Uninitialized } from '@wix-velo/test-commons'
+import { MySqlConfigValidator } from './mysql_config_validator'
+import * as gen from '../tests/gen'
 
 describe('MySqlConfigValidator', () => {
 
