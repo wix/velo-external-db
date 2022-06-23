@@ -1,4 +1,5 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
+import { InputField, ResponseField } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
 
 export const SystemTable = '_descriptor'
@@ -7,7 +8,7 @@ export const EmptyFilter = { filterExpr: {} }
 
 export const isSystemTable = (collectionId: string) => SystemTable === collectionId.trim().toLowerCase()
 
-export const validateTable = (collection: any) => {
+export const validateTable = (collection: string) => {
     if (collection && isSystemTable(collection) ) {
         throw new InvalidQuery('Illegal table name')
     }
@@ -27,7 +28,7 @@ export const patchFixDates = (record: { [x: string]: any }) => {
 }
 
 
-export const reformatFields = (field: { name: any; type: any }) => {
+export const reformatFields = (field: InputField): ResponseField => {
     return {
         field: field.name,
         type: field.type,

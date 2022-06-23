@@ -7,16 +7,11 @@ import { DynamoParsedFilter } from './types'
 const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
 
-export interface IDynamoDBFilterParser {
-    transform(filter: Filter, fields?: any): { filterExpr: DynamoParsedFilter, queryable: boolean }
-    selectFieldsFor(projection: string[]): { projectionExpr: string, projectionAttributeNames: {[key: string]: string} }
-}
-
-export default class FilterParser implements IDynamoDBFilterParser{
+export default class FilterParser {
     constructor() {
     }
 
-    transform(filter: Filter, fields: any) {
+    transform(filter: Filter, fields?: any): { filterExpr: DynamoParsedFilter, queryable: boolean } {
         
         const results = this.parseFilter(filter)
         if (results.length === 0) {
@@ -183,7 +178,7 @@ export default class FilterParser implements IDynamoDBFilterParser{
         return filterAttributes.every(v => collectionKeys.includes(v))
     }
 
-    selectFieldsFor(projection: any[]) { 
+    selectFieldsFor(projection: any[]): { projectionExpr: string, projectionAttributeNames: {[key: string]: string} } { 
         const projectionExpr = projection.map((f: any) => `#${f}`).join(', ')
         const projectionAttributeNames = projection.reduce((pV: any, cV: any) => (
             { ...pV, [`#${cV}`]: cV }

@@ -1,13 +1,13 @@
 import { patchDateTime } from '@wix-velo/velo-external-db-commons'
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import { validateTable, patchFixDates } from './dynamo_utils'
-import { DynamoDB, DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { IDynamoDBFilterParser } from './sql_filter_transformer'
+import { DynamoDB } from '@aws-sdk/client-dynamodb'
+import FilterParser from './sql_filter_transformer'
 import { IDataProvider, AdapterFilter as Filter, Item} from '@wix-velo/velo-external-db-types'
 import * as dynamoRequests from './dynamo_data_requests_utils'
 
 export default class DataProvider implements IDataProvider {
-    filterParser: IDynamoDBFilterParser
+    filterParser: FilterParser
     client: DynamoDB
     docClient: DynamoDBDocument
     constructor(client: DynamoDB, filterParser: any) {
@@ -20,7 +20,7 @@ export default class DataProvider implements IDataProvider {
         return queryable ? await this.docClient.query(command) : await this.docClient.scan(command)
     }
 
-    async find(collectionName: string, filter: Filter, sort: any, skip: any, limit: any, projection: any): Promise<Item[]> {
+    async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, projection: any): Promise<Item[]> {
         const { filterExpr, queryable } = this.filterParser.transform(filter)
         const { projectionExpr, projectionAttributeNames } = this.filterParser.selectFieldsFor(projection)
 

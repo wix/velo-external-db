@@ -5,3 +5,9 @@ export type DynamoParsedFilter = {
     ExpressionAttributeValues?: { [key: string]: any }
     ProjectionExpression?: { [key: string]: string }
 }
+
+export interface DynamoConfig {
+    region: string
+    endpoint?: string
+    [x: string]: any
+}

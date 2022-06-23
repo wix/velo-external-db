@@ -4,7 +4,7 @@ import { errors } from '@wix-velo/velo-external-db-commons'
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { idFilter } from '../tests/gen'
 import each from 'jest-each'
-import Chance = require('chance')
+import * as Chance from 'chance' 
 const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_contains, and, or, not } = AdapterOperators

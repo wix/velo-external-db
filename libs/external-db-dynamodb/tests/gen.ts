@@ -1,7 +1,6 @@
 
 
-import Chance = require('chance')
-
+import * as Chance from 'chance' 
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators 
 

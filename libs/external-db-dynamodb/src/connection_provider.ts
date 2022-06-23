@@ -4,12 +4,8 @@ import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './dynamo_operations'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
 import { DbProviders } from '@wix-velo/velo-external-db-types'
+import { DynamoConfig } from './types'
 
-export interface DynamoConfig {
-    region: string
-    endpoint?: string
-    [x: string]: any
-}
 
 const extraOptions  = (cfg: DynamoConfig) => { 
     if (cfg.endpoint)
