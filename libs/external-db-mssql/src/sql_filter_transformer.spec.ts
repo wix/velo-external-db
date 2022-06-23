@@ -4,7 +4,7 @@ import { escapeId, validateLiteral, patchFieldName } from './mssql_utils'
 import { Uninitialized, gen } from '@wix-velo/test-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import each from 'jest-each'
-import Chance = require('chance')
+import * as Chance from 'chance'
 const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators

@@ -1,12 +1,12 @@
 import { escapeId, validateLiteral, escape, patchFieldName, escapeTable } from './mssql_utils'
 import { updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
-import { IMSSQLFilterParser } from './sql_filter_transformer'
 import { ConnectionPool as MSSQLPool } from 'mssql'
 import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item} from '@wix-velo/velo-external-db-types'
+import FilterParser from './sql_filter_transformer'
 
 export default class DataProvider implements IDataProvider {
-    filterParser: IMSSQLFilterParser
+    filterParser: FilterParser
     sql: MSSQLPool
     constructor(pool: any, filterParser: any) {
         this.filterParser = filterParser

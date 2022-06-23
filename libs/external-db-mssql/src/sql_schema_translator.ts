@@ -1,13 +1,7 @@
 import { escapeId } from './mssql_utils'
 import { InputField } from '@wix-velo/velo-external-db-types'
 
-export interface IMSSQLSchemaColumnTranslator {
-    translateType(dbType: string): string
-    columnToDbColumnSql(field: InputField): string
-    dbTypeFor(field: InputField): string
-}
-
-export default class SchemaColumnTranslator implements IMSSQLSchemaColumnTranslator {
+export default class SchemaColumnTranslator {
     constructor() {
     }
 

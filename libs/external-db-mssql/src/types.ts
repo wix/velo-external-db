@@ -9,3 +9,13 @@ export type MSSQLParsedAggregation = {
     havingFilter: string,
     parameters: any[]
 }
+
+
+export interface MSSQLConfig {
+    user: string
+    password: string
+    db: string
+    host: string
+    unsecuredEnv?: any
+    [key: string]: any
+}

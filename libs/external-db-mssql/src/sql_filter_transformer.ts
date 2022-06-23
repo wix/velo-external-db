@@ -8,15 +8,7 @@ const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_co
 const { avg, max, min, sum, count } = AdapterFunctions
 
 
-export interface IMSSQLFilterParser {
-    transform(filter: Filter): MSSQLParsedFilter
-    orderBy(sort: any): { sortExpr: string }
-    selectFieldsFor(projection: any[]): string
-    parseAggregation(aggregation: Aggregation): MSSQLParsedAggregation
-}
-
-
-export default class FilterParser implements IMSSQLFilterParser {
+export default class FilterParser {
     constructor() {
     }
 

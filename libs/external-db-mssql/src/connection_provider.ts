@@ -5,6 +5,7 @@ import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './mssql_operations'
 import { notConnectedPool } from './mssql_utils'
 import { DbProviders } from '@wix-velo/velo-external-db-types'
+import { MSSQLConfig } from './types'
 
 const extraOptions = (cfg: MSSQLConfig) => {
     if (cfg.unsecuredEnv === 'true') {
@@ -22,15 +23,6 @@ const extraOptions = (cfg: MSSQLConfig) => {
             }
         }
     }
-}
-
-export interface MSSQLConfig {
-    user: string
-    password: string
-    db: string
-    host: string
-    unsecuredEnv?: any
-    [key: string]: any
 }
 
 export default async (cfg: MSSQLConfig, _poolOptions: { [key: string]: any }): Promise<DbProviders<ConnectionPool>> => {
@@ -60,5 +52,5 @@ export default async (cfg: MSSQLConfig, _poolOptions: { [key: string]: any }): P
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool, cleanup } 
+    return { dataProvider, schemaProvider, databaseOperations, connection: pool, cleanup } 
 }

@@ -1,5 +1,5 @@
 import { translateErrorCodes, notThrowingTranslateErrorCodes } from './sql_exception_translator'
-import SchemaColumnTranslator, { IMSSQLSchemaColumnTranslator } from './sql_schema_translator'
+import SchemaColumnTranslator from './sql_schema_translator'
 import { escapeId, escapeTable } from './mssql_utils'
 import { SystemFields, validateSystemFields, parseTableData } from '@wix-velo/velo-external-db-commons'
 import { supportedOperations } from './supported_operations'
@@ -11,7 +11,7 @@ const { CollectionDoesNotExists, CollectionAlreadyExists } = errors
 export default class SchemaProvider implements ISchemaProvider {
     sql: MSSQLPool
     dbName: string
-    sqlSchemaTranslator: IMSSQLSchemaColumnTranslator
+    sqlSchemaTranslator: SchemaColumnTranslator
     constructor(pool: any) {
         this.sql = pool
         this.dbName = pool.config.database
