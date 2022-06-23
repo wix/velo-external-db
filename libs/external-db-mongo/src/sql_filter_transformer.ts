@@ -1,21 +1,13 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { isObject, AdapterFunctions, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter, EmptySort } from './mongo_utils'
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, Sort } from '@wix-velo/velo-external-db-types' 
+import { AdapterAggregation as Aggregation, AdapterFilter, AdapterFilter as Filter, Sort } from '@wix-velo/velo-external-db-types' 
 import { MongoAggregation, MongoFieldSort, MongoFilter, MongoProjection, MongoSort } from './types'
 const { InvalidQuery } = errors
 const { string_begins, string_ends, string_contains, urlized, matches } = AdapterOperators
 const { count } = AdapterFunctions
 
-export interface IMongoFilterParser {
-    transform(filter: Filter): { filterExpr: MongoFilter }
-    parseFilter(filter: Filter): { filterExpr: MongoFilter }[]
-    parseAggregation(aggregation: Aggregation): MongoAggregation
-    orderBy(sort: Sort[]): { sortExpr: MongoSort }
-    selectFieldsFor(projection: string[]): MongoProjection
-}
-
-export default class FilterParser implements IMongoFilterParser {
+export default class FilterParser {
     constructor() {
     }
 
@@ -60,12 +52,11 @@ export default class FilterParser implements IMongoFilterParser {
         return `$${func}`
     }
 
-    parseFilter(_filter: Filter | {} ): { filterExpr: MongoFilter }[] {
-        if (isEmptyFilter(_filter)) {
+    parseFilter(filter: Filter | {}): { filterExpr: MongoFilter }[] {
+        if (isEmptyFilter(filter)) {
             return []
         }
-        const filter = _filter as Filter
-        const { operator, fieldName, value } = filter
+        const { operator, fieldName, value } = filter as Filter
         const mongoOp = this.adapterOperatorToMongoOperator(operator)
 
         if (this.isMultipleFieldOperator(mongoOp)) {
