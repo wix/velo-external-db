@@ -1,7 +1,7 @@
-const { patchFloat, extractFloatFields } = require('./spanner_utils')
-const { Spanner } = require ('@google-cloud/spanner')
-const { Chance } = require('chance')
-const { Uninitialized } = require('@wix-velo/test-commons')
+import { patchFloat, extractFloatFields } from './spanner_utils'
+import { Spanner } from '@google-cloud/spanner'
+import { Chance } from 'chance'
+import { Uninitialized } from '@wix-velo/test-commons'
 
 const chance = Chance()
 
@@ -23,6 +23,7 @@ describe('Spanner utils', () => {
         field: ctx.text,
       })
     })
+
     const ctx = {
       integer: Uninitialized,
       text: Uninitialized

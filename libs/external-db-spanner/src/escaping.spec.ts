@@ -1,8 +1,9 @@
 /* eslint-disable no-useless-escape */
-const { testLiteral, validateLiteral } = require('./spanner_utils')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const each = require('jest-each').default
-const Chance = require('chance')
+import { testLiteral, validateLiteral } from './spanner_utils'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import each from 'jest-each'
+import * as Chance from 'chance'
+const { InvalidQuery } = errors
 const chance = Chance()
 
 describe('escape literal', () => {

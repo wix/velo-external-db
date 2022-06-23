@@ -11,5 +11,6 @@
     "**/*.spec.ts",
     "**/*.test.ts",
     "**/*.test.js"
-  ]
+  ],
+  "noImplicitAny": true,
 }

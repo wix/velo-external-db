@@ -8,7 +8,7 @@
       "outputs": [ "{options.outputPath}" ],
       "options": {
         "outputPath": "dist/libs/external-db-spanner",
-        "main": "libs/external-db-spanner/src/index.js",
+        "main": "libs/external-db-spanner/src/index.ts",
         "tsConfig": "libs/external-db-spanner/tsconfig.lib.json",
         "assets": [ "libs/external-db-spanner/*.md" ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
@@ -32,14 +32,14 @@
         "{options.outputFile}"
       ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-spanner/**/*.js" ]
+        "lintFilePatterns": [ "libs/external-db-spanner/**/*.ts" ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": [ "coverage/libs/external-db-spanner" ],
       "options": {
-        "jestConfig": "libs/external-db-spanner/jest.config.js",
+        "jestConfig": "libs/external-db-spanner/jest.config.ts",
         "passWithNoTests": true
       }
     }
