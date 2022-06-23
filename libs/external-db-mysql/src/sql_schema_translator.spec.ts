@@ -1,7 +1,7 @@
-const SchemaColumnTranslator = require('./sql_schema_translator')
-const { Uninitialized } = require('@wix-velo/test-commons')
-const Chance = require('chance')
-const { escapeId } = require('./mysql_utils')
+import SchemaColumnTranslator from './sql_schema_translator'
+import { Uninitialized } from '@wix-velo/test-commons'
+import * as Chance from 'chance'
+import { escapeId } from './mysql_utils'
 const chance = Chance()
 
 describe('Sql Schema Column Translator', () => {
@@ -127,56 +127,9 @@ describe('Sql Schema Column Translator', () => {
                 ['tinyint'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual('boolean')
                 })
-                // expect( env.schemaTranslator.translateType('tinyint') ).toEqual(`${ctx.fieldName} BOOLEAN`)
             })
         })
     })
-
-
-
-/*
-    {
-        wixDataType: 'text',
-        dbType: 'varchar'
-    },
-
-    {
-        wixDataType: 'number',
-        dbType: 'decimal'
-    },
-
-    {
-        wixDataType: 'number',
-        dbType: 'integer'
-    },
-
-    {
-        wixDataType: 'number',
-        dbType: 'int'
-    },
-
-    {
-        wixDataType: 'boolean',
-        dbType: 'tinyint'
-    },
-
-    {
-        wixDataType: 'datetime',
-        dbType: 'timestamp'
-    },
-
-    {
-        wixDataType: 'datetime',
-        dbType: 'datetime'
-    },
-
-    {
-        wixDataType: 'object',
-        dbType: 'json'
-    },
- */
-
-
 
     const ctx = {
         fieldName: Uninitialized,

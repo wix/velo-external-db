@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'external-db-mysql',
     clearMocks: true,
     verbose: true,
