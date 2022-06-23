@@ -19,4 +19,3 @@ export const configWithInvalidHost = () => ({
     ... validConfig(),
     host: chance.natural()
 })
-

@@ -1,5 +1,6 @@
-import { checkRequiredKeys, checkThatHasAtLestOneRequiredKeys } from '@wix-velo/velo-external-db-commons'
 import { IConfigValidator } from '@wix-velo/velo-external-db-types'
+import { checkRequiredKeys, checkThatHasAtLestOneRequiredKeys } from '@wix-velo/velo-external-db-commons'
+
 
 export class MySqlConfigValidator implements IConfigValidator {
     requiredKeys: string[]
