@@ -87,7 +87,7 @@ export default class FilterParser implements ISpannerFilterParser {
                     .concat({ filterExpr: '', parameters: {} })[0]
     }
 
-    parseFilter(filter: Filter, inlineFields: any): SpannerParsedFilter[]{
+    parseFilter(filter: Filter | {}, inlineFields: any): SpannerParsedFilter[]{
         if (isEmptyFilter(filter)) {
             return []
         }

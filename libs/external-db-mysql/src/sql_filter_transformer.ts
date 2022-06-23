@@ -29,7 +29,7 @@ export default class FilterParser implements IMySqlFilterParser {
         }
     }
 
-    parseFilter(filter: Filter) : MySqlParsedFilter[] {
+    parseFilter(filter: Filter | {}) : MySqlParsedFilter[] {
         if (isEmptyFilter(filter)) {
             return []
         }
