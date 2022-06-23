@@ -32,7 +32,7 @@ export default class SchemaProvider implements ISchemaProvider{
 
     }
 
-    async listHeaders(): Promise<TableHeader[]> {
+    async listHeaders(): Promise<string[]> {
         await this.ensureSystemTableExists()
 
         const resp = await this.client.db()

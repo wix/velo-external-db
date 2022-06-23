@@ -37,7 +37,7 @@ export default class SchemaProvider implements ISchemaProvider {
                      }))
     }
 
-    async listHeaders(): Promise<TableHeader[]> {
+    async listHeaders(): Promise<string[]> {
         const query = {
             sql: 'SELECT table_name FROM information_schema.tables WHERE table_catalog = @tableCatalog and table_schema = @tableSchema',
             params: {

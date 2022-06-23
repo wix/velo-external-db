@@ -30,7 +30,7 @@ export default class SchemaProvider implements ISchemaProvider{
                      } ))
     }
 
-    async listHeaders(): Promise<TableHeader[]> {
+    async listHeaders(): Promise<string[]> {
         const currentDb = this.pool.config.connectionConfig.database
         const data = await this.query('SELECT TABLE_NAME as table_name FROM information_schema.tables WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME', currentDb)
         return data.map( (rs: { table_name: any }) => rs.table_name )
