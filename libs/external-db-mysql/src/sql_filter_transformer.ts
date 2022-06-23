@@ -29,12 +29,12 @@ export default class FilterParser implements IMySqlFilterParser {
         }
     }
 
-    parseFilter(filter: Filter) : MySqlParsedFilter[] {
+    parseFilter(filter: Filter | {}) : MySqlParsedFilter[] {
         if (isEmptyFilter(filter)) {
             return []
         }
 
-        const { operator, fieldName, value } = filter
+        const { operator, fieldName, value } = filter as Filter
 
         switch (operator) {
             case and:
