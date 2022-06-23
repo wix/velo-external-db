@@ -1,6 +1,6 @@
-const init = require('../../src/connection_provider')
+import init from '../../src/connection_provider'
 
-const createPool = modify => {
+const createPool = (modify: {[x:string]: any}) => {
     const config = {
         projectId: 'test-project',
         instanceId: 'test-instance',
@@ -16,17 +16,12 @@ const dbOperationWithMisconfiguredDatabaseId = () => createPool( { databaseId: '
 
 const dbOperationWithMisconfiguredInstanceId = () => createPool( { instanceId: 'wrong' } ).databaseOperations
 
-const dbOperationWithValidDB = () => {
+export const dbOperationWithValidDB = () => {
     const { databaseOperations, cleanup } = createPool({ } )
     return { dbOperations: databaseOperations, cleanup }
 }
 
-const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong projectId', () => dbOperationWithMisconfiguredProjectId()],
+export const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong projectId', () => dbOperationWithMisconfiguredProjectId()],
                                             ['pool connection with wrong databaseId', () => dbOperationWithMisconfiguredDatabaseId()],
                                             ['pool connection with wrong instanceId', () => dbOperationWithMisconfiguredInstanceId()]
                                         ])
-
-
-module.exports = {
-     dbOperationWithValidDB, misconfiguredDbOperationOptions
-}

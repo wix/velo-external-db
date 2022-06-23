@@ -77,7 +77,7 @@ export type FieldProjection = {
 export type FunctionProjection = {
     name: string
     function: AdapterFunctions
-    alias?: string
+    alias: string
 }
 
 export type Projection = FieldProjection | FunctionProjection    
@@ -91,8 +91,8 @@ export type AdapterAggregation = {
 export interface IDataProvider {
     find(collectionName: string, filter: AdapterFilter, sort: Sort, skip: number, limit: number, projection: string[]): Promise<Item[]>;
     count(collectionName: string, filter: AdapterFilter): Promise<number>;
-    insert(collectionName: string, items: Item[], fields?: any[]): Promise<number>;
-    update(collectionName: string, items: Item[]): Promise<number>;
+    insert(collectionName: string, items: Item[], fields?: any): Promise<number>;
+    update(collectionName: string, items: Item[], fields?: any): Promise<number>;
     delete(collectionName: string, itemIds: string[]): Promise<number>;
     truncate(collectionName: string): Promise<void>;
     aggregate(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation): Promise<Item[]>;
