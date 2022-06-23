@@ -117,7 +117,7 @@ export type ResponseField = FieldAttributes & { field: string }
 
 export interface ISchemaProvider {
     list(): Promise<Table[]>
-    listHeaders(): Promise<TableHeader[]>
+    listHeaders(): Promise<string[]>
     supportedOperations(): SchemaOperations[]
     create(collectionName: string, columns: InputField[]): Promise<void>
     addColumn(collectionName: string, column: InputField): Promise<void>
