@@ -1,7 +1,11 @@
-const { checkRequiredKeys, checkThatHasAtLestOneRequiredKeys } = require('@wix-velo/velo-external-db-commons')
+import { checkRequiredKeys, checkThatHasAtLestOneRequiredKeys } from '@wix-velo/velo-external-db-commons'
+import { IConfigValidator } from '@wix-velo/velo-external-db-types'
 
-class MySqlConfigValidator {
-    constructor(config) {
+export class MySqlConfigValidator implements IConfigValidator {
+    requiredKeys: string[]
+    hostKeyOptions: string[]
+    config: any
+    constructor(config: any) {
         this.requiredKeys = ['user', 'password', 'db'] 
         this.hostKeyOptions = ['host', 'cloudSqlConnectionName']
         this.config = config
@@ -19,5 +23,3 @@ class MySqlConfigValidator {
         }
     }
 }
-
-module.exports = { MySqlConfigValidator }
