@@ -1,9 +1,9 @@
-const DataService = require('./data')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const driver = require('../../test/drivers/data_provider_test_support')
-const { SystemFields } = require('@wix-velo/velo-external-db-commons')
-const Chance = require('chance')
-const { getByIdFilterFor } = require('../utils/data_utils')
+import DataService from './data'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import * as driver from '../../test/drivers/data_provider_test_support'
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
+import Chance = require('chance')
+import { getByIdFilterFor } from '../utils/data_utils'
 const chance = new Chance()
 
 describe('Data Service', () => {
@@ -82,6 +82,7 @@ describe('Data Service', () => {
         return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
     })
 
+
     const ctx = {
         collectionName: Uninitialized,
         filter: Uninitialized,
@@ -96,9 +97,14 @@ describe('Data Service', () => {
         itemId: Uninitialized,
         itemIds: Uninitialized,
         total: Uninitialized,
+        defaultProjection: Uninitialized
     }
 
-    const env = {
+    interface Enviorment {
+        dataService: DataService
+    }
+
+    const env: Enviorment = {
         dataService: Uninitialized,
     }
 
@@ -121,9 +127,9 @@ describe('Data Service', () => {
         ctx.entity = gen.randomEntity()
 
         const e = gen.randomEntity()
-        delete e._id
+        delete e['_id']
         ctx.entityWithoutId = e
-        ctx.entitiesWithoutId = gen.randomEntities().map(i => { delete i._id; return i })
+        ctx.entitiesWithoutId = gen.randomEntities().map(i => { delete i['_id']; return i })
 
         env.dataService = new DataService(driver.dataProvider)
     })

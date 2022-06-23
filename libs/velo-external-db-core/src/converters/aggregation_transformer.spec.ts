@@ -1,12 +1,13 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const AggregationTransformer = require('./aggregation_transformer')
-const { EmptyFilter } = require ('./utils')
-const Chance = require('chance')
+import { Uninitialized } from '@wix-velo/test-commons'
+import AggregationTransformer from './aggregation_transformer'
+import { EmptyFilter } from './utils'
+import * as driver from '../../test/drivers/filter_transformer_test_support'
+import { AdapterFunctions } from '@wix-velo/velo-external-db-commons'
+import each from 'jest-each'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import Chance = require('chance')
 const chance = Chance()
-const each = require('jest-each').default
-const { AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
-const driver = require ('../../test/drivers/filter_transformer_test_support')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+const { InvalidQuery } = errors
 
 describe('Aggregation Transformer', () => {
     beforeAll(() => {
@@ -18,9 +19,9 @@ describe('Aggregation Transformer', () => {
         each([
             '$avg', '$max', '$min', '$sum'
         ])
-        .test('correctly transform [%s]', (f) => {
+        .test('correctly transform [%s]', (f: string) => {
             const AdapterFunction = f.substring(1) 
-            expect(env.AggregationTransformer.wixFunctionToAdapterFunction(f)).toEqual(AdapterFunctions[AdapterFunction])
+            expect(env.AggregationTransformer.wixFunctionToAdapterFunction(f)).toEqual((AdapterFunctions as any)[AdapterFunction])
         })
 
         test('transform unknown function will throw an exception', () => {
@@ -145,9 +146,12 @@ describe('Aggregation Transformer', () => {
         })
     })
 
+    interface Enviorment {
+        driver: any
+        AggregationTransformer: AggregationTransformer 
+    }
 
-
-    const env = {
+    const env: Enviorment = {
         driver: Uninitialized,
         AggregationTransformer: Uninitialized
     }

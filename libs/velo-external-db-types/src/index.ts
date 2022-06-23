@@ -52,7 +52,7 @@ export type AnyFixMe = any
 export type AdapterFilter = {
     operator: AdapterOperator,
     fieldName: string,
-    value: any
+    value?: any
 }
 
 export type Sort = {
@@ -85,13 +85,13 @@ export type Projection = FieldProjection | FunctionProjection
 
 export type AdapterAggregation = {
     projection: Projection[],
-    postFilter: AdapterFilter,
+    postFilter: AdapterFilter | {},
 }
 
 export interface IDataProvider {
-    find(collectionName: string, filter: AdapterFilter, sort: Sort, skip: number, limit: number, projection: string[]): Promise<Item[]>;
+    find(collectionName: string, filter: AdapterFilter, sort: any, skip: number, limit: number, projection: string[]): Promise<Item[]>;
     count(collectionName: string, filter: AdapterFilter): Promise<number>;
-    insert(collectionName: string, items: Item[], fields?: any): Promise<number>;
+    insert(collectionName: string, items: Item[], fields?: ResponseField[]): Promise<number>;
     update(collectionName: string, items: Item[], fields?: any): Promise<number>;
     delete(collectionName: string, itemIds: string[]): Promise<number>;
     truncate(collectionName: string): Promise<void>;
@@ -119,7 +119,7 @@ export interface ISchemaProvider {
     list(): Promise<Table[]>
     listHeaders(): Promise<string[]>
     supportedOperations(): SchemaOperations[]
-    create(collectionName: string, columns: InputField[]): Promise<void>
+    create(collectionName: string, columns?: InputField[]): Promise<void>
     addColumn(collectionName: string, column: InputField): Promise<void>
     removeColumn(collectionName: string, columnName: string): Promise<void>
     describeCollection(collectionName: string): Promise<ResponseField[]>
@@ -131,10 +131,12 @@ export interface IBaseHttpError extends Error {
     status: number;
 }
 
-export type ValidateConnectionResult = {
-    valid: boolean,
-    error?: IBaseHttpError
-}
+type ValidConnectionResult = { valid: true }
+type InvalidConnectionResult = { valid: false, error: IBaseHttpError }
+
+export type ValidateConnectionResult = ValidConnectionResult | InvalidConnectionResult
+
+export type connectionStatusResult = {status: string} | {error: string}
 
 export interface IDatabaseOperations {
     validateConnection(): Promise<ValidateConnectionResult>
@@ -153,4 +155,55 @@ export type DbProviders<T> = {
 export interface IConfigValidator {
     validate(config: any): { missingRequiredSecretsKeys: string[] }
     readConfig(): any
+}
+
+export enum WixDataSingleFieldOperators {
+    $eq = '$eq',
+    $gt = '$gt',
+    $gte = '$gte',
+    $hasSome = '$hasSome',
+    $lt = '$lt',
+    $lte = '$lte',
+    $ne = '$ne',
+    $startsWith = '$startsWith',
+    $endsWith = '$endsWith',
+    $contains = '$contains',
+    $and = '$and',
+    $or = '$or',
+    $not = '$not',
+    $urlized = '$urlized',
+    $matches = '$matches'
+}
+
+export enum WixDataMultiFieldOperators {
+    $and = '$and',
+    $or = '$or',
+    $not = '$not',
+}
+
+export type WixDataSingleFieldFilter = {
+    [key: string]: { [key in WixDataSingleFieldOperators]: any }
+}
+
+export type WixDataMultipleFieldsFilter = {
+    [key in WixDataMultiFieldOperators]?: WixDataFilter[]
+}
+
+export type WixDataFilter = WixDataSingleFieldFilter | WixDataMultipleFieldsFilter
+
+
+export enum WixDataFunction {
+    $avg = '$avg',
+    $max = '$max',
+    $min = '$min',
+    $sum = '$sum',
+}
+
+export type WixDataAggregation = {
+    processingStep: {
+        _id: string |  { [key: string]: any }
+        [key: string]: any
+        // [fieldAlias: string]: {[key in WixDataFunction]: string | number },
+    }
+    postFilteringStep: WixDataFilter
 }

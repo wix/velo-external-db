@@ -1,13 +1,24 @@
-const { isObject, AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
-const { projectionFieldFor, projectionFunctionFor } = require ('./utils')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+import { isObject } from '@wix-velo/velo-external-db-commons'
+import { AdapterAggregation, AdapterFunctions, FieldProjection, FunctionProjection, WixDataAggregation } from '@wix-velo/velo-external-db-types'
+import { IFilterTransformer } from './filter_transformer'
+import { projectionFieldFor, projectionFunctionFor } from './utils'
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { InvalidQuery } = errors
 
-class AggregationTransformer {
-    constructor(filterTransformer) {
+interface IAggregationTransformer {
+    transform(aggregation: any): AdapterAggregation
+    extractProjectionFunctions(functionsObj: { [x: string]: { [s: string]: string | number } }): FunctionProjection[]
+    extractProjectionFields(fields: { [fieldName: string]: string } | string): FieldProjection[]
+    wixFunctionToAdapterFunction(wixFunction: string): AdapterFunctions
+}
+
+export default class AggregationTransformer implements IAggregationTransformer{
+    filterTransformer: IFilterTransformer
+    constructor(filterTransformer: any) {
         this.filterTransformer = filterTransformer
     }
 
-    transform({ processingStep, postFilteringStep }) {        
+    transform({ processingStep, postFilteringStep }: any): AdapterAggregation {        
         const { _id: fields, ...functions } = processingStep
 
         const projectionFields = this.extractProjectionFields(fields)
@@ -23,8 +34,8 @@ class AggregationTransformer {
         }
     }
 
-    extractProjectionFunctions(functionsObj) {
-        const projectionFunctions = []
+    extractProjectionFunctions(functionsObj: { [x: string]: { [s: string]: string | number } }) {
+        const projectionFunctions: { name: any; alias: any; function: any }[] = []
         Object.keys(functionsObj)
               .forEach(fieldAlias => {
                   Object.entries(functionsObj[fieldAlias])
@@ -36,7 +47,7 @@ class AggregationTransformer {
         return projectionFunctions
     }
 
-    extractProjectionFields(fields) {
+    extractProjectionFields(fields: { [fieldName: string]: string } | string) {
         const projectionFields = []
 
         if (isObject(fields)) {
@@ -48,7 +59,11 @@ class AggregationTransformer {
         return projectionFields
     }
 
-    wixFunctionToAdapterFunction(func) {
+    wixFunctionToAdapterFunction(func: string): AdapterFunctions {
+        return this.wixFunctionToAdapterFunctionString(func) as AdapterFunctions
+    }
+
+    private wixFunctionToAdapterFunctionString(func: string): string {
         switch (func) {
             case '$avg':
                 return AdapterFunctions.avg
@@ -64,5 +79,3 @@ class AggregationTransformer {
         }
     }
 }
-
-module.exports= AggregationTransformer

@@ -1,12 +1,12 @@
-const Chance = require('chance')
-const SchemaService = require('./schema')
-const { AllSchemaOperations, errors } = require('@wix-velo/velo-external-db-commons')
-const { Uninitialized } = require('@wix-velo/test-commons')
-const driver = require('../../test/drivers/schema_provider_test_support')
-const schema = require('../../test/drivers/schema_information_test_support')
-const matchers = require('../../test/drivers/schema_matchers')
-const gen = require('../../test/gen')
-const { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor  } = matchers
+import * as Chance from 'chance'
+import SchemaService from './schema'
+import { AllSchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
+import { Uninitialized } from '@wix-velo/test-commons'
+import * as driver from '../../test/drivers/schema_provider_test_support'
+import * as schema from '../../test/drivers/schema_information_test_support'
+import * as matchers from '../../test/drivers/schema_matchers'
+import * as gen from '../../test/gen'
+const { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor } = matchers
 const chance = Chance()
 
 describe('Schema Service', () => {
@@ -29,7 +29,7 @@ describe('Schema Service', () => {
         driver.givenAllSchemaOperations()
         schema.givenSchemaFieldsResultFor(ctx.dbsWithIdColumn)
 
-        await expect( env.schemaService.find(ctx.dbsWithIdColumn.map(db => db.id)) ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
+        await expect( env.schemaService.find(ctx.dbsWithIdColumn.map((db: { id: any }) => db.id)) ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
     })
 
     test('create collection name', async() => {
@@ -80,7 +80,11 @@ describe('Schema Service', () => {
         invalidOperations: Uninitialized,
     }
 
-    const env = {
+    interface Enviorment {
+        schemaService: SchemaService
+    }
+
+    const env: Enviorment = {
         schemaService: Uninitialized,
     }
 

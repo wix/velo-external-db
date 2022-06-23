@@ -1,11 +1,11 @@
-const rewire = require('rewire')
-const validate = require('uuid-validate')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const { truthyValue, falsyValue } = require ('../../test/gen')
-const Chance = require('chance')
+import rewire = require('rewire')
+import validate = require('uuid-validate')
+import dateTimeProvider = require('../../test/drivers/date_time_provider_test_support')
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import { truthyValue, falsyValue } from '../../test/gen'
+import Chance = require('chance')
 const chance = Chance()
 const rewiredItemTransformer = rewire('./item_transformer')
-const dateTimeProvider = require('../../test/drivers/date_time_provider_test_support')
 
 describe('Item Transformer', () => {
     describe('default value for', () => {
@@ -128,6 +128,7 @@ describe('Item Transformer', () => {
         obj: Uninitialized,
         objSchemaFields: Uninitialized,
         property: Uninitialized,
+        anotherProperty: Uninitialized,
         veloDate: Uninitialized
     }
 
