@@ -1,11 +1,12 @@
-const SchemaAwareDataService = require ('./schema_aware_data')
-const schema = require ('../../test/drivers/schema_information_test_support')
-const data = require ('../../test/drivers/data_service_test_support')
-const queryValidator = require('../../test/drivers/query_validator_test_support')
-const patcher = require ('../../test/drivers/item_patcher_test_support')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const Chance = require('chance')
-const { SystemFields } = require('@wix-velo/velo-external-db-commons')
+import SchemaAwareDataService from './schema_aware_data'
+import * as schema from '../../test/drivers/schema_information_test_support'
+import * as data from '../../test/drivers/data_service_test_support'
+import * as queryValidator from '../../test/drivers/query_validator_test_support'
+import * as patcher from '../../test/drivers/item_patcher_test_support'
+import * as Chance from 'chance'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
+import DataService from './data'
 const chance = new Chance()
 
 describe ('Schema Aware Data Service', () => {
@@ -117,11 +118,19 @@ describe ('Schema Aware Data Service', () => {
         sort: Uninitialized,
         limit: Uninitialized,
         skip: Uninitialized,
-        defaultFields: Uninitialized
+        defaultFields: Uninitialized,
+        entityWithExtraProps: Uninitialized,
+        entitiesWithExtraProps: Uninitialized,
     }
 
-    const env = {
+    interface Enviorment {
+        schemaAwareDataService: SchemaAwareDataService
+        dataService: DataService
+    }
+
+    const env: Enviorment = {
         dataService: Uninitialized,
+        schemaAwareDataService: Uninitialized,
     }
 
     beforeEach(() => {
@@ -139,9 +148,9 @@ describe ('Schema Aware Data Service', () => {
         ctx.patchedEntities = gen.randomEntities()
 
         const e = gen.randomEntity()
-        delete e._id
+        delete e['_id']
         ctx.entityWithoutId = e
-        ctx.entitiesWithoutId = gen.randomEntities().map(i => { delete i._id; return i })
+        ctx.entitiesWithoutId = gen.randomEntities().map(i => { delete i['_id']; return i })
         ctx.entityWithExtraProps = { ...gen.randomEntity(), someProp: chance.word() }
         ctx.entitiesWithExtraProps = gen.randomEntities().map(i => ({ ...i, someProp: chance.word() }))
 

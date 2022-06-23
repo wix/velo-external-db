@@ -1,7 +1,7 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 const { DbConnectionError } = errors
 import { isConnected } from './mongo_utils'
-import { IDatabaseOperations } from '@wix-velo/velo-external-db-types'
+import { IDatabaseOperations, ValidateConnectionResult } from '@wix-velo/velo-external-db-types'
 
 export default class DatabaseOperations implements IDatabaseOperations {
     client: any
@@ -9,7 +9,7 @@ export default class DatabaseOperations implements IDatabaseOperations {
         this.client = client
     }
 
-    async validateConnection() {
+    async validateConnection(): Promise<ValidateConnectionResult> {
         try {
             if (isConnected(this.client))
                 return { valid: true }

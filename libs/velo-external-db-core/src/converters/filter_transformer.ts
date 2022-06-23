@@ -1,22 +1,31 @@
-const { AdapterOperators, isObject } = require('@wix-velo/velo-external-db-commons')
-const { EmptyFilter } = require ('./utils')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+import { AdapterOperators, isObject } from '@wix-velo/velo-external-db-commons'
+import { EmptyFilter } from './utils'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { AdapterFilter, AdapterOperator, WixDataFilter, WixDataMultiFieldOperators, } from '@wix-velo/velo-external-db-types'
+const { InvalidQuery } = errors
 
-class FilterTransformer {
+export interface IFilterTransformer {
+    transform(filter: any): AdapterFilter | {}
+    isMultipleFieldOperator(filter: WixDataFilter): boolean
+    wixOperatorToAdapterOperator(wixOperator: string): AdapterOperator
+    isEmptyFilter(filter: any): boolean
+}
+
+export default class FilterTransformer implements IFilterTransformer {
     constructor() {
 
     }
 
-    transform(filter) {
+    transform(filter: any): AdapterFilter | {} {
         if (this.isEmptyFilter(filter)) return EmptyFilter
 
-        if(this.isMultipleFieldOperator(filter)) {
+        if (this.isMultipleFieldOperator(filter)) {
             const wixOperator = Object.keys(filter)[0]
             const operator = this.wixOperatorToAdapterOperator(wixOperator)
             const values = filter[wixOperator]
             const res = values.map(this.transform.bind(this))
             return {
-                operator,
+                operator: operator,
                 value: res
             }
         }
@@ -26,18 +35,21 @@ class FilterTransformer {
         const operator = this.wixOperatorToAdapterOperator(wixOperator)
         const value = filter[fieldName][wixOperator]
         return {
-            operator,
+            operator: operator as AdapterOperator,
             fieldName,
             value
         }
     }
 
-    isMultipleFieldOperator(filter) { 
-        return ['$not', '$or', '$and'].includes(Object.keys(filter)[0])
+    isMultipleFieldOperator(filter: WixDataFilter) {
+        return (<any>Object).values(WixDataMultiFieldOperators).includes(Object.keys(filter)[0])
     }
 
+    wixOperatorToAdapterOperator(wixOperator: string): AdapterOperator {
+        return this.wixOperatorToAdapterOperatorString(wixOperator) as AdapterOperator
+    }
 
-    wixOperatorToAdapterOperator(operator) {
+    wixOperatorToAdapterOperatorString(operator: string) {
         switch (operator) {
             case '$eq':
                 return AdapterOperators.eq
@@ -74,10 +86,8 @@ class FilterTransformer {
         }
     }
 
-    isEmptyFilter(filter) {
-        return (!filter || !isObject(filter)|| Object.keys(filter)[0] === undefined)
-    } 
-    
-}
+    isEmptyFilter(filter: any): boolean {
+        return (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined)
+    }
 
-module.exports = FilterTransformer
+}

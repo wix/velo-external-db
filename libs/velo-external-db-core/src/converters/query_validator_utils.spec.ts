@@ -1,10 +1,11 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { extractFieldsAndOperators, queryAdapterOperatorsFor } = require ('./query_validator_utils')
-const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { extractFieldsAndOperators, queryAdapterOperatorsFor } from './query_validator_utils'
+import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { EmptyFilter } from './utils'
+import * as gen from '../../test/gen'
+import Chance = require('chance')
+import { AdapterOperator } from '@wix-velo/velo-external-db-types'
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, matches } = AdapterOperators
-const { EmptyFilter } = require('./utils')
-const gen = require('../../test/gen')
-const Chance = require('chance')
 const chance = Chance()
 
 describe('Query Validator utils spec', () => {
@@ -24,7 +25,7 @@ describe('Query Validator utils spec', () => {
 
         test('correctly extract fields and operators with multiple fields filter', () => {
             expect(extractFieldsAndOperators({
-                                                operator: and,
+                                                operator: and as AdapterOperator,
                                                 value: [{
                                                     fieldName: ctx.fieldName,
                                                     operator: ctx.operator,
@@ -65,7 +66,6 @@ describe('Query Validator utils spec', () => {
             expect(queryAdapterOperatorsFor('image')).toEqual([])
         })
     })
-
 
     const ctx = {
         fieldName: Uninitialized,

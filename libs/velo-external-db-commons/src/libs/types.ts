@@ -1,3 +1,5 @@
+import { ResponseField } from "@wix-velo/velo-external-db-types"
+
 export type Field = {
     field: string,
     type: string,
@@ -6,7 +8,7 @@ export type Field = {
     isPrimary?: boolean,
 }
 
-export type FieldWithQueryOperators = Field & { queryOperators: string[] }
+export type FieldWithQueryOperators = ResponseField & { queryOperators: string[] }
 
 export interface AsWixSchemaHeaders {
     id: string,

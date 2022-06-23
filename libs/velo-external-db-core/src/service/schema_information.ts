@@ -1,30 +1,28 @@
-const { CollectionDoesNotExists } = require('@wix-velo/velo-external-db-commons').errors
-const NodeCache = require('node-cache')
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { ISchemaProvider, ResponseField } from '@wix-velo/velo-external-db-types'
+const { CollectionDoesNotExists } = errors
+import * as NodeCache from 'node-cache'
 
 const FiveMinutes = 5 * 60
 
-class CacheableSchemaInformation {
-    constructor(schemaProvider) {
+export default class CacheableSchemaInformation {
+    schemaProvider: ISchemaProvider
+    cache: NodeCache
+    constructor(schemaProvider: any) {
         this.schemaProvider = schemaProvider
         this.cache = new NodeCache( { checkperiod: FiveMinutes + 10 } )
-
-        // const refreshFunc = async() => {
-        //     await this.refresh()
-        //               .catch( console.log )
-        // }
-        // setImmediate(refreshFunc)
     }
     
-    async schemaFieldsFor(collectionName) {
+    async schemaFieldsFor(collectionName: string): Promise<ResponseField[]> {
         const schema = this.cache.get(collectionName)
         if ( !schema ) {
             await this.update(collectionName)
-            return this.cache.get(collectionName) 
+            return this.cache.get(collectionName) as ResponseField[] 
         }
-        return schema
+        return schema as ResponseField[]
     }
 
-    async update(collectionName) {
+    async update(collectionName: string) {
         const collection = await this.schemaProvider.describeCollection(collectionName)
         if (!collection) throw new CollectionDoesNotExists('Collection does not exists')
         this.cache.set(collectionName, collection, FiveMinutes)
@@ -33,7 +31,7 @@ class CacheableSchemaInformation {
     async refresh() {
         const schema = await this.schemaProvider.list()
         if (schema && schema.length) 
-            schema.forEach(collection => {
+            schema.forEach((collection: { id: any; fields: any }) => {
                 this.cache.set(collection.id, collection.fields, FiveMinutes)
             })
     }
@@ -43,5 +41,3 @@ class CacheableSchemaInformation {
     }
 
 }
-
-module.exports = CacheableSchemaInformation
