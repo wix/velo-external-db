@@ -1,13 +1,13 @@
 import { translateErrorCodes } from './exception_translator'
 import { unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
 import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item} from '@wix-velo/velo-external-db-types'
-import { IMongoFilterParser } from './sql_filter_transformer'
+import FilterParser from './sql_filter_transformer'
 import { MongoClient } from 'mongodb'
 
 
 export default class DataProvider implements IDataProvider {
     client: MongoClient
-    filterParser: IMongoFilterParser
+    filterParser: FilterParser
     constructor(client: any, filterParser: any) {
         this.client = client
         this.filterParser = filterParser
