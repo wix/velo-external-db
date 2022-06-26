@@ -49,11 +49,15 @@ export enum AdapterFunctions { //in data_commons as well
 
 export type AnyFixMe = any
 
-export type AdapterFilter = {
+export type EmptyFilter = {}
+
+export type NotEmptyAdapterFilter = {
     operator: AdapterOperator,
     fieldName: string,
     value: any
 }
+
+export type AdapterFilter = EmptyFilter | NotEmptyAdapterFilter
 
 export type Sort = {
     fieldName: string,

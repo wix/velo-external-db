@@ -1,7 +1,7 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, isEmptyFilter, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { escapeId, validateLiteral, patchFieldName, escapeFieldId } from './spanner_utils'
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, AdapterOperator, Sort, FunctionProjection, FieldProjection} from '@wix-velo/velo-external-db-types'
+import { AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, AdapterOperator, Sort, FunctionProjection, FieldProjection, NotEmptyAdapterFilter as NotEmptyFilter} from '@wix-velo/velo-external-db-types'
 import { SpannerParsedAggregation, SpannerParsedFilter } from './types'
 const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
@@ -87,12 +87,12 @@ export default class FilterParser implements ISpannerFilterParser {
                     .concat({ filterExpr: '', parameters: {} })[0]
     }
 
-    parseFilter(filter: Filter | {}, inlineFields: any): SpannerParsedFilter[]{
+    parseFilter(filter: Filter, inlineFields: any): SpannerParsedFilter[]{
         if (isEmptyFilter(filter)) {
             return []
         }
 
-        const { operator, fieldName, value } = filter as Filter
+        const { operator, fieldName, value } = filter as NotEmptyFilter
 
         switch (operator) {
             case and:
