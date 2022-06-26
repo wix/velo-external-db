@@ -1,24 +1,32 @@
-const path = require('path')
-const Promise = require('bluebird')
-const express = require('express')
-const compression = require('compression')
-const { errorMiddleware } = require('./web/error-middleware')
-const { appInfoFor } = require('./health/app_info')
+import * as path from 'path'
+import * as BPromise from 'bluebird'
+import * as express from 'express'
+import * as compression from 'compression'
+import { errorMiddleware } from './web/error-middleware'
+import { appInfoFor } from './health/app_info'
 const { InvalidRequest, ItemNotFound } = require('@wix-velo/velo-external-db-commons').errors
-const { extractRole } = require('./web/auth-role-middleware')
-const { config } = require('./roles-config.json')
-const { secretKeyAuthMiddleware } = require('./web/auth-middleware')
-const { authRoleMiddleware } = require('./web/auth-role-middleware')
-const { unless, includes } = require('./web/middleware-support')
-const { getAppInfoPage } = require('./utils/router_utils')
-const { HooksForAction: DataHooksForAction, Operations: dataOperations, payloadFor: dataPayloadFor, Actions: DataActions, requestContextFor } = require('./data_hooks_utils')
-const { HooksForAction: SchemaHooksForAction, Operations: SchemaOperations, payloadFor: schemaPayloadFor, Actions: SchemaActions } = require('./schema_hooks_utils')
+import { extractRole } from './web/auth-role-middleware'
+import { config } from './roles-config.json'
+import { secretKeyAuthMiddleware } from './web/auth-middleware'
+import { authRoleMiddleware } from './web/auth-role-middleware'
+import { unless, includes } from './web/middleware-support'
+import { getAppInfoPage } from './utils/router_utils'
+import { DataHooksForAction, DataOperations, dataPayloadFor, DataActions, requestContextFor } from './data_hooks_utils'
+import { SchemaHooksForAction, SchemaOperations, schemaPayloadFor, SchemaActions } from './schema_hooks_utils'
+import SchemaService from './service/schema'
+import OperationService from './service/operation'
+import { AnyFixMe, IConfigValidator } from '@wix-velo/velo-external-db-types'
+import SchemaAwareDataService from './service/schema_aware_data'
+import FilterTransformer from './converters/filter_transformer'
+import AggregationTransformer from './converters/aggregation_transformer'
+import { RoleAuthorizationService } from '@wix-velo/external-db-security'
+import { DataHooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 
-const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = dataOperations
+const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
 
-let schemaService, operationService, externalDbConfigClient, schemaAwareDataService, cfg, filterTransformer, aggregationTransformer, roleAuthorizationService, dataHooks, schemaHooks
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: IConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
 
-const initServices = (_schemaAwareDataService, _schemaService, _operationService, _externalDbConfigClient, _cfg, _filterTransformer, _aggregationTransformer, _roleAuthorizationService, _hooks) => {
+export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService, _externalDbConfigClient: IConfigValidator, _cfg: { secretKey?: any; type?: any; vendor?: any }, _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer, _roleAuthorizationService: RoleAuthorizationService, _hooks: {dataHooks?: DataHooks, schemaHooks?: SchemaHooks}) => {
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient
@@ -27,31 +35,33 @@ const initServices = (_schemaAwareDataService, _schemaService, _operationService
     filterTransformer = _filterTransformer
     aggregationTransformer = _aggregationTransformer
     roleAuthorizationService = _roleAuthorizationService
-    dataHooks = _hooks?.dataHooks || {}
-    schemaHooks = _hooks?.schemaHooks || {}
+    dataHooks = _hooks.dataHooks || {}
+    schemaHooks = _hooks.schemaHooks || {}
 }
 
-const serviceContext = () => ({
+const serviceContext = (): ServiceContext => ({
     dataService: schemaAwareDataService,
     schemaService
 })
 
 
-const executeDataHooksFor = async(action, payload, requestContext) => {
-    return Promise.reduce(DataHooksForAction[action], async(lastHookResult, hook) => {
-        return await executeHook(dataHooks, hook, lastHookResult, requestContext)
+const executeDataHooksFor = async(action: string, payload: AnyFixMe, requestContext: RequestContext) => {
+    return BPromise.reduce(DataHooksForAction[action], async(lastHookResult: AnyFixMe, hookName: string) => {
+        return await executeHook(dataHooks, hookName, lastHookResult, requestContext)
     }, payload)
 }
 
-const executeSchemaHooksFor = async(action, payload, requestContext) => {
-    return Promise.reduce(SchemaHooksForAction[action], async(lastHookResult, hook) => {
-        return await executeHook(schemaHooks, hook, lastHookResult, requestContext)
+const executeSchemaHooksFor = async(action: string, payload: any, requestContext: RequestContext) => {
+    return BPromise.reduce(SchemaHooksForAction[action], async(lastHookResult: any, hookName: string) => {
+        return await executeHook(schemaHooks, hookName, lastHookResult, requestContext)
     }, payload)
 }
 
-const executeHook = async(hooks, actionName, payload, requestContext) => {
+const executeHook = async(hooks: DataHooks| SchemaHooks , _actionName: string, payload: AnyFixMe, requestContext: RequestContext) => {
+    const actionName = _actionName as keyof typeof hooks
     if (hooks[actionName]) {
         try {
+            // @ts-ignore
             const payloadAfterHook = await hooks[actionName](payload, requestContext, serviceContext())
             return payloadAfterHook || payload
         } catch (e) {
@@ -61,7 +71,7 @@ const executeHook = async(hooks, actionName, payload, requestContext) => {
     return payload
 }
 
-const createRouter = () => {
+export const createRouter = () => {
     const router = express.Router()
     router.use(express.json())
     router.use(compression())
@@ -146,10 +156,10 @@ const createRouter = () => {
     router.post('/data/get', async(req, res, next) => {
         try {
             const { collectionName } = req.body
-
+            
             const { itemId } = await executeDataHooksFor(DataActions.BeforeGetById, dataPayloadFor(GET, req.body), requestContextFor(GET, req.body))
             await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.getById(collectionName, itemId, '', 0, 1)
+            const data = await schemaAwareDataService.getById(collectionName, itemId)
 
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterGetById, data, requestContextFor(GET, req.body))
             if (!dataAfterAction.item) {
@@ -336,4 +346,3 @@ const createRouter = () => {
 
     return router
 }
-module.exports = { createRouter, initServices }

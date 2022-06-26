@@ -8,8 +8,8 @@ import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
 import QueryValidator from './converters/query_validator'
 import SchemaAwareDataService from './service/schema_aware_data'
+import { initServices, createRouter } from './router'
 const ItemTransformer = require('./converters/item_transformer')
-const { initServices, createRouter } = require('./router')
 const { RoleAuthorizationService } = require ('@wix-velo/external-db-security')
 const { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } = require ('@wix-velo/external-db-config')
 

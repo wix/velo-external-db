@@ -1,6 +1,8 @@
+import { Item, WixDataAggregation, WixDataFilter } from "@wix-velo/velo-external-db-types";
+import { AggregationQuery, FindQuery, RequestContext } from "./types";
 
 
-const HooksForAction = {
+export const DataHooksForAction: { [key: string]: string[] } = {
     beforeFind: ['beforeAll', 'beforeRead', 'beforeFind'],
     afterFind: ['afterAll', 'afterRead', 'afterFind'],
     beforeInsert: ['beforeAll', 'beforeWrite', 'beforeInsert'],
@@ -23,20 +25,21 @@ const HooksForAction = {
     afterGetById: ['afterAll', 'afterRead', 'afterGetById'],
 }
 
-const Operations = {
-    Find: 'find',
-    Insert: 'insert',
-    BulkInsert: 'bulkInsert',
-    Update: 'update',
-    BulkUpdate: 'bulkUpdate',
-    Remove: 'remove',
-    BulkRemove: 'bulkRemove',
-    Aggregate: 'aggregate',
-    Count: 'count',
-    Get: 'getById',
+
+export enum DataOperations {
+    Find = 'find',
+    Insert = 'insert',
+    BulkInsert = 'bulkInsert',
+    Update = 'update',
+    BulkUpdate = 'bulkUpdate',
+    Remove = 'remove',
+    BulkRemove = 'bulkRemove',
+    Aggregate = 'aggregate',
+    Count = 'count',
+    Get = 'getById',
 }
 
-const Actions = {
+export const DataActions = {
     BeforeFind: 'beforeFind',
     AfterFind: 'afterFind',
     BeforeInsert: 'beforeInsert',
@@ -65,40 +68,38 @@ const Actions = {
     AfterWrite: 'afterWrite'
 }
 
-const payloadFor = (operation, body) => {
+export const dataPayloadFor = (operation: DataOperations, body: any) => {
     switch (operation) {
-        case Operations.Find:
+        case DataOperations.Find:
             return {
                 filter: body.filter,
                 limit: body.limit,
                 skip: body.skip,
                 sort: body.sort
-            }
-        case Operations.Insert:
-        case Operations.Update:
-            return { item: body.item }
-        case Operations.BulkInsert:
-        case Operations.BulkUpdate:
-            return { items: body.items }
-        case Operations.Get:
-        case Operations.Remove:
-            return { itemId: body.itemId }
-        case Operations.BulkRemove:
-            return { itemIds: body.itemIds }
-        case Operations.Aggregate:
+            } as FindQuery
+        case DataOperations.Insert:
+        case DataOperations.Update:
+            return { item: body.item as Item }
+        case DataOperations.BulkInsert:
+        case DataOperations.BulkUpdate:
+            return { items: body.items as Item[] }
+        case DataOperations.Get:
+        case DataOperations.Remove:
+            return { itemId: body.itemId as string }
+        case DataOperations.BulkRemove:
+            return { itemIds: body.itemIds as string[] }
+        case DataOperations.Aggregate:
             return {
                 filter: body.filter,
                 processingStep: body.processingStep,
                 postFilteringStep: body.postFilteringStep
-            }
-        case Operations.Count:
-            return { filter: body.filter }
-        default:
-            return body
+            } as AggregationQuery
+        case DataOperations.Count:
+            return { filter: body.filter as WixDataFilter }
     }
 }
 
-const requestContextFor = (operation, body) => ({ 
+export const requestContextFor = (operation: any, body: any): RequestContext => ({ 
     operation, 
     collectionName: body.collectionName, 
     instanceId: body.requestContext.instanceId,
@@ -106,5 +107,3 @@ const requestContextFor = (operation, body) => ({
     role: body.requestContext.role,
     settings: body.requestContext.settings
 })
-
-module.exports = { HooksForAction, Operations, payloadFor, Actions, requestContextFor }

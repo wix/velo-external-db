@@ -1,5 +1,5 @@
 
-const HooksForAction = {
+export const SchemaHooksForAction: { [key: string]: string[] }  = {
     beforeList: ['beforeAll', 'beforeRead', 'beforeList'],
     afterList: ['afterAll', 'afterRead', 'afterList'],
     beforeListHeaders: ['beforeAll', 'beforeRead', 'beforeListHeaders'],
@@ -14,7 +14,7 @@ const HooksForAction = {
     afterColumnRemove: ['afterAll', 'afterWrite', 'afterColumnRemove']
 }
 
-const Operations = {
+export const SchemaOperations = {
     List: 'list',
     ListHeaders: 'listHeaders',
     Find: 'find',
@@ -23,7 +23,7 @@ const Operations = {
     ColumnRemove: 'columnRemove',
 }
 
-const Actions = {
+export const SchemaActions = {
     BeforeList: 'beforeList',
     AfterList: 'afterList',
     BeforeListHeaders: 'beforeListHeaders',
@@ -44,22 +44,20 @@ const Actions = {
     AfterWrite: 'afterWrite'
 }
 
-const payloadFor = (operation, body) => {
+export const schemaPayloadFor = (operation: any, body: { schemaIds: any; collectionName: any; column: any; columnName: any }) => {
     switch (operation) {
-        case Operations.List:
-        case Operations.ListHeaders:
+        case SchemaOperations.List:
+        case SchemaOperations.ListHeaders:
             return {}
-        case Operations.Find:
+        case SchemaOperations.Find:
             return { schemaIds: body.schemaIds }
-        case Operations.Create:
+        case SchemaOperations.Create:
             return { collectionName: body.collectionName }
-        case Operations.ColumnAdd:
+        case SchemaOperations.ColumnAdd:
             return { column: body.column }
-        case Operations.ColumnRemove:
+        case SchemaOperations.ColumnRemove:
             return { columnName: body.columnName }
         default:
             return body
     }
 }
-
-module.exports = { HooksForAction, Operations, payloadFor, Actions }
