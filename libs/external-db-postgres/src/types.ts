@@ -6,6 +6,10 @@ export interface postgresConfig  {
     db: string
 }
 
+export interface postgresPoolOptions {
+    [x:string]: any
+}
+
 export type ParsedFilter = {
     filterExpr?: string,
     filterColumns: [],

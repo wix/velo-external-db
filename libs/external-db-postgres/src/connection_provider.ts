@@ -4,11 +4,11 @@ import SchemaProvider from './postgres_schema_provider'
 import DataProvider  from './postgres_data_provider'
 import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './postgres_operations'
-import { postgresConfig } from './types'
+import { postgresConfig, postgresPoolOptions } from './types'
 
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
-export default (cfg: postgresConfig, _poolOptions: any) => {
+export default (cfg: postgresConfig, _poolOptions: postgresPoolOptions) => {
     const config = {
         host: cfg.host,
         user: cfg.user,

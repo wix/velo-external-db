@@ -2,7 +2,7 @@ import { Pool } from 'pg'
 import { escapeIdentifier, prepareStatementVariables } from './postgres_utils'
 import { asParamArrays, patchDateTime, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
-import { IDataProvider, AdapterFilter, Sort, Item, AdapterAggregation as Aggregation, AnyFixMe } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, Sort, Item, AdapterAggregation as Aggregation, ResponseField } from '@wix-velo/velo-external-db-types'
 import FilterParser from './sql_filter_transformer'
 
 export default class DataProvider implements IDataProvider {
@@ -14,7 +14,7 @@ export default class DataProvider implements IDataProvider {
         this.pool = pool
     }
 
-    async find(collectionName: string, filter: AdapterFilter, sort: Sort[], skip: number, limit: number, projection: string[]): Promise<Item[]> {
+    async find(collectionName: string, filter: Filter, sort: Sort[], skip: number, limit: number, projection: string[]): Promise<Item[]> {
         const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
@@ -23,14 +23,14 @@ export default class DataProvider implements IDataProvider {
         return resultSet.rows
     }
 
-    async count(collectionName: string, filter: AdapterFilter) {
+    async count(collectionName: string, filter: Filter) {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const resultSet = await this.pool.query(`SELECT COUNT(*) AS num FROM ${escapeIdentifier(collectionName)} ${filterExpr}`, parameters)
                                          .catch( translateErrorCodes )
         return parseInt(resultSet.rows[0]['num'], 10)
     }
 
-    async insert(collectionName: string, items: any[], fields: any[]) {
+    async insert(collectionName: string, items: Item[], fields: ResponseField[]) {
         const escapedFieldsNames = fields.map( (f: { field: string }) => escapeIdentifier(f.field)).join(', ')
         const res = await Promise.all(
             items.map(async(item: { [x: string]: any }) => {
@@ -67,7 +67,7 @@ export default class DataProvider implements IDataProvider {
     }
 
     // TODO: change filter's type to Filter type
-    async aggregate(collectionName: string, filter: AnyFixMe, aggregation: Aggregation): Promise<Item[]> {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<Item[]> {
         const { filterExpr: whereFilterExpr, parameters: whereParameters, offset } = this.filterParser.transform(filter)
         const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters } = this.filterParser.parseAggregation(aggregation, offset)
 
