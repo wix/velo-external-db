@@ -1,9 +1,9 @@
-const each = require('jest-each').default
-const Chance = require('chance')
+import each from 'jest-each'
+import * as Chance from 'chance'
+import { Uninitialized } from '@wix-velo/test-commons'
+import { randomBodyWith } from '../test/gen'
+import { DataHooksForAction, DataOperations, dataPayloadFor, DataActions } from './data_hooks_utils'
 const chance = Chance()
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { randomBodyWith } = require ('../test/gen')
-const { DataHooksForAction, DataOperations, dataPayloadFor, DataActions } = require('./data_hooks_utils')
 
 describe('Hooks Utils', () => {
     describe('Hooks For Action', () => {
@@ -87,7 +87,9 @@ describe('Hooks Utils', () => {
         item: Uninitialized,
         items: Uninitialized,
         itemId: Uninitialized,
-        itemIds: Uninitialized
+        itemIds: Uninitialized,
+        processingStep: Uninitialized,
+        postFilteringStep: Uninitialized
     }
 
     beforeEach(() => {

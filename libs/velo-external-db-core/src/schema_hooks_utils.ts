@@ -1,5 +1,5 @@
 
-export const SchemaHooksForAction: { [key: string]: string[] }  = {
+export const SchemaHooksForAction: { [key: string]: string[] } = {
     beforeList: ['beforeAll', 'beforeRead', 'beforeList'],
     afterList: ['afterAll', 'afterRead', 'afterList'],
     beforeListHeaders: ['beforeAll', 'beforeRead', 'beforeListHeaders'],
@@ -14,13 +14,13 @@ export const SchemaHooksForAction: { [key: string]: string[] }  = {
     afterColumnRemove: ['afterAll', 'afterWrite', 'afterColumnRemove']
 }
 
-export const SchemaOperations = {
-    List: 'list',
-    ListHeaders: 'listHeaders',
-    Find: 'find',
-    Create: 'create',
-    ColumnAdd: 'columnAdd',
-    ColumnRemove: 'columnRemove',
+export enum SchemaOperations {
+    List = 'list',
+    ListHeaders = 'listHeaders',
+    Find = 'find',
+    Create = 'create',
+    ColumnAdd = 'columnAdd',
+    ColumnRemove = 'columnRemove',
 }
 
 export const SchemaActions = {
@@ -44,7 +44,7 @@ export const SchemaActions = {
     AfterWrite: 'afterWrite'
 }
 
-export const schemaPayloadFor = (operation: any, body: { schemaIds: any; collectionName: any; column: any; columnName: any }) => {
+export const schemaPayloadFor = (operation: SchemaOperations, body: any) => {
     switch (operation) {
         case SchemaOperations.List:
         case SchemaOperations.ListHeaders:

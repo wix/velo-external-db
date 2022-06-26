@@ -1,9 +1,9 @@
-const each = require('jest-each').default
-const Chance = require('chance')
+import each from 'jest-each'
+import * as Chance from 'chance'
+import { Uninitialized } from '@wix-velo/test-commons'
+import { randomBodyWith } from '../test/gen'
+import { SchemaHooksForAction, SchemaOperations, schemaPayloadFor, SchemaActions } from './schema_hooks_utils'
 const chance = Chance()
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { randomBodyWith } = require ('../test/gen')
-const { SchemaHooksForAction, SchemaOperations, schemaPayloadFor, SchemaActions } = require('./schema_hooks_utils')
 
 describe('Hooks Utils', () => {
     describe('Hooks For Action', () => {
