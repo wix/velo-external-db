@@ -35,8 +35,8 @@ export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _s
     filterTransformer = _filterTransformer
     aggregationTransformer = _aggregationTransformer
     roleAuthorizationService = _roleAuthorizationService
-    dataHooks = _hooks.dataHooks || {}
-    schemaHooks = _hooks.schemaHooks || {}
+    dataHooks = _hooks?.dataHooks || {}
+    schemaHooks = _hooks?.schemaHooks || {}
 }
 
 const serviceContext = (): ServiceContext => ({
