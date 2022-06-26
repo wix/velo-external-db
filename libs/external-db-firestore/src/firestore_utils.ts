@@ -1,15 +1,15 @@
-const { Timestamp } = require('@google-cloud/firestore')
+import { Timestamp } from '@google-cloud/firestore'
 
-const LastLetterCoder = String.fromCharCode(65535)
+export const LastLetterCoder = String.fromCharCode(65535)
 
-const fixDates = (value) => {
+export const fixDates = (value : any) => {
     if (value instanceof Timestamp) {
         return value.toDate()
     }
     return value
 }
 
-const asEntity = (docEntity) => {
+export const asEntity = (docEntity ) => {
   const doc = docEntity.data()
   return Object.keys(doc)
   .reduce(function(obj, key) {
@@ -19,4 +19,4 @@ const asEntity = (docEntity) => {
 
 
 
-module.exports = { fixDates, asEntity, LastLetterCoder }
+

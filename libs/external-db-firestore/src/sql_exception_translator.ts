@@ -1,8 +1,8 @@
-/* eslint-disable */
-const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { DbConnectionError } = errors
 
 
-const notThrowingTranslateErrorCodes = err => {
+export const notThrowingTranslateErrorCodes = (err: any) => {
     switch (err.code) {
         case 7:
             return new DbConnectionError(`Permission denied - Cloud Firestore API has not been enabled: ${err.details}`)
@@ -14,8 +14,6 @@ const notThrowingTranslateErrorCodes = err => {
     }
 }
 
-const translateErrorCodes = err => {
-    throw notThrowingTranslateErrorCodes(err);
+export const translateErrorCodes = (err: any) => {
+    throw notThrowingTranslateErrorCodes(err)
 }
-
-module.exports = { translateErrorCodes, notThrowingTranslateErrorCodes }

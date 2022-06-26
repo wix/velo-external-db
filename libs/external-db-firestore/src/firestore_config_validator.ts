@@ -1,7 +1,11 @@
-const { checkRequiredKeys } = require('@wix-velo/velo-external-db-commons')
+import { checkRequiredKeys } from '@wix-velo/velo-external-db-commons'
+import { IConfigValidator } from '@wix-velo/velo-external-db-types'
 
-class ConfigValidator {
-    constructor(config) {
+export class ConfigValidator implements IConfigValidator {
+    requiredKeys: string[]
+    config: any
+    
+    public constructor(config: any) {
         this.requiredKeys = ['projectId', 'instanceId', 'databaseId'] 
         this.config = config
     }
@@ -16,5 +20,3 @@ class ConfigValidator {
         }
     }
 }
-
-module.exports = ConfigValidator

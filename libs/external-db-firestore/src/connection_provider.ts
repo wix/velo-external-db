@@ -1,10 +1,11 @@
-const SchemaProvider = require('./firestore_schema_provider')
-const DataProvider  = require('./firestore_data_provider')
-const FilterParser = require('./sql_filter_transformer')
-const DatabaseOperations = require('./firestore_operations')
-const Firestore = require('@google-cloud/firestore')
+import SchemaProvider = require('./firestore_schema_provider')
+import DataProvider = require('./firestore_data_provider')
+import FilterParser = require('./sql_filter_transformer')
+import DatabaseOperations = require('./firestore_operations')
+import { Firestore } from '@google-cloud/firestore'
+import { firestoreConfig } from './types'
 
-const init = ({ projectId }) => {
+const init = ({ projectId }: firestoreConfig) => {
     const firestore = new Firestore({
         projectId: projectId,
     })

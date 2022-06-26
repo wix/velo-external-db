@@ -1,6 +1,6 @@
-const { asEntity } = require('./firestore_utils')
+import { asEntity } from './firestore_utils'
 
-class DataProvider {
+export default class DataProvider {
     constructor(database, filterParser) {
         this.filterParser = filterParser
 
@@ -80,4 +80,3 @@ class DataProvider {
       
 }
 
-module.exports = DataProvider
