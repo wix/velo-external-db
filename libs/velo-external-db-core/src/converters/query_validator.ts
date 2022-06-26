@@ -7,7 +7,7 @@ export default class QueryValidator {
     constructor() {
     }
 
-    validateFilter(fields: ResponseField[], filter: AdapterFilter | {}) {
+    validateFilter(fields: ResponseField[], filter: AdapterFilter ) {
         const filterFieldsAndOpsObj = extractFieldsAndOperators(filter)
         const filterFields = filterFieldsAndOpsObj.map((f: { name: string }) => f.name)
         const fieldNames = fields.map((f: ResponseField) => f.field)
