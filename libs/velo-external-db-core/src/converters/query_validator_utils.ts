@@ -1,5 +1,5 @@
 import { QueryOperatorsByFieldType } from '@wix-velo/velo-external-db-commons' 
-import { AdapterFilter, AdapterOperator } from '@wix-velo/velo-external-db-types'
+import { AdapterFilter, AdapterOperator, NotEmptyAdapterFilter } from '@wix-velo/velo-external-db-types'
 import FilterTransformer from '../converters/filter_transformer'
 import { EmptyFilter } from '../converters/utils'
 const WixOperatorToAdapterOperator = new FilterTransformer().wixOperatorToAdapterOperatorString
@@ -8,7 +8,7 @@ export const queryAdapterOperatorsFor = (type: string) => ( (QueryOperatorsByFie
 
 export const extractFieldsAndOperators = (_filter: AdapterFilter | {}): { name: string, operator: AdapterOperator }[] => { 
     if (_filter === EmptyFilter) return []
-    const filter = _filter as AdapterFilter
+    const filter = _filter as NotEmptyAdapterFilter
     if (filter.fieldName) return [{ name: filter.fieldName, operator: filter.operator as AdapterOperator }]
     return filter.value.map((filter: any) =>  extractFieldsAndOperators(filter)).flat()
 }
