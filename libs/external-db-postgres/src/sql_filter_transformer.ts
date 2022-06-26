@@ -1,4 +1,4 @@
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Sort } from '@wix-velo/velo-external-db-types' 
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, NotEmptyAdapterFilter as NotEmptyFilter, Sort } from '@wix-velo/velo-external-db-types' 
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { escapeIdentifier } from './postgres_utils'
@@ -89,7 +89,7 @@ export default class FilterParser {
             return []
         }
         
-        const { operator, fieldName, value } = filter
+        const { operator, fieldName, value } = filter as NotEmptyFilter
         
         switch (operator) {
             case and:
