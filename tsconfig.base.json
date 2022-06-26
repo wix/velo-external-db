@@ -14,6 +14,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "resolveJsonModule": true,
     "paths": {
       "@wix-velo/external-db-config": [ "libs/external-db-config/src/index.js" ],
       "@wix-velo/external-db-mysql": [ "libs/external-db-mysql/src/index.ts" ],

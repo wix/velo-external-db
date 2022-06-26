@@ -39,6 +39,21 @@ export enum SchemaOperations { //in schema_commons as well
     IncludeOperator = 'include',
 }
 
+export type FieldWithQueryOperators = ResponseField & { queryOperators: string[] }
+
+export interface AsWixSchemaHeaders {
+    id: string,
+    displayName: string,
+    maxPageSize: number,
+    ttl: number
+}
+
+export interface AsWixSchema extends AsWixSchemaHeaders {
+    allowedOperations: string[],
+    allowedSchemaOperations: string[],
+    fields: { [field: string]: FieldWithQueryOperators }
+}
+
 export enum AdapterFunctions { //in data_commons as well
     avg = 'avg',
     max = 'max',

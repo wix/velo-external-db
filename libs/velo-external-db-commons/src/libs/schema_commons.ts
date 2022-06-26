@@ -1,6 +1,6 @@
 import { CannotModifySystemField } from './errors'
-import { Field, FieldWithQueryOperators, AsWixSchemaHeaders, AsWixSchema  } from './types'
-import { ResponseField } from '@wix-velo/velo-external-db-types'
+
+import { ResponseField, FieldWithQueryOperators, AsWixSchemaHeaders, AsWixSchema} from '@wix-velo/velo-external-db-types'
 
 export const SystemFields = [
     {

@@ -8,8 +8,7 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true,
+    "noFallthroughCasesInSwitch": true
   },
   "files": [],
   "include": [],

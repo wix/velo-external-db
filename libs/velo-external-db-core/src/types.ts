@@ -1,5 +1,4 @@
-import { AdapterFilter, InputField, Item, Sort, WixDataFilter } from "@wix-velo/velo-external-db-types";
-import { AsWixSchema, AsWixSchemaHeaders } from "libs/velo-external-db-commons/src/libs/types";
+import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders } from "@wix-velo/velo-external-db-types";
 import SchemaService from "./service/schema";
 import SchemaAwareDataService from "./service/schema_aware_data";
 
