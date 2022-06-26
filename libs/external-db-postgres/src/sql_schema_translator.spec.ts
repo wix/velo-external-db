@@ -1,8 +1,8 @@
 /* eslint-disable jest/no-commented-out-tests */
-const SchemaColumnTranslator = require('./sql_schema_translator')
-const { escapeIdentifier } = require('./postgres_utils')
-const { Uninitialized } = require('@wix-velo/test-commons')
-const Chance = require('chance')
+import * as Chance from 'chance'
+import { Uninitialized } from '@wix-velo/test-commons'
+import SchemaColumnTranslator from './sql_schema_translator'
+import { escapeIdentifier } from './postgres_utils'
 const chance = Chance()
 
 describe('Sql Schema Column Translator', () => {
