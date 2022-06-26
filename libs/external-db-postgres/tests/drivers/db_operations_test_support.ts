@@ -1,7 +1,7 @@
-const DatabaseOperations = require('../../src/postgres_operations')
-const init = require('../../src/connection_provider')
+import DatabaseOperations from '../../src/postgres_operations'
+import init from '../../src/connection_provider'
 
-const createPool = modify => {
+const createPool = ( modify: any ) => {
     const config = {
         host: 'localhost',
         user: 'test-user',
@@ -18,18 +18,15 @@ const dbOperationWithMisconfiguredDatabase = () => new DatabaseOperations(create
 
 const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool( { host: 'wrong' } ).connection)
 
-const dbOperationWithValidDB = () => {
+export const dbOperationWithValidDB = () => {
     const { connection, cleanup } = createPool({ } )
     const dbOperations = new DatabaseOperations(connection)
     return { dbOperations, cleanup: cleanup }
 }
 
-const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong password', () => dbOperationWithMisconfiguredPassword()],
+export const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong password', () => dbOperationWithMisconfiguredPassword()],
                                             ['pool connection with wrong database', () => dbOperationWithMisconfiguredDatabase()],
                                             ['pool connection with wrong host', () => dbOperationWithMisconfiguredHost()]
                                         ])
 
 
-module.exports = {
-    dbOperationWithValidDB, misconfiguredDbOperationOptions
-}
