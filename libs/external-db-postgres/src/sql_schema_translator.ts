@@ -1,11 +1,13 @@
-const { escapeIdentifier } = require('./postgres_utils')
+import { InputField } from '@wix-velo/velo-external-db-types' 
+import { escapeIdentifier } from './postgres_utils'
 
-class SchemaColumnTranslator {
 
-    constructor() {
+export default class SchemaColumnTranslator {
+
+    public constructor() {
     }
 
-    translateType(dbType) {
+    translateType(dbType: string) {
         const type = dbType.toLowerCase()
                            .split('(')
                            .shift()
@@ -58,15 +60,15 @@ class SchemaColumnTranslator {
         }
     }
 
-    columnToDbColumnSql(f) {
+    columnToDbColumnSql(f: InputField) {
         return `${escapeIdentifier(f.name)} ${this.dbTypeFor(f)}`
     }
 
-    dbTypeFor(f) {
-        return this.dbType(f.type, f.subtype, f.precision)
+    dbTypeFor(f: InputField) {
+        return this.dbType(f.type, f.subtype, f.precision as string)
     }
 
-    dbType(type, subtype, precision) {
+    dbType(type: string, subtype: string | undefined, precision: string | undefined) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
             case 'number_int':
                 return 'integer'
@@ -113,7 +115,7 @@ class SchemaColumnTranslator {
         }
     }
 
-    parseLength(length) {
+    parseLength(length = '') {
         try {
             const parsed = parseInt(length)
             if (isNaN(parsed) || parsed <= 0) {
@@ -126,5 +128,3 @@ class SchemaColumnTranslator {
     }
 
 }
-
-module.exports = SchemaColumnTranslator

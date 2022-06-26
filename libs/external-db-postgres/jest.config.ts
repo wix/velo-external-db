@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'external-db-postgres',
     clearMocks: true,
     verbose: true,
@@ -14,6 +14,4 @@ module.exports = {
     moduleFileExtensions: ['ts', 'js', 'html'],
     coverageDirectory: '../../coverage/libs/external-db-postgres',
     testEnvironment: 'node'
-    // roots: ['<rootDir>/src'],
-    // testRegex: '(.*\\.spec\\.)js$',
 }

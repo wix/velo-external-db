@@ -1,7 +1,7 @@
-const each = require('jest-each').default
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { PostgresConfigValidator } = require('./postgres_config_validator')
-const gen = require('../tests/gen')
+import each from 'jest-each'
+import { Uninitialized } from '@wix-velo/test-commons'
+import { PostgresConfigValidator } from './postgres_config_validator'
+import * as gen from '../tests/gen'
 
 describe('PostgresConfigValidator', () => {
 
@@ -39,11 +39,11 @@ describe('PostgresConfigValidator', () => {
     })
 
     const ctx = {
-        validConfig: Uninitialized,
         validGCPConfig: Uninitialized,
+        validConfig: Uninitialized,
         configWithInvalidHost: Uninitialized,
     }
-    
+
     const env = {
         postgresConfigValidator: Uninitialized,
     }
