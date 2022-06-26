@@ -4,7 +4,7 @@ import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, e
 import { wildCardWith, escapeId } from './mysql_utils'
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort} from '@wix-velo/velo-external-db-types'
+import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, NotEmptyAdapterFilter as NotEmptyFilter} from '@wix-velo/velo-external-db-types'
 import { MySqlParsedFilter, MySqlParsedAggregation } from './types'
 
 export interface IMySqlFilterParser {
@@ -29,12 +29,12 @@ export default class FilterParser implements IMySqlFilterParser {
         }
     }
 
-    parseFilter(filter: Filter | {}) : MySqlParsedFilter[] {
+    parseFilter(filter: Filter) : MySqlParsedFilter[] {
         if (isEmptyFilter(filter)) {
             return []
         }
 
-        const { operator, fieldName, value } = filter as Filter
+        const { operator, fieldName, value } = filter as NotEmptyFilter
 
         switch (operator) {
             case and:
