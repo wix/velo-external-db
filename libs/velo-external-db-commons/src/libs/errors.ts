@@ -82,3 +82,9 @@ export class UnsupportedDatabase extends BaseHttpError {
         super(message, 405)
     }
 }
+
+export class UnrecognizedError extends BaseHttpError {
+    constructor(message: string) {
+        super(`Unrecognized Error: ${message}`, 400)
+    }
+}

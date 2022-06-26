@@ -1,7 +1,6 @@
 import { Pool } from 'pg'
-import { IDatabaseOperations } from "@wix-velo/velo-external-db-types"
-
- const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
+import { IDatabaseOperations } from '@wix-velo/velo-external-db-types'
+import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
 
 export default class DatabaseOperations implements IDatabaseOperations {
     pool: Pool

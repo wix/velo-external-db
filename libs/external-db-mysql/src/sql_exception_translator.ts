@@ -1,5 +1,5 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists } = errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists, UnrecognizedError } = errors
 
 export const notThrowingTranslateErrorCodes = (err: any) => {
     switch (err.code) {
@@ -20,7 +20,8 @@ export const notThrowingTranslateErrorCodes = (err: any) => {
         case 'ER_DUP_ENTRY': 
             return new ItemAlreadyExists(`Item already exists: ${err.sqlMessage}`)
         default :
-            return new Error(`default ${err.code} ${err.sqlMessage}`)
+            console.error(err)
+            return new UnrecognizedError(`${err.code} ${err.sqlMessage}`)
     }
 }
 
