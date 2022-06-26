@@ -1,4 +1,4 @@
-import { Item, WixDataAggregation, WixDataFilter } from "@wix-velo/velo-external-db-types";
+import { Item, WixDataFilter } from "@wix-velo/velo-external-db-types";
 import { AggregationQuery, FindQuery, RequestContext } from "./types";
 
 

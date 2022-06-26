@@ -3,52 +3,52 @@ const Chance = require('chance')
 const chance = Chance()
 const { Uninitialized } = require('@wix-velo/test-commons')
 const { randomBodyWith } = require ('../test/gen')
-const { HooksForAction, Operations, payloadFor, Actions } = require('./schema_hooks_utils')
+const { SchemaHooksForAction, SchemaOperations, schemaPayloadFor, SchemaActions } = require('./schema_hooks_utils')
 
 describe('Hooks Utils', () => {
     describe('Hooks For Action', () => {
         describe('Before Read', () => {
-            each([Actions.BeforeList, Actions.BeforeListHeaders, Actions.BeforeFind])
+            each([SchemaActions.BeforeList, SchemaActions.BeforeListHeaders, SchemaActions.BeforeFind])
                 .test('Hooks action for %s should return appropriate array', (action) => {
-                    expect(HooksForAction[action]).toEqual(['beforeAll', 'beforeRead', action])
+                    expect(SchemaHooksForAction[action]).toEqual(['beforeAll', 'beforeRead', action])
                 })
         })
         describe('After Read', () => {
-            each([Actions.AfterList, Actions.AfterListHeaders, Actions.AfterFind])
+            each([SchemaActions.AfterList, SchemaActions.AfterListHeaders, SchemaActions.AfterFind])
                 .test('Hooks action for %s should return appropriate array', (action) => {
-                    expect(HooksForAction[action]).toEqual(['afterAll', 'afterRead', action])
+                    expect(SchemaHooksForAction[action]).toEqual(['afterAll', 'afterRead', action])
                 })
         })
         describe('Before Write', () => {
-            each([Actions.BeforeCreate, Actions.BeforeColumnAdd, Actions.BeforeColumnRemove])
+            each([SchemaActions.BeforeCreate, SchemaActions.BeforeColumnAdd, SchemaActions.BeforeColumnRemove])
                 .test('Hooks action for %s should return appropriate array', (action) => {
-                    expect(HooksForAction[action]).toEqual(['beforeAll', 'beforeWrite', action])
+                    expect(SchemaHooksForAction[action]).toEqual(['beforeAll', 'beforeWrite', action])
                 })
         })
         describe('After Write', () => {
-            each([Actions.AfterCreate, Actions.AfterColumnAdd, Actions.AfterColumnRemove])
+            each([SchemaActions.AfterCreate, SchemaActions.AfterColumnAdd, SchemaActions.AfterColumnRemove])
                 .test('Hooks action for %s should return appropriate array', (action) => {
-                    expect(HooksForAction[action]).toEqual(['afterAll', 'afterWrite', action])
+                    expect(SchemaHooksForAction[action]).toEqual(['afterAll', 'afterWrite', action])
                 })
         })
     })
 
     describe('Payload For', () => {
-        each([Operations.List, Operations.ListHeaders])
+        each([SchemaOperations.List, SchemaOperations.ListHeaders])
             .test('Payload for %s should return null', (operation) => {
-                expect(payloadFor(operation, randomBodyWith({}))).toEqual({})
+                expect(schemaPayloadFor(operation, randomBodyWith({}))).toEqual({})
             })
         test('Payload for Find should return schemaIds', () => {
-            expect(payloadFor(Operations.Find, randomBodyWith({ schemaIds: ctx.schemaIds }))).toEqual({ schemaIds: ctx.schemaIds })
+            expect(schemaPayloadFor(SchemaOperations.Find, randomBodyWith({ schemaIds: ctx.schemaIds }))).toEqual({ schemaIds: ctx.schemaIds })
         })
         test('Payload for Create should return collectionName', () => {
-            expect(payloadFor(Operations.Create, randomBodyWith({ collectionName: ctx.collectionName }))).toEqual({ collectionName: ctx.collectionName })
+            expect(schemaPayloadFor(SchemaOperations.Create, randomBodyWith({ collectionName: ctx.collectionName }))).toEqual({ collectionName: ctx.collectionName })
         })
         test('Payload for ColumnAdd should return column', () => {
-            expect(payloadFor(Operations.ColumnAdd, randomBodyWith({ column: ctx.column }))).toEqual({ column: ctx.column })
+            expect(schemaPayloadFor(SchemaOperations.ColumnAdd, randomBodyWith({ column: ctx.column }))).toEqual({ column: ctx.column })
         })
         test('Payload for ColumnRemove should return columnName', () => {
-            expect(payloadFor(Operations.ColumnRemove, randomBodyWith({ columnName: ctx.columnName }))).toEqual({ columnName: ctx.columnName })
+            expect(schemaPayloadFor(SchemaOperations.ColumnRemove, randomBodyWith({ columnName: ctx.columnName }))).toEqual({ columnName: ctx.columnName })
         })
     })
 
