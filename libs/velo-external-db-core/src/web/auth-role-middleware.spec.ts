@@ -1,8 +1,9 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { authRoleMiddleware } = require('./auth-role-middleware')
-const driver = require('../../test/drivers/auth_middleware_test_support')
-const { UnauthorizedError } = require('@wix-velo/velo-external-db-commons').errors
-const Chance = require('chance')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { authRoleMiddleware } from './auth-role-middleware'
+import * as driver from '../../test/drivers/auth_middleware_test_support'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import * as Chance from 'chance'
+const { UnauthorizedError } = errors
 const chance = Chance()
 
 describe('Auth Role Middleware', () => {
@@ -12,6 +13,8 @@ describe('Auth Role Middleware', () => {
         permittedRole: Uninitialized,
         notPermittedRole: Uninitialized,
         next: Uninitialized,
+        secretKey: Uninitialized,
+        
     }
 
     const env = {

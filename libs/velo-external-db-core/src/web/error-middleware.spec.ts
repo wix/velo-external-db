@@ -1,11 +1,12 @@
-const Chance = require('chance')
+import * as Chance from 'chance'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { errorMiddleware } from './error-middleware'
+import { Uninitialized } from '@wix-velo/test-commons'
 const chance = Chance()
-const errors = require('@wix-velo/velo-external-db-commons').errors
-const { errorMiddleware } = require('./error-middleware')
 
 describe('Error Middleware', () => {
   const ctx = {
-    res: null,
+    res: Uninitialized,
   }
 
   beforeEach(() => {

@@ -1,8 +1,9 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { secretKeyAuthMiddleware } = require('./auth-middleware')
-const driver = require('../../test/drivers/auth_middleware_test_support') //TODO: change driver location
-const { UnauthorizedError } = require('@wix-velo/velo-external-db-commons').errors
-const Chance = require('chance')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { secretKeyAuthMiddleware } from './auth-middleware'
+import * as driver from '../../test/drivers/auth_middleware_test_support' //TODO: change driver location
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { UnauthorizedError } = errors
+import * as Chance from 'chance'
 const chance = Chance()
 
 describe('Auth Middleware', () => {
@@ -11,6 +12,8 @@ describe('Auth Middleware', () => {
         secretKey: Uninitialized,
         anotherSecretKey: Uninitialized,
         next: Uninitialized,
+        ownerRole: Uninitialized,
+        dataPath: Uninitialized,
     }
 
     const env = {
