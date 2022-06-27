@@ -10,7 +10,7 @@ import QueryValidator from './converters/query_validator'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { initServices, createRouter } from './router'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
-import { DataHooks, SchemaHooks } from './types'
+import { DataHooks, ExternalDbRouterConfig, SchemaHooks } from './types'
 import ItemTransformer = require('./converters/item_transformer')
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } from '@wix-velo/external-db-config'
@@ -32,8 +32,8 @@ export class ExternalDbRouter {
     roleAuthorizationService: RoleAuthorizationService
     cleanup: ConnectionCleanUp
     router: Router
-    config: AnyFixMe
-    constructor({ connector, config, hooks }: { connector: DbConnector, config: any, hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks} }) {
+    config: ExternalDbRouterConfig
+    constructor({ connector, config, hooks }: { connector: DbConnector, config: ExternalDbRouterConfig, hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks} }) {
         this.isInitialized(connector)
         this.connector = connector
         this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), new CommonConfigValidator({ secretKey: config.secretKey, vendor: config.vendor }))

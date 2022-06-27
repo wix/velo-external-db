@@ -1,4 +1,4 @@
-import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders } from "@wix-velo/velo-external-db-types";
+import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, AnyFixMe } from "@wix-velo/velo-external-db-types";
 import SchemaService from "./service/schema";
 import SchemaAwareDataService from "./service/schema_aware_data";
 
@@ -108,4 +108,11 @@ export interface SchemaHooks {
     afterColumnAdd?: Hook<{}>
     beforeColumnRemove?: Hook<{ columnName: string }>
     afterColumnRemove?: Hook<{}>
+}
+
+export interface ExternalDbRouterConfig {
+    secretKey: string
+    authorization?: AnyFixMe
+    vendor?: string
+    type?: string
 }
