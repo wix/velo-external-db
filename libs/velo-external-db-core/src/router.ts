@@ -21,12 +21,13 @@ import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { DataHooks, RequestContext, SchemaHooks, ServiceContext } from './types'
+import { ConfigValidator } from '@wix-velo/external-db-config'
 
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: IConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
 
-export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService, _externalDbConfigClient: IConfigValidator, _cfg: { secretKey?: any; type?: any; vendor?: any }, _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer, _roleAuthorizationService: RoleAuthorizationService, _hooks: {dataHooks?: DataHooks, schemaHooks?: SchemaHooks}) => {
+export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService, _externalDbConfigClient: ConfigValidator, _cfg: { secretKey?: any; type?: any; vendor?: any }, _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer, _roleAuthorizationService: RoleAuthorizationService, _hooks: {dataHooks?: DataHooks, schemaHooks?: SchemaHooks}) => {
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient

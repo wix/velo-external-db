@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'velo-external-db-core',
     clearMocks: true,
     verbose: true,
