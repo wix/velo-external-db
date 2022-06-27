@@ -1,15 +1,13 @@
-const dataOperation = {
+export const dataOperation = {
     validateConnection: jest.fn()
 }
 
-const givenValidPool = () =>
+export const givenValidPool = () =>
     dataOperation.validateConnection.mockResolvedValue({ valid: true })
 
-const givenInvalidPool = (error) =>
+export const givenInvalidPool = (error: any) =>
     dataOperation.validateConnection.mockImplementation(() => { return { valid: false, error } })
 
-const reset = () => {
+export const reset = () => {
     dataOperation.validateConnection.mockClear()
 }
-
-module.exports = { dataOperation, reset, givenValidPool, givenInvalidPool }

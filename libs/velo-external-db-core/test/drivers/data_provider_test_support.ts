@@ -1,6 +1,6 @@
-const { when } = require('jest-when')
+import { when } from 'jest-when'
 
-const dataProvider = {
+export const dataProvider = {
     find: jest.fn(),
     count: jest.fn(),
     insert: jest.fn(),
@@ -10,39 +10,39 @@ const dataProvider = {
     delete: jest.fn(),
 }
 
-const givenListResult = (entities, forCollectionName, filter, sort, skip, andLimit, projection) =>
+export const givenListResult = (entities: any, forCollectionName: any, filter: any, sort: any, skip: any, andLimit: any, projection: any) =>
     when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit, projection)
                            .mockResolvedValue(entities)
 
-const givenCountResult = (total, forCollectionName, filter) =>
+export const givenCountResult = (total: any, forCollectionName: any, filter: any) =>
     when(dataProvider.count).calledWith(forCollectionName, filter)
                             .mockResolvedValue(total)
 
-const givenAggregateResult = (total, forCollectionName, filter, andAggregation) =>
+export const givenAggregateResult = (total: any, forCollectionName: any, filter: any, andAggregation: any) =>
     when(dataProvider.aggregate).calledWith(forCollectionName, filter, andAggregation)
                                 .mockResolvedValue(total)
 
-const expectInsertFor = (items, forCollectionName) =>
+export const expectInsertFor = (items: string | any[], forCollectionName: any) =>
     when(dataProvider.insert).calledWith(forCollectionName, items)
                              .mockResolvedValue(items.length)
 
-const expectInsertMatchedFor = (items, forCollectionName) =>
+export const expectInsertMatchedFor = (items: any, forCollectionName: any) =>
     when(dataProvider.insert).calledWith(forCollectionName, expect.arrayContaining(items.map( expect.objectContaining )))
                              .mockResolvedValue(1)
 
-const expectUpdateFor = (items, forCollectionName) =>
+export const expectUpdateFor = (items: string | any[], forCollectionName: any) =>
     when(dataProvider.update).calledWith(forCollectionName, items)
                              .mockResolvedValue(items.length)
 
-const expectDeleteFor = (itemIds, forCollectionName) =>
+export const expectDeleteFor = (itemIds: string | any[], forCollectionName: any) =>
     when(dataProvider.delete).calledWith(forCollectionName, itemIds)
                              .mockResolvedValue(itemIds.length)
 
-const expectTruncateFor = (collectionName) =>
+export const expectTruncateFor = (collectionName: any) =>
     when(dataProvider.truncate).calledWith(collectionName)
                                .mockResolvedValue(1)
 
-const reset = () => {
+export const reset = () => {
     dataProvider.find.mockClear()
     dataProvider.count.mockClear()
     dataProvider.insert.mockClear()
@@ -51,5 +51,3 @@ const reset = () => {
     dataProvider.aggregate.mockClear()
     dataProvider.delete.mockClear()
 }
-
-module.exports = { givenListResult, dataProvider, expectInsertFor, expectUpdateFor, givenCountResult, expectTruncateFor, givenAggregateResult, expectDeleteFor, expectInsertMatchedFor, reset }

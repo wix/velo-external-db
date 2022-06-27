@@ -1,5 +1,5 @@
 
-const requestBodyWith = (secretKey, role, path) => ({
+export const requestBodyWith = (secretKey: string, role: string | undefined, path: string | undefined) => ({
     path: path || '/',
     body: {
         requestContext: {
@@ -7,5 +7,3 @@ const requestBodyWith = (secretKey, role, path) => ({
             settings: {
                 secretKey: secretKey
             } } } } )
-
-module.exports = { requestBodyWith }

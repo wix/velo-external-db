@@ -1,7 +1,7 @@
-const { when } = require('jest-when')
-const { SystemFields } = require('@wix-velo/velo-external-db-commons')
+import { when } from 'jest-when'
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
 
-const dataService = {
+export const dataService = {
     find: jest.fn(),
     count: jest.fn(),
     getById: jest.fn(),
@@ -17,51 +17,51 @@ const dataService = {
 
 const systemFields = SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) )
 
-const givenListResult = (entities, totalCount, forCollectionName, filter, sort, skip, limit, projection) => 
+export const givenListResult = (entities: any, totalCount: any, forCollectionName: any, filter: any, sort: any, skip: any, limit: any, projection: any) => 
     when(dataService.find).calledWith(forCollectionName, filter, sort, skip, limit, projection)
                           .mockResolvedValue( { items: entities, totalCount } )
 
-const givenCountResult = (totalCount, forCollectionName, filter) =>
+export const givenCountResult = (totalCount: any, forCollectionName: any, filter: any) =>
     when(dataService.count).calledWith(forCollectionName, filter)
                            .mockResolvedValue( { totalCount })
 
-const givenGetByIdResult = (item, forCollectionName, itemId, projection) => 
+export const givenGetByIdResult = (item: any, forCollectionName: any, itemId: any, projection: any) => 
     when(dataService.getById).calledWith(forCollectionName, itemId, projection)
                              .mockResolvedValue({ item })
 
-const givenInsertResult = (item, forCollectionName) =>
+export const givenInsertResult = (item: any, forCollectionName: any) =>
     when(dataService.insert).calledWith(forCollectionName, item, systemFields)
                              .mockResolvedValue({ item })
 
-const givenBulkInsertResult = (items, forCollectionName) =>
+export const givenBulkInsertResult = (items: any, forCollectionName: any) =>
     when(dataService.bulkInsert).calledWith(forCollectionName, items, systemFields)
                              .mockResolvedValue({ items: items })
 
-const givenUpdateResult = (item, forCollectionName) => 
+export const givenUpdateResult = (item: any, forCollectionName: any) => 
     when(dataService.update).calledWith(forCollectionName, item)
                             .mockResolvedValue({ item })
 
-const givenBulkUpdateResult = (items, forCollectionName) => 
+export const givenBulkUpdateResult = (items: any, forCollectionName: any) => 
     when(dataService.bulkUpdate).calledWith(forCollectionName, items)
                             .mockResolvedValue({ items })
 
-const deleteResultTo = (itemId, forCollectionName) => 
+export const deleteResultTo = (itemId: any, forCollectionName: any) => 
     when(dataService.delete).calledWith(forCollectionName, itemId)
                             .mockResolvedValue({ item: {} })
 
-const bulkDeleteResultTo = (itemIds, forCollectionName) => 
+export const bulkDeleteResultTo = (itemIds: any, forCollectionName: any) => 
     when(dataService.bulkDelete).calledWith(forCollectionName, itemIds)
                                 .mockResolvedValue({ items: [] })
 
-const truncateResultTo = (forCollectionName) => 
+export const truncateResultTo = (forCollectionName: any) => 
     when(dataService.truncate).calledWith(forCollectionName)
                               .mockResolvedValue(1)
 
-const givenAggregateResult = (items, forCollectionName, filter, aggregation) =>    
+export const givenAggregateResult = (items: any, forCollectionName: any, filter: any, aggregation: any) =>    
     when(dataService.aggregate).calledWith(forCollectionName, filter, aggregation)
                                .mockResolvedValue({ items, totalCount: 0 })
 
-const reset = () => {
+export const reset = () => {
     dataService.find.mockClear()
     dataService.count.mockClear()
     dataService.getById.mockClear()
@@ -74,5 +74,3 @@ const reset = () => {
     dataService.delete.mockClear()
     dataService.bulkDelete.mockClear()
 }
-module.exports = { dataService, givenListResult, givenCountResult, givenGetByIdResult, givenInsertResult, givenBulkInsertResult,
-                 givenUpdateResult, givenBulkUpdateResult, deleteResultTo, bulkDeleteResultTo, truncateResultTo, givenAggregateResult, reset }
