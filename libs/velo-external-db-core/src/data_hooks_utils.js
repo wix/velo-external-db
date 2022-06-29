@@ -98,6 +98,13 @@ const payloadFor = (operation, body) => {
     }
 }
 
-const requestContextFor = (operation, body) => ({ operation, collectionName: body.collectionName, instanceId: body.instanceId })
+const requestContextFor = (operation, body) => ({ 
+    operation, 
+    collectionName: body.collectionName, 
+    instanceId: body.requestContext.instanceId,
+    memberId: body.requestContext.memberId,
+    role: body.requestContext.role,
+    settings: body.requestContext.settings
+})
 
 module.exports = { HooksForAction, Operations, payloadFor, Actions, requestContextFor }
