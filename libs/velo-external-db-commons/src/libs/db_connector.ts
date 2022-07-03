@@ -8,6 +8,7 @@ export default class DbConnector {
     connection: any
     cleanup: any
     configValidator: any
+    type: any
     constructor(configValidator: any, init: any) {
         this.initialized = false
         this.configValidatorProvider = configValidator

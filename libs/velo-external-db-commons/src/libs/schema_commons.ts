@@ -1,5 +1,6 @@
 import { CannotModifySystemField } from './errors'
-import { Field, FieldWithQueryOperators, AsWixSchemaHeaders, AsWixSchema  } from './types'
+
+import { ResponseField, FieldWithQueryOperators, AsWixSchemaHeaders, AsWixSchema} from '@wix-velo/velo-external-db-types'
 
 export const SystemFields = [
     {
@@ -105,6 +106,6 @@ export const parseTableData = (data: any[]) => data.reduce((o: { [x: string]: an
     return o
 }, {})
 
-export const allowedOperationsFor = ({ fields }: {fields: Field[]}) => fields.find((c: Field) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
+export const allowedOperationsFor = ({ fields }: {fields: ResponseField[]}) => fields.find((c: ResponseField) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
 
-export const appendQueryOperatorsTo = (fields: Field[]) => fields.map((f: Field) => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))
+export const appendQueryOperatorsTo = (fields: ResponseField[]) => fields.map((f: ResponseField) => ({ ...f, queryOperators: QueryOperationsByFieldType[f.type] }))

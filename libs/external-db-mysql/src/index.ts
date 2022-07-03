@@ -15,7 +15,6 @@ export const opsDriver = () => require('../tests/drivers/db_operations_test_supp
 
 
 export class MySqlConnector extends DbConnector {
-    type: string
     constructor() {
         super(MySqlConfigValidator, init)
         this.type = 'mysql'
