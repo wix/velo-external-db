@@ -55,7 +55,8 @@ const executeHook = async(hooks, actionName, payload, requestContext) => {
             const payloadAfterHook = await hooks[actionName](payload, requestContext, serviceContext())
             return payloadAfterHook || payload
         } catch (e) {
-            throw ({ status: 400, message: e })
+            if (e.status) throw e
+            throw new InvalidRequest(e.message || e)
         }
     }
     return payload
