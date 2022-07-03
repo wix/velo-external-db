@@ -1,7 +1,8 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
+import { IBaseHttpError } from '@wix-velo/velo-external-db-types'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists, UnrecognizedError } = errors
 
-export const notThrowingTranslateErrorCodes = (err: any) => {
+export const notThrowingTranslateErrorCodes = (err: any): IBaseHttpError => {
     switch (err.code) {
         case '42703':
             return new FieldDoesNotExist('Collection does not contain a field with this name')

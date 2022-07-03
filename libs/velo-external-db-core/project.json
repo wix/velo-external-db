@@ -8,7 +8,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/velo-external-db-core",
-        "main": "libs/velo-external-db-core/src/index.js",
+        "main": "libs/velo-external-db-core/src/index.ts",
         "tsConfig": "libs/velo-external-db-core/tsconfig.lib.json",
         "assets": ["libs/velo-external-db-core/*.md", "libs/velo-external-db-core/src/assets/**/*", "libs/velo-external-db-core/src/views/**/*", "libs/velo-external-db-core/src/*.json"],
         "buildableProjectDepsInPackageJsonType": "dependencies"
@@ -30,14 +30,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/velo-external-db-core/**/*.js"]
+        "lintFilePatterns": ["libs/velo-external-db-core/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/velo-external-db-core"],
       "options": {
-        "jestConfig": "libs/velo-external-db-core/jest.config.js",
+        "jestConfig": "libs/velo-external-db-core/jest.config.ts",
         "passWithNoTests": true
       }
     }

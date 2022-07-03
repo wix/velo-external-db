@@ -14,7 +14,6 @@ export const driver = () => require('../tests/drivers/sql_filter_transformer_tes
 export const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 
 export class SpannerConnector extends DbConnector {
-    type: string
     constructor() {
         super(ConfigValidator, init)
         this.type = 'spanner'
