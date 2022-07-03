@@ -1,7 +1,7 @@
-const SchemaColumnTranslator = require('./sql_schema_translator')
-const { Uninitialized } = require('@wix-velo/test-commons')
-const Chance = require('chance')
-const { escapeId } = require('./mssql_utils')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { escapeId } from './mssql_utils'
+import SchemaColumnTranslator from './sql_schema_translator'
+import * as Chance from 'chance'
 const chance = Chance()
 
 describe('Sql Schema Column Translator', () => {
@@ -138,14 +138,15 @@ describe('Sql Schema Column Translator', () => {
     })
 
 
-
-
-
     const ctx = {
         fieldName: Uninitialized,
     }
 
-    const env = {
+    interface Enviorment {
+        schemaTranslator: SchemaColumnTranslator
+    }
+    
+    const env: Enviorment= {
         schemaTranslator: Uninitialized,
     }
 

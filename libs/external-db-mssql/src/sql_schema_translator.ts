@@ -1,11 +1,11 @@
-const { escapeId } = require('./mssql_utils')
+import { escapeId } from './mssql_utils'
+import { InputField } from '@wix-velo/velo-external-db-types'
 
-class SchemaColumnTranslator {
-
+export default class SchemaColumnTranslator {
     constructor() {
     }
 
-    translateType(dbType) {
+    translateType(dbType: string) {
         const type = dbType.toLowerCase()
             .split('(')
             .shift()
@@ -45,15 +45,15 @@ class SchemaColumnTranslator {
     }
 
 
-    columnToDbColumnSql(f) {
+    columnToDbColumnSql(f: InputField) {
         return `${escapeId(f.name)} ${this.dbTypeFor(f)}`
     }
 
-    dbTypeFor(f) {
+    dbTypeFor(f: InputField) {
         return this.dbType(f.type, f.subtype, f.precision)
     }
 
-    dbType(type, subtype, precision) {
+    dbType(type: string, subtype: any, precision: any) {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
             case 'number_int':
                 return 'INT'
@@ -101,18 +101,18 @@ class SchemaColumnTranslator {
         }
     }
 
-    parsePrecision(precision) {
+    parsePrecision(precision: string) {
         try {
-            const parsed = precision.split(',').map(s => s.trim()).map(s => parseInt(s))
+            const parsed = precision.split(',').map((s: string) => s.trim()).map((s: string) => parseInt(s))
             return `(${parsed.join(',')})`
         } catch (e) {
             return '(5,2)'
         }
     }
 
-    parseLength(length) {
+    parseLength(length: string | number) {
         try {
-            const parsed = parseInt(length)
+            const parsed = parseInt(length as string)
             if (isNaN(parsed) || parsed <= 0) {
                 return '(2048)'
             }
@@ -123,5 +123,3 @@ class SchemaColumnTranslator {
     }
 
 }
-
-module.exports = SchemaColumnTranslator

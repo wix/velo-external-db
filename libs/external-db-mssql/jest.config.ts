@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'external-db-mssql',
     clearMocks: true,
     verbose: true,

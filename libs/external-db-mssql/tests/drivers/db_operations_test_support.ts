@@ -1,8 +1,8 @@
-const { ConnectionPool } = require('mssql')
-const DatabaseOperations = require('../../src/mssql_operations')
+import { config, ConnectionPool } from 'mssql'
+import DatabaseOperations from '../../src/mssql_operations'
 
-const createPool = async modify => {
-    const config = {
+const createPool = async (modify: {[key:string]: string}) => {
+    const config: config = {
         user: 'sa',
         password: 't9D4:EHfU6Xgccs-',
         database: 'tempdb',
@@ -30,18 +30,14 @@ const dbOperationWithMisconfiguredDatabase = async() => new DatabaseOperations(a
 
 const dbOperationWithMisconfiguredServer = async() => new DatabaseOperations(await createPool({ server: 'wrong' }))
 
-const dbOperationWithValidDB = async() => {
+export const dbOperationWithValidDB = async() => {
     const connection = await createPool({ })
     const dbOperations = new DatabaseOperations( connection )
 
     return { dbOperations, cleanup: async() => await (await connection).close() }
 }
 
-const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong password', () => dbOperationWithMisconfiguredPassword()],
+export const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong password', () => dbOperationWithMisconfiguredPassword()],
                                             ['pool connection with wrong database', () => dbOperationWithMisconfiguredDatabase()],
                                             ['pool connection with wrong server', () => dbOperationWithMisconfiguredServer()]
                                         ])
-
-module.exports = {
-    dbOperationWithValidDB, misconfiguredDbOperationOptions
-}
