@@ -33,7 +33,7 @@ export default class SchemaProvider implements ISchemaProvider {
                      }))
     }
 
-    async listHeaders(): Promise<TableHeader[]> {
+    async listHeaders(): Promise<string[]> {
         const rs = await this.sql.request()
                                  .input('db', this.dbName)
                                  .query('SELECT TABLE_NAME as table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_CATALOG = @db')

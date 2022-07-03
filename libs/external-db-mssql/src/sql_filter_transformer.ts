@@ -1,8 +1,8 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { escapeId, validateLiteral, patchFieldName } from './mssql_utils'
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, AdapterOperator, Sort, FunctionProjection, FieldProjection} from '@wix-velo/velo-external-db-types'
-import { MSSQLParsedAggregation, MSSQLParsedFilter } from './types'
+import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, FunctionProjection, NotEmptyAdapterFilter as NotEmptyFilter} from '@wix-velo/velo-external-db-types'
+import { MSSQLParsedFilter } from './types'
 const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -87,7 +87,7 @@ export default class FilterParser {
             return []
         }
 
-        const { operator, fieldName, value } =  filter
+        const { operator, fieldName, value } =  filter as NotEmptyFilter
 
         switch (operator) {
             case and:
