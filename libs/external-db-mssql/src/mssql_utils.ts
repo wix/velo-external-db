@@ -1,5 +1,6 @@
-const SqlString = require('tsqlstring')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
+const SqlString = require('tsqlstring') 
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { InvalidQuery } = errors
 
 const SqlServerSystemTables = ['syblicenseslog', 'sysalternates', 'sysaltusages', 'sysattributes', 'sysauditoptions',
                                'sysaudits_01', 'sysaudits_02', 'sysaudits_03', 'sysaudits_04', 'sysaudits_05', 'sysaudits_06', 'sysaudits_07', 'sysaudits_08',
@@ -11,19 +12,21 @@ const SqlServerSystemTables = ['syblicenseslog', 'sysalternates', 'sysaltusages'
                                'sysusages', 'sysusermessages', 'sysusers', 'sysxtypes']
 
 
-const isSystemTable = collectionId => SqlServerSystemTables.includes(collectionId.trim().toLowerCase())
+export const isSystemTable = (collectionId: string) => SqlServerSystemTables.includes(collectionId.trim().toLowerCase())
 
-const escapeId = s => s === '*' ? '*' : SqlString.escapeId(s)
-const escape = s => SqlString.escape(s)
-const escapeTable = s => {
+export const escapeId = (s: string) => s === '*' ? '*' : SqlString.escapeId(s)
+export const escape = (s: any) => SqlString.escape(s)
+
+export const escapeTable = (s: string) => {
     if (s && ( s.indexOf('.') !== -1 || isSystemTable(s) )) {
         throw new InvalidQuery('Illegal table name')
     }
     return escapeId(s)
 }
-const patchFieldName = s => `x${SqlString.escape(s).substring(1).slice(0, -1)}`
-const validateLiteral = s => `@${patchFieldName(s)}`
-const notConnectedPool = (pool, err) => {
+
+export const patchFieldName = (s: any) => `x${SqlString.escape(s).substring(1).slice(0, -1)}`
+export const validateLiteral = (s: any) => `@${patchFieldName(s)}`
+export const notConnectedPool = (pool: { connect: () => any }, err: any) => {
     return {
         pool: {
             ...pool,
@@ -35,4 +38,3 @@ const notConnectedPool = (pool, err) => {
     }
 }
 
-module.exports = { escapeId, validateLiteral, patchFieldName, escape, notConnectedPool, escapeTable, isSystemTable }

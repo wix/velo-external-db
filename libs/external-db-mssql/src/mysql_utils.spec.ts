@@ -1,5 +1,6 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { escapeTable, escapeId } = require('./mssql_utils')
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { escapeTable, escapeId } from './mssql_utils'
+const { InvalidQuery } = errors
 
 describe('Sql Server Utils', () => {
     test('escape collection id will not allow dots', () => {
