@@ -14,7 +14,7 @@ import { DataHooks, ExternalDbRouterConfig, SchemaHooks } from './types'
 import ItemTransformer = require('./converters/item_transformer')
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } from '@wix-velo/external-db-config'
-import { AnyFixMe, ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
+import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
 
 export class ExternalDbRouter {
@@ -55,7 +55,7 @@ export class ExternalDbRouter {
         this.router = createRouter()
     }
 
-    reloadHooks(hooks: { dataHooks?: DataHooks | undefined; schemaHooks?: SchemaHooks | undefined }) {
+    reloadHooks(hooks: { dataHooks?: DataHooks, schemaHooks?: SchemaHooks }) {
         initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
     }
 

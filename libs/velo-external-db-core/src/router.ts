@@ -15,7 +15,7 @@ import { DataHooksForAction, DataOperations, dataPayloadFor, DataActions, reques
 import { SchemaHooksForAction, SchemaOperations, schemaPayloadFor, SchemaActions } from './schema_hooks_utils'
 import SchemaService from './service/schema'
 import OperationService from './service/operation'
-import { AnyFixMe, IConfigValidator } from '@wix-velo/velo-external-db-types'
+import { AnyFixMe } from '@wix-velo/velo-external-db-types'
 import SchemaAwareDataService from './service/schema_aware_data'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
@@ -27,7 +27,7 @@ const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, Bul
 
 let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
 
-export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService, _externalDbConfigClient: ConfigValidator, _cfg: { secretKey?: any; type?: any; vendor?: any }, _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer, _roleAuthorizationService: RoleAuthorizationService, _hooks: {dataHooks?: DataHooks, schemaHooks?: SchemaHooks}) => {
+export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService, _externalDbConfigClient: ConfigValidator, _cfg: { secretKey?: string, type?: string, vendor?: string }, _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer, _roleAuthorizationService: RoleAuthorizationService, _hooks: {dataHooks?: DataHooks, schemaHooks?: SchemaHooks}) => {
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient
