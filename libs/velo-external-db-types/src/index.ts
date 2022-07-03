@@ -205,7 +205,7 @@ export type WixDataSingleFieldFilter = {
 }
 
 export type WixDataMultipleFieldsFilter = {
-    [key in WixDataMultiFieldOperators]?: WixDataFilter[]
+    [key in WixDataMultiFieldOperators]?: WixDataSingleFieldFilter[] | WixDataSingleFieldFilter[]
 }
 
 export type WixDataFilter = WixDataSingleFieldFilter | WixDataMultipleFieldsFilter
