@@ -2,7 +2,7 @@ import { errors } from '@wix-velo/velo-external-db-commons'
 import { isEmptyFilter } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter } from './dynamo_utils'
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { AdapterFilter as Filter, Sort } from '@wix-velo/velo-external-db-types' 
+import { AdapterFilter as Filter, NotEmptyAdapterFilter as NotEmptyFilter, Sort } from '@wix-velo/velo-external-db-types' 
 import { DynamoParsedFilter } from './types'
 const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
@@ -33,7 +33,7 @@ export default class FilterParser {
             return []
         }
 
-        const { operator, fieldName, value } =  filter
+        const { operator, fieldName, value } =  filter as NotEmptyFilter
         
         switch (operator) {
             case and:
