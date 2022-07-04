@@ -1,8 +1,7 @@
-const { EmptySort } = require('@wix-velo/velo-external-db-commons')
-const { when } = require('jest-when')
-// const { escapeId } = require('../../src/mysql_utils');
+import { EmptySort } from '@wix-velo/velo-external-db-commons'
+import { when } from 'jest-when'
 
-const filterParser = {
+export const filterParser = {
     transform: jest.fn(),
     parseFilter: jest.fn(),
     orderBy: jest.fn(),
@@ -10,51 +9,49 @@ const filterParser = {
     selectFieldsFor: jest.fn()
 }
 
-const stubEmptyFilterAndSortFor = (filter, sort) => {
+export const stubEmptyFilterAndSortFor = (filter: any, sort: any) => {
     stubEmptyFilterFor(filter)
     stubEmptyOrderByFor(sort)
 }
 
-const stubEmptyFilterFor = (filter) => {
+export const stubEmptyFilterFor = (filter: any) => {
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: '', parameters: [] })
 }
 
-const stubEmptyOrderByFor = (sort) => {
+export const stubEmptyOrderByFor = (sort: any) => {
     when(filterParser.orderBy).calledWith(sort)
                               .mockReturnValue(EmptySort)
 }
 
-const givenOrderByFor = (column, sort) => {
+export const givenOrderByFor = (column: any, sort: any) => {
     when(filterParser.orderBy).calledWith(sort)
                               .mockReturnValue({  sort: [ { field: column, direction: 'asc' } ] })
 
 }
 
 
-const givenFilterByIdWith = (id, filter) => {
+export const givenFilterByIdWith = (id: any, filter: any) => {
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: `_id = "${id}"` })
 }
 
-const givenAllFieldsProjectionFor = (projection) => 
+export const givenAllFieldsProjectionFor = (projection: any) =>
     when(filterParser.selectFieldsFor).calledWith(projection)
+                                      //@ts-ignore 
                                       .mockReturnValue()
 
-const givenProjectionExprFor = (projection) => 
+export const givenProjectionExprFor = (projection: any) => 
     when(filterParser.selectFieldsFor).calledWith(projection)
                                       .mockReturnValue(projection)
 
 
 
 
-const reset = () => {
+export const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
     filterParser.parseAggregation.mockClear()
     filterParser.parseFilter.mockClear()
     filterParser.selectFieldsFor.mockClear()
 }
-
-module.exports = { stubEmptyOrderByFor, stubEmptyFilterFor, givenFilterByIdWith, givenOrderByFor, stubEmptyFilterAndSortFor
-                    , givenAllFieldsProjectionFor, givenProjectionExprFor, filterParser, reset }

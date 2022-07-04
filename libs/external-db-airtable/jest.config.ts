@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'external-db-airtable',
     clearMocks: true,
     verbose: true,

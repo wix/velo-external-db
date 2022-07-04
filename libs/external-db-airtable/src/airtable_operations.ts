@@ -1,13 +1,17 @@
 
-const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
+import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
+import { Base as AirtableBase} from 'airtable'
+import { IDatabaseOperations, ValidateConnectionResult } from '@wix-velo/velo-external-db-types'
 
-class DatabaseOperations {
-    constructor(base) {
+export default class DatabaseOperations implements IDatabaseOperations {
+    base: AirtableBase
+    baseId: string
+    constructor(base: any) {
         this.base = base
         this.baseId = base.getId()
     }
 
-    async validateConnection() {
+    async validateConnection(): Promise<ValidateConnectionResult> {
         try {
             await this.base('Table')
                       .select({})
@@ -19,10 +23,7 @@ class DatabaseOperations {
         }
     }
 
-    connectionSucceedTableDoesNotExist(e) {
+    connectionSucceedTableDoesNotExist(e: any) {
         return  e.message === `Could not find table Table in application ${this.baseId}`
     }
 }
-
-module.exports = DatabaseOperations
-
