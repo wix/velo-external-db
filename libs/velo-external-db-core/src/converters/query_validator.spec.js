@@ -132,8 +132,19 @@ describe('Query Validator', () => {
             }
             expect ( () => env.queryValidator.validateAggregation([{ field: ctx.fieldName, type: ctx.type }], aggregation)).toThrow(InvalidQuery)
         })
-
         
+    })
+
+    describe('validateProjection', () => {
+        test('will not throw if projection fields exist', () => {
+            const projection = [ctx.fieldName]
+            expect ( () => env.queryValidator.validateProjection([{ field: ctx.fieldName, type: ctx.type }], projection)).not.toThrow()
+        })
+
+        test('will throw Invalid Query if projection fields doesn\'t exist', () => {
+            const projection = ['wrong']
+            expect ( () => env.queryValidator.validateProjection([{ field: ctx.fieldName, type: ctx.type }], projection)).toThrow(InvalidQuery)
+        })
     })
 
     const env = {
