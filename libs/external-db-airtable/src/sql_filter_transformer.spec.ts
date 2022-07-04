@@ -1,12 +1,14 @@
-const FilterParser = require('./sql_filter_transformer')
-const { EmptySort } = require ('./airtable_utils')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
-const each = require('jest-each').default
-const Chance = require('chance')
+import FilterParser from './sql_filter_transformer'
+import { EmptySort } from './airtable_utils'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import each from 'jest-each'
+import Chance = require('chance')
+const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
+
 
 describe('Sql Parser', () => {
     describe('sort parser', () => {
@@ -76,7 +78,7 @@ describe('Sql Parser', () => {
         describe('handle single field operator', () => {
             each([
                 ne, lt, lte, gt, gte, eq,
-            ]).test('correctly transform operator [%s]', (o) => {
+            ]).test('correctly transform operator [%s]', (o: any) => {
                 const filter = {
                     operator: o,
                     fieldName: ctx.fieldName,
@@ -110,7 +112,7 @@ describe('Sql Parser', () => {
                 }
                 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `OR(${ctx.fieldListValue.map(val => `${ctx.fieldName} = "${val}"`)})`
+                    filterExpr: `OR(${ctx.fieldListValue.map((val: any) => `${ctx.fieldName} = "${val}"`)})`
                 }])
             })
 
@@ -195,7 +197,7 @@ describe('Sql Parser', () => {
         describe('handle multi field operator', () => {
             each([
                 and, or
-            ]).test('correctly transform operator [%s]', (o) => {
+            ]).test('correctly transform operator [%s]', (o: string) => {
                 const filter = {
                     operator: o,
                     value: [ctx.filter, ctx.anotherFilter]
@@ -223,7 +225,17 @@ describe('Sql Parser', () => {
 
     })
 
-    const ctx = {
+    interface Context {
+        fieldName: any
+        fieldValue: any
+        fieldListValue: any
+        anotherFieldName: any
+        moreFieldName: any
+        filter: any
+        anotherFilter: any
+    }
+
+    const ctx: Context= {
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
         fieldListValue: Uninitialized,
@@ -233,7 +245,11 @@ describe('Sql Parser', () => {
         anotherFilter: Uninitialized,
     }
 
-    const env = {
+    interface Enviorment {
+        filterParser: any
+    }
+
+    const env: Enviorment = {
         filterParser: Uninitialized,
     }
 

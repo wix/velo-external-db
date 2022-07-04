@@ -8,7 +8,7 @@
       "outputs": [ "{options.outputPath}" ],
       "options": {
         "outputPath": "dist/libs/external-db-airtable",
-        "main": "libs/external-db-airtable/src/index.js",
+        "main": "libs/external-db-airtable/src/index.ts",
         "tsConfig": "libs/external-db-airtable/tsconfig.lib.json",
         "assets": [ "libs/external-db-airtable/*.md" ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
@@ -30,14 +30,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": [ "{options.outputFile}" ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-airtable/**/*.js" ]
+        "lintFilePatterns": [ "libs/external-db-airtable/**/*.ts" ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": [ "coverage/libs/external-db-airtable" ],
       "options": {
-        "jestConfig": "libs/external-db-airtable/jest.config.js",
+        "jestConfig": "libs/external-db-airtable/jest.config.ts",
         "passWithNoTests": true
       }
     }

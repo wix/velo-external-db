@@ -79,7 +79,7 @@ export default class DataService implements IDataService {
 
     async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation) {
         return {
-            items: (await this.storage.aggregate(collectionName, filter, aggregation))
+            items: ((await this.storage.aggregate?.(collectionName, filter, aggregation)) || [])
                                       .map( asWixData ),
             totalCount: 0
         }

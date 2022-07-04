@@ -114,7 +114,7 @@ export interface IDataProvider {
     update(collectionName: string, items: Item[], fields?: any): Promise<number>;
     delete(collectionName: string, itemIds: string[]): Promise<number>;
     truncate(collectionName: string): Promise<void>;
-    aggregate(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation): Promise<Item[]>;
+    aggregate?(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation): Promise<Item[]>;
 }
 
 export type TableHeader = {
@@ -143,7 +143,7 @@ export interface ISchemaProvider {
     removeColumn(collectionName: string, columnName: string): Promise<void>
     describeCollection(collectionName: string): Promise<ResponseField[]>
     drop(collectionName: string): Promise<void>
-    translateDbTypes?(column: InputField | ResponseField): ResponseField
+    translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
 }
 
 export interface IBaseHttpError extends Error {

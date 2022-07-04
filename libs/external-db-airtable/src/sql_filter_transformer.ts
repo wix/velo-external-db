@@ -1,13 +1,22 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { isObject, AdapterOperators, isEmptyFilter } = require('@wix-velo/velo-external-db-commons')
-const { EmptySort } = require ('./airtable_utils')
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { isObject, AdapterOperators, isEmptyFilter } from '@wix-velo/velo-external-db-commons'
+import { EmptySort } from './airtable_utils'
+import { AdapterFilter as Filter, AdapterOperator, NotEmptyAdapterFilter as NotEmptyFilter, Sort } from '@wix-velo/velo-external-db-types' 
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
+const { InvalidQuery } = errors
 
-class FilterParser {
+export interface IAirtableFilterParser {
+    transform(filter: Filter): { filterExpr: string } | any[] // never[] is a hack to make the type checker happy
+    orderBy(sort: Sort[]): { sort: { field: string; direction: string }[] }
+    selectFieldsFor(projection: any): any
+}
+
+
+export default class FilterParser implements IAirtableFilterParser {
     constructor() {
     }
 
-    transform(filter) {
+    transform(filter: Filter) {
         const results = this.parseFilter(filter)
         if (results.length === 0) {
             return []
@@ -18,12 +27,12 @@ class FilterParser {
     }
 
 
-    parseFilter(filter) {
+    parseFilter(filter: Filter): { filterExpr: string }[] {
         if (isEmptyFilter(filter)) {
             return []
         }
 
-        const { operator, fieldName, value } = filter
+        const { operator, fieldName, value } = filter as NotEmptyFilter
 
         switch (operator) {
             case and:
@@ -44,7 +53,7 @@ class FilterParser {
                     throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
                 }
 
-                const ress = value.map(val => { return { fieldName,
+                const ress = value.map((val: any) => { return { fieldName,
                                                          operator: eq,
                                                          value: val }
                                               }
@@ -59,7 +68,7 @@ class FilterParser {
 
         if (this.isSingleFieldOperator(operator)) {
             return [{
-                filterExpr: `${fieldName} ${this.adapterOperatorToAirtableOperator(operator, value)} ${this.valueForOperator(value, operator)}`
+                filterExpr: `${fieldName} ${this.adapterOperatorToAirtableOperator(operator)} ${this.valueForOperator(value, operator)}`
             }]
         }
 
@@ -74,11 +83,11 @@ class FilterParser {
         return []
     }
 
-    multipleFieldOperatorToFilterExpr(operator, values) {
-        return `${operator}(${values.map(r => r[0]?.filterExpr).join(',')})`
+    multipleFieldOperatorToFilterExpr(operator: string, values: any[]) {
+        return `${operator}(${values.map((r: { filterExpr: any }[]) => r[0]?.filterExpr).join(',')})`
     }
 
-    valueForStringOperator(operator, value) {
+    valueForStringOperator(operator: AdapterOperator, value: any) {
         switch (operator) {
             case string_contains:
                 return value
@@ -89,9 +98,9 @@ class FilterParser {
         }
     }
 
-    valueForOperator(value, operator) {
+    valueForOperator(value: string | any[] | undefined, operator: string) {
         if (operator === include) {
-            if (value === undefined || value.length === 0) {
+            if (value === undefined || !Array.isArray(value) || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
             }
             return this.multipleFieldOperatorToFilterExpr('OR', value)
@@ -103,15 +112,15 @@ class FilterParser {
         return `"${value}"`
     }
 
-    isSingleFieldOperator(operator) {
+    isSingleFieldOperator(operator: AdapterOperator) {
         return [ne, lt, lte, gt, gte, include, eq].includes(operator)
     }
 
-    isSingleFieldStringOperator(operator) {
+    isSingleFieldStringOperator(operator: AdapterOperator) {
         return [string_contains, string_begins, string_ends].includes(operator)
     }
 
-    adapterOperatorToAirtableOperator(operator) {
+    adapterOperatorToAirtableOperator(operator: AdapterOperator) {
         switch (operator) {
             case eq:
                 return '='
@@ -125,10 +134,12 @@ class FilterParser {
                 return '>'
             case gte:
                 return '>='
+            default:
+                return operator
         }
     }
 
-    orderBy(sort) {
+    orderBy(sort: Sort[]) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EmptySort
         }
@@ -137,13 +148,13 @@ class FilterParser {
         if (results.length === 0) {
             return EmptySort
         }
+
         return {
             sort: results
         }
     }
 
-
-    parseSort({ fieldName, direction }) {
+    parseSort({ fieldName, direction }: Sort): { field: string; direction: string } | [] {
         if (typeof fieldName !== 'string') {
             return []
         }
@@ -155,10 +166,8 @@ class FilterParser {
 
     }
 
-    selectFieldsFor(projection) {
+    selectFieldsFor(projection: any) {
         return projection
     }
 
 }
-
-module.exports = FilterParser
