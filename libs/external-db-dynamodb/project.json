@@ -8,7 +8,7 @@
       "outputs": [ "{options.outputPath}" ],
       "options": {
         "outputPath": "dist/libs/external-db-dynamodb",
-        "main": "libs/external-db-dynamodb/src/index.js",
+        "main": "libs/external-db-dynamodb/src/index.ts",
         "tsConfig": "libs/external-db-dynamodb/tsconfig.lib.json",
         "assets": [ "libs/external-db-dynamodb/*.md" ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
@@ -30,14 +30,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": [ "{options.outputFile}" ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-dynamodb/**/*.js" ]
+        "lintFilePatterns": [ "libs/external-db-dynamodb/**/*.ts" ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": [ "coverage/libs/external-db-dynamodb" ],
       "options": {
-        "jestConfig": "libs/external-db-dynamodb/jest.config.js",
+        "jestConfig": "libs/external-db-dynamodb/jest.config.ts",
         "passWithNoTests": true
       }
     }

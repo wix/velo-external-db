@@ -1,7 +1,7 @@
-const { EmptySort } = require('@wix-velo/velo-external-db-commons')
-const { when } = require('jest-when')
+import { EmptySort } from '@wix-velo/velo-external-db-commons'
+import { when } from 'jest-when'
 
-const filterParser = {
+export const filterParser = {
     transform: jest.fn(),
     parseFilter: jest.fn(),
     orderBy: jest.fn(),
@@ -9,22 +9,22 @@ const filterParser = {
     selectFieldsFor: jest.fn(),
 }
 
-const stubEmptyFilterAndSortFor = (filter, sort) => {
+export const stubEmptyFilterAndSortFor = (filter: any, sort: any) => {
     stubEmptyFilterFor(filter)
     stubEmptyOrderByFor(sort)
 }
 
-const stubEmptyFilterFor = (filter) => {
+export const stubEmptyFilterFor = (filter: any) => {
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: '', queryable: false })
 }
 
-const stubEmptyOrderByFor = (sort) => {
+export const stubEmptyOrderByFor = (sort: any) => {
     when(filterParser.orderBy).calledWith(sort)
                               .mockReturnValue(EmptySort)
 }
 
-const givenFilterByIdWith = (id, filter) => {
+export const givenFilterByIdWith = (id: any, filter: any) => {
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: {
                                     KeyConditionExpression: '#_id = :_id',
@@ -38,7 +38,7 @@ const givenFilterByIdWith = (id, filter) => {
                             })
 }
 
-const givenAllFieldsProjectionFor = (projection) => 
+export const givenAllFieldsProjectionFor = (projection: any) => 
     when(filterParser.selectFieldsFor).calledWith(projection)
                                       .mockReturnValue(
                                           {
@@ -47,20 +47,20 @@ const givenAllFieldsProjectionFor = (projection) =>
                                           }
                                       )
 
-const givenProjectionExprFor = (projection) => 
+export const givenProjectionExprFor = (projection: any[]) => 
     when(filterParser.selectFieldsFor).calledWith(projection)
                                       .mockReturnValue(
                                             {
-                                                projectionExpr: projection.map(f => `#${f}`).join(', '),
-                                                projectionAttributeNames: projection.reduce((pV, cV) => (
+                                                projectionExpr: projection.map((f: any) => `#${f}`).join(', '),
+                                                projectionAttributeNames: projection.reduce((pV: any, cV: any) => (
                                                     { ...pV, [`#${cV}`]: cV }
                                                 ), {})
                                             }
                                         )
 
-const givenAggregateQueryWith = (_having, _numericColumns, _columnAliases, _groupByColumns, _filter) => {}
+export const givenAggregateQueryWith = (_having: any, _numericColumns: any, _columnAliases: any, _groupByColumns: any, _filter: any) => {}
 
-const givenStartsWithFilterFor = (filter, column, value) =>
+export const givenStartsWithFilterFor = (filter: any, column: any, value: any) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: {
                                     FilterExpression: `begins_with (#${column}, :${column})`,
@@ -73,7 +73,7 @@ const givenStartsWithFilterFor = (filter, column, value) =>
                                 }
                             })
                     
-const givenGreaterThenFilterFor = (filter, column, value) =>
+export const givenGreaterThenFilterFor = (filter: any, column: any, value: any) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: {
                                     FilterExpression: `#${column} > :${column}`,
@@ -87,7 +87,7 @@ const givenGreaterThenFilterFor = (filter, column, value) =>
                             })
 
 
-const givenNotFilterQueryFor = (filter, column, value) =>
+export const givenNotFilterQueryFor = (filter: any, column: any, value: any) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: {
                                     FilterExpression: `NOT (#${column} = :${column})`,
@@ -100,7 +100,7 @@ const givenNotFilterQueryFor = (filter, column, value) =>
                                 }
                             })
 
-const givenIncludeFilterForIdColumn = (filter, value) =>
+export const givenIncludeFilterForIdColumn = (filter: any, value: any) =>
     when(filterParser.transform).calledWith(filter)
                                 .mockReturnValue({ filterExpr: {
                                     FilterExpression: '#_id IN (:0)',
@@ -113,16 +113,10 @@ const givenIncludeFilterForIdColumn = (filter, value) =>
                                 }
                             })
 
-const reset = () => {
+export const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
     filterParser.parseAggregation.mockClear()
     filterParser.parseFilter.mockClear()
     filterParser.selectFieldsFor.mockClear()
-}
-
-module.exports = { stubEmptyFilterAndSortFor, stubEmptyOrderByFor, stubEmptyFilterFor,
-                   givenFilterByIdWith, filterParser, reset, givenAggregateQueryWith,
-                   givenAllFieldsProjectionFor, givenProjectionExprFor, givenStartsWithFilterFor,
-                   givenGreaterThenFilterFor, givenNotFilterQueryFor, givenIncludeFilterForIdColumn
 }

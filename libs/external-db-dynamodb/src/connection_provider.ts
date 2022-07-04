@@ -1,15 +1,20 @@
-const SchemaProvider = require('./dynamo_schema_provider')
-const DataProvider  = require('./dynamo_data_provider')
-const FilterParser = require('./sql_filter_transformer')
-const DatabaseOperations = require('./dynamo_operations')
-const { DynamoDB } = require('@aws-sdk/client-dynamodb')
+import SchemaProvider from'./dynamo_schema_provider'
+import DataProvider from './dynamo_data_provider'
+import FilterParser from './sql_filter_transformer'
+import DatabaseOperations from './dynamo_operations'
+import { DynamoDB } from '@aws-sdk/client-dynamodb'
+import { DbProviders } from '@wix-velo/velo-external-db-types'
+import { DynamoConfig } from './types'
 
-const extraOptions  = (cfg) => { 
+
+const extraOptions  = (cfg: DynamoConfig) => { 
     if (cfg.endpoint)
         return { endpoint: cfg.endpoint }
+    return {}
 }
 
-const init = (cfg, _cfgOptions) => { 
+
+export default (cfg: DynamoConfig, _cfgOptions?: {[x: string]: any}) : DbProviders<DynamoDB> => { 
     const options = _cfgOptions || {}
     const client = new DynamoDB({ region: cfg.region, ...extraOptions(cfg), ...options })
     const databaseOperations = new DatabaseOperations(client)
@@ -20,5 +25,3 @@ const init = (cfg, _cfgOptions) => {
 
     return { dataProvider, schemaProvider, databaseOperations, connection: client, cleanup: () => {} }
 }
-
-module.exports = init

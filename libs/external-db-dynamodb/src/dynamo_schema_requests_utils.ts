@@ -1,7 +1,7 @@
 
-const { SystemTable } = require('./dynamo_utils')
+import { SystemTable } from './dynamo_utils'
 
-const removeColumnExpression = (collectionName, columns) => ({
+export const removeColumnExpression = (collectionName: any, columns: any) => ({
     TableName: SystemTable,
     Key: {
         tableName: collectionName
@@ -16,7 +16,7 @@ const removeColumnExpression = (collectionName, columns) => ({
     ReturnValues: 'UPDATED_NEW'
 })
 
-const addColumnExpression = (collectionName, column) => ({
+export const addColumnExpression = (collectionName: any, column: any) => ({
         TableName: SystemTable,
         Key: {
             tableName: collectionName
@@ -31,21 +31,21 @@ const addColumnExpression = (collectionName, column) => ({
         ReturnValues: 'UPDATED_NEW'
 })
 
-const createTableExpression = (collectionName) => ({
+export const createTableExpression = (collectionName: any) => ({
     TableName: collectionName,
     KeySchema: [{ AttributeName: '_id', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: '_id', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST'
 })
 
-const createSystemTableExpression = () => ({
+export const createSystemTableExpression = () => ({
     TableName: SystemTable,
     KeySchema: [{ AttributeName: 'tableName', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'tableName', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST'
 })
 
-const insertToSystemTableExpression = (collectionName, fields) => ({
+export const insertToSystemTableExpression = (collectionName: any, fields: any) => ({
     TableName: SystemTable, 
     Item: {
     tableName: collectionName,
@@ -53,21 +53,16 @@ const insertToSystemTableExpression = (collectionName, fields) => ({
     }
 })
 
-const deleteTableFromSystemTableExpression = (collectionName) => ({
+export const deleteTableFromSystemTableExpression = (collectionName: any) => ({
     TableName: SystemTable,
     Key: { tableName: collectionName }
 })
 
-const getCollectionFromSystemTableExpression = (collectionName) => ({
+export const getCollectionFromSystemTableExpression = (collectionName: any) => ({
     TableName: SystemTable,
     Key: { tableName: collectionName }
 })
 
-const listTablesExpression = () => ({
+export const listTablesExpression = () => ({
     TableName: SystemTable 
 })
-
-module.exports = { removeColumnExpression, addColumnExpression, createTableExpression, 
-                   createSystemTableExpression, insertToSystemTableExpression, deleteTableFromSystemTableExpression,
-                   getCollectionFromSystemTableExpression, listTablesExpression
-}
