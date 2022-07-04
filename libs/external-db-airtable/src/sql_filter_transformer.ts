@@ -1,7 +1,7 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { isObject, AdapterOperators, isEmptyFilter } from '@wix-velo/velo-external-db-commons'
 import { EmptySort } from './airtable_utils'
-import { AdapterFilter as Filter, AdapterOperator, Sort } from '@wix-velo/velo-external-db-types' 
+import { AdapterFilter as Filter, AdapterOperator, NotEmptyAdapterFilter as NotEmptyFilter, Sort } from '@wix-velo/velo-external-db-types' 
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 const { InvalidQuery } = errors
 
@@ -32,7 +32,7 @@ export default class FilterParser implements IAirtableFilterParser {
             return []
         }
 
-        const { operator, fieldName, value } = filter
+        const { operator, fieldName, value } = filter as NotEmptyFilter
 
         switch (operator) {
             case and:

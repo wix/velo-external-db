@@ -1,7 +1,7 @@
 
 import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
 import { Base as AirtableBase} from 'airtable'
-import { IDatabaseOperations } from '@wix-velo/velo-external-db-types'
+import { IDatabaseOperations, ValidateConnectionResult } from '@wix-velo/velo-external-db-types'
 
 export default class DatabaseOperations implements IDatabaseOperations {
     base: AirtableBase
@@ -11,7 +11,7 @@ export default class DatabaseOperations implements IDatabaseOperations {
         this.baseId = base.getId()
     }
 
-    async validateConnection() {
+    async validateConnection(): Promise<ValidateConnectionResult> {
         try {
             await this.base('Table')
                       .select({})
