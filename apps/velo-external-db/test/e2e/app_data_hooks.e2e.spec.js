@@ -222,6 +222,22 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     expect(response.data.items).toEqual([ctx.item])
                 })
 
+            test('beforeFind should be able to change projection payload /data/find', async() => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+
+                env.externalDbRouter.reloadHooks({
+                    dataHooks: {
+                        beforeFind: (payload, _requestContext, _serviceContext) => {
+                            return { ...payload, projection: ['_id'] }
+                        }
+                    }
+                })
+
+            const response = await axios.post('/data/find', hooks.findRequestBodyWith(ctx.collectionName, { _id: { $eq: ctx.item._id } }), authOwner)
+                expect(response.data.items).toEqual([{ _id: ctx.item._id }])
+
+            })
             each(['beforeAll', 'beforeRead', 'beforeGetById'])
                 .test('%s should able to change payload /data/get', async(hookName) => {
                     await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)

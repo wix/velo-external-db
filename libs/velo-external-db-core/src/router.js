@@ -89,10 +89,10 @@ const createRouter = () => {
         try {
             const { collectionName } = req.body
 
-            const { filter, sort, skip, limit } = await executeDataHooksFor(DataActions.BeforeFind, dataPayloadFor(FIND, req.body), requestContextFor(FIND, req.body))
+            const { filter, sort, skip, limit, projection } = await executeDataHooksFor(DataActions.BeforeFind, dataPayloadFor(FIND, req.body), requestContextFor(FIND, req.body))
 
             await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), sort, skip, limit)
+            const data = await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), sort, skip, limit, projection)
 
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterFind, data, requestContextFor(FIND, req.body))
             res.json(dataAfterAction)
@@ -148,9 +148,9 @@ const createRouter = () => {
         try {
             const { collectionName } = req.body
 
-            const { itemId } = await executeDataHooksFor(DataActions.BeforeGetById, dataPayloadFor(GET, req.body), requestContextFor(GET, req.body))
+            const { itemId, projection } = await executeDataHooksFor(DataActions.BeforeGetById, dataPayloadFor(GET, req.body), requestContextFor(GET, req.body))
             await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.getById(collectionName, itemId, '', 0, 1)
+            const data = await schemaAwareDataService.getById(collectionName, itemId, projection)
 
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterGetById, data, requestContextFor(GET, req.body))
             if (!dataAfterAction.item) {
