@@ -1,7 +1,6 @@
 const { Uninitialized } = require('@wix-velo/test-commons')
 const { env, initEnv, reset } = require('../drivers/external_config_reader_e2e_test_support')
 const each = require('jest-each').default
-const { invalidConfigStatusResponse } = require('./external_db_config_client_matcher')
 
 each(
 [
@@ -33,11 +32,11 @@ each(
             await expect( env.configReader.readConfig() ).resolves.toEqual(ctx.config)
         })
 
-        test('validate config', async() => {
-            env.driver.defineInvalidConfig()
+        // test('validate config', async() => {
+        //     env.driver.defineInvalidConfig()
 
-            await expect( env.configReader.configStatus() ).resolves.toEqual( invalidConfigStatusResponse() )
-        })
+        //     await expect( env.configReader.configStatus() ).resolves.toEqual( invalidConfigStatusResponse() )
+        // })
 
     })
 
