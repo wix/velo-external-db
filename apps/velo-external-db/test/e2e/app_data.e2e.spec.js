@@ -1,5 +1,5 @@
 const { Uninitialized, gen: genCommon } = require('@wix-velo/test-commons')
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort } = require('@wix-velo/velo-external-db-commons').SchemaOperations
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection } = require('@wix-velo/velo-external-db-commons').SchemaOperations
 const { testIfSupportedOperationsIncludes } = require('@wix-velo/test-commons')
 const gen = require('../gen')
 const schema = require('../drivers/schema_api_rest_test_support')
@@ -37,7 +37,17 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
                     totalCount: 2
                 } }))
     })
-
+    
+    testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('find api with projection', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ctx.item ], ctx.collectionName, authAdmin)
+        await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', skip: 0, limit: 25, projection: [ctx.column.name] }, authOwner) ).resolves.toEqual(
+            expect.objectContaining({ data: {
+                    items: [ ctx.item ].map(item => ({ [ctx.column.name]: item[ctx.column.name] })),
+                    totalCount: 1
+                } }))
+    })
+    
     //todo: create another test without sort for these implementations
 
     test('insert api', async() => {
