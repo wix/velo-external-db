@@ -279,6 +279,54 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             }
         })
     })
+
+    describe('Data Hooks - Error Handling', () => {
+        test('should handle error object and throw with the corresponding status', async() => {
+            env.externalDbRouter.reloadHooks({
+                dataHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        const error = new Error('message')
+                        error.status = '409'
+                        throw error                    
+                    }
+                }
+            })
+
+            await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
+                errorResponseWith(409, 'message')
+            )
+        })
+        
+        test('If not specified should throw 400 - Error object', async() => {
+            env.externalDbRouter.reloadHooks({
+                dataHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        const error = new Error('message')
+                        throw error
+                    }
+                }
+            })
+
+            await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
+                errorResponseWith(400, 'message')
+            )
+        })
+
+        test('If not specified should throw 400 - string', async() => { 
+            env.externalDbRouter.reloadHooks({
+                dataHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        throw 'message'
+                    }
+                }
+            })
+
+            await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
+                errorResponseWith(400, 'message')
+            )
+        })
+    })
+
     const ctx = {
         collectionName: Uninitialized,
         column: Uninitialized,

@@ -177,6 +177,53 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
         })
     })
 
+    describe('Schema Hooks - Error Handling', () => {
+        test('should handle error object and throw with the corresponding status', async() => {
+            env.externalDbRouter.reloadHooks({
+                schemaHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        const error = new Error('message')
+                        error.status = '409'
+                        throw error                    
+                    }
+                }
+            })
+
+            await expect(axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)).rejects.toMatchObject(
+                errorResponseWith(409, 'message')
+            )
+        })
+        
+        test('If not specified should throw 400 - Error object', async() => {
+            env.externalDbRouter.reloadHooks({
+                schemaHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        const error = new Error('message')
+                        throw error                    
+                    }
+                }
+            })
+
+            await expect(axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)).rejects.toMatchObject(
+                errorResponseWith(400, 'message')
+            )
+        })
+
+        test('If not specified should throw 400 - string', async() => { 
+            env.externalDbRouter.reloadHooks({
+                schemaHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        throw 'message'                    
+                    }
+                }
+            })
+
+            await expect(axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)).rejects.toMatchObject(
+                errorResponseWith(400, 'message')
+            )
+        })
+    })
+
     const ctx = {
         collectionName: Uninitialized,
         anotherCollectionName: Uninitialized,
