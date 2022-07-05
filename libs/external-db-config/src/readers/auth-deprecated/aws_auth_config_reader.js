@@ -1,5 +1,5 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
-const { checkRequiredKeys } = require('../utils/config_utils')
+const { checkRequiredKeys } = require('../../utils/config_utils')
 
 const EmptyAWSAuthConfig = { callbackUrl: '', clientId: '', clientSecret: '', clientDomain: '' }
 
