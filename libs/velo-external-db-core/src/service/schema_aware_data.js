@@ -7,19 +7,21 @@ class SchemaAwareDataService {
         this.itemTransformer = itemTransformer
     }
 
-    async find(collectionName, filter, sort, skip, limit) {
+    async find(collectionName, filter, sort, skip, limit, _projection) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         await this.validateFilter(collectionName, filter, fields)
-        const projection = await this.schemaFieldNamesFor(collectionName, fields)
+        const projection = _projection ?? (await this.schemaInformation.schemaFieldsFor(collectionName)).map(f => f.field)
+        await this.validateProjection(collectionName, projection, fields)
 
         const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection)
         return { items: this.itemTransformer.patchItems(items, fields), totalCount }
     }
 
-    async getById(collectionName, itemId) {
+    async getById(collectionName, itemId, _projection) {
         await this.validateGetById(collectionName, itemId)
-        const projection = await this.schemaFieldNamesFor(collectionName)
-        
+        const projection = _projection ?? (await this.schemaInformation.schemaFieldsFor(collectionName)).map(f => f.field)
+        this.validateProjection(collectionName, projection)
+
         return await this.dataService.getById(collectionName, itemId, projection)
     }
 
@@ -81,6 +83,11 @@ class SchemaAwareDataService {
     async validateAggregation(collectionName, aggregation) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         this.queryValidator.validateAggregation(fields, aggregation)
+    }
+
+    async validateProjection(collectionName, projection, fields) {
+        const schemaFields = fields ?? await this.schemaInformation.schemaFieldsFor(collectionName)
+        this.queryValidator.validateProjection(schemaFields, projection)
     }
 
     async prepareItemsForUpdate(collectionName, items) {

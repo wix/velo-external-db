@@ -2,7 +2,7 @@ const each = require('jest-each').default
 const Chance = require('chance')
 const chance = Chance()
 const { Uninitialized } = require('@wix-velo/test-commons')
-const { randomBodyWith } = require ('../test/gen')
+const { randomBodyWith } = require('../test/gen')
 const { HooksForAction, Operations, payloadFor, Actions } = require('./data_hooks_utils')
 
 describe('Hooks Utils', () => {
@@ -35,11 +35,12 @@ describe('Hooks Utils', () => {
 
     describe('Payload For', () => {
         test('Payload for Find should return query object', () => {
-            expect(payloadFor(Operations.Find, randomBodyWith({ filter: ctx.filter, skip: ctx.skip, limit: ctx.limit, sort: ctx.sort }))).toEqual({
+            expect(payloadFor(Operations.Find, randomBodyWith({ filter: ctx.filter, skip: ctx.skip, limit: ctx.limit, sort: ctx.sort, projection: ctx.projection }))).toEqual({
                 filter: ctx.filter,
                 skip: ctx.skip,
                 limit: ctx.limit,
-                sort: ctx.sort
+                sort: ctx.sort,
+                projection: ctx.projection
             })
         })
         test('Payload for Insert should return item', () => {
@@ -63,8 +64,8 @@ describe('Hooks Utils', () => {
         test('Payload for Count should return filter', () => {
             expect(payloadFor(Operations.Count, randomBodyWith({ filter: ctx.filter }))).toEqual({ filter: ctx.filter })
         })
-        test('Payload for Get should return item id', () => {
-            expect(payloadFor(Operations.Get, randomBodyWith({ itemId: ctx.itemId }))).toEqual({ itemId: ctx.itemId })
+        test('Payload for Get should return item id and projection', () => {
+            expect(payloadFor(Operations.Get, randomBodyWith({ itemId: ctx.itemId, projection: ctx.projection }))).toEqual({ itemId: ctx.itemId, projection: ctx.projection })
         })
         test('Payload for Aggregate should return Aggregation query', () => {
             expect(payloadFor(Operations.Aggregate, randomBodyWith({ filter: ctx.filter, processingStep: ctx.processingStep, postFilteringStep: ctx.postFilteringStep })))
@@ -84,6 +85,7 @@ describe('Hooks Utils', () => {
         limit: Uninitialized,
         skip: Uninitialized,
         sort: Uninitialized,
+        projection: Uninitialized,
         item: Uninitialized,
         items: Uninitialized,
         itemId: Uninitialized,
@@ -95,6 +97,7 @@ describe('Hooks Utils', () => {
         ctx.limit = chance.word()
         ctx.skip = chance.word()
         ctx.sort = chance.word()
+        ctx.projection = chance.word()
         ctx.item = chance.word()
         ctx.items = chance.word()
         ctx.itemId = chance.word()
