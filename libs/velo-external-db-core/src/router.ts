@@ -4,7 +4,7 @@ import * as express from 'express'
 import * as compression from 'compression'
 import { errorMiddleware } from './web/error-middleware'
 import { appInfoFor } from './health/app_info'
-const { InvalidRequest, ItemNotFound } = require('@wix-velo/velo-external-db-commons').errors
+import { errors } from '@wix-velo/velo-external-db-commons'
 import { extractRole } from './web/auth-role-middleware'
 import { config } from './roles-config.json'
 import { secretKeyAuthMiddleware } from './web/auth-middleware'
@@ -23,6 +23,7 @@ import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { DataHooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
 
+const { InvalidRequest, ItemNotFound } = errors
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
 
 let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
@@ -291,7 +292,7 @@ export const createRouter = () => {
             const { schemaIds } = await executeSchemaHooksFor(SchemaActions.BeforeFind, schemaPayloadFor(SchemaOperations.Find, req.body), requestContextFor(SchemaOperations.Find, req.body))
 
             if (schemaIds && schemaIds.length > 10) {
-                throw new InvalidRequest()
+                throw new InvalidRequest('Too many schemas requested')
             }
             const data = await schemaService.find(schemaIds)
             const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterFind, data, requestContextFor(SchemaOperations.Find, req.body))
