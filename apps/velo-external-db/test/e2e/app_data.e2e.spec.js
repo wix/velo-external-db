@@ -120,6 +120,16 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect( axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin) ).resolves.toEqual(matchers.responseWith({ item: ctx.item }))
     })
 
+    testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('get by id api with projection', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+
+        await expect(axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id, projection: [ctx.column.name] }, authAdmin)).resolves.toEqual(
+            matchers.responseWith({
+                item: { [ctx.column.name]: ctx.item[ctx.column.name] }
+            }))
+    })
+
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
