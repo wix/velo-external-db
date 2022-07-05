@@ -1,4 +1,3 @@
-const { checkRequiredKeys } = require('../utils/config_utils')
 
 class GcpConfigReader {
   constructor() {
@@ -9,11 +8,6 @@ class GcpConfigReader {
     return { cloudSqlConnectionName: CLOUD_SQL_CONNECTION_NAME, user: USER, password: PASSWORD, db: DB, secretKey: SECRET_KEY }
   }
 
-  validate() {
-    return {
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY'])
-    }
-  }
 }
 
 class GcpSpannerConfigReader {
@@ -25,11 +19,6 @@ class GcpSpannerConfigReader {
     return { projectId: PROJECT_ID, instanceId: INSTANCE_ID, databaseId: DATABASE_ID, secretKey: SECRET_KEY }
   }
 
-  validate() {
-    return {
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['PROJECT_ID', 'INSTANCE_ID', 'DATABASE_ID', 'SECRET_KEY'])
-    }
-  }
 
 }
 
@@ -41,11 +30,6 @@ class GcpFirestoreConfigReader {
     return { projectId: PROJECT_ID, secretKey: SECRET_KEY }
   }
 
-  validate() {
-    return {
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['PROJECT_ID', 'SECRET_KEY'])
-    }
-  }
 
 }
 
@@ -57,11 +41,6 @@ class GcpGoogleSheetsConfigReader {
     return { clientEmail: CLIENT_EMAIL, apiPrivateKey: API_PRIVATE_KEY, sheetId: SHEET_ID, secretKey: SECRET_KEY }
   }
 
-  validate() {
-    return {
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLIENT_EMAIL', 'SHEET_ID', 'API_PRIVATE_KEY', 'SECRET_KEY'])
-    }
-  }
 }
 
 class GcpMongoConfigReader {
@@ -71,12 +50,6 @@ class GcpMongoConfigReader {
     const { URI, SECRET_KEY } = process.env
     return { connectionUri: URI, secretKey: SECRET_KEY }
   }
-  
-  validate() {
-    return {
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['URI', 'SECRET_KEY'])
-    }
-  }
 }
 
 class GcpAirtableConfigReader {
@@ -85,12 +58,6 @@ class GcpAirtableConfigReader {
   async readConfig() {
     const { AIRTABLE_API_KEY, META_API_KEY, BASE_ID, SECRET_KEY, BASE_URL } = process.env
     return { apiPrivateKey: AIRTABLE_API_KEY, metaApiKey: META_API_KEY, baseId: BASE_ID, secretKey: SECRET_KEY, baseUrl: BASE_URL }
-  }
-
-  validate() {
-    return {
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['AIRTABLE_API_KEY', 'META_API_KEY', 'BASE_ID', 'SECRET_KEY'])
-    }
   }
 }
 
@@ -102,13 +69,6 @@ class GcpBigQueryConfigReader {
     const { PROJECT_ID, DATABASE_ID, SECRET_KEY } = process.env
     return { projectId: PROJECT_ID, databaseId: DATABASE_ID, secretKey: SECRET_KEY }
   }
-
-  validate() {
-    return {
-      missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['PROJECT_ID', 'DATABASE_ID', 'SECRET_KEY'])
-    }
-  }
-
 }
 
 

@@ -6,10 +6,6 @@ class StubConfigReader {
     readConfig() {
         return {}
     }
-
-    validate() {
-        return { missingRequiredSecretsKeys: [] }
-    }
 }
 
 module.exports = StubConfigReader
