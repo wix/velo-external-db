@@ -90,7 +90,7 @@ class FilterParser {
                 const res = value.map( this.parseFilter.bind(this) )
                 const op = operator === and ? ' AND ' : ' OR '
                 return [{
-                    filterExpr: res.map(r => r[0].filterExpr).join( op ),
+                    filterExpr: `(${res.map(r => r[0].filterExpr).join( op )})`,
                     parameters: res.map( s => s[0].parameters ).flat()
                 }]
             case not:

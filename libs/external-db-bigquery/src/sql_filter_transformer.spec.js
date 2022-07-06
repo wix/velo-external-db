@@ -266,7 +266,7 @@ describe('Sql Parser', () => {
                 const op = o === and ? 'AND' : 'OR'
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                    filterExpr: `${env.filterParser.parseFilter(ctx.filter)[0].filterExpr} ${op} ${env.filterParser.parseFilter(ctx.anotherFilter)[0].filterExpr}`,
+                    filterExpr: `(${env.filterParser.parseFilter(ctx.filter)[0].filterExpr} ${op} ${env.filterParser.parseFilter(ctx.anotherFilter)[0].filterExpr})`,
                     parameters: [].concat(env.filterParser.parseFilter(ctx.filter)[0].parameters)
                                   .concat(env.filterParser.parseFilter(ctx.anotherFilter)[0].parameters)
                 }])

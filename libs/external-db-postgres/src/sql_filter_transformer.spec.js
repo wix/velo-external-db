@@ -290,7 +290,7 @@ describe('Sql Parser', () => {
                 const filter1 = env.filterParser.parseFilter(ctx.filter, ctx.offset)[0]
                 const filter2 = env.filterParser.parseFilter(ctx.anotherFilter, filter1.offset)[0]
                 expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
-                    filterExpr: `${filter1.filterExpr} ${op} ${filter2.filterExpr}`,
+                    filterExpr: `(${filter1.filterExpr} ${op} ${filter2.filterExpr})`,
                     filterColumns: [],
                     offset: filter2.offset,
                     parameters: [].concat(filter1.parameters)
