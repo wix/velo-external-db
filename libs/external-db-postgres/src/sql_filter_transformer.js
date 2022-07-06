@@ -99,7 +99,7 @@ class FilterParser {
 
                 const op = operator === and ? ' AND ' : ' OR '
                 return [{
-                    filterExpr: res.filter.map(r => r.filterExpr).join( op ),
+                    filterExpr: `(${res.filter.map(r => r.filterExpr).join( op )})`,
                     filterColumns: [],
                     offset: res.offset,
                     parameters: res.filter.map( s => s.parameters ).flat()
