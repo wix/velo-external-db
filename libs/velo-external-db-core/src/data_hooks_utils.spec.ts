@@ -35,7 +35,7 @@ describe('Hooks Utils', () => {
 
     describe('Payload For', () => {
         test('Payload for Find should return query object', () => {
-            expect(dataPayloadFor(DataOperations.Find, randomBodyWith({ filter: ctx.filter, skip: ctx.skip, limit: ctx.limit, sort: ctx.sort }))).toEqual({
+            expect(dataPayloadFor(DataOperations.Find, randomBodyWith({ filter: ctx.filter, skip: ctx.skip, limit: ctx.limit, sort: ctx.sort, projection: ctx.projection }))).toEqual({
                 filter: ctx.filter,
                 skip: ctx.skip,
                 limit: ctx.limit,

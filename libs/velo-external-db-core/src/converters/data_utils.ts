@@ -7,7 +7,7 @@ export const asWixData = (item: Item, projection?: any) => {
     return generateIdsIfNeeded(packDates(item), projectionNotIncludesId)
 }
 
-export const generateIdsIfNeeded = (item: Item, projectionWithOutId: boolean): ItemWithId => {
+export const generateIdsIfNeeded = (item: Item, projectionWithOutId?: boolean): ItemWithId => {
     if ('_id' in item || projectionWithOutId)
         return item as ItemWithId
     const sha = crypto.createHash('sha1')

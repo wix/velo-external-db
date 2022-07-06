@@ -85,6 +85,7 @@ export const dataPayloadFor = (operation: DataOperations, body: any) => {
         case DataOperations.BulkUpdate:
             return { items: body.items as Item[] }
         case DataOperations.Get:
+            return { itemId: body.itemId, projection: body.projection }
         case DataOperations.Remove:
             return { itemId: body.itemId as string }
         case DataOperations.BulkRemove:
