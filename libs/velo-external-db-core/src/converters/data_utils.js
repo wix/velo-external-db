@@ -1,10 +1,13 @@
 const { isDate } = require('@wix-velo/velo-external-db-commons')
 const crypto = require('crypto')
 
-const asWixData = e => generateIdsIfNeeded(packDates(e))
+const asWixData = (item, projection) => { 
+    const projectionNotIncludesId = Array.isArray(projection) && !projection.includes('_id')
+    return generateIdsIfNeeded(packDates(item), projectionNotIncludesId)
+}
 
-const generateIdsIfNeeded = item => {
-    if ('_id' in item)
+const generateIdsIfNeeded = (item, projectionWithOutId) => {
+    if ('_id' in item || projectionWithOutId )
         return item
     const sha = crypto.createHash('sha1')
     const fieldsConcat = Object.values(item).join('')

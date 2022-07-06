@@ -13,6 +13,7 @@ describe ('Schema Aware Data Service', () => {
     test('find validate filter and call data service with projection fields', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.transformedFilter) 
+        queryValidator.givenValidProjectionForDefaultFieldsOf(SystemFields)
         data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultFields)  
         patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities)
 
@@ -117,6 +118,7 @@ describe ('Schema Aware Data Service', () => {
         sort: Uninitialized,
         limit: Uninitialized,
         skip: Uninitialized,
+        projection: Uninitialized,
         defaultFields: Uninitialized
     }
 
@@ -156,7 +158,7 @@ describe ('Schema Aware Data Service', () => {
         ctx.sort = chance.word()
         ctx.skip = chance.integer()
         ctx.limit = chance.integer()
-
+        ctx.projection = [chance.word()]
         ctx.defaultFields = SystemFields.map(f => f.name)
     })
 })

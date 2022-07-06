@@ -6,7 +6,8 @@ const systemFields = SystemFields.map(({ name, type, subtype }) => ({ field: nam
 const queryValidator = {
     validateFilter: jest.fn(),
     validateAggregation: jest.fn(),
-    validateGetById: jest.fn()
+    validateGetById: jest.fn(),
+    validateProjection: jest.fn(),
 }
 
 const givenValidFilterForDefaultFieldsOf = (filter) => 
@@ -22,6 +23,10 @@ const givenValidGetByIdForDefaultFieldsFor = (itemId) =>
     when(queryValidator.validateGetById).calledWith(systemFields, itemId)
                                        .mockReturnValue()
 
+const givenValidProjectionForDefaultFieldsOf = (projection) =>
+    when(queryValidator.validateProjection).calledWith(systemFields, projection)
+                                             .mockReturnValue()
+                                       
 const reset = () => {
     queryValidator.validateFilter.mockClear()
     queryValidator.validateAggregation.mockClear()
@@ -30,5 +35,5 @@ const reset = () => {
 
 module.exports = {
     queryValidator, givenValidFilterForDefaultFieldsOf, reset, validateFilter: queryValidator.validateFilter,
-     givenValidAggregationForDefaultFieldsOf, givenValidGetByIdForDefaultFieldsFor
+     givenValidAggregationForDefaultFieldsOf, givenValidGetByIdForDefaultFieldsFor, givenValidProjectionForDefaultFieldsOf
 }

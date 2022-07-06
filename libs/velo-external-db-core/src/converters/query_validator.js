@@ -36,10 +36,15 @@ class QueryValidator {
 
     validateFieldsExists(allFields, queryFields) { 
         const nonExistentFields = queryFields.filter(field => !allFields.includes(field)) 
-
         if (nonExistentFields.length) {
-            throw new InvalidQuery(`fields ${nonExistentFields.map(f => f.name).join(', ')} don't exist`)
+            throw new InvalidQuery(`fields ${nonExistentFields.join(', ')} don't exist`)
         }
+    }
+
+    validateProjection(fields, projection) {
+        if (!Array.isArray(projection))
+            throw new Error(`Projection must be an array, but was ${typeof projection}`) 
+        this.validateFieldsExists(fields.map(f => f.field), projection)
     }
 
     validateOperators(fields, filterObj) {

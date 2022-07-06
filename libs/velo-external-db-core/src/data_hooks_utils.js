@@ -72,7 +72,8 @@ const payloadFor = (operation, body) => {
                 filter: body.filter,
                 limit: body.limit,
                 skip: body.skip,
-                sort: body.sort
+                sort: body.sort,
+                projection: body.projection
             }
         case Operations.Insert:
         case Operations.Update:
@@ -81,6 +82,10 @@ const payloadFor = (operation, body) => {
         case Operations.BulkUpdate:
             return { items: body.items }
         case Operations.Get:
+            return {
+                itemId: body.itemId,
+                projection: body.projection
+            }
         case Operations.Remove:
             return { itemId: body.itemId }
         case Operations.BulkRemove:
@@ -98,9 +103,9 @@ const payloadFor = (operation, body) => {
     }
 }
 
-const requestContextFor = (operation, body) => ({ 
-    operation, 
-    collectionName: body.collectionName, 
+const requestContextFor = (operation, body) => ({
+    operation,
+    collectionName: body.collectionName,
     instanceId: body.requestContext.instanceId,
     memberId: body.requestContext.memberId,
     role: body.requestContext.role,
