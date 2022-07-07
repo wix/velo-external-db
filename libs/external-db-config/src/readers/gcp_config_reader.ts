@@ -1,5 +1,5 @@
 
-class GcpConfigReader {
+export class GcpConfigReader {
   constructor() {
   }
 
@@ -10,7 +10,7 @@ class GcpConfigReader {
 
 }
 
-class GcpSpannerConfigReader {
+export class GcpSpannerConfigReader {
   constructor() {
   }
 
@@ -22,7 +22,7 @@ class GcpSpannerConfigReader {
 
 }
 
-class GcpFirestoreConfigReader {
+export class GcpFirestoreConfigReader {
   constructor() { }
 
   async readConfig() {
@@ -33,7 +33,7 @@ class GcpFirestoreConfigReader {
 
 }
 
-class GcpGoogleSheetsConfigReader {
+export class GcpGoogleSheetsConfigReader {
   constructor() { }
 
   async readConfig() {
@@ -43,7 +43,7 @@ class GcpGoogleSheetsConfigReader {
 
 }
 
-class GcpMongoConfigReader {
+export class GcpMongoConfigReader {
   constructor() { }
 
   async readConfig() {
@@ -52,7 +52,7 @@ class GcpMongoConfigReader {
   }
 }
 
-class GcpAirtableConfigReader {
+export class GcpAirtableConfigReader {
   constructor() { }
 
   async readConfig() {
@@ -61,7 +61,7 @@ class GcpAirtableConfigReader {
   }
 }
 
-class GcpBigQueryConfigReader {
+export class GcpBigQueryConfigReader {
   constructor() {
   }
 
@@ -70,6 +70,3 @@ class GcpBigQueryConfigReader {
     return { projectId: PROJECT_ID, databaseId: DATABASE_ID, secretKey: SECRET_KEY }
   }
 }
-
-
-module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader, GcpMongoConfigReader, GcpAirtableConfigReader, GcpBigQueryConfigReader }

@@ -1,5 +1,5 @@
 
-class StubConfigReader {
+export default class StubConfigReader {
     constructor() {
     }
 
@@ -7,5 +7,3 @@ class StubConfigReader {
         return {}
     }
 }
-
-module.exports = StubConfigReader

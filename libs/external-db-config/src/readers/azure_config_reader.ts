@@ -1,4 +1,4 @@
-class AzureConfigReader {
+export class AzureConfigReader {
   constructor() {
   }
 
@@ -7,5 +7,3 @@ class AzureConfigReader {
     return { host: HOST, user: USER, password: PASSWORD, db: DB, secretKey: SECRET_KEY, unsecuredEnv: UNSECURED_ENV }
   }
 }
-
-module.exports = { AzureConfigReader }

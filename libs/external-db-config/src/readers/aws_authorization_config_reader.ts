@@ -1,9 +1,11 @@
-const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
-const { isJson, jsonParser } = require('../utils/config_utils')
-const emptyExternalDbConfig = (err) => ({ externalConfig: {}, secretMangerError: err.message })
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+import { isJson, jsonParser } from '../utils/config_utils'
+const emptyExternalDbConfig = (err: any) => ({ externalConfig: {}, secretMangerError: err.message })
 
-class AwsAuthorizationConfigReader {
-  constructor(region, secretId) {
+export default class AwsAuthorizationConfigReader {
+  secretId: string
+  region: string
+  constructor(region: string, secretId: string) {
     this.secretId = secretId
     this.region = region
   }
@@ -19,18 +21,16 @@ class AwsAuthorizationConfigReader {
     try {
       const client = new SecretsManagerClient({ region: this.region })
       const data = await client.send(new GetSecretValueCommand({ SecretId: this.secretId }))
-      return { externalConfig: JSON.parse(data.SecretString) }
+      return { externalConfig: JSON.parse(data.SecretString || '') }
     } catch (err) {
       return emptyExternalDbConfig(err)
     }
   }
 
   async readExternalAndLocalConfig() {
-    const { externalConfig, secretMangerError } = await this.readExternalConfig()
-    const { PERMISSIONS } = { ...process.env, ...externalConfig }
+    const { externalConfig, secretMangerError }: {[key:string]: any} = await this.readExternalConfig()
+    const { PERMISSIONS }: { PERMISSIONS: any } = { ...process.env, ...externalConfig }
     const config = { PERMISSIONS }
     return { config, secretMangerError: secretMangerError }
   }
 }
-
-module.exports = AwsAuthorizationConfigReader 

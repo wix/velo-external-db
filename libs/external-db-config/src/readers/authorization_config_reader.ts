@@ -1,6 +1,6 @@
-const { isJson, jsonParser } = require('../utils/config_utils')
+import { isJson, jsonParser } from '../utils/config_utils'
 
-class AuthorizationConfigReader {
+export default class AuthorizationConfigReader {
   constructor() {
   }
 
@@ -10,5 +10,3 @@ class AuthorizationConfigReader {
     return isJson(roleConfig) ? jsonParser(roleConfig) : roleConfig
   }
 }
-
-module.exports = AuthorizationConfigReader 
