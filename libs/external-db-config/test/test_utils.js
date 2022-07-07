@@ -19,4 +19,7 @@ const splitConfig = (config) => {
                                           .reduce((pV, cV) => ({ ...pV, [cV]: config[cV] }), {})
     return { firstPart, secondPart }
 }
-module.exports = { validAuthorizationConfig, splitConfig }
+
+const extendedCommonConfigRequiredProperties = ['secretKey', 'vendor', 'type']
+
+module.exports = { validAuthorizationConfig, splitConfig, extendedCommonConfigRequiredProperties }

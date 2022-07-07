@@ -16,9 +16,7 @@ class CommonConfigValidator {
 
     validateBasic() {
         return {
-            missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['secretKey']),
-            validType: true,
-            validVendor: true
+            missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['secretKey'])
         }
     }
 
@@ -28,7 +26,7 @@ class CommonConfigValidator {
         return {
             validType,
             validVendor,
-            missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLOUD_VENDOR', 'TYPE'])
+            missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['type', 'vendor', 'secretKey'])
         }
     }
 }

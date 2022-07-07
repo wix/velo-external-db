@@ -12,9 +12,9 @@ class ConfigValidator {
     configStatus() {
         const { missingRequiredSecretsKeys: missingRequiredConnectorEnvs } = this.connectorValidator.validate()
         const { valid: validAuthorization, message: authorizationMessage } = this.authValidator.validate()
-        const { missingRequiredSecretsKeys: missingRequiredCommonEnvs, validType, validVendor } = this.commonValidator.validate()
+        const { missingRequiredSecretsKeys: missingRequiredCommonEnvs, validType = true, validVendor = true } = this.commonValidator.validate()
 
-        const validConfig = missingRequiredConnectorEnvs.length === 0 && missingRequiredCommonEnvs.length === 0
+        const validConfig = missingRequiredConnectorEnvs.length === 0 && missingRequiredCommonEnvs.length === 0 && validType && validVendor
 
         let message
         

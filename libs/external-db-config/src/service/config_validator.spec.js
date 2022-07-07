@@ -13,7 +13,7 @@ describe('Config Reader Client', () => {
         driver.givenCommonConfig(ctx.secretKey)
         driver.givenAuthorizationConfig(ctx.authorizationConfig)
 
-        expect( env.configReader.readConfig() ).toEqual(matchers.configResponseFor(ctx.config, ctx.authorizationConfig))
+        expect( env.configValidator.readConfig() ).toEqual(matchers.configResponseFor(ctx.config, ctx.authorizationConfig))
     })
 
     test('status call will return successful message in case config is valid', async() => {
@@ -21,7 +21,7 @@ describe('Config Reader Client', () => {
         driver.givenValidCommonConfig()
         driver.givenValidAuthorizationConfig()
 
-        expect( env.configReader.configStatus() ).toEqual( matchers.validConfigStatusResponse() )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.validConfigStatusResponse() )
     })
 
     test('status call will return error message containing list of missing properties', async() => {
@@ -29,7 +29,7 @@ describe('Config Reader Client', () => {
         driver.givenValidCommonConfig()
         driver.givenValidAuthorizationConfig()
 
-        expect( env.configReader.configStatus() ).toEqual( matchers.configResponseWithMissingProperties(ctx.missingProperties) )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.configResponseWithMissingProperties(ctx.missingProperties) )
     })
 
     test('status call will return error message containing list of missing properties from common reader', async() => {
@@ -37,7 +37,7 @@ describe('Config Reader Client', () => {
         driver.givenInvalidCommonConfigWith(ctx.missingProperties)
         driver.givenValidAuthorizationConfig()
 
-        expect( env.configReader.configStatus() ).toEqual( matchers.configResponseWithMissingProperties(ctx.missingProperties) )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.configResponseWithMissingProperties(ctx.missingProperties) )
     })
 
     test('status call will return error message containing list of all missing properties from common reader and normal reader', async() => {
@@ -45,31 +45,31 @@ describe('Config Reader Client', () => {
         driver.givenInvalidCommonConfigWith(ctx.moreMissingProperties)
         driver.givenValidAuthorizationConfig()
 
-        expect( env.configReader.configStatus() ).toEqual( matchers.configResponseWithMissingProperties([...ctx.missingProperties, ...ctx.moreMissingProperties]))
+        expect( env.configValidator.configStatus() ).toEqual( matchers.configResponseWithMissingProperties([...ctx.missingProperties, ...ctx.moreMissingProperties]))
     })
 
-    // test('status call with wrong cloud vendor', async() => {
-    //     driver.givenValidConfig()
-    //     driver.givenInvalidCloudVendor()
-    //     driver.givenValidAuthorizationConfig()
+    test('status call with wrong cloud vendor', async() => {
+        driver.givenValidConfig()
+        driver.givenInvalidCloudVendor()
+        driver.givenValidAuthorizationConfig()
 
-    //     expect( env.configReader.configStatus() ).toEqual( matchers.invalidVendorConfigStatusResponse() )
-    // })
+        expect( env.configValidator.configStatus() ).toEqual( matchers.invalidVendorConfigStatusResponse() )
+    })
 
-    // test('status call with wrong db type', async() => {
-    //     driver.givenValidConfig()
-    //     driver.givenInvalidDBType()
-    //     driver.givenValidAuthorizationConfig()
+    test('status call with wrong db type', async() => {
+        driver.givenValidConfig()
+        driver.givenInvalidDBType()
+        driver.givenValidAuthorizationConfig()
 
-    //     await expect( env.configReader.configStatus() ).resolves.toEqual( matchers.invalidDbTypeConfigStatusResponse() )
-    // })
+        await expect( env.configValidator.configStatus() ).toEqual( matchers.invalidDbTypeConfigStatusResponse() )
+    })
 
     test('status call with empty authorization config', async() => {
         driver.givenValidConfig()
         driver.givenValidCommonConfig()
         driver.givenEmptyAuthorizationConfig()
 
-        expect( env.configReader.configStatus() ).toEqual( matchers.emptyAuthorizationConfigStatusResponse() )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.emptyAuthorizationConfigStatusResponse() )
     })
 
     test('status call with wrong authorization config format', async() => {
@@ -77,7 +77,7 @@ describe('Config Reader Client', () => {
         driver.givenValidCommonConfig()
         driver.givenInvalidAuthorizationConfig()
 
-        expect( env.configReader.configStatus() ).toEqual( matchers.invalidAuthorizationConfigStatusResponse() )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.invalidAuthorizationConfigStatusResponse() )
     })
 
     const ctx = {
@@ -89,7 +89,7 @@ describe('Config Reader Client', () => {
     }
 
     const env = {
-        configReader: Uninitialized,
+        configValidator: Uninitialized,
     }
 
     beforeEach(() => {
@@ -100,6 +100,6 @@ describe('Config Reader Client', () => {
         ctx.missingProperties = Array.from({ length: 5 }, () => chance.word())
         ctx.moreMissingProperties = Array.from({ length: 5 }, () => chance.word())
         ctx.secretKey = chance.guid()
-        env.configReader = new ConfigValidator(driver.configValidator, driver.authorizationConfigValidator, driver.commonConfigValidator)
+        env.configValidator = new ConfigValidator(driver.configValidator, driver.authorizationConfigValidator, driver.commonConfigValidator)
     })
 })
