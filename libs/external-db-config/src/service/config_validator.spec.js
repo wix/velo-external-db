@@ -1,18 +1,19 @@
-const ConfigReader = require('./config_reader')
 const { Uninitialized } = require('@wix-velo/test-commons')
 const driver = require('../../test/drivers/external_db_config_test_support')
-const matchers = require('./config_reader_matchers')
+const matchers = require('./config_validator_matchers')
 const gen = require('../../test/gen')
 const Chance = require('chance')
+const { ConfigValidator } = require('../validators/config_validator')
 const chance = new Chance()
 
 describe('Config Reader Client', () => {
 
     test('read config will retrieve config from secret provider and validate retrieved data', async() => {
         driver.givenConfig(ctx.config)
+        driver.givenCommonConfig(ctx.secretKey)
         driver.givenAuthorizationConfig(ctx.authorizationConfig)
 
-        await expect( env.configReader.readConfig() ).resolves.toEqual(matchers.configResponseFor(ctx.config, ctx.authorizationConfig))
+        expect( env.configValidator.readConfig() ).toEqual(matchers.configResponseFor(ctx.config, ctx.authorizationConfig))
     })
 
     test('status call will return successful message in case config is valid', async() => {
@@ -20,7 +21,7 @@ describe('Config Reader Client', () => {
         driver.givenValidCommonConfig()
         driver.givenValidAuthorizationConfig()
 
-        await expect( env.configReader.configStatus() ).resolves.toEqual( matchers.validConfigStatusResponse() )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.validConfigStatusResponse() )
     })
 
     test('status call will return error message containing list of missing properties', async() => {
@@ -28,7 +29,7 @@ describe('Config Reader Client', () => {
         driver.givenValidCommonConfig()
         driver.givenValidAuthorizationConfig()
 
-        await expect( env.configReader.configStatus() ).resolves.toEqual( matchers.configResponseWithMissingProperties(ctx.missingProperties) )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.configResponseWithMissingProperties(ctx.missingProperties) )
     })
 
     test('status call will return error message containing list of missing properties from common reader', async() => {
@@ -36,7 +37,7 @@ describe('Config Reader Client', () => {
         driver.givenInvalidCommonConfigWith(ctx.missingProperties)
         driver.givenValidAuthorizationConfig()
 
-        await expect( env.configReader.configStatus() ).resolves.toEqual( matchers.configResponseWithMissingProperties(ctx.missingProperties) )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.configResponseWithMissingProperties(ctx.missingProperties) )
     })
 
     test('status call will return error message containing list of all missing properties from common reader and normal reader', async() => {
@@ -44,7 +45,7 @@ describe('Config Reader Client', () => {
         driver.givenInvalidCommonConfigWith(ctx.moreMissingProperties)
         driver.givenValidAuthorizationConfig()
 
-        await expect( env.configReader.configStatus() ).resolves.toEqual( matchers.configResponseWithMissingProperties([...ctx.missingProperties, ...ctx.moreMissingProperties]))
+        expect( env.configValidator.configStatus() ).toEqual( matchers.configResponseWithMissingProperties([...ctx.missingProperties, ...ctx.moreMissingProperties]))
     })
 
     test('status call with wrong cloud vendor', async() => {
@@ -52,8 +53,7 @@ describe('Config Reader Client', () => {
         driver.givenInvalidCloudVendor()
         driver.givenValidAuthorizationConfig()
 
-        await expect( env.configReader.configStatus() ).resolves.toEqual( matchers.invalidVendorConfigStatusResponse() )
-
+        expect( env.configValidator.configStatus() ).toEqual( matchers.invalidVendorConfigStatusResponse() )
     })
 
     test('status call with wrong db type', async() => {
@@ -61,7 +61,7 @@ describe('Config Reader Client', () => {
         driver.givenInvalidDBType()
         driver.givenValidAuthorizationConfig()
 
-        await expect( env.configReader.configStatus() ).resolves.toEqual( matchers.invalidDbTypeConfigStatusResponse() )
+        await expect( env.configValidator.configStatus() ).toEqual( matchers.invalidDbTypeConfigStatusResponse() )
     })
 
     test('status call with empty authorization config', async() => {
@@ -69,7 +69,7 @@ describe('Config Reader Client', () => {
         driver.givenValidCommonConfig()
         driver.givenEmptyAuthorizationConfig()
 
-        await expect( env.configReader.configStatus() ).resolves.toEqual( matchers.emptyAuthorizationConfigStatusResponse() )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.emptyAuthorizationConfigStatusResponse() )
     })
 
     test('status call with wrong authorization config format', async() => {
@@ -77,7 +77,7 @@ describe('Config Reader Client', () => {
         driver.givenValidCommonConfig()
         driver.givenInvalidAuthorizationConfig()
 
-        await expect( env.configReader.configStatus() ).resolves.toEqual( matchers.invalidAuthorizationConfigStatusResponse() )
+        expect( env.configValidator.configStatus() ).toEqual( matchers.invalidAuthorizationConfigStatusResponse() )
     })
 
     const ctx = {
@@ -85,10 +85,11 @@ describe('Config Reader Client', () => {
         configStatus: Uninitialized,
         missingProperties: Uninitialized,
         moreMissingProperties: Uninitialized,
+        secretKey: Uninitialized,
     }
 
     const env = {
-        configReader: Uninitialized,
+        configValidator: Uninitialized,
     }
 
     beforeEach(() => {
@@ -98,7 +99,7 @@ describe('Config Reader Client', () => {
         ctx.configStatus = gen.randomConfig()
         ctx.missingProperties = Array.from({ length: 5 }, () => chance.word())
         ctx.moreMissingProperties = Array.from({ length: 5 }, () => chance.word())
-
-        env.configReader = new ConfigReader(driver.configReader, driver.commonConfigReader, driver.authorizationConfigReader)
+        ctx.secretKey = chance.guid()
+        env.configValidator = new ConfigValidator(driver.configValidator, driver.authorizationConfigValidator, driver.commonConfigValidator)
     })
 })

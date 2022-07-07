@@ -1,13 +1,9 @@
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
-const { checkRequiredKeys, isJson, configPattern, collectionConfigPattern, jsonParser } = require('../utils/config_utils')
-const Avj = require('ajv')
-const ajv = new Avj({ strict: false })
+const { isJson, jsonParser } = require('../utils/config_utils')
 const emptyExternalDbConfig = (err) => ({ externalConfig: {}, secretMangerError: err.message })
 
 class AwsAuthorizationConfigReader {
   constructor(region, secretId) {
-    this.configValidator = ajv.compile(configPattern)
-    this.collectionValidator = ajv.compile(collectionConfigPattern)
     this.secretId = secretId
     this.region = region
   }
@@ -34,35 +30,6 @@ class AwsAuthorizationConfigReader {
     const { PERMISSIONS } = { ...process.env, ...externalConfig }
     const config = { PERMISSIONS }
     return { config, secretMangerError: secretMangerError }
-  }
-
-  async validate() {
-    try{
-        const { config, secretMangerError } = await this.readExternalAndLocalConfig()
-
-        const { PERMISSIONS: roleConfig } = config
-
-        const valid = isJson(roleConfig) && this.configValidator(jsonParser(roleConfig))
-
-        let message 
-        
-    
-        if (checkRequiredKeys(config, ['PERMISSIONS']).length)  
-          message = 'Permissions config not defined, using default'
-        else if (!isJson(roleConfig)) 
-          message = 'Permissions config value is not a valid JSON'
-        else if (!valid)
-          message = this.configValidator.errors.map(err => (`Error in ${err.instancePath}: ${err.message}`)).join(', ')
-        else 
-          message = 'Permissions config read successfully'
-      
-        return { valid, message, secretMangerError }
-    }
-
-    catch(err) {
-      console.log(err)
-        return { valid: false, message: err.message }
-    }
   }
 }
 

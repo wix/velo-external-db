@@ -1,12 +1,22 @@
 const Chance = require('chance')
+const { supportedVendors, supportedDBs } = require('../src/utils/config_utils')
 const chance = Chance()
 
 const randomConfig = () => ({
     host: chance.url(),
     user: chance.first(),
     password: chance.guid(),
-    secretKey: chance.guid(),
     db: chance.word(),
 })
 
-module.exports = { randomConfig }
+const randomCommonConfig = () => ({
+    secretKey: chance.guid(),
+})
+
+const randomExtendedCommonConfig = () => ({
+    secretKey: chance.guid(),
+    vendor: chance.pickone(supportedVendors),
+    type: chance.pickone(supportedDBs),
+})
+
+module.exports = { randomConfig, randomCommonConfig, randomExtendedCommonConfig }

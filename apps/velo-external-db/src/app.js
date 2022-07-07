@@ -24,7 +24,9 @@ const initConnector = async(hooks) => {
                 roleConfig: authorization
             },
             secretKey,
-            vendor
+            vendor,
+            adapterType,
+            commonExtended: true
         },
         hooks
     })
