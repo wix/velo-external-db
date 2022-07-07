@@ -31,13 +31,6 @@ each(
 
             await expect( env.configReader.readConfig() ).resolves.toEqual(ctx.config)
         })
-
-        // test('validate config', async() => {
-        //     env.driver.defineInvalidConfig()
-
-        //     await expect( env.configReader.configStatus() ).resolves.toEqual( invalidConfigStatusResponse() )
-        // })
-
     })
 
 })

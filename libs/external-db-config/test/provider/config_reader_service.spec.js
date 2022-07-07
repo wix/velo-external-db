@@ -48,25 +48,8 @@ describe('External DB config client', () => {
 
       expect(expected[p]).toBeUndefined()
     })
-    // each(
-    //     Object.keys(driver.validConfig())
-    //           .map((v, i) => [driver.ExpectedProperties[i], v])
-    // ).test('validate will detect missing property [%s]', async(s, p) => {
-    //   delete ctx.config[p]
-    //   driver.defineValidConfig(ctx.config)
-
-    //   const expected = await env.configReaderProvider.validate()
-
-    //   expect(expected).toMatchObject({ missingRequiredSecretsKeys: [s] })
-    // })
+    
     if (driver.hasReadErrors) {
-      // test('validate will detect config read errors', async() => {
-      //     driver.defineErroneousConfig(ctx.error)
-      //     const expected = await env.configReaderProvider.validate()
-
-      //     expect(expected).toEqual({ secretMangerError: ctx.error, missingRequiredSecretsKeys: driver.RequiredProperties })
-      // })
-
       test('read config when part of the config from secret manager and other part from process.env', async() => {
         driver.defineSplittedConfig(ctx.config)
 

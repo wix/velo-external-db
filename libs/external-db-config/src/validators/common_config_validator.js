@@ -23,7 +23,6 @@ class CommonConfigValidator {
     }
 
     validateExtended() {
-        console.log(this.config)
         const validType = supportedDBs.includes(this.config.type)
         const validVendor = supportedVendors.includes(this.config.vendor)
         return {
@@ -32,7 +31,6 @@ class CommonConfigValidator {
             missingRequiredSecretsKeys: checkRequiredKeys(process.env, ['CLOUD_VENDOR', 'TYPE'])
         }
     }
-
 }
 
 module.exports = { CommonConfigValidator }
