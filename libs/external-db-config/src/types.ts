@@ -1,4 +1,4 @@
-type VeloRole = 'Admin' | 'Member' | 'Visitor'
+export type VeloRole = 'Admin' | 'Member' | 'Visitor'
 
 interface CollectionPermissions {
     id: string
