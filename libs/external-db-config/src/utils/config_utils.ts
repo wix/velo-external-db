@@ -2,7 +2,7 @@ import { VeloRole } from "../types"
 
 const objectContainsKey = (obj: { [x: string]: any }, key: string | number) => typeof obj[key] === 'string' && obj[key].length > 0
 
-export const checkRequiredKeys = (obj: { [x: string]: any }, requiredKeys: any[]) => requiredKeys.filter((key: any) => !objectContainsKey(obj, key))
+export const checkRequiredKeys = (obj: { [x: string]: any }, requiredKeys: any[]): string[] => requiredKeys.filter((key: any) => !objectContainsKey(obj, key))
 
 export const supportedDBs = ['postgres', 'spanner', 'firestore', 'mssql', 'mysql', 'mongo', 'airtable', 'dynamodb', 'bigquery', 'google-sheets']
 

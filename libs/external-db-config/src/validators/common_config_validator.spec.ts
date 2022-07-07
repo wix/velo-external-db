@@ -1,8 +1,8 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { CommonConfigValidator } = require('./common_config_validator')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { CommonConfigValidator } from './common_config_validator'
 const each = require('jest-each').default
-const gen = require('../../test/gen')
-const { extendedCommonConfigRequiredProperties } = require('../../test/test_utils')
+import gen = require('../../test/gen')
+import { extendedCommonConfigRequiredProperties } from '../../test/test_utils'
 
 describe('MySqlConfigValidator', () => {
 
@@ -18,7 +18,7 @@ describe('MySqlConfigValidator', () => {
 
     each(
         extendedCommonConfigRequiredProperties
-    ).test('validate extended will detect missing property [%s]', async(s) => {
+    ).test('validate extended will detect missing property [%s]', async(s: string | number) => {
         delete ctx.validExtendedConfig[s]
         env.CommonConfigValidator = new CommonConfigValidator(ctx.validExtendedConfig, true)
 
@@ -35,7 +35,9 @@ describe('MySqlConfigValidator', () => {
         validExtendedConfig: Uninitialized,
     }
 
-    const env = {
+    const env: {
+        CommonConfigValidator: CommonConfigValidator
+    } = {
         CommonConfigValidator: Uninitialized,
     }
 

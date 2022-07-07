@@ -1,5 +1,12 @@
-class ConfigValidator {
-    constructor(connectorValidator, authValidator, commonValidator) {
+import { IConfigValidator } from "@wix-velo/velo-external-db-types"
+import { AuthorizationConfigValidator } from "./authorization_config_validator"
+import { CommonConfigResponseExtended, CommonConfigValidator } from "./common_config_validator"
+
+export class ConfigValidator {
+    connectorValidator: IConfigValidator
+    authValidator: AuthorizationConfigValidator
+    commonValidator: CommonConfigValidator
+    constructor(connectorValidator: any, authValidator: any, commonValidator: any) {
         this.connectorValidator = connectorValidator
         this.authValidator = authValidator
         this.commonValidator = commonValidator
@@ -12,7 +19,7 @@ class ConfigValidator {
     configStatus() {
         const { missingRequiredSecretsKeys: missingRequiredConnectorEnvs } = this.connectorValidator.validate()
         const { valid: validAuthorization, message: authorizationMessage } = this.authValidator.validate()
-        const { missingRequiredSecretsKeys: missingRequiredCommonEnvs, validType = true, validVendor = true } = this.commonValidator.validate()
+        const { missingRequiredSecretsKeys: missingRequiredCommonEnvs, validType = true, validVendor = true } = (this.commonValidator.validate() as CommonConfigResponseExtended)
 
         const validConfig = missingRequiredConnectorEnvs.length === 0 && missingRequiredCommonEnvs.length === 0 && validType && validVendor
 
@@ -33,5 +40,3 @@ class ConfigValidator {
         return { validConfig, message, validAuthorization, authorizationMessage }
     }
 }
-
-module.exports = { ConfigValidator }

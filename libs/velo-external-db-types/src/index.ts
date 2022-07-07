@@ -171,8 +171,10 @@ export type DbProviders<T> = {
     cleanup: ConnectionCleanUp
 }
 
+export type ValidateConfigResponse = { missingRequiredSecretsKeys : string[]}
+
 export interface IConfigValidator {
-    validate(config: any): { missingRequiredSecretsKeys: string[] }
+    validate(): ValidateConfigResponse
     readConfig(): any
 }
 

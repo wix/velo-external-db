@@ -1,7 +1,13 @@
-const { checkRequiredKeys, supportedDBs, supportedVendors } = require('../utils/config_utils')
+import { ValidateConfigResponse } from '@wix-velo/velo-external-db-types'
+import { checkRequiredKeys, supportedDBs, supportedVendors } from '../utils/config_utils'
 
-class CommonConfigValidator {
-    constructor(config, extended) {
+export type CommonConfigResponseExtended = ValidateConfigResponse & {validType: boolean, validVendor: boolean}
+ 
+
+export class CommonConfigValidator {
+    config: any
+    extended: boolean
+    constructor(config: any, extended?: boolean) {
         this.config = config
         this.extended = extended ?? false
     }
@@ -10,7 +16,7 @@ class CommonConfigValidator {
         return this.config
     }
 
-    validate() {
+    validate(): ValidateConfigResponse | CommonConfigResponseExtended {
         return this.extended ? this.validateExtended() : this.validateBasic()
     }
 
@@ -30,5 +36,3 @@ class CommonConfigValidator {
         }
     }
 }
-
-module.exports = { CommonConfigValidator }
