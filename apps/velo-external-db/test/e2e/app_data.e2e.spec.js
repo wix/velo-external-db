@@ -120,6 +120,13 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect( axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin) ).resolves.toEqual(matchers.responseWith({ item: ctx.item }))
     })
 
+    test('get by id api should throw 404 if not found', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+
+        await expect( axios.post('/data/get', { collectionName: ctx.collectionName, itemId: 'wrong' }, authAdmin) ).rejects.toThrow('404')
+    })
+
     testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('get by id api with projection', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item], ctx.collectionName, authAdmin)

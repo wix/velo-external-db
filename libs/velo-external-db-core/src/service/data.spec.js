@@ -32,6 +32,14 @@ describe('Data Service', () => {
         return expect(env.dataService.getById(ctx.collectionName, ctx.itemId, ctx.defaultProjection)).resolves.toEqual({ item: ctx.entity })
     })
 
+    test('get by id without item as a result will return item: null', async() => {
+        const idFilter = getByIdFilterFor(ctx.itemId)
+        driver.givenListResult([], ctx.collectionName,
+                        idFilter, '', 0, 1, ctx.defaultProjection)
+
+        return expect(env.dataService.getById(ctx.collectionName, ctx.itemId, ctx.defaultProjection)).resolves.toEqual({ item: null })
+    })
+
     test('insert will insert data into db', async() => {
         driver.expectInsertFor([ctx.entity], ctx.collectionName)
 
