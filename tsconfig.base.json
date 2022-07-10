@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "resolveJsonModule": true,
     "paths": {
-      "@wix-velo/external-db-config": [ "libs/external-db-config/src/index.js" ],
+      "@wix-velo/external-db-config": [ "libs/external-db-config/src/index.ts" ],
       "@wix-velo/external-db-mysql": [ "libs/external-db-mysql/src/index.ts" ],
       "@wix-velo/external-db-postgres": [ "libs/external-db-postgres/src/index.ts" ],
       "@wix-velo/external-db-mssql": [ "libs/external-db-mssql/src/index.ts" ],
