@@ -1,18 +1,19 @@
 
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { create } = require('../../src/factory')
-const awsMySql = require('./aws_mysql_config_test_support')
-const awsMongo = require('./aws_mongo_config_test_support')
-const azureMySql = require('./azure_mysql_config_test_support')
-const gcpMySql = require('./gcp_mysql_config_test_support')
-const gcpSpanner = require('./gcp_spanner_config_test_support')
-const gcpFirestore = require('./gcp_firestore_config_test_support')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { create } from '../../src/factory'
+import awsMySql = require('./aws_mysql_config_test_support')
+import awsMongo = require('./aws_mongo_config_test_support')
+import azureMySql = require('./azure_mysql_config_test_support')
+import gcpMySql = require('./gcp_mysql_config_test_support')
+import gcpSpanner = require('./gcp_spanner_config_test_support')
+import gcpFirestore = require('./gcp_firestore_config_test_support')
 
-const env = {
+export const env = {
     configReader: Uninitialized,
+    driver: Uninitialized,
 }
 
-const initDriver = (vendor, engine) => {
+const initDriver = (vendor: string, engine: string) => {
     switch (vendor.toLowerCase()) {
         case 'aws':
             switch(engine) {
@@ -34,13 +35,15 @@ const initDriver = (vendor, engine) => {
                 default:
                     return gcpMySql
             }
+        default:
+            return gcpMySql
     }
 }
 
 
-const initEnv = (vendor, engine) => {
-    process.env.CLOUD_VENDOR = vendor
-    process.env.TYPE = engine
+export const initEnv = (vendor: string, engine: string) => {
+    process.env['CLOUD_VENDOR'] = vendor
+    process.env['TYPE'] = engine
 
     env.configReader = create()
     env.driver = initDriver(vendor, engine)
@@ -49,10 +52,7 @@ const initEnv = (vendor, engine) => {
 
 const ExpectedProperties = ['CLOUD_VENDOR', 'TYPE']
 
-const reset = () => {
+export const reset = () => {
     env.driver.reset()
     ExpectedProperties.forEach(p => delete process.env[p])
-}
-
-module.exports = { initEnv, reset, env,
 }

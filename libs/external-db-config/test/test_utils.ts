@@ -1,8 +1,12 @@
 
-const Chance = require('chance')
+import * as Chance from 'chance'
+import { RoleConfig } from '../src/types'
+import { gen } from '@wix-velo/test-commons'
+
 const chance = new Chance()
-const { randomElementsFromArray } = require ('@wix-velo/test-commons').gen
-const validAuthorizationConfig = {
+const { randomElementsFromArray } = gen
+
+export const validAuthorizationConfig = {
     collectionPermissions: [
         {
             id: chance.word(),
@@ -12,7 +16,7 @@ const validAuthorizationConfig = {
     ]
 }
 
-const splitConfig = (config) => {
+export const splitConfig = (config: {[key: string]: any}) => {
     const firstPart = randomElementsFromArray(Object.keys(config)).reduce((pV, cV) => ({ ...pV, [cV]: config[cV] }), {})
     
     const secondPart = Object.keys(config).filter(k => firstPart[k] === undefined)
@@ -20,6 +24,4 @@ const splitConfig = (config) => {
     return { firstPart, secondPart }
 }
 
-const extendedCommonConfigRequiredProperties = ['secretKey', 'vendor', 'type']
-
-module.exports = { validAuthorizationConfig, splitConfig, extendedCommonConfigRequiredProperties }
+export const extendedCommonConfigRequiredProperties = ['secretKey', 'vendor', 'type']
