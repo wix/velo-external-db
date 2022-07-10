@@ -1,8 +1,10 @@
-const each = require('jest-each').default
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { errors } = require('@wix-velo/velo-external-db-commons')
-const RoleAuthorizationService = require('./role_authorization')
-const gen = require ('../test/gen') 
+import each from 'jest-each'
+import { Uninitialized } from '@wix-velo/test-commons'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import RoleAuthorizationService from './role_authorization'
+import * as gen from '../test/gen'
+import { CollectionPermissions, WixDataRole } from '@wix-velo/velo-external-db-types'
+
 const { UnauthorizedError } = errors
 
 describe('Authorization Service', () => {
@@ -17,13 +19,13 @@ describe('Authorization Service', () => {
     
         each([
             'OWNER', 'BACKEND_CODE'
-        ]).test('authorizeRead on nonexistent collection in config should allow default policies', (role) => {
+        ]).test('authorizeRead on nonexistent collection in config should allow default policies', (role: WixDataRole) => {
             expect(() => env.roleAuthorizationService.authorizeRead('wrong', role)).not.toThrow()
         })
 
         each([
             'MEMBER', 'VISITOR'
-        ]).test('authorizeRead on nonexistent collection in config should throw UnauthorizedError on any other role but default', (role) => {
+        ]).test('authorizeRead on nonexistent collection in config should throw UnauthorizedError on any other role but default', (role: WixDataRole) => {
             expect(() => env.roleAuthorizationService.authorizeRead('wrong', role)).toThrow(UnauthorizedError)
         })
 
@@ -40,20 +42,23 @@ describe('Authorization Service', () => {
     
         each([
             'OWNER', 'BACKEND_CODE'
-        ]).test('authorizeWrite on nonexistent collection in config should allow default policies', (role) => {
+        ]).test('authorizeWrite on nonexistent collection in config should allow default policies', (role: WixDataRole) => {
             expect(() => env.roleAuthorizationService.authorizeWrite('wrong', role)).not.toThrow()
         })
         
         each([
             'MEMBER', 'VISITOR'
-        ]).test('authorizeWrite on nonexistent collection in config should throw UnauthorizedError on any other role but default', (role) => {
+        ]).test('authorizeWrite on nonexistent collection in config should throw UnauthorizedError on any other role but default', (role: WixDataRole) => {
             expect(() => env.roleAuthorizationService.authorizeWrite('wrong', role)).toThrow(UnauthorizedError)
         })
     })  
 
 
 
-    const env = {
+    const env: {
+        config: CollectionPermissions[],
+        roleAuthorizationService: RoleAuthorizationService
+    } = {
         config: Uninitialized,
         roleAuthorizationService: Uninitialized
     }
