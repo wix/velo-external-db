@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'external-db-security',
     clearMocks: true,
     verbose: true,

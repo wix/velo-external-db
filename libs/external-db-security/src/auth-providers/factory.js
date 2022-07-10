@@ -1,22 +1,22 @@
 const strategyFor = (vendor = '', cfg) => {
   switch (vendor.toLowerCase()) {
     case 'aws': {
-      const { AwsAuthProvider } = require('./auth-providers/aws_auth_provider')
+      const { AwsAuthProvider } = require('./aws_auth_provider')
       return { authProvider: new AwsAuthProvider(cfg), isValidAuthProvider: true }
     
     }
     case 'gcp': {
-      const { GcpAuthProvider } = require('./auth-providers/gcp_auth_provider.js')
+      const { GcpAuthProvider } = require('./gcp_auth_provider.js')
       return { authProvider: new GcpAuthProvider(cfg), isValidAuthProvider: true } 
     }
 
     case 'azure': {
-      const { AzureAuthProvider } = require('./auth-providers/azure_auth_provider')
+      const { AzureAuthProvider } = require('./azure_auth_provider')
       return { authProvider: new  AzureAuthProvider(cfg), isValidAuthProvider: true } 
     }
 
     default: {
-      const { StubAuthProvider } = require('./auth-providers/stub_auth_provider')
+      const { StubAuthProvider } = require('./stub_auth_provider')
       return { authProvider: new StubAuthProvider(), isValidAuthProvider: false }
     }      
   }
