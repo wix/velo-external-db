@@ -4,8 +4,8 @@ const emptyExternalDbConfig = (err: any) => ({ externalConfig: {}, secretMangerE
 
 export default class AwsAuthorizationConfigReader {
   secretId: string
-  region: string
-  constructor(region: string, secretId: string) {
+  region: string | undefined
+  constructor(region: string | undefined, secretId: string) {
     this.secretId = secretId
     this.region = region
   }

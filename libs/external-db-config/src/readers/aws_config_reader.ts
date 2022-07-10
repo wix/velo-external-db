@@ -4,8 +4,8 @@ const emptyExternalDbConfig = (err: any) => ({ externalConfig: {}, secretMangerE
 
 export class AwsConfigReader {
   secretId: string
-  region: string
-  constructor(secretId: string, region: string) {
+  region: string | undefined
+  constructor(secretId: string, region: string | undefined) {
     this.secretId = secretId
     this.region = region
   }
@@ -35,9 +35,9 @@ export class AwsConfigReader {
 }
 
 export class AwsDynamoConfigReader {
-  region: string
+  region: string | undefined
   secretId: string
-  constructor(region: string, secretId: string) {
+  constructor(region: string | undefined, secretId: string) {
     this.region = region
     this.secretId = secretId
     }
@@ -70,9 +70,9 @@ export class AwsDynamoConfigReader {
 }
 
 export class AwsMongoConfigReader {
-  region: string
+  region: string | undefined
   secretId: string
-  constructor(region: string, secretId: string) {
+  constructor(region: string | undefined, secretId: string) {
     this.region = region
     this.secretId = secretId
     }

@@ -7,6 +7,6 @@ export default class AuthorizationConfigReader {
   async readConfig() {
     const { PERMISSIONS: roleConfig } = process.env
 
-    return isJson(roleConfig) ? jsonParser(roleConfig) : roleConfig
+    return isJson(roleConfig) ? jsonParser((roleConfig) as string) : roleConfig
   }
 }
