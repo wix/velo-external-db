@@ -1,5 +1,5 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-const { DbConnectionError } = errors
+const { DbConnectionError, UnrecognizedError } = errors
 
 
 export const notThrowingTranslateErrorCodes = (err: any) => {
@@ -9,8 +9,8 @@ export const notThrowingTranslateErrorCodes = (err: any) => {
         case 16:
             return new DbConnectionError(`Access to database denied - probably wrong credentials,firestore message: ${err.details}`)
         default :
-            console.log(err)
-            return new Error(`default ${err.details}`)
+            console.error(err)
+            return new UnrecognizedError(err.details)
     }
 }
 

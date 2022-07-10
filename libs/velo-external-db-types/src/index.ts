@@ -133,7 +133,7 @@ export interface IBaseHttpError extends Error {
 
 export type ValidateConnectionResult = {
     valid: boolean,
-    error?: IBaseHttpError
+    error?: IBaseHttpError | any
 }
 
 export interface IDatabaseOperations {

@@ -1,4 +1,4 @@
-class BaseHttpError extends Error {
+export class BaseHttpError extends Error {
     status: number
     constructor(message: string, status: number) {
         super(message)
@@ -80,5 +80,11 @@ export class UnsupportedOperation extends BaseHttpError {
 export class UnsupportedDatabase extends BaseHttpError {
     constructor(message: string) {
         super(message, 405)
+    }
+}
+
+export class UnrecognizedError extends BaseHttpError {
+    constructor(message: string) {
+        super(`Unrecognized Error: ${message}`, 400)
     }
 }

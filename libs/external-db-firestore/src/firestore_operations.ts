@@ -1,7 +1,11 @@
-const { notThrowingTranslateErrorCodes } = require('./sql_exception_translator')
+import { Firestore } from '@google-cloud/firestore'
+import { IDatabaseOperations } from '@wix-velo/velo-external-db-types'
+import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
 
-class DatabaseOperations {
-    constructor(database) {
+export default class DatabaseOperations implements IDatabaseOperations {
+    database: Firestore
+
+    public constructor(database: Firestore) {
         this.database = database
     }
 
@@ -12,5 +16,3 @@ class DatabaseOperations {
     }
 
 }
-
-module.exports = DatabaseOperations

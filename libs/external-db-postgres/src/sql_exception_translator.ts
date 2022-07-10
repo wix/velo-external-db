@@ -1,5 +1,5 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists } = errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists, UnrecognizedError } = errors
 
 export const notThrowingTranslateErrorCodes = (err: any) => {
     switch (err.code) {
@@ -19,7 +19,7 @@ export const notThrowingTranslateErrorCodes = (err: any) => {
         case 'EAI_AGAIN':
             return new DbConnectionError('Database host is unavailable.')
         default :
-            return new Error(`default ${err.code}, ${err.message}`)
+            return new UnrecognizedError(`${err.code}, ${err.message}`)
     }
 }
 

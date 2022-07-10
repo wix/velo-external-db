@@ -1,13 +1,16 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { isObject, AdapterOperators, isEmptyFilter } = require('@wix-velo/velo-external-db-commons')
-const { LastLetterCoder } = require('./firestore_utils')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 
-class FilterParser {
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { AdapterFilter as Filter, Sort } from '@wix-velo/velo-external-db-types' 
+import { isObject, AdapterOperators, isEmptyFilter } from '@wix-velo/velo-external-db-commons'
+import { LastLetterCoder } from './firestore_utils'
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
+const { InvalidQuery } = errors
+
+export default class FilterParser {
     constructor() {
     }
 
-    transform(filter) {
+    transform(filter: Filter) {
     const results = this.parseFilter(filter)
     
         if (results.length === 0) {
@@ -17,7 +20,7 @@ class FilterParser {
         return results
     }
 
-    parseFilter(filter, inlineFields) {
+    parseFilter(filter: Filter, inlineFields: any = '') {
         if (isEmptyFilter(filter)) {
             return []
         }
@@ -43,7 +46,7 @@ class FilterParser {
         }
         
         if(this.isMultipleFiledOperator(operator)) {
-            return value.reduce((o, f) => {
+            return value.reduce((o: any, f: any) => {
                 return o.concat( this.parseFilter.bind(this)(f) )
             }, [])
         }
@@ -51,23 +54,23 @@ class FilterParser {
         return []
     }
 
-    isSingleFieldOperator(operator) {
+    isSingleFieldOperator(operator: string) {
         return [ne, lt, lte, gt, gte, include, eq, string_begins, string_ends].includes(operator)
     }
 
-    isStringBeginsOperator(operator) {
+    isStringBeginsOperator(operator: string) {
         return operator === string_begins
     }
     
-    isUnsupportedOperator(operator) {   
+    isUnsupportedOperator(operator: string) {   
         return [or, urlized, string_contains, not, string_ends].includes(operator)
     }
     
-    isMultipleFiledOperator(operator) {
+    isMultipleFiledOperator(operator: string) {
         return [and].includes(operator)
     }
     
-    valueForOperator(value, operator) {
+    valueForOperator(value: any, operator: string) {
         if (operator === include) {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery(`${operator} cannot have an empty list of arguments`)
@@ -80,7 +83,7 @@ class FilterParser {
         return value
     }
     
-    adapterOperatorToFirestoreOperator(operator) {
+    adapterOperatorToFirestoreOperator(operator: string) {
         switch (operator) {
             case eq:
                 return '=='
@@ -96,10 +99,12 @@ class FilterParser {
                 return '>='
             case include:
                 return 'in'
+            default:
+                return
         }
     }
     
-    orderBy(sort) {
+    orderBy(sort: Sort[]) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return []
         }
@@ -114,7 +119,7 @@ class FilterParser {
 
     }
     
-    parseSort({ fieldName, direction }) {
+    parseSort({ fieldName, direction }: Sort) {
         if (typeof fieldName !== 'string') {
             return []
         }
@@ -126,7 +131,7 @@ class FilterParser {
 
     }
 
-    inlineVariableIfNeeded(fieldName, inlineFields) {
+    inlineVariableIfNeeded(fieldName: string, inlineFields: {[key: string]: any}) {
         if (inlineFields) {
             if (inlineFields[fieldName]) {
                 return inlineFields[fieldName]
@@ -135,7 +140,7 @@ class FilterParser {
         return fieldName
     }
 
-    parseStringBegins(fieldName, inlineFields, value) {
+    parseStringBegins(fieldName: string, inlineFields: {[key: string]: any}, value: string) {
         return [{
             fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
             opStr: '>=',
@@ -148,9 +153,7 @@ class FilterParser {
         }]
     }
 
-    selectFieldsFor(projection) { 
+    selectFieldsFor(projection: string[]) { 
         return projection
     }
 }
-
-module.exports = FilterParser

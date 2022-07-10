@@ -9,10 +9,11 @@ export const fixDates = (value : any) => {
     return value
 }
 
-export const asEntity = (docEntity ) => {
+
+export const asEntity = (docEntity: any) => {
   const doc = docEntity.data()
   return Object.keys(doc)
-  .reduce(function(obj, key) {
+  .reduce(function(obj: { [key: string]: any}, key: any) {
       return { ...obj, [key]: fixDates(doc[key]) }
   }.bind(this), {})
 }
