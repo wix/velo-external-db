@@ -1,6 +1,7 @@
+import { IConfigReader } from '../types'
 import { isJson, jsonParser } from '../utils/config_utils'
 
-export default class AuthorizationConfigReader {
+export default class AuthorizationConfigReader implements IConfigReader {
   constructor() {
   }
 

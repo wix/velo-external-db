@@ -9,3 +9,9 @@ interface CollectionPermissions {
 export interface RoleConfig {
     collectionPermissions: CollectionPermissions[]
 }
+
+export interface IConfigReader {
+    readConfig(): any
+    readExternalAndLocalConfig?(): any
+    readExternalConfig?(): any
+}

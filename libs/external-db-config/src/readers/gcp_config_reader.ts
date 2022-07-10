@@ -1,5 +1,6 @@
+import { IConfigReader } from "../types"
 
-export class GcpConfigReader {
+export class GcpConfigReader implements IConfigReader{
   constructor() {
   }
 
@@ -10,7 +11,7 @@ export class GcpConfigReader {
 
 }
 
-export class GcpSpannerConfigReader {
+export class GcpSpannerConfigReader implements IConfigReader {
   constructor() {
   }
 
@@ -22,7 +23,7 @@ export class GcpSpannerConfigReader {
 
 }
 
-export class GcpFirestoreConfigReader {
+export class GcpFirestoreConfigReader implements IConfigReader{
   constructor() { }
 
   async readConfig() {
@@ -33,7 +34,7 @@ export class GcpFirestoreConfigReader {
 
 }
 
-export class GcpGoogleSheetsConfigReader {
+export class GcpGoogleSheetsConfigReader implements IConfigReader {
   constructor() { }
 
   async readConfig() {
@@ -43,7 +44,7 @@ export class GcpGoogleSheetsConfigReader {
 
 }
 
-export class GcpMongoConfigReader {
+export class GcpMongoConfigReader implements IConfigReader{
   constructor() { }
 
   async readConfig() {
@@ -52,7 +53,7 @@ export class GcpMongoConfigReader {
   }
 }
 
-export class GcpAirtableConfigReader {
+export class GcpAirtableConfigReader implements IConfigReader{
   constructor() { }
 
   async readConfig() {
@@ -61,7 +62,7 @@ export class GcpAirtableConfigReader {
   }
 }
 
-export class GcpBigQueryConfigReader {
+export class GcpBigQueryConfigReader implements IConfigReader{
   constructor() {
   }
 

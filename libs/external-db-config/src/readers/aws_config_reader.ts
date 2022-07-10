@@ -1,8 +1,9 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+import { IConfigReader } from '../types'
 
 const emptyExternalDbConfig = (err: any) => ({ externalConfig: {}, secretMangerError: err.message })
 
-export class AwsConfigReader {
+export class AwsConfigReader implements IConfigReader {
   secretId: string
   region: string | undefined
   constructor(secretId: string, region: string | undefined) {
@@ -34,7 +35,7 @@ export class AwsConfigReader {
   }
 }
 
-export class AwsDynamoConfigReader {
+export class AwsDynamoConfigReader implements IConfigReader {
   region: string | undefined
   secretId: string
   constructor(region: string | undefined, secretId: string) {
@@ -69,7 +70,7 @@ export class AwsDynamoConfigReader {
   }
 }
 
-export class AwsMongoConfigReader {
+export class AwsMongoConfigReader implements IConfigReader {
   region: string | undefined
   secretId: string
   constructor(region: string | undefined, secretId: string) {
@@ -103,5 +104,3 @@ export class AwsMongoConfigReader {
     return { secretKey: SECRET_KEY, connectionUri: URI }
   }
 }
-
-module.exports = { AwsConfigReader, AwsDynamoConfigReader, AwsMongoConfigReader }

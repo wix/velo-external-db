@@ -1,5 +1,5 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { env, initEnv, reset } = require('../drivers/external_config_reader_e2e_test_support')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { env, initEnv, reset } from '../drivers/external_config_reader_e2e_test_support'
 const each = require('jest-each').default
 
 each(
@@ -8,9 +8,9 @@ each(
        ['AWS', ['mysql', 'postgres', 'mongo']],
        ['GCP', ['mysql', 'postgres', 'spanner', 'firestore']]
       ]
-).describe('Config Reader for %s', (vendor, engines) => {
+).describe('Config Reader for %s', (vendor: string, engines: string) => {
 
-    each(engines).describe('Engine %s', (engine) => {
+    each(engines).describe('Engine %s', (engine: string) => {
 
         beforeAll(async() => {
             initEnv(vendor, engine)

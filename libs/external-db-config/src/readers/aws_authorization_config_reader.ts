@@ -1,8 +1,9 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+import { IConfigReader } from '../types'
 import { isJson, jsonParser } from '../utils/config_utils'
 const emptyExternalDbConfig = (err: any) => ({ externalConfig: {}, secretMangerError: err.message })
 
-export default class AwsAuthorizationConfigReader {
+export default class AwsAuthorizationConfigReader implements IConfigReader {
   secretId: string
   region: string | undefined
   constructor(region: string | undefined, secretId: string) {

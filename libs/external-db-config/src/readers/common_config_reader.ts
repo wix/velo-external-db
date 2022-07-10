@@ -1,4 +1,6 @@
-export default class CommonConfigReader {
+import { IConfigReader } from "../types"
+
+export default class CommonConfigReader implements IConfigReader {
     constructor() { }
 
     readConfig() {

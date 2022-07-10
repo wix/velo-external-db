@@ -1,5 +1,6 @@
+import { IConfigReader } from "../types";
 
-export default class StubConfigReader {
+export default class StubConfigReader implements IConfigReader{
     constructor() {
     }
 
