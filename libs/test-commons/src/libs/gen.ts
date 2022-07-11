@@ -70,9 +70,9 @@ export const randomObjectFromArray = (array: any[]) => array[chance.integer({ mi
 
 export const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
 
-export const randomWrappedFilter = () => {
+export const randomWrappedFilter = (_fieldName?: string) => {
     const operator = randomAdapterOperator()
-    const fieldName = chance.word()
+    const fieldName =  _fieldName ?? chance.word()
     const value = operator === AdapterOperators.include ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
         fieldName,
