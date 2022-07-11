@@ -355,7 +355,8 @@ describe('Sql Parser', () => {
             describe('transform select fields', () => {
                 test('single id field', () => {
                     const aggregation = {
-                        projection: [{ name: ctx.fieldName }]
+                        projection: [{ name: ctx.fieldName }],
+                        postFilter: {}
                     }
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
@@ -371,7 +372,8 @@ describe('Sql Parser', () => {
                         projection: [
                             { name: ctx.fieldName },
                             { name: ctx.anotherFieldName }
-                           ]
+                           ],
+                        postFilter: {}
                      }
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
@@ -413,7 +415,8 @@ describe('Sql Parser', () => {
                         projection: [
                             { name: ctx.fieldName },
                             { name: ctx.anotherFieldName, function: adapterFunction, alias: ctx.moreFieldName }
-                        ]
+                        ],
+                        postFilter: {}
                     }
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
@@ -429,7 +432,8 @@ describe('Sql Parser', () => {
                         projection: [
                             { name: ctx.fieldName },
                             { name: '*', alias: ctx.moreFieldName, function: count }
-                        ]
+                        ],
+                        postFilter: {}
                     }
 
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
