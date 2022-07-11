@@ -1,6 +1,6 @@
 import { EmptyRoleConfig, configPattern, collectionConfigPattern } from '../utils/config_utils'
 import * as Avj from 'ajv'
-import { RoleConfig } from '../types'
+import { RoleConfig } from '@wix-velo/velo-external-db-types'
 const ajv = new Avj()
 
 export class AuthorizationConfigValidator {

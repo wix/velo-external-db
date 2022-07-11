@@ -1,6 +1,5 @@
 
 import * as Chance from 'chance'
-import { RoleConfig } from '../src/types'
 import { gen } from '@wix-velo/test-commons'
 
 const chance = new Chance()

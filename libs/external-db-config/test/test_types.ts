@@ -1,4 +1,3 @@
-import { RoleConfig } from "../src/types"
 
 export interface MongoConfig {
     connectionUri?: string
