@@ -1,12 +1,12 @@
 import { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, patchFloat, extractFloatFields } from './spanner_utils'
 import { translateErrorCodes } from './sql_exception_translator'
-import { ISpannerFilterParser } from './sql_filter_transformer'
 import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item} from '@wix-velo/velo-external-db-types'
 import { Database as SpannerDb } from '@google-cloud/spanner'
+import FilterParser from './sql_filter_transformer'
 
 
 export default class DataProvider implements IDataProvider {
-    filterParser: ISpannerFilterParser
+    filterParser: FilterParser
     database: SpannerDb
     constructor(database: any, filterParser: any) {
         this.filterParser = filterParser

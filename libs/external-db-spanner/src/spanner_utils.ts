@@ -1,6 +1,7 @@
 import { escapeId } from 'sqlstring'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { Spanner } from '@google-cloud/spanner'
+import { Counter } from './sql_filter_transformer'
 const { InvalidQuery } = errors
 
 export { escapeId }
@@ -27,6 +28,9 @@ export const validateLiteral = (l: any) => {
     }
     return `@${l}`
 }
+
+export const validateLiteralWithCounter = (s: any, counter: Counter) => validateLiteral(`${s}${counter.valueCounter++}`)
+export const nameWithCounter = (name: string, counter: Counter) => `${name}${counter.paramCounter++}`
 
 export const escapeFieldId = (f: string) => f=== '*' ? '*' : escapeId(patchFieldName(f))
 
