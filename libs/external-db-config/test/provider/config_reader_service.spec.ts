@@ -1,6 +1,6 @@
 import { Uninitialized } from '@wix-velo/test-commons'
 const each = require('jest-each').default
-import Chance = require('chance')
+import * as Chance from 'chance'
 const chance = new Chance()
 import gcpDriver = require('../drivers/gcp_mysql_config_test_support')
 import gcpSpannerDriver = require('../drivers/gcp_spanner_config_test_support')
@@ -9,7 +9,7 @@ import azureDriver = require('../drivers/gcp_mysql_config_test_support')
 import awsDriver = require('../drivers/aws_mysql_config_test_support')
 import awsMongoDriver = require('../drivers/aws_mongo_config_test_support')
 import commonDriver = require('../drivers/common_config_test_support')
-import { IConfigReader } from 'libs/external-db-config/src/types'
+import { IConfigReader } from '../../src/types'
 
 interface Driver {
     init?(): void
