@@ -1,9 +1,12 @@
-const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+import { IConfigReader } from '../types'
 
-const emptyExternalDbConfig = (err) => ({ externalConfig: {}, secretMangerError: err.message })
+const emptyExternalDbConfig = (err: any) => ({ externalConfig: {}, secretMangerError: err.message })
 
-class AwsConfigReader {
-  constructor(secretId, region) {
+export class AwsConfigReader implements IConfigReader {
+  secretId: string
+  region: string | undefined
+  constructor(secretId: string, region: string | undefined) {
     this.secretId = secretId
     this.region = region
   }
@@ -18,37 +21,39 @@ class AwsConfigReader {
     try {
       const client = new SecretsManagerClient({ region: this.region })
       const data = await client.send(new GetSecretValueCommand({ SecretId: this.secretId }))
-      return { externalConfig: JSON.parse(data.SecretString) }
+      return { externalConfig: JSON.parse(data.SecretString || '') }
     } catch (err) {
       return emptyExternalDbConfig(err)
     }
   }
 
   async readExternalAndLocalConfig() { 
-    const { externalConfig, secretMangerError } = await this.readExternalConfig()
-    const { host, username, password, DB, SECRET_KEY, HOST, PASSWORD, USER } = { ...process.env, ...externalConfig }
+    const { externalConfig, secretMangerError }: {[key: string]: any} = await this.readExternalConfig()
+    const { host, username, password, DB, SECRET_KEY, HOST, PASSWORD, USER }: {[key: string]: string} = { ...process.env, ...externalConfig }
     const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, SECRET_KEY }
-    return { config, secretMangerError: secretMangerError }
+    return { config, secretMangerError }
   }
 }
 
-class AwsDynamoConfigReader {
-  constructor(region, secretId) {
+export class AwsDynamoConfigReader implements IConfigReader {
+  region: string | undefined
+  secretId: string
+  constructor(region: string | undefined, secretId: string) {
     this.region = region
     this.secretId = secretId
     }
 
     async readConfig() {
       const { config } = await this.readExternalAndLocalConfig()
-      if (process.env.NODE_ENV === 'test') {
-        return { region: this.region, secretKey: config.SECRET_KEY, endpoint: process.env.ENDPOINT_URL }
+      if (process.env['NODE_ENV'] === 'test') {
+        return { region: this.region, secretKey: config.SECRET_KEY, endpoint: process.env['ENDPOINT_URL'] }
       }
       return { region: this.region, secretKey: config.SECRET_KEY }
     }
     
     async readExternalAndLocalConfig() { 
-      const { externalConfig, secretMangerError } = await this.readExternalConfig()
-      const { SECRET_KEY } = { ...process.env, ...externalConfig }
+      const { externalConfig, secretMangerError }: {[key: string]: any} = await this.readExternalConfig()
+      const { SECRET_KEY = undefined } = { ...process.env, ...externalConfig }
       const config = { SECRET_KEY }
 
       return { config, secretMangerError: secretMangerError }
@@ -58,15 +63,17 @@ class AwsDynamoConfigReader {
       try {
         const client = new SecretsManagerClient({ region: this.region })
         const data = await client.send(new GetSecretValueCommand({ SecretId: this.secretId }))
-        return { externalConfig: JSON.parse(data.SecretString) }
+        return { externalConfig: JSON.parse(data.SecretString || '') }
       } catch (err) {
         return emptyExternalDbConfig(err)
       }
   }
 }
 
-class AwsMongoConfigReader {
-  constructor(region, secretId) {
+export class AwsMongoConfigReader implements IConfigReader {
+  region: string | undefined
+  secretId: string
+  constructor(region: string | undefined, secretId: string) {
     this.region = region
     this.secretId = secretId
     }
@@ -75,15 +82,15 @@ class AwsMongoConfigReader {
       try {
         const client = new SecretsManagerClient({ region: this.region })
         const data = await client.send(new GetSecretValueCommand({ SecretId: this.secretId }))
-        return { externalConfig: JSON.parse(data.SecretString) }
+        return { externalConfig: JSON.parse(data.SecretString || '') }
       } catch (err) {
         return emptyExternalDbConfig(err)
       }
     }
 
   async readExternalAndLocalConfig() { 
-    const { externalConfig, secretMangerError } = await this.readExternalConfig()
-    const { SECRET_KEY, URI } = { ...process.env, ...externalConfig }
+    const { externalConfig, secretMangerError } :{[key: string]: any} = await this.readExternalConfig()
+    const { SECRET_KEY, URI }: {SECRET_KEY: string, URI: string} = { ...process.env, ...externalConfig }
     const config = { SECRET_KEY, URI }
 
     return { config, secretMangerError: secretMangerError }
@@ -97,5 +104,3 @@ class AwsMongoConfigReader {
     return { secretKey: SECRET_KEY, connectionUri: URI }
   }
 }
-
-module.exports = { AwsConfigReader, AwsDynamoConfigReader, AwsMongoConfigReader }

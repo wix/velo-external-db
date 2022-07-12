@@ -1,4 +1,6 @@
-class AzureConfigReader {
+import { IConfigReader } from "../types"
+
+export class AzureConfigReader implements IConfigReader {
   constructor() {
   }
 
@@ -7,5 +9,3 @@ class AzureConfigReader {
     return { host: HOST, user: USER, password: PASSWORD, db: DB, secretKey: SECRET_KEY, unsecuredEnv: UNSECURED_ENV }
   }
 }
-
-module.exports = { AzureConfigReader }

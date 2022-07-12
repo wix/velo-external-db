@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'external-db-config',
     preset: '../../jest.preset.js',
     globals: {

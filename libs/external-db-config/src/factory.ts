@@ -1,17 +1,18 @@
-const ConfigReader = require('./service/config_reader')
-const CommonConfigReader = require('./readers/common_config_reader')
-const StubConfigReader = require('./readers/stub_config_reader')
-const AwsAuthorizationConfigReader = require ('./readers/aws_authorization_config_reader')
-const AuthorizationConfigReader = require ('./readers/authorization_config_reader')
-const aws = require('./readers/aws_config_reader')
-const gcp = require('./readers/gcp_config_reader')
-const azure = require('./readers/azure_config_reader')
+import ConfigReader = require('./service/config_reader')
+import CommonConfigReader from './readers/common_config_reader'
+import StubConfigReader from './readers/stub_config_reader'
+import AwsAuthorizationConfigReader from './readers/aws_authorization_config_reader'
+import AuthorizationConfigReader from './readers/authorization_config_reader'
+import * as aws from './readers/aws_config_reader'
+import * as gcp from './readers/gcp_config_reader'
+import * as azure from './readers/azure_config_reader'
 
 const DefaultSecretId = 'VELO-EXTERNAL-DB-SECRETS'
 
-const create = () => {
+export const create = () => {
   const common = new CommonConfigReader()
-  const { vendor = '', type, secretId, region } = common.readConfig()
+  const { vendor = '', type, secretId: _secretId , region } = common.readConfig()
+  const secretId = _secretId || DefaultSecretId
   let internalConfigReader
   let authorizationConfigReader
 
@@ -26,7 +27,7 @@ const create = () => {
           internalConfigReader = new aws.AwsMongoConfigReader(region, secretId)
           break
         default:
-          internalConfigReader = new aws.AwsConfigReader(secretId || DefaultSecretId, region)
+          internalConfigReader = new aws.AwsConfigReader(secretId, region)
       }      
     
     }
@@ -80,7 +81,7 @@ const create = () => {
           internalConfigReader = new gcp.GcpAirtableConfigReader()
           break
         case 'dynamodb':
-          internalConfigReader = new aws.AwsDynamoConfigReader(region) 
+          internalConfigReader = new aws.AwsDynamoConfigReader(region, secretId) 
           break
         case 'bigquery':
           internalConfigReader = new gcp.GcpBigQueryConfigReader()
@@ -97,5 +98,3 @@ const create = () => {
 
   return new ConfigReader(internalConfigReader || new StubConfigReader, common, authorizationConfigReader || new StubConfigReader)
 }
-
-module.exports = { create }

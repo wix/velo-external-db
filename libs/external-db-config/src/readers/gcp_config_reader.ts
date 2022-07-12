@@ -1,5 +1,6 @@
+import { IConfigReader } from "../types"
 
-class GcpConfigReader {
+export class GcpConfigReader implements IConfigReader{
   constructor() {
   }
 
@@ -10,7 +11,7 @@ class GcpConfigReader {
 
 }
 
-class GcpSpannerConfigReader {
+export class GcpSpannerConfigReader implements IConfigReader {
   constructor() {
   }
 
@@ -22,7 +23,7 @@ class GcpSpannerConfigReader {
 
 }
 
-class GcpFirestoreConfigReader {
+export class GcpFirestoreConfigReader implements IConfigReader{
   constructor() { }
 
   async readConfig() {
@@ -33,7 +34,7 @@ class GcpFirestoreConfigReader {
 
 }
 
-class GcpGoogleSheetsConfigReader {
+export class GcpGoogleSheetsConfigReader implements IConfigReader {
   constructor() { }
 
   async readConfig() {
@@ -43,7 +44,7 @@ class GcpGoogleSheetsConfigReader {
 
 }
 
-class GcpMongoConfigReader {
+export class GcpMongoConfigReader implements IConfigReader{
   constructor() { }
 
   async readConfig() {
@@ -52,7 +53,7 @@ class GcpMongoConfigReader {
   }
 }
 
-class GcpAirtableConfigReader {
+export class GcpAirtableConfigReader implements IConfigReader{
   constructor() { }
 
   async readConfig() {
@@ -61,7 +62,7 @@ class GcpAirtableConfigReader {
   }
 }
 
-class GcpBigQueryConfigReader {
+export class GcpBigQueryConfigReader implements IConfigReader{
   constructor() {
   }
 
@@ -70,6 +71,3 @@ class GcpBigQueryConfigReader {
     return { projectId: PROJECT_ID, databaseId: DATABASE_ID, secretKey: SECRET_KEY }
   }
 }
-
-
-module.exports = { GcpConfigReader, GcpSpannerConfigReader, GcpFirestoreConfigReader, GcpGoogleSheetsConfigReader, GcpMongoConfigReader, GcpAirtableConfigReader, GcpBigQueryConfigReader }

@@ -1,7 +1,7 @@
-const Chance = require('chance')
+import * as Chance from 'chance'
 const chance = Chance()
-const { checkRequiredKeys, jsonParser } = require('../utils/config_utils')
-const { gen } = require('@wix-velo/test-commons')
+import { checkRequiredKeys, jsonParser } from '../utils/config_utils'
+import { gen } from '@wix-velo/test-commons'
 
 
 describe('Check Required Keys Function', () => {
@@ -43,5 +43,4 @@ describe('Check Required Keys Function', () => {
     test('jsonParser should return json object on double quoted string', () => {
         expect(jsonParser('"{}"')).toEqual({})
     })
-
 })

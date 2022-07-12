@@ -1,4 +1,6 @@
-class CommonConfigReader {
+import { IConfigReader } from "../types"
+
+export default class CommonConfigReader implements IConfigReader {
     constructor() { }
 
     readConfig() {
@@ -6,5 +8,3 @@ class CommonConfigReader {
         return { vendor: CLOUD_VENDOR, type: TYPE, region: REGION, secretId: SECRET_NAME }
     }
 }
-
-module.exports = CommonConfigReader
