@@ -77,9 +77,9 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName}1 ${env.filterParser.adapterOperatorToDynamoOperator(o)} :${ctx.fieldName}1`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}1`]: ctx.fieldName },
-                        ExpressionAttributeValues: { [`:${ctx.fieldName}1`]: ctx.fieldValue } 
+                        FilterExpression: `#${ctx.fieldName}0 ${env.filterParser.adapterOperatorToDynamoOperator(o)} :${ctx.fieldName}0`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: ctx.fieldValue } 
                     }                     
                 }])
 
@@ -94,9 +94,9 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName}1 = :${ctx.fieldName}1`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}1`]: ctx.fieldName },
-                        ExpressionAttributeValues: { [`:${ctx.fieldName}1`]: 0 } 
+                        FilterExpression: `#${ctx.fieldName}0 = :${ctx.fieldName}0`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: 0 } 
                     }  
                 }])
             })
@@ -110,10 +110,10 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName}1 IN (:${ctx.fieldName}1, :${ctx.fieldName}2, :${ctx.fieldName}3, :${ctx.fieldName}4, :${ctx.fieldName}5)`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}1`]: ctx.fieldName },
-                        ExpressionAttributeValues: { [`:${ctx.fieldName}1`]: ctx.fieldListValue[0], [`:${ctx.fieldName}2`]: ctx.fieldListValue[1], [`:${ctx.fieldName}3`]: ctx.fieldListValue[2],
-                                                     [`:${ctx.fieldName}4`]: ctx.fieldListValue[3], [`:${ctx.fieldName}5`]: ctx.fieldListValue[4] } 
+                        FilterExpression: `#${ctx.fieldName}0 IN (:${ctx.fieldName}0, :${ctx.fieldName}1, :${ctx.fieldName}2, :${ctx.fieldName}3, :${ctx.fieldName}4)`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: ctx.fieldListValue[0], [`:${ctx.fieldName}1`]: ctx.fieldListValue[1], [`:${ctx.fieldName}2`]: ctx.fieldListValue[2],
+                                                     [`:${ctx.fieldName}3`]: ctx.fieldListValue[3], [`:${ctx.fieldName}4`]: ctx.fieldListValue[4] } 
                     }
                 }])
             })
@@ -137,9 +137,9 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName}1 = :${ctx.fieldName}1`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}1`]: ctx.fieldName },
-                        ExpressionAttributeValues: { [`:${ctx.fieldName}1`]: null } 
+                        FilterExpression: `#${ctx.fieldName}0 = :${ctx.fieldName}0`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: null } 
                     }
                 }])
 
@@ -155,9 +155,9 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName}1 = :${ctx.fieldName}1`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}1`]: ctx.fieldName },
-                        ExpressionAttributeValues: { [`:${ctx.fieldName}1`]: value } 
+                        FilterExpression: `#${ctx.fieldName}0 = :${ctx.fieldName}0`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: value } 
                     }
                 }])
 
@@ -174,9 +174,9 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: {
-                            FilterExpression: `contains (#${ctx.fieldName}1, :${ctx.fieldName}1)`,
-                            ExpressionAttributeNames: { [`#${ctx.fieldName}1`]: ctx.fieldName },
-                            ExpressionAttributeValues: { [`:${ctx.fieldName}1`]: ctx.fieldValue } 
+                            FilterExpression: `contains (#${ctx.fieldName}0, :${ctx.fieldName}0)`,
+                            ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                            ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: ctx.fieldValue } 
                         }
                     }])
 
@@ -191,9 +191,9 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: {
-                            FilterExpression: `begins_with (#${ctx.fieldName}1, :${ctx.fieldName}1)`,
-                            ExpressionAttributeNames: { [`#${ctx.fieldName}1`]: ctx.fieldName },
-                            ExpressionAttributeValues: { [`:${ctx.fieldName}1`]: ctx.fieldValue } 
+                            FilterExpression: `begins_with (#${ctx.fieldName}0, :${ctx.fieldName}0)`,
+                            ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                            ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: ctx.fieldValue } 
                         }                    
                     }])
 
