@@ -28,15 +28,9 @@ export const escapeTable = (s: string) => {
 export const patchFieldName = (s: any) => `x${SqlString.escape(s).substring(1).slice(0, -1)}`
 export const validateLiteral = (s: any) => `@${patchFieldName(s)}`
 
-export const validateLiteralWithCounter = (s: any, counter: Counter) => {
-    counter.valueCounter ++
-    return validateLiteral(`${s}${counter.valueCounter}`)
-}
+export const validateLiteralWithCounter = (s: any, counter: Counter) => validateLiteral(`${s}${counter.valueCounter++}`)
 
-export const patchFieldNameWithCounter = (s: any, counter: Counter) => {
-    counter.paramCounter ++
-    return patchFieldName(`${s}${counter.paramCounter}`)
-}
+export const patchFieldNameWithCounter = (s: any, counter: Counter) => patchFieldName(`${s}${counter.paramCounter++}`)
 
 export const notConnectedPool = (pool: { connect: () => any }, err: any) => {
     return {
