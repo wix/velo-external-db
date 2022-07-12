@@ -15,7 +15,9 @@ describe('Sql Parser', () => {
 
         test('handles undefined filter', () => {
             expect( env.filterParser.parseFilter('') ).toEqual([])
+            //@ts-ignore
             expect( env.filterParser.parseFilter(undefined) ).toEqual([])
+            //@ts-ignore
             expect( env.filterParser.parseFilter(null) ).toEqual([])
             expect( env.filterParser.parseFilter(555) ).toEqual([])
             expect( env.filterParser.parseFilter([5555]) ).toEqual([])
@@ -33,15 +35,33 @@ describe('Sql Parser', () => {
             })
         })
 
-        test('transform filter on id to query command', () => {
-            const filterExpr = env.filterParser.parseFilter(ctx.idFilter)[0].filterExpr
-            expect( env.filterParser.transform(ctx.idFilter) ).toEqual({
+        //todo: transform only idFilter with equal operator!
+        test('transform filter id filter with equal operator to query command', () => {
+            const filter = {
+                fieldName: '_id',
+                operator: eq,
+                value: ctx.fieldValue
+            }
+            const filterExpr = env.filterParser.parseFilter(filter)[0].filterExpr
+            expect( env.filterParser.transform(filter) ).toEqual({
                 filterExpr: {
                     KeyConditionExpression: filterExpr.FilterExpression,
                     ExpressionAttributeNames: filterExpr.ExpressionAttributeNames,
                     ExpressionAttributeValues: filterExpr.ExpressionAttributeValues
                 },
                     queryable: true
+            })
+        })
+
+        test('filter on id with any other operator but equal shouldn\'t transform to query', () => {
+            const filterExpr = env.filterParser.parseFilter(ctx.idFilterNotEqual)[0].filterExpr
+            expect( env.filterParser.transform(ctx.idFilterNotEqual) ).toEqual({
+                filterExpr: {
+                    FilterExpression: filterExpr.FilterExpression,
+                    ExpressionAttributeNames: filterExpr.ExpressionAttributeNames,
+                    ExpressionAttributeValues: filterExpr.ExpressionAttributeValues
+                },
+                    queryable: false
             })
         })
 
@@ -57,9 +77,9 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName} ${env.filterParser.adapterOperatorToDynamoOperator(o, ctx.fieldValue)} :${ctx.fieldName}`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName },
-                        ExpressionAttributeValues: { [`:${ctx.fieldName}`]: ctx.fieldValue } 
+                        FilterExpression: `#${ctx.fieldName}0 ${env.filterParser.adapterOperatorToDynamoOperator(o)} :${ctx.fieldName}0`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: ctx.fieldValue } 
                     }                     
                 }])
 
@@ -74,9 +94,9 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName} = :${ctx.fieldName}`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName },
-                        ExpressionAttributeValues: { [`:${ctx.fieldName}`]: 0 } 
+                        FilterExpression: `#${ctx.fieldName}0 = :${ctx.fieldName}0`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: 0 } 
                     }  
                 }])
             })
@@ -90,10 +110,10 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName} IN (:0, :1, :2, :3, :4)`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName },
-                        ExpressionAttributeValues: { ':0': ctx.fieldListValue[0], ':1': ctx.fieldListValue[1], ':2': ctx.fieldListValue[2],
-                                                     ':3': ctx.fieldListValue[3], ':4': ctx.fieldListValue[4] } 
+                        FilterExpression: `#${ctx.fieldName}0 IN (:${ctx.fieldName}0, :${ctx.fieldName}1, :${ctx.fieldName}2, :${ctx.fieldName}3, :${ctx.fieldName}4)`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: ctx.fieldListValue[0], [`:${ctx.fieldName}1`]: ctx.fieldListValue[1], [`:${ctx.fieldName}2`]: ctx.fieldListValue[2],
+                                                     [`:${ctx.fieldName}3`]: ctx.fieldListValue[3], [`:${ctx.fieldName}4`]: ctx.fieldListValue[4] } 
                     }
                 }])
             })
@@ -117,9 +137,9 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName} = :${ctx.fieldName}`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName },
-                        ExpressionAttributeValues: { [`:${ctx.fieldName}`]: null } 
+                        FilterExpression: `#${ctx.fieldName}0 = :${ctx.fieldName}0`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: null } 
                     }
                 }])
 
@@ -135,9 +155,9 @@ describe('Sql Parser', () => {
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `#${ctx.fieldName} = :${ctx.fieldName}`,
-                        ExpressionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName },
-                        ExpressionAttributeValues: { [`:${ctx.fieldName}`]: value } 
+                        FilterExpression: `#${ctx.fieldName}0 = :${ctx.fieldName}0`,
+                        ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: value } 
                     }
                 }])
 
@@ -154,9 +174,9 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: {
-                            FilterExpression: `contains (#${ctx.fieldName}, :${ctx.fieldName})`,
-                            ExpressionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName },
-                            ExpressionAttributeValues: { [`:${ctx.fieldName}`]: ctx.fieldValue } 
+                            FilterExpression: `contains (#${ctx.fieldName}0, :${ctx.fieldName}0)`,
+                            ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                            ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: ctx.fieldValue } 
                         }
                     }])
 
@@ -171,9 +191,9 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: {
-                            FilterExpression: `begins_with (#${ctx.fieldName}, :${ctx.fieldName})`,
-                            ExpressionAttributeNames: { [`#${ctx.fieldName}`]: ctx.fieldName },
-                            ExpressionAttributeValues: { [`:${ctx.fieldName}`]: ctx.fieldValue } 
+                            FilterExpression: `begins_with (#${ctx.fieldName}0, :${ctx.fieldName}0)`,
+                            ExpressionAttributeNames: { [`#${ctx.fieldName}0`]: ctx.fieldName },
+                            ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: ctx.fieldValue } 
                         }                    
                     }])
 
@@ -191,12 +211,13 @@ describe('Sql Parser', () => {
                 }
                 const op = o === and ? 'AND' : 'OR'
 
-                const filterExpr = env.filterParser.parseFilter(ctx.filter)[0].filterExpr
-                const anotherFilterExpr = env.filterParser.parseFilter(ctx.anotherFilter)[0].filterExpr
+                const counter = {nameCounter: 0, valueCounter: 0}
+                const filterExpr = env.filterParser.parseFilter(ctx.filter, counter)[0].filterExpr
+                const anotherFilterExpr = env.filterParser.parseFilter(ctx.anotherFilter, counter)[0].filterExpr
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
                     filterExpr: {
-                        FilterExpression: `${filterExpr.FilterExpression} ${op} ${anotherFilterExpr.FilterExpression}`,
+                        FilterExpression: `(${filterExpr.FilterExpression} ${op} ${anotherFilterExpr.FilterExpression})`,
                     
                         ExpressionAttributeNames: { ...filterExpr.ExpressionAttributeNames,
                                                     ...anotherFilterExpr.ExpressionAttributeNames                      
@@ -244,34 +265,22 @@ describe('Sql Parser', () => {
         })
 
     })
-    
-    interface Context {
-        fieldName: any
-        fieldValue: any
-        fieldListValue: any
-        anotherFieldName: any
-        moreFieldName: any
-        filter: any
-        anotherFilter: any
-        idFilter: any
-    }
 
-    const ctx: Context = {
+    const ctx = {
         fieldName: Uninitialized,
         fieldValue: Uninitialized,
         fieldListValue: Uninitialized,
         anotherFieldName: Uninitialized,
         moreFieldName: Uninitialized,
         filter: Uninitialized,
-        idFilter: Uninitialized,
+        idFilterNotEqual: Uninitialized,
         anotherFilter: Uninitialized,
     }
-    
-    interface Enviorment {
-        filterParser: any
-    }
 
-    const env: Enviorment = {
+
+    const env: {
+        filterParser: FilterParser
+    } = {
         filterParser: Uninitialized,
     }
 
@@ -284,7 +293,7 @@ describe('Sql Parser', () => {
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
 
         ctx.filter = gen.randomWrappedFilter()
-        ctx.idFilter = idFilter()
+        ctx.idFilterNotEqual = idFilter({ withoutEqual: true })
         ctx.anotherFilter = gen.randomWrappedFilter()
     })
 
