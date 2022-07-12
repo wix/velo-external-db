@@ -234,7 +234,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     }
                 })
 
-            const response = await axios.post('/data/find', hooks.findRequestBodyWith(ctx.collectionName, { _id: { $eq: ctx.item._id } }), authOwner)
+                const response = await axios.post('/data/find', hooks.findRequestBodyWith(ctx.collectionName, { _id: { $eq: ctx.item._id } }), authOwner)
                 expect(response.data.items).toEqual([{ _id: ctx.item._id }])
 
             })
@@ -296,14 +296,14 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         })
     })
 
-    describe('Data Hooks - Error Handling', () => {
+    describe('Error Handling', () => {
         test('should handle error object and throw with the corresponding status', async() => {
             env.externalDbRouter.reloadHooks({
                 dataHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
                         const error = new Error('message')
                         error.status = '409'
-                        throw error                    
+                        throw error
                     }
                 }
             })
@@ -312,7 +312,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 errorResponseWith(409, 'message')
             )
         })
-        
+
         test('If not specified should throw 400 - Error object', async() => {
             env.externalDbRouter.reloadHooks({
                 dataHooks: {
@@ -328,7 +328,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             )
         })
 
-        test('If not specified should throw 400 - string', async() => { 
+        test('If not specified should throw 400 - string', async() => {
             env.externalDbRouter.reloadHooks({
                 dataHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
@@ -340,6 +340,95 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
                 errorResponseWith(400, 'message')
             )
+        })
+    })
+
+
+    describe('Custom Context', () => {
+        describe('Read operations', () => {
+            each([
+                ['Get', 'beforeGetById', 'afterGetById', '/data/get'],
+                ['Find', 'beforeFind', 'afterFind', '/data/find'],
+                ['Aggregate', 'beforeAggregate', 'afterAggregate', '/data/aggregate'],
+                ['Count', 'beforeCount', 'afterCount', '/data/count']
+            ]).test('customContext should pass by ref on on [%s] ', async(_, beforeHook, afterHook, api) => {
+                if (hooks.skipAggregationIfNotSupported(beforeHook, supportedOperations))
+                    return
+
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                await data.givenItems(ctx.items, ctx.collectionName, authOwner)
+
+                env.externalDbRouter.reloadHooks({
+                    dataHooks: {
+                        beforeAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext.beforeAll = true
+                        },
+                        beforeRead: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext.beforeRead = true
+                        },
+                        [beforeHook]: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext[beforeHook] = true
+                        },
+                        afterAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext.afterAll = true
+                        },
+                        afterRead: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext.afterRead = true
+                        },
+                        [afterHook]: (payload, _requestContext, _serviceContext, customContext) => {
+                            customContext[afterHook] = true
+                            return { ...payload, customContext }
+                        }
+                    }
+                })
+                const response = await axios.post(api, hooks.readRequestBodyWith(ctx.collectionName, ctx.items), authOwner)
+                expect(response.data.customContext).toEqual({
+                    beforeAll: true, beforeRead: true, [beforeHook]: true, afterAll: true, afterRead: true, [afterHook]: true
+                })
+            })
+        })
+
+        describe('Write operations', () => {
+            each([
+                ['Insert', 'beforeInsert', 'afterInsert', '/data/insert'],
+                ['Bulk Insert', 'beforeBulkInsert', 'afterBulkInsert', '/data/insert/bulk'],
+                ['Update', 'beforeUpdate', 'afterUpdate', '/data/update'],
+                ['Bulk Update', 'beforeBulkUpdate', 'afterBulkUpdate', '/data/update/bulk'],
+                ['Remove', 'beforeRemove', 'afterRemove', '/data/remove'],
+                ['Bulk Remove', 'beforeBulkRemove', 'afterBulkRemove', '/data/remove/bulk']
+            ]).test('customContext should pass by ref on on [%s] ', async(_, beforeHook, afterHook, api) => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                if (!['afterInsert', 'afterBulkInsert'].includes(afterHook)) {
+                    await data.givenItems(ctx.items, ctx.collectionName, authOwner)
+                }
+                env.externalDbRouter.reloadHooks({
+                    dataHooks: {
+                        beforeAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext.beforeAll = true
+                        },
+                        beforeWrite: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext.beforeWrite = true
+                        },
+                        [beforeHook]: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext[beforeHook] = true
+                        },
+                        afterAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext.afterAll = true
+                        },
+                        afterWrite: (_payload, _requestContext, _serviceContext, customContext) => {
+                            customContext.afterWrite = true
+                        },
+                        [afterHook]: (payload, _requestContext, _serviceContext, customContext) => {
+                            customContext[afterHook] = true
+                            return { ...payload, customContext }
+                        }
+                    }
+                })
+                const response = await axios.post(api, hooks.writeRequestBodyWith(ctx.collectionName, ctx.items), authOwner)
+                expect(response.data.customContext).toEqual({
+                    beforeAll: true, beforeWrite: true, [beforeHook]: true, afterAll: true, afterWrite: true, [afterHook]: true
+                })
+            })
         })
     })
 
