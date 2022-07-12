@@ -1,6 +1,6 @@
-import { CollectionPermissions, VeloRole, WixDataRole } from "@wix-velo/velo-external-db-types"
+import { CollectionPermissions, VeloRole, WixDataRole } from '@wix-velo/velo-external-db-types'
 
-const { errors } = require('@wix-velo/velo-external-db-commons')
+import { errors } from '@wix-velo/velo-external-db-commons'
 const { UnauthorizedError } = errors
 const DefaultPolicies = ['Admin']
 
