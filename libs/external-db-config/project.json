@@ -30,14 +30,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/external-db-config/**/*.js"]
+        "lintFilePatterns": ["libs/external-db-config/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/external-db-config"],
       "options": {
-        "jestConfig": "libs/external-db-config/jest.config.js",
+        "jestConfig": "libs/external-db-config/jest.config.ts",
         "passWithNoTests": true
       }
     }

@@ -32,14 +32,14 @@
         "{options.outputFile}"
       ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-mongo/**/*.js" ]
+        "lintFilePatterns": [ "libs/external-db-mongo/**/*.ts" ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": [ "coverage/libs/external-db-mongo" ],
       "options": {
-        "jestConfig": "libs/external-db-mongo/jest.config.js",
+        "jestConfig": "libs/external-db-mongo/jest.config.ts",
         "passWithNoTests": true
       }
     }
