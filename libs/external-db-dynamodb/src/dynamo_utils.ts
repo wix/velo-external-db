@@ -1,5 +1,6 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { InputField, ResponseField } from '@wix-velo/velo-external-db-types'
+import { Counter } from './sql_filter_transformer'
 const { InvalidQuery } = errors
 
 export const SystemTable = '_descriptor'
@@ -45,3 +46,6 @@ export const canQuery = (filterExpr: { ExpressionAttributeNames: { [s: string]: 
 }
 
 export const isEmptyObject = (obj: {}) => Object.keys(obj).length === 0
+
+export const fieldNameWithCounter = (fieldName: string, counter: Counter) => `#${fieldName}${++counter.nameCounter}`
+export const attributeValueNameWithCounter = (fieldName: any, counter: Counter) => `:${fieldName}${++counter.valueCounter}`
