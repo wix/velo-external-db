@@ -27,7 +27,7 @@ export enum SchemaOperations { //in schema_commons as well
     FindWithSort = 'findWithSort',
     Aggregate = 'aggregate',
     BulkDelete = 'bulkDelete',
-    Truncate = 'truncate',
+    Truncate = 'truncate', 
     UpdateImmediately = 'updateImmediately',
     DeleteImmediately = 'deleteImmediately',
     StartWithCaseSensitive = 'startWithCaseSensitive',
