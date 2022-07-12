@@ -1,25 +1,25 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, isEmptyFilter, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
-import { escapeId, validateLiteral, patchFieldName, escapeFieldId } from './spanner_utils'
+import { escapeId, validateLiteral, patchFieldName, escapeFieldId, validateLiteralWithCounter, nameWithCounter } from './spanner_utils'
 import { AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, AdapterOperator, Sort, FunctionProjection, FieldProjection, NotEmptyAdapterFilter as NotEmptyFilter} from '@wix-velo/velo-external-db-types'
 import { SpannerParsedAggregation, SpannerParsedFilter } from './types'
 const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 
-export interface ISpannerFilterParser{
-    transform(filter: Filter): SpannerParsedFilter
-    orderBy(sort: any): { sortExpr: string }
-    selectFieldsFor(projection: any[]): string
-    parseAggregation(aggregation: Aggregation): SpannerParsedAggregation
+export type Counter = {
+    paramCounter: number,
+    valueCounter: number
 }
 
-export default class FilterParser implements ISpannerFilterParser {
+
+export default class FilterParser {
     constructor() {
     }
 
     transform(filter: Filter) {
-        const results = this.parseFilter(filter, 1)
+        const counter = {paramCounter: 0, valueCounter: 0}
+        const results = this.parseFilter(filter, counter, 1)
 
         if (results.length === 0) {
             return EmptyFilter
@@ -56,7 +56,7 @@ export default class FilterParser implements ISpannerFilterParser {
 
         const { filterColumnsStr, aliasToFunction } = this.createFieldsStatementAndAliases(projectionFunctions, groupByColumns)
 
-        const havingFilter = this.parseFilter(aggregation.postFilter, aliasToFunction)
+        const havingFilter = this.parseFilter(aggregation.postFilter, undefined, aliasToFunction)
 
         const { filterExpr, parameters } = this.extractFilterExprAndParams(havingFilter)
 
@@ -87,7 +87,7 @@ export default class FilterParser implements ISpannerFilterParser {
                     .concat({ filterExpr: '', parameters: {} })[0]
     }
 
-    parseFilter(filter: Filter, inlineFields: any): SpannerParsedFilter[]{
+    parseFilter(filter: Filter, counter: Counter = {paramCounter:0, valueCounter:0} ,inlineFields?: any): SpannerParsedFilter[]{
         if (isEmptyFilter(filter)) {
             return []
         }
@@ -98,18 +98,18 @@ export default class FilterParser implements ISpannerFilterParser {
             case and:
             case or:
                 const res = value.reduce((o: {filter: SpannerParsedFilter[]}, f: Filter) => {
-                    const res = this.parseFilter.bind(this)(f, inlineFields)
+                    const res = this.parseFilter.bind(this)(f, counter, inlineFields)
                     return {
                         filter: o.filter.concat( ...res ),
                     }
                 }, { filter: [] })
                 const op = operator === and ? ' AND ' : ' OR '
                 return [{
-                    filterExpr: res.filter.map((r: SpannerParsedFilter) => r.filterExpr).join( op ),
+                    filterExpr: `(${res.filter.map((r: SpannerParsedFilter) => r.filterExpr).join( op )})`,
                     parameters: res.filter.reduce((o: any, s: SpannerParsedFilter) => ( { ...o, ...s.parameters } ), {} )
                 }]
             case not:
-                const res2: SpannerParsedFilter[] = this.parseFilter( value[0], inlineFields )
+                const res2: SpannerParsedFilter[] = this.parseFilter( value[0], counter,  inlineFields )
                 return [{
                     filterExpr: `NOT (${res2[0].filterExpr})`,
                     parameters: res2[0].parameters
@@ -117,46 +117,51 @@ export default class FilterParser implements ISpannerFilterParser {
         }
 
         if (this.isSingleFieldOperator(operator)) {
-            const params = this.valueForOperator(fieldName, value, operator)
+            const literals = this.valueForOperator(fieldName, value, operator, counter).sql
 
             return [{
-                filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} ${this.adapterOperatorToMySqlOperator(operator, value)} ${params.sql}`.trim(),
-                parameters: this.parametersFor(fieldName, value)
+                filterExpr: `${this.inlineVariableIfNeeded(fieldName, inlineFields)} ${this.adapterOperatorToMySqlOperator(operator, value)} ${literals}`.trim(),
+                parameters: this.parametersFor(fieldName, value, counter)
             }]
         }
 
 
         if (this.isSingleFieldStringOperator(operator)) {
+            const literals = this.valueForOperator(fieldName, value, operator, counter).sql
+
             return [{
-                filterExpr: `LOWER(${this.inlineVariableIfNeeded(fieldName, inlineFields)}) LIKE LOWER(${validateLiteral(fieldName)})`,
-                parameters: { [fieldName]: this.valueForStringOperator(operator, value) }
+                filterExpr: `LOWER(${this.inlineVariableIfNeeded(fieldName, inlineFields)}) LIKE LOWER(${literals})`,
+                parameters: this.parametersFor(fieldName, this.valueForStringOperator(operator, value), counter)
             }]
         }
 
         if (operator === urlized) {
+            const literals = this.valueForOperator(fieldName, value, operator, counter).sql
+
             return [{
-                filterExpr: `LOWER(${escapeId(fieldName)}) RLIKE ${validateLiteral(fieldName)}`,
-                parameters: { [fieldName]: value.map((s: string) => s.toLowerCase()).join('[- ]') }
+                filterExpr: `LOWER(${escapeId(fieldName)}) RLIKE ${literals}`,
+                parameters: this.parametersFor(fieldName, value.map((s: string) => s.toLowerCase()).join('[- ]'), counter)
             }]
         }
         
         if (operator === matches) {
             const ignoreCase = value.ignoreCase ? 'LOWER' : ''
+            const literals = this.valueForOperator(fieldName, value, operator, counter).sql
             return [{
-                filterExpr: `REGEXP_CONTAINS (${ignoreCase}(${escapeId(fieldName)}), ${ignoreCase}(${validateLiteral(fieldName)}))`,
-                parameters: { [fieldName]: specArrayToRegex(value.spec) }
+                filterExpr: `REGEXP_CONTAINS (${ignoreCase}(${escapeId(fieldName)}), ${ignoreCase}(${literals}))`,
+                parameters: this.parametersFor(fieldName, specArrayToRegex(value.spec), counter)
             }]
         }
 
         return []
     }
 
-    parametersFor(name: string, value: any[]) {
+    parametersFor(name: string, value: any, counter: Counter) {
         if (!isNull(value)) {
             if (!Array.isArray(value)) {
-                return { [name]: this.patchTrueFalseValue(value) }
+                return { [nameWithCounter(name, counter)]: this.patchTrueFalseValue(value) }
             } else {
-                return value.reduce((o, v, i) => ( { ...o, [`${name}${i + 1}`]: v } ), {})
+                return value.reduce((o, v, i) => ( { ...o, [nameWithCounter(name, counter)]: v } ), {})
             }
         }
         return { }
@@ -183,20 +188,23 @@ export default class FilterParser implements ISpannerFilterParser {
         return [string_contains, string_begins, string_ends].includes(operator)
     }
 
-    prepareStatementVariables(n: any, fieldName: any) {
-
-        return Array.from({ length: n }, (_, i) => validateLiteral(`${(fieldName)}${i + 1}`) )
+    // prepareStatementVariables(n: any, fieldName: any) {
+    //     return Array.from({ length: n }, (_, i) => validateLiteral(`${(fieldName)}${i + 1}`) )
+    //                 .join(', ')
+    // }
+    prepareStatementVariables(n: any, fieldName: string, counter: Counter) {
+        return Array.from({ length: n }, (_, i) => validateLiteralWithCounter(fieldName, counter) )
                     .join(', ')
     }
 
 
-    valueForOperator(fieldName: string, value: string | any[] | undefined, operator: string) {
+    valueForOperator(fieldName: string, value: any, operator: string, counter: Counter) {
         if (operator === include) {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery('include operator cannot have an empty list of arguments')
             }
             return {
-                sql: `(${this.prepareStatementVariables(value.length, fieldName)})`,
+                sql: `(${this.prepareStatementVariables(value.length, fieldName, counter)})`,
             }
         } else if ((operator === eq || operator === ne) && isNull(value)) {
             return {
@@ -205,7 +213,7 @@ export default class FilterParser implements ISpannerFilterParser {
         }
 
         return {
-            sql: validateLiteral(fieldName),
+            sql: validateLiteralWithCounter(fieldName, counter),
         }
     }
 
@@ -236,11 +244,12 @@ export default class FilterParser implements ISpannerFilterParser {
         }
     }
 
-    orderBy(sort: Sort[]) {
+    orderBy(sort: any) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EmptySort
         }
 
+        //todo: add a function that ensure the sort is valid
         const results = sort.flatMap( this.parseSort )
 
         if (results.length === 0) {
