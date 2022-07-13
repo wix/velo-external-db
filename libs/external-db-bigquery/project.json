@@ -30,14 +30,14 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": [ "{options.outputFile}" ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-bigquery/**/*.js" ]
+        "lintFilePatterns": [ "libs/external-db-bigquery/**/*.ts" ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": [ "coverage/libs/external-db-bigquery" ],
       "options": {
-        "jestConfig": "libs/external-db-bigquery/jest.config.js",
+        "jestConfig": "libs/external-db-bigquery/jest.config.ts",
         "passWithNoTests": true
       }
     }
