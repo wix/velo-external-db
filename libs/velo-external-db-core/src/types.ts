@@ -1,4 +1,4 @@
-import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, AnyFixMe } from "@wix-velo/velo-external-db-types";
+import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from "@wix-velo/velo-external-db-types";
 import SchemaService from "./service/schema";
 import SchemaAwareDataService from "./service/schema_aware_data";
 
@@ -58,7 +58,7 @@ export interface ServiceContext {
 }
 
 
-export type Hook<Payload> = (payload: Payload, requestContext: RequestContext, serviceContext: ServiceContext) => (Promise<Payload> | Payload | void);
+export type Hook<Payload> = (payload: Payload, requestContext: RequestContext, serviceContext: ServiceContext, customContext?: object) => (Promise<Payload> | Payload | void);
 
 export interface DataHooks {
     beforeAll?: Hook<Payload>;
@@ -112,7 +112,7 @@ export interface SchemaHooks {
 
 export interface ExternalDbRouterConfig {
     secretKey: string
-    authorization?: AnyFixMe
+    authorization?: { roleConfig: RoleConfig }
     vendor?: string
     adapterType?: string
     commonExtended?: boolean
