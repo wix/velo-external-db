@@ -351,7 +351,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 ['Find', 'beforeFind', 'afterFind', '/data/find'],
                 ['Aggregate', 'beforeAggregate', 'afterAggregate', '/data/aggregate'],
                 ['Count', 'beforeCount', 'afterCount', '/data/count']
-            ]).test('customContext should pass by ref on on [%s] ', async(_, beforeHook, afterHook, api) => {
+            ]).test('customContext should pass by ref on [%s] ', async(_, beforeHook, afterHook, api) => {
                 if (hooks.skipAggregationIfNotSupported(beforeHook, supportedOperations))
                     return
 
@@ -396,7 +396,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 ['Bulk Update', 'beforeBulkUpdate', 'afterBulkUpdate', '/data/update/bulk'],
                 ['Remove', 'beforeRemove', 'afterRemove', '/data/remove'],
                 ['Bulk Remove', 'beforeBulkRemove', 'afterBulkRemove', '/data/remove/bulk']
-            ]).test('customContext should pass by ref on on [%s] ', async(_, beforeHook, afterHook, api) => {
+            ]).test('customContext should pass by ref on [%s] ', async(_, beforeHook, afterHook, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 if (!['afterInsert', 'afterBulkInsert'].includes(afterHook)) {
                     await data.givenItems(ctx.items, ctx.collectionName, authOwner)
