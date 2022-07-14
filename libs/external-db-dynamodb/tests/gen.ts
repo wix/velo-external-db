@@ -6,12 +6,13 @@ const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_co
 
 const chance = Chance()
 
+const operatorsWithoutEqual = [lt, lte, gt, gte, include, string_contains, string_begins, string_ends]
+const randomOperatorWithoutEqual = () => ( chance.pickone(operatorsWithoutEqual) )
+const randomAdapterOperator = () => ( chance.pickone([...operatorsWithoutEqual, eq]) )
 
-const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
 
-
-export const idFilter = () => {
-    const operator = randomAdapterOperator()
+export const idFilter = ({withoutEqual}: {withoutEqual: boolean} = {withoutEqual: false}) => {
+    const operator = withoutEqual ? randomOperatorWithoutEqual() : randomAdapterOperator() 
     const value = operator === '$hasSome' ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
         fieldName: '_id',

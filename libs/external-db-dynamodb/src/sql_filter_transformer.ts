@@ -1,24 +1,29 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { isEmptyFilter } from '@wix-velo/velo-external-db-commons'
-import { EmptyFilter } from './dynamo_utils'
+import { attributeValueNameWithCounter, EmptyFilter, fieldNameWithCounter as attributeNameWithCounter } from './dynamo_utils'
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { AdapterFilter as Filter, NotEmptyAdapterFilter as NotEmptyFilter, Sort } from '@wix-velo/velo-external-db-types' 
 import { DynamoParsedFilter } from './types'
 const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not } = AdapterOperators
 
+export type Counter = {
+    nameCounter: number,
+    valueCounter: number
+}
+
 export default class FilterParser {
     constructor() {
     }
 
     transform(filter: Filter, fields?: any): { filterExpr: DynamoParsedFilter, queryable: boolean } {
-        
-        const results = this.parseFilter(filter)
+        const counter = { nameCounter: 0, valueCounter: 0 }
+        const results = this.parseFilter(filter, counter)
         if (results.length === 0) {
             return { ...EmptyFilter, queryable: false }
         }
 
-        const { filterExpr, queryable } = this.filterExprToQueryIfPossible(results[0].filterExpr, fields)
+        const { filterExpr, queryable } = this.filterExprToQueryIfPossible(results[0].filterExpr, fields, (filter as NotEmptyFilter).operator)
         
         return {
             filterExpr,
@@ -28,27 +33,27 @@ export default class FilterParser {
 
 
     
-    parseFilter(filter: Filter): { filterExpr: DynamoParsedFilter }[] {
+    parseFilter(filter: Filter, counter: Counter = { nameCounter: 0, valueCounter: 0 }): { filterExpr: DynamoParsedFilter }[] {
         if (isEmptyFilter(filter)) {
             return []
         }
-
+        
         const { operator, fieldName, value } =  filter as NotEmptyFilter
         
         switch (operator) {
             case and:
             case or:
-                const res = value.map( this.parseFilter.bind(this) )
+                const res = value.map((f:Filter) =>  this.parseFilter.bind(this)(f, counter) )
                 const op = operator === and ? ' AND ' : ' OR '
                 return [{
                     filterExpr: {
-                        FilterExpression: res.map((r: { filterExpr: { FilterExpression: any } }[]) => r[0].filterExpr.FilterExpression).join( op ),
+                        FilterExpression: `(${res.map((r: { filterExpr: { FilterExpression: any } }[]) => r[0].filterExpr.FilterExpression).join( op )})`,
                         ExpressionAttributeNames: Object.assign ({}, ...res.map((r: { filterExpr: { ExpressionAttributeNames: any } }[]) => r[0].filterExpr.ExpressionAttributeNames) ),
                         ExpressionAttributeValues: Object.assign({}, ...res.map((r: { filterExpr: { ExpressionAttributeValues: any } }[]) => r[0].filterExpr.ExpressionAttributeValues) )
                     }
                 }]
             case not:
-                const res2 = this.parseFilter( value[0] )
+                const res2 = this.parseFilter( value[0], counter )
                 return [{
                     filterExpr: {
                         FilterExpression: `NOT (${res2[0].filterExpr.FilterExpression})`,
@@ -58,29 +63,33 @@ export default class FilterParser {
                 }]
         }
         
+        const expressionAttributeName = attributeNameWithCounter(fieldName, counter)
+        
         if (this.isSingleFieldOperator(operator)) {
+            const expressionAttributeValue = attributeValueNameWithCounter(fieldName, counter)
             return [{
                 filterExpr: {
-                    FilterExpression: `#${fieldName} ${this.adapterOperatorToDynamoOperator(operator)} :${fieldName}`,
+                    FilterExpression: `${expressionAttributeName} ${this.adapterOperatorToDynamoOperator(operator)} ${expressionAttributeValue}`,
                     ExpressionAttributeNames: {
-                        [`#${fieldName}`]: fieldName
+                        [expressionAttributeName]: fieldName
                     },
                     ExpressionAttributeValues: {
-                        [`:${fieldName}`]: this.valueForOperator(value, operator)
+                        [expressionAttributeValue]: this.valueForOperator(value, operator)
                     }
                 }
             }]
         }
 
         if (this.isSingleFieldStringOperator(operator)) {
+            const expressionAttributeValue = attributeValueNameWithCounter(fieldName, counter)
             return [{
                 filterExpr: {
-                    FilterExpression: `${this.adapterOperatorToDynamoOperator(operator)} (#${fieldName}, :${fieldName})`,
+                    FilterExpression: `${this.adapterOperatorToDynamoOperator(operator)} (${expressionAttributeName}, ${expressionAttributeValue})`,
                     ExpressionAttributeNames: {
-                        [`#${fieldName}`]: fieldName
+                        [expressionAttributeName]: fieldName
                     },
                     ExpressionAttributeValues: {
-                        [`:${fieldName}`]: value
+                        [expressionAttributeValue]: value
                     }
                 }
             }]
@@ -91,14 +100,19 @@ export default class FilterParser {
             
             if (value === undefined || value.length === 0)
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
-
+                            
+            const expressionAttributeValue = Array.from(value, _ => attributeValueNameWithCounter(fieldName, counter))
+            
             return [{
                 filterExpr: {
-                    FilterExpression: `#${fieldName} IN (${value.map((_v: any, i: any) => `:${i}`).join(', ')})`,
+                    FilterExpression: `${expressionAttributeName} IN (${expressionAttributeValue.join(', ')})`,
                     ExpressionAttributeNames: {
-                        [`#${fieldName}`]: fieldName
+                        [expressionAttributeName]: fieldName
                     },
-                    ExpressionAttributeValues: value.reduce((pV: any, cV: any, i: any) => ({ ...pV, [`:${i}`]: cV }), {})                 
+                    ExpressionAttributeValues: expressionAttributeValue.reduce((pV, cV, i) => ({
+                        ...pV,
+                        [cV]: value[i]
+                    }), {})
                 }
             }] 
 
@@ -155,8 +169,8 @@ export default class FilterParser {
         }
     }
 
-    filterExprToQueryIfPossible(filterExpr: DynamoParsedFilter, fields: any): { filterExpr: DynamoParsedFilter, queryable: boolean } {
-        const queryable = this.canQuery(filterExpr, fields)
+    filterExprToQueryIfPossible(filterExpr: DynamoParsedFilter, fields: any, operator: string): { filterExpr: DynamoParsedFilter, queryable: boolean } {
+        const queryable = this.canQuery(filterExpr, fields, operator)
         if (queryable) 
             filterExpr = this.filterExprToQueryExpr(filterExpr)
         
@@ -168,14 +182,14 @@ export default class FilterParser {
         return filter
     }
 
-    canQuery(filterExpr: DynamoParsedFilter, _fields: any) {
+    canQuery(filterExpr: DynamoParsedFilter, _fields: any, operator: string) {
         // const collectionKeys = fields.filter(f=>f.isPrimary).map(f=>f.name)
         const collectionKeys = ['_id']
 
         if (!filterExpr) return false
         
         const filterAttributes = filterExpr.ExpressionAttributeNames ? Object.values(filterExpr.ExpressionAttributeNames) : []
-        return filterAttributes.every(v => collectionKeys.includes(v))
+        return (filterAttributes.every(v => collectionKeys.includes(v)) && operator === eq)
     }
 
     selectFieldsFor(projection: any[]): { projectionExpr: string, projectionAttributeNames: {[key: string]: string} } { 
