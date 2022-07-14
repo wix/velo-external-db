@@ -1,14 +1,19 @@
-const { unPatchDateTime, patchDateTime, escapeIdentifier } = require('./bigquery_utils')
-const { asParamArrays, updateFieldsFor } = require('@wix-velo/velo-external-db-commons')
-const { translateErrorCodes } = require('./sql_exception_translator')
+import { Dataset } from '@google-cloud/bigquery'
+import { IDataProvider, AdapterFilter as Filter, Item } from '@wix-velo/velo-external-db-types'
+import { asParamArrays, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
+import { unPatchDateTime, patchDateTime, escapeIdentifier } from './bigquery_utils'
+import FilterParser from './sql_filter_transformer'
+import { translateErrorCodes } from './sql_exception_translator'
 
-class DataProvider {
-    constructor(pool, filterParser) {
+export default class DataProvider implements IDataProvider {
+    filterParser: FilterParser
+    pool: Dataset
+    constructor(pool: Dataset, filterParser: FilterParser) {
         this.filterParser = filterParser
         this.pool = pool
     }
 
-    async find(collectionName, filter, sort, skip, limit, projection) {
+    async find(collectionName: string, filter: Filter, sort: any, skip: any, limit: any, projection: any) {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
@@ -21,7 +26,7 @@ class DataProvider {
         return resultSet[0].map( unPatchDateTime )
     }
 
-    async count(collectionName, filter) {
+    async count(collectionName: string, filter: Filter) {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const sql = `SELECT COUNT(*) AS num FROM ${escapeIdentifier(collectionName)} ${filterExpr}`
 
@@ -33,41 +38,42 @@ class DataProvider {
         return resultSet[0][0]['num']
     }
 
-    async insert(collectionName, items) {
+    async insert(collectionName: string, items: Item[]) {
         const table = await this.pool.table(collectionName)
         await table.insert(items)
 
         return items.length
     }
 
-    async update(collectionName, items) {
+    async update(collectionName: string, items: any[]) {        
         const updateFields = updateFieldsFor(items[0])
         const queries = items.map(() => `UPDATE ${escapeIdentifier(collectionName)} SET ${updateFields.map(f => `${escapeIdentifier(f)} = ?`).join(', ')} WHERE _id = ?` )
                              .join(';')
-        const updateTables = items.map(i => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
-                                .map(u => asParamArrays( patchDateTime(u) ))
-
-        const resultSet = await this.pool.query({ query: queries, params: [].concat(...updateTables) })
+        const updateTables = items.map((i: Record<string, any>) => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}))
+                                .map((u: any) => asParamArrays( patchDateTime(u) ))
+                                
+                                    
+        const resultSet = await this.pool.query({ query: queries, params: updateTables.flatMap(i => i) })
                                     .catch( translateErrorCodes )
 
         return resultSet[0].length
     }
 
-    async delete(collectionName, itemIds) {
+    async delete(collectionName: string, itemIds: string[]) {
         const sql = `DELETE FROM ${escapeIdentifier(collectionName)} WHERE _id IN UNNEST(@idsList)`
 
         const rs = await this.pool.query({ query: sql, params: { idsList: itemIds }, types: { idsList: ['STRING'] } })
                              .catch( translateErrorCodes )
-        
-        return rs[0]
+         
+        return rs[0].length
     }
 
-    async truncate(collectionName) {
+    async truncate(collectionName: string) {
         await this.pool.query(`TRUNCATE TABLE ${escapeIdentifier(collectionName)}`)
                   .catch( translateErrorCodes )
     }
 
-    async aggregate(collectionName, filter, aggregation) {
+    async aggregate(collectionName: string, filter: any, aggregation: any) {
         const { filterExpr: whereFilterExpr, parameters: whereParameters } = this.filterParser.transform(filter)
         const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation)
 
@@ -80,4 +86,3 @@ class DataProvider {
     }
 }
 
-module.exports = DataProvider

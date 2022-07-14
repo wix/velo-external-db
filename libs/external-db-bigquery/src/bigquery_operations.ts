@@ -1,8 +1,10 @@
 
 
-const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
+import { Dataset } from '@google-cloud/bigquery'
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { DbConnectionError } = errors
 
-const notThrowingTranslateErrorCodes = err => {
+const notThrowingTranslateErrorCodes = (err: any) => {
     switch (err.code) {
         case 404:
             return new DbConnectionError(err.message)
@@ -11,8 +13,9 @@ const notThrowingTranslateErrorCodes = err => {
     }
 }
 
-class DatabaseOperations {
-    constructor(pool) {
+export default class DatabaseOperations {
+    pool: Dataset
+    constructor(pool: Dataset) {
         this.pool = pool
     }
 
@@ -22,4 +25,3 @@ class DatabaseOperations {
     }
 }
 
-module.exports = DatabaseOperations

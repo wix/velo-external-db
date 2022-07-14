@@ -1,10 +1,11 @@
-const FilterParser = require('./sql_filter_transformer')
-const { EmptySort, AdapterOperators, AdapterFunctions } = require('@wix-velo/velo-external-db-commons')
-const { Uninitialized, gen } = require('@wix-velo/test-commons')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const each = require('jest-each').default
-const Chance = require('chance')
-const { escapeIdentifier: escapeId, escapeIdentifier } = require('./bigquery_utils')
+import * as Chance from 'chance'
+import each from 'jest-each'
+import { EmptySort, AdapterOperators, AdapterFunctions } from '@wix-velo/velo-external-db-commons'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import FilterParser from './sql_filter_transformer'
+import { escapeIdentifier as escapeId, escapeIdentifier } from './bigquery_utils'
+const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
@@ -210,7 +211,7 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `LOWER(${escapeId(ctx.fieldName)}) RLIKE ?`,
-                        parameters: [ctx.fieldListValue.map(s => s.toLowerCase()).join('[- ]')]
+                        parameters: [ctx.fieldListValue.map((s: string) => s.toLowerCase()).join('[- ]')]
                     }])
                 })
 

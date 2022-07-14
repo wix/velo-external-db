@@ -1,7 +1,7 @@
-const SchemaColumnTranslator = require('./sql_schema_translator')
-const { Uninitialized } = require('@wix-velo/test-commons')
-const Chance = require('chance')
-const { escapeIdentifier: escapeId } = require('./bigquery_utils')
+import * as Chance from 'chance'
+import { Uninitialized } from '@wix-velo/test-commons'
+import SchemaColumnTranslator from './sql_schema_translator'
+import { escapeIdentifier as escapeId } from './bigquery_utils'
 const chance = Chance()
 
 describe('Sql Schema Column Translator', () => {

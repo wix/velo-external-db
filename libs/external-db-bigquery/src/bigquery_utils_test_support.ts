@@ -1,27 +1,22 @@
-const { when } = require('jest-when')
+import { when } from 'jest-when'
 
-const bigQueryItem = {}
+export const bigQueryItem: any = {}
 
-const givenNullValueTo = ( propertyName ) => bigQueryItem[propertyName] = null
+export const givenNullValueTo = ( propertyName: string ) => bigQueryItem[propertyName] = null
 
 
-const givenNumberValueTo = (propertyName, number) => {
+export const givenNumberValueTo = (propertyName: string, number: number) => {
     bigQueryItem[propertyName] = { toNumber: jest.fn() }
     when(bigQueryItem[propertyName].toNumber).calledWith().mockReturnValue(number)
 }
 
-const givenDateValueTo = (propertyName, date) => {
+export const givenDateValueTo = (propertyName: string, date: Date) => {
     bigQueryItem[propertyName] = { value: date.toISOString() }
 }
 
-const givenWrongFormatDateValueTo = (propertyName, date) => {
+export const givenWrongFormatDateValueTo = (propertyName: string, date: Date) => {
     bigQueryItem[propertyName] = date.toISOString()
 }
-
-const reset = () => {
+export const reset = () => {
     Object.keys(bigQueryItem).forEach(key => delete bigQueryItem[key])
 }
-
-
-module.exports = {  bigQueryItem, givenNullValueTo, givenNumberValueTo,
-     givenDateValueTo, givenWrongFormatDateValueTo, reset }
