@@ -1,28 +1,29 @@
-const { init, supportedOperations } = require('@wix-velo/external-db-dynamodb')
-const { runImage, stopImage } = require('./docker_support')
+import { init } from '@wix-velo/external-db-dynamodb'
+import { runImage, stopImage } from './docker_support'
+export { supportedOperations } from '@wix-velo/external-db-dynamodb'
 
-const connection = async() => {
-    const { connection, schemaProvider, cleanup } = await init(connectionConfig(), accessOptions())
+export const connection = async() => {
+    const { connection, schemaProvider, cleanup } = init(connectionConfig(), accessOptions())
 
     return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
-const cleanup = async() => {
-    const { schemaProvider, cleanup } = await init(connectionConfig(), accessOptions())
+export const cleanup = async() => {
+    const { schemaProvider, cleanup } = init(connectionConfig(), accessOptions())
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map(t => schemaProvider.drop(t)))
     await cleanup()
 }
 
-const initEnv = async() => {
+export const initEnv = async() => {
     await runImage('dynamodb')
 }
 
-const shutdownEnv = async() => {
+export const shutdownEnv = async() => {
     await stopImage('dynamodb')
 }
 
-const setActive = () => {
+export const setActive = () => {
     process.env.TYPE = 'dynamodb'
     process.env.REGION = 'us-west-2'
     process.env.AWS_SECRET_ACCESS_KEY = 'TEST_SECRET_ACCESS_KEY'
@@ -36,5 +37,3 @@ const connectionConfig = () => ({ endpoint: 'http://localhost:8000',
 const accessOptions = () => ({
                                 credentials: { accessKeyId: 'TEST_ACCESS_KEY_ID', secretAccessKey: 'TEST_SECRET_ACCESS_KEY' }
                             })
-
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, supportedOperations }

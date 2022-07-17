@@ -1,13 +1,14 @@
-const { init, supportedOperations } = require('@wix-velo/external-db-mongo')
-const { runImage, stopImage } = require('./docker_support')
+import { init } from '@wix-velo/external-db-mongo'
+import { runImage, stopImage } from './docker_support'
+export { supportedOperations } from '@wix-velo/external-db-mongo'
 
-const connection = async() => {
+export const connection = async() => {
     const { connection, schemaProvider, cleanup } = await init({ connectionUri: 'mongodb://root:pass@localhost/testdb' })
 
     return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
-const cleanup = async() => {
+export const cleanup = async() => {
     const { schemaProvider, cleanup } = await init({ connectionUri: 'mongodb://root:pass@localhost/testdb' })
 
     const tables = await schemaProvider.list()
@@ -16,19 +17,15 @@ const cleanup = async() => {
     await cleanup()
 }
 
-const initEnv = async() => {
+export const initEnv = async() => {
     await runImage('mongo')
 }
 
-const shutdownEnv = async() => {
+export const shutdownEnv = async() => {
     await stopImage('mongo')
 }
 
-const setActive = () => {
+export const setActive = () => {
     process.env.TYPE = 'mongo'
     process.env.URI = 'mongodb://root:pass@localhost/testdb'
 }
-
-
-
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, supportedOperations }

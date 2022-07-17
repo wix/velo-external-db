@@ -1,5 +1,6 @@
-const { init, supportedOperations } = require('@wix-velo/external-db-mssql')
-const { runImage, stopImage } = require('./docker_support')
+import { init } from '@wix-velo/external-db-mssql'
+import { runImage, stopImage } from './docker_support'
+export { supportedOperations } from '@wix-velo/external-db-mssql'
 
 const testEnvConfig = {
     host: 'localhost',
@@ -17,13 +18,13 @@ const extraOptions = {
     },
 }
 
-const connection = async() => {
+export const connection = async() => {
     const { connection, schemaProvider, cleanup } = await init(testEnvConfig, extraOptions)
 
     return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
-const cleanup = async() => {
+export const cleanup = async() => {
     const { schemaProvider, cleanup } = await init(testEnvConfig, extraOptions)
 
     const tables = await schemaProvider.list()
@@ -32,15 +33,15 @@ const cleanup = async() => {
     await cleanup()
 }
 
-const initEnv = async() => {
+export const initEnv = async() => {
     await runImage('mssql')
 }
 
-const shutdownEnv = async() => {
+export const shutdownEnv = async() => {
     await stopImage('mssql')
 }
 
-const setActive = () => {
+export const setActive = () => {
     process.env.TYPE = 'mssql'
     process.env.HOST = 'localhost'
     process.env.USER = 'sa'
@@ -48,5 +49,3 @@ const setActive = () => {
     process.env.DB = 'tempdb'
     process.env.UNSECURED_ENV = 'true'
 }
-
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, supportedOperations }

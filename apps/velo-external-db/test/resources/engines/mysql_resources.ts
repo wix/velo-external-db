@@ -1,13 +1,14 @@
-const { init, supportedOperations } = require('@wix-velo/external-db-mysql')
-const { runImage, stopImage } = require('./docker_support')
-const { waitUntil } = require('async-wait-until')
+import { init } from '@wix-velo/external-db-mysql'
+import { runImage, stopImage } from './docker_support'
+import { waitUntil } from 'async-wait-until'
+export { supportedOperations } from '@wix-velo/external-db-mysql'
 
-const connection = () => {
+export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { connectionLimit: 1, queueLimit: 0 })
     return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
-const cleanup = async() => {
+export const cleanup = async() => {
     const { schemaProvider, databaseOperations, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { connectionLimit: 1, queueLimit: 0 })
     await waitUntil(async() => (await databaseOperations.validateConnection()).valid)
     const tables = await schemaProvider.list()
@@ -16,22 +17,18 @@ const cleanup = async() => {
     await cleanup()
 }
 
-const initEnv = async() => {
+export const initEnv = async() => {
     await runImage('mysql')
 }
 
-const shutdownEnv = async() => {
+export const shutdownEnv = async() => {
     await stopImage('mysql')
 }
 
-const setActive = () => {
+export const setActive = () => {
     process.env.TYPE = 'mysql'
     process.env.HOST = 'localhost'
     process.env.USER = 'test-user'
     process.env.PASSWORD = 'password'
     process.env.DB = 'test-db'
 }
-
-
-
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, supportedOperations }

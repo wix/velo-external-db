@@ -1,14 +1,15 @@
-const { init, supportedOperations } = require('@wix-velo/external-db-spanner')
-const { runImage, stopImage } = require('./docker_support')
+import { init } from '@wix-velo/external-db-spanner'
+import { runImage, stopImage } from './docker_support'
+export { supportedOperations } from '@wix-velo/external-db-spanner'
 
 const setEmulatorOn = () => process.env.SPANNER_EMULATOR_HOST = 'localhost:9010'
 
-const connection = () => {
+export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
     return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
-const cleanup = async() => {
+export const cleanup = async() => {
     setEmulatorOn()
     const { schemaProvider, cleanup } = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
     const res = await schemaProvider.list()
@@ -21,11 +22,11 @@ const cleanup = async() => {
     await cleanup()
 }
 
-const initEnv = async() => {
+export const initEnv = async() => {
     await runImage('spanner')
 }
 
-const setActive = () => {
+export const setActive = () => {
     setEmulatorOn()
     process.env.TYPE = 'spanner'
     process.env.PROJECT_ID = 'test-project'
@@ -33,8 +34,6 @@ const setActive = () => {
     process.env.DATABASE_ID = 'test-database'
 }
 
-const shutdownEnv = async() => {
+export const shutdownEnv = async() => {
     await stopImage('spanner')
 }
-
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, supportedOperations }

@@ -1,12 +1,13 @@
-const { init, supportedOperations } = require('@wix-velo/external-db-postgres')
-const { runImage, stopImage } = require('./docker_support')
+import { init } from '@wix-velo/external-db-postgres'
+import { runImage, stopImage } from './docker_support'
+export { supportedOperations } from '@wix-velo/external-db-postgres'
 
-const connection = () => {
+export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
     return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
-const cleanup = async() => {
+export const cleanup = async() => {
     const { schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
     const tables = await schemaProvider.list()
     await Promise.all(tables.map(t => t.id).map( t => schemaProvider.drop(t) ))
@@ -14,11 +15,11 @@ const cleanup = async() => {
     await cleanup()
 }
 
-const initEnv = async() => {
+export const initEnv = async() => {
     await runImage('postgres')
 }
 
-const setActive = () => {
+export const setActive = () => {
     process.env.TYPE = 'postgres'
     process.env.HOST = 'localhost'
     process.env.USER = 'test-user'
@@ -26,8 +27,6 @@ const setActive = () => {
     process.env.DB = 'test-db'
 }
 
-const shutdownEnv = async() => {
+export const shutdownEnv = async() => {
     await stopImage('postgres')
 }
-
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, supportedOperations }

@@ -1,16 +1,18 @@
-const { init, mockServer, supportedOperations }= require('@wix-velo/external-db-airtable')
+import { init, mockServer } from '@wix-velo/external-db-airtable'
+export { supportedOperations } from '@wix-velo/external-db-airtable'
+import { Server } from 'http'
 
-let _server
+let _server: Server
 const PORT = 9000
 
-const connection = async() => {
+export const connection = async() => {
     const { connection, schemaProvider, cleanup } = await init(connectionConfig(),
         { requestTimeout: 1000 })
 
     return { pool: connection, schemaProvider, cleanup: cleanup }
 }
 
-const cleanup = async() => {
+export const cleanup = async() => {
     const { schemaProvider, cleanup } = await init(connectionConfig(),
         { requestTimeout: 1000 })
     const tables = await schemaProvider.list()
@@ -18,15 +20,15 @@ const cleanup = async() => {
     await cleanup()
 }
 
-const initEnv = async() => {
+export const initEnv = async() => {
     _server = mockServer.listen(PORT)
 }
 
-const shutdownEnv = async() => {
+export const shutdownEnv = async() => {
     _server.close()
 }
 
-const setActive = () => {
+export const setActive = () => {
     process.env.AIRTABLE_API_KEY = 'key123'
     process.env.META_API_KEY = 'meta123'
     process.env.TYPE = 'airtable'
@@ -34,7 +36,7 @@ const setActive = () => {
     process.env.BASE_URL = 'http://localhost:9000'
 }
 
-const schemaProviderTestVariables = () => (
+export const schemaProviderTestVariables = () => (
     {
         apiKey: 'key123',
         metaApiKey: 'meta123',
@@ -43,5 +45,3 @@ const schemaProviderTestVariables = () => (
 )
 
 const connectionConfig = () => ({ apiPrivateKey: 'key123', baseId: 'app123', metaApiKey: 'meta123',  baseUrl: `http://localhost:${PORT}` })
-
-module.exports = { initEnv, shutdownEnv, setActive, connection, cleanup, schemaProviderTestVariables, supportedOperations }

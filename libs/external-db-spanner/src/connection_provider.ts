@@ -12,7 +12,7 @@ export interface SpannerConfig {
     databaseId: string
 }
 
-export default (cfg: SpannerConfig, _poolOptions: {[x:string]: any}): DbProviders<SpannerDb> => {
+export default (cfg: SpannerConfig, _poolOptions?: {[x:string]: any}): DbProviders<SpannerDb> => {
     const spanner = new Spanner({ projectId: cfg.projectId })
     const instance = spanner.instance(cfg.instanceId)
 

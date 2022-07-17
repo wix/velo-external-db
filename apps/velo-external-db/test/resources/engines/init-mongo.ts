@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+//@ts-ignore
 db.createUser(
     {
         user: 'root',
