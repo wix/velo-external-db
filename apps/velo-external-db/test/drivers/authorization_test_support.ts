@@ -1,8 +1,9 @@
-const { dbTeardown, initApp } = require('../resources/e2e_resources')
+import { VeloRole } from '@wix-velo/velo-external-db-types'
+import { dbTeardown, initApp } from '../resources/e2e_resources'
 
 const DefaultPolicies = ['Admin']
 
-const authRoleConfig = (collectionName, read, write) => {
+const authRoleConfig = (collectionName: string, read: VeloRole[], write: VeloRole[]) => {
     const config = {
         collectionPermissions: [
             {
@@ -15,10 +16,8 @@ const authRoleConfig = (collectionName, read, write) => {
     process.env.PERMISSIONS = JSON.stringify(config)
 }
 
-const givenCollectionWithVisitorReadPolicy = async(collectionName) => {
+export const givenCollectionWithVisitorReadPolicy = async(collectionName: string) => {
     await dbTeardown()
     authRoleConfig(collectionName, ['Visitor'], [])
     await initApp()
 }
-
-module.exports = { givenCollectionWithVisitorReadPolicy }

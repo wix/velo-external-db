@@ -1,8 +1,8 @@
-const hasSameSchemaFieldsLike = (fields) => expect.arrayContaining( fields.map(f => expect.objectContaining( f ) ))
+import { ResponseField } from "@wix-velo/velo-external-db-types"
 
-const collectionWithDefaultFields = () => hasSameSchemaFieldsLike([ { field: '_id', type: 'text' },
+export const hasSameSchemaFieldsLike = (fields: ResponseField[]) => expect.arrayContaining( fields.map((f: any) => expect.objectContaining( f ) ))
+
+export const collectionWithDefaultFields = () => hasSameSchemaFieldsLike([ { field: '_id', type: 'text' },
                                                                           { field: '_createdDate', type: 'datetime' },
                                                                           { field: '_updatedDate', type: 'datetime' },
                                                                           { field: '_owner', type: 'text' } ])
-
-module.exports = { collectionWithDefaultFields, hasSameSchemaFieldsLike }
