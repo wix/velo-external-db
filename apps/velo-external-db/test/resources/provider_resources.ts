@@ -1,45 +1,50 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { suiteDef } = require('./test_suite_definition')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { suiteDef } from './test_suite_definition'
 
-const mysql = require('@wix-velo/external-db-mysql')
-const mysqlTestEnv = require('./engines/mysql_resources')
+import * as mysql from '@wix-velo/external-db-mysql'
+import * as mysqlTestEnv from './engines/mysql_resources'
 
-const spanner = require('@wix-velo/external-db-spanner')
-const spannerTestEnv = require('./engines/spanner_resources')
+import * as spanner from '@wix-velo/external-db-spanner'
+import * as spannerTestEnv from './engines/spanner_resources'
 
-const postgres = require('@wix-velo/external-db-postgres')
-const postgresTestEnv = require('./engines/postgres_resources')
+import * as postgres from '@wix-velo/external-db-postgres'
+import * as postgresTestEnv from './engines/postgres_resources'
 
-const firestore = require('@wix-velo/external-db-firestore')
-const firestoreTestEnv = require('./engines/firestore_resources')
+import * as firestore from '@wix-velo/external-db-firestore'
+import * as firestoreTestEnv from './engines/firestore_resources'
 
-const mssql = require('@wix-velo/external-db-mssql')
-const mssqlTestEnv = require('./engines/mssql_resources')
+import * as mssql from '@wix-velo/external-db-mssql'
+import * as mssqlTestEnv from './engines/mssql_resources'
 
-const mongo = require('@wix-velo/external-db-mongo')
-const mongoTestEnv = require('./engines/mongo_resources')
+import * as mongo from '@wix-velo/external-db-mongo'
+import * as mongoTestEnv from './engines/mongo_resources'
 
-const airtable = require ('@wix-velo/external-db-airtable')
-const airtableEnv = require ('./engines/airtable_resources')
+import * as airtable from '@wix-velo/external-db-airtable'
+import * as airtableEnv from './engines/airtable_resources'
 
-const dynamo = require ('@wix-velo/external-db-dynamodb')
-const dynamoTestEnv = require ('./engines/dynamodb_resources')
+import * as dynamo from '@wix-velo/external-db-dynamodb'
+import * as dynamoTestEnv from './engines/dynamodb_resources'
 
-const bigquery = require('@wix-velo/external-db-bigquery')
-const bigqueryTestEnv = require('./engines/bigquery_resources')
+import * as bigquery from '@wix-velo/external-db-bigquery'
+import * as bigqueryTestEnv from './engines/bigquery_resources'
+import { AnyFixMe, ConnectionCleanUp, IDataProvider, ISchemaProvider } from '@wix-velo/velo-external-db-types'
 
 // const googleSheet = require('@wix-velo/external-db-google-sheets')
 // const googleSheetTestEnv = require('./engines/google_sheets_resources')
 
-const env = {
+export const env: {
+    dataProvider: IDataProvider
+    schemaProvider: ISchemaProvider
+    cleanup: ConnectionCleanUp
+    driver: AnyFixMe
+} = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
-    schemaColumnTranslator: Uninitialized,
     cleanup: Uninitialized,
     driver: Uninitialized,
 }
 
-const dbInit = async(testEnv, impl) => {
+const dbInit = async(testEnv: any, impl: any) => {
     await testEnv.cleanup()
 
     const { pool, cleanup } = await testEnv.connection()
@@ -51,12 +56,11 @@ const dbInit = async(testEnv, impl) => {
     env.cleanup = cleanup
 }
 
-const dbTeardown = async() => {
+export const dbTeardown = async() => {
     await env.cleanup()
     env.dataProvider = Uninitialized
     env.schemaProvider = Uninitialized
     env.driver = Uninitialized
-    env.schemaColumnTranslator = Uninitialized
 }
 
 const postgresTestEnvInit = async() => await dbInit(postgresTestEnv, postgres)
@@ -84,8 +88,6 @@ const testSuits = {
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
-const supportedOperations = testedSuit().supportedOperations
-const setupDb = () => testedSuit().setup()
-const currentDbImplementationName = () => testedSuit().name
-
-module.exports = { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations }
+export const supportedOperations = testedSuit().supportedOperations
+export const setupDb = () => testedSuit().setup()
+export const currentDbImplementationName = () => testedSuit().name

@@ -1,27 +1,27 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const mysql = require('@wix-velo/external-db-mysql')
-const spanner = require('@wix-velo/external-db-spanner')
-const postgres = require('@wix-velo/external-db-postgres')
-const firestore = require('@wix-velo/external-db-firestore')
-const mssql = require('@wix-velo/external-db-mssql')
-const mongo = require ('@wix-velo/external-db-mongo')
-const airtable = require ('@wix-velo/external-db-airtable')
-const dynamo = require ('@wix-velo/external-db-dynamodb')
-const bigquery = require ('@wix-velo/external-db-bigquery')
+import { Uninitialized } from '@wix-velo/test-commons'
+import * as mysql from '@wix-velo/external-db-mysql'
+import * as spanner from '@wix-velo/external-db-spanner'
+import * as postgres from '@wix-velo/external-db-postgres'
+import * as firestore from '@wix-velo/external-db-firestore'
+import * as mssql from '@wix-velo/external-db-mssql'
+import * as mongo from '@wix-velo/external-db-mongo'
+import * as airtable from '@wix-velo/external-db-airtable'
+import * as dynamo from '@wix-velo/external-db-dynamodb'
+import * as bigquery from '@wix-velo/external-db-bigquery'
 
-const suiteDef = (name, setup, misconfiguredDbOperations) => ( { name, setup, misconfiguredDbOperations } )
+const suiteDef = (name: string, setup: any, misconfiguredDbOperations: any) => ( { name, setup, misconfiguredDbOperations } )
 
-const env = {
+export const env = {
     driver: Uninitialized,
 }
 
-const init = async impl => {
+const init = async (impl: any) => {
     const driver = impl.opsDriver()
 
     env.driver = driver
 }
 
-const misconfiguredDbOperation = impl => (impl.opsDriver().misconfiguredDbOperationOptions())
+const misconfiguredDbOperation = (impl: any) => (impl.opsDriver().misconfiguredDbOperationOptions())
 
 const postgresTestEnvInit = async() => await init(postgres)
 const mysqlTestEnvInit = async() => await init(mysql)
@@ -47,8 +47,6 @@ const testSuits = {
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]
-const setupDb = () => testedSuit().setup()
-const currentDbImplementationName = () => testedSuit().name
-const misconfiguredDbOperationOptions = () => testedSuit().misconfiguredDbOperations
-
-module.exports = { env, setupDb, currentDbImplementationName, misconfiguredDbOperationOptions }
+export const setupDb = () => testedSuit().setup()
+export const currentDbImplementationName = () => testedSuit().name
+export const misconfiguredDbOperationOptions = () => testedSuit().misconfiguredDbOperations
