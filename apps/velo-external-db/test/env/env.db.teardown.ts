@@ -1,15 +1,15 @@
-const postgres = require('../resources/engines/postgres_resources')
-const mysql = require('../resources/engines/mysql_resources')
-const spanner = require('../resources/engines/spanner_resources')
-const firestore = require('../resources/engines/firestore_resources')
-const mssql = require('../resources/engines/mssql_resources')
-const googleSheet = require('../resources/engines/google_sheets_resources')
-const airtable = require('../resources/engines/airtable_resources')
-const dynamo = require('../resources/engines/dynamodb_resources')
-const mongo = require ('../resources/engines/mongo_resources')
-const ci = require('./ci_utils')
+import * as postgres from '../resources/engines/postgres_resources'
+import * as mysql from '../resources/engines/mysql_resources'
+import * as spanner from '../resources/engines/spanner_resources'
+import * as firestore from '../resources/engines/firestore_resources'
+import * as mssql from '../resources/engines/mssql_resources'
+import * as mongo from '../resources/engines/mongo_resources'
+import * as googleSheet from '../resources/engines/google_sheets_resources'
+import * as airtable from '../resources/engines/airtable_resources'
+import * as dynamo from '../resources/engines/dynamodb_resources'
+import * as ci from './ci_utils'
 
-const shutdownEnv = async(testEngine) => {
+const shutdownEnv = async(testEngine: string) => {
     switch (testEngine) {
         case 'mysql':
             await mysql.shutdownEnv()
@@ -49,7 +49,7 @@ const shutdownEnv = async(testEngine) => {
     }
 }
 
-module.exports = async() => {
+export default async() => {
     const testEngine = process.env.TEST_ENGINE
     if (ci.LocalDev() || ci.engineWithoutDocker(testEngine)) {
         await shutdownEnv(testEngine)
