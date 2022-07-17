@@ -55,7 +55,7 @@ export class ExternalDbRouter {
         this.router = createRouter()
     }
 
-    reloadHooks(hooks: { dataHooks?: DataHooks, schemaHooks?: SchemaHooks }) {
+    reloadHooks(hooks?: { dataHooks?: DataHooks, schemaHooks?: SchemaHooks }) {
         initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
     }
 
