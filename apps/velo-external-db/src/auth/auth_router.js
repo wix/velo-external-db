@@ -1,5 +1,5 @@
 const express = require('express')
-const auth = require('./auth/auth_request_handlers')
+const auth = require('./auth_request_handlers')
 
 let authProvider
 
