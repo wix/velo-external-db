@@ -1,7 +1,5 @@
-const { StubDataProvider, StubDatabaseOperations, StubSchemaProvider } = require ('./providers')
+import { StubDataProvider, StubDatabaseOperations, StubSchemaProvider } from './providers'
 
-const init = (type) => (
+export default (type: string) => (
     { dataProvider: new StubDataProvider(), schemaProvider: new StubSchemaProvider(), databaseOperations: new StubDatabaseOperations(type), connection: {}, cleanup: {} }
 )
-
-module.exports = init

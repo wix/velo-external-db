@@ -1,10 +1,12 @@
-const { checkRequiredKeys } = require('@wix-velo/velo-external-db-commons')
-const { UnsupportedDatabase } = require('@wix-velo/velo-external-db-commons').errors
+import { checkRequiredKeys } from '@wix-velo/velo-external-db-commons'
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { UnsupportedDatabase } = errors
 
-class StubDataProvider {}
+export class StubDataProvider {}
 
-class StubConfigValidator {
-    constructor(config) {
+export class StubConfigValidator {
+    config: any
+    constructor(config: any) {
         this.config = config
     }
 
@@ -19,8 +21,9 @@ class StubConfigValidator {
     }
 }
 
-class StubDatabaseOperations {
-    constructor(type) {
+export class StubDatabaseOperations {
+    type: any
+    constructor(type: any) {
         this.type = type
     }
 
@@ -29,7 +32,7 @@ class StubDatabaseOperations {
     }
 }
 
-class StubSchemaProvider {
+export class StubSchemaProvider {
     constructor() {
     }
 
@@ -37,5 +40,3 @@ class StubSchemaProvider {
         return {}
     }
 }
-
-module.exports = { StubDataProvider, StubDatabaseOperations, StubSchemaProvider, StubConfigValidator }

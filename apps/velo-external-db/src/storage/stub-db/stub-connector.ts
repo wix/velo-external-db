@@ -1,16 +1,17 @@
-const { DbConnector } = require('@wix-velo/velo-external-db-commons')
-const init = require('./init')
-const { StubConfigValidator } = require('./providers')
+import { DbConnector } from '@wix-velo/velo-external-db-commons'
+import init = require('./init')
+import { StubConfigValidator } from './providers'
 
 class StubConnector extends DbConnector {
-    constructor(type) {
+    constructor(type: string) {
+        // @ts-ignore - todo: fix this
         super(StubConfigValidator, init)
         this.type = type
     }
 }
 
 
-const stubFactory = async(type, config) => {
+const stubFactory = async(type: string, config: any) => {
     const connector = new StubConnector(type)
     const { connection, cleanup, ...providers } = await connector.initialize(type, config)
     return { connector, connection, providers, cleanup }
