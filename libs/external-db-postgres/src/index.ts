@@ -14,6 +14,7 @@ export const opsDriver = () => require('../tests/drivers/db_operations_test_supp
 
 export class PostgresConnector extends DbConnector {
     constructor() {
+        //@ts-ignore todo: fix
         super(PostgresConfigValidator, init)
         this.type = 'postgres'
     }

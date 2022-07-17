@@ -1,15 +1,27 @@
+import { ConnectionCleanUp, DbProviders, IConfigValidator, IDatabaseOperations, IDataProvider, ISchemaProvider } from "@wix-velo/velo-external-db-types"
+
+type DbFactoryResponse = {
+    connector: DbConnector
+    providers: {
+        dataProvider: IDataProvider;
+        schemaProvider: ISchemaProvider;
+        databaseOperations: IDatabaseOperations;    
+    }
+    cleanup: ConnectionCleanUp
+}
+
 export default class DbConnector {
     initialized: boolean
     configValidatorProvider: any
-    init: any
-    dataProvider: any
-    schemaProvider: any
-    databaseOperations: any
+    init: (config: any, ...args: any) => Promise<DbProviders<any>> | DbProviders<any>
+    dataProvider!: IDataProvider
+    schemaProvider!: ISchemaProvider
+    databaseOperations!: IDatabaseOperations
     connection: any
-    cleanup: any
-    configValidator: any
-    type: any
-    constructor(configValidator: any, init: any) {
+    cleanup!: ConnectionCleanUp
+    configValidator!: IConfigValidator
+    type!: string
+    constructor(configValidator: any, init: (config: any, ...args: any) => Promise<DbProviders<any>> | DbProviders<any>) {
         this.initialized = false
         this.configValidatorProvider = configValidator
         this.init = init
