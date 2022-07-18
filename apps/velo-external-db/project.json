@@ -8,7 +8,7 @@
       "outputs": [ "{options.outputPath}" ],
       "options": {
         "outputPath": "dist/apps/velo-external-db",
-        "main": "apps/velo-external-db/src/app.js",
+        "main": "apps/velo-external-db/src/app.ts",
         "tsConfig": "apps/velo-external-db/tsconfig.app.json",
         "generatePackageJson": true,
         "progress": true,
@@ -18,8 +18,8 @@
           { "glob": "**/*", "input": "libs/velo-external-db-core/src/assets", "output": "./assets" }
         ],
         "fileReplacements": [
-          { "replace": "apps/velo-external-db/src/environments/environment.js", "with": "apps/velo-external-db/src/environments/environment.prod.js" },
-          { "replace": "libs/velo-external-db-core/src/utils/router_utils.js", "with": "libs/velo-external-db-core/src/utils/router_utils.build.js" }
+          { "replace": "apps/velo-external-db/src/environments/environment.ts", "with": "apps/velo-external-db/src/environments/environment.prod.ts" },
+          { "replace": "libs/velo-external-db-core/src/utils/router_utils.ts", "with": "libs/velo-external-db-core/src/utils/router_utils.build.ts" }
         ]
       },
       "configurations": {
@@ -43,7 +43,7 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "apps/velo-external-db/**/*.js"
+          "apps/velo-external-db/**/*.ts"
         ]
       }
     },
@@ -53,7 +53,7 @@
         "coverage/apps/velo-external-db"
       ],
       "options": {
-        "jestConfig": "apps/velo-external-db/jest.config.js",
+        "jestConfig": "apps/velo-external-db/jest.config.ts",
         "passWithNoTests": true
       }
     }, 

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'velo-external-db',
     preset: '../../jest.preset.js',
     clearMocks: true,
