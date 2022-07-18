@@ -9,3 +9,9 @@ export const shouldRunOnlyOn = (impl: string[], current: string) => impl.include
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
 export const testIfSupportedOperationsIncludes = (supportedOperations: string[], operation: string[]): any => operation.every((o: any) => supportedOperations.includes(o)) ? test : test.skip 
+
+export const testSupportedOperations = (supportedOperations: string[], operationTable: string[][]): string[][] => {
+    return operationTable.filter(i => !i[2] || supportedOperations.includes(i[2]))
+}
+
+
