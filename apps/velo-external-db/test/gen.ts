@@ -1,7 +1,7 @@
 
-const { SystemFields } = require('@wix-velo/velo-external-db-commons')
-const Chance = require('chance')
-
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
+import { InputField } from '@wix-velo/velo-external-db-types'
+import * as Chance from 'chance'
 
 const chance = Chance()
 
@@ -11,7 +11,7 @@ const newDate = () => {
     return d
 }
 
-const randomDbEntity = (columns) => {
+export const randomDbEntity = (columns: string[]) => {
     const entity = {
         _id: chance.guid(),
         _createdDate: newDate(),
@@ -21,14 +21,14 @@ const randomDbEntity = (columns) => {
 
     const _columns = columns || []
 
-    _columns.forEach(column => entity[column] = chance.word())
+    _columns.forEach((column: string) => entity[column] = chance.word())
 
     return entity
 }
 
 
 
-const randomDbEntities = (columns) => {
+export const randomDbEntities = (columns: string[]) => {
     const num = chance.natural({ min: 2, max: 20 })
     const arr = []
     for (let i = 0; i < num; i++) {
@@ -37,7 +37,7 @@ const randomDbEntities = (columns) => {
     return arr
 }
 
-const randomNumberDbEntity = (columns) => {
+export const randomNumberDbEntity = (columns: InputField[]) => {
     const entity = {
         _id: chance.guid(),
         _createdDate: newDate(),
@@ -47,7 +47,7 @@ const randomNumberDbEntity = (columns) => {
 
     const _columns = columns || []
 
-    _columns.forEach(column => {
+    _columns.forEach((column: InputField) => {
         if (column.type === 'number' && column.subtype === 'int') {
             entity[column.name] = chance.integer({ min: 0, max: 10000 })
         } else if (column.type === 'number' && column.subtype === 'decimal') {
@@ -58,7 +58,7 @@ const randomNumberDbEntity = (columns) => {
     return entity
 }
 
-const randomObjectDbEntity = (columns) => {
+export const randomObjectDbEntity = (columns: InputField[]) => {
     const entity = {
         _id: chance.guid(),
         _createdDate: newDate(),
@@ -68,25 +68,25 @@ const randomObjectDbEntity = (columns) => {
 
     const _columns = columns || []
 
-    _columns.forEach(column => entity[column.name] = ({ [chance.word()]: chance.word() }) )
+    _columns.forEach((column: InputField) => entity[column.name] = ({ [chance.word()]: chance.word() }) )
 
     return entity
 }
 
-const randomNumberColumns = () => {
+export const randomNumberColumns = () => {
     return [ { name: chance.word(), type: 'number', subtype: 'int', isPrimary: false },
              { name: chance.word(), type: 'number', subtype: 'decimal', precision: '10,2', isPrimary: false } ]
 }
 
-const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
+export const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 
-const randomObjectColumn = () => ( { name: chance.word(), type: 'object' } )
+export const randomObjectColumn = () => ( { name: chance.word(), type: 'object' } )
 
-const randomCollectionName = () => chance.word({ length: 5 })
+export const randomCollectionName = () => chance.word({ length: 5 })
 
-const systemFieldsWith = fields => {
+export const systemFieldsWith = (fields: InputField[]) => {
     const systemFields = SystemFields.map(({ name, type, subtype, isPrimary }) => ({ field: name, type, subtype, isPrimary }))
-    return fields.reduce((pV, cV) =>
+    return fields.reduce((pV: any, cV: { name: any; type: any; subtype: any; isPrimary: any }) =>
         [...pV, 
         {
             field: cV.name,
@@ -97,7 +97,7 @@ const systemFieldsWith = fields => {
         , systemFields)
 }
 
-const randomMatchesValueWithDashes = () => {
+export const randomMatchesValueWithDashes = () => {
     const num = chance.natural({ min: 2, max: 5 })
     const arr = []
     for (let i = 0; i < num; i++) {
@@ -105,7 +105,3 @@ const randomMatchesValueWithDashes = () => {
     }
     return arr.join('-')
 }
-
-
-
-module.exports = { randomDbEntities, randomDbEntity, randomNumberDbEntity, randomNumberColumns, randomColumn, randomCollectionName, systemFieldsWith, randomMatchesValueWithDashes, randomObjectColumn, randomObjectDbEntity }
