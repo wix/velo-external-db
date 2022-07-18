@@ -1,9 +1,9 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const driver = require('../../test/drivers/external_db_config_test_support')
-const matchers = require('./config_validator_matchers')
-const gen = require('../../test/gen')
-const Chance = require('chance')
-const { ConfigValidator } = require('../validators/config_validator')
+import { Uninitialized } from '@wix-velo/test-commons'
+import * as driver from '../../test/drivers/external_db_config_test_support'
+import * as matchers from './config_validator_matchers'
+import * as gen from '../../test/gen'
+import Chance = require('chance')
+import { ConfigValidator } from '../validators/config_validator'
 const chance = new Chance()
 
 describe('Config Reader Client', () => {
@@ -86,9 +86,12 @@ describe('Config Reader Client', () => {
         missingProperties: Uninitialized,
         moreMissingProperties: Uninitialized,
         secretKey: Uninitialized,
+        authorizationConfig: Uninitialized,
     }
 
-    const env = {
+    const env:{
+        configValidator: ConfigValidator
+    } = {
         configValidator: Uninitialized,
     }
 

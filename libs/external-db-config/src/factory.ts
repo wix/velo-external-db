@@ -1,4 +1,4 @@
-import ConfigReader = require('./service/config_reader')
+import ConfigReader from './service/config_reader'
 import CommonConfigReader from './readers/common_config_reader'
 import StubConfigReader from './readers/stub_config_reader'
 import AwsAuthorizationConfigReader from './readers/aws_authorization_config_reader'
