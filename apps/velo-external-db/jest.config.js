@@ -14,8 +14,8 @@ module.exports = {
     transform: {
         '^.+\\.[tj]s$': 'ts-jest',
     },
-    globalSetup: './test/env/env.db.setup.ts',
-    globalTeardown: './test/env/env.db.teardown.ts',
+    globalSetup: './test/env/env.db.setup.js',
+    globalTeardown: './test/env/env.db.teardown.js',
     testTimeout: 20000,
     moduleFileExtensions: ['ts', 'js', 'html'],
     setupFilesAfterEnv: ['jest-extended/all'],
