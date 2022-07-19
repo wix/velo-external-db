@@ -1,7 +1,8 @@
 const { authOwner, errorResponseWith } = require('../drivers/auth_test_support')
+const { testSupportedOperations } = require('@wix-velo/test-commons')
+const { UpdateImmediately, DeleteImmediately, Aggregate } = require('@wix-velo/velo-external-db-commons').SchemaOperations
 const each = require('jest-each').default
 const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } = require('../resources/e2e_resources')
-const { Aggregate } = require('@wix-velo/velo-external-db-commons').SchemaOperations
 const gen = require('../gen')
 const schema = require('../drivers/schema_api_rest_test_support')
 const data = require('../drivers/data_api_rest_test_support')
@@ -24,16 +25,17 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         await dbTeardown()
     }, 20000)
 
+
     describe('After hooks', () => {
         describe('Write Operations', () => {
-            each([
+            each(testSupportedOperations(supportedOperations, [
                 ['afterInsert', '/data/insert'],
                 ['afterBulkInsert', '/data/insert/bulk'],
-                ['afterUpdate', '/data/update'],
-                ['afterBulkUpdate', '/data/update/bulk'],
-                ['afterRemove', '/data/remove'],
-                ['afterBulkRemove', '/data/remove/bulk']
-            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
+                ['afterUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
+                ['afterBulkUpdate', '/data/update/bulk', { neededOperations: [UpdateImmediately] }],
+                ['afterRemove', '/data/remove', { neededOperations: [DeleteImmediately] }],
+                ['afterBulkRemove', '/data/remove/bulk', { neededOperations: [DeleteImmediately] }]
+            ])).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 if (!['afterInsert', 'afterBulkInsert'].includes(hookName)) {
                     await data.givenItems(ctx.items, ctx.collectionName, authOwner)
@@ -60,12 +62,12 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         })
 
         describe('Read Operations', () => {
-            each([
+            each(testSupportedOperations(supportedOperations, [
                 ['afterGetById', '/data/get'],
                 ['afterFind', '/data/find'],
-                ['afterAggregate', '/data/aggregate'],
+                ['afterAggregate', '/data/aggregate', { neededOperations: [Aggregate] }],
                 ['afterCount', '/data/count']
-            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
+            ])).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
                 if (hooks.skipAggregationIfNotSupported(hookName, supportedOperations))
                     return
 
@@ -95,10 +97,10 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
     describe('Before hooks', () => {
         describe('Write Operations', () => {
-            each([
+            each(testSupportedOperations(supportedOperations, [
                 ['beforeInsert', '/data/insert'],
-                ['beforeUpdate', '/data/update'],
-            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
+                ['beforeUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
+            ])).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.beforeAllColumn, ctx.beforeWriteColumn, ctx.beforeHookColumn], authOwner)
                 if (hookName !== 'beforeInsert') {
                     await data.givenItems([ctx.item], ctx.collectionName, authOwner)
@@ -129,10 +131,10 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 )
             })
 
-            each([
+            each(testSupportedOperations(supportedOperations, [
                 ['beforeBulkInsert', '/data/insert/bulk'],
-                ['beforeBulkUpdate', '/data/update/bulk'],
-            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
+                ['beforeBulkUpdate', '/data/update/bulk', { neededOperations: [UpdateImmediately] }],
+            ])).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.beforeAllColumn, ctx.beforeWriteColumn, ctx.beforeHookColumn], authOwner)
                 if (hookName !== 'beforeBulkInsert') {
                     await data.givenItems(ctx.items, ctx.collectionName, authOwner)
@@ -346,12 +348,12 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
     describe('Custom Context', () => {
         describe('Read operations', () => {
-            each([
+            each(testSupportedOperations(supportedOperations, [
                 ['Get', 'beforeGetById', 'afterGetById', '/data/get'],
                 ['Find', 'beforeFind', 'afterFind', '/data/find'],
-                ['Aggregate', 'beforeAggregate', 'afterAggregate', '/data/aggregate'],
+                ['Aggregate', 'beforeAggregate', 'afterAggregate', '/data/aggregate', { neededOperations: [Aggregate] }],
                 ['Count', 'beforeCount', 'afterCount', '/data/count']
-            ]).test('customContext should pass by ref on [%s] ', async(_, beforeHook, afterHook, api) => {
+            ])).test('customContext should pass by ref on [%s] ', async(_, beforeHook, afterHook, api) => {
                 if (hooks.skipAggregationIfNotSupported(beforeHook, supportedOperations))
                     return
 
@@ -389,14 +391,14 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         })
 
         describe('Write operations', () => {
-            each([
+            each(testSupportedOperations(supportedOperations, [
                 ['Insert', 'beforeInsert', 'afterInsert', '/data/insert'],
                 ['Bulk Insert', 'beforeBulkInsert', 'afterBulkInsert', '/data/insert/bulk'],
-                ['Update', 'beforeUpdate', 'afterUpdate', '/data/update'],
-                ['Bulk Update', 'beforeBulkUpdate', 'afterBulkUpdate', '/data/update/bulk'],
-                ['Remove', 'beforeRemove', 'afterRemove', '/data/remove'],
-                ['Bulk Remove', 'beforeBulkRemove', 'afterBulkRemove', '/data/remove/bulk']
-            ]).test('customContext should pass by ref on [%s] ', async(_, beforeHook, afterHook, api) => {
+                ['Update', 'beforeUpdate', 'afterUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
+                ['Bulk Update', 'beforeBulkUpdate', 'afterBulkUpdate', '/data/update/bulk', { neededOperations: [UpdateImmediately] }],
+                ['Remove', 'beforeRemove', 'afterRemove', '/data/remove', { neededOperations: [DeleteImmediately] }],
+                ['Bulk Remove', 'beforeBulkRemove', 'afterBulkRemove', '/data/remove/bulk', { neededOperations: [DeleteImmediately] }]
+            ])).test('customContext should pass by ref on [%s] ', async(_, beforeHook, afterHook, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 if (!['afterInsert', 'afterBulkInsert'].includes(afterHook)) {
                     await data.givenItems(ctx.items, ctx.collectionName, authOwner)
