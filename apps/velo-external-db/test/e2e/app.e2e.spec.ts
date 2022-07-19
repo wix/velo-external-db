@@ -1,5 +1,5 @@
-const { authOwner } = require('../drivers/auth_test_support')
-const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } = require('../resources/e2e_resources')
+import { authOwner } from '../drivers/auth_test_support'
+import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } from '../resources/e2e_resources'
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'

@@ -1,12 +1,13 @@
-const { authOwner, errorResponseWith } = require('../drivers/auth_test_support')
+import { authOwner, errorResponseWith } from '../drivers/auth_test_support'
 const each = require('jest-each').default
-const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } = require('../resources/e2e_resources')
-const gen = require('../gen')
-const matchers = require('../drivers/schema_api_rest_matchers')
-const schema = require('../drivers/schema_api_rest_test_support')
-const hooks = require('../drivers/hooks_test_support')
+import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } from '../resources/e2e_resources'
+import gen = require('../gen')
+import matchers = require('../drivers/schema_api_rest_matchers')
+import schema = require('../drivers/schema_api_rest_test_support')
+import hooks = require('../drivers/hooks_test_support')
 
-const { Uninitialized } = require('@wix-velo/test-commons')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { ServiceContext } from 'libs/velo-external-db-core/src/types'
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
@@ -29,7 +30,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 ['afterCreate', '/schemas/create'],
                 ['afterColumnAdd', '/schemas/column/add'],
                 ['afterColumnRemove', '/schemas/column/remove']
-            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
+            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName: string, api: string) => {
                 if (!['afterCreate'].includes(hookName)) {
                     await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 }
@@ -59,7 +60,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 ['afterFind', '/schemas/find'],
                 ['afterList', '/schemas/list'],
                 ['afterListHeaders', '/schemas/list/headers']
-            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName, api) => {
+            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName: string, api: string) => {
                 await schema.givenCollection(ctx.collectionName, [], authOwner)
 
                 env.externalDbRouter.reloadHooks({
@@ -86,7 +87,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
     describe('Before hooks', () => {
         describe('Write operations', () => {
             each(['beforeAll', 'beforeWrite', 'beforeCreate'])
-                .test('Before create collection %s hook should change payload', async(hookName) => {
+                .test('Before create collection %s hook should change payload', async(hookName: string) => {
                     env.externalDbRouter.reloadHooks({
                         schemaHooks: {
                             [hookName]: (payload, requestContext, _serviceContext) => {
@@ -102,7 +103,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 })
 
             each(['beforeAll', 'beforeWrite', 'beforeColumnAdd'])
-                .test('Before add column %s hook should change payload', async(hookName) => {
+                .test('Before add column %s hook should change payload', async(hookName: string) => {
                     await schema.givenCollection(ctx.collectionName, [], authOwner)
 
                     env.externalDbRouter.reloadHooks({
@@ -120,7 +121,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 })
 
             each(['beforeAll', 'beforeWrite', 'beforeColumnRemove'])
-                .test('Before remove column %s hook should change payload', async(hookName) => {
+                .test('Before remove column %s hook should change payload', async(hookName: string) => {
                     await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
                     env.externalDbRouter.reloadHooks({
@@ -141,7 +142,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
 
         describe('Read operations', () => {
             each(['beforeAll', 'beforeRead', 'beforeFind'])
-                .test('Before find collection %s hook should change payload', async(hookName) => {
+                .test('Before find collection %s hook should change payload', async(hookName: string) => {
                     await schema.givenCollection(ctx.anotherCollectionName, [], authOwner)
                     env.externalDbRouter.reloadHooks({
                         schemaHooks: {
@@ -162,10 +163,10 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 ['listHeaders', 'beforeAll', '/schemas/list/headers'],
                 ['listHeaders', 'beforeRead', '/schemas/list/headers'],
                 ['listHeaders', 'beforeListHeaders', '/schemas/list/headers']
-            ]).test('before %s operation, %s hook should be able to create collection', async(operation, hookName, api) => {
+            ]).test('before %s operation, %s hook should be able to create collection', async(operation: any, hookName: string, api: string) => {
                 env.externalDbRouter.reloadHooks({
                     schemaHooks: {
-                        [hookName]: async(_payload, requestContext, serviceContext) => {
+                        [hookName]: async(_payload, requestContext, serviceContext: ServiceContext) => {
                             if (requestContext.operation === operation)
                                 await serviceContext.schemaService.create(ctx.collectionName)
                         }
@@ -183,7 +184,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 schemaHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
                         const error = new Error('message')
-                        error.status = '409'
+                        error['status'] = '409'
                         throw error                    
                     }
                 }
@@ -230,25 +231,25 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                ['List', 'beforeList', 'afterList', '/schemas/list'],
                 ['ListHeaders', 'beforeListHeaders', 'afterListHeaders', '/schemas/list/headers'],
                 ['Find', 'beforeFind', 'afterFind', '/schemas/find']
-            ]).test('customContext should pass by ref on [%s]', async(_, beforeHook, afterHook, api) => {
+            ]).test('customContext should pass by ref on [%s]', async(_: any, beforeHook: string, afterHook: string | number, api: string) => {
                 await schema.givenCollection(ctx.collectionName, [], authOwner)
 
                 env.externalDbRouter.reloadHooks({
                     schemaHooks: {
                         beforeAll: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext.beforeAll = true
+                            customContext['beforeAll'] = true
                         },
                         beforeRead: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext.beforeRead = true
+                            customContext['beforeRead'] = true
                         },
                         [beforeHook]: (_payload, _requestContext, _serviceContext, customContext) => {
                             customContext[beforeHook] = true
                         },
                         afterAll: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext.afterAll = true
+                            customContext['afterAll'] = true
                         },
                         afterRead: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext.afterRead = true
+                            customContext['afterRead'] = true
                         },
                         [afterHook]: (payload, _requestContext, _serviceContext, customContext) => {
                             customContext[afterHook] = true
@@ -269,7 +270,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 ['Create', 'beforeCreate', 'afterCreate', '/schemas/create'],
                 ['Column Add', 'beforeColumnAdd', 'afterColumnAdd', '/schemas/column/add'],
                 ['Column Remove', 'beforeColumnRemove', 'afterColumnRemove', '/schemas/column/remove'],
-            ]).test('customContext should pass by ref on [%s]', async(operation, beforeHook, afterHook, api) => {
+            ]).test('customContext should pass by ref on [%s]', async(operation: string, beforeHook: string | number, afterHook: string | number, api: string) => {
                 if (operation !== 'Create') {
                     await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 }
@@ -277,19 +278,19 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 env.externalDbRouter.reloadHooks({
                     schemaHooks: {
                         beforeAll: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext.beforeAll = true
+                            customContext['beforeAll'] = true
                         },
                         beforeWrite: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext.beforeRead = true
+                            customContext['beforeRead'] = true
                         },
                         [beforeHook]: (_payload, _requestContext, _serviceContext, customContext) => {
                             customContext[beforeHook] = true
                         },
                         afterAll: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext.afterAll = true
+                            customContext['afterAll'] = true
                         },
                         afterWrite: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext.afterRead = true
+                            customContext['afterRead'] = true
                         },
                         [afterHook]: (payload, _requestContext, _serviceContext, customContext) => {
                             customContext[afterHook] = true

@@ -1,14 +1,15 @@
-const { Uninitialized, gen: genCommon } = require('@wix-velo/test-commons')
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection } = require('@wix-velo/velo-external-db-commons').SchemaOperations
-const { testIfSupportedOperationsIncludes } = require('@wix-velo/test-commons')
-const gen = require('../gen')
-const schema = require('../drivers/schema_api_rest_test_support')
-const data = require('../drivers/data_api_rest_test_support')
-const matchers = require('../drivers/schema_api_rest_matchers')
-const { authAdmin, authOwner, authVisitor } = require('../drivers/auth_test_support')
-const authorization = require ('../drivers/authorization_test_support')
-const Chance = require('chance')
-const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/e2e_resources')
+import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection } = SchemaOperations
+import { testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
+import * as gen from '../gen'
+import * as schema from '../drivers/schema_api_rest_test_support'
+import * as data from '../drivers/data_api_rest_test_support'
+import * as matchers from '../drivers/schema_api_rest_matchers'
+import { authAdmin, authOwner, authVisitor } from '../drivers/auth_test_support'
+import * as authorization from '../drivers/authorization_test_support'
+import Chance = require('chance')
+import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
 
 const chance = Chance()
 
@@ -108,7 +109,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 
-        await axios.post('/data/remove/bulk', { collectionName: ctx.collectionName, itemIds: ctx.items.map(i => i._id) }, authAdmin)
+        await axios.post('/data/remove/bulk', { collectionName: ctx.collectionName, itemIds: ctx.items.map((i: { _id: any }) => i._id) }, authAdmin)
 
         await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({ items: [ ], totalCount: 0 })
     })
@@ -195,7 +196,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         ctx.numberColumns = gen.randomNumberColumns()
         ctx.item = genCommon.randomEntity([ctx.column.name])
         ctx.items = Array.from({ length: 10 }, () => genCommon.randomEntity([ctx.column.name]))
-        ctx.modifiedItems = ctx.items.map(i => ( { ...i, [ctx.column.name]: chance.word() } ) )
+        ctx.modifiedItems = ctx.items.map((i: any) => ( { ...i, [ctx.column.name]: chance.word() } ) )
         ctx.modifiedItem = { ...ctx.item, [ctx.column.name]: chance.word() }
         ctx.anotherItem = genCommon.randomEntity([ctx.column.name])
         ctx.numberItem = gen.randomNumberDbEntity(ctx.numberColumns)

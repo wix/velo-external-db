@@ -203,7 +203,7 @@ export enum WixDataMultiFieldOperators {
 }
 
 export type WixDataSingleFieldFilter = {
-    [key: string]: { [key in WixDataSingleFieldOperators]: any }
+    [key: string]: { [key in WixDataSingleFieldOperators]?: any }
 }
 
 export type WixDataMultipleFieldsFilter = {

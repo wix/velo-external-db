@@ -1,11 +1,12 @@
-const { Uninitialized, gen: genCommon, testIfSupportedOperationsIncludes } = require('@wix-velo/test-commons')
-const { RemoveColumn } = require('@wix-velo/velo-external-db-commons').SchemaOperations
-const schema = require('../drivers/schema_api_rest_test_support')
-const matchers = require('../drivers/schema_api_rest_matchers')
-const { authOwner } = require('../drivers/auth_test_support')
-const gen = require('../gen')
-const Chance = require('chance')
-const { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/e2e_resources')
+import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
+const { RemoveColumn } = SchemaOperations
+import * as schema from '../drivers/schema_api_rest_test_support'
+import * as matchers from '../drivers/schema_api_rest_matchers'
+import { authOwner } from '../drivers/auth_test_support'
+import * as gen from '../gen'
+import Chance = require('chance')
+import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
 const chance = Chance()
 
 const axios = require('axios').create({
