@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 const { when } = require('jest-when')
 import { LastLetterCoder } from '../../src/firestore_utils'
 const escapeId = (x: string) => x
