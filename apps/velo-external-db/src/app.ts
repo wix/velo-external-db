@@ -4,7 +4,7 @@ import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
 import { engineConnectorFor } from './storage/factory'
 import { Server } from 'http'
 import { ConnectionCleanUp, ISchemaProvider } from '@wix-velo/velo-external-db-types'
-import { DataHooks, SchemaHooks } from 'libs/velo-external-db-core/src/types'
+import { Hooks } from 'libs/velo-external-db-core/src/types'
 
 let started = false
 let server: Server, _schemaProvider: ISchemaProvider, _cleanup: ConnectionCleanUp
@@ -12,7 +12,7 @@ let externalDbRouter: ExternalDbRouter
 
 
 
-const initConnector = async (hooks?: { dataHooks: DataHooks, schemaHooks: SchemaHooks }) => {
+const initConnector = async (hooks?: Hooks) => {
     const { vendor, type: adapterType } = readCommonConfig()
     const configReader = create()
     const { authorization, secretKey, ...dbConfig } = await configReader.readConfig()

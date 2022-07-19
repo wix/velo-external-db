@@ -117,3 +117,8 @@ export interface ExternalDbRouterConfig {
     adapterType?: string
     commonExtended?: boolean
 }
+
+export type Hooks = {
+    dataHooks?: DataHooks;
+    schemaHooks?: SchemaHooks;
+}

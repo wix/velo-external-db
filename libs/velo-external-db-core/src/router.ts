@@ -20,7 +20,7 @@ import SchemaAwareDataService from './service/schema_aware_data'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
-import { DataHooks, RequestContext, SchemaHooks, ServiceContext } from './types'
+import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
 
 const { InvalidRequest, ItemNotFound } = errors
@@ -28,7 +28,7 @@ const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, Bul
 
 let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
 
-export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService, _externalDbConfigClient: ConfigValidator, _cfg: { secretKey?: string, type?: string, vendor?: string }, _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer, _roleAuthorizationService: RoleAuthorizationService, _hooks?: {dataHooks?: DataHooks, schemaHooks?: SchemaHooks}) => {
+export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService, _externalDbConfigClient: ConfigValidator, _cfg: { secretKey?: string, type?: string, vendor?: string }, _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer, _roleAuthorizationService: RoleAuthorizationService, _hooks?: Hooks) => {
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient
