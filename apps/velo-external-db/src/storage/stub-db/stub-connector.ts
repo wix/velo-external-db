@@ -1,5 +1,5 @@
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
-import init = require('./init')
+import init from './init'
 import { StubConfigValidator } from './providers'
 
 class StubConnector extends DbConnector {
