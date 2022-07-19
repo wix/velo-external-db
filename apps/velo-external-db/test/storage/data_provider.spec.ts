@@ -1,10 +1,11 @@
-const { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } = require('@wix-velo/test-commons')
-const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator, FindObject, IncludeOperator } = require('@wix-velo/velo-external-db-commons').SchemaOperations
+import { Uninitialized, testIfSupportedOperationsIncludes, shouldNotRunOn } from '@wix-velo/test-commons'
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
+const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWithCaseSensitive, StartWithCaseInsensitive, Projection, Matches, NotOperator, FindObject, IncludeOperator } = SchemaOperations
 
-const Chance = require('chance')
-const gen = require('../gen')
-const { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/provider_resources')
-const { entitiesWithOwnerFieldOnly, entityWithObjectField } = require ('../drivers/data_provider_matchers') //todo: move toggleCase to utils
+import Chance = require('chance')
+import gen = require('../gen')
+import { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/provider_resources'
+import { entitiesWithOwnerFieldOnly, entityWithObjectField } from '../drivers/data_provider_matchers' //todo: move toggleCase to utils
 const chance = new Chance()
 
 describe(`Data API: ${currentDbImplementationName()}`, () => {

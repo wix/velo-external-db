@@ -1,12 +1,12 @@
-const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = require('@wix-velo/velo-external-db-commons').errors
-const { Uninitialized, gen, testIfSupportedOperationsIncludes } = require('@wix-velo/test-commons')
-const { RemoveColumn } = require('@wix-velo/velo-external-db-commons').SchemaOperations
-const Chance = require('chance')
-const { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } = require('../resources/provider_resources')
-const { collectionWithDefaultFields, hasSameSchemaFieldsLike } = require('../drivers/schema_provider_matchers')
+import { errors, SchemaOperations } from '@wix-velo/velo-external-db-commons'
+const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = errors
+import { Uninitialized, gen, testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
+const { RemoveColumn } = SchemaOperations
+import Chance = require('chance')
+import { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/provider_resources'
+import { collectionWithDefaultFields, hasSameSchemaFieldsLike } from '../drivers/schema_provider_matchers'
 const chance = new Chance()
-const { SystemFields } = require('@wix-velo/velo-external-db-commons')
-
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
 
 
 describe(`Schema API: ${currentDbImplementationName()}`, () => {
@@ -88,7 +88,7 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
     test('add column on a an existing collection', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
         await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
-        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName  }]))
+        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName }]))
     })
 
     test('add duplicate column will fail', async() => {

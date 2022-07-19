@@ -1,6 +1,6 @@
-const each = require('jest-each').default
+import each from 'jest-each'
 const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
-const { env, setupDb, currentDbImplementationName, misconfiguredDbOperationOptions } = require('../resources/operations_resources')
+import { env, setupDb, currentDbImplementationName, misconfiguredDbOperationOptions } from '../resources/operations_resources'
 
 describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {
@@ -8,7 +8,7 @@ describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
     })
 
     each(misconfiguredDbOperationOptions())
-    .test('%s will return DbConnectionError', async(message, givenMisconfiguredDbOperation) => {
+    .test('%s will return DbConnectionError', async(_message, givenMisconfiguredDbOperation) => {
         const dbOperation = await givenMisconfiguredDbOperation()
 
         const validateConnection = await dbOperation.validateConnection()
