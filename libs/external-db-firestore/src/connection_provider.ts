@@ -4,8 +4,9 @@ import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './firestore_operations'
 import { Firestore } from '@google-cloud/firestore'
 import { firestoreConfig } from './types'
+import { DbProviders } from '@wix-velo/velo-external-db-types'
 
-export default ({ projectId }: firestoreConfig) => {
+export default ({ projectId }: firestoreConfig): DbProviders<Firestore>  => {
     const firestore = new Firestore({
         projectId: projectId,
     })
