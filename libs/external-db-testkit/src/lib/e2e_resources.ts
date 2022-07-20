@@ -1,6 +1,5 @@
-import { Uninitialized, sleep } from '@wix-velo/test-commons'
-import { ConnectionCleanUp, IImplementationResources } from '@wix-velo/velo-external-db-types';
-import { Router } from 'express';
+import { sleep } from '@wix-velo/test-commons'
+import { ConnectionCleanUp, IImplementationResources, SchemaOperations } from '@wix-velo/velo-external-db-types';
 import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
 import { Server } from 'http';
 import { authInit } from './auth_test_support';
@@ -14,14 +13,20 @@ export default class E2EResources {
         server: Server, externalDbRouter: ExternalDbRouter, cleanup: ConnectionCleanUp, [x: string]: any
     };
     externalDbRouter!: ExternalDbRouter;
-
+    currentDbImplementationName: string;
+    supportedOperations: SchemaOperations[]
     constructor(implementation: IImplementationResources, initFunc: InitFunc) {
         this.implementation = implementation;
         this.initFunc = initFunc;
+        this.currentDbImplementationName = this.implementation.name;
+        this.supportedOperations = this.implementation.supportedOperations;
     }
 
     async initEnv() {
         await this.implementation.initEnv()
+        await sleep(5000)
+        await this.implementation.cleanup()
+        this.implementation.setActive()
     }
 
     async shutdownEnv() {
@@ -29,10 +34,14 @@ export default class E2EResources {
     }
 
     async initApp() {
+        process.env['CLOUD_VENDOR'] = 'azure'
         if (this.env) {
+            console.log('closing server...')
             await this.env.server.close()
         }
-        authInit()
+        else{
+            authInit()
+        }
         this.env = await this.initFunc()
         this.env.externalDbRouter = this.env.externalDbRouter
     }
@@ -43,15 +52,11 @@ export default class E2EResources {
 
     async teardownApp() {
         await sleep(500)
-        await this.env.server.close()
+        this.env.server.close()
     }
 
     async dbInit() {
         await this.implementation.cleanup()
         this.implementation.setActive()
-    }
-
-    supportedOperations() {
-        return this.implementation.supportedOperations()
     }
 }
