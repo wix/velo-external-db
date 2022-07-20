@@ -1,4 +1,4 @@
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, NotEmptyAdapterFilter as NotEmptyFilter, NotEmptyAdapterFilter} from '@wix-velo/velo-external-db-types'
+import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, NotEmptyAdapterFilter } from '@wix-velo/velo-external-db-types'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { escapeIdentifier, wildCardWith } from './bigquery_utils'
 import { EmptyFilter, EmptySort, isObject, isEmptyFilter, AdapterOperators, AdapterFunctions, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
@@ -196,7 +196,7 @@ export default class FilterParser {
         }
     }
 
-    orderBy(sort: Sort[]) {
+    orderBy(sort: any) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return EmptySort
         }
@@ -232,7 +232,7 @@ export default class FilterParser {
         return value
     }
 
-    selectFieldsFor(projection: any[]) {
+    selectFieldsFor(projection: string[]) {
         return projection.map(escapeIdentifier).join(', ')
     }
 }

@@ -1,3 +1,4 @@
+import { Item } from '@wix-velo/velo-external-db-types'
 
 // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
 export const escapeIdentifier = (str: string) => str ==='*' ? '*' : `\`${(str || '').replace(/"/g, '""')}\``
@@ -5,7 +6,7 @@ export const wildCardWith = (n: number, char: string) => Array(n).fill(char, 0, 
 
 const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
 
-export const patchDateTime = (item: any) => {
+export const patchDateTime = (item: Item) => {
     const obj: any = {}
     for (const key of Object.keys(item)) {
         const value = item[key]

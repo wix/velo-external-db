@@ -30,12 +30,19 @@ describe('Sql Parser', () => {
         })
 
         test('process single sort expression invalid sort will return empty result', () => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             expect( env.filterParser.parseSort({ }) ).toEqual([])
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             expect( env.filterParser.parseSort({ invalid: 'object' }) ).toEqual([])
+
         })
 
         test('process single sort expression', () => {
             expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'asc' }) ).toEqual([{ expr: `${escapeId(ctx.fieldName)} ASC` }])
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'aSc' }) ).toEqual([{ expr: `${escapeId(ctx.fieldName)} ASC` }])
             expect( env.filterParser.parseSort({ fieldName: ctx.fieldName, direction: 'desc' }) ).toEqual([{ expr: `${escapeId(ctx.fieldName)} DESC` }])
             expect( env.filterParser.parseSort({ fieldName: ctx.fieldName }) ).toEqual([{ expr: `${escapeId(ctx.fieldName)} ASC` }])
@@ -62,11 +69,16 @@ describe('Sql Parser', () => {
 
         test('handles undefined filter', () => {
             expect( env.filterParser.parseFilter('') ).toEqual([])
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             expect( env.filterParser.parseFilter(undefined) ).toEqual([])
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             expect( env.filterParser.parseFilter(null) ).toEqual([])
             expect( env.filterParser.parseFilter(555) ).toEqual([])
             expect( env.filterParser.parseFilter([5555]) ).toEqual([])
         })
+
 
         test('transform filter', () => {
             expect( env.filterParser.transform(ctx.filter) ).toEqual({
@@ -307,6 +319,8 @@ describe('Sql Parser', () => {
                         projection: [{ name: ctx.fieldName }]
                     }
 
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: escapeId(ctx.fieldName),
                         groupByColumns: [ctx.fieldName],
@@ -323,6 +337,8 @@ describe('Sql Parser', () => {
                            ]
                      }
 
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: `${escapeId(ctx.fieldName)}, ${escapeId(ctx.anotherFieldName)}`,
                         groupByColumns: [ctx.fieldName, ctx.anotherFieldName],
@@ -346,6 +362,8 @@ describe('Sql Parser', () => {
 
                     const havingFilter = { [ctx.moreFieldName]: { $gt: ctx.fieldValue } }
 
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
                     expect( env.filterParser.parseAggregation(aggregation, havingFilter) ).toEqual({
                         fieldsStatement: `${escapeId(ctx.fieldName)}, CAST(AVG(${escapeId(ctx.anotherFieldName)}) AS FLOAT64) AS ${escapeId(ctx.moreFieldName)}`,
                         groupByColumns: [ctx.fieldName],
@@ -367,6 +385,8 @@ describe('Sql Parser', () => {
                         ]
                     }
 
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
                     expect( env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: `${escapeId(ctx.fieldName)}, CAST(${mySqlFunction}(${escapeId(ctx.anotherFieldName)}) AS FLOAT64) AS ${escapeId(ctx.moreFieldName)}`,
                         groupByColumns: [ctx.fieldName],
@@ -383,6 +403,8 @@ describe('Sql Parser', () => {
                         ]
                     }
                     
+                    //  eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
                     expect(env.filterParser.parseAggregation(aggregation) ).toEqual({
                         fieldsStatement: `${escapeId(ctx.fieldName)}, CAST(COUNT(*) AS FLOAT64) AS ${escapeId(ctx.moreFieldName)}`,
                         groupByColumns: [ctx.fieldName],
@@ -408,7 +430,9 @@ describe('Sql Parser', () => {
         anotherFilter: Uninitialized,
     }
 
-    const env = {
+    const env: {
+        filterParser: FilterParser,
+    }= {
         filterParser: Uninitialized,
     }
 

@@ -107,7 +107,7 @@ export type AdapterAggregation = {
     postFilter: AdapterFilter,
 }
 
-export interface    IDataProvider {
+export interface IDataProvider {
     find(collectionName: string, filter: AdapterFilter, sort: any, skip: number, limit: number, projection: string[]): Promise<Item[]>;
     count(collectionName: string, filter: AdapterFilter): Promise<number>;
     insert(collectionName: string, items: Item[], fields?: ResponseField[]): Promise<number>;

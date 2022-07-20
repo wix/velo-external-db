@@ -1,6 +1,6 @@
 import { Dataset } from '@google-cloud/bigquery'
 import { SystemFields, validateSystemFields, parseTableData, SchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, ResponseField } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, Table } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes, removeColumnTranslateErrorCodes } from './sql_exception_translator'
 import { escapeIdentifier } from './bigquery_utils'
 import SchemaColumnTranslator from './sql_schema_translator'
@@ -19,11 +19,11 @@ export default class SchemaProvider implements ISchemaProvider {
         this.sqlSchemaTranslator = new SchemaColumnTranslator()
     }
 
-    async list() {
+    async list(): Promise<Table[]> {
         const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${escapeIdentifier(`${this.projectId}.${this.databaseId}`)}.INFORMATION_SCHEMA.COLUMNS`)
         const tables = parseTableData(res[0])
         return Object.entries(tables)
-                        .map(([collectionName, rs]: [any, any]) => ({
+                        .map(([collectionName, rs]) => ({
                             id: collectionName,
                             fields: rs.map( this.translateDbTypes.bind(this) )
                         }))
@@ -31,7 +31,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
     async listHeaders() {
         const data = await this.pool.query(`SELECT table_name FROM ${escapeIdentifier(`${this.projectId}.${this.databaseId}`)}.INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME`)
-        return data[0].map((rs: { table_name: any }) => rs.table_name )
+        return data[0].map((rs: { table_name: string }) => rs.table_name )
     }
 
     supportedOperations() {
@@ -40,7 +40,7 @@ export default class SchemaProvider implements ISchemaProvider {
         return [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, FindWithSort, Aggregate, BulkDelete, Truncate ]
     }
 
-    async create(collectionName: string, _columns: never[]) {
+    async create(collectionName: string, _columns: InputField[]) {
         const columns = _columns || []
         const dbColumnsSql = [...SystemFields, ...columns].map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c, { escapeId: false, precision: false }))
         await this.pool.createTable(collectionName, { schema: dbColumnsSql })
