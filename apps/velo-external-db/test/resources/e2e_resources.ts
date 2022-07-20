@@ -43,13 +43,11 @@ export const env:{
 export const initApp = async() => {
     process.env.CLOUD_VENDOR = 'azure'
     if (env.app) {
-        await env.app.reload()
+        await env.app.server.close()
     }
-    else {
-        authInit()
-        env.app = await createApp()
-        env.externalDbRouter = env.app.externalDbRouter
-    }
+    authInit()
+    env.app = await createApp()
+    env.externalDbRouter = env.app.externalDbRouter
 }
 
 export const teardownApp = async() => {
