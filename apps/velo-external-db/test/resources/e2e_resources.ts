@@ -15,13 +15,13 @@ import * as bigquery from'./engines/bigquery_resources'
 import { Server } from 'http'
 import { ConnectionCleanUp, ISchemaProvider } from '@wix-velo/velo-external-db-types'
 import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
+import { createApp } from 'velo-external-db'
 // const googleSheet = require('./engines/google_sheets_resources')
 
 interface App {
     server: Server;
     schemaProvider: ISchemaProvider;
     cleanup: ConnectionCleanUp;
-    started: boolean;
     reload: (hooks?: any) => Promise<{
         externalDbRouter: ExternalDbRouter;
     }>;
@@ -42,17 +42,14 @@ export const env:{
 
 export const initApp = async() => {
     process.env.CLOUD_VENDOR = 'azure'
-
     if (env.app) {
         await env.app.reload()
-    } else {
-        authInit()
-        env.internals = require('../../src/app').internals
-
-        await waitUntil(() => env.internals().started)
     }
-    env.app = env.internals()
-    env.externalDbRouter = env.app.externalDbRouter
+    else {
+        authInit()
+        env.app = await createApp()
+        env.externalDbRouter = env.app.externalDbRouter
+    }
 }
 
 export const teardownApp = async() => {
