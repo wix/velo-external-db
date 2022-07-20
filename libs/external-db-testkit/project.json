@@ -8,7 +8,7 @@
       "outputs": [ "{options.outputPath}" ],
       "options": {
         "outputPath": "dist/libs/external-db-testkit",
-        "main": "libs/external-db-testkit/src/index.js",
+        "main": "libs/external-db-testkit/src/index.ts",
         "tsConfig": "libs/external-db-testkit/tsconfig.lib.json",
         "assets": [ "libs/external-db-testkit/*.md" ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
