@@ -1,0 +1,48 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/external-db-testkit/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": [ "{options.outputPath}" ],
+      "options": {
+        "outputPath": "dist/libs/external-db-testkit",
+        "main": "libs/external-db-testkit/src/index.js",
+        "tsConfig": "libs/external-db-testkit/tsconfig.lib.json",
+        "assets": [ "libs/external-db-testkit/*.md" ],
+        "buildableProjectDepsInPackageJsonType": "dependencies"
+      }
+    },
+    "publish": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs @wix-velo/external-db-testkit {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
+      "options": {
+        "lintFilePatterns": [ "libs/external-db-testkit/**/*.ts" ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [ "coverage/libs/external-db-testkit" ],
+      "options": {
+        "jestConfig": "libs/external-db-testkit/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
