@@ -1,11 +1,12 @@
 
+import { WhereFilterOp, OrderByDirection } from '@google-cloud/firestore'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { AdapterFilter as Filter, NotEmptyAdapterFilter, Sort } from '@wix-velo/velo-external-db-types' 
 import { isObject, AdapterOperators, isEmptyFilter } from '@wix-velo/velo-external-db-commons'
 import { LastLetterCoder } from './firestore_utils'
+import { queryFilter } from './types'
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 const { InvalidQuery } = errors
-
 export default class FilterParser {
     constructor() {
     }
@@ -20,7 +21,7 @@ export default class FilterParser {
         return results
     }
 
-    parseFilter(filter: Filter, inlineFields: any = '') {
+    parseFilter(filter: Filter, inlineFields: any = ''): queryFilter[] {
         if (isEmptyFilter(filter)) {
             return []
         }
@@ -46,7 +47,7 @@ export default class FilterParser {
         }
         
         if(this.isMultipleFiledOperator(operator)) {
-            return value.reduce((o: any, f: any) => {
+            return value.reduce((o: queryFilter[], f: Filter) => { 
                 return o.concat( this.parseFilter.bind(this)(f) )
             }, [])
         }
@@ -83,7 +84,7 @@ export default class FilterParser {
         return value
     }
     
-    adapterOperatorToFirestoreOperator(operator: string) {
+    adapterOperatorToFirestoreOperator(operator: string): WhereFilterOp {
         switch (operator) {
             case eq:
                 return '=='
@@ -100,11 +101,11 @@ export default class FilterParser {
             case include:
                 return 'in'
             default:
-                return
+                throw('Unrecognized operator')
         }
     }
     
-    orderBy(sort: Sort[]) {
+    orderBy(sort: any) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return []
         }
@@ -125,7 +126,7 @@ export default class FilterParser {
         }
         const _direction = direction || 'asc'
     
-        const dir = 'asc' === _direction.toLowerCase() ? 'asc' : 'desc'
+        const dir: OrderByDirection = 'asc' === _direction.toLowerCase() ? 'asc' : 'desc'
         
         return [{ fieldName, direction: dir }]
 
@@ -143,12 +144,12 @@ export default class FilterParser {
     parseStringBegins(fieldName: string, inlineFields: {[key: string]: any}, value: string) {
         return [{
             fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
-            opStr: '>=',
+            opStr: '>=' as WhereFilterOp,
             value,
         },
         {
             fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
-            opStr: '<',
+            opStr: '<' as WhereFilterOp,
             value: value + LastLetterCoder
         }]
     }

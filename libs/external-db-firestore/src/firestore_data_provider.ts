@@ -1,4 +1,4 @@
-import { Firestore, WriteBatch } from '@google-cloud/firestore'
+import { Firestore, WriteBatch, Query, DocumentData } from '@google-cloud/firestore'
 import { AdapterAggregation, AdapterFilter, IDataProvider, Item, AdapterFilter as Filter } from '@wix-velo/velo-external-db-types'
 import FilterParser from './sql_filter_transformer'
 import { asEntity } from './firestore_utils'
@@ -18,8 +18,8 @@ export default class DataProvider implements IDataProvider {
         const sortOperations = this.filterParser.orderBy(sort)
 
         const projection = this.filterParser.selectFieldsFor(_projection)
-    
-        const collectionRef = filterOperations.reduce((c: { where: (arg0: any, arg1: any, arg2: any) => any }, { fieldName, opStr, value }: any) => c.where(fieldName, opStr, value), this.database.collection(collectionName))
+
+        const collectionRef = filterOperations.reduce((c: Query<DocumentData>, { fieldName, opStr, value }) => c.where(fieldName, opStr, value), this.database.collection(collectionName))
 
         const collectionRef2 = sortOperations.reduce((c, { fieldName, direction }) => c = c.orderBy(fieldName, direction), collectionRef)
 
@@ -27,13 +27,13 @@ export default class DataProvider implements IDataProvider {
 
         const docs = (await projectedCollectionRef.limit(limit).offset(skip).get()).docs
 
-        return docs.map((doc: any) => asEntity(doc))
+        return docs.map((doc) => asEntity(doc))
     }
     
     async count(collectionName: string, filter: Filter): Promise<number> {
         const filterOperations = this.filterParser.transform(filter)
 
-        const collectionRef = filterOperations.reduce((c: { where: (arg0: any, arg1: any, arg2: any) => any }, { fieldName, opStr, value }: any) => c.where(fieldName, opStr, value), this.database.collection(collectionName))
+        const collectionRef = filterOperations.reduce((c:  Query<DocumentData>, { fieldName, opStr, value }) => c.where(fieldName, opStr, value), this.database.collection(collectionName))
 
         return (await collectionRef.get()).size
     }

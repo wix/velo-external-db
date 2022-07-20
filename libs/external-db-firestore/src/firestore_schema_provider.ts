@@ -1,6 +1,7 @@
 import { Firestore } from '@google-cloud/firestore'
 import { SystemFields, validateSystemFields, SchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
 import { ISchemaProvider, ResponseField, Table } from '@wix-velo/velo-external-db-types'
+import { table } from './types'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
 
 const SystemTable = '_descriptor'
@@ -19,7 +20,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
     async list(): Promise<Table[]> {
         const l = await this.database.collection(SystemTable).get()
-        const tables = l.docs.reduce((o, d) => ( { ...o, [d.id]: d.data() } ), {})
+        const tables: {[x:string]: table[]} = l.docs.reduce((o, d) => ({ ...o, [d.id]: d.data() }), {})
         return Object.entries(tables)
                      .map(([collectionName, rs]: [string, any]) => ({
                          id: collectionName,

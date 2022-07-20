@@ -1,4 +1,4 @@
-import { Timestamp } from '@google-cloud/firestore'
+import { Timestamp, DocumentData, QueryDocumentSnapshot } from '@google-cloud/firestore'
 
 export const LastLetterCoder = String.fromCharCode(65535)
 
@@ -10,7 +10,7 @@ export const fixDates = (value : any) => {
 }
 
 
-export const asEntity = (docEntity: any) => {
+export const asEntity = (docEntity: QueryDocumentSnapshot<DocumentData>) => {
   const doc = docEntity.data()
   return Object.keys(doc)
   .reduce(function(obj: { [key: string]: any}, key: any) {

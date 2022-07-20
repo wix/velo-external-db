@@ -228,9 +228,7 @@ describe('Fire Store Parser', () => {
         offset: Uninitialized,
     }
 
-    const env: {
-        filterParser: any
-    } = {
+    const env = {
         filterParser: Uninitialized,
     }
 
