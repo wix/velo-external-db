@@ -5,7 +5,7 @@ export class ConfigValidator implements IConfigValidator {
     requiredKeys: string[]
     config: any
     
-    public constructor(config: any) {
+    constructor(config: any) {
         this.requiredKeys = ['projectId', 'instanceId', 'databaseId'] 
         this.config = config
     }
