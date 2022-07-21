@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 1433:1433
+    environment:
+      SA_PASSWORD: "t9D4:EHfU6Xgccs-"
+      ACCEPT_EULA: "Y"
+    networks:
+      - backend
+    command:
+      - /bin/bash
+      - -c
+      - |
+        /opt/mssql/bin/sqlservr
+        curl -s https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh | bash /dev/stdin localhost:1433
+
+      
+networks:
+  backend:
+    driver: bridge

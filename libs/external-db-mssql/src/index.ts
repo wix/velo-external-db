@@ -5,6 +5,8 @@ export { default as SchemaColumnTranslator} from './sql_schema_translator'
 export { default as DatabaseOperations } from './mssql_operations'
 export { default as init } from './connection_provider'
 export { supportedOperations } from './supported_operations'
+export * as testResources from '../tests/e2e-testkit/mssql_resources'
+
 
 import init from './connection_provider'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
