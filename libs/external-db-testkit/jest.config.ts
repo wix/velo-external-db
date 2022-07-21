@@ -1,5 +1,5 @@
 export default {
-  displayName: 'external-db-mongo',
+  displayName: 'external-db-testkit',
   clearMocks: true,
   verbose: true,
   preset: '../../jest.preset.js',
@@ -12,6 +12,6 @@ export default {
     '^.+\\.[tj]s$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/libs/external-db-mongo',
+  coverageDirectory: '../../coverage/libs/external-db-testkit',
   testEnvironment: 'node'
 }

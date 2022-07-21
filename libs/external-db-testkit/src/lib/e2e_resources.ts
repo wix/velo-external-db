@@ -25,6 +25,9 @@ export default class E2EResources {
     async initEnv() {
         await this.implementation.initEnv()
         await sleep(5000)
+    }
+
+    async setUpDb() {
         await this.implementation.cleanup()
         this.implementation.setActive()
     }

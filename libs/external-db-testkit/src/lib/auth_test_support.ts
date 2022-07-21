@@ -1,4 +1,5 @@
-const Chance = require('chance')
+import * as Chance from 'chance'
+
 const chance = Chance()
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080',
@@ -6,38 +7,35 @@ const axios = require('axios').create({
 
 const secretKey = chance.word()
 
-const authInit = () => {
-    process.env.SECRET_KEY = secretKey
+export const authInit = () => {
+    process.env['SECRET_KEY'] = secretKey
 }
 
-const appendSecretKeyToRequest = dataRaw => {
+const appendSecretKeyToRequest = (dataRaw: string) => {
     const data = JSON.parse( dataRaw )
     return JSON.stringify({ ...data, ...{ requestContext: { settings: { secretKey: secretKey } } } })
 }
 
-const appendRoleToRequest = role => dataRaw => {
+const appendRoleToRequest = (role: string) => (dataRaw: string) => {
     const data = JSON.parse( dataRaw )
     return JSON.stringify({ ...data, ...{ requestContext: { ...data.requestContext, role: role } } })
 }
 
-const authAdmin = { transformRequest: axios.defaults
+export const authAdmin = { transformRequest: axios.defaults
                                       .transformRequest
                                       .concat( appendSecretKeyToRequest, appendRoleToRequest('BACKEND_CODE') ) }
 
-const authOwner = { transformRequest: axios.defaults
+export const authOwner = { transformRequest: axios.defaults
                                       .transformRequest
                                       .concat( appendSecretKeyToRequest, appendRoleToRequest('OWNER' ) ) }
 
-const authVisitor = { transformRequest: axios.defaults
+export const authVisitor = { transformRequest: axios.defaults
                                       .transformRequest
                                       .concat( appendSecretKeyToRequest, appendRoleToRequest('VISITOR' ) ) }
 
-const authOwnerWithoutSecretKey = { transformRequest: axios.defaults
+export const authOwnerWithoutSecretKey = { transformRequest: axios.defaults
                                       .transformRequest
                                       .concat( appendRoleToRequest('OWNER' ) ) }
 
-const errorResponseWith = (status, message) => ({ response: { data: { message: expect.stringContaining(message) }, status } })
-
-
-module.exports = { authInit, authAdmin, authOwner, authVisitor, authOwnerWithoutSecretKey, errorResponseWith }
-
+//@ts-ignore
+export const errorResponseWith = (status: any, message: string) => ({ response: { data: { message: expect.stringContaining(message) }, status } })
