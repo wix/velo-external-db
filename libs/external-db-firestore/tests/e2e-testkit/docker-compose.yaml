@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  firestore:
+    image: groovex/firestore-emulator:latest
+    ports:
+      - 8082:8082
+    build:
+      args:
+        GCLOUD_SDK_VERSION: 360.0.0
+      context: .
+    networks:
+      - backend
+      
+networks:
+  backend:
+    driver: bridge
