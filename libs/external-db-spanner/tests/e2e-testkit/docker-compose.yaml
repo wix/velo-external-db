@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  spanner:
+    image: roryq/spanner-emulator:latest
+    ports:
+      - 9010:9010
+      - 9020:9020
+    environment:
+      SPANNER_DATABASE_ID: test-database
+      SPANNER_INSTANCE_ID: test-instance
+      SPANNER_PROJECT_ID: test-project
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
