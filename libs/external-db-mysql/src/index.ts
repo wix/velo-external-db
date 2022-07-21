@@ -5,6 +5,7 @@ export { default as SchemaColumnTranslator } from './sql_schema_translator'
 export { default as init } from './connection_provider'
 export { default as DatabaseOperations } from './mysql_operations'
 export { supportedOperations } from './supported_operations'
+export * as testResources from '../tests/e2e-testkit/mysql_resources'
 
 import { MySqlConfigValidator } from './mysql_config_validator'
 import { DatabaseFactoryResponse, DbConnector } from '@wix-velo/velo-external-db-commons'
