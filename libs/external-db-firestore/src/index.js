@@ -4,6 +4,8 @@ const ConfigValidator = require('./firestore_config_validator')
 const init = require('./connection_provider')
 const { supportedOperations } = require('./supported_operations')
 const { DbConnector } = require('@wix-velo/velo-external-db-commons')
+const testResources = require ('../tests/e2e-testkit/firestore_resources')
+
 
 const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 const opsDriver = () => require('../tests/drivers/db_operations_test_support')
@@ -21,4 +23,4 @@ const firestoreFactory = async(config, options) => {
 } 
 
 
-module.exports = { SchemaProvider, init, driver, opsDriver, DataProvider, supportedOperations, FirestoreConnector, firestoreFactory }
+module.exports = { SchemaProvider, init, driver, opsDriver, DataProvider, supportedOperations, FirestoreConnector, firestoreFactory, testResources }
