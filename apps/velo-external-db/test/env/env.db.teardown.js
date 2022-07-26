@@ -1,12 +1,13 @@
-const postgres = require('../resources/engines/postgres_resources')
-const mysql = require('../resources/engines/mysql_resources')
-const spanner = require('../resources/engines/spanner_resources')
-const firestore = require('../resources/engines/firestore_resources')
-const mssql = require('../resources/engines/mssql_resources')
+const { testResources: postgres } = require ('@wix-velo/external-db-postgres')
+const { testResources: mysql } = require ('@wix-velo/external-db-mysql')
+const { testResources: spanner } = require ('@wix-velo/external-db-spanner')
+const { testResources: firestore } = require ('@wix-velo/external-db-firestore')
+const { testResources: mssql } = require ('@wix-velo/external-db-mssql')
+const { testResources: mongo } = require ('@wix-velo/external-db-mongo')
 const googleSheet = require('../resources/engines/google_sheets_resources')
 const airtable = require('../resources/engines/airtable_resources')
 const dynamo = require('../resources/engines/dynamodb_resources')
-const mongo = require ('../resources/engines/mongo_resources')
+
 const ci = require('./ci_utils')
 
 const shutdownEnv = async(testEngine) => {
