@@ -1,4 +1,4 @@
-import { authOwner, errorResponseWith } from '../drivers/auth_test_support'
+import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
 const each = require('jest-each').default
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } from '../resources/e2e_resources'
 import gen = require('../gen')
@@ -7,6 +7,7 @@ import schema = require('../drivers/schema_api_rest_test_support')
 import hooks = require('../drivers/hooks_test_support')
 
 import { Uninitialized } from '@wix-velo/test-commons'
+
 import { ServiceContext } from 'libs/velo-external-db-core/src/types'
 
 const axios = require('axios').create({
