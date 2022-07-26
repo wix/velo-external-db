@@ -50,7 +50,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     
     //todo: create another test without sort for these implementations
 
-    test.only('insert api', async() => {
+    test('insert api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await axios.post('/data/insert', { collectionName: ctx.collectionName, item: ctx.item }, authAdmin)
 
