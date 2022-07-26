@@ -6,7 +6,7 @@ export { default as init } from './connection_provider'
 export { default as DatabaseOperations } from './airtable_operations'
 export { supportedOperations } from './supported_operations'
 export { app as mockServer } from '../tests/drivers/mock_air_table'
-
+export * as testResources from '../tests/e2e-testkit/airtable_resources'
 import init from './connection_provider'
 import { AirtableConfigValidator } from './airtable_config_validator'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
