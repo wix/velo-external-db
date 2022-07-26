@@ -7,7 +7,7 @@ const SchemaColumnTranslator = require('./sql_schema_translator')
 const init = require('./connection_provider')
 const DatabaseOperations = require ('./bigquery_operations')
 const { supportedOperations } = require('./supported_operations')
-
+const testResources = require ('../tests/e2e-testkit/bigquery_resources')
 const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 
@@ -24,4 +24,4 @@ const bigqueryFactory = async(config, options) => {
     return { connector, connection, providers, cleanup }
 }
 
-module.exports = { SchemaProvider, DataProvider, FilterParser, SchemaColumnTranslator, driver, opsDriver, init, DatabaseOperations, supportedOperations, BigQueryConnector, bigqueryFactory }
+module.exports = { SchemaProvider, DataProvider, FilterParser, SchemaColumnTranslator, driver, opsDriver, init, DatabaseOperations, supportedOperations, BigQueryConnector, bigqueryFactory, testResources }
