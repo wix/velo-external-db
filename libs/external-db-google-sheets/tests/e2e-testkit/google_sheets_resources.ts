@@ -1,7 +1,7 @@
 const init = require('../../src/connection_provider')
 const { app: mockServer} = require ('../mock_google_sheets_api')
 import { Server } from 'http'
-export { supportedOperations } from '@wix-velo/external-db-google-sheets'
+export { supportedOperations } from '../../src/supported_operations'
 
 let _server: Server, port = 1502
 
