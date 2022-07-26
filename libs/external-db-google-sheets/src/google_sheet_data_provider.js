@@ -1,5 +1,5 @@
 const { sheetFor, headersFrom, findRowById } = require('./google_sheet_utils')
-const { eq } = require('@wix-velo/velo-external-db-commons').AdapterOperators
+const { include } = require('@wix-velo/velo-external-db-commons').AdapterOperators
 
 class DataProvider {
     constructor(doc, filterParser) {
@@ -21,8 +21,8 @@ class DataProvider {
     
     async find(collectionName, filter, sort, skip, limit) {
         const sheet = await sheetFor(collectionName, this.doc)
-        if (filter && filter.operator === eq && filter.fieldName === '_id') {
-            const row = await findRowById(sheet, filter.value)
+        if (filter && filter.operator === include && filter.fieldName === '_id') {
+            const row = await findRowById(sheet, filter.value[0])
             return row !== undefined ? [this.formatRow(row)] : []
         }
 
