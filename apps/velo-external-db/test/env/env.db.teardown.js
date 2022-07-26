@@ -4,9 +4,10 @@ const { testResources: spanner } = require ('@wix-velo/external-db-spanner')
 const { testResources: firestore } = require ('@wix-velo/external-db-firestore')
 const { testResources: mssql } = require ('@wix-velo/external-db-mssql')
 const { testResources: mongo } = require ('@wix-velo/external-db-mongo')
-const googleSheet = require('../resources/engines/google_sheets_resources')
-const airtable = require('../resources/engines/airtable_resources')
-const dynamo = require('../resources/engines/dynamodb_resources')
+const { testResources: googleSheet } = require('@wix-velo/external-db-google-sheets')
+const { testResources: airtable } = require('@wix-velo/external-db-airtable')
+const { testResources: dynamo } = require('@wix-velo/external-db-dynamodb')
+const { testResources: bigquery } = require('@wix-velo/external-db-bigquery')
 
 const ci = require('./ci_utils')
 
@@ -46,6 +47,10 @@ const shutdownEnv = async(testEngine) => {
 
         case 'mongo': 
             await mongo.shutdownEnv()
+            break
+        
+        case 'bigquery':
+            await bigquery.shutdownEnv()
             break
     }
 }
