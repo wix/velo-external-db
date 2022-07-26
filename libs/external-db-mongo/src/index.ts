@@ -4,6 +4,7 @@ export { default as FilterParser } from './sql_filter_transformer'
 export { default as DatabaseOperations } from './mongo_operations'
 export { default as init } from './connection_provider'
 export { supportedOperations } from './supported_operations'
+export * as testResources from '../tests/e2e-testkit/mongo_resources'
 
 import init from './connection_provider'
 import { MongoConfigValidator } from './mongo_config_validator'
