@@ -1,4 +1,4 @@
-import { authOwner, errorResponseWith } from '../drivers/auth_test_support'
+import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { testSupportedOperations } from '@wix-velo/test-commons'
 const { UpdateImmediately, DeleteImmediately, Aggregate } = require('@wix-velo/velo-external-db-commons').SchemaOperations
 const each = require('jest-each').default

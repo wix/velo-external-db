@@ -1,4 +1,4 @@
-import { authOwner } from '../drivers/auth_test_support'
+import { authOwner } from '@wix-velo/external-db-testkit'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } from '../resources/e2e_resources'
 
 const axios = require('axios').create({

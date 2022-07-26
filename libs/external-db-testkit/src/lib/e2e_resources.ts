@@ -47,6 +47,7 @@ export default class E2EResources {
         }
         this.env = await this.initFunc()
         this.env.externalDbRouter = this.env.externalDbRouter
+        return this.env
     }
 
     async dbTeardown() {
