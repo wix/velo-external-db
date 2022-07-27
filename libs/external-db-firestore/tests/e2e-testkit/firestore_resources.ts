@@ -1,5 +1,5 @@
 export { supportedOperations } from '../../src/supported_operations'
-const init = require('../../src/connection_provider')
+import { init } from '@wix-velo/external-db-firestore'
 
 import * as compose from 'docker-compose'
 

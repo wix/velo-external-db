@@ -7,6 +7,7 @@ export { default as DatabaseOperations } from './firestore_operations'
 import init from './connection_provider'
 export { default as init } from './connection_provider'
 export { supportedOperations } from './supported_operations'
+export * as testResources from '../tests/e2e-testkit/firestore_resources'
 
 export const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 export const opsDriver = () => require('../tests/drivers/db_operations_test_support')
