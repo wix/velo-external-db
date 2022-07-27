@@ -1,4 +1,4 @@
-import { createApp } from 'velo-external-db'
+import { createApp } from '../../src/app'
 
 import { testResources as postgres } from '@wix-velo/external-db-postgres'
 import { testResources as mysql } from '@wix-velo/external-db-mysql'

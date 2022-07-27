@@ -1,4 +1,4 @@
-import { init } from '@wix-velo/external-db-bigquery'
+import init  from '../../src/connection_provider'
 export { supportedOperations } from '../../src/supported_operations'
 
 const databaseId = 'testDB'
