@@ -1,5 +1,5 @@
 import { Dataset } from '@google-cloud/bigquery'
-import { IDataProvider, AdapterFilter as Filter, Item } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, Item, AdapterFilter, AdapterAggregation } from '@wix-velo/velo-external-db-types'
 import { asParamArrays, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { unPatchDateTime, patchDateTime, escapeIdentifier } from './bigquery_utils'
 import FilterParser from './sql_filter_transformer'
@@ -45,11 +45,11 @@ export default class DataProvider implements IDataProvider {
         return items.length
     }
 
-    async update(collectionName: string, items: any[]) {        
+    async update(collectionName: string, items: Item[]) {        
         const updateFields = updateFieldsFor(items[0])
         const queries = items.map(() => `UPDATE ${escapeIdentifier(collectionName)} SET ${updateFields.map(f => `${escapeIdentifier(f)} = ?`).join(', ')} WHERE _id = ?` )
                              .join(';')
-        const updateTables = items.map((i: Record<string, any>) => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}))
+        const updateTables = items.map((i: Item) => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}))
                                 .map((u: any) => asParamArrays( patchDateTime(u) ))
                                 
                                     
@@ -73,7 +73,7 @@ export default class DataProvider implements IDataProvider {
                   .catch( translateErrorCodes )
     }
 
-    async aggregate(collectionName: string, filter: any, aggregation: any) {
+    async aggregate(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation) {
         const { filterExpr: whereFilterExpr, parameters: whereParameters } = this.filterParser.transform(filter)
         const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation)
 
