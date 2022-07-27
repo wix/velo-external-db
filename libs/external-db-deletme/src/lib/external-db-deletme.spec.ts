@@ -21,6 +21,21 @@ describe('externalDbDeletme', () => {
         }))
     })
 
+    test('should add -hook suffix to collection', async () => {
+        await axios.post('/schemas/create', { collectionName: 'collection' }, authOwner)
+
+        await expect(axios.post('/schemas/find', { schemaIds: ['collection-hook'] }, authOwner)).resolves.toEqual(expect.objectContaining({
+            data:
+            {
+                schemas: expect.arrayContaining([
+                    expect.objectContaining({
+                        id: 'collection-hook'
+                    })
+                ])
+            }
+        }))
+    })
+
     afterAll(async () => {
         await env.globalTeardown()
     })
