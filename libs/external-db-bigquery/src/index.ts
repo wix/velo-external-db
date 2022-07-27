@@ -5,6 +5,7 @@ export { default as SchemaColumnTranslator } from './sql_schema_translator'
 export { default as DatabaseOperations } from './bigquery_operations'
 export { default as init } from './connection_provider'
 export { supportedOperations } from './supported_operations'
+export * as testResources from '../tests/e2e-testkit/bigquery_resources'
 
 import ConfigValidator from './bigquery_config_validator'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
