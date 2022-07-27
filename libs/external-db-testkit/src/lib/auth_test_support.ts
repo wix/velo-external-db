@@ -5,7 +5,7 @@ const axios = require('axios').create({
     baseURL: 'http://localhost:8080',
 })
 
-const secretKey = chance.word()
+const secretKey = 'secretKey'
 
 export const authInit = () => {
     process.env['SECRET_KEY'] = secretKey
