@@ -1,15 +1,16 @@
-const FilterParser = require('./sql_filter_transformer')
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { LastLetterCoder } = require('./firestore_utils')
-const { randomSupportedFilter } = require('../tests/gen')
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const each = require('jest-each').default
-const Chance = require('chance')
+import FilterParser from './sql_filter_transformer'
+import { Uninitialized } from '@wix-velo/test-commons'
+import { LastLetterCoder } from './firestore_utils'
+import { randomSupportedFilter } from '../tests/gen'
+import { errors } from '@wix-velo/velo-external-db-commons'
+const { InvalidQuery } = errors
+import each from 'jest-each'
+import * as Chance from 'chance'
 const chance = Chance()
-const { AdapterOperators } = require('@wix-velo/velo-external-db-commons')
+import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_contains, and, urlized } = AdapterOperators
 
-const EmptySort = []
+const EmptySort: any[] = []
 
 describe('Fire Store Parser', () => {
 

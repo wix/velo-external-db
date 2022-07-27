@@ -1,13 +1,17 @@
-const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-const { isObject, AdapterOperators, isEmptyFilter } = require('@wix-velo/velo-external-db-commons')
-const { LastLetterCoder } = require('./firestore_utils')
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
 
-class FilterParser {
+import { WhereFilterOp, OrderByDirection } from '@google-cloud/firestore'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { AdapterFilter as Filter, NotEmptyAdapterFilter, Sort } from '@wix-velo/velo-external-db-types' 
+import { isObject, AdapterOperators, isEmptyFilter } from '@wix-velo/velo-external-db-commons'
+import { LastLetterCoder } from './firestore_utils'
+import { queryFilter } from './types'
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized } = AdapterOperators
+const { InvalidQuery } = errors
+export default class FilterParser {
     constructor() {
     }
 
-    transform(filter) {
+    transform(filter: Filter) {
     const results = this.parseFilter(filter)
     
         if (results.length === 0) {
@@ -17,12 +21,12 @@ class FilterParser {
         return results
     }
 
-    parseFilter(filter, inlineFields) {
+    parseFilter(filter: Filter, inlineFields: any = ''): queryFilter[] {
         if (isEmptyFilter(filter)) {
             return []
         }
 
-        const { operator, fieldName, value } =  filter
+        const { operator, fieldName, value } =  filter as NotEmptyAdapterFilter
 
         if(this.isUnsupportedOperator(operator)) {
             throw new InvalidQuery(`${operator} operator cant be used in firebase`)
@@ -43,7 +47,7 @@ class FilterParser {
         }
         
         if(this.isMultipleFiledOperator(operator)) {
-            return value.reduce((o, f) => {
+            return value.reduce((o: queryFilter[], f: Filter) => { 
                 return o.concat( this.parseFilter.bind(this)(f) )
             }, [])
         }
@@ -51,23 +55,23 @@ class FilterParser {
         return []
     }
 
-    isSingleFieldOperator(operator) {
+    isSingleFieldOperator(operator: string) {
         return [ne, lt, lte, gt, gte, include, eq, string_begins, string_ends].includes(operator)
     }
 
-    isStringBeginsOperator(operator) {
+    isStringBeginsOperator(operator: string) {
         return operator === string_begins
     }
     
-    isUnsupportedOperator(operator) {   
+    isUnsupportedOperator(operator: string) {   
         return [or, urlized, string_contains, not, string_ends].includes(operator)
     }
     
-    isMultipleFiledOperator(operator) {
+    isMultipleFiledOperator(operator: string) {
         return [and].includes(operator)
     }
     
-    valueForOperator(value, operator) {
+    valueForOperator(value: any, operator: string) {
         if (operator === include) {
             if (value === undefined || value.length === 0) {
                 throw new InvalidQuery(`${operator} cannot have an empty list of arguments`)
@@ -80,7 +84,7 @@ class FilterParser {
         return value
     }
     
-    adapterOperatorToFirestoreOperator(operator) {
+    adapterOperatorToFirestoreOperator(operator: string): WhereFilterOp {
         switch (operator) {
             case eq:
                 return '=='
@@ -96,10 +100,12 @@ class FilterParser {
                 return '>='
             case include:
                 return 'in'
+            default:
+                throw('Unrecognized operator')
         }
     }
     
-    orderBy(sort) {
+    orderBy(sort: any) {
         if (!Array.isArray(sort) || !sort.every(isObject)) {
             return []
         }
@@ -114,19 +120,19 @@ class FilterParser {
 
     }
     
-    parseSort({ fieldName, direction }) {
+    parseSort({ fieldName, direction }: Sort) {
         if (typeof fieldName !== 'string') {
             return []
         }
         const _direction = direction || 'asc'
     
-        const dir = 'asc' === _direction.toLowerCase() ? 'asc' : 'desc'
+        const dir: OrderByDirection = 'asc' === _direction.toLowerCase() ? 'asc' : 'desc'
         
         return [{ fieldName, direction: dir }]
 
     }
 
-    inlineVariableIfNeeded(fieldName, inlineFields) {
+    inlineVariableIfNeeded(fieldName: string, inlineFields: {[key: string]: any}) {
         if (inlineFields) {
             if (inlineFields[fieldName]) {
                 return inlineFields[fieldName]
@@ -135,22 +141,20 @@ class FilterParser {
         return fieldName
     }
 
-    parseStringBegins(fieldName, inlineFields, value) {
+    parseStringBegins(fieldName: string, inlineFields: {[key: string]: any}, value: string) {
         return [{
             fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
-            opStr: '>=',
+            opStr: '>=' as WhereFilterOp,
             value,
         },
         {
             fieldName: this.inlineVariableIfNeeded(fieldName, inlineFields),
-            opStr: '<',
+            opStr: '<' as WhereFilterOp,
             value: value + LastLetterCoder
         }]
     }
 
-    selectFieldsFor(projection) { 
+    selectFieldsFor(projection: string[]) { 
         return projection
     }
 }
-
-module.exports = FilterParser
