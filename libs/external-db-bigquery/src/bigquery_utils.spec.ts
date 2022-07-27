@@ -1,7 +1,7 @@
-const { Uninitialized } = require('@wix-velo/test-commons')
-const { unPatchDateTime } = require('./bigquery_utils')
-const driver = require('./bigquery_utils_test_support')
-const Chance = require('chance')
+import { Uninitialized } from '@wix-velo/test-commons'
+import { unPatchDateTime } from './bigquery_utils'
+import * as driver from './bigquery_utils_test_support'
+import * as Chance from 'chance'
 const chance = Chance()
 
 describe('BigQuery Utils', () => {

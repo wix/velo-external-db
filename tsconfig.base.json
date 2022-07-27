@@ -26,7 +26,7 @@
       "@wix-velo/external-db-dynamodb": [ "libs/external-db-dynamodb/src/index.ts" ],
       "@wix-velo/external-db-google-sheets": [ "libs/external-db-google-sheets/src/index.js" ],
       "@wix-velo/external-db-airtable": [ "libs/external-db-airtable/src/index.ts" ],
-      "@wix-velo/external-db-bigquery": [ "libs/external-db-bigquery/src/index.js" ],
+      "@wix-velo/external-db-bigquery": [ "libs/external-db-bigquery/src/index.ts" ],
       "@wix-velo/external-db-security": [ "libs/external-db-security/src/index.ts" ],
       "@wix-velo/test-commons": [ "libs/test-commons/src/index.ts" ],
       "@wix-velo/velo-external-db-commons": [ "libs/velo-external-db-commons/src/index.ts" ],

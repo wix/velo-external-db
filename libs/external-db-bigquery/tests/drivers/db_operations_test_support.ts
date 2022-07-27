@@ -1,7 +1,7 @@
-const DatabaseOperations = require('../../src/bigquery_operations')
-const init = require('../../src/connection_provider')
+import DatabaseOperations from '../../src/bigquery_operations'
+import init from '../../src/connection_provider'
 
-const createPool = modify => {
+const createPool = (modify: any) => {
     const config = {}
     const { connection, cleanup } = init({ ...config, ...modify })
     return { connection, cleanup }
@@ -9,14 +9,10 @@ const createPool = modify => {
 
 const dbOperationWithMisconfiguredDatabaseId = () => new DatabaseOperations(createPool({ databaseId: 'wrong' }).connection)
 
-const dbOperationWithValidDB = () => {
+export const dbOperationWithValidDB = () => {
     const { connection, cleanup } = createPool({ databaseId: 'testDB' })
     const dbOperations = new DatabaseOperations(connection)
     return { dbOperations, cleanup: cleanup }
 }
 
-const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong databaseId', () => dbOperationWithMisconfiguredDatabaseId()]])
-
-module.exports = {
-    misconfiguredDbOperationOptions, dbOperationWithValidDB
-}
+export const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong databaseId', () => dbOperationWithMisconfiguredDatabaseId()]])

@@ -104,7 +104,7 @@ export const parseTableData = (data: any[]) => data.reduce((o: { [x: string]: an
     arr.push(r)
     o[r.table_name] = arr
     return o
-}, {})
+}, {}) as {[x:string]: {table_name: string, field: string, type: string}[]}
 
 export const allowedOperationsFor = ({ fields }: {fields: ResponseField[]}) => fields.find((c: ResponseField) => c.field === '_id') ? ReadWriteOperations : ReadOnlyOperations
 

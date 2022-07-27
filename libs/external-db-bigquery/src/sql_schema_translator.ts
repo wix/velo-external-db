@@ -1,10 +1,11 @@
-const { escapeIdentifier } = require('./bigquery_utils')
-class SchemaColumnTranslator {
+import { InputField } from '@wix-velo/velo-external-db-types'
+import { escapeIdentifier } from './bigquery_utils'
+export default class SchemaColumnTranslator {
 
     constructor() {
     }
 
-    translateType(dbType) {
+    translateType(dbType: string) {
         const type = dbType.toLowerCase()
                            .split('(')
                            .shift() 
@@ -37,7 +38,7 @@ class SchemaColumnTranslator {
         }
     }
 
-    columnToDbColumnSql(f, options = { escapeId: true, precision: true }) {
+    columnToDbColumnSql(f: InputField, options = { escapeId: true, precision: true }) {
         return { 
             name: options.escapeId ? escapeIdentifier(f.name) : f.name, 
             type: this.dbTypeFor(f, { precision: options.precision }), 
@@ -45,14 +46,14 @@ class SchemaColumnTranslator {
         }
     }
 
-    dbTypeFor(f, options = { precision: true }) {
+    dbTypeFor(f: InputField, options = { precision: true }) {
         if (options.precision) {
-            return this.dbType(f.type, f.subtype, f.precision)
+            return this.dbType(f.type, f.subtype, f.precision as string)
         }
         return this.dbType(f.type, f.subtype)
     }
 
-    dbType(type, subtype, precision) {
+    dbType(type: string, subtype = '', precision = '') {
         switch (`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`) {
             case 'number_int':
                 return 'INTEGER'
@@ -61,11 +62,11 @@ class SchemaColumnTranslator {
                 return 'BIGINT'
 
             case 'number_double':
-                return `BIGDECIMAL${this.parseLength(precision)}`
+                return `BIGDECIMAL${this.parseLength(precision as string)}`
 
             case 'number_decimal':
             case 'number_float':
-                return `NUMERIC${this.parseLength(precision)}`
+                return `NUMERIC${this.parseLength(precision as string)}`
 
             case 'datetime_date':
                 return 'TIMESTAMP'
@@ -78,7 +79,7 @@ class SchemaColumnTranslator {
                 return 'TIMESTAMP'
 
             case 'text_string':
-                return `STRING${this.parseLength(precision)}`
+                return `STRING${this.parseLength(precision as string)}`
 
             case 'text_small':
             case 'text_medium':
@@ -122,5 +123,3 @@ class SchemaColumnTranslator {
 
 
 }
-
-module.exports = SchemaColumnTranslator

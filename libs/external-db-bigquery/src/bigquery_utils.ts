@@ -1,12 +1,13 @@
+import { Item } from '@wix-velo/velo-external-db-types'
 
 // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
-const escapeIdentifier = (str) => str==='*' ? '*' : `\`${(str || '').replace(/"/g, '""')}\``
-const wildCardWith = (n, char) => Array(n).fill(char, 0, n).join(', ')
+export const escapeIdentifier = (str: string) => str ==='*' ? '*' : `\`${(str || '').replace(/"/g, '""')}\``
+export const wildCardWith = (n: number, char: string) => Array(n).fill(char, 0, n).join(', ')
 
 const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
 
-const patchDateTime = (item) => {
-    const obj = {}
+export const patchDateTime = (item: Item) => {
+    const obj: any = {}
     for (const key of Object.keys(item)) {
         const value = item[key]
         
@@ -19,8 +20,8 @@ const patchDateTime = (item) => {
     return obj
 }
 
-const unPatchDateTime = (item) => {
-    return Object.keys(item).reduce((acc, key) => {
+export const unPatchDateTime = (item: any) => {
+    return Object.keys(item).reduce((acc: any, key) => {
         const value = item[key]?.value
         
         if (isDate(value)) 
@@ -37,7 +38,5 @@ const unPatchDateTime = (item) => {
     }, {})
 }
 
-const isNumber = (value) => value !== null && value.toNumber
-const isDate = (value) => reISO.test(value)
-
-module.exports = { patchDateTime, unPatchDateTime, escapeIdentifier, wildCardWith }
+const isNumber = (value: any) => value !== null && value.toNumber
+const isDate = (value: any) => reISO.test(value)

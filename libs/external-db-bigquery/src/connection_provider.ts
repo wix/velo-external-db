@@ -1,10 +1,12 @@
-const { BigQuery } = require('@google-cloud/bigquery')
-const FilterParser = require('./sql_filter_transformer')
-const DatabaseOperations = require ('./bigquery_operations')
-const SchemaProvider = require('./bigquery_schema_provider')
-const DataProvider = require('./bigquery_data_provider')
+import { BigQuery, Dataset } from '@google-cloud/bigquery'
+import FilterParser from './sql_filter_transformer'
+import DatabaseOperations from './bigquery_operations'
+import SchemaProvider from './bigquery_schema_provider'
+import DataProvider from './bigquery_data_provider'
+import { BigQueryConfig } from './types'
+import { DbProviders } from '@wix-velo/velo-external-db-types'
 
-const init = ({ projectId, databaseId }) => {
+export default ({ projectId, databaseId }: BigQueryConfig): DbProviders<Dataset> => {
     const bigquery = new BigQuery()
     const pool = bigquery.dataset(databaseId)
 
@@ -16,4 +18,3 @@ const init = ({ projectId, databaseId }) => {
     return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool,  cleanup: async() => {} }
 }
 
-module.exports = init
