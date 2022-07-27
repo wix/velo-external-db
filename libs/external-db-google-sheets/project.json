@@ -8,7 +8,7 @@
       "outputs": [ "{options.outputPath}" ],
       "options": {
         "outputPath": "dist/libs/external-db-google-sheets",
-        "main": "libs/external-db-google-sheets/src/index.js",
+        "main": "libs/external-db-google-sheets/src/index.ts",
         "tsConfig": "libs/external-db-google-sheets/tsconfig.lib.json",
         "assets": [ "libs/external-db-google-sheets/*.md" ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
@@ -49,7 +49,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": [ "coverage/libs/external-db-google-sheets" ],
       "options": {
-        "jestConfig": "libs/external-db-google-sheets/jest.config.js",
+        "jestConfig": "libs/external-db-google-sheets/jest.config.ts",
         "passWithNoTests": true
       }
     }

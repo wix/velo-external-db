@@ -1,22 +1,26 @@
-const { SystemFields, validateSystemFields, parseTableData, errors } = require('@wix-velo/velo-external-db-commons')
-const { SchemaOperations } = require('@wix-velo/velo-external-db-types')
-const { translateErrorCodes } = require('./google_sheet_exception_translator')
-const { describeSheetHeaders, headersFrom, sheetFor } = require('./google_sheet_utils')
-class SchemaProvider {
-    constructor(doc) {
+import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet } from 'google-spreadsheet'
+import { SystemFields, validateSystemFields, parseTableData, errors, SchemaOperations } from '@wix-velo/velo-external-db-commons'
+import { ISchemaProvider, ResponseField, InputField, Table } from '@wix-velo/velo-external-db-types'
+import { translateErrorCodes } from './google_sheet_exception_translator'
+import { describeSheetHeaders, headersFrom, sheetFor } from './google_sheet_utils'
+
+export default class SchemaProvider implements ISchemaProvider {
+    doc: GoogleSpreadsheet
+
+    constructor(doc: GoogleSpreadsheet) {
         this.doc = doc
     }
 
-    async sheetsHeaders(sheets) {
+    async sheetsHeaders(sheets: GoogleSpreadsheetWorksheet[]) {
         const describedSheets = await Promise.all(sheets.map(describeSheetHeaders))
         return describedSheets.flatMap(s => s)
     }
 
-    async list() {
+    async list() : Promise<Table[]> {
         await this.doc.loadInfo()
         const sheets = Object.values(this.doc.sheetsByTitle)
         const sheetsHeaders = await this.sheetsHeaders(sheets)
-        const parsedSheetsHeadersData = parseTableData(sheetsHeaders)
+        const parsedSheetsHeadersData: {[x:string]: {table_name: string, field: string, type: string}[]}  = parseTableData(sheetsHeaders) 
         return Object.entries(parsedSheetsHeadersData)
                      .map(([collectionName, rs]) => ({
                          id: collectionName,
@@ -26,8 +30,7 @@ class SchemaProvider {
 
     async listHeaders() {
         await this.doc.loadInfo()
-        const sheets = await Promise.all( Object.values(this.doc.sheetsByTitle) )
-        return sheets.map(sheet => sheet._rawProperties.title)
+        return Object.keys(this.doc.sheetsByTitle)
     }
 
     supportedOperations() {
@@ -35,18 +38,18 @@ class SchemaProvider {
         return [ List, ListHeaders, Create, Drop, AddColumn, Describe ]
     }
 
-    async create(collectionName) {
+    async create(collectionName: string) {
         const newSheet = await this.doc.addSheet({ title: collectionName })
         await newSheet.setHeaderRow(SystemFields.map(i => i.name))
                       .catch(translateErrorCodes)
     }
 
-    async describeCollection(collectionName) {
+    async describeCollection(collectionName: string) {
         const sheet = await sheetFor(collectionName, this.doc)
         return await describeSheetHeaders(sheet)
     }
 
-    async addColumn(collectionName, column) {
+    async addColumn(collectionName: string, column: InputField) {
         await validateSystemFields(column.name)
         const sheet = await sheetFor(collectionName, this.doc)
         const header = await headersFrom(sheet)
@@ -58,12 +61,12 @@ class SchemaProvider {
         throw new errors.InvalidRequest('Columns in Google Sheets cannot be deleted')
     }
 
-    async drop(collectionName) {
+    async drop(collectionName: string) {
         const sheet = await sheetFor(collectionName, this.doc)
         await sheet.delete()
     }
 
-    translateDbTypes(row) {
+    translateDbTypes(row: ResponseField) {
         return {
             field: row.field,
             type: row.type
@@ -71,4 +74,3 @@ class SchemaProvider {
     }
 }
 
-module.exports = SchemaProvider
