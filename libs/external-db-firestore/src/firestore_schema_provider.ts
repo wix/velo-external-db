@@ -1,6 +1,6 @@
 import { Firestore } from '@google-cloud/firestore'
 import { SystemFields, validateSystemFields, SchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
-import { ISchemaProvider, ResponseField, Table } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, Table } from '@wix-velo/velo-external-db-types'
 import { table } from './types'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
 
@@ -11,7 +11,7 @@ export default class SchemaProvider implements ISchemaProvider {
         this.database = database
     }
 
-    reformatFields(field: { name: any; type: any }) {
+    reformatFields(field: InputField) {
         return {
             field: field.name,
             type: field.type,
@@ -40,7 +40,7 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
 
-    async create(collectionName: string, columns: any) {
+    async create(collectionName: string, columns: InputField[]) {
         const coll = await this.database.collection(SystemTable)
                                         .doc(collectionName)
                                         .get()
@@ -54,7 +54,7 @@ export default class SchemaProvider implements ISchemaProvider {
         }
     }
 
-    async addColumn(collectionName: string, column: { name: string }) {
+    async addColumn(collectionName: string, column: InputField) {
         await validateSystemFields(column.name)
 
         const collectionRef = this.database.collection(SystemTable).doc(collectionName)
