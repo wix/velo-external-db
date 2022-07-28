@@ -1,5 +1,4 @@
 import * as Chance from 'chance'
-import '@types/jest';
 
 const chance = Chance()
 const axios = require('axios').create({
