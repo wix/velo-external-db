@@ -1,5 +1,5 @@
-import { init } from '@wix-velo/external-db-postgres'
-export { supportedOperations } from '@wix-velo/external-db-postgres'
+import init from '../../src/connection_provider'
+export { supportedOperations } from '../../src/supported_operations'
 import * as compose from 'docker-compose'
 
 export const connection = () => {
