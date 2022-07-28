@@ -67,15 +67,15 @@ const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 // const googleSheetTestEnvInit = async() => await dbInit(googleSheetTestEnv, googleSheet)
 
 const testSuits = {
-    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.supportedOperations),
-    postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.supportedOperations),
-    spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.supportedOperations),
-    firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.supportedOperations),
-    mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.supportedOperations),
-    mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.supportedOperations),
-    airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.supportedOperations),
-    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.supportedOperations),
-    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.supportedOperations),
+    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.testResources.supportedOperations),
+    postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.testResources.supportedOperations),
+    spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.testResources.supportedOperations),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.testResources.supportedOperations),
+    mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.testResources.supportedOperations),
+    mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.testResources.supportedOperations),
+    airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.testResources.supportedOperations),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.testResources.supportedOperations),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.testResources.supportedOperations),
     // 'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
 }
 

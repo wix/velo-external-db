@@ -3,7 +3,6 @@ export { default as DataProvider } from './dynamo_data_provider'
 export { default as FilterParser } from './sql_filter_transformer'
 export { default as DatabaseOperations } from './dynamo_operations'
 export { default as init } from './connection_provider'
-export { supportedOperations } from './supported_operations'
 export * as testResources from '../tests/e2e-testkit/dynamodb_resources'
 
 import init from './connection_provider'
