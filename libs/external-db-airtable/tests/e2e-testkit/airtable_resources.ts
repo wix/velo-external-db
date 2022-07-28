@@ -1,7 +1,7 @@
+import { Server } from 'http'
 import init from '../../src/connection_provider'
 import { app as mockServer } from '../drivers/mock_air_table'
 export { supportedOperations } from '../../src/supported_operations'
-import { Server } from 'http'
 
 let _server: Server
 const PORT = 9000

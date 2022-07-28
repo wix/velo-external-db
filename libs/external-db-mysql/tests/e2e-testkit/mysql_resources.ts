@@ -1,7 +1,7 @@
-import init from '../../src/connection_provider'
-import { waitUntil } from 'async-wait-until'
-export { supportedOperations } from '@wix-velo/external-db-mysql'
 import * as compose from 'docker-compose'
+import { waitUntil } from 'async-wait-until'
+import init from '../../src/connection_provider'
+export { supportedOperations } from '../../src/supported_operations'
 
 
 export const connection = () => {

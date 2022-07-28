@@ -1,7 +1,8 @@
-export { supportedOperations } from '../../src/supported_operations'
-import { init } from '@wix-velo/external-db-firestore'
-
 import * as compose from 'docker-compose'
+import init from '../../src/connection_provider'
+
+export { supportedOperations } from '../../src/supported_operations'
+
 
 const setEmulatorOn = () => process.env['FIRESTORE_EMULATOR_HOST'] = 'localhost:8082'
 

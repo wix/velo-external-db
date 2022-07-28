@@ -249,5 +249,4 @@ export interface IImplementationResources {
     cleanup(): Promise<void> | void   
     supportedOperations: SchemaOperations[]
     name: string
-    // connection(): Promise<T> | T
 }

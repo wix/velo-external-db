@@ -1,4 +1,5 @@
 import * as Chance from 'chance'
+import '@types/jest';
 
 const chance = Chance()
 const axios = require('axios').create({
@@ -37,5 +38,4 @@ export const authOwnerWithoutSecretKey = { transformRequest: axios.defaults
                                       .transformRequest
                                       .concat( appendRoleToRequest('OWNER' ) ) }
 
-//@ts-ignore
 export const errorResponseWith = (status: any, message: string) => ({ response: { data: { message: expect.stringContaining(message) }, status } })

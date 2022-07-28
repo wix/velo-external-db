@@ -1,6 +1,6 @@
-import { init } from '@wix-velo/external-db-mssql'
-export { supportedOperations } from '@wix-velo/external-db-mssql'
 import * as compose from 'docker-compose'
+import init from '../../src/connection_provider'
+export { supportedOperations } from '../../src/supported_operations'
 
 const testEnvConfig = {
     host: 'localhost',
