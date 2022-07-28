@@ -164,6 +164,8 @@ services:
       - 27017:27017
     volumes:
       - ./engines/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - backend
 
   mongo4:
     image: mongo:4
@@ -176,6 +178,8 @@ services:
       - 27017:27017
     volumes:
       - ./engines/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - backend
 
   dynamodb:
     image:  amazon/dynamodb-local:latest
@@ -186,6 +190,8 @@ services:
       AWS_REGION: us-west-2
       AWS_ACCESS_KEY_ID: TEST_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: TEST_SECRET_ACCESS_KEY
+    networks:
+      - backend
 
 networks:
   backend:

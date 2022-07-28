@@ -9,3 +9,9 @@ services:
       AWS_REGION: us-west-2
       AWS_ACCESS_KEY_ID: TEST_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: TEST_SECRET_ACCESS_KEY
+    networks:
+      - backend
+  
+networks:
+  backend:
+    driver: bridge
