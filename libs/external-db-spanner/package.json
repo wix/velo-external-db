@@ -1,5 +1,5 @@
 {
-  "name": "@wix-velo/external-db-sapnner",
-  "version": "1.1.0",
+  "name": "@wix-velo/external-db-spanner",
+  "version": "1.2.0",
 	"type": "commonjs"
 }
