@@ -1,7 +1,8 @@
-import { init } from '@wix-velo/external-db-mysql'
-import { runImage, stopImage } from './docker_support'
+import * as compose from 'docker-compose'
 import { waitUntil } from 'async-wait-until'
-export { supportedOperations } from '@wix-velo/external-db-mysql'
+import init from '../../src/connection_provider'
+export { supportedOperations } from '../../src/supported_operations'
+
 
 export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { connectionLimit: 1, queueLimit: 0 })
@@ -17,18 +18,20 @@ export const cleanup = async() => {
     await cleanup()
 }
 
-export const initEnv = async() => {
-    await runImage('mysql')
+export const initEnv = async () => {
+    await compose.upOne('mysql', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] })
 }
 
-export const shutdownEnv = async() => {
-    await stopImage('mysql')
+export const shutdownEnv = async () => {
+    await compose.stopOne('mysql', { cwd: __dirname, log: true })
 }
 
 export const setActive = () => {
-    process.env.TYPE = 'mysql'
-    process.env.HOST = 'localhost'
-    process.env.USER = 'test-user'
-    process.env.PASSWORD = 'password'
-    process.env.DB = 'test-db'
+    process.env['TYPE'] = 'mysql'
+    process.env['HOST'] = 'localhost'
+    process.env['USER'] = 'test-user'
+    process.env['PASSWORD'] = 'password'
+    process.env['DB'] = 'test-db'
 }
+
+export const name = 'mysql'

@@ -8,7 +8,7 @@
       "outputs": [ "{options.outputPath}" ],
       "options": {
         "outputPath": "dist/apps/velo-external-db",
-        "main": "apps/velo-external-db/src/app.ts",
+        "main": "apps/velo-external-db/src/main.ts",
         "tsConfig": "apps/velo-external-db/tsconfig.app.json",
         "generatePackageJson": true,
         "progress": true,

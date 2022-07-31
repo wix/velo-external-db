@@ -17,6 +17,7 @@
     "@wix-velo/velo-external-db-commons": "libs/velo-external-db-commons",
     "@wix-velo/velo-external-db-core": "libs/velo-external-db-core",
     "@wix-velo/velo-external-db-types": "libs/velo-external-db-types",
+    "@wix-velo/external-db-testkit": "libs/external-db-testkit",
     "velo-external-db": "apps/velo-external-db"
   }
 }

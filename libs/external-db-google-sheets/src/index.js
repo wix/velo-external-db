@@ -5,6 +5,7 @@ const ConfigValidator = require('./google_sheet_config_validator')
 const init = require('./connection_provider')
 const { app: mockServer, cleanupSheets }  = require('../tests/mock_google_sheets_api')
 const { supportedOperations } = require('./supported_operations')
+const testResources = require ('../tests/e2e-testkit/google_sheets_resources')
 
 const driver = () => require('../tests/sql_filter_transformer_test_support.js')
 
@@ -23,4 +24,4 @@ const googleSheetFactory = async(config, options) => {
 
 
 
-module.exports = { SchemaProvider, DataProvider, init, mockServer, driver, cleanupSheets, supportedOperations, GoogleSheetConnector, googleSheetFactory }
+module.exports = { SchemaProvider, DataProvider, init, mockServer, driver, cleanupSheets, supportedOperations, GoogleSheetConnector, googleSheetFactory, testResources }

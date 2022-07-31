@@ -1,6 +1,6 @@
-import { init } from '@wix-velo/external-db-mssql'
-import { runImage, stopImage } from './docker_support'
-export { supportedOperations } from '@wix-velo/external-db-mssql'
+import * as compose from 'docker-compose'
+import init from '../../src/connection_provider'
+export { supportedOperations } from '../../src/supported_operations'
 
 const testEnvConfig = {
     host: 'localhost',
@@ -34,18 +34,20 @@ export const cleanup = async() => {
 }
 
 export const initEnv = async() => {
-    await runImage('mssql')
+    await compose.upOne('mssql', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] })
 }
 
 export const shutdownEnv = async() => {
-    await stopImage('mssql')
+    await compose.stopOne('mssql', { cwd: __dirname, log: true })
 }
 
 export const setActive = () => {
-    process.env.TYPE = 'mssql'
-    process.env.HOST = 'localhost'
-    process.env.USER = 'sa'
-    process.env.PASSWORD = 't9D4:EHfU6Xgccs-'
-    process.env.DB = 'tempdb'
-    process.env.UNSECURED_ENV = 'true'
+    process.env['TYPE'] = 'mssql'
+    process.env['HOST'] = 'localhost'
+    process.env['USER'] = 'sa'
+    process.env['PASSWORD'] = 't9D4:EHfU6Xgccs-'
+    process.env['DB'] = 'tempdb'
+    process.env['UNSECURED_ENV'] = 'true'
 }
+
+export const name = 'mssql'

@@ -3,7 +3,7 @@ import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 const { RemoveColumn } = SchemaOperations
 import * as schema from '../drivers/schema_api_rest_test_support'
 import * as matchers from '../drivers/schema_api_rest_matchers'
-import { authOwner } from '../drivers/auth_test_support'
+import { authOwner } from '@wix-velo/external-db-testkit'
 import * as gen from '../gen'
 import Chance = require('chance')
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'

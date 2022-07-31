@@ -1,4 +1,5 @@
 import * as Chance from 'chance'
+
 const chance = Chance()
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080',
@@ -7,7 +8,7 @@ const axios = require('axios').create({
 const secretKey = chance.word()
 
 export const authInit = () => {
-    process.env.SECRET_KEY = secretKey
+    process.env['SECRET_KEY'] = secretKey
 }
 
 const appendSecretKeyToRequest = (dataRaw: string) => {

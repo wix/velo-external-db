@@ -241,3 +241,12 @@ export interface CollectionPermissions {
 export interface RoleConfig {
     collectionPermissions: CollectionPermissions[]
 }
+
+export interface IImplementationResources {
+    initEnv(): Promise<void>
+    shutdownEnv(): Promise<void> 
+    setActive(): Promise<void> | void
+    cleanup(): Promise<void> | void   
+    supportedOperations: SchemaOperations[]
+    name: string
+}

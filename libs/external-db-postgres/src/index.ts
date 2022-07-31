@@ -7,10 +7,10 @@ export { default as DataProvider } from'./postgres_data_provider'
 export { default as FilterParser } from'./sql_filter_transformer'
 export { default as SchemaColumnTranslator } from'./sql_schema_translator'
 export { default as DatabaseOperations } from'./postgres_operations'
-export { supportedOperations } from './supported_operations'
 export { default as init } from './connection_provider'
 export const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 export const opsDriver = () => require('../tests/drivers/db_operations_test_support')
+export * as testResources from '../tests/e2e-testkit/postgres_resources'
 
 export class PostgresConnector extends DbConnector {
     constructor() {

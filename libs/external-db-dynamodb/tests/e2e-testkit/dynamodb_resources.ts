@@ -1,6 +1,6 @@
-import { init } from '@wix-velo/external-db-dynamodb'
-import { runImage, stopImage } from './docker_support'
-export { supportedOperations } from '@wix-velo/external-db-dynamodb'
+import * as compose from 'docker-compose'
+import init from '../../src/connection_provider'
+export { supportedOperations } from '../../src/supported_operations'
 
 export const connection = async() => {
     const { connection, schemaProvider, cleanup } = init(connectionConfig(), accessOptions())
@@ -16,19 +16,19 @@ export const cleanup = async() => {
 }
 
 export const initEnv = async() => {
-    await runImage('dynamodb')
+    await compose.upOne('dynamodb', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] })
 }
 
 export const shutdownEnv = async() => {
-    await stopImage('dynamodb')
+    await compose.stopOne('dynamodb', { cwd: __dirname, log: true })
 }
 
 export const setActive = () => {
-    process.env.TYPE = 'dynamodb'
-    process.env.REGION = 'us-west-2'
-    process.env.AWS_SECRET_ACCESS_KEY = 'TEST_SECRET_ACCESS_KEY'
-    process.env.AWS_ACCESS_KEY_ID = 'TEST_ACCESS_KEY_ID'
-    process.env.ENDPOINT_URL = 'http://localhost:8000'
+    process.env['TYPE'] = 'dynamodb'
+    process.env['REGION'] = 'us-west-2'
+    process.env['AWS_SECRET_ACCESS_KEY'] = 'TEST_SECRET_ACCESS_KEY'
+    process.env['AWS_ACCESS_KEY_ID'] = 'TEST_ACCESS_KEY_ID'
+    process.env['ENDPOINT_URL'] = 'http://localhost:8000'
 }
 
 const connectionConfig = () => ({ endpoint: 'http://localhost:8000',
@@ -37,3 +37,5 @@ const connectionConfig = () => ({ endpoint: 'http://localhost:8000',
 const accessOptions = () => ({
                                 credentials: { accessKeyId: 'TEST_ACCESS_KEY_ID', secretAccessKey: 'TEST_SECRET_ACCESS_KEY' }
                             })
+
+export const name = 'dynamodb'

@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  dynamodb:
+    image:  amazon/dynamodb-local:latest
+    restart: always
+    ports:
+      - 8000:8000
+    environment:
+      AWS_REGION: us-west-2
+      AWS_ACCESS_KEY_ID: TEST_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: TEST_SECRET_ACCESS_KEY
+    networks:
+      - backend
+  
+networks:
+  backend:
+    driver: bridge

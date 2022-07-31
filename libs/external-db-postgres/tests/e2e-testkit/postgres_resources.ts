@@ -1,6 +1,6 @@
-import { init } from '@wix-velo/external-db-postgres'
-import { runImage, stopImage } from './docker_support'
-export { supportedOperations } from '@wix-velo/external-db-postgres'
+import init from '../../src/connection_provider'
+export { supportedOperations } from '../../src/supported_operations'
+import * as compose from 'docker-compose'
 
 export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
@@ -16,17 +16,19 @@ export const cleanup = async() => {
 }
 
 export const initEnv = async() => {
-    await runImage('postgres')
+    await compose.upOne('postgres', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] })
 }
 
 export const setActive = () => {
-    process.env.TYPE = 'postgres'
-    process.env.HOST = 'localhost'
-    process.env.USER = 'test-user'
-    process.env.PASSWORD = 'password'
-    process.env.DB = 'test-db'
+    process.env['TYPE'] = 'postgres'
+    process.env['HOST'] = 'localhost'
+    process.env['USER'] = 'test-user'
+    process.env['PASSWORD'] = 'password'
+    process.env['DB'] = 'test-db'
 }
 
 export const shutdownEnv = async() => {
-    await stopImage('postgres')
+    await compose.stopOne('postgres', { cwd: __dirname, log: true })
 }
+
+export const name = 'postgres'
