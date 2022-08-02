@@ -72,7 +72,12 @@ export type NotEmptyAdapterFilter = {
     value: any
 }
 
-export type AdapterFilter = EmptyFilter | NotEmptyAdapterFilter
+export type MultiFieldAdapterFilter = {
+    operator: AdapterOperator,
+    value: AdapterFilter[]
+} 
+
+export type AdapterFilter = EmptyFilter | NotEmptyAdapterFilter | MultiFieldAdapterFilter
 
 export type Sort = {
     fieldName: string,
