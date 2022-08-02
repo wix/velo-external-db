@@ -5,6 +5,7 @@ import { Uninitialized, gen } from '@wix-velo/test-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import each from 'jest-each'
 import * as Chance from 'chance'
+import { AdapterOperator } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
@@ -64,13 +65,15 @@ describe('Sql Parser', () => {
     describe('filter parser', () => {
 
         test('handles undefined filter', () => {
-            
+            //@ts-ignore
             expect( env.filterParser.parseFilter('') ).toEqual([])
             //@ts-ignore
             expect( env.filterParser.parseFilter(undefined) ).toEqual([])
             //@ts-ignore
             expect( env.filterParser.parseFilter(null) ).toEqual([])
+            //@ts-ignore
             expect( env.filterParser.parseFilter(555) ).toEqual([])
+            //@ts-ignore
             expect( env.filterParser.parseFilter([5555]) ).toEqual([])
         })
 
@@ -86,7 +89,7 @@ describe('Sql Parser', () => {
                 ne, lt, lte, gt, gte, eq,
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
-                    operator: o,
+                    operator: o as AdapterOperator,
                     fieldName: ctx.fieldName,
                     value: ctx.fieldValue
                 }
@@ -101,7 +104,7 @@ describe('Sql Parser', () => {
 
             test('correctly extract filter value if value is 0', () => {
                 const filter = {
-                    operator: eq,
+                    operator: eq as AdapterOperator,
                     fieldName: ctx.fieldName,
                     value: 0
                 }
@@ -116,7 +119,7 @@ describe('Sql Parser', () => {
             // todo: $hasAll ???
             test('correctly transform operator [include]', () => {
                 const filter = {
-                    operator: include,
+                    operator: include as AdapterOperator,
                     fieldName: ctx.fieldName,
                     value: ctx.fieldListValue
                 }
@@ -135,7 +138,7 @@ describe('Sql Parser', () => {
 
             test('operator [$hasSome] with empty list of values will throw an exception', () => {
                 const filter = {
-                    operator: include,
+                    operator: include as AdapterOperator,
                     fieldName: ctx.fieldName,
                     value: []
                 }
@@ -147,7 +150,7 @@ describe('Sql Parser', () => {
                 undefined, null
             ]).test('correctly transform operator [$eq] with null value [%s]', (value) => {
                 const filter = {
-                    operator: eq,
+                    operator: eq as AdapterOperator,
                     fieldName: ctx.fieldName,
                     value
                 }
@@ -162,7 +165,7 @@ describe('Sql Parser', () => {
                 undefined, null
             ]).test('correctly transform operator [$ne] with null value [%s]', (value) => {
                 const filter = {
-                    operator: ne,
+                    operator: ne as AdapterOperator,
                     fieldName: ctx.fieldName,
                     value
                 }
@@ -176,7 +179,7 @@ describe('Sql Parser', () => {
             test('correctly transform operator [$eq] with boolean value', () => {
                 const value = chance.bool()
                 const filter = {
-                    operator: eq,
+                    operator: eq as AdapterOperator,
                     fieldName: ctx.fieldName,
                     value: value
                 }
@@ -190,7 +193,7 @@ describe('Sql Parser', () => {
             describe('handle string operators', () => {
                 test('correctly transform operator [string_contains]', () => {
                     const filter = {
-                        operator: string_contains,
+                        operator: string_contains as AdapterOperator,
                         fieldName: ctx.fieldName,
                         value: ctx.fieldValue
                     }
@@ -203,7 +206,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [string_begins]', () => {
                     const filter = {
-                        operator: string_begins,
+                        operator: string_begins as AdapterOperator,
                         fieldName: ctx.fieldName,
                         value: ctx.fieldValue
                     }
@@ -216,7 +219,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [string_ends]', () => {
                     const filter = {
-                        operator: string_ends,
+                        operator: string_ends as AdapterOperator,
                         fieldName: ctx.fieldName,
                         value: ctx.fieldValue
                     }
@@ -229,7 +232,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [urlized]', () => {
                     const filter = {
-                        operator: urlized,
+                        operator: urlized as AdapterOperator,
                         fieldName: ctx.fieldName,
                         value: ctx.fieldListValue
                     }
@@ -242,7 +245,7 @@ describe('Sql Parser', () => {
 
                 test('correctly transform operator [matches] with ignoreCase', () => {
                     const filter = {
-                        operator: matches,
+                        operator: matches as AdapterOperator,
                         fieldName: ctx.fieldName,
                         value: {
                             ignoreCase: true,
@@ -262,7 +265,7 @@ describe('Sql Parser', () => {
                 
                 test('correctly transform operator [matches] without ignoreCase', () => {
                     const filter = {
-                        operator: matches,
+                        operator: matches as AdapterOperator,
                         fieldName: ctx.fieldName,
                         value: {
                             ignoreCase: false,
@@ -287,7 +290,7 @@ describe('Sql Parser', () => {
                 and, or
             ]).test('correctly transform operator [%s]', (o) => {
                 const filter = {
-                    operator: o,
+                    operator: o as AdapterOperator,
                     value: [ctx.filter, ctx.anotherFilter]
                 }
                 const op = o === and ? 'AND' : 'OR'
@@ -305,14 +308,14 @@ describe('Sql Parser', () => {
                 and, or
             ]).test('correctly transform operator [%s] with field that appears in both filters', (o) => {
                 const filter = {
-                    operator: o,
+                    operator: o as AdapterOperator,
                     value: [{
-                        operator: eq,
+                        operator: eq as AdapterOperator,
                         fieldName: ctx.fieldName,
                         value: ctx.fieldValue
                     },
                     {
-                        operator: eq,
+                        operator: eq as AdapterOperator,
                         fieldName: ctx.fieldName,
                         value: ctx.anotherValue
                     }]
@@ -327,7 +330,7 @@ describe('Sql Parser', () => {
 
             test('correctly transform operator [not]', () => {
                 const filter = {
-                    operator: not,
+                    operator: not as AdapterOperator,
                     value: [ ctx.filter ]
                 }
 
@@ -391,7 +394,7 @@ describe('Sql Parser', () => {
                             { name: ctx.anotherFieldName, function: avg, alias: ctx.moreFieldName }
                         ],
                         postFilter: {
-                            operator: gt,
+                            operator: gt as AdapterOperator,
                             fieldName: ctx.moreFieldName,
                             value: ctx.fieldValue
                         }
