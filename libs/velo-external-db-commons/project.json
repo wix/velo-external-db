@@ -30,7 +30,7 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/velo-external-db-commons/**/*.js", "libs/velo-external-db-commons/**/*.ts"]
+        "lintFilePatterns": ["libs/velo-external-db-commons/**/*.ts"]
       }
     },
     "test": {
