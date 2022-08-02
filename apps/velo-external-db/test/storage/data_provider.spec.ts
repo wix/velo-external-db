@@ -125,7 +125,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         await expect( env.dataProvider.insert(ctx.collectionName, [ctx.entity], ctx.entityFields) ).resolves.toEqual(1)
 
-        await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.entity])
+        await expect( env.dataProvider.find(ctx.collectionName, {}, '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.entity])
     })
 
     test('bulk insert data into collection name and query all of it', async() => { 
@@ -134,7 +134,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         await expect( env.dataProvider.insert(ctx.collectionName, ctx.entities, ctx.entityFields) ).resolves.toEqual(ctx.entities.length)
 
-        await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual(expect.arrayContaining(ctx.entities))
+        await expect( env.dataProvider.find(ctx.collectionName, {}, {}, 0, 50, ctx.projection) ).resolves.toEqual(expect.arrayContaining(ctx.entities))
     })
 
     test('insert entity with number', async() => {
@@ -144,7 +144,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         await expect( env.dataProvider.insert(ctx.numericCollectionName, [ctx.numberEntity], ctx.numberEntityFields)).resolves.toEqual(1)
 
-        await expect( env.dataProvider.find(ctx.numericCollectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.numberEntity])
+        await expect( env.dataProvider.find(ctx.numericCollectionName, {}, '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.numberEntity])
     })
     
     testIfSupportedOperationsIncludes(supportedOperations, [ FindObject ])('insert entity with object', async() => {
@@ -153,7 +153,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
         
         await expect( env.dataProvider.insert(ctx.objectCollectionName, [ctx.objectEntity], ctx.objectEntityFields)).resolves.toEqual(1)
-        await expect( env.dataProvider.find(ctx.objectCollectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual(entityWithObjectField(ctx.objectEntity, ctx.objectEntityFields))
+        await expect( env.dataProvider.find(ctx.objectCollectionName, {}, '', 0, 50, ctx.projection) ).resolves.toEqual(entityWithObjectField(ctx.objectEntity, ctx.objectEntityFields))
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ IncludeOperator ])('include operator on _id field', async() => {
@@ -172,7 +172,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         await expect( env.dataProvider.delete(ctx.collectionName, ctx.entities.map(e => e._id)) ).resolves.toEqual(ctx.entities.length)
 
-        await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([])
+        await expect( env.dataProvider.find(ctx.collectionName, {}, '', 0, 50, ctx.projection) ).resolves.toEqual([])
     })
     
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('allow update for single entity', async() => {
@@ -182,7 +182,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         await expect( env.dataProvider.update(ctx.collectionName, [ctx.modifiedEntity]) ).resolves.toEqual(1)
 
-        await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.modifiedEntity])
+        await expect( env.dataProvider.find(ctx.collectionName, {}, '', 0, 50, ctx.projection) ).resolves.toEqual([ctx.modifiedEntity])
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('allow update for multiple entities', async() => {
@@ -192,7 +192,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         expect( await env.dataProvider.update(ctx.collectionName, ctx.modifiedEntities) ).toEqual(ctx.modifiedEntities.length)
 
-        expect( await env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
+        expect( await env.dataProvider.find(ctx.collectionName, {}, '', 0, 50, ctx.projection) ).toEqual(expect.arrayContaining(ctx.modifiedEntities))
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Matches ])('matches operator should return data', async() => {
@@ -211,7 +211,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         await env.dataProvider.truncate(ctx.collectionName)
 
-        await expect( env.dataProvider.find(ctx.collectionName, '', '', 0, 50, ctx.projection) ).resolves.toEqual([])
+        await expect( env.dataProvider.find(ctx.collectionName, {}, '', 0, 50, ctx.projection) ).resolves.toEqual([])
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api without filter', async() => {
