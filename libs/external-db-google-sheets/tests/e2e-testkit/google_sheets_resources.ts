@@ -1,9 +1,10 @@
 const init = require('../../src/connection_provider')
-const { app: mockServer} = require ('../mock_google_sheets_api')
+const { app: mockServer } = require ('../mock_google_sheets_api')
 import { Server } from 'http'
 export { supportedOperations } from '../../src/supported_operations'
 
-let _server: Server, port = 1502
+let _server: Server
+const port = 1502
 
 export const connection = async() => {
     const { connection, schemaProvider, cleanup } = await init({ sheetId: 'test-sheet-id' })

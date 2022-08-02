@@ -1,5 +1,4 @@
 import { isObject } from '@wix-velo/velo-external-db-commons'
-import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 const { errors } = require('@wix-velo/velo-external-db-commons')
 const { InvalidQuery } = errors
 
@@ -20,8 +19,8 @@ export type MongoStubPool = {
 }
 
 export const notConnectedPool = (err: any): MongoStubPool => ({
-    db: () => { throw err } ,
-    close: async () => { },
+    db: () => { throw err },
+    close: async() => { },
 })
 
 export type MongoStubClient = {
@@ -29,7 +28,7 @@ export type MongoStubClient = {
 }
 
 export const emptyClient = (): MongoStubClient => ({
-    connect: async () => notConnectedPool(new Error('No URI was provided')),
+    connect: async() => notConnectedPool(new Error('No URI was provided')),
 })
 
 export const isConnected = (client: { topology: { isConnected: () => any } }) => {

@@ -1,6 +1,6 @@
-import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from "@wix-velo/velo-external-db-types";
-import SchemaService from "./service/schema";
-import SchemaAwareDataService from "./service/schema_aware_data";
+import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from '@wix-velo/velo-external-db-types'
+import SchemaService from './service/schema'
+import SchemaAwareDataService from './service/schema_aware_data'
 
 
 export interface FindQuery {
@@ -96,18 +96,18 @@ export interface SchemaHooks {
     afterRead?: Hook<Payload>;
     beforeWrite?: Hook<Payload>;
     afterWrite?: Hook<Payload>;
-    beforeList?: Hook<{}>
+    beforeList?: Hook<Record<string, never>>
     afterList?: Hook<{ schemas: AsWixSchema[] }>
-    beforeListHeaders?: Hook<{}>
+    beforeListHeaders?: Hook<Record<string, never>>
     afterListHeaders?: Hook<{ schemas: AsWixSchemaHeaders[] }>
     beforeFind?: Hook<string>
     afterFind?: Hook<{ schemas: AsWixSchema[] }>
     beforeCreate?: Hook<{ collectionName: string }>
-    afterCreate?: Hook<{}>
+    afterCreate?: Hook<Record<string, never>>
     beforeColumnAdd?: Hook<{ column: InputField }>
-    afterColumnAdd?: Hook<{}>
+    afterColumnAdd?: Hook<Record<string, never>>
     beforeColumnRemove?: Hook<{ columnName: string }>
-    afterColumnRemove?: Hook<{}>
+    afterColumnRemove?: Hook<Record<string, never>>
 }
 
 export interface ExternalDbRouterConfig {

@@ -77,7 +77,7 @@ describe('Sql Parser', () => {
         test('transform filter', () => {
             expect( env.filterParser.transform(ctx.filter) ).toEqual({
                 filterExpr: `WHERE ${env.filterParser.parseFilter(ctx.filter, undefined, 1)[0].filterExpr}`,
-                parameters: env.filterParser.parseFilter(ctx.filter,undefined ,1)[0].parameters
+                parameters: env.filterParser.parseFilter(ctx.filter, undefined, 1)[0].parameters
             })
         })
 
@@ -292,7 +292,7 @@ describe('Sql Parser', () => {
                 }
                 const op = o === and ? 'AND' : 'OR'
 
-                const counter = {paramCounter: 0, valueCounter: 0}
+                const counter = { paramCounter: 0, valueCounter: 0 }
                 const filter1 = env.filterParser.parseFilter(ctx.filter, counter)[0]
                 const filter2 = env.filterParser.parseFilter(ctx.anotherFilter, counter)[0]
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{

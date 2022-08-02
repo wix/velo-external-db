@@ -19,12 +19,12 @@ const extraOptions = (cfg: AirtableConfig) => {
     return {}
 }
 
-export default async (cfg: AirtableConfig, _cfgOptions: { [x: string]: any }): Promise<DbProviders<Airtable.Base>> => {
+export default async(cfg: AirtableConfig, _cfgOptions: { [x: string]: any }): Promise<DbProviders<Airtable.Base>> => {
     const options = _cfgOptions || {}
     const airtableBase = new Airtable({ apiKey: cfg.apiPrivateKey, ...extraOptions(cfg), ...options }).base(cfg.baseId)
     const databaseOperations = new DatabaseOperations(airtableBase)
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(airtableBase, filterParser)
     const schemaProvider = new SchemaProvider(airtableBase, { apiKey: cfg.apiPrivateKey, metaApiKey: cfg.metaApiKey, baseUrl: cfg.baseUrl })
-    return { dataProvider, schemaProvider, connection: airtableBase, databaseOperations, cleanup: async () => { } }
+    return { dataProvider, schemaProvider, connection: airtableBase, databaseOperations, cleanup: async() => { } }
 }

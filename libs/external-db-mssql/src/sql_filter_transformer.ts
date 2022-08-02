@@ -1,7 +1,7 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { escapeId, validateLiteralWithCounter, patchFieldNameWithCounter } from './mssql_utils'
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, FunctionProjection, NotEmptyAdapterFilter as NotEmptyFilter} from '@wix-velo/velo-external-db-types'
+import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, FunctionProjection, NotEmptyAdapterFilter as NotEmptyFilter } from '@wix-velo/velo-external-db-types'
 import { MSSQLParsedFilter } from './types'
 const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
@@ -17,7 +17,7 @@ export default class FilterParser {
     }
 
     transform(filter: Filter) {
-        const counter = {paramCounter: 0, valueCounter: 0}
+        const counter = { paramCounter: 0, valueCounter: 0 }
         const results = this.parseFilter(filter, counter, 1)
 
         if (results.length === 0) {
@@ -87,7 +87,7 @@ export default class FilterParser {
                         .concat({ filterExpr: '', parameters: {} })[0]
     }
 
-    parseFilter(filter: Filter, counter: Counter = {paramCounter: 0, valueCounter: 0}, inlineFields?: any): MSSQLParsedFilter[] {
+    parseFilter(filter: Filter, counter: Counter = { paramCounter: 0, valueCounter: 0 }, inlineFields?: any): MSSQLParsedFilter[] {
 
         if (isEmptyFilter(filter)) {
             return []
@@ -191,7 +191,7 @@ export default class FilterParser {
     }
 
     prepareStatementVariables(n: any, fieldName: any, counter: Counter) {
-        return Array.from({ length: n }, (_, i) => validateLiteralWithCounter(fieldName, counter) )
+        return Array.from({ length: n }, (_, _i) => validateLiteralWithCounter(fieldName, counter) )
                     .join(', ')
     }
 

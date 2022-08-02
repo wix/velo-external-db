@@ -211,7 +211,7 @@ describe('Sql Parser', () => {
                 }
                 const op = o === and ? 'AND' : 'OR'
 
-                const counter = {nameCounter: 0, valueCounter: 0}
+                const counter = { nameCounter: 0, valueCounter: 0 }
                 const filterExpr = env.filterParser.parseFilter(ctx.filter, counter)[0].filterExpr
                 const anotherFilterExpr = env.filterParser.parseFilter(ctx.anotherFilter, counter)[0].filterExpr
 

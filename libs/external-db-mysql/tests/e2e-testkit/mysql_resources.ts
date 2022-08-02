@@ -18,11 +18,11 @@ export const cleanup = async() => {
     await cleanup()
 }
 
-export const initEnv = async () => {
+export const initEnv = async() => {
     await compose.upOne('mysql', { cwd: __dirname, log: true, commandOptions: [['--force-recreate', '--remove-orphans']] })
 }
 
-export const shutdownEnv = async () => {
+export const shutdownEnv = async() => {
     await compose.stopOne('mysql', { cwd: __dirname, log: true })
 }
 

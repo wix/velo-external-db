@@ -1,4 +1,4 @@
-import { VeloRole } from "@wix-velo/velo-external-db-types"
+import { VeloRole } from '@wix-velo/velo-external-db-types'
 
 const objectContainsKey = (obj: { [x: string]: any }, key: string | number) => typeof obj[key] === 'string' && obj[key].length > 0
 

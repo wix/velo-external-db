@@ -1,6 +1,6 @@
 import path = require('path')
 import ejs = require('ejs')
-import {promises as fs} from 'fs'
+import { promises as fs } from 'fs'
 
 const getAppInfoTemplate = async() => { // TODO: fix this hack!
     try {

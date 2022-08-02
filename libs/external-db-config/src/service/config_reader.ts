@@ -1,5 +1,5 @@
-import CommonConfigReader from "../readers/common_config_reader"
-import { IAuthorizationConfigReader, IConfigReader } from "../types"
+import CommonConfigReader from '../readers/common_config_reader'
+import { IAuthorizationConfigReader, IConfigReader } from '../types'
 
 export default class ConfigReader {
   externalConfigReader: IConfigReader

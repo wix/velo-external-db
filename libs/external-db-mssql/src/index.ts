@@ -1,7 +1,7 @@
 export { default as SchemaProvider } from './mssql_schema_provider'
 export { default as DataProvider } from './mssql_data_provider'
 export { default as FilterParser } from './sql_filter_transformer'
-export { default as SchemaColumnTranslator} from './sql_schema_translator'
+export { default as SchemaColumnTranslator } from './sql_schema_translator'
 export { default as DatabaseOperations } from './mssql_operations'
 export { default as init } from './connection_provider'
 export * as testResources from '../tests/e2e-testkit/mssql_resources'

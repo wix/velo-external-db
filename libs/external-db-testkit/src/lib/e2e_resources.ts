@@ -1,25 +1,25 @@
 import { sleep } from '@wix-velo/test-commons'
-import { ConnectionCleanUp, IImplementationResources, SchemaOperations } from '@wix-velo/velo-external-db-types';
+import { ConnectionCleanUp, IImplementationResources, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
-import { Server } from 'http';
-import { authInit } from './auth_test_support';
+import { Server } from 'http'
+import { authInit } from './auth_test_support'
 
 type InitFunc = () => Promise<{ server: Server, externalDbRouter: ExternalDbRouter, cleanup: ConnectionCleanUp, [x: string]: any }>
 
 export default class E2EResources {
-    implementation: IImplementationResources;
-    initFunc: InitFunc;
+    implementation: IImplementationResources
+    initFunc: InitFunc
     env!: {
         server: Server, externalDbRouter: ExternalDbRouter, cleanup: ConnectionCleanUp, [x: string]: any
-    };
-    externalDbRouter!: ExternalDbRouter;
-    currentDbImplementationName: string;
+    }
+    externalDbRouter!: ExternalDbRouter
+    currentDbImplementationName: string
     supportedOperations: SchemaOperations[]
     constructor(implementation: IImplementationResources, initFunc: InitFunc) {
-        this.implementation = implementation;
-        this.initFunc = initFunc;
-        this.currentDbImplementationName = this.implementation.name;
-        this.supportedOperations = this.implementation.supportedOperations;
+        this.implementation = implementation
+        this.initFunc = initFunc
+        this.currentDbImplementationName = this.implementation.name
+        this.supportedOperations = this.implementation.supportedOperations
     }
 
     async globalSetUp() {
@@ -58,7 +58,6 @@ export default class E2EResources {
             authInit()
         }
         this.env = await this.initFunc()
-        this.env.externalDbRouter = this.env.externalDbRouter
         return this.env
     }
 

@@ -1,5 +1,5 @@
-import { ConnectionCleanUp, IDatabaseOperations, IDataProvider, ISchemaProvider, ResponseField } from "@wix-velo/velo-external-db-types"
-import DbConnector from "./db_connector"
+import { ConnectionCleanUp, IDatabaseOperations, IDataProvider, ISchemaProvider } from '@wix-velo/velo-external-db-types'
+import DbConnector from './db_connector'
 
 export type Field = {
     field: string,

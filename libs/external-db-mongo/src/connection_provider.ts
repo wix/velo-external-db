@@ -11,14 +11,14 @@ type MongoConfig = {
     connectionUri?: string
 }
 
-export default async (cfg: MongoConfig): Promise<DbProviders<MongoClient | MongoStubPool>> => {
+export default async(cfg: MongoConfig): Promise<DbProviders<MongoClient | MongoStubPool>> => {
     const client: MongoClient | MongoStubClient = cfg.connectionUri ? new MongoClient(cfg.connectionUri) : emptyClient()
 
     const { pool, cleanup }: { pool: MongoClient| MongoStubPool, cleanup: ConnectionCleanUp } = await client.connect()
         .then((res: MongoClient | MongoStubPool) => {
-            return { pool: res, cleanup: async (): Promise<void> => await pool.close() }
+            return { pool: res, cleanup: async(): Promise<void> => await pool.close() }
         }).catch(err => {
-            return { pool: notConnectedPool(err), cleanup: async () => { } }
+            return { pool: notConnectedPool(err), cleanup: async() => { } }
         })
 
     const databaseOperations = new DatabaseOperations(client)

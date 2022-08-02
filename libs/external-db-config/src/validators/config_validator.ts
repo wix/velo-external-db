@@ -1,6 +1,6 @@
-import { IConfigValidator } from "@wix-velo/velo-external-db-types"
-import { AuthorizationConfigValidator } from "./authorization_config_validator"
-import { CommonConfigResponseExtended, CommonConfigValidator } from "./common_config_validator"
+import { IConfigValidator } from '@wix-velo/velo-external-db-types'
+import { AuthorizationConfigValidator } from './authorization_config_validator'
+import { CommonConfigResponseExtended, CommonConfigValidator } from './common_config_validator'
 
 export class ConfigValidator {
     connectorValidator: IConfigValidator

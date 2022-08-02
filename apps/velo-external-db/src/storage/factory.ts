@@ -1,4 +1,4 @@
-import { DatabaseFactoryResponse } from "@wix-velo/velo-external-db-commons"
+import { DatabaseFactoryResponse } from '@wix-velo/velo-external-db-commons'
 
 export const engineConnectorFor = async(_type: string, config: any): Promise<DatabaseFactoryResponse> => {
     const type = _type || ''

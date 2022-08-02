@@ -14,5 +14,5 @@ export default {
     clearMocks: true,
     verbose: true,
     // testRegex: '(.*\\.spec\\.)js$',
-  };
+  }
   

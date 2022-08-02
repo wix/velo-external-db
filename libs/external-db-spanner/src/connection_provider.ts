@@ -26,5 +26,5 @@ export default (cfg: SpannerConfig, _poolOptions?: {[x:string]: any}): DbProvide
     const dataProvider = new DataProvider(database, filterParser)
     const schemaProvider = new SchemaProvider(database)
 
-    return { dataProvider, schemaProvider, databaseOperations, connection: database, cleanup: async () => { await database.close() } }
+    return { dataProvider, schemaProvider, databaseOperations, connection: database, cleanup: async() => { await database.close() } }
 }

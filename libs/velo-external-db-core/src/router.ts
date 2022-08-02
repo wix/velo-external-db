@@ -50,19 +50,19 @@ const serviceContext = (): ServiceContext => ({
 })
 
 
-const executeDataHooksFor = async (action: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
-    return BPromise.reduce(DataHooksForAction[action], async (lastHookResult: AnyFixMe, hookName: string) => {
+const executeDataHooksFor = async(action: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
+    return BPromise.reduce(DataHooksForAction[action], async(lastHookResult: AnyFixMe, hookName: string) => {
         return await executeHook(dataHooks, hookName, lastHookResult, requestContext, customContext)
     }, payload)
 }
 
-const executeSchemaHooksFor = async (action: string, payload: any, requestContext: RequestContext, customContext: any) => {
-    return BPromise.reduce(SchemaHooksForAction[action], async (lastHookResult: any, hookName: string) => {
+const executeSchemaHooksFor = async(action: string, payload: any, requestContext: RequestContext, customContext: any) => {
+    return BPromise.reduce(SchemaHooksForAction[action], async(lastHookResult: any, hookName: string) => {
         return await executeHook(schemaHooks, hookName, lastHookResult, requestContext, customContext)
     }, payload)
 }
 
-const executeHook = async (hooks: DataHooks | SchemaHooks, _actionName: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
+const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
     const actionName = _actionName as keyof typeof hooks
     if (hooks[actionName]) {
         try {
@@ -87,20 +87,20 @@ export const createRouter = () => {
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
     // *************** INFO **********************
-    router.get('/', async (req, res) => {
+    router.get('/', async(req, res) => {
         const appInfo = await appInfoFor(operationService, externalDbConfigClient)
         const appInfoPage = await getAppInfoPage(appInfo)
 
         res.send(appInfoPage)
     })
 
-    router.post('/provision', async (req, res) => {
+    router.post('/provision', async(req, res) => {
         const { type, vendor } = cfg
         res.json({ type, vendor, protocolVersion: 2 })
     })
 
     // *************** Data API **********************
-    router.post('/data/find', async (req, res, next) => {
+    router.post('/data/find', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -116,7 +116,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/aggregate', async (req, res, next) => {
+    router.post('/data/aggregate', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -131,7 +131,7 @@ export const createRouter = () => {
     })
 
 
-    router.post('/data/insert', async (req, res, next) => {
+    router.post('/data/insert', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -146,7 +146,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/insert/bulk', async (req, res, next) => {
+    router.post('/data/insert/bulk', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -162,7 +162,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/get', async (req, res, next) => {
+    router.post('/data/get', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -180,7 +180,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/update', async (req, res, next) => {
+    router.post('/data/update', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -195,7 +195,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/update/bulk', async (req, res, next) => {
+    router.post('/data/update/bulk', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -210,7 +210,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/remove', async (req, res, next) => {
+    router.post('/data/remove', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -225,7 +225,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/remove/bulk', async (req, res, next) => {
+    router.post('/data/remove/bulk', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -240,7 +240,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/count', async (req, res, next) => {
+    router.post('/data/count', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -255,7 +255,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/truncate', async (req, res, next) => {
+    router.post('/data/truncate', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
@@ -269,9 +269,9 @@ export const createRouter = () => {
 
 
     // *************** Schema API **********************
-    router.post('/schemas/list', async (req, res, next) => {
+    router.post('/schemas/list', async(req, res, next) => {
         try {
-            let customContext = {}
+            const customContext = {}
             await executeSchemaHooksFor(SchemaActions.BeforeList, schemaPayloadFor(SchemaOperations.List, req.body), requestContextFor(SchemaOperations.List, req.body), customContext)
 
             const data = await schemaService.list()
@@ -283,7 +283,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/schemas/list/headers', async (req, res, next) => {
+    router.post('/schemas/list/headers', async(req, res, next) => {
         try {
             const customContext = {}
             await executeSchemaHooksFor(SchemaActions.BeforeListHeaders, schemaPayloadFor(SchemaOperations.ListHeaders, req.body), requestContextFor(SchemaOperations.ListHeaders, req.body), customContext)
@@ -296,7 +296,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/schemas/find', async (req, res, next) => {
+    router.post('/schemas/find', async(req, res, next) => {
         try {
             const customContext = {}
             const { schemaIds } = await executeSchemaHooksFor(SchemaActions.BeforeFind, schemaPayloadFor(SchemaOperations.Find, req.body), requestContextFor(SchemaOperations.Find, req.body), customContext)
@@ -312,7 +312,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/schemas/create', async (req, res, next) => {
+    router.post('/schemas/create', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionName } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(SchemaOperations.Create, req.body), requestContextFor(SchemaOperations.Create, req.body), customContext)
@@ -326,7 +326,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/schemas/column/add', async (req, res, next) => {
+    router.post('/schemas/column/add', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}
@@ -342,7 +342,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/schemas/column/remove', async (req, res, next) => {
+    router.post('/schemas/column/remove', async(req, res, next) => {
         try {
             const { collectionName } = req.body
             const customContext = {}

@@ -1,4 +1,4 @@
-import { IDatabaseOperations, ValidateConnectionResult, connectionStatusResult } from "@wix-velo/velo-external-db-types"
+import { IDatabaseOperations, ValidateConnectionResult, connectionStatusResult } from '@wix-velo/velo-external-db-types'
 
 export interface IOperationService {
     validateConnection(): Promise<ValidateConnectionResult>

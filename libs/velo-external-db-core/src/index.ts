@@ -10,7 +10,7 @@ import QueryValidator from './converters/query_validator'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { initServices, createRouter } from './router'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
-import { DataHooks, ExternalDbRouterConfig, Hooks, SchemaHooks } from './types'
+import { DataHooks, ExternalDbRouterConfig, Hooks, SchemaHooks, ServiceContext } from './types'
 import ItemTransformer = require('./converters/item_transformer')
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } from '@wix-velo/external-db-config'
@@ -66,4 +66,4 @@ export class ExternalDbRouter {
     }
 }
 
-export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer }
+export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext }

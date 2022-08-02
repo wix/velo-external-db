@@ -4,7 +4,7 @@ import { promisify } from 'util'
 import { asParamArrays, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
 import { wildCardWith } from './mysql_utils'
-import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item} from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item } from '@wix-velo/velo-external-db-types'
 import { IMySqlFilterParser } from './sql_filter_transformer'
 import { MySqlQuery } from './types'
 

@@ -1,3 +1,3 @@
-import { createApp } from 'velo-external-db'
+import { createApp } from './app'
 
 createApp()

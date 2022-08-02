@@ -7,7 +7,7 @@ import { DbProviders } from '@wix-velo/velo-external-db-types'
 import { MySqlConfig } from './types'
 
 
-export default (cfg: MySqlConfig, _poolOptions: {}): DbProviders<mysql.Pool>  => {
+export default (cfg: MySqlConfig, _poolOptions: Record<string, unknown>): DbProviders<mysql.Pool>  => {
     const config: mysql.PoolConfig = {
         host: cfg.host,
         user: cfg.user,

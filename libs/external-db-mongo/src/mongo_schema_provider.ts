@@ -1,10 +1,10 @@
 import { SystemFields, validateSystemFields, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table, TableHeader } from '@wix-velo/velo-external-db-types';
+import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('@wix-velo/velo-external-db-commons').errors
 import { validateTable, SystemTable } from './mongo_utils'
 
-export default class SchemaProvider implements ISchemaProvider{
-    client: any;
+export default class SchemaProvider implements ISchemaProvider {
+    client: any
     constructor(client: any) {
         this.client = client
     }

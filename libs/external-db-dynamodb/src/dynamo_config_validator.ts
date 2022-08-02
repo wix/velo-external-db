@@ -1,7 +1,7 @@
 import { checkRequiredKeys } from '@wix-velo/velo-external-db-commons'
 import { IConfigValidator } from '@wix-velo/velo-external-db-types'
 
-export default class ConfigValidator implements IConfigValidator{
+export default class ConfigValidator implements IConfigValidator {
     config: any
     requiredKeys: string[]
     constructor(config: any) {

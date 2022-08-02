@@ -8,7 +8,7 @@ import hooks = require('../drivers/hooks_test_support')
 
 import { Uninitialized } from '@wix-velo/test-commons'
 
-import { ServiceContext } from 'libs/velo-external-db-core/src/types'
+import { ServiceContext } from '@wix-velo/velo-external-db-core'
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'

@@ -1,5 +1,5 @@
-import { Item, WixDataFilter } from "@wix-velo/velo-external-db-types";
-import { AggregationQuery, FindQuery, RequestContext } from "./types";
+import { Item, WixDataFilter } from '@wix-velo/velo-external-db-types'
+import { AggregationQuery, FindQuery, RequestContext } from './types'
 
 
 export const DataHooksForAction: { [key: string]: string[] } = {

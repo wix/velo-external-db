@@ -1,4 +1,4 @@
-import { AnyFixMe } from "@wix-velo/velo-external-db-types"
+import { AnyFixMe } from '@wix-velo/velo-external-db-types'
 
 export type MongoFilter = {
     [key: string]: AnyFixMe

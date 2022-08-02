@@ -16,7 +16,7 @@ export default class FilterTransformer implements IFilterTransformer {
 
     }
 
-    transform(filter: any): AdapterFilter{
+    transform(filter: any): AdapterFilter {
         if (this.isEmptyFilter(filter)) return EmptyFilter
 
         if (this.isMultipleFieldOperator(filter)) {

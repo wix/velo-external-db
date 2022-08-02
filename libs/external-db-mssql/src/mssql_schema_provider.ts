@@ -4,7 +4,7 @@ import { escapeId, escapeTable } from './mssql_utils'
 import { SystemFields, validateSystemFields, parseTableData } from '@wix-velo/velo-external-db-commons'
 import { supportedOperations } from './supported_operations'
 import { ConnectionPool as MSSQLPool } from 'mssql'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, TableHeader } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
 import { errors } from '@wix-velo/velo-external-db-commons'
 const { CollectionDoesNotExists, CollectionAlreadyExists } = errors
 

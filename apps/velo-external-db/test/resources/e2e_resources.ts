@@ -59,8 +59,8 @@ export const supportedOperations = testedSuit().supportedOperations
 
 export const setupDb = () => testedSuit().setUpDb()
 export const currentDbImplementationName = () => testedSuit().name
-export const initApp = async () => {
+export const initApp = async() => {
     env = await testedSuit().initApp()
 }
-export const teardownApp = async () => testedSuit().teardownApp()
-export const dbTeardown = async () => testedSuit().dbTeardown()
+export const teardownApp = async() => testedSuit().teardownApp()
+export const dbTeardown = async() => testedSuit().dbTeardown()

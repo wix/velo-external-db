@@ -1,7 +1,7 @@
 import { config, ConnectionPool } from 'mssql'
 import DatabaseOperations from '../../src/mssql_operations'
 
-const createPool = async (modify: {[key:string]: string}) => {
+const createPool = async(modify: {[key:string]: string}) => {
     const config: config = {
         user: 'sa',
         password: 't9D4:EHfU6Xgccs-',

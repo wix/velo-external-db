@@ -1,6 +1,6 @@
-import { IConfigReader } from "../types";
+import { IConfigReader } from '../types'
 
-export default class StubConfigReader implements IConfigReader{
+export default class StubConfigReader implements IConfigReader {
     constructor() {
     }
 

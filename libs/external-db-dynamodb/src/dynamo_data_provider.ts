@@ -3,7 +3,7 @@ import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import { validateTable, patchFixDates } from './dynamo_utils'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
 import FilterParser from './sql_filter_transformer'
-import { IDataProvider, AdapterFilter as Filter, Item} from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, Item } from '@wix-velo/velo-external-db-types'
 import * as dynamoRequests from './dynamo_data_requests_utils'
 
 export default class DataProvider implements IDataProvider {

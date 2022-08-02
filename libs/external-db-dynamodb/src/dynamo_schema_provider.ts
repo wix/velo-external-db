@@ -4,7 +4,7 @@ import { SystemFields, validateSystemFields, errors } from '@wix-velo/velo-exter
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import * as dynamoRequests from './dynamo_schema_requests_utils'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, TableHeader } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
 
 export default class SchemaProvider implements ISchemaProvider {
@@ -21,7 +21,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const { Items } = await this.docClient
                                     .scan(dynamoRequests.listTablesExpression())
 
-        return Items ? Items.map((table: { [x:string]: any ,tableName?: any, fields?: any }) => ({
+        return Items ? Items.map((table: { [x:string]: any, tableName?: any, fields?: any }) => ({
             id: table.tableName,
             fields: [...SystemFields, ...table.fields].map(reformatFields)
         })) : []
