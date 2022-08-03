@@ -1,4 +1,4 @@
-import { Item, ResponseField } from "@wix-velo/velo-external-db-types"
+import { Item, ResponseField } from '@wix-velo/velo-external-db-types'
 
 export const entitiesWithOwnerFieldOnly = (entities: Item[]) => expect.arrayContaining(entities.map((e: Item) => ({ _owner: e._owner })))
 

@@ -59,7 +59,9 @@
             "jest/no-conditional-expect": [ "off" ],
             "jest/no-identical-title": [ "off" ],
             "@typescript-eslint/no-unused-vars": [ "error", { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" } ],
-            "@typescript-eslint/no-explicit-any": "off"
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/ban-ts-comment": "warn",
+            "eol-last": [ "error", "always" ]
           }
         }
       ]

@@ -54,7 +54,7 @@ export const randomDbsWithIdColumn = () => randomDbs().map(i => ({ ...i, fields:
 export const truthyValue = () => chance.pickone(['true', '1', 1, true])
 export const falsyValue = () => chance.pickone(['false', '0', 0, false])
 
-export const randomKeyObject = (obj: {}) => {
+export const randomKeyObject = (obj: Record<string, unknown>) => {
     const objectKeys = Object.keys(obj)
     const selectedKey = objectKeys[Math.floor(Math.random() * objectKeys.length)]
     return selectedKey

@@ -5,9 +5,10 @@ import { Uninitialized, gen } from '@wix-velo/test-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import each from 'jest-each'
 import * as Chance from 'chance'
+import { AdapterOperator } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
 const chance = Chance()
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators //TODO: extract
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators as Record<string, AdapterOperator>
 const { avg, max, min, sum, count } = AdapterFunctions
 
 describe('Sql Parser', () => {
@@ -64,12 +65,15 @@ describe('Sql Parser', () => {
     describe('filter parser', () => {
 
         test('handles undefined filter', () => {
+            //@ts-ignore
             expect( env.filterParser.parseFilter('') ).toEqual([])
             //@ts-ignore
             expect( env.filterParser.parseFilter(undefined) ).toEqual([])
             //@ts-ignore
             expect( env.filterParser.parseFilter(null) ).toEqual([])
+            //@ts-ignore
             expect( env.filterParser.parseFilter(555) ).toEqual([])
+            //@ts-ignore
             expect( env.filterParser.parseFilter([5555]) ).toEqual([])
         })
 
@@ -304,12 +308,12 @@ describe('Sql Parser', () => {
                 and, or
             ]).test('correctly transform operator [%s]', (o: string) => {
                 const filter = {
-                    operator: o,
+                    operator: o as AdapterOperator,
                     value: [ctx.filter, ctx.anotherFilter]
                 }
                 const op = o === and ? 'AND' : 'OR'
 
-                const counter = {paramCounter: 0, valueCounter: 0}
+                const counter = { paramCounter: 0, valueCounter: 0 }
                 const filter1 = env.filterParser.parseFilter(ctx.filter, counter)[0]
                 const filter2 = env.filterParser.parseFilter(ctx.anotherFilter, counter)[0]
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{

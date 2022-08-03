@@ -13,7 +13,7 @@ const axiosFor = ({ adapterUrl, secretKey }) => {
         baseURL: adapterUrl,
         transformRequest: [
             // eslint-disable-next-line no-unused-vars
-            (data, headers) => appendSecretKeyRoleToRequest(data, secretKey),
+            (data, _headers) => appendSecretKeyRoleToRequest(data, secretKey),
             ...axios.defaults.transformRequest]
     })
 }

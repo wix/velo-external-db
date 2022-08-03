@@ -1,4 +1,4 @@
-import { ConnectionCleanUp, DbProviders, IConfigValidator, IDatabaseOperations, IDataProvider, ISchemaProvider } from "@wix-velo/velo-external-db-types"
+import { ConnectionCleanUp, DbProviders, IConfigValidator, IDatabaseOperations, IDataProvider, ISchemaProvider } from '@wix-velo/velo-external-db-types'
 
 
 export default class DbConnector {

@@ -45,7 +45,7 @@ export const canQuery = (filterExpr: { ExpressionAttributeNames: { [s: string]: 
     return filterAttributes.every(v => collectionKeys.includes(v))
 }
 
-export const isEmptyObject = (obj: {}) => Object.keys(obj).length === 0
+export const isEmptyObject = (obj: Record<string, unknown>) => Object.keys(obj).length === 0
 
 export const fieldNameWithCounter = (fieldName: string, counter: Counter) => `#${fieldName}${counter.nameCounter++}`
 export const attributeValueNameWithCounter = (fieldName: any, counter: Counter) => `:${fieldName}${counter.valueCounter++}`

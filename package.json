@@ -111,7 +111,8 @@
     "uuid-validate": "^0.0.3"
   },
   "lint-staged": {
-    "*.js": "eslint --cache --fix"
+    "*.js": "eslint --cache --fix",
+    "*.ts": "eslint --cache --fix"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, IDataProvider, InputField, Item, ItemWithId, ResponseField } from '@wix-velo/velo-external-db-types'
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, IDataProvider, Item, ResponseField } from '@wix-velo/velo-external-db-types'
 import { asWixData } from '../converters/data_utils'
 import { getByIdFilterFor } from '../utils/data_utils'
 

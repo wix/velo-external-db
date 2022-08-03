@@ -20,7 +20,7 @@ v4SpreadsheetsRouter.get('/:sheetId/values/:range', (req, res) => {
     if (range.includes('A1:')) {
         res.send(sheet.getSheetHeader())
     } else {
-        const [_, startIndex, endIndex] = range.match(/[A-Z]+([0-9]+):[A-Z]+([0-9]+)/)
+        const [, startIndex, endIndex] = range.match(/[A-Z]+([0-9]+):[A-Z]+([0-9]+)/)
         const getRowsRes = sheet.getRows(parseInt(startIndex), parseInt(endIndex))
         res.send(getRowsRes)
     }
@@ -37,7 +37,7 @@ v4SpreadsheetsRouter.post('/:sheetId/:requestType', (req, res) => {
 })
 
 v4SpreadsheetsRouter.post('/:sheetId/values/:sheet_range_requestType', (req, res) => {
-    const [sheetTitle_range, requestType] = req.params.sheet_range_requestType.split(':')
+    const [sheetTitle_range, ] = req.params.sheet_range_requestType.split(':')
     const [sheetTitle, range] = sheetTitle_range.split('!')
     const sheet = doc.getSheet(sheetTitle.replace(/^'/, '').replace(/'$/, ''))
     const addRowsRes = sheet.addRows(req.body.values, range )

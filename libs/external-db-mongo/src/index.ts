@@ -19,7 +19,7 @@ export class MongoConnector extends DbConnector {
     }
 }
 
-export const mongoFactory = async (config: any, options: any) => {
+export const mongoFactory = async(config: any, options: any) => {
     const connector = new MongoConnector()
     const { connection, cleanup, ...providers } = await connector.initialize(config, options)
     return { connector, connection, providers, cleanup }

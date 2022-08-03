@@ -1,6 +1,6 @@
 
 import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
-import { Base as AirtableBase} from 'airtable'
+import { Base as AirtableBase } from 'airtable'
 import { IDatabaseOperations, ValidateConnectionResult } from '@wix-velo/velo-external-db-types'
 
 export default class DatabaseOperations implements IDatabaseOperations {

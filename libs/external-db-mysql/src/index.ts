@@ -21,7 +21,7 @@ export class MySqlConnector extends DbConnector {
     }
 }
 
-export const mySqlFactory = async (config: any, options: any): Promise<DatabaseFactoryResponse> => {
+export const mySqlFactory = async(config: any, options: any): Promise<DatabaseFactoryResponse> => {
     const connector = new MySqlConnector()
     const { connection, cleanup, ...providers } = await connector.initialize(config, options)
     return { connector, connection, providers, cleanup }

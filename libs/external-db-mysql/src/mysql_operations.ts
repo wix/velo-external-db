@@ -1,7 +1,7 @@
 import { IDatabaseOperations } from '@wix-velo/velo-external-db-types'
 import { promisify } from 'util'
 import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
-import { Pool as MysqlPool, QueryFunction } from 'mysql' 
+import { Pool as MysqlPool } from 'mysql' 
 
 export default class DatabaseOperations implements IDatabaseOperations {
     pool: MysqlPool 

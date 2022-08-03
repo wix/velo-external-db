@@ -1,6 +1,5 @@
 import DatabaseOperations from '../../src/mysql_operations'
 import init from '../../src/connection_provider'
-import { MySqlConfig } from '../../src/types'
 
 
 const createPool = (modify: {[x:string]: string}) => {

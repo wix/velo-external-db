@@ -1,10 +1,10 @@
-import { AwsMongoConfigReader } from '../../src/readers/aws_config_reader';
-import { SecretsManagerClient, GetSecretValueCommand, ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-secrets-manager';
+import { AwsMongoConfigReader } from '../../src/readers/aws_config_reader'
+import { SecretsManagerClient, GetSecretValueCommand, ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-secrets-manager'
 import * as mockClient from 'aws-sdk-client-mock'
 
-import { validAuthorizationConfig, splitConfig } from '../test_utils';
+import { validAuthorizationConfig, splitConfig } from '../test_utils'
 import Chance = require('chance');
-import { MongoAwsConfig, MongoConfig } from '../test_types';
+import { MongoAwsConfig, MongoConfig } from '../test_types'
 const chance = new Chance()
 
 let mockedAwsSdk: mockClient.AwsStub<ServiceInputTypes, ServiceOutputTypes> 

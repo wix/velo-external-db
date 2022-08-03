@@ -1,5 +1,5 @@
 import { isObject } from '@wix-velo/velo-external-db-commons'
-import { AdapterAggregation, AdapterFunctions, FieldProjection, FunctionProjection, WixDataAggregation } from '@wix-velo/velo-external-db-types'
+import { AdapterAggregation, AdapterFunctions, FieldProjection, FunctionProjection } from '@wix-velo/velo-external-db-types'
 import { IFilterTransformer } from './filter_transformer'
 import { projectionFieldFor, projectionFunctionFor } from './utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
@@ -12,7 +12,7 @@ interface IAggregationTransformer {
     wixFunctionToAdapterFunction(wixFunction: string): AdapterFunctions
 }
 
-export default class AggregationTransformer implements IAggregationTransformer{
+export default class AggregationTransformer implements IAggregationTransformer {
     filterTransformer: IFilterTransformer
     constructor(filterTransformer: any) {
         this.filterTransformer = filterTransformer

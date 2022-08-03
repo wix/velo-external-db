@@ -20,7 +20,7 @@ export class AirtableConnector extends DbConnector {
     }
 }
 
-export const airtableFactory = async (config: any, options: any) => {
+export const airtableFactory = async(config: any, options: any) => {
     const connector = new AirtableConnector()
     const { connection, cleanup, ...providers } = await connector.initialize(config, options)
     return { connector, connection, providers, cleanup }

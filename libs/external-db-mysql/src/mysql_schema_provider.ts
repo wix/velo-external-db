@@ -5,9 +5,9 @@ import { escapeId, escapeTable } from './mysql_utils'
 import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
 import { Pool as MySqlPool } from 'mysql'
 import { MySqlQuery } from './types'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, TableHeader } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
 
-export default class SchemaProvider implements ISchemaProvider{
+export default class SchemaProvider implements ISchemaProvider {
     pool: MySqlPool
     sqlSchemaTranslator: IMySqlSchemaColumnTranslator
     query: MySqlQuery

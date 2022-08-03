@@ -20,11 +20,11 @@ export default class SchemaService {
 
     async listHeaders() {
         const collections = await this.storage.listHeaders()
-        return { schemas: collections.map((collection)=> asWixSchemaHeaders(collection)) }
+        return { schemas: collections.map((collection) => asWixSchemaHeaders(collection)) }
     }
 
     async find(collectionNames: string[]) {
-        const dbs: Table[] = await Promise.all(collectionNames.map(async (collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
+        const dbs: Table[] = await Promise.all(collectionNames.map(async(collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
         const dbsWithAllowedOperations = this.appendAllowedOperationsTo(dbs)
 
         return { schemas: dbsWithAllowedOperations.map( asWixSchema ) }

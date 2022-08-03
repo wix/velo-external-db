@@ -7,7 +7,7 @@ import Chance = require('chance')
 import { errors } from '@wix-velo/velo-external-db-commons'
 const chance = Chance()
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { WixDataFilter, WixDataMultiFieldOperators, WixDataSingleFieldOperators } from '@wix-velo/velo-external-db-types'
+import { WixDataMultiFieldOperators, WixDataSingleFieldOperators } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
 
 describe('Filter Transformer', () => {

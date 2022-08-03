@@ -2,7 +2,7 @@ import SchemaColumnTranslator, { IAirtableSchemaColumnTranslator } from './sql_s
 import { SystemFields, validateSystemFields } from '@wix-velo/velo-external-db-commons'
 import axios, { Axios } from 'axios'
 import { Base } from 'airtable'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, TableHeader } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { errors } from '@wix-velo/velo-external-db-commons'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
 

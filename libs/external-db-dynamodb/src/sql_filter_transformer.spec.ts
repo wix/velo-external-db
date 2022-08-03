@@ -5,21 +5,25 @@ import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { idFilter } from '../tests/gen'
 import each from 'jest-each'
 import * as Chance from 'chance' 
+import { AdapterOperator } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
 const chance = Chance()
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_contains, and, or, not } = AdapterOperators
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_contains, and, or, not } = AdapterOperators as Record<string, AdapterOperator>
 
 describe('Sql Parser', () => {
 
     describe('filter parser', () => {
 
         test('handles undefined filter', () => {
+            //@ts-ignore
             expect( env.filterParser.parseFilter('') ).toEqual([])
             //@ts-ignore
             expect( env.filterParser.parseFilter(undefined) ).toEqual([])
             //@ts-ignore
             expect( env.filterParser.parseFilter(null) ).toEqual([])
+            //@ts-ignore
             expect( env.filterParser.parseFilter(555) ).toEqual([])
+            //@ts-ignore
             expect( env.filterParser.parseFilter([5555]) ).toEqual([])
         })
 
@@ -211,7 +215,7 @@ describe('Sql Parser', () => {
                 }
                 const op = o === and ? 'AND' : 'OR'
 
-                const counter = {nameCounter: 0, valueCounter: 0}
+                const counter = { nameCounter: 0, valueCounter: 0 }
                 const filterExpr = env.filterParser.parseFilter(ctx.filter, counter)[0].filterExpr
                 const anotherFilterExpr = env.filterParser.parseFilter(ctx.anotherFilter, counter)[0].filterExpr
 

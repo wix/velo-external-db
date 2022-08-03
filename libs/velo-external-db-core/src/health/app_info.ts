@@ -1,10 +1,9 @@
-import { AnyFixMe } from "@wix-velo/velo-external-db-types"
-import OperationService from "../service/operation"
+import { AnyFixMe } from '@wix-velo/velo-external-db-types'
 
 export const maskSensitiveData = (cfg: {[key: string]: any}) => {
     const config = { ...cfg }
-    if (config["password"]) config["password"] = '*********'
-    if (config["secretKey"]) config["secretKey"] = '*********'
+    if (config['password']) config['password'] = '*********'
+    if (config['secretKey']) config['secretKey'] = '*********'
     return config
 }
 

@@ -1,7 +1,7 @@
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Item, ItemWithId, ResponseField } from "@wix-velo/velo-external-db-types"
-import QueryValidator from "../converters/query_validator"
-import DataService from "./data"
-import CacheableSchemaInformation from "./schema_information"
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Item, ItemWithId, ResponseField } from '@wix-velo/velo-external-db-types'
+import QueryValidator from '../converters/query_validator'
+import DataService from './data'
+import CacheableSchemaInformation from './schema_information'
 
 export default class SchemaAwareDataService {
     queryValidator: QueryValidator

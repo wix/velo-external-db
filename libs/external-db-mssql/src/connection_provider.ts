@@ -25,7 +25,7 @@ const extraOptions = (cfg: MSSQLConfig) => {
     }
 }
 
-export default async (cfg: MSSQLConfig, _poolOptions: { [key: string]: any }): Promise<DbProviders<ConnectionPool>> => {
+export default async(cfg: MSSQLConfig, _poolOptions: { [key: string]: any }): Promise<DbProviders<ConnectionPool>> => {
     const config: config = {
         user: cfg.user,
         password: cfg.password,

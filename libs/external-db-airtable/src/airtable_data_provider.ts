@@ -1,7 +1,7 @@
 import { minifyAndFixDates, DEFAULT_MAX_RECORDS, EmptySort } from './airtable_utils'
-import { Base as AirtableBase} from 'airtable'
+import { Base as AirtableBase } from 'airtable'
 import { IAirtableFilterParser } from './sql_filter_transformer'
-import { IDataProvider, AdapterFilter as Filter,  Item} from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter,  Item } from '@wix-velo/velo-external-db-types'
 
 
 type AirtableQuery = {
@@ -51,12 +51,12 @@ export default class DataProvider implements IDataProvider {
     }
 
     async update(collectionName: string, items: Item[]): Promise<number> {
-        const updated = await Promise.all( items.map(async (item: any) => await this.updateSingle(collectionName, item)) )
+        const updated = await Promise.all( items.map(async(item: any) => await this.updateSingle(collectionName, item)) )
         return updated.length
     }
 
     async delete(collectionName: string, itemIds: string[]): Promise<number> {
-        const ids = await Promise.all(itemIds.map(async (id: any) => await this.wixDataIdToAirtableId(collectionName, id)))
+        const ids = await Promise.all(itemIds.map(async(id: any) => await this.wixDataIdToAirtableId(collectionName, id)))
         const deleted = await this.base(collectionName)
                                   .destroy(ids)
         return deleted.length

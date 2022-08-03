@@ -5,9 +5,10 @@ import { Uninitialized, gen } from '@wix-velo/test-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import FilterParser from './sql_filter_transformer'
 import { escapeIdentifier as escapeId, escapeIdentifier } from './bigquery_utils'
+import { AdapterOperator } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
 const chance = Chance()
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators as Record<string, AdapterOperator>
 const { avg, max, min, sum, count } = AdapterFunctions
 
 describe('Sql Parser', () => {
@@ -68,14 +69,15 @@ describe('Sql Parser', () => {
     describe('filter parser', () => {
 
         test('handles undefined filter', () => {
+            // @ts-ignore
             expect( env.filterParser.parseFilter('') ).toEqual([])
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             expect( env.filterParser.parseFilter(undefined) ).toEqual([])
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             expect( env.filterParser.parseFilter(null) ).toEqual([])
+            // @ts-ignore
             expect( env.filterParser.parseFilter(555) ).toEqual([])
+            // @ts-ignore
             expect( env.filterParser.parseFilter([5555]) ).toEqual([])
         })
 

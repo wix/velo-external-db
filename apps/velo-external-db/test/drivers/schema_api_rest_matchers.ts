@@ -1,5 +1,5 @@
 import { SystemFields, asWixSchemaHeaders } from '@wix-velo/velo-external-db-commons'
-import { InputField } from '@wix-velo/velo-external-db-types';
+import { InputField } from '@wix-velo/velo-external-db-types'
 
 export const responseWith = (matcher: any) => expect.objectContaining( { data: matcher } )
 

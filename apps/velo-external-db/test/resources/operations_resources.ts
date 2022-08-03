@@ -15,7 +15,7 @@ export const env = {
     driver: Uninitialized,
 }
 
-const init = async (impl: any) => {
+const init = async(impl: any) => {
     const driver = impl.opsDriver()
 
     env.driver = driver

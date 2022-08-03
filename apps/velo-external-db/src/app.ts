@@ -1,10 +1,10 @@
 import express = require('express')
 import { create, readCommonConfig } from '@wix-velo/external-db-config'
-import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
+import { ExternalDbRouter, Hooks } from '@wix-velo/velo-external-db-core'
 import { engineConnectorFor } from './storage/factory'
-import { Hooks } from 'libs/velo-external-db-core/src/types'
 
-const initConnector = async (hooks?: Hooks) => {
+
+const initConnector = async(hooks?: Hooks) => {
     const { vendor, type: adapterType } = readCommonConfig()
     const configReader = create()
     const { authorization, secretKey, ...dbConfig } = await configReader.readConfig()
@@ -25,10 +25,10 @@ const initConnector = async (hooks?: Hooks) => {
         hooks
     })
 
-    return { externalDbRouter, cleanup: async () => await cleanup(), schemaProvider: providers.schemaProvider }
+    return { externalDbRouter, cleanup: async() => await cleanup(), schemaProvider: providers.schemaProvider }
 }
 
-export const createApp = async () => {
+export const createApp = async() => {
     const app = express()
     const initConnectorResponse = await initConnector()
     app.use(initConnectorResponse.externalDbRouter.router)

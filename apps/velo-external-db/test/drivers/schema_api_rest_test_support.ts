@@ -1,4 +1,4 @@
-import { InputField } from "@wix-velo/velo-external-db-types"
+import { InputField } from '@wix-velo/velo-external-db-types'
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'

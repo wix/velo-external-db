@@ -1,4 +1,4 @@
-import { EmptySort } from 'libs/external-db-mongo/src/mongo_utils'
+import { EmptySort } from '../../src/mongo_utils'
 import { when } from 'jest-when'
 import { jest } from '@jest/globals'
 

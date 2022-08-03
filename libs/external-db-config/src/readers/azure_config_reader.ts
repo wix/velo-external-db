@@ -1,4 +1,4 @@
-import { IConfigReader } from "../types"
+import { IConfigReader } from '../types'
 
 export class AzureConfigReader implements IConfigReader {
   constructor() {

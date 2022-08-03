@@ -1,6 +1,6 @@
 import { translateErrorCodes } from './exception_translator'
 import { unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
-import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item} from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item } from '@wix-velo/velo-external-db-types'
 import FilterParser from './sql_filter_transformer'
 import { MongoClient } from 'mongodb'
 

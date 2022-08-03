@@ -1,7 +1,7 @@
 import { IDatabaseOperations } from '@wix-velo/velo-external-db-types'
 import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
 
-export default class DatabaseOperations implements IDatabaseOperations{
+export default class DatabaseOperations implements IDatabaseOperations {
     database: any
     constructor(database: any) {
         this.database = database
