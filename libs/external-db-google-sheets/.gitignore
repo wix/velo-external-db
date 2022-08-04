@@ -6,4 +6,5 @@ schemas.json
 .gcloudignore
 .eslint
 .idea
+tests/e2e-testkit/service_account_key.json
 
