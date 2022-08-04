@@ -65,13 +65,6 @@ export const AdapterOperators = {
     matches: 'matches'
 }
 
-export const AdapterFunctions = {
-    avg: 'avg',
-    max: 'max',
-    min: 'min',
-    sum: 'sum',
-    count: 'count'
-}
 
 export const extractGroupByNames = (projection: any[]) => projection.filter((f: { function: any }) => !f.function).map((f: { name: any }) => f.name)
 

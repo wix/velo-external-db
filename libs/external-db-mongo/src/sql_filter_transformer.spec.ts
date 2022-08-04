@@ -1,11 +1,11 @@
-import FilterParser from './sql_filter_transformer'
-import { AdapterOperators, AdapterFunctions } from '@wix-velo/velo-external-db-commons'
-import { Uninitialized, gen } from '@wix-velo/test-commons'
-import { errors } from '@wix-velo/velo-external-db-commons'
-const { InvalidQuery } = errors
 import each from 'jest-each'
 import Chance = require('chance')
+import { AdapterOperators, errors } from '@wix-velo/velo-external-db-commons'
+import { AdapterFunctions } from '@wix-velo/velo-external-db-types'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import FilterParser from './sql_filter_transformer'
 import { EmptySort } from './mongo_utils'
+const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions

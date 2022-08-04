@@ -1,4 +1,4 @@
-import { AdapterFunctions } from '@wix-velo/velo-external-db-commons'
+import { AdapterFunctions } from '@wix-velo/velo-external-db-types'
 
 export const EmptyFilter = {}
 

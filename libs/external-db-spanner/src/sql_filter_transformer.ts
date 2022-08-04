@@ -1,7 +1,7 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { EmptyFilter, EmptySort, isObject, AdapterOperators, AdapterFunctions, isEmptyFilter, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
+import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, FunctionProjection, NotEmptyAdapterFilter as NotEmptyFilter, AdapterFunctions } from '@wix-velo/velo-external-db-types'
+import { EmptyFilter, EmptySort, isObject, AdapterOperators, isEmptyFilter, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { escapeId, patchFieldName, escapeFieldId, validateLiteralWithCounter, nameWithCounter } from './spanner_utils'
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, FunctionProjection, NotEmptyAdapterFilter as NotEmptyFilter } from '@wix-velo/velo-external-db-types'
 import { SpannerParsedFilter } from './types'
 const { InvalidQuery } = errors
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators

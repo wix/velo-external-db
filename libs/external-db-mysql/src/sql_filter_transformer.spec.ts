@@ -1,9 +1,9 @@
-import FilterParser from './sql_filter_transformer'
-import { EmptySort, AdapterOperators, AdapterFunctions } from '@wix-velo/velo-external-db-commons'
-import { Uninitialized, gen } from '@wix-velo/test-commons'
-import { errors } from '@wix-velo/velo-external-db-commons'
 import each from 'jest-each'
 import * as Chance from 'chance'
+import { EmptySort, AdapterOperators, errors } from '@wix-velo/velo-external-db-commons'
+import { AdapterFunctions } from '@wix-velo/velo-external-db-types'
+import { Uninitialized, gen } from '@wix-velo/test-commons'
+import FilterParser from './sql_filter_transformer'
 import { escapeId } from './mysql_utils'
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
