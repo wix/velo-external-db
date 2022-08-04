@@ -28,7 +28,6 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
         await expect( env.schemaProvider.listHeaders() ).resolves.toEqual([ctx.collectionName])
     })
 
-    // TODO: remove this test if supportedOperations method will be removed from schema provider
     test('supported operations is defined', async() => {
         expect( env.schemaProvider.supportedOperations() ).not.toEqual([])
     })

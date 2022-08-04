@@ -6,7 +6,7 @@ import each from 'jest-each'
 import * as Chance from 'chance'
 import { escapeId } from './mysql_utils'
 const chance = Chance()
-const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators //TODO: extract
+const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 const { InvalidQuery } = errors
 

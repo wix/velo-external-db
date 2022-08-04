@@ -15,7 +15,6 @@ describe('Sql Parser', () => {
 
     describe('sort parser', () => {
 
-        // todo: should we even check for valid input or should we let the validation library to handle this ?
         test('handles undefined sort', () => {
             expect( env.filterParser.orderBy('') ).toEqual(EmptySort)
             expect( env.filterParser.orderBy('    ') ).toEqual(EmptySort)
@@ -116,7 +115,6 @@ describe('Sql Parser', () => {
 
             })
 
-            // todo: $hasAll ???
             test('correctly transform operator [include]', () => {
                 const filter = {
                     operator: include as AdapterOperator,
