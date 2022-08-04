@@ -54,7 +54,7 @@ export interface AsWixSchema extends AsWixSchemaHeaders {
     fields: { [field: string]: FieldWithQueryOperators }
 }
 
-export enum AdapterFunctions { //in data_commons as well
+export enum AdapterFunctions {
     avg = 'avg',
     max = 'max',
     min = 'min',
