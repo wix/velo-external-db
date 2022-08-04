@@ -3,46 +3,49 @@ import * as serviceAccountKey from '../e2e-testkit/service_account_key.json'
 import { SHEET_ID } from '../e2e-testkit/google_sheets_resources'
 import DatabaseOperations from '../../src/google_sheet_operations'
 
-const createPool =  () => {
-    const googleSheetDoc = new GoogleSpreadsheet(SHEET_ID)
+const createValidPool = async(sheetID: string, client_email: string, private_key: string) => {
+    const googleSheetDoc = new GoogleSpreadsheet(sheetID)
 
-    googleSheetDoc.useServiceAccountAuth({
-        client_email: serviceAccountKey.client_email,
-        private_key: serviceAccountKey.private_key
-    })
+    await googleSheetDoc.useServiceAccountAuth({ client_email, private_key })
 
     return googleSheetDoc
 }
 
-const dbOperationWithMisconfiguredApiPrivateKey = () => {
-    const googleSheetDoc2 = new GoogleSpreadsheet(SHEET_ID)
+const createInValidPool = async(sheetID: string, client_email: string, private_key: string) => {
+    const googleSheetDoc = new GoogleSpreadsheet(sheetID)
 
     try {
-        googleSheetDoc2.useServiceAccountAuth({
-             client_email: serviceAccountKey.client_email, 
-             private_key: 'broken-key'
-        })
+        await googleSheetDoc.useServiceAccountAuth({ client_email, private_key })
     } catch (error) {
         // 
     }
 
-    return new DatabaseOperations(googleSheetDoc2)
+    return googleSheetDoc
+
 }
 
-const dbOperationWithMisconfiguredSheetId = () => { 
-}
-const dbOperationWithMisconfiguredClientEmail = () => {
+const dbOperationWithMisconfiguredApiPrivateKey = async() => {
+    const googleSheetPoolWithBrokenApi = await createInValidPool(SHEET_ID, serviceAccountKey.client_email, 'broken-api-key')
+    return new DatabaseOperations(googleSheetPoolWithBrokenApi)
 }
 
-export const dbOperationWithValidDB = () => {
-    const googleSheetDoc = createPool()
+const dbOperationWithMisconfiguredSheetId = async() => {
+    const googleSheetWPoolithBrokenSheetID = await createInValidPool('broken-sheed-id', serviceAccountKey.client_email, serviceAccountKey.private_key)
+    return new DatabaseOperations(googleSheetWPoolithBrokenSheetID)
+}
+const dbOperationWithMisconfiguredClientEmail = async() => {
+    const googleSheetPoolWithBrokenClientEmail = await createInValidPool(SHEET_ID, 'invalid-client-email', serviceAccountKey.private_key)
+    return new DatabaseOperations(googleSheetPoolWithBrokenClientEmail)
+}
+
+export const dbOperationWithValidDB = async() => {
+    const googleSheetDoc = await createValidPool(SHEET_ID, serviceAccountKey.client_email, serviceAccountKey.private_key)
     const dbOperations = new DatabaseOperations(googleSheetDoc)
     return { dbOperations, cleanup: () => {} }
 }
 
 export const misconfiguredDbOperationOptions = () => ([   
-    ['pool connection with wrong apiPrivateKey', () => dbOperationWithMisconfiguredApiPrivateKey()],
-    // ['pool connection with wrong client_email', () => dbOperationWithMisconfiguredClientEmail()],
-    // ['pool connection with wrong sheetId', () => dbOperationWithMisconfiguredSheetId()],
-
+    ['pool connection with wrong apiPrivateKey', async() => await dbOperationWithMisconfiguredApiPrivateKey()],
+    ['pool connection with wrong client_email', async() => await dbOperationWithMisconfiguredClientEmail()],
+    ['pool connection with wrong sheetId', async() => await dbOperationWithMisconfiguredSheetId()],
 ])
