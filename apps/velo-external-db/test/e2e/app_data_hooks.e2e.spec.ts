@@ -1,14 +1,15 @@
+import each from 'jest-each'
 import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { testSupportedOperations } from '@wix-velo/test-commons'
-const { UpdateImmediately, DeleteImmediately, Aggregate } = require('@wix-velo/velo-external-db-commons').SchemaOperations
-const each = require('jest-each').default
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } from '../resources/e2e_resources'
 import gen = require('../gen')
 import schema = require('../drivers/schema_api_rest_test_support')
 import data = require('../drivers/data_api_rest_test_support')
 import hooks = require('../drivers/hooks_test_support')
+const { UpdateImmediately, DeleteImmediately, Aggregate } = SchemaOperations
 
-import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'

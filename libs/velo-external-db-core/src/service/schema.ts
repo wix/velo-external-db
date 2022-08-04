@@ -1,5 +1,5 @@
-import { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, SchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, Table } from '@wix-velo/velo-external-db-types'
+import { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, errors } from '@wix-velo/velo-external-db-commons'
+import { InputField, ISchemaProvider, Table, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import CacheableSchemaInformation from './schema_information'
 const { Create, AddColumn, RemoveColumn } = SchemaOperations
 

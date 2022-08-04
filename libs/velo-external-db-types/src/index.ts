@@ -16,7 +16,7 @@ export enum AdapterOperator { //in velo-external-db-core
     matches = 'matches'
 }
 
-export enum SchemaOperations { //in schema_commons as well
+export enum SchemaOperations {
     List = 'list',
     ListHeaders = 'listHeaders',
     Create = 'createCollection',

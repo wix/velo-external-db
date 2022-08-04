@@ -1,6 +1,6 @@
 import { CannotModifySystemField } from './errors'
 
-import { ResponseField, FieldWithQueryOperators, AsWixSchemaHeaders, AsWixSchema } from '@wix-velo/velo-external-db-types'
+import { ResponseField, FieldWithQueryOperators, AsWixSchemaHeaders, AsWixSchema, SchemaOperations } from '@wix-velo/velo-external-db-types'
 
 export const SystemFields = [
     {
@@ -34,30 +34,6 @@ const QueryOperationsByFieldType: {[x: string]: any} = {
     datetime: [...QueryOperatorsByFieldType.datetime],
     image: QueryOperatorsByFieldType.image,
     object: [...QueryOperatorsByFieldType.object, 'isEmpty', 'isNotEmpty'],
-}
-
-
-export enum SchemaOperations {
-    List = 'list',
-    ListHeaders = 'listHeaders',
-    Create = 'createCollection',
-    Drop = 'dropCollection',
-    AddColumn = 'addColumn',
-    RemoveColumn = 'removeColumn',
-    Describe = 'describeCollection',
-    FindWithSort = 'findWithSort',
-    Aggregate = 'aggregate',
-    BulkDelete = 'bulkDelete',
-    Truncate = 'truncate',
-    UpdateImmediately = 'updateImmediately',
-    DeleteImmediately = 'deleteImmediately',
-    StartWithCaseSensitive = 'startWithCaseSensitive',
-    StartWithCaseInsensitive = 'startWithCaseInsensitive',
-    Projection = 'projection',
-    FindObject = 'findObject',
-    Matches = 'matches',
-    NotOperator = 'not',
-    IncludeOperator = 'include',
 }
 
 export const AllSchemaOperations = Object.values(SchemaOperations)

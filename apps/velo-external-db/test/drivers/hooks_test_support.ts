@@ -1,6 +1,5 @@
-import { SchemaOperations } from '@wix-velo/velo-external-db-commons'
 import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
-import { InputField, Item, WixDataFilter } from '@wix-velo/velo-external-db-types'
+import { InputField, Item, WixDataFilter, SchemaOperations } from '@wix-velo/velo-external-db-types'
 const { Aggregate } = SchemaOperations
 
 export const resetHooks = (externalDbRouter: ExternalDbRouter) => externalDbRouter.reloadHooks()

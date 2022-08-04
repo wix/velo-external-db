@@ -53,7 +53,6 @@ const testSuits = {
     bigquery: new E2EResources(bigquery, createApp),
 }
 
-
 export const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 export const supportedOperations = testedSuit().supportedOperations
 

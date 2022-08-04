@@ -1,6 +1,6 @@
 import { Firestore } from '@google-cloud/firestore'
-import { SystemFields, validateSystemFields, SchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, ResponseField, Table } from '@wix-velo/velo-external-db-types'
+import { SystemFields, validateSystemFields, errors } from '@wix-velo/velo-external-db-commons'
+import { InputField, ISchemaProvider, ResponseField, Table, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { table } from './types'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
 

@@ -1,6 +1,7 @@
 import each from 'jest-each'
-const { DbConnectionError } = require('@wix-velo/velo-external-db-commons').errors
+import { errors } from '@wix-velo/velo-external-db-commons'
 import { env, setupDb, currentDbImplementationName, misconfiguredDbOperationOptions } from '../resources/operations_resources'
+const { DbConnectionError } = errors
 
 describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {

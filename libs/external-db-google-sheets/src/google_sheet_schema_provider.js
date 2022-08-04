@@ -1,4 +1,5 @@
-const { SystemFields, validateSystemFields, parseTableData, errors, SchemaOperations } = require('@wix-velo/velo-external-db-commons')
+const { SystemFields, validateSystemFields, parseTableData, errors } = require('@wix-velo/velo-external-db-commons')
+const { SchemaOperations } = require('@wix-velo/velo-external-db-types')
 const { translateErrorCodes } = require('./google_sheet_exception_translator')
 const { describeSheetHeaders, headersFrom, sheetFor } = require('./google_sheet_utils')
 class SchemaProvider {
