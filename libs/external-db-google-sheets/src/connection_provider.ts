@@ -4,8 +4,9 @@ import SchemaProvider from './google_sheet_schema_provider'
 import DataProvider from './google_sheet_data_provider'
 import DatabaseOperations from './google_sheet_operations'
 import { DbProviders } from '@wix-velo/velo-external-db-types'
+import { GoogleSheetsConfig } from './types'
 
-export default async(config: any): Promise<DbProviders<GoogleSpreadsheet>>  => {
+export default async(config: GoogleSheetsConfig): Promise<DbProviders<GoogleSpreadsheet>>  => {
     const doc = new GoogleSpreadsheet(config.sheetId)
     docAuthSetup(config, doc)
     await loadSheets(doc) 
