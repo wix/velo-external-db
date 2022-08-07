@@ -17,7 +17,7 @@
     "publish": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "command": "node tools/scripts/publish.mjs @wix-velo/external-db-bigquery {args.ver} {args.tag}"
+        "command": "node tools/scripts/publish.mjs @wix-velo/external-db-bigquery {args.ver} {args.tag} {args.update}"
       },
       "dependsOn": [
         {

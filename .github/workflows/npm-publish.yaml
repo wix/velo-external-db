@@ -3,90 +3,23 @@ name: Publish NPM packages
 on:
   workflow_dispatch:
     inputs:
-      version: 
-        description: "Package version number"  
-
-      # wix-velo/external-db-airtable:
-      #   type: boolean
-      #   description: "@wix-velo/external-db-airtable"
-      #   default: true
-
-      wix-velo/external-db-bigquery:
-        type: boolean
+      bigquery:
+        required: false
+        type: choice
+        options:
+          - nothing
+          - patch
+          - minor
+          - major
         description: "@wix-velo/external-db-bigquery"
-        default: true
-
-      # wix-velo/external-db-config:
-      #   type: boolean
-      #   description: "@wix-velo/external-db-config"
-      #   default: true
-
-      wix-velo/external-db-dynamodb:
-        type: boolean
-        description: "@wix-velo/external-db-dynamodb"
-        default: true
-
-      # wix-velo/external-db-firestore:
-      #   type: boolean
-      #   description: "@wix-velo/external-db-firestore"
-      #   default: true
-
-      wix-velo/external-db-google-sheets:
-        type: boolean
-        description: "@wix-velo/external-db-google-sheets"
-        default: true
-
-      wix-velo/external-db-mongo:
-        type: boolean
-        description: "@wix-velo/external-db-mongo"
-        default: true
-
-      wix-velo/external-db-mssql:
-        type: boolean
-        description: "@wix-velo/external-db-mssql"
-        default: true
-
-      wix-velo/external-db-mysql:
-        type: boolean
-        description: "@wix-velo/external-db-mysql"
-        default: true
-
-      wix-velo/external-db-postgres:
-        type: boolean
-        description: "@wix-velo/external-db-postgres"
-        default: true
-
-      # wix-velo/external-db-security:
-      #   type: boolean
-      #   description: "@wix-velo/external-db-security"
-      #   default: true
-
-      wix-velo/external-db-spanner:
-        type: boolean
-        description: "@wix-velo/external-db-spanner"
-        default: true
-
-      # wix-velo/test-commons:
-      #   type: boolean
-      #   description: "@wix-velo/test-commons"
-      #   default: true
-
-      # wix-velo/velo-external-db-commons:
-      #   type: boolean
-      #   description: "@wix-velo/velo-external-db-commons"
-      #   default: true
-
-      wix-velo/velo-external-db-core:
-        type: boolean
-        description: "@wix-velo/velo-external-db-core"
-        default: true
+        default: nothing
 
 jobs:
-  publish_npm_ackage:
+  publish_npm_package:
   
     runs-on: ubuntu-latest
     env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      NODE_AUTH_TOKEN: 'something'
 
     steps:
       - name: Git checkout
@@ -101,12 +34,12 @@ jobs:
         run: npm install -g nx
 
       - run: npm install 
+     
+      - name: publish to npm
+        if: github.event.inputs.bigquery != 'nothing'
+        run: |
+          nx run @wix-velo/external-db-bigquery:publish --update=${{github.event.inputs.bigquery}} --dryRun
 
-      - uses: actions/github-script@v6
-        with:
-          script: |
-            const script = require('.github/workflows/script.js')
-            await script({github, context, core})
-            
+
 
 
