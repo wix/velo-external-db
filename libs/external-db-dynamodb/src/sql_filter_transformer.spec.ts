@@ -39,7 +39,7 @@ describe('Sql Parser', () => {
             })
         })
 
-        //todo: transform only idFilter with equal operator!
+        
         test('transform filter id filter with equal operator to query command', () => {
             const filter = {
                 fieldName: '_id',

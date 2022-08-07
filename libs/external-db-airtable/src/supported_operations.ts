@@ -1,4 +1,4 @@
-import { SchemaOperations } from '@wix-velo/velo-external-db-commons'
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 
 const { List, ListHeaders, Create, Drop, AddColumn, Describe, NotOperator } = SchemaOperations
 

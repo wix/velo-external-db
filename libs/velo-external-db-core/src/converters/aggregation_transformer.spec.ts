@@ -1,11 +1,11 @@
+import each from 'jest-each'
+import Chance = require('chance')
 import { Uninitialized } from '@wix-velo/test-commons'
+import { AdapterFunctions } from '@wix-velo/velo-external-db-types'
+import { errors } from '@wix-velo/velo-external-db-commons'
 import AggregationTransformer from './aggregation_transformer'
 import { EmptyFilter } from './utils'
 import * as driver from '../../test/drivers/filter_transformer_test_support'
-import { AdapterFunctions } from '@wix-velo/velo-external-db-commons'
-import each from 'jest-each'
-import { errors } from '@wix-velo/velo-external-db-commons'
-import Chance = require('chance')
 const chance = Chance()
 const { InvalidQuery } = errors
 

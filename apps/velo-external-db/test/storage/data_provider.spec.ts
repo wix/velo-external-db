@@ -5,7 +5,7 @@ const { FindWithSort, DeleteImmediately, Aggregate, UpdateImmediately, StartWith
 import Chance = require('chance')
 import gen = require('../gen')
 import { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/provider_resources'
-import { entitiesWithOwnerFieldOnly, entityWithObjectField } from '../drivers/data_provider_matchers' //todo: move toggleCase to utils
+import { entitiesWithOwnerFieldOnly, entityWithObjectField } from '../drivers/data_provider_matchers'
 const chance = new Chance()
 
 describe(`Data API: ${currentDbImplementationName()}`, () => {

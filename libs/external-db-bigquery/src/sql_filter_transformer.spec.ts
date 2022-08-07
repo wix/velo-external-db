@@ -1,11 +1,10 @@
 import * as Chance from 'chance'
 import each from 'jest-each'
-import { EmptySort, AdapterOperators, AdapterFunctions } from '@wix-velo/velo-external-db-commons'
+import { EmptySort, AdapterOperators,  errors } from '@wix-velo/velo-external-db-commons'
 import { Uninitialized, gen } from '@wix-velo/test-commons'
-import { errors } from '@wix-velo/velo-external-db-commons'
 import FilterParser from './sql_filter_transformer'
 import { escapeIdentifier as escapeId, escapeIdentifier } from './bigquery_utils'
-import { AdapterOperator } from '@wix-velo/velo-external-db-types'
+import { AdapterOperator, AdapterFunctions } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
 const chance = Chance()
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators as Record<string, AdapterOperator>
@@ -14,7 +13,6 @@ const { avg, max, min, sum, count } = AdapterFunctions
 describe('Sql Parser', () => {
     describe('sort parser', () => {
 
-        // todo: should we even check for valid input or should we let the validation library to handle this ?
         test('handles undefined sort', () => {
             expect( env.filterParser.orderBy('') ).toEqual(EmptySort)
             expect( env.filterParser.orderBy('    ') ).toEqual(EmptySort)

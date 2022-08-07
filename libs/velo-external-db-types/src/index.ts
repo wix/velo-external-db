@@ -16,7 +16,7 @@ export enum AdapterOperator { //in velo-external-db-core
     matches = 'matches'
 }
 
-export enum SchemaOperations { //in schema_commons as well
+export enum SchemaOperations {
     List = 'list',
     ListHeaders = 'listHeaders',
     Create = 'createCollection',
@@ -54,7 +54,7 @@ export interface AsWixSchema extends AsWixSchemaHeaders {
     fields: { [field: string]: FieldWithQueryOperators }
 }
 
-export enum AdapterFunctions { //in data_commons as well
+export enum AdapterFunctions {
     avg = 'avg',
     max = 'max',
     min = 'min',

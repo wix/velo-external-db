@@ -1,6 +1,6 @@
 import { Dataset } from '@google-cloud/bigquery'
-import { SystemFields, validateSystemFields, parseTableData, SchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, ResponseField, Table } from '@wix-velo/velo-external-db-types'
+import { SystemFields, validateSystemFields, parseTableData, errors } from '@wix-velo/velo-external-db-commons'
+import { InputField, ISchemaProvider, ResponseField, Table, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes, removeColumnTranslateErrorCodes } from './sql_exception_translator'
 import { escapeIdentifier } from './bigquery_utils'
 import SchemaColumnTranslator from './sql_schema_translator'

@@ -1,12 +1,12 @@
-import { errors, SchemaOperations } from '@wix-velo/velo-external-db-commons'
-const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = errors
-import { Uninitialized, gen, testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
-const { RemoveColumn } = SchemaOperations
 import Chance = require('chance')
+import { errors, SystemFields } from '@wix-velo/velo-external-db-commons'
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { Uninitialized, gen, testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
 import { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/provider_resources'
 import { collectionWithDefaultFields, hasSameSchemaFieldsLike } from '../drivers/schema_provider_matchers'
 const chance = new Chance()
-import { SystemFields } from '@wix-velo/velo-external-db-commons'
+const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = errors
+const { RemoveColumn } = SchemaOperations
 
 
 describe(`Schema API: ${currentDbImplementationName()}`, () => {
@@ -28,7 +28,6 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
         await expect( env.schemaProvider.listHeaders() ).resolves.toEqual([ctx.collectionName])
     })
 
-    // TODO: remove this test if supportedOperations method will be removed from schema provider
     test('supported operations is defined', async() => {
         expect( env.schemaProvider.supportedOperations() ).not.toEqual([])
     })

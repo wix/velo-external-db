@@ -66,7 +66,6 @@ export default class DataProvider implements IDataProvider {
         await this.pool.query(`TRUNCATE ${escapeIdentifier(collectionName)}`).catch( translateErrorCodes )
     }
 
-    // TODO: change filter's type to Filter type
     async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<Item[]> {
         const { filterExpr: whereFilterExpr, parameters: whereParameters, offset } = this.filterParser.transform(filter)
         const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters } = this.filterParser.parseAggregation(aggregation, offset)
