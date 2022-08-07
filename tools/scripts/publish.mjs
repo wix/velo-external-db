@@ -22,15 +22,7 @@ function invariant(condition, message) {
 
 // Executing publish script: node path/to/publish.mjs {name} --version {version} --tag {tag}
 // Default "tag" to "next" so we won't publish the "latest" tag by accident.
-const [, , name, version, tag = 'next'] = process.argv;
-
-// A simple SemVer validation to validate the version
-const validVersion = /^\d+\.\d+\.\d(-\w+\.\d+)?/;
-invariant(
-  version && validVersion.test(version),
-  `No version provided or version did not match Semantic Versioning, expected: #.#.#-tag.# or #.#.#, got ${version}.`
-);
-
+const [, , name, version, tag = 'next', update ] = process.argv;
 
 const graph = readCachedProjectGraph();
 const project = graph.nodes[name];
@@ -39,6 +31,27 @@ invariant(
   project,
  `Could not find project "${name}" in the workspace. Is the project.json configured correctly?`
 );
+let updatedVersion 
+if (version === undefined) {
+  try {
+    const json = JSON.parse(readFileSync(`package.json`).toString());
+    updatedVersion = getUpdatedVersion(update, json.version);
+  } catch (e) {
+    console.error(
+      chalk.bold.red(`Error reading package.json file from library build output.`)
+    );
+  }
+}
+
+updatedVersion = updatedVersion || version;
+
+// A simple SemVer validation to validate the version
+const validVersion = /^\d+\.\d+\.\d(-\w+\.\d+)?/;
+invariant(
+  updatedVersion && validVersion.test(updatedVersion),
+  `No version provided or version did not match Semantic Versioning, expected: #.#.#-tag.# or #.#.#, got ${updatedVersion}.`
+);
+
 
 const outputPath = project.data?.targets?.build?.options?.outputPath;
 invariant(
@@ -51,7 +64,7 @@ process.chdir(outputPath);
 // Updating the version in "package.json" before publishing
 try {
   const json = JSON.parse(readFileSync(`package.json`).toString());
-  json.version = version;
+  json.version = updatedVersion;
   writeFileSync(`package.json`, JSON.stringify(json, null, 2));
 } catch (e) {
   console.error(
@@ -61,3 +74,40 @@ try {
 
 // Execute "npm publish" to publish
 execSync(`npm publish --access public --tag ${tag}`);
+
+
+const getUpdatedVersion = (update, version) => {
+  validateUpdate(update);
+  if (update === 'patch') {
+    return version.split('.').map((v, i) => {
+      if (i === 2) {
+        return parseInt(v) + 1;
+      }
+      return v;
+    }).join('.');
+  }
+  if (update === 'minor') {
+    return version.split('.').map((v, i) => {
+      if (i === 1) {
+        return parseInt(v) + 1;
+      }
+      return v;
+    }).join('.');
+  }
+  if (update === 'major') {
+    return version.split('.').map((v, i) => {
+      if (i === 0) {
+        return parseInt(v) + 1;
+      }
+      return v;
+    }).join('.');
+  }
+  return version;
+}
+
+const validateUpdate = (update) => {
+  invariant(
+    update === 'patch' || update === 'minor' || update === 'major',
+    `Invalid update value, expected "patch", "minor" or "major", got ${update}.`
+  );
+}
