@@ -44,12 +44,10 @@ process.chdir(outputPath);
 // Execute "npm publish" to publish
 try {
     execSync(`npm publish --access public --tag ${tag}`);
-    console.log('published successfully');
+    console.log(chalk.bold.green(`Published ${name}@${tag} to npm.`));
 } catch (e) {
     if (e.message.includes('You cannot publish over the previously published versions')) {
-        console.log('~~~~~~~~~~~~~~~~');
         console.error(chalk.bold.red(`You cannot publish over the previously published versions of "${name}".`));
-        console.log('##################');
     }
     else {
         process.exit(1)
