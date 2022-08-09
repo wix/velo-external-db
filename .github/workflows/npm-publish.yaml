@@ -2,17 +2,6 @@ name: Publish NPM packages
 
 on:
   workflow_dispatch:
-    inputs:
-      bigquery:
-        required: false
-        type: choice
-        options:
-          - nothing
-          - patch
-          - minor
-          - major
-        description: "@wix-velo/external-db-bigquery"
-        default: nothing
 
 jobs:
   publish_npm_package:
@@ -36,9 +25,8 @@ jobs:
       - run: npm install 
      
       - name: publish to npm
-        if: github.event.inputs.bigquery != 'nothing'
         run: |
-          nx run @wix-velo/external-db-bigquery:publish --update=${{github.event.inputs.bigquery}} --dryRun
+          nx run-many --exclude=velo-external-db --target=publishCi --all
 
 
 
