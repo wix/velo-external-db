@@ -30,6 +30,18 @@
         }
       ]
     },
+    "publishCi": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node tools/scripts/publishCi.mjs @wix-velo/velo-external-db-types"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": [
