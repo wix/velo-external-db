@@ -1,7 +1,23 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet'
-import * as serviceAccountKey from '../e2e-testkit/service_account_key.json'
 import { SHEET_ID } from '../e2e-testkit/google_sheets_resources'
 import DatabaseOperations from '../../src/google_sheet_operations'
+
+const initServiceAccountKey = () => { 
+    if ( process.env['CI'] === undefined || process.env['CI'] === 'false') {
+        const serviceAccountKey = require('../e2e-testkit/service_account_key.json')
+        process.env['CLIENT_EMAIL'] = serviceAccountKey.client_email
+        process.env['API_PRIVATE_KEY'] = serviceAccountKey.private_key
+    }
+}
+
+initServiceAccountKey()
+
+const serviceAccountKey = {
+    client_email: process.env['CLIENT_EMAIL'] as string,
+    private_key: process.env['API_PRIVATE_KEY'] as string,
+}
+
+
 
 const createValidPool = async(sheetID: string, client_email: string, private_key: string) => {
     const googleSheetDoc = new GoogleSpreadsheet(sheetID)
