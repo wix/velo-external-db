@@ -23,7 +23,7 @@
     "test:firestore": "TEST_ENGINE=firestore nx run-many --skip-nx-cache --target=test --projects=@wix-velo/external-db-firestore,velo-external-db",
     "test:mongo": "TEST_ENGINE=mongo nx run-many --skip-nx-cache --target=test --projects=@wix-velo/external-db-mongo,velo-external-db",
     "test:mongo4": "npm run test:mongo",
-    "test:google-sheets": "TEST_ENGINE=google-sheet nx run-many --skip-nx-cache --target=test --projects=@wix-velo/external-db-google-sheets,velo-external-db",
+    "test:google-sheets": "TEST_ENGINE=google-sheet  nx test --test-file app_data.e2e.spec.ts    --verbose --skip-nx-cache",
     "test:airtable": "TEST_ENGINE=airtable nx run-many --skip-nx-cache --target=test --projects=@wix-velo/external-db-airtable,velo-external-db",
     "test:dynamodb": "TEST_ENGINE=dynamodb nx run-many --skip-nx-cache --target=test --projects=@wix-velo/external-db-dynamodb,velo-external-db",
     "test:bigquery": "TEST_ENGINE=bigquery nx run-many --skip-nx-cache --target=test --projects=@wix-velo/external-db-bigquery,velo-external-db",

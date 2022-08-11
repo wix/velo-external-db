@@ -26,9 +26,10 @@ export const sheetFor = async(sheetTitle: string, doc: GoogleSpreadsheet) => {
         await doc.loadInfo()
     }
 
-    if (!sheet) {
+    if (!doc.sheetsByTitle[sheetTitle]) {
         throw new errors.CollectionDoesNotExists('Collection does not exists')
     }
+    
     return doc.sheetsByTitle[sheetTitle]
 }
 
@@ -53,4 +54,39 @@ export const docAuthSetup = async(config: GoogleSheetsConfig, doc: GoogleSpreads
 }
 
 export const dateFormatColumns = ['_updatedDate', '_createdDate']
+
+const delay = (retryCount: number) => new Promise(resolve => setTimeout(resolve, retryCount * 1000))
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+export const promiseRetry = async(_promise: any, retryCount = 0, lastError: any = null): Promise<any> => {
+    
+    if (retryCount > 5) {  
+        return new Error(lastError)
+    }
+
+    try {
+        return await _promise()
+    } catch (e: any) {
+        if (contains(e.message, '[429]')) {
+            const d = 2 ** (retryCount +1) > 80 ? 80: 2 ** (retryCount +1)
+
+            console.log(`429 error - waiting ${d} seconds, ${e.message}`) 
+
+            await delay(d)
+
+            console.log('429 error - retrying ....') 
+
+            return await promiseRetry(_promise, retryCount + 1, e)
+
+        }
+
+        return new errors.UnauthorizedError(e.message)
+    }
+}
+
+export const contains = (str: string, subStr: string) => {
+    return str.indexOf(subStr) > -1
+}
+
 
