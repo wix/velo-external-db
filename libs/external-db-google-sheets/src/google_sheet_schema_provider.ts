@@ -2,7 +2,7 @@ import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet } from 'google-spreadshee
 import { SystemFields, validateSystemFields, parseTableData, errors, SchemaOperations } from '@wix-velo/velo-external-db-commons'
 import { ISchemaProvider, ResponseField, InputField, Table } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes } from './google_sheet_exception_translator'
-import { describeSheetHeaders, headersFrom, sheetFor } from './google_sheet_utils'
+import { describeSheetHeaders, headersFrom, sheetFor, promiseRetry } from './google_sheet_utils'
 
 export default class SchemaProvider implements ISchemaProvider {
     doc: GoogleSpreadsheet
@@ -17,9 +17,9 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async list() : Promise<Table[]> {
-        await this.doc.loadInfo()
+        await promiseRetry(() => this.doc.loadInfo())
         const sheets = Object.values(this.doc.sheetsByTitle)
-        const sheetsHeaders = await this.sheetsHeaders(sheets)
+        const sheetsHeaders = await promiseRetry(() => this.sheetsHeaders(sheets))
         const parsedSheetsHeadersData: {[x:string]: {table_name: string, field: string, type: string}[]}  = parseTableData(sheetsHeaders) 
         return Object.entries(parsedSheetsHeadersData)
                      .map(([collectionName, rs]) => ({
@@ -29,7 +29,7 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async listHeaders() {
-        await this.doc.loadInfo()
+        await promiseRetry(() => this.doc.loadInfo())
         return Object.keys(this.doc.sheetsByTitle)
     }
 
@@ -39,21 +39,30 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async create(collectionName: string) {
-        const newSheet = await this.doc.addSheet({ title: collectionName })
-        await newSheet.setHeaderRow(SystemFields.map(i => i.name))
-                      .catch(translateErrorCodes)
+        try {
+            const newSheet = await promiseRetry(() => this.doc.addSheet({ title: collectionName }))
+            await newSheet.setHeaderRow(SystemFields.map(i => i.name))
+                          .catch(translateErrorCodes)
+        } catch (error) {
+            return      
+        }
     }
 
     async describeCollection(collectionName: string) {
-        const sheet = await sheetFor(collectionName, this.doc)
+        const sheet = await promiseRetry(() => sheetFor(collectionName, this.doc))
         return await describeSheetHeaders(sheet)
     }
 
     async addColumn(collectionName: string, column: InputField) {
         await validateSystemFields(column.name)
-        const sheet = await sheetFor(collectionName, this.doc)
-        const header = await headersFrom(sheet)
-        await sheet.setHeaderRow([ ...header, column.name])
+        const sheet = await promiseRetry(() => sheetFor(collectionName, this.doc))
+        const headers = await promiseRetry(() => headersFrom(sheet))
+
+        if (headers.includes(column.name)) {
+            throw new errors.FieldAlreadyExists('wtf')
+        }
+
+        await promiseRetry(() => sheet.setHeaderRow([ ...headers, column.name]))
                    .catch(translateErrorCodes)
     }
 
@@ -62,7 +71,7 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async drop(collectionName: string) {
-        const sheet = await sheetFor(collectionName, this.doc)
+        const sheet = await promiseRetry(() => sheetFor(collectionName, this.doc))
         await sheet.delete()
     }
 

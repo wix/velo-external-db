@@ -61,7 +61,7 @@ export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve
 
 export const promiseRetry = async(_promise: any, retryCount = 0, lastError: any = null): Promise<any> => {
     
-    if (retryCount > 5) {  
+    if (retryCount > 6) {  
         return new Error(lastError)
     }
 
