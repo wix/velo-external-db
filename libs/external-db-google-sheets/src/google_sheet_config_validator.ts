@@ -6,7 +6,7 @@ export default class ConfigValidator implements IConfigValidator {
     config: any
 
     constructor(config: any) {
-        this.requiredKeys = ['clientEmail', 'apiPrivateKey', 'databaseId'] 
+        this.requiredKeys = ['clientEmail', 'apiPrivateKey', 'sheetId'] 
         this.config = config
     }
 
