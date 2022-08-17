@@ -43,6 +43,14 @@ export const headersFrom = async(sheet: GoogleSpreadsheetWorksheet) => {
 }
 
 export const docAuthSetup = async(config: GoogleSheetsConfig, doc: GoogleSpreadsheet) => {
+    if (process.env['NODE_ENV'] === 'test') {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        doc.axios.defaults.baseURL = `http://localhost:1502/v4/spreadsheets/${config.sheetId}`
+        doc.useRawAccessToken('mockup-token')
+        return
+    }
+    
     try {
         await doc.useServiceAccountAuth({
             client_email: config.clientEmail as string,
@@ -54,39 +62,3 @@ export const docAuthSetup = async(config: GoogleSheetsConfig, doc: GoogleSpreads
 }
 
 export const dateFormatColumns = ['_updatedDate', '_createdDate']
-
-const delay = (retryCount: number) => new Promise(resolve => setTimeout(resolve, retryCount * 1000))
-
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-export const promiseRetry = async(_promise: any, retryCount = 0, lastError: any = null): Promise<any> => {
-    
-    if (retryCount > 6) {  
-        return new Error(lastError)
-    }
-
-    try {
-        return await _promise()
-    } catch (e: any) {
-        if (contains(e.message, '[429]')) {
-            const d = 2 ** (retryCount +1) > 80 ? 80: 2 ** (retryCount +1)
-
-            console.log(`429 error - waiting ${d} seconds, ${e.message}`) 
-
-            await delay(d)
-
-            console.log('429 error - retrying ....') 
-
-            return await promiseRetry(_promise, retryCount + 1, e)
-
-        }
-
-        return new errors.UnauthorizedError(e.message)
-    }
-}
-
-export const contains = (str: string, subStr: string) => {
-    return str.indexOf(subStr) > -1
-}
-
-
