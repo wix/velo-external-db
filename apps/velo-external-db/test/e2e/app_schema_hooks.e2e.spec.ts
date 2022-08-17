@@ -1,10 +1,13 @@
 import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
+import { testSupportedOperations } from '@wix-velo/test-commons'
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 const each = require('jest-each').default
-import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } from '../resources/e2e_resources'
+import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } from '../resources/e2e_resources'
 import gen = require('../gen')
 import matchers = require('../drivers/schema_api_rest_matchers')
 import schema = require('../drivers/schema_api_rest_test_support')
 import hooks = require('../drivers/hooks_test_support')
+const { RemoveColumn } = SchemaOperations
 
 import { Uninitialized } from '@wix-velo/test-commons'
 
@@ -27,11 +30,11 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
 
     describe('After Hooks', () => {
         describe('Write operations', () => {
-            each([
+            each(testSupportedOperations(supportedOperations, [
                 ['afterCreate', '/schemas/create'],
                 ['afterColumnAdd', '/schemas/column/add'],
-                ['afterColumnRemove', '/schemas/column/remove']
-            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName: string, api: string) => {
+                ['afterColumnRemove', '/schemas/column/remove',  { neededOperations: [RemoveColumn] }]
+            ])).test('specific hook %s should overwrite non-specific and change payload', async(hookName: string, api: string) => {
                 if (!['afterCreate'].includes(hookName)) {
                     await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 }
@@ -267,11 +270,11 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
         })
 
         describe ('Write Operations', () => {
-            each([
+            each(testSupportedOperations(supportedOperations, [
                 ['Create', 'beforeCreate', 'afterCreate', '/schemas/create'],
                 ['Column Add', 'beforeColumnAdd', 'afterColumnAdd', '/schemas/column/add'],
-                ['Column Remove', 'beforeColumnRemove', 'afterColumnRemove', '/schemas/column/remove'],
-            ]).test('customContext should pass by ref on [%s]', async(operation: string, beforeHook: string | number, afterHook: string | number, api: string) => {
+                ['Column Remove', 'beforeColumnRemove', 'afterColumnRemove', '/schemas/column/remove', { neededOperations: [RemoveColumn] }],
+            ])).test('customContext should pass by ref on [%s]', async(operation: string, beforeHook: string | number, afterHook: string | number, api: string) => {
                 if (operation !== 'Create') {
                     await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 }

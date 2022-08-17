@@ -66,7 +66,7 @@ export default class SchemaService {
         const allowedSchemaOperations = this.storage.supportedOperations()
 
         if (!allowedSchemaOperations.includes(operationName)) 
-            throw new errors.UnsupportedOperation(`You database doesn't support ${operationName} operation`)
+            throw new errors.UnsupportedOperation(`Your database doesn't support ${operationName} operation`)
     }
 
 }
