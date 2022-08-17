@@ -1,12 +1,13 @@
 import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { testSupportedOperations } from '@wix-velo/test-commons'
-const { RemoveColumn } = require('@wix-velo/velo-external-db-commons').SchemaOperations
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 const each = require('jest-each').default
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } from '../resources/e2e_resources'
 import gen = require('../gen')
 import matchers = require('../drivers/schema_api_rest_matchers')
 import schema = require('../drivers/schema_api_rest_test_support')
 import hooks = require('../drivers/hooks_test_support')
+const { RemoveColumn } = SchemaOperations
 
 import { Uninitialized } from '@wix-velo/test-commons'
 
