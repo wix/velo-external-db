@@ -41,15 +41,24 @@ v4SpreadsheetsRouter.post('/:sheetId/(:batchUpdate)/', (req, res) => {
 })
 
 v4SpreadsheetsRouter.post('/:sheetId/values/:sheet_range_requestType', (req, res) => {
-    const [sheetTitle_range, ] = req.params.sheet_range_requestType.split(':')
+    const [sheetTitle_range, requestType] = req.params.sheet_range_requestType.split(':')
     const sheetTitle = sheetTitle_range.split('!')[0].replace(/^'/, '').replace(/'$/, '')
     const range = sheetTitle_range.split('!')[1]
     const values = req.body.values
-        
-    const sheet = doc.getSheet(sheetTitle)
-    const addRowsRes = sheet.addRows(values, range)
-    
-    res.send({ updates: addRowsRes })
+
+    switch (requestType) {
+        case 'append': {
+            const sheet = doc.getSheet(sheetTitle)
+            const addRowsRes = sheet.addRows(values, range)
+            return res.send({ updates: addRowsRes })
+        }
+        case 'clear': {
+            const sheet = doc.getSheet(sheetTitle)
+            const clearSheetRes = sheet.clearSheet()
+            return res.send({ updates: clearSheetRes })
+        }
+    }
+      
 })
 
 v4SpreadsheetsRouter.put('/:sheetId/values/:sheetName_range', (req, res) => {
@@ -110,9 +119,6 @@ const deleteRowFromSheet = (request, sheet) => {
     const deleteRowsRes = sheet.deleteRows(startRowIndex, endRowIndex)
     return deleteRowsRes
 }
-
-
-
 
 
 module.exports = { app, cleanupSheets: doc.cleanupSheets }
