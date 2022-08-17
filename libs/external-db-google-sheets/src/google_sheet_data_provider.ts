@@ -5,14 +5,17 @@ import { sheetFor, headersFrom, dateFormatColumns } from './google_sheet_utils'
 const { include, eq } = AdapterOperators
 export default class DataProvider implements IDataProvider {
     doc: GoogleSpreadsheet
+    testSupport: any
 
-    constructor(doc: GoogleSpreadsheet) {
+    constructor(doc: GoogleSpreadsheet, testSupport?: any) {
         this.doc = doc
+        this.testSupport = testSupport
     }
 
     // FIND RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////
 
-    formatRow(sheetRow: GoogleSpreadsheetRow, projectionArray: string[]) {
+    formatRow(sheetRow: GoogleSpreadsheetRow, customProjection?: string[]) {
+        const projectionArray: string[] = customProjection ? customProjection : sheetRow['_sheet'].headerValues
         return projectionArray.reduce((obj, columnName) => {
             obj[columnName] = dateFormatColumns.includes(columnName) ? new Date(sheetRow[columnName]) : sheetRow[columnName]
             return obj
@@ -24,20 +27,21 @@ export default class DataProvider implements IDataProvider {
         return rows.find(r => r['_id'] === id)
     }
     
-    async find(collectionName: string, _filter: AdapterFilter, sort: any, skip: number, limit: number, projection: string[]): Promise<Item[]> {        
+    async find(collectionName: string, _filter: AdapterFilter, sort: any, skip: number, limit: number, _projection: string[]): Promise<Item[]> {        
         const sheet: GoogleSpreadsheetWorksheet = await sheetFor(collectionName, this.doc)
         const filter = _filter as NotEmptyAdapterFilter
+        const projection: string[] =  this.testSupport? this.testSupport.projection(_projection) : _projection 
 
         if (filter && filter.operator === include && filter.fieldName === '_id') {
             const row: GoogleSpreadsheetRow | undefined = await this.findRowById(sheet, filter.value[0])
             return row !== undefined ? [this.formatRow(row, projection)] : []
         }
-
+        
         if (filter && filter.operator === eq && filter.fieldName === '_id') {
             const row: GoogleSpreadsheetRow | undefined = await this.findRowById(sheet, filter.value)
             return row !== undefined ? [this.formatRow(row, projection)] : []
         }
-
+        
         const rows: GoogleSpreadsheetRow[] = await sheet.getRows({ offset: skip, limit })
         return rows.map(r => this.formatRow(r, projection))
     }
@@ -46,6 +50,13 @@ export default class DataProvider implements IDataProvider {
 
     async count(collectionName: string, _filter: AdapterFilter): Promise<number> {
         const sheet: GoogleSpreadsheetWorksheet = await sheetFor(collectionName, this.doc)
+        const filter = this.testSupport ? this.testSupport.filter(_filter) : _filter as NotEmptyAdapterFilter
+
+        if (filter && filter.operator === eq && filter.fieldName === '_id') {
+            const row: GoogleSpreadsheetRow | undefined = await this.findRowById(sheet, filter.value)
+            return row !== undefined ? 1 : 0
+        }
+
         const rows: GoogleSpreadsheetRow[] = await sheet.getRows()
         return rows.length
     }
@@ -54,8 +65,8 @@ export default class DataProvider implements IDataProvider {
 
     async insert(collectionName: string, items: Item[]): Promise<number> {
         const sheet: GoogleSpreadsheetWorksheet = await sheetFor(collectionName, this.doc)
-        const rows: GoogleSpreadsheetRow[] = await sheet.addRows(items)
-        return rows.length
+        await sheet.addRows(items)        
+        return items.length
     }
     
     // UPDATE RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////

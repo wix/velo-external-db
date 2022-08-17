@@ -1,5 +1,6 @@
 import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet } from 'google-spreadsheet'
-import { SystemFields, validateSystemFields, parseTableData, errors, SchemaOperations } from '@wix-velo/velo-external-db-commons'
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { SystemFields, validateSystemFields, parseTableData, errors } from '@wix-velo/velo-external-db-commons'
 import { ISchemaProvider, ResponseField, InputField, Table } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes } from './google_sheet_exception_translator'
 import { describeSheetHeaders, headersFrom, sheetFor } from './google_sheet_utils'
@@ -38,9 +39,9 @@ export default class SchemaProvider implements ISchemaProvider {
         return [ List, ListHeaders, Create, Drop, AddColumn, Describe ]
     }
 
-    async create(collectionName: string) {
+    async create(collectionName: string, columns: InputField[]) {
         try {
-            const headerValues = SystemFields.map(i => i.name)
+            const headerValues = columns? [...SystemFields.map(i => i.name), ...columns.map(i => i.name)] : [...SystemFields.map(i => i.name)]
             await this.doc.addSheet({ title: collectionName, headerValues })
         } catch (error) {
             return      
