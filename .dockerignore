@@ -6,7 +6,6 @@ node_modules
 .husky
 scripts
 tmp
-dist
 tools
 
 

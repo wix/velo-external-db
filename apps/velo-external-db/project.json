@@ -63,7 +63,7 @@
       "options": {
         "commands": [
           "nx run velo-external-db:build",
-          "docker build -f ./Dockerfile . -t velo-external-db"
+          "docker build -f ./apps/velo-external-db/Dockerfile . -t velo-external-db"
         ],
         "parallel": false
       }
