@@ -8,6 +8,8 @@ import * as mongo from '@wix-velo/external-db-mongo'
 import * as airtable from '@wix-velo/external-db-airtable'
 import * as dynamo from '@wix-velo/external-db-dynamodb'
 import * as bigquery from '@wix-velo/external-db-bigquery'
+import * as googleSheets from '@wix-velo/external-db-google-sheets'
+
 
 const suiteDef = (name: string, setup: any, misconfiguredDbOperations: any) => ( { name, setup, misconfiguredDbOperations } )
 
@@ -32,6 +34,7 @@ const mongoTestEnvInit = async() => await init(mongo)
 const airTableTestEnvInit = async() => await init(airtable)
 const dynamoTestEnvInit = async() => await init(dynamo)
 const bigqueryTestEnvInit = async() => await init(bigquery)
+const googleSheetsTestEnvInit = async() => await init(googleSheets)
 
 const testSuits = {
     mysql: suiteDef('MySql', mysqlTestEnvInit, misconfiguredDbOperation(mysql)),
@@ -43,7 +46,7 @@ const testSuits = {
     airtable: suiteDef('Airtable', airTableTestEnvInit, misconfiguredDbOperation(airtable)),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, misconfiguredDbOperation(dynamo)),
     bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, misconfiguredDbOperation(bigquery)),
-    // 'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit),
+    'google-sheet': suiteDef('Google-Sheet', googleSheetsTestEnvInit, misconfiguredDbOperation(googleSheets)),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]

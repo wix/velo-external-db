@@ -45,9 +45,13 @@ jobs:
                    "mongo", "mongo4",
                    "firestore",
                    "airtable",
-                   "dynamodb"
+                   "dynamodb",
+                   "google-sheets"
                    ]
 
+    env:
+      API_PRIVATE_KEY: ${{ secrets.API_PRIVATE_KEY }}
+      CLIENT_EMAIL: ${{ secrets.CLIENT_EMAIL }}
     steps:
       - uses: actions/checkout@v2
 

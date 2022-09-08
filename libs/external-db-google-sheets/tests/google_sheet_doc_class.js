@@ -6,11 +6,6 @@ class GoogleSpreadsheetDoc {
         this.spreadsheetId = spreadsheetId
         this.properties = {
             title: title,
-            locale: 'en_US',
-            autoRecalc: 'ON_CHANGE',
-            timeZone: 'Asia/Jerusalem',
-            defaultFormat: {},
-            spreadsheetTheme: {}
         }
         this.sheets = []
         this.namedRanges = []

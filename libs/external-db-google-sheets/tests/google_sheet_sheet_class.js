@@ -75,6 +75,10 @@ class GoogleSpreadsheetSheet {
         }
     }
 
+    clearSheet() {
+        this.values = []
+    }
+
 }
 
 module.exports = GoogleSpreadsheetSheet
