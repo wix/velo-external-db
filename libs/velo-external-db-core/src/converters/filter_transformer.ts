@@ -17,6 +17,9 @@ export default class FilterTransformer implements IFilterTransformer {
     }
 
     transform(filter: any): AdapterFilter {
+
+        console.log(JSON.stringify(filter))
+
         if (this.isEmptyFilter(filter)) return EmptyFilter
 
         if (this.isMultipleFieldOperator(filter)) {
