@@ -103,6 +103,7 @@ export const createRouter = () => {
     router.post('/data/find', async(req, res, next) => {
         try {
             const { collectionName } = req.body
+            console.log(JSON.stringify(req.body))
             const customContext = {}
             const { filter, sort, skip, limit, projection } = await executeDataHooksFor(DataActions.BeforeFind, dataPayloadFor(FIND, req.body), requestContextFor(FIND, req.body), customContext)
 
