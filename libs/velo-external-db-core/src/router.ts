@@ -1,6 +1,7 @@
 import * as path from 'path'
 import * as BPromise from 'bluebird'
 import * as express from 'express'
+import type {Response} from 'express';
 import * as compression from 'compression'
 import { errorMiddleware } from './web/error-middleware'
 import { appInfoFor } from './health/app_info'
@@ -22,6 +23,8 @@ import AggregationTransformer from './converters/aggregation_transformer'
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
+import * as dataSource from './spi-model/data_source'
+
 
 const { InvalidRequest, ItemNotFound } = errors
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
@@ -86,6 +89,12 @@ export const createRouter = () => {
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
+    const streamCollection = (collection: any[], res: Response) => {
+        res.contentType('application/x-ndjson')
+        collection.forEach(item => res.write(JSON.stringify(item)))
+    }
+    
+
     // *************** INFO **********************
     router.get('/', async(req, res) => {
         const { hideAppInfo } = cfg
@@ -101,10 +110,139 @@ export const createRouter = () => {
     })
 
     // *************** Data API **********************
+    router.post('query', async(req, res, next) => {
+        const queryRequest: dataSource.QueryRequest = req.body;
+        const query = queryRequest.query
+
+        const offset = query.paging? query.paging.offset: 0
+        const limit = query.paging? query.paging.limit: 50
+
+        const data = await schemaAwareDataService.find(
+            queryRequest.collectionId, 
+            filterTransformer.transform(query.filter), 
+            query.sort, 
+            offset, 
+            limit, 
+            query.fields
+        )
+
+        const responseParts = data.items.map(item => ( {
+                item
+            } as dataSource.QueryResponsePart
+        ))
+
+        const metadata = {
+            pagingMetadata: {
+                count: limit,
+                offset: offset,
+                total: data.totalCount,
+                tooManyToCount: false, //Check if always false
+            }
+        } as dataSource.QueryResponsePart
+
+        streamCollection([...responseParts, ...[metadata]], res)
+        
+    })
+
+
+    router.post('count', async(req, res, next) => {
+        const countRequest: dataSource.CountRequest = req.body;
+        
+
+
+        const data = await schemaAwareDataService.count(
+            countRequest.collectionId, 
+            filterTransformer.transform(countRequest.filter), 
+        )
+
+        const response: dataSource.CountResponse = {
+            totalCount: data.totalCount
+        }
+
+        res.json(response)
+    })
+
+    router.post('aggregate', async(req, res, next) => {
+        const aggregateRequest: dataSource.AggregateRequest = req.body;
+        
+
+
+        const data = await schemaAwareDataService.aggregate(
+            aggregateRequest.collectionId,
+            filterTransformer.transform(aggregateRequest.initialFilter),
+            {
+                projection: [],
+                postFilter: aggregateRequest.finalFilter,
+            }
+        )
+
+        res.json(data)
+    })
+
+    router.post('insert', async(req, res, next) => {
+        // todo: handle upserts.
+        try {
+            const insertRequest: dataSource.InsertRequest = req.body;
+
+            const collectionName = insertRequest.collectionId
+
+            const data = await schemaAwareDataService.bulkInsert(collectionName, insertRequest.items)
+
+            const responseParts = data.items.map(item => ({
+                    item: item
+                } as dataSource.InsertResponsePart
+            ))
+
+            streamCollection(responseParts, res)
+        } catch (e) {
+            next(e)
+        }
+    })
+
+    router.post('update', async(req, res, next) => {
+        
+        try {
+            const updateRequest: dataSource.UpdateRequest = req.body;
+
+            const collectionName = updateRequest.collectionId
+
+            const data = await schemaAwareDataService.bulkUpdate(collectionName, updateRequest.items)
+
+            const responseParts = data.items.map(item => ({
+                    item: item
+                } as dataSource.UpdateResponsePart
+            ))
+
+            streamCollection(responseParts, res)
+        } catch (e) {
+            next(e)
+        }
+    })
+
+    router.post('remove', async(req, res, next) => {
+        try {
+            const removeRequest: dataSource.RemoveRequest = req.body;
+            const collectionName = removeRequest.collectionId
+            
+            const objectsBeforeRemove = await removeRequest.itemIds.map(id => schemaAwareDataService.getById(collectionName, id))
+            const data = await schemaAwareDataService.bulkDelete(collectionName, removeRequest.itemIds)
+            
+            const responseParts = objectsBeforeRemove.map(item => ({
+                    item: item
+                } as dataSource.RemoveResponsePart
+            ))
+
+            streamCollection(responseParts, res)
+        } catch (e) {
+            next(e)
+        }
+    })    
+
+
+
     router.post('/data/find', async(req, res, next) => {
         try {
             const { collectionName } = req.body
-            console.log(JSON.stringify(req.body))
             const customContext = {}
             const { filter, sort, skip, limit, projection } = await executeDataHooksFor(DataActions.BeforeFind, dataPayloadFor(FIND, req.body), requestContextFor(FIND, req.body), customContext)
 
