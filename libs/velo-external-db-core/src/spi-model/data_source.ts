@@ -1,5 +1,5 @@
 
-interface QueryRequest {
+export interface QueryRequest {
     collectionId: string;
     namespace?: string;
     query: QueryV2;
@@ -8,7 +8,7 @@ interface QueryRequest {
     omitTotalCount: boolean;
 }
 
-interface QueryV2 {
+export interface QueryV2 {
     filter: any;
     sort?: Sorting[];
     fields: string[];
@@ -17,22 +17,22 @@ interface QueryV2 {
     cursorPaging?: CursorPaging;
 }
 
-interface Sorting {
+export interface Sorting {
     fieldName: string;
     order: SortOrder;
 }
 
-interface Paging {
+export interface Paging {
     limit: number;
     offset: number;
 }
 
-interface CursorPaging {
+export interface CursorPaging {
     limit: number;
     cursor?: string;
 }
 
-interface Options {
+export interface Options {
     consistentRead: string;
     appOptions: any;
 }
@@ -42,12 +42,12 @@ enum SortOrder {
     DESC = 'DESC'
 }
 
-interface QueryResponsePart {
+export interface QueryResponsePart {
     item?: any;
     pagingMetadata?: PagingMetadataV2
 }
 
-interface PagingMetadataV2 {
+export interface PagingMetadataV2 {
     count?: number;
     // Offset that was requested.
     offset?: number;
@@ -63,13 +63,13 @@ interface PagingMetadataV2 {
     has_next?: boolean
 }
 
-interface Cursors {
+export interface Cursors {
     next?: string;
     // Cursor pointing to previous page in the list of results.
     prev?: string;
 }
 
-interface CountRequest {
+export interface CountRequest {
     // collection name to query
     collectionId: string;
     // Optional namespace assigned to collection/installation
@@ -80,11 +80,11 @@ interface CountRequest {
     options: Options;
 }
 
-interface CountResponse {
+export interface CountResponse {
     totalCount: number;
 }
 
-interface QueryReferencedRequest {
+export interface QueryReferencedRequest {
     // collection name of referencing item
     collectionId: string;
     // Optional namespace assigned to collection/installation
@@ -114,7 +114,7 @@ interface QueryReferencedRequest {
 // - "Album" items are called "referencing items"
 // - "Song" is called "referenced collection"
 // - "Song" items are called "referenced items"
-interface ReferencedItem {
+export interface ReferencedItem {
     // Requested collection item that references returned item
     referencingItemId: string;
     // Item from referenced collection that is referenced by referencing item
@@ -124,14 +124,14 @@ interface ReferencedItem {
     item?: any;
   }
 
-interface QueryReferencedResponsePart {
+export interface QueryReferencedResponsePart {
     // overall result will contain single paging_metadata
     // and zero or more items
     item: ReferencedItem;
     pagingMetadata: PagingMetadataV2;
 }
 
-interface AggregateRequest {
+export interface AggregateRequest {
     // collection name
     collectionId: string;
     // Optional namespace assigned to collection/installation
@@ -157,14 +157,14 @@ interface AggregateRequest {
     omitTotalCount: boolean;    
 }
   
-interface Group {
+export interface Group {
     // properties to group by, if empty single group would be created
     by: string[];
     // aggregations, resulted group will contain field with given name and aggregation value
     aggregation: Aggregation;
 }
 
-interface Aggregation {
+export interface Aggregation {
     // result property name
     name: string;
     // property to calculate average of
@@ -179,7 +179,7 @@ interface Aggregation {
     count: number;
 }
 
-interface AggregateResponsePart {
+export interface AggregateResponsePart {
     // query response consists of any number of items plus single paging metadata
     // Aggregation result item.
     // In case of group request, it should contain a field for each `group.by` value
@@ -206,7 +206,7 @@ interface AggregateResponsePart {
     pagingMetadata?: PagingMetadataV2;
 }
 
-interface InsertRequest {
+export interface InsertRequest {
     // collection name
     collectionId: string;
     // Optional namespace assigned to collection/installation
@@ -219,13 +219,13 @@ interface InsertRequest {
     options: Options;
 }
 
-interface InsertResponsePart {
+export interface InsertResponsePart {
     item?: any;
     // error from [errors list](errors.proto)
     error?: ApplicationError;
 }
 
-interface UpdateRequest {
+export interface UpdateRequest {
      // collection name
      collectionId: string;
      // Optional namespace assigned to collection/installation
@@ -236,14 +236,14 @@ interface UpdateRequest {
     options: Options;
 }
   
-interface UpdateResponsePart {
+export interface UpdateResponsePart {
     // results in order of request
     item?: any;
     // error from [errors list](errors.proto)
     error?: ApplicationError;
 }
 
-interface RemoveRequest {
+export interface RemoveRequest {
     // collection name
     collectionId: string;
     // Optional namespace assigned to collection/installation
@@ -254,7 +254,7 @@ interface RemoveRequest {
     options: Options;
 }
   
-interface RemoveResponsePart {
+export interface RemoveResponsePart {
     // results in order of request
     // results in order of request
     item?: any;
@@ -262,7 +262,7 @@ interface RemoveResponsePart {
     error?: ApplicationError;
 }
 
-interface TruncateRequest {
+export interface TruncateRequest {
     // collection name
     collectionId: string;
     // Optional namespace assigned to collection/installation
@@ -271,9 +271,9 @@ interface TruncateRequest {
     options: Options;
 }
   
-interface TruncateResponse {}
+export interface TruncateResponse {}
 
-interface InsertReferencesRequest {
+export interface InsertReferencesRequest {
     // collection name
     collectionId: string;
     // Optional namespace assigned to collection/installation
@@ -286,21 +286,21 @@ interface InsertReferencesRequest {
     options: Options;
 }
   
-interface InsertReferencesResponsePart {
+export interface InsertReferencesResponsePart {
     reference: ReferenceId;
     // error from [errors list](errors.proto)
     error: ApplicationError;
     
 }
 
-interface ReferenceId {
+export interface ReferenceId {
     // Id of item in requested collection
     referencingItemId: string;
     // Id of item in referenced collection
     referencedItemId: string;
 }
 
-interface RemoveReferencesRequest {
+export interface RemoveReferencesRequest {
     collectionId: string;
     // Optional namespace assigned to collection/installation
     namespace?: string;
@@ -314,16 +314,16 @@ interface RemoveReferencesRequest {
     
 }
   
-interface ReferenceMask {
+export interface ReferenceMask {
     // Referencing item ID or any item if empty
     referencingItemId?: string;
     // Referenced item ID or any item if empty
     referencedItemId?: string;
 }
 
-interface RemoveReferencesResponse {}
+export interface RemoveReferencesResponse {}
 
-interface ApplicationError {
+export interface ApplicationError {
     code: string;
     description: string;
     data: any;
