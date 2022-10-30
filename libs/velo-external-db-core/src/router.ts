@@ -24,6 +24,8 @@ import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
 import * as dataSource from './spi-model/data_source'
+import { json } from 'stream/consumers';
+import DataService from './service/data';
 
 
 const { InvalidRequest, ItemNotFound } = errors
@@ -91,7 +93,12 @@ export const createRouter = () => {
 
     const streamCollection = (collection: any[], res: Response) => {
         res.contentType('application/x-ndjson')
-        collection.forEach(item => res.write(JSON.stringify(item)))
+        collection.forEach(item => {
+            console.log('streaming item: ', JSON.stringify(item))
+            res.write(JSON.stringify(item))
+        
+        })
+        res.end()
     }
     
 
@@ -110,7 +117,7 @@ export const createRouter = () => {
     })
 
     // *************** Data API **********************
-    router.post('query', async(req, res, next) => {
+    router.post('/data2/query', async(req, res, next) => {
         const queryRequest: dataSource.QueryRequest = req.body;
         const query = queryRequest.query
 
@@ -137,7 +144,7 @@ export const createRouter = () => {
                 offset: offset,
                 total: data.totalCount,
                 tooManyToCount: false, //Check if always false
-            }
+            } as dataSource.PagingMetadataV2
         } as dataSource.QueryResponsePart
 
         streamCollection([...responseParts, ...[metadata]], res)
@@ -145,7 +152,7 @@ export const createRouter = () => {
     })
 
 
-    router.post('count', async(req, res, next) => {
+    router.post('/data2/count', async(req, res, next) => {
         const countRequest: dataSource.CountRequest = req.body;
         
 
@@ -162,7 +169,7 @@ export const createRouter = () => {
         res.json(response)
     })
 
-    router.post('aggregate', async(req, res, next) => {
+    router.post('/data2/aggregate', async(req, res, next) => {
         const aggregateRequest: dataSource.AggregateRequest = req.body;
         
 
@@ -179,7 +186,7 @@ export const createRouter = () => {
         res.json(data)
     })
 
-    router.post('insert', async(req, res, next) => {
+    router.post('/data2/insert', async(req, res, next) => {
         // todo: handle upserts.
         try {
             const insertRequest: dataSource.InsertRequest = req.body;
@@ -199,7 +206,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('update', async(req, res, next) => {
+    router.post('/data2/update', async(req, res, next) => {
         
         try {
             const updateRequest: dataSource.UpdateRequest = req.body;
@@ -219,7 +226,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('remove', async(req, res, next) => {
+    router.post('/data2/remove', async(req, res, next) => {
         try {
             const removeRequest: dataSource.RemoveRequest = req.body;
             const collectionName = removeRequest.collectionId
