@@ -33,7 +33,7 @@ export interface CursorPaging {
 }
 
 export interface Options {
-    consistentRead: string;
+    consistentRead: boolean;
     appOptions: any;
 }
 
