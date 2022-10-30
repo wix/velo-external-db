@@ -10,8 +10,29 @@ import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit
 import * as authorization from '../drivers/authorization_test_support'
 import Chance = require('chance')
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
+import { Options, QueryRequest, QueryV2 } from 'libs/velo-external-db-core/src/spi-model/data_source'
 
 const chance = Chance()
+
+
+const streamToArray = async (stream) => {
+
+    return new Promise((resolve, reject) => {
+        const arr = []
+    
+        stream.on('data', data => {
+            arr.push(JSON.parse(data.toString()))
+        });
+        
+        stream.on('end', () => {
+            resolve(arr)
+        });
+
+        stream.on('error', (err) => reject(err))
+        
+    })
+}
+
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
@@ -31,21 +52,68 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
         await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
-        await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25 }, authVisitor) ).resolves.toEqual(
-            expect.objectContaining({ data: {
-                    items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
-                    totalCount: 2
-                } }))
+
+        const response = await axios.post('/data2/query', 
+        { 
+            collectionId: ctx.collectionName,
+            query: {
+                filter: '',
+                sort: [{ fieldName: ctx.column.name }],
+                fields: undefined,
+                fieldsets: undefined,
+                paging: {
+                    limit: 25,
+                    offset: 0,
+                },
+                cursorPaging: null
+            } as QueryV2,
+            includeReferencedItems: [],
+            options: {
+                consistentRead: false,
+                appOptions: {},
+            } as Options,
+            omitTotalCount: false
+        } as QueryRequest, 
+        {responseType: 'stream', transformRequest: authVisitor.transformRequest}
+        ) 
+                
+        await expect(streamToArray(response.data)).resolves.toEqual(
+            expect.arrayContaining([{item: ctx.item}, {item: ctx.anotherItem}, {pagingMetadata: {count: 25, offset:0, total: 2, tooManyToCount: false}}])
+        )
     })
     
     testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('find api with projection', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item ], ctx.collectionName, authAdmin)
-        await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', skip: 0, limit: 25, projection: [ctx.column.name] }, authOwner) ).resolves.toEqual(
-            expect.objectContaining({ data: {
-                    items: [ ctx.item ].map(item => ({ [ctx.column.name]: item[ctx.column.name] })),
-                    totalCount: 1
-                } }))
+
+
+        const response = await axios.post('/data2/query', 
+        { 
+            collectionId: ctx.collectionName,
+            query: {
+                filter: '',
+                sort: [{ fieldName: ctx.column.name }],
+                fields: [ctx.column.name],
+                fieldsets: undefined,
+                paging: {
+                    limit: 25,
+                    offset: 0,
+                },
+                cursorPaging: null
+            } as QueryV2,
+            includeReferencedItems: [],
+            options: {
+                consistentRead: false,
+                appOptions: {},
+            } as Options,
+            omitTotalCount: false
+        } as QueryRequest, 
+        {responseType: 'stream', transformRequest: authVisitor.transformRequest}
+        ) 
+                
+        await expect(streamToArray(response.data)).resolves.toEqual(
+            expect.arrayContaining([{item: {[ctx.column.name]: ctx.item[ctx.column.name]}}, {pagingMetadata: {count: 25, offset:0, total: 1, tooManyToCount: false}}])
+        )                
     })
     
     //todo: create another test without sort for these implementations
