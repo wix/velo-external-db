@@ -28,6 +28,7 @@ export default class SchemaAwareDataService {
     async getById(collectionName: string, itemId: string, _projection?: any) {
         await this.validateGetById(collectionName, itemId)
         const projection = _projection ?? (await this.schemaInformation.schemaFieldsFor(collectionName)).map(f => f.field)
+        
         this.validateProjection(collectionName, projection)
 
         return await this.dataService.getById(collectionName, itemId, projection)

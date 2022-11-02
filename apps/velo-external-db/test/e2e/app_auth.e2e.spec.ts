@@ -20,11 +20,11 @@ describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () 
         await dbTeardown()
     }, 20000)
 
-    each(['data/find', 'data/aggregate', 'data/insert', 'data/insert/bulk', 'data/get', 'data/update',
-          'data/update/bulk', 'data/remove', 'data/remove/bulk', 'data/count'])
-    .test('should throw 401 on a request to %s without the appropriate role', async(api) => {
-            return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
-    })
+    // each(['data/query', 'data/aggregate', 'data/insert', 'data/insert/bulk', 'data/get', 'data/update',
+    //       'data/update/bulk', 'data/remove', 'data/remove/bulk', 'data/count'])
+    // .test('should throw 401 on a request to %s without the appropriate role', async(api) => {
+    //         return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
+    // })
 
     test('wrong secretKey will throw an appropriate error with the right format', async() => {
         return expect(() => axios.post('/schemas/list', {}, authOwnerWithoutSecretKey)).rejects.toMatchObject(errorResponseWith(401, 'You are not authorized'))
