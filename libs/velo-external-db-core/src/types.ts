@@ -1,7 +1,7 @@
 import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
-import { AggregateRequest } from './spi-model/data_source';
+import { AggregateRequest, Group, Paging, Sorting } from './spi-model/data_source';
 
 
 export interface FindQuery {
@@ -15,12 +15,13 @@ export interface FindQuery {
 
 export interface Payload {
     filter?: WixDataFilter | AdapterFilter
-    sort?: Sort;
+    sort?: Sort[] | Sorting[];
     skip?: number;
     limit?: number;
-    postProcessingStep?: WixDataFilter | AdapterFilter;
-    processingStep?: WixDataFilter | AdapterFilter;
-    postFilteringStep?: WixDataFilter | AdapterFilter;
+    initialFilter: WixDataFilter | AdapterFilter;
+    group?: Group;
+    finalFilter?: WixDataFilter | AdapterFilter;
+    paging?: Paging;
     item?: Item;
     items?: Item[];
     itemId?: string;

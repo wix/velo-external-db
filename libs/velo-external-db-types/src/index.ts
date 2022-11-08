@@ -226,15 +226,6 @@ export enum WixDataFunction {
     $sum = '$sum',
 }
 
-export type WixDataAggregation = {
-    processingStep: {
-        _id: string |  { [key: string]: any }
-        [key: string]: any
-        // [fieldAlias: string]: {[key in WixDataFunction]: string | number },
-    }
-    postFilteringStep: WixDataFilter
-}
-
 export type WixDataRole = 'OWNER' | 'BACKEND_CODE' | 'MEMBER' | 'VISITOR'
 export type VeloRole = 'Admin' | 'Member' | 'Visitor'
 

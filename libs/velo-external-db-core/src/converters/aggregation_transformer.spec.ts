@@ -72,14 +72,6 @@ describe('Aggregation Transformer', () => {
     test('single id field with count function and without postFilter', () => {
         env.driver.stubEmptyFilterForUndefined()
 
-        const processingStep = {
-            _id: `$${ctx.fieldName}`,
-            [ctx.fieldAlias]: {
-                $sum: 1
-            }
-        }
-        const postFilteringStep = null
-
         const group = { by: [ctx.fieldName], aggregation: [{ name: ctx.fieldAlias, count: 1 }] } as Group
 
         expect(env.AggregationTransformer.transform({ group })).toEqual({
