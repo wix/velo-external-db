@@ -246,16 +246,16 @@ export const createRouter = () => {
 
     router.post('/data/aggregate', async (req, res, next) => {
         try {
-            const { collectionId } = req.body
-            const offset = req.body.paging ? req.body.paging.offset : 0
-            const limit = req.body.paging ? req.body.paging.limit : 50
-            const sort = req.body.sort || [] //should always get it?
+            const aggregationRequest = req.body as dataSource.AggregateRequest
+            const { collectionId, paging, sort } = aggregationRequest
+            const offset = paging ? paging.offset : 0
+            const limit = paging ? paging.limit : 50
 
             const customContext = {}
-            const { initialFilter, group, finalFilter } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(AGGREGATE, req.body), requestContextFor(AGGREGATE, req.body), customContext)
-            roleAuthorizationService.authorizeRead(collectionId, extractRole(req.body))
+            const { initialFilter, group, finalFilter } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(AGGREGATE, aggregationRequest), requestContextFor(AGGREGATE, aggregationRequest), customContext)
+            roleAuthorizationService.authorizeRead(collectionId, extractRole(aggregationRequest))
             const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), aggregationTransformer.transform({ group, finalFilter }), filterTransformer.transformSort(sort), offset, limit)
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(AGGREGATE, req.body), customContext)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(AGGREGATE, aggregationRequest), customContext)
 
             const responseParts = dataAfterAction.items.map((item: Item) => ({
                     item

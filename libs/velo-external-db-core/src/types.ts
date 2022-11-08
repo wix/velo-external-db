@@ -1,6 +1,7 @@
 import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
+import { AggregateRequest } from './spi-model/data_source';
 
 
 export interface FindQuery {
@@ -10,11 +11,7 @@ export interface FindQuery {
     limit?: number;
 }
 
-export type AggregationQuery = {
-    filter?: WixDataFilter,
-    processingStep?: WixDataFilter,
-    postProcessingStep?: WixDataFilter
-}
+
 
 export interface Payload {
     filter?: WixDataFilter | AdapterFilter
@@ -81,7 +78,7 @@ export interface DataHooks {
     afterRemove?: Hook<{ itemId: string }>
     beforeBulkRemove?: Hook<{ itemIds: string[] }>
     afterBulkRemove?: Hook<{ itemIds: string[] }>
-    beforeAggregate?: Hook<AggregationQuery>
+    beforeAggregate?: Hook<AggregateRequest>
     afterAggregate?: Hook<{ items: Item[] }>
     beforeCount?: Hook<WixDataFilter>
     afterCount?: Hook<{ totalCount: number }>
