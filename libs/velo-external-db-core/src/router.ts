@@ -223,14 +223,11 @@ export const createRouter = () => {
             const removeRequest: dataSource.RemoveRequest = req.body;
             const collectionName = removeRequest.collectionId
             
-            console.log('removeRequest.itemIds', JSON.stringify(removeRequest.itemIds))
-
             const idEqExpression = removeRequest.itemIds.map(itemId => ({_id: {$eq: itemId}}))
             const filter = {$or: idEqExpression}
 
             const objectsBeforeRemove = (await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), undefined, 0, removeRequest.itemIds.length)).items
 
-            console.log("!!!!!!!!",  JSON.stringify(objectsBeforeRemove))
             const data = await schemaAwareDataService.bulkDelete(collectionName, removeRequest.itemIds)
             
             const responseParts = objectsBeforeRemove.map(item => ({
