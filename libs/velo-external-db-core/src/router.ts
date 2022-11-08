@@ -121,7 +121,7 @@ export const createRouter = () => {
         const data = await schemaAwareDataService.find(
             queryRequest.collectionId, 
             filterTransformer.transform(query.filter), 
-            query.sort, 
+            filterTransformer.transformSort(query.sort), 
             offset, 
             limit, 
             query.fields
@@ -254,7 +254,7 @@ export const createRouter = () => {
             const customContext = {}
             const { initialFilter, group, finalFilter } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(AGGREGATE, req.body), requestContextFor(AGGREGATE, req.body), customContext)
             roleAuthorizationService.authorizeRead(collectionId, extractRole(req.body))
-            const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), aggregationTransformer.transform({ group, finalFilter }), sort, offset, limit)
+            const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), aggregationTransformer.transform({ group, finalFilter }), filterTransformer.transformSort(sort), offset, limit)
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(AGGREGATE, req.body), customContext)
 
             const responseParts = dataAfterAction.items.map((item: Item) => ({

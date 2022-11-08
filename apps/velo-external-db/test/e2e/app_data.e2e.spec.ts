@@ -85,8 +85,10 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
         await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
 
-        await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name }], undefined)).resolves.toEqual(
-            expect.arrayContaining([{item: ctx.item} as QueryResponsePart, {item: ctx.anotherItem} as QueryResponsePart, pagingMetadata(2)])
+        const itemsByOrder = [ctx.item, ctx.anotherItem].sort((a,b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1).map(item => ({item}))
+        
+        await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: 'ASC' }], undefined)).resolves.toEqual(
+            ([...itemsByOrder, pagingMetadata(2)])
         )
     })
     

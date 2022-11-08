@@ -1,7 +1,8 @@
 import { AdapterOperators, isObject } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter } from './utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { AdapterFilter, AdapterOperator, WixDataFilter, WixDataMultiFieldOperators, } from '@wix-velo/velo-external-db-types'
+import { AdapterFilter, AdapterOperator, Sort, WixDataFilter, WixDataMultiFieldOperators, } from '@wix-velo/velo-external-db-types'
+import { Sorting } from '../spi-model/data_source'
 const { InvalidQuery } = errors
 
 export interface IFilterTransformer {
@@ -42,6 +43,19 @@ export default class FilterTransformer implements IFilterTransformer {
             fieldName,
             value
         }
+    }
+
+    transformSort(sort: any): Sort[] {
+        if (!this.isSortArray(sort)) {
+            return []
+        }
+
+        return (sort as Sorting[]).map(sorting => {
+            return {
+                fieldName: sorting.fieldName,
+                direction: sorting.order.toLowerCase() as 'asc' | 'desc'
+            }
+        })
     }
 
     isMultipleFieldOperator(filter: WixDataFilter) {
@@ -93,4 +107,17 @@ export default class FilterTransformer implements IFilterTransformer {
         return (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined)
     }
 
+    isSortArray(sort: any): boolean {
+        
+        if (!Array.isArray(sort)) {
+            return false
+        }
+        return sort.every((s: any) => {
+            return this.isSortObject(s)
+        })   
+    }
+
+    isSortObject(sort:any): boolean {
+        return sort.fieldName && sort.order
+    }
 }
