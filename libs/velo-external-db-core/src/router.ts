@@ -161,23 +161,6 @@ export const createRouter = () => {
         res.json(response)
     })
 
-    router.post('/data2/aggregate', async(req, res, next) => {
-        const aggregateRequest: dataSource.AggregateRequest = req.body;
-        
-
-
-        const data = await schemaAwareDataService.aggregate(
-            aggregateRequest.collectionId,
-            filterTransformer.transform(aggregateRequest.initialFilter),
-            {
-                projection: [],
-                postFilter: aggregateRequest.finalFilter,
-            }
-        )
-
-        res.json(data)
-    })
-
     router.post('/data2/insert', async(req, res, next) => {
         // todo: handle upserts.
         try {
