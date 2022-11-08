@@ -92,9 +92,10 @@ export const dataPayloadFor = (operation: DataOperations, body: any) => {
             return { itemIds: body.itemIds as string[] }
         case DataOperations.Aggregate:
             return {
-                filter: body.filter,
-                processingStep: body.processingStep,
-                postFilteringStep: body.postFilteringStep
+                initialFilter: body.initialFilter,
+                group: body.group,
+                finalFilter: body.finalFilter,
+                sort: body.sort,
             } as AggregationQuery
         case DataOperations.Count:
             return { filter: body.filter as WixDataFilter }

@@ -10,7 +10,7 @@ import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit
 import * as authorization from '../drivers/authorization_test_support'
 import Chance = require('chance')
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
-import { Options, QueryRequest, QueryV2, CountRequest, QueryResponsePart, UpdateRequest, TruncateRequest, RemoveRequest, RemoveResponsePart } from 'libs/velo-external-db-core/src/spi-model/data_source'
+import { Options, QueryRequest, QueryV2, CountRequest, QueryResponsePart, UpdateRequest, TruncateRequest, RemoveRequest, RemoveResponsePart, Group } from 'libs/velo-external-db-core/src/spi-model/data_source'
 import axios from 'axios'
 import { streamToArray } from '@wix-velo/test-commons'
 
@@ -68,7 +68,7 @@ const updateRequest = (collectionName, items) => ({
     } as Options,
 }) as UpdateRequest
 
-const pagingMetadata = (total) => ({pagingMetadata: {count: 25, offset:0, total: total, tooManyToCount: false}} as QueryResponsePart)
+const pagingMetadata = (total, count?) => ({pagingMetadata: {count: count || total , offset:0, total: total, tooManyToCount: false}} as QueryResponsePart)
 
 describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  () => {
     beforeAll(async() => {
@@ -122,31 +122,40 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api', async() => {
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
         await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
-
-        await expect( axiosInstance.post('/data/aggregate',
-            {
-                collectionName: ctx.collectionName,
-                filter: { _id: { $eq: ctx.numberItem._id } },
-                processingStep: {
-                    _id: {
-                        field1: '$_id',
-                        field2: '$_owner',
+        
+        const response = await axiosInstance.post('/data/aggregate',
+        {
+            collectionId: ctx.collectionName,
+            initialFilter: { _id: { $eq: ctx.numberItem._id } },
+            group: {
+                by: ['_id', '_owner'], aggregation: [
+                    {
+                        name: 'myAvg',
+                        avg: ctx.numberColumns[0].name
                     },
-                    myAvg: {
-                        $avg: `$${ctx.numberColumns[0].name}`
-                    },
-                    mySum: {
-                        $sum: `$${ctx.numberColumns[1].name}`
+                    {
+                        name: 'mySum',
+                        sum: ctx.numberColumns[1].name
                     }
-                },
-                postFilteringStep: {
-                    $and: [
-                        { myAvg: { $gt: 0 } },
-                        { mySum: { $gt: 0 } }
-                    ],
-                },
-            }, authAdmin) ).resolves.toEqual(matchers.responseWith({ items: [ { _id: ctx.numberItem._id, _owner: ctx.numberItem._owner, myAvg: ctx.numberItem[ctx.numberColumns[0].name], mySum: ctx.numberItem[ctx.numberColumns[1].name] } ],
-            totalCount: 0 }))
+                ]
+            } as Group,
+            finalFilter: {
+                $and: [
+                    { myAvg: { $gt: 0 } },
+                    { mySum: { $gt: 0 } }
+                ],
+            },
+        }, { responseType: 'stream', ...authAdmin })
+        
+        await expect(streamToArray(response.data)).resolves.toEqual(
+            expect.arrayContaining([{item: { 
+                _id: ctx.numberItem._id,
+                _owner: ctx.numberItem._owner,
+                myAvg: ctx.numberItem[ctx.numberColumns[0].name],
+                mySum: ctx.numberItem[ctx.numberColumns[1].name]
+                }},
+                pagingMetadata(1)
+        ]))
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('bulk delete api', async() => {
