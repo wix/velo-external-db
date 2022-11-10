@@ -127,25 +127,15 @@ export const createRouter = () => {
             query.sort, 
             offset, 
             limit, 
-            query.fields
+            query.fields,
+            queryRequest.omitTotalCount
         )
 
-        const responseParts = data.items.map(item => ( {
-                item
-            } as dataSource.QueryResponsePart
-        ))
+        const responseParts = data.items.map(dataSource.QueryResponsePart.item)
 
-        const metadata = {
-            pagingMetadata: {
-                count: limit,
-                offset: offset,
-                total: data.totalCount,
-                tooManyToCount: false, //Check if always false
-            } as dataSource.PagingMetadataV2
-        } as dataSource.QueryResponsePart
+        const metadata = dataSource.QueryResponsePart.pagingMetadata(responseParts.length, offset, data.totalCount)
 
         streamCollection([...responseParts, ...[metadata]], res)
-        
     })
 
 
@@ -181,14 +171,15 @@ export const createRouter = () => {
         res.json(data)
     })
 
-    router.post('/data2/insert', async(req, res, next) => {
-        // todo: handle upserts.
+    router.post('/data/insert', async(req, res, next) => {
         try {
             const insertRequest: dataSource.InsertRequest = req.body;
 
             const collectionName = insertRequest.collectionId
 
-            const data = await schemaAwareDataService.bulkInsert(collectionName, insertRequest.items)
+            const data = insertRequest.overwriteExisting ? 
+                            await schemaAwareDataService.bulkUpsert(collectionName, insertRequest.items) : 
+                            await schemaAwareDataService.bulkInsert(collectionName, insertRequest.items)
 
             const responseParts = data.items.map(item => ({
                     item: item
@@ -225,15 +216,12 @@ export const createRouter = () => {
         try {
             const removeRequest: dataSource.RemoveRequest = req.body;
             const collectionName = removeRequest.collectionId
-            
-            console.log('removeRequest.itemIds', JSON.stringify(removeRequest.itemIds))
 
             const idEqExpression = removeRequest.itemIds.map(itemId => ({_id: {$eq: itemId}}))
             const filter = {$or: idEqExpression}
 
             const objectsBeforeRemove = (await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), undefined, 0, removeRequest.itemIds.length)).items
 
-            console.log("!!!!!!!!",  JSON.stringify(objectsBeforeRemove))
             const data = await schemaAwareDataService.bulkDelete(collectionName, removeRequest.itemIds)
             
             const responseParts = objectsBeforeRemove.map(item => ({
@@ -261,38 +249,6 @@ export const createRouter = () => {
         }
     })
 
-
-    router.post('/data/insert', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { item } = await executeDataHooksFor(DataActions.BeforeInsert, dataPayloadFor(INSERT, req.body), requestContextFor(INSERT, req.body), customContext)
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.insert(collectionName, item)
-
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, data, requestContextFor(INSERT, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-
-    router.post('/data/insert/bulk', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { items } = await executeDataHooksFor(DataActions.BeforeBulkInsert, dataPayloadFor(BULK_INSERT, req.body), requestContextFor(BULK_INSERT, req.body), customContext)
-
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.bulkInsert(collectionName, items)
-
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterBulkInsert, data, requestContextFor(BULK_INSERT, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-
     router.post('/data/get', async(req, res, next) => {
         try {
             const { collectionName } = req.body
@@ -311,35 +267,6 @@ export const createRouter = () => {
         }
     })
 
-    // router.post('/data/remove', async(req, res, next) => {
-    //     try {
-    //         const { collectionName } = req.body
-    //         const customContext = {}
-    //         const { itemId } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(REMOVE, req.body), requestContextFor(REMOVE, req.body), customContext)
-    //         await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-    //         const data = await schemaAwareDataService.delete(collectionName, itemId)
-
-    //         const dataAfterAction = await executeDataHooksFor(DataActions.AfterRemove, data, requestContextFor(REMOVE, req.body), customContext)
-    //         res.json(dataAfterAction)
-    //     } catch (e) {
-    //         next(e)
-    //     }
-    // })
-
-    // router.post('/data/remove/bulk', async(req, res, next) => {
-    //     try {
-    //         const { collectionName } = req.body
-    //         const customContext = {}
-    //         const { itemIds } = await executeDataHooksFor(DataActions.BeforeBulkRemove, dataPayloadFor(BULK_REMOVE, req.body), requestContextFor(BULK_REMOVE, req.body), customContext)
-    //         await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-    //         const data = await schemaAwareDataService.bulkDelete(collectionName, itemIds)
-
-    //         const dataAfterAction = await executeDataHooksFor(DataActions.AfterBulkRemove, data, requestContextFor(BULK_REMOVE, req.body), customContext)
-    //         res.json(dataAfterAction)
-    //     } catch (e) {
-    //         next(e)
-    //     }
-    // })
 
     router.post('/data/truncate', async(req, res, next) => {
         try {

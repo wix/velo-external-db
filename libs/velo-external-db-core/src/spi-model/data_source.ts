@@ -44,7 +44,23 @@ enum SortOrder {
 
 export interface QueryResponsePart {
     item?: any;
-    pagingMetadata?: PagingMetadataV2
+    pagingMetadata?: PagingMetadataV2;
+}
+
+export class QueryResponsePart {
+    static item(item: any): QueryResponsePart {
+        return {
+            item: item
+        } as QueryResponsePart
+    }
+
+    static pagingMetadata(count?: number, offset?: number, total?: number): QueryResponsePart {
+        return {
+            pagingMetadata: {
+                count, offset, total, tooManyToCount: false
+            } as PagingMetadataV2
+        }
+    }
 }
 
 export interface PagingMetadataV2 {

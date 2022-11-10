@@ -38,9 +38,10 @@ export default class DataProvider implements IDataProvider {
         return resultset[0]['num']
     }
 
-    async insert(collectionName: string, items: Item[], fields: any[]): Promise<number> {
+    async insert(collectionName: string, items: Item[], fields: any[], upsert?: boolean): Promise<number> {
         const escapedFieldsNames = fields.map( (f: { field: any }) => escapeId(f.field)).join(', ')
-        const sql = `INSERT INTO ${escapeTable(collectionName)} (${escapedFieldsNames}) VALUES ?`
+        const op = upsert ? 'REPLACE' : 'INSERT'
+        const sql = `${op} INTO ${escapeTable(collectionName)} (${escapedFieldsNames}) VALUES ?`
         
         const data = items.map((item: Item) => asParamArrays( patchItem(item) ) )
         const resultset = await this.query(sql, [data])

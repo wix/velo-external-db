@@ -10,7 +10,7 @@ import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit
 import * as authorization from '../drivers/authorization_test_support'
 import Chance = require('chance')
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
-import { Options, QueryRequest, QueryV2, CountRequest, QueryResponsePart, UpdateRequest, TruncateRequest, RemoveRequest, RemoveResponsePart } from 'libs/velo-external-db-core/src/spi-model/data_source'
+import { Options, QueryRequest, QueryV2, CountRequest, QueryResponsePart, UpdateRequest, TruncateRequest, RemoveRequest, RemoveResponsePart, InsertRequest } from 'libs/velo-external-db-core/src/spi-model/data_source'
 import axios from 'axios'
 import { streamToArray } from '@wix-velo/test-commons'
 
@@ -42,6 +42,8 @@ const queryRequest = (collectionName, sort, fields) => ({
     omitTotalCount: false
 } as QueryRequest)
 
+
+
 const queryCollectionAsArray = (collectionName, sort, fields) => axiosInstance.post('/data/query', 
             queryRequest(collectionName, sort, fields), 
             {responseType: 'stream', transformRequest: authVisitor.transformRequest}).then(response => streamToArray(response.data))
@@ -68,7 +70,20 @@ const updateRequest = (collectionName, items) => ({
     } as Options,
 }) as UpdateRequest
 
-const pagingMetadata = (total) => ({pagingMetadata: {count: 25, offset:0, total: total, tooManyToCount: false}} as QueryResponsePart)
+const insertRequest = (collectionName, items, overwriteExisting) => ({
+    collectionId: collectionName,
+    items: items,
+    overwriteExisting: overwriteExisting,
+    options: {
+        consistentRead: false,
+        appOptions: {},
+    } as Options,
+} as InsertRequest)
+
+const givenItems = async (items, collectionName, auth) => 
+    axiosInstance.post('/data/insert', insertRequest(collectionName, items, false),  {responseType: 'stream', transformRequest: auth.transformRequest})
+
+const pagingMetadata = (total, count) => ({pagingMetadata: {count: count, offset:0, total: total, tooManyToCount: false}} as QueryResponsePart)
 
 describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  () => {
     beforeAll(async() => {
@@ -82,17 +97,17 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
     testIfSupportedOperationsIncludes(supportedOperations, [ FindWithSort ])('find api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        await givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
         await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
 
         await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name }], undefined)).resolves.toEqual(
-            expect.arrayContaining([{item: ctx.item} as QueryResponsePart, {item: ctx.anotherItem} as QueryResponsePart, pagingMetadata(2)])
+            expect.arrayContaining([{item: ctx.item} as QueryResponsePart, {item: ctx.anotherItem} as QueryResponsePart, pagingMetadata(2, 2)])
         )
     })
     
     testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('find api with projection', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ctx.item ], ctx.collectionName, authAdmin)
+        await givenItems([ctx.item ], ctx.collectionName, authAdmin)
 
 
         const response = await axiosInstance.post('/data/query', 
@@ -101,7 +116,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         ) 
                 
         await expect(queryCollectionAsArray(ctx.collectionName, [], [ctx.column.name])).resolves.toEqual(
-            expect.arrayContaining([{item: {[ctx.column.name]: ctx.item[ctx.column.name]}}, pagingMetadata(1)])
+            expect.arrayContaining([{item: {[ctx.column.name]: ctx.item[ctx.column.name]}}, pagingMetadata(1, 1)])
         )                
     })
     
@@ -109,19 +124,22 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
     test('insert api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await axiosInstance.post('/data/insert', { collectionName: ctx.collectionName, item: ctx.item }, authAdmin)
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual([{item: ctx.item} as QueryResponsePart, pagingMetadata(1)])
-    })
 
-    test('bulk insert api', async() => {
-        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await axiosInstance.post('/data/insert/bulk', { collectionName: ctx.collectionName, items: ctx.items }, authAdmin)
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining([ ...(ctx.items.map(item => ({item: item} as QueryResponsePart))), ...[pagingMetadata(ctx.items.length)]]))
+        const response = await axiosInstance.post('/data/insert', insertRequest(ctx.collectionName, ctx.items, false),  {responseType: 'stream', transformRequest: authAdmin.transformRequest})
+
+        const expectedItems = ctx.items.map(item => ({item: item} as QueryResponsePart))
+
+        await expect(streamToArray(response.data)).resolves.toEqual(expectedItems)
+        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
+            [ 
+                ...expectedItems, 
+                ...[pagingMetadata(ctx.items.length, ctx.items.length)]
+            ]))
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api', async() => {
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
-        await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
+        await givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
 
         await expect( axiosInstance.post('/data/aggregate',
             {
@@ -151,7 +169,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
     testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('bulk delete api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
+        await givenItems(ctx.items, ctx.collectionName, authAdmin)
 
         const response = await axiosInstance.post('/data/remove', { 
             collectionId: ctx.collectionName, itemIds: ctx.items.map((i: { _id: any }) => i._id) 
@@ -160,26 +178,26 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         const expectedItems = ctx.items.map(item => ({item: item} as RemoveResponsePart))
 
         await expect(streamToArray(response.data)).resolves.toEqual(expect.arrayContaining(expectedItems))
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual([pagingMetadata(0)])
+        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual([pagingMetadata(0, 0)])
     })
 
     test('get by id api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+        await givenItems([ctx.item], ctx.collectionName, authAdmin)
 
         await expect( axiosInstance.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin) ).resolves.toEqual(matchers.responseWith({ item: ctx.item }))
     })
 
     test('get by id api should throw 404 if not found', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+        await givenItems([ctx.item], ctx.collectionName, authAdmin)
 
         await expect( axiosInstance.post('/data/get', { collectionName: ctx.collectionName, itemId: 'wrong' }, authAdmin) ).rejects.toThrow('404')
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('get by id api with projection', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+        await givenItems([ctx.item], ctx.collectionName, authAdmin)
 
         await expect(axiosInstance.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id, projection: [ctx.column.name] }, authAdmin)).resolves.toEqual(
             matchers.responseWith({
@@ -189,7 +207,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
+        await givenItems(ctx.items, ctx.collectionName, authAdmin)
         const response = await axiosInstance.post('/data/update', updateRequest(ctx.collectionName, ctx.modifiedItems),  {responseType: 'stream', transformRequest: authAdmin.transformRequest})
 
         const expectedItems = ctx.modifiedItems.map(item => ({item: item} as QueryResponsePart))
@@ -199,22 +217,22 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
             [ 
                 ...expectedItems, 
-                ...[pagingMetadata(ctx.modifiedItems.length)]
+                ...[pagingMetadata(ctx.modifiedItems.length,ctx.modifiedItems.length)]
             ]))
     })
 
     test('count api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        await givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
         await expect( axiosInstance.post('/data/count', countRequest(ctx.collectionName), authAdmin) ).resolves.toEqual(matchers.responseWith( { totalCount: 2 } ))
     })
 
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Truncate ])('truncate api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        await givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
         await axiosInstance.post('/data/truncate', { collectionId: ctx.collectionName } as TruncateRequest, authAdmin)
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual([pagingMetadata(0)])
+        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual([pagingMetadata(0, 0)])
     })
 
 

@@ -15,14 +15,15 @@ export default class SchemaAwareDataService {
         this.itemTransformer = itemTransformer
     }
 
-    async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any): Promise<{ items: ItemWithId[], totalCount: number }> {
+    async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any, omitTotalCount?: boolean): Promise<{ items: ItemWithId[], totalCount?: number }> {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         await this.validateFilter(collectionName, filter, fields)
         const projection = _projection ?? (await this.schemaInformation.schemaFieldsFor(collectionName)).map(f => f.field)
         await this.validateProjection(collectionName, projection, fields)
+        await this.dataService.find(collectionName, filter, sort, skip, limit, projection, omitTotalCount)
 
-        const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection)
-        return { items: this.itemTransformer.patchItems(items, fields), totalCount }
+        const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection, omitTotalCount)
+        return { items: this.itemTransformer.patchItems(items, fields), totalCount }    
     }
 
     async getById(collectionName: string, itemId: string, _projection?: any) {
@@ -45,6 +46,12 @@ export default class SchemaAwareDataService {
         return await this.dataService.insert(collectionName, prepared[0], fields)
     }
     
+    async bulkUpsert(collectionName: string, items: Item[]) {
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        const prepared = await this.prepareItemsForInsert(fields, items)
+        return await this.dataService.bulkUpsert(collectionName, prepared, fields)
+    }
+
     async bulkInsert(collectionName: string, items: Item[]) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         const prepared = await this.prepareItemsForInsert(fields, items)

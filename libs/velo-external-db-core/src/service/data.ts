@@ -9,13 +9,14 @@ export default class DataService {
         this.storage = storage
     }
 
-    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any) {
-        const items = this.storage.find(collectionName, _filter, sort, skip, limit, projection)
-        const totalCount = this.storage.count(collectionName, _filter)
+    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any, omitTotalCount?: boolean): Promise<{items: any[], totalCount?: number}> {
+        const items = await this.storage.find(collectionName, _filter, sort, skip, limit, projection)
+        const totalCount = omitTotalCount? undefined : await this.storage.count(collectionName, _filter)
+
         return {
-            items: (await items).map(item => asWixData(item, projection)),
-            totalCount: await totalCount
-        }
+            items: items.map(item => asWixData(item, projection)),
+            totalCount: totalCount
+        }     
     }
 
     async getById(collectionName: string, itemId: string, projection: any) {
@@ -32,6 +33,11 @@ export default class DataService {
     async insert(collectionName: string, item: Item, fields?: ResponseField[]) {
         const resp = await this.bulkInsert(collectionName, [item], fields)
         return { item: asWixData(resp.items[0]) }
+    }
+
+    async bulkUpsert(collectionName: string, items: Item[], fields?: ResponseField[]) {
+        const resp = await this.storage.insert(collectionName, items, fields, true)
+        return { items: items.map( asWixData ) }
     }
 
     async bulkInsert(collectionName: string, items: Item[], fields?: ResponseField[]) {
