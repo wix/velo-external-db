@@ -1,4 +1,4 @@
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Item, ItemWithId, ResponseField } from '@wix-velo/velo-external-db-types'
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Item, ItemWithId, ResponseField, Sort } from '@wix-velo/velo-external-db-types'
 import QueryValidator from '../converters/query_validator'
 import DataService from './data'
 import CacheableSchemaInformation from './schema_information'
@@ -80,10 +80,11 @@ export default class SchemaAwareDataService {
         return await this.dataService.truncate(collectionName)
     }
     
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation) {
+    // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number) {
         await this.validateAggregation(collectionName, aggregation)
         await this.validateFilter(collectionName, filter)
-        return await this.dataService.aggregate(collectionName, filter, aggregation)
+        return await this.dataService.aggregate(collectionName, filter, aggregation, sort, skip, limit)
     }
 
     async validateFilter(collectionName: string, filter: Filter, _fields?: ResponseField[]) {

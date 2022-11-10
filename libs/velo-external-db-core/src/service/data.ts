@@ -1,4 +1,4 @@
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, IDataProvider, Item, ResponseField } from '@wix-velo/velo-external-db-types'
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, IDataProvider, Item, ResponseField, Sort } from '@wix-velo/velo-external-db-types'
 import { asWixData } from '../converters/data_utils'
 import { getByIdFilterFor } from '../utils/data_utils'
 
@@ -69,11 +69,14 @@ export default class DataService {
         return this.storage.truncate(collectionName)
     }
 
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation) {
+
+    // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number) {
+        const totalCount = this.storage.count(collectionName, filter)
         return {
-            items: ((await this.storage.aggregate?.(collectionName, filter, aggregation)) || [])
+            items: ((await this.storage.aggregate?.(collectionName, filter, aggregation, sort, skip, limit)) || [])
                                       .map( asWixData ),
-            totalCount: 0
+            totalCount: await totalCount
         }
     }
 }

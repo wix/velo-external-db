@@ -16,7 +16,7 @@ import { DataHooksForAction, DataOperations, dataPayloadFor, DataActions, reques
 import { SchemaHooksForAction, SchemaOperations, schemaPayloadFor, SchemaActions } from './schema_hooks_utils'
 import SchemaService from './service/schema'
 import OperationService from './service/operation'
-import { AnyFixMe } from '@wix-velo/velo-external-db-types'
+import { AnyFixMe, Item } from '@wix-velo/velo-external-db-types'
 import SchemaAwareDataService from './service/schema_aware_data'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
@@ -24,9 +24,6 @@ import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
 import * as dataSource from './spi-model/data_source'
-import { json } from 'stream/consumers';
-import DataService from './service/data';
-
 
 const { InvalidRequest, ItemNotFound } = errors
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
@@ -124,7 +121,7 @@ export const createRouter = () => {
         const data = await schemaAwareDataService.find(
             queryRequest.collectionId, 
             filterTransformer.transform(query.filter), 
-            query.sort, 
+            filterTransformer.transformSort(query.sort), 
             offset, 
             limit, 
             query.fields,
@@ -134,6 +131,7 @@ export const createRouter = () => {
         const responseParts = data.items.map(dataSource.QueryResponsePart.item)
 
         const metadata = dataSource.QueryResponsePart.pagingMetadata(responseParts.length, offset, data.totalCount)
+
 
         streamCollection([...responseParts, ...[metadata]], res)
     })
@@ -216,7 +214,6 @@ export const createRouter = () => {
         try {
             const removeRequest: dataSource.RemoveRequest = req.body;
             const collectionName = removeRequest.collectionId
-
             const idEqExpression = removeRequest.itemIds.map(itemId => ({_id: {$eq: itemId}}))
             const filter = {$or: idEqExpression}
 
@@ -235,15 +232,34 @@ export const createRouter = () => {
         }
     })    
 
-    router.post('/data/aggregate', async(req, res, next) => {
+    router.post('/data/aggregate', async (req, res, next) => {
         try {
-            const { collectionName } = req.body
+            const aggregationRequest = req.body as dataSource.AggregateRequest
+            const { collectionId, paging, sort } = aggregationRequest
+            const offset = paging ? paging.offset : 0
+            const limit = paging ? paging.limit : 50
+
             const customContext = {}
-            const { filter, processingStep, postFilteringStep } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(AGGREGATE, req.body), requestContextFor(AGGREGATE, req.body), customContext)
-            await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.aggregate(collectionName, filterTransformer.transform(filter), aggregationTransformer.transform({ processingStep, postFilteringStep }))
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(AGGREGATE, req.body), customContext)
-            res.json(dataAfterAction)
+            const { initialFilter, group, finalFilter } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(AGGREGATE, aggregationRequest), requestContextFor(AGGREGATE, aggregationRequest), customContext)
+            roleAuthorizationService.authorizeRead(collectionId, extractRole(aggregationRequest))
+            const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), aggregationTransformer.transform({ group, finalFilter }), filterTransformer.transformSort(sort), offset, limit)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(AGGREGATE, aggregationRequest), customContext)
+
+            const responseParts = dataAfterAction.items.map((item: Item) => ({
+                    item
+                } as dataSource.AggregateResponsePart
+            ))
+
+            const metadata = {
+                pagingMetadata: {
+                    count: (dataAfterAction.items as Item[]).length,
+                    offset: offset,
+                    total: data.totalCount,
+                    tooManyToCount: false, //Check if always false
+                } as dataSource.PagingMetadataV2
+            } as dataSource.AggregateResponsePart
+
+            streamCollection([...responseParts, ...[metadata]], res)
         } catch (e) {
             next(e)
         }
