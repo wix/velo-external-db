@@ -111,7 +111,6 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await givenItems([ctx.item ], ctx.collectionName, authAdmin)
 
-
         const response = await axiosInstance.post('/data/query', 
             queryRequest(ctx.collectionName, [], [ctx.column.name]), 
             {responseType: 'stream', transformRequest: authVisitor.transformRequest}
@@ -140,9 +139,9 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api', async() => {
+        
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
-        await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
-
+        await givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
         const response = await axiosInstance.post('/data/aggregate',
         {
             collectionId: ctx.collectionName,
