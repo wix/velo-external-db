@@ -95,9 +95,9 @@ describe ('Schema Aware Data Service', () => {
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter) 
         queryValidator.givenValidAggregationForDefaultFieldsOf(ctx.aggregation)
         
-        data.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
+        data.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
         
-        return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
+        return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
     })
     
     const ctx = {
