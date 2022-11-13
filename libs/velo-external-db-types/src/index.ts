@@ -261,3 +261,13 @@ export interface IImplementationResources {
     supportedOperations: SchemaOperations[]
     name: string
 }
+
+
+export interface DomainIndex {
+    collectionName: string
+    name: string
+    columns: string[]
+    isUnique: boolean
+    caseInsensitive: boolean
+    order : 'ASC' | 'DESC'
+}
