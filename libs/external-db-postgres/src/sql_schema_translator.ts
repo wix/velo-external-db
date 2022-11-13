@@ -49,14 +49,15 @@ export default class SchemaColumnTranslator {
                 
             case 'bool':
             case 'boolean':
+            case 'bit':
                 return 'boolean'
 
             case 'json':
                 return 'object'    
 
             default:
-                console.log(type)
-                throw Error(type)
+                console.log('Unknown type', type)
+                return 'text'
         }
     }
 
