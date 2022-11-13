@@ -2,10 +2,11 @@ import { promisify } from 'util'
 import { translateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator, { IMySqlSchemaColumnTranslator } from './sql_schema_translator'
 import { escapeId, escapeTable } from './mysql_utils'
-import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
+import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { Pool as MySqlPool } from 'mysql'
 import { MySqlQuery } from './types'
 import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export default class SchemaProvider implements ISchemaProvider {
     pool: MySqlPool
@@ -77,5 +78,44 @@ export default class SchemaProvider implements ISchemaProvider {
     translateDbTypes(row: ResponseField): ResponseField {
         row.type = this.sqlSchemaTranslator.translateType(row.type)
         return row
+    }
+
+    getColumnCapabilitiesFor(columnType: string): { sortable: boolean; columnQueryOperators: string[] } {
+        switch (columnType) {
+            case 'text':
+            case 'url':
+                return {
+                   sortable: true,
+                   columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte]
+                }
+            case 'number':
+                return {
+                    sortable: true,
+                    columnQueryOperators: [eq, ne, gt, gte, lt, lte, include]
+                }
+            case 'boolean':
+                return {
+                    sortable: true,
+                    columnQueryOperators: [eq]
+                }
+            case 'image':
+                return {
+                    sortable: true,
+                    columnQueryOperators: []
+                }
+            case 'object':
+                return {
+                    sortable: true,
+                    columnQueryOperators: [eq, ne]
+                }
+            case 'datetime':
+                return {
+                    sortable: true,
+                    columnQueryOperators: [eq, ne, gt, gte, lt, lte]
+                }
+
+            default:
+                throw new Error(`${columnType} - Unsupported field type`)
+        }
     }
 }

@@ -1,4 +1,6 @@
+import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { FieldType, QueryOperator } from '../spi-model/collection'
+const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export const convertFieldTypeToEnum = ( fieldType: string ): FieldType => {
     switch (fieldType) {
@@ -22,32 +24,32 @@ export const convertFieldTypeToEnum = ( fieldType: string ): FieldType => {
 
 export const convertQueryOperatorsToEnum = (queryOperator: string): QueryOperator => {
     switch (queryOperator) {
-        case 'eq':
+        case eq:
             return QueryOperator.eq
-        case 'lt':
+        case lt:
             return QueryOperator.lt
-        case 'gt':
+        case gt:
             return QueryOperator.gt
-        case 'ne':
+        case ne:
             return QueryOperator.ne
-        case 'lte':
+        case lte:
             return QueryOperator.lte
-        case 'gte':
+        case gte:
             return QueryOperator.gte
-        case 'startsWith':
+        case string_begins:
             return QueryOperator.startsWith
-        case 'endsWith':
+        case string_ends:
             return QueryOperator.endsWith
-        case 'contains':
+        case string_contains:
             return QueryOperator.contains
-        case 'hasSome':
+        case include:
             return QueryOperator.hasSome
-        case 'hasAll':
-            return QueryOperator.hasAll
-        case 'exists':
-            return QueryOperator.exists
-        case 'urlized':
-            return QueryOperator.urlized
+        // case 'hasAll':
+            // return QueryOperator.hasAll
+        // case 'exists':
+            // return QueryOperator.exists
+        // case 'urlized':
+            // return QueryOperator.urlized
         default:
             throw new Error(`${queryOperator} - Unsupported query operator`)
     }    

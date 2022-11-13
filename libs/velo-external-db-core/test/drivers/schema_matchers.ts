@@ -1,5 +1,6 @@
-import { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders, ReadOnlyOperations } from '@wix-velo/velo-external-db-commons'
+import { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders, ReadOnlyOperations, AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { convertFieldTypeToEnum, convertQueriesToQueryOperatorsEnum } from '../../src/utils/schema_utils'
+const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 const appendAllowedOperationsToDbs = (dbs: any[], allowedSchemaOperations: any) => {
     return dbs.map( (db: { fields: any }) => ({
@@ -34,19 +35,18 @@ const toHaveCollection = ( collections: any[], functionOnEachCollection: any, ..
 export const queryOperatorsFor = (fieldType: string): string[] => {
     switch (fieldType) {
         case 'text':
-            return ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'gt', 'gte', 'lt', 'lte']
+        case 'url':
+            return [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte]
         case 'number':
-            return ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome']
+            return [eq, ne, gt, gte, lt, lte, include]
         case 'boolean':
-            return ['eq']
+            return [eq]
         case 'image':
             return []
         case 'object':
-            return ['eq', 'ne']
+            return [eq, ne]
         case 'datetime':
-            return ['eq', 'ne', 'gt', 'gte', 'lt', 'lte']
-        case 'url':
-            return ['eq', 'ne', 'contains', 'hasSome']
+            return [eq, ne, gt, gte, lt, lte]
     
         default:
             throw new Error(`${fieldType} - Unsupported field type`)

@@ -1,5 +1,6 @@
 import { when } from 'jest-when'
-import { AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
+import { AllSchemaOperations, AdapterOperators } from '@wix-velo/velo-external-db-commons'
+const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export const schemaProvider = {
     list: jest.fn(),
@@ -41,19 +42,19 @@ export const expectRemoveColumnOf = (columnName: any, collectionName: any) =>
 
 export const givenColumnCapabilities = () => {
     when(schemaProvider.getColumnCapabilitiesFor).calledWith('text')
-        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'gt', 'gte', 'lt', 'lte'] })
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] })
     when(schemaProvider.getColumnCapabilitiesFor).calledWith('number')
-        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'] })
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include] })
     when(schemaProvider.getColumnCapabilitiesFor).calledWith('boolean')
-        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq'] })
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq] })
     when(schemaProvider.getColumnCapabilitiesFor).calledWith('url')
-        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq', 'ne', 'contains', 'hasSome'] })
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] })
     when(schemaProvider.getColumnCapabilitiesFor).calledWith('datetime')
-        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'] })
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte] })
     when(schemaProvider.getColumnCapabilitiesFor).calledWith('image')
         .mockReturnValue({ sortable: false, columnQueryOperators: [] })
     when(schemaProvider.getColumnCapabilitiesFor).calledWith('object')
-        .mockReturnValue({ sortable: false, columnQueryOperators: ['eq', 'ne'] })
+        .mockReturnValue({ sortable: false, columnQueryOperators: [eq, ne] })
 }
     
 
