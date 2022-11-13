@@ -1,17 +1,17 @@
 
 
 
+export type listCollections = (req: ListCollectionsRequest) => Promise<ListCollectionsResponsePart>
+export type createCollection = (req: CreateCollectionRequest) => Promise<CreateCollectionResponse>
+export type updateCollection = (req: UpdateCollectionRequest) => Promise<UpdateCollectionResponse>
+export type deleteCollection = (req: DeleteCollectionRequest) => Promise<DeleteCollectionResponse>
 export abstract class CollectionService {
-    abstract listCollections(req: ListCollectionsRequest): Promise<ListCollectionsResponsePart>
-    abstract createCollection(req: CreateCollectionRequest): Promise<CreateCollectionResponse>
-    abstract updateCollection(req: UpdateCollectionRequest): Promise<UpdateCollectionResponse>
-    abstract deleteCollection(req: DeleteCollectionRequest): Promise<DeleteCollectionResponse>
 }
 export interface ListCollectionsRequest {
     collectionIds: string[];
 }
 export interface ListCollectionsResponsePart {
-    collection?: Collection;
+    collection?: Collection[];
 }
 export interface DeleteCollectionRequest {
     collectionId?: string;
@@ -32,16 +32,22 @@ export interface UpdateCollectionResponse {
     collection?: Collection;
 }
 export interface Collection {
-    id?: string;
-    fields?: Field[];
-    capabilities?: CollectionCapabilities;
+    id: string;
+    fields: Field[];
+    capabilities: CollectionCapabilities;
 }
 
 export interface Field {
-    key?: string;
+    // Identifier of the field.
+    key: string;
+    // Value is encrypted when `true`. Global data source capabilities define where encryption takes place.
     encrypted?: boolean;
-    type?: FieldType;
+    // Type of the field.
+    type: FieldType;
+    // Defines what kind of operations this field supports.
+    // Should be set by datasource itself and ignored in request payload.
     capabilities?: FieldCapabilities;
+    // Additional options for specific field types, should be one of the following
     singleReferenceOptions?: SingleReferenceOptions;
     multiReferenceOptions?: MultiReferenceOptions;
 }
@@ -57,54 +63,64 @@ export interface MultiReferenceOptions {
 }
     
 export interface FieldCapabilities {
-    sortable?: boolean;
-    queryOperators?: QueryOperator[];
+    // Indicates if field can be used to sort items in collection. Defaults to false.
+    sortable: boolean;
+    // Query operators (e.g. equals, less than) that can be used for this field.
+    queryOperators: QueryOperator[];
     singleReferenceOptions?: SingleReferenceOptions;
     multiReferenceOptions?: MultiReferenceOptions;
 }
 
 export enum QueryOperator {
-    EQ = 0,
-    LT = 1,
-    GT = 2,
-    NE = 3,
-    LTE = 4,
-    GTE = 5,
-    STARTS_WITH = 6,
-    ENDS_WITH = 7,
-    CONTAINS = 8,
-    HAS_SOME = 9,
-    HAS_ALL = 10,
-    EXISTS = 11,
-    URLIZED = 12,
+    eq = 0,
+    lt = 1,
+    gt = 2,
+    ne = 3,
+    lte = 4,
+    gte = 5,
+    startsWith = 6,
+    endsWith = 7,
+    contains = 8,
+    hasSome = 9,
+    hasAll = 10,
+    exists = 11,
+    urlized = 12,
 }
 export interface SingleReferenceOptions {
+    // `true` when datasource supports `include_referenced_items` in query method natively.
     includeSupported?: boolean;
 }
 export interface MultiReferenceOptions {
+    // `true` when datasource supports `include_referenced_items` in query method natively.
     includeSupported?: boolean;
 }
 
 export interface CollectionCapabilities {
-    dataOperations?: DataOperation[];
-    fieldTypes?: FieldType[];
+    // Lists data operations supported by collection.
+    dataOperations: DataOperation[];
+    // Supported field types.
+    fieldTypes: FieldType[];
+    // Describes what kind of reference capabilities is supported.
     referenceCapabilities?: ReferenceCapabilities;
-    collectionOperations?: CollectionOperation[];
+    // Lists what kind of modifications this collection accept.
+    collectionOperations: CollectionOperation[];
+    // Defines which indexing operations is supported.
     indexing?: IndexingCapabilityEnum[];
+    // Defines if/how encryption is supported.
     encryption?: Encryption;
 }
 
 export enum DataOperation {
-    QUERY = 0,
-    COUNT = 1,
-    QUERY_REFERENCED = 2,
-    AGGREGATE = 3,
-    INSERT = 4,
-    UPDATE = 5,
-    REMOVE = 6,
-    TRUNCATE = 7,
-    INSERT_REFERENCES = 8,
-    REMOVE_REFERENCES = 9,
+    query = 0,
+    count = 1,
+    queryReferenced = 2,
+    aggregate = 3,
+    insert = 4,
+    update = 5,
+    remove = 6,
+    truncate = 7,
+    insertReferences = 8,
+    removeReferences = 9,
 }
 
 export interface ReferenceCapabilities {
@@ -115,8 +131,8 @@ export interface CollectionOperationEnum {
 }
 
 export enum CollectionOperation {
-    UPDATE = 0,
-    REMOVE = 1,
+    update = 0,
+    remove = 1,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -124,25 +140,25 @@ export interface IndexingCapabilityEnum {
 }
 
 export enum IndexingCapability {
-    LIST = 0,
-    CREATE = 1,
-    REMOVE = 2,
+    list = 0,
+    create = 1,
+    remove = 2,
 }
 
 export enum Encryption {
-    NOT_SUPPORTED = 0,
-    WIX_DATA_NATIVE = 1,
-    DATA_SOURCE_NATIVE = 2,
+    notSupported = 0,
+    wixDataNative = 1,
+    dataSourceNative = 2,
 }
 export enum FieldType {
-    TEXT = 0,
-    NUMBER = 1,
-    BOOLEAN = 2,
-    TIMESTAMP = 3,
-    JSON = 4,
-    LONG_TEXT = 5,
-    SINGLE_REFERENCE = 6,
-    MULTI_REFERENCE = 7,
+    text = 0,
+    number = 1,
+    boolean = 2,
+    datetime = 3,
+    object = 4,
+    longText = 5,
+    singleReference = 6,
+    multiReference = 7,
 }
 
 
