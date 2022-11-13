@@ -40,6 +40,7 @@ export default class SchemaColumnTranslator {
                 return 'boolean'
 
             default:
+                console.log('Unknown type', type)
                 return 'text'
         }
     }
