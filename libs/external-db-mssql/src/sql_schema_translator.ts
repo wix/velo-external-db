@@ -36,11 +36,11 @@ export default class SchemaColumnTranslator {
                 return 'text'
 
             case 'tinyint':
+            case 'bit':
                 return 'boolean'
 
             default:
-                console.log(type)
-                throw Error(type)
+                return 'text'
         }
     }
 
