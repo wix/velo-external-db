@@ -31,10 +31,12 @@ export default class SchemaColumnTranslator {
                 
             case 'boolean':
             case 'bool':
+            case 'bit':
                 return 'boolean'
 
             default:
-                throw Error(`Unknown data type ${dbType}`)
+                console.log('Unknown type', type)
+                return 'text'
         }
     }
 
