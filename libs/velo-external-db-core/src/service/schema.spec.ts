@@ -6,7 +6,7 @@ import * as driver from '../../test/drivers/schema_provider_test_support'
 import * as schema from '../../test/drivers/schema_information_test_support'
 import * as matchers from '../../test/drivers/schema_matchers'
 import * as gen from '../../test/gen'
-const { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor } = matchers
+const { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor, collectionsListFor } = matchers
 const chance = Chance()
 
 describe('Schema Service', () => {
@@ -71,6 +71,15 @@ describe('Schema Service', () => {
         await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).rejects.toThrow(errors.UnsupportedOperation)
     })
 
+    test('retrieve all collections from provider with listAllCollections', async() => {
+        driver.givenAllSchemaOperations()
+        driver.givenColumnCapabilities()
+        driver.givenListResult(ctx.dbsWithIdColumn)
+        
+
+        await expect( env.schemaService.listCollections([]) ).resolves.toEqual( collectionsListFor(ctx.dbsWithIdColumn)  )
+    })
+    
     const ctx = {
         dbsWithoutIdColumn: Uninitialized,
         dbsWithIdColumn: Uninitialized,

@@ -151,6 +151,7 @@ export interface ISchemaProvider {
     describeCollection(collectionName: string): Promise<ResponseField[]>
     drop(collectionName: string): Promise<void>
     translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
+    getColumnCapabilitiesFor(columnType: string): { sortable: boolean, columnQueryOperators: string[] }
 }
 
 export interface IBaseHttpError extends Error {}

@@ -1,5 +1,7 @@
 import { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, Table, SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, Table, SchemaOperations, ResponseField } from '@wix-velo/velo-external-db-types'
+import { Collection, CollectionCapabilities, Field, FieldCapabilities, ListCollectionsResponsePart } from '../spi-model/collection'
+import { convertQueriesToQueryOperatorsEnum, convertFieldTypeToEnum } from '../utils/schema_utils'
 import CacheableSchemaInformation from './schema_information'
 const { Create, AddColumn, RemoveColumn } = SchemaOperations
 
@@ -16,6 +18,53 @@ export default class SchemaService {
         const dbsWithAllowedOperations = this.appendAllowedOperationsTo(dbs)
 
         return { schemas: dbsWithAllowedOperations.map( asWixSchema ) }
+    }
+
+    async listCollections(collectionIds: string[]): Promise<ListCollectionsResponsePart> {
+
+        let collections: Table[]
+        
+        if (collectionIds.length === 0) {
+            collections = await this.storage.list()
+        } else  {
+            collections = await Promise.all(collectionIds.map(async(collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
+        }
+        
+        const collectionAfterFormat: Collection[] = collections.map((collection) => ({
+            id: collection.id,
+            fields: this.formatFields(collection.fields),
+            capabilities: this.getCollectionCapabilities()
+        }))
+
+        return { collection: collectionAfterFormat }
+
+    }
+
+    formatFields(fields: ResponseField[]): Field[] {
+
+        const getFieldCapabilities = (type: string): FieldCapabilities => {
+            const { sortable, columnQueryOperators } = this.storage.getColumnCapabilitiesFor(type)
+            return {
+                sortable,
+                queryOperators: convertQueriesToQueryOperatorsEnum(columnQueryOperators)
+            }
+        }
+
+        return fields.map((field) => ({
+            key: field.field,
+            // TODO: think about how to implement this
+            encrypted: false,
+            type: convertFieldTypeToEnum(field.type),
+            capabilities: getFieldCapabilities(field.type)
+        }))
+    }
+
+    getCollectionCapabilities(): CollectionCapabilities {
+        return {
+            dataOperations: [],
+            fieldTypes: [],
+            collectionOperations: [],
+        }
     }
 
     async listHeaders() {
@@ -61,7 +110,6 @@ export default class SchemaService {
         }))
     }
 
-    
     async validateOperation(operationName: SchemaOperations) {
         const allowedSchemaOperations = this.storage.supportedOperations()
 

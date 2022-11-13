@@ -8,7 +8,8 @@ export const schemaProvider = {
     create: jest.fn(),
     addColumn: jest.fn(),
     removeColumn: jest.fn(),
-    supportedOperations: jest.fn()
+    supportedOperations: jest.fn(),
+    getColumnCapabilitiesFor: jest.fn(),
 }
 
 export const givenListResult = (dbs: any) =>
@@ -38,6 +39,24 @@ export const expectRemoveColumnOf = (columnName: any, collectionName: any) =>
     when(schemaProvider.removeColumn).calledWith(collectionName, columnName)
                                      .mockResolvedValue(undefined)
 
+export const givenColumnCapabilities = () => {
+    when(schemaProvider.getColumnCapabilitiesFor).calledWith('text')
+        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'gt', 'gte', 'lt', 'lte'] })
+    when(schemaProvider.getColumnCapabilitiesFor).calledWith('number')
+        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'] })
+    when(schemaProvider.getColumnCapabilitiesFor).calledWith('boolean')
+        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq'] })
+    when(schemaProvider.getColumnCapabilitiesFor).calledWith('url')
+        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq', 'ne', 'contains', 'hasSome'] })
+    when(schemaProvider.getColumnCapabilitiesFor).calledWith('datetime')
+        .mockReturnValue({ sortable: true, columnQueryOperators: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'] })
+    when(schemaProvider.getColumnCapabilitiesFor).calledWith('image')
+        .mockReturnValue({ sortable: false, columnQueryOperators: [] })
+    when(schemaProvider.getColumnCapabilitiesFor).calledWith('object')
+        .mockReturnValue({ sortable: false, columnQueryOperators: ['eq', 'ne'] })
+}
+    
+
 export const reset = () => {
     schemaProvider.list.mockClear()
     schemaProvider.listHeaders.mockClear()
@@ -46,4 +65,5 @@ export const reset = () => {
     schemaProvider.addColumn.mockClear()
     schemaProvider.removeColumn.mockClear()
     schemaProvider.supportedOperations.mockClear()
+    schemaProvider.getColumnCapabilitiesFor.mockClear()
 }
