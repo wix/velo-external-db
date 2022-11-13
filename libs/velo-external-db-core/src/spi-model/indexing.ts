@@ -1,0 +1,95 @@
+interface Index {
+    // Index name
+    name: string;
+
+    // Fields over which the index is defined
+    fields: IndexField[];
+
+    // Indicates current status of index
+    status: IndexStatus;
+
+    // If true index will enforce that values in the field are unique in scope of a collection. Default is false.
+    unique: boolean;
+
+    // If true index will be case-insensitive. Default is false.
+    caseInsensitive: boolean;
+
+    // Contains details about failure reason when index is in *FAILED* status
+    //  wix.api.ApplicationError failure = 8 [(wix.api.readOnly) = true];
+    failure: ApplicationError;
+}
+
+enum IndexStatus {
+    UNKNOWN = 0,
+    BUILDING = 1,
+    ACTIVE = 2,
+    DROPPING = 3,
+    DROPPED = 4,
+    FAILED = 5,
+    INVALID = 6
+}
+
+interface IndexField {
+    // Order determines how values are ordered in the index. This is important when
+    // ordering and/or range querying by indexed fields.
+    order: IndexFieldOrder;
+
+    // The field path to index.
+    path: string;
+}
+
+enum IndexFieldOrder {
+    ASC = 0,
+    DESC = 1
+}
+
+interface ApplicationError {
+    code: string,
+    description: string,
+    data: any
+}
+
+export abstract class IndexingService {
+    abstract ListIndexes(req: ListIndexesRequest): Promise<ListIndexesResponse> //stream of Indexes
+    abstract CreateIndex(req: CreateIndexRequest): Promise<CreateIndexResponse>
+    abstract RemoveIndex(req: RemoveIndexRequest): Promise<RemoveIndexResponse>
+}
+
+interface ListIndexesRequest {
+    // collection to list indexes from
+    dataCollectionId: string;
+    // optional namespace assigned to collection/installation
+    namespace?: string;
+    // slower read but consistent with recent updates
+    consistentRead: boolean;
+}
+
+interface ListIndexesResponse {
+    // stream of Indexes
+    index: Index[];
+}
+
+interface CreateIndexRequest {
+    // collection to list indexes from
+    dataCollectionId: string;
+    // optional namespace assigned to collection/installation
+    namespace?: string;
+    // index definition
+    index: Index;
+}
+
+interface CreateIndexResponse {
+    // created index and it's status
+    index: Index;
+}
+
+interface RemoveIndexRequest {
+    // collection to delete index from
+    dataCollectionId: string;
+    // optional namespace assigned to collection/installation
+    namespace?: string;
+    // index name
+    indexName: string;
+}
+
+interface RemoveIndexResponse {}
