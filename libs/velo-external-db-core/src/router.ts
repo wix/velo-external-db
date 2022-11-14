@@ -228,25 +228,6 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/get', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { itemId, projection } = await executeDataHooksFor(DataActions.BeforeGetById, dataPayloadFor(GET, req.body), requestContextFor(GET, req.body), customContext)
-            await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.getById(collectionName, itemId, projection)
-
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterGetById, data, requestContextFor(GET, req.body), customContext)
-            if (!dataAfterAction.item) {
-                throw new ItemNotFound('Item not found')
-            }
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-
-
     router.post('/data/truncate', async(req, res, next) => {
         try {
             const trancateRequest = req.body as dataSource.TruncateRequest
