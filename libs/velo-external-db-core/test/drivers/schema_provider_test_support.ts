@@ -10,7 +10,8 @@ export const schemaProvider = {
     addColumn: jest.fn(),
     removeColumn: jest.fn(),
     supportedOperations: jest.fn(),
-    getColumnCapabilitiesFor: jest.fn(),
+    columnCapabilitiesFor: jest.fn(),
+    capabilities: jest.fn(),
 }
 
 export const givenListResult = (dbs: any) =>
@@ -25,11 +26,18 @@ export const givenAdapterSupportedOperationsWith = (operations: any) =>
 export const givenAllSchemaOperations = () =>
     when(schemaProvider.supportedOperations).mockReturnValue(AllSchemaOperations)
 
+    export const givenCollectionCapabilities = (capabilities: any) =>
+    when(schemaProvider.capabilities).mockReturnValue(capabilities)
+
 export const givenFindResults = (dbs: any[]) =>
     dbs.forEach((db: { id: any; fields: any }) => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db.fields) )
 
 export const expectCreateOf = (collectionName: any) =>
     when(schemaProvider.create).calledWith(collectionName)
+                               .mockResolvedValue(undefined)
+
+export const expectCreateWithFieldsOf = (collectionName: any, column: any) =>
+    when(schemaProvider.create).calledWith(collectionName, column)
                                .mockResolvedValue(undefined)
 
 export const expectCreateColumnOf = (column: any, collectionName: any) =>
@@ -41,19 +49,19 @@ export const expectRemoveColumnOf = (columnName: any, collectionName: any) =>
                                      .mockResolvedValue(undefined)
 
 export const givenColumnCapabilities = () => {
-    when(schemaProvider.getColumnCapabilitiesFor).calledWith('text')
+    when(schemaProvider.columnCapabilitiesFor).calledWith('text')
         .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] })
-    when(schemaProvider.getColumnCapabilitiesFor).calledWith('number')
+    when(schemaProvider.columnCapabilitiesFor).calledWith('number')
         .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include] })
-    when(schemaProvider.getColumnCapabilitiesFor).calledWith('boolean')
+    when(schemaProvider.columnCapabilitiesFor).calledWith('boolean')
         .mockReturnValue({ sortable: true, columnQueryOperators: [eq] })
-    when(schemaProvider.getColumnCapabilitiesFor).calledWith('url')
+    when(schemaProvider.columnCapabilitiesFor).calledWith('url')
         .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] })
-    when(schemaProvider.getColumnCapabilitiesFor).calledWith('datetime')
+    when(schemaProvider.columnCapabilitiesFor).calledWith('datetime')
         .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte] })
-    when(schemaProvider.getColumnCapabilitiesFor).calledWith('image')
+    when(schemaProvider.columnCapabilitiesFor).calledWith('image')
         .mockReturnValue({ sortable: false, columnQueryOperators: [] })
-    when(schemaProvider.getColumnCapabilitiesFor).calledWith('object')
+    when(schemaProvider.columnCapabilitiesFor).calledWith('object')
         .mockReturnValue({ sortable: false, columnQueryOperators: [eq, ne] })
 }
     
@@ -66,5 +74,6 @@ export const reset = () => {
     schemaProvider.addColumn.mockClear()
     schemaProvider.removeColumn.mockClear()
     schemaProvider.supportedOperations.mockClear()
-    schemaProvider.getColumnCapabilitiesFor.mockClear()
+    schemaProvider.columnCapabilitiesFor.mockClear()
+    schemaProvider.capabilities.mockClear()
 }

@@ -6,6 +6,7 @@ import * as driver from '../../test/drivers/schema_provider_test_support'
 import * as schema from '../../test/drivers/schema_information_test_support'
 import * as matchers from '../../test/drivers/schema_matchers'
 import * as gen from '../../test/gen'
+import { convertFieldTypeToEnum } from '../utils/schema_utils'
 const { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor, collectionsListFor } = matchers
 const chance = Chance()
 
@@ -71,13 +72,42 @@ describe('Schema Service', () => {
         await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).rejects.toThrow(errors.UnsupportedOperation)
     })
 
-    test('retrieve all collections from provider with listAllCollections', async() => {
-        driver.givenAllSchemaOperations()
-        driver.givenColumnCapabilities()
-        driver.givenListResult(ctx.dbsWithIdColumn)
-        
+    describe('Collection new SPI', () => {
+        test('retrieve all collections from provider', async() => {
+            const collectionCapabilities = {
+                dataOperations: [],
+                fieldTypes: [],
+                collectionOperations: [],
+            }
+            
+            driver.givenAllSchemaOperations()
+            driver.givenCollectionCapabilities(collectionCapabilities)
+            driver.givenColumnCapabilities()
+            driver.givenListResult(ctx.dbsWithIdColumn)
+            
 
-        await expect( env.schemaService.listCollections([]) ).resolves.toEqual( collectionsListFor(ctx.dbsWithIdColumn)  )
+            await expect( env.schemaService.listCollections([]) ).resolves.toEqual( collectionsListFor(ctx.dbsWithIdColumn, collectionCapabilities))
+        })
+
+        test('create collection name without fields', async() => {
+            driver.givenAllSchemaOperations()
+            driver.expectCreateOf(ctx.collectionName)
+            schema.expectSchemaRefresh()
+    
+            await expect(env.schemaService.createCollection({ id: ctx.collectionName, fields: [] })).resolves.toEqual({ id: ctx.collectionName, fields: [] })
+        })
+
+        test('create collection name with fields', async() => {
+            const fields = [{
+                key: ctx.column.name,
+                type: convertFieldTypeToEnum(ctx.column.type),
+            }]
+            driver.givenAllSchemaOperations()
+            schema.expectSchemaRefresh()            
+            driver.expectCreateWithFieldsOf(ctx.collectionName, fields)
+    
+            await expect(env.schemaService.createCollection({ id: ctx.collectionName, fields })).resolves.toEqual({ id: ctx.collectionName, fields })
+        })
     })
     
     const ctx = {

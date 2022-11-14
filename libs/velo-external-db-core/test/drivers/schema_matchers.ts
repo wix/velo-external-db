@@ -71,12 +71,15 @@ export const capabilitiesInNewWixFormat = () => expect.objectContaining({
     collectionOperations: expect.any(Array),
 })
 
-export const collectionInNewWixFormat = (collection: any) => expect.objectContaining({
-    id: collection.id,
-    fields: expect.arrayContaining(
-        collection.fields.map((field: any) => fieldInNewWixFormat(field))
-    ),
-    capabilities: capabilitiesInNewWixFormat()
-})
+export const collectionInNewWixFormat = (collection: any, args: any) => {
+    const [collectionsCapabilities] = args
+    return expect.objectContaining({
+        id: collection.id,
+        fields: expect.arrayContaining(
+            collection.fields.map((field: any) => fieldInNewWixFormat(field))
+        ),
+        capabilities: collectionsCapabilities
+    })
+}
 
-export const collectionsListFor = (collections: any) => toHaveCollection(collections, collectionInNewWixFormat)
+export const collectionsListFor = (collections: any, collectionsCapabilities: any) => toHaveCollection(collections, collectionInNewWixFormat, collectionsCapabilities)

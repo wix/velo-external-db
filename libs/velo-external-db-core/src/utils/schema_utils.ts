@@ -22,6 +22,28 @@ export const convertFieldTypeToEnum = ( fieldType: string ): FieldType => {
     }
 }
 
+export const convertEnumToFieldType = (fieldEnum: number): string => {
+    switch (fieldEnum) {
+        case FieldType.text:
+        case FieldType.longText:
+            return 'text'
+        case FieldType.number:
+            return 'number'
+        case FieldType.datetime:
+            return 'datetime'
+        case FieldType.boolean:
+            return 'boolean'
+        case FieldType.object:
+            return 'object'
+
+        case FieldType.singleReference:
+        case FieldType.multiReference:
+        default:
+            // TODO: throw specific error
+            throw new Error(`Unsupported field type: ${fieldEnum}`)
+    }
+}
+
 export const convertQueryOperatorsToEnum = (queryOperator: string): QueryOperator => {
     switch (queryOperator) {
         case eq:
