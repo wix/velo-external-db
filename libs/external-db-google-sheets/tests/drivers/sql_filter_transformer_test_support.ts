@@ -8,7 +8,7 @@ export const filterParser = {
 }
 
 
-export const stubEmptyFilterFor = (filter: any) => {    
+export const stubEmptyFilterFor = (_filter: any) => {    
 }
 
 
@@ -24,7 +24,7 @@ export const givenAllFieldsProjectionFor = (projection: any) => {
     when(filterParser.projection).calledWith(projection).mockReturnValue(undefined)        
 }
 
-export const stubEmptyFilterAndSortFor = (filter: any) => {    
+export const stubEmptyFilterAndSortFor = (_filter: any) => {    
 }
 
 export const givenFilterByIdWith = (id:any, filter: any) => {

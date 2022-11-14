@@ -12,6 +12,7 @@ export const notThrowingTranslateErrorCodes = (err: any) => {
         case 'ERR_OSSL_PEM_BAD_BASE64_DECODE':
         case 'ERR_OSSL_PEM_NO_START_LINE':
         case 'ERR_OSSL_PEM_BAD_END_LINE':
+        case 'ERR_OSSL_UNSUPPORTED':
             return new DbConnectionError(`API key is invalid: ${err.message}`)
         case '400':
             return new DbConnectionError('Client email is invalid')
