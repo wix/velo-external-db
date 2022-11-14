@@ -42,8 +42,10 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
 
             case 'tinyint':
             case 'bit':
+            case 'boolean':
+            case 'bool':
                 return 'boolean'
-                
+
             case 'json':
                 return 'object'
 
