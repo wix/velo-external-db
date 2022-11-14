@@ -234,7 +234,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             _id: {$eq: ctx.item._id}
         }
 
-        await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: 'ASC' }], undefined, filter)).resolves.toEqual(
+        await expect(queryCollectionAsArray(ctx.collectionName, undefined, undefined, filter)).resolves.toEqual(
             ([...[QueryResponsePart.item(ctx.item)], pagingMetadata(1, 1)])
         )
     })
@@ -247,7 +247,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             _id: {$eq: 'wrong'}
         }
 
-        await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: 'ASC' }], undefined, filter)).resolves.toEqual(
+        await expect(queryCollectionAsArray(ctx.collectionName, undefined, undefined, filter)).resolves.toEqual(
             ([pagingMetadata(0, 0)])
         )
     })
@@ -260,7 +260,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             _id: {$eq: ctx.item._id}
         }
 
-        await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: 'ASC' }], [ctx.column.name], filter)).resolves.toEqual(
+        await expect(queryCollectionAsArray(ctx.collectionName, undefined, [ctx.column.name], filter)).resolves.toEqual(
             ([QueryResponsePart.item({[ctx.column.name]: ctx.item[ctx.column.name]}), pagingMetadata(1, 1)])
         )
     })
