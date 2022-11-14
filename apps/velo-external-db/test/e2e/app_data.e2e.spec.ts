@@ -21,10 +21,10 @@ const axiosInstance = axios.create({
     baseURL: 'http://localhost:8080'
 })
 
-const queryRequest = (collectionName, sort, fields) => ({ 
+const queryRequest = (collectionName, sort, fields, filter?: any) => ({ 
     collectionId: collectionName,
     query: {
-        filter: '',
+        filter: filter ? filter : '',
         sort: sort,
         fields: fields,
         fieldsets: undefined,
@@ -44,8 +44,8 @@ const queryRequest = (collectionName, sort, fields) => ({
 
 
 
-const queryCollectionAsArray = (collectionName, sort, fields) => axiosInstance.post('/data/query', 
-            queryRequest(collectionName, sort, fields), 
+const queryCollectionAsArray = (collectionName, sort, fields, filter?: any) => axiosInstance.post('/data/query', 
+            queryRequest(collectionName, sort, fields, filter), 
             {responseType: 'stream', transformRequest: authVisitor.transformRequest}).then(response => streamToArray(response.data))
 
 const countRequest = (collectionName) => ({
@@ -134,8 +134,43 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
             [ 
                 ...expectedItems, 
-                ...[pagingMetadata(ctx.items.length, ctx.items.length)]
-            ]))
+                pagingMetadata(ctx.items.length, ctx.items.length)
+            ])
+        )
+    })
+
+    test('insert api should fail if item already exists', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await givenItems([ ctx.items[0] ], ctx.collectionName, authAdmin)
+
+        const response = axiosInstance.post('/data/insert', insertRequest(ctx.collectionName, ctx.items, false),  {responseType: 'stream', transformRequest: authAdmin.transformRequest})
+
+        const expectedItems = [QueryResponsePart.item(ctx.items[0])]
+
+        await expect(response).rejects.toThrow('400')
+
+        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
+            [ 
+                ...expectedItems, 
+                pagingMetadata(expectedItems.length, expectedItems.length)
+            ])
+        )
+    })
+
+    test('insert api should succeed if item already exists and overwriteExisting is on', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await givenItems([ ctx.item ], ctx.collectionName, authAdmin)
+
+        const response = await axiosInstance.post('/data/insert', insertRequest(ctx.collectionName, [ctx.modifiedItem], true),  {responseType: 'stream', transformRequest: authAdmin.transformRequest})
+        const expectedItems = [QueryResponsePart.item(ctx.modifiedItem)]
+
+        await expect(streamToArray(response.data)).resolves.toEqual(expectedItems)
+        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
+            [ 
+                ...expectedItems, 
+                pagingMetadata(expectedItems.length, expectedItems.length)
+            ])
+        )
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api', async() => {
@@ -191,28 +226,43 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual([pagingMetadata(0, 0)])
     })
 
-    test('get by id api', async() => {
+    test('query by id api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ctx.item], ctx.collectionName, authAdmin)
+        await givenItems([ctx.item], ctx.collectionName, authAdmin) 
 
-        await expect( axiosInstance.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id }, authAdmin) ).resolves.toEqual(matchers.responseWith({ item: ctx.item }))
+        const filter = {
+            _id: {$eq: ctx.item._id}
+        }
+
+        await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: 'ASC' }], undefined, filter)).resolves.toEqual(
+            ([...[QueryResponsePart.item(ctx.item)], pagingMetadata(1, 1)])
+        )
     })
 
-    test('get by id api should throw 404 if not found', async() => {
+    test('query by id api should return empty result if not found', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await givenItems([ctx.item], ctx.collectionName, authAdmin)
 
-        await expect( axiosInstance.post('/data/get', { collectionName: ctx.collectionName, itemId: 'wrong' }, authAdmin) ).rejects.toThrow('404')
+        const filter = {
+            _id: {$eq: 'wrong'}
+        }
+
+        await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: 'ASC' }], undefined, filter)).resolves.toEqual(
+            ([pagingMetadata(0, 0)])
+        )
     })
 
-    testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('get by id api with projection', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('query by id api with projection', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await givenItems([ctx.item], ctx.collectionName, authAdmin)
 
-        await expect(axiosInstance.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id, projection: [ctx.column.name] }, authAdmin)).resolves.toEqual(
-            matchers.responseWith({
-                item: { [ctx.column.name]: ctx.item[ctx.column.name] }
-            }))
+        const filter = {
+            _id: {$eq: ctx.item._id}
+        }
+
+        await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: 'ASC' }], [ctx.column.name], filter)).resolves.toEqual(
+            ([QueryResponsePart.item({[ctx.column.name]: ctx.item[ctx.column.name]}), pagingMetadata(1, 1)])
+        )
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api', async() => {
@@ -227,7 +277,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
             [ 
                 ...expectedItems, 
-                ...[pagingMetadata(ctx.modifiedItems.length,ctx.modifiedItems.length)]
+                pagingMetadata(ctx.modifiedItems.length,ctx.modifiedItems.length)
             ]))
     })
 

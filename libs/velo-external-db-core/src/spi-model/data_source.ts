@@ -224,6 +224,22 @@ export interface AggregateResponsePart {
     pagingMetadata?: PagingMetadataV2;
 }
 
+export class AggregateResponsePart {
+    static item(item: any) {
+        return {
+            item
+        } as AggregateResponsePart
+    }
+
+    static pagingMetadata(count?: number, offset?: number, total?: number): QueryResponsePart {
+        return {
+            pagingMetadata: {
+                count, offset, total, tooManyToCount: false
+            } as PagingMetadataV2
+        }
+    }
+}
+
 export interface InsertRequest {
     // collection name
     collectionId: string;
@@ -241,6 +257,20 @@ export interface InsertResponsePart {
     item?: any;
     // error from [errors list](errors.proto)
     error?: ApplicationError;
+}
+
+export class InsertResponsePart {
+    static item(item: any) {
+        return {
+            item
+        } as InsertResponsePart
+    }
+
+    static error(error: ApplicationError) {
+        return {
+            error
+        } as InsertResponsePart
+    }
 }
 
 export interface UpdateRequest {
@@ -261,6 +291,20 @@ export interface UpdateResponsePart {
     error?: ApplicationError;
 }
 
+export class UpdateResponsePart {
+    static item(item: any) {
+        return {
+            item
+        } as UpdateResponsePart
+    }
+
+    static error(error: ApplicationError) {
+        return {
+            error
+        } as UpdateResponsePart
+    }
+}
+
 export interface RemoveRequest {
     // collection name
     collectionId: string;
@@ -278,6 +322,20 @@ export interface RemoveResponsePart {
     item?: any;
     // error from [errors list](errors.proto)
     error?: ApplicationError;
+}
+
+export class RemoveResponsePart {
+    static item(item: any) {
+        return {
+            item
+        } as RemoveResponsePart
+    }
+
+    static error(error: ApplicationError) {
+        return {
+            error
+        } as RemoveResponsePart
+    }
 }
 
 export interface TruncateRequest {

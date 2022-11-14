@@ -162,10 +162,7 @@ export const createRouter = () => {
                             await schemaAwareDataService.bulkUpsert(collectionName, insertRequest.items) : 
                             await schemaAwareDataService.bulkInsert(collectionName, insertRequest.items)
 
-            const responseParts = data.items.map(item => ({
-                    item: item
-                } as dataSource.InsertResponsePart
-            ))
+            const responseParts = data.items.map(dataSource.InsertResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {
@@ -182,10 +179,7 @@ export const createRouter = () => {
 
             const data = await schemaAwareDataService.bulkUpdate(collectionName, updateRequest.items)
 
-            const responseParts = data.items.map(item => ({
-                    item: item
-                } as dataSource.UpdateResponsePart
-            ))
+            const responseParts = data.items.map(dataSource.UpdateResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {
@@ -202,12 +196,9 @@ export const createRouter = () => {
 
             const objectsBeforeRemove = (await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), undefined, 0, removeRequest.itemIds.length)).items
 
-            const data = await schemaAwareDataService.bulkDelete(collectionName, removeRequest.itemIds)
+            await schemaAwareDataService.bulkDelete(collectionName, removeRequest.itemIds)
             
-            const responseParts = objectsBeforeRemove.map(item => ({
-                    item: item
-                } as dataSource.RemoveResponsePart
-            ))
+            const responseParts = objectsBeforeRemove.map(dataSource.RemoveResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {
@@ -228,19 +219,8 @@ export const createRouter = () => {
             const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), aggregationTransformer.transform({ group, finalFilter }), filterTransformer.transformSort(sort), offset, limit)
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(AGGREGATE, aggregationRequest), customContext)
 
-            const responseParts = dataAfterAction.items.map((item: Item) => ({
-                    item
-                } as dataSource.AggregateResponsePart
-            ))
-
-            const metadata = {
-                pagingMetadata: {
-                    count: (dataAfterAction.items as Item[]).length,
-                    offset: offset,
-                    total: data.totalCount,
-                    tooManyToCount: false, //Check if always false
-                } as dataSource.PagingMetadataV2
-            } as dataSource.AggregateResponsePart
+            const responseParts = dataAfterAction.items.map(dataSource.AggregateResponsePart.item)
+            const metadata = dataSource.AggregateResponsePart.pagingMetadata((dataAfterAction.items as Item[]).length, offset, data.totalCount)
 
             streamCollection([...responseParts, ...[metadata]], res)
         } catch (e) {
