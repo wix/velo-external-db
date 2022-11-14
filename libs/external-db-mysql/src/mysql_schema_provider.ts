@@ -62,8 +62,10 @@ export default class SchemaProvider implements ISchemaProvider {
                   .catch( err => translateErrorCodes(err, collectionName) )
     }
 
-    changeColumnType(_collectionName: string, _column: InputField): Promise<void> {
-        throw new Error('Method not implemented.')
+    async changeColumnType(collectionName: string, column: InputField): Promise<void> {
+        await validateSystemFields(column.name)
+        await this.query(`ALTER TABLE ${escapeTable(collectionName)} MODIFY ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
+                  .catch( translateErrorCodes )
     }
 
     async removeColumn(collectionName: string, columnName: string): Promise<void> {
