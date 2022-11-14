@@ -1,5 +1,6 @@
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { FieldType, QueryOperator } from '../spi-model/collection'
+import { InputField, ResponseField } from '@wix-velo/velo-external-db-types'
+import { Field, FieldType, QueryOperator } from '../spi-model/collection'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export const convertFieldTypeToEnum = ( fieldType: string ): FieldType => {
@@ -79,4 +80,20 @@ export const convertQueryOperatorsToEnum = (queryOperator: string): QueryOperato
 
 export const convertQueriesToQueryOperatorsEnum = (queryOperators: string[]): QueryOperator[] => {
     return queryOperators.map(convertQueryOperatorsToEnum)
+}
+
+export const convertResponseFieldToWixFormat = (fields: ResponseField[]): Field[] => {
+    return fields.map(field => {
+        return {
+            key: field.field,
+            type: convertFieldTypeToEnum(field.type)
+        }
+    })
+}
+
+export const convertWixFormatFieldsToInputFields = (fields: Field[]): InputField[] => {
+    return fields.map( field => ({
+        name: field.key,
+        type: convertEnumToFieldType(field.type)
+    }))
 }

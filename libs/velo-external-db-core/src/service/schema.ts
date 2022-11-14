@@ -1,7 +1,7 @@
 import { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, errors } from '@wix-velo/velo-external-db-commons'
 import { InputField, ISchemaProvider, Table, SchemaOperations, ResponseField, DbCapabilities } from '@wix-velo/velo-external-db-types'
-import { Collection, CollectionCapabilities, CollectionOperation, DataOperation, Field, FieldCapabilities, FieldType, ListCollectionsResponsePart } from '../spi-model/collection'
-import { convertQueriesToQueryOperatorsEnum, convertFieldTypeToEnum, convertEnumToFieldType } from '../utils/schema_utils'
+import { Collection, CollectionCapabilities, CollectionOperation, CreateCollectionResponse, DataOperation, DeleteCollectionResponse, Field, FieldCapabilities, FieldType, ListCollectionsResponsePart, UpdateCollectionResponse } from '../spi-model/collection'
+import { convertQueriesToQueryOperatorsEnum, convertFieldTypeToEnum, convertEnumToFieldType, convertWixFormatFieldsToInputFields, convertResponseFieldToWixFormat } from '../utils/schema_utils'
 import CacheableSchemaInformation from './schema_information'
 const { Create, AddColumn, RemoveColumn } = SchemaOperations
 
@@ -111,44 +111,36 @@ export default class SchemaService {
         }
     }
 
-    async createCollection(collection: Collection) {                
+    async createCollection(collection: Collection): Promise<CreateCollectionResponse> {                
         await this.validateOperation(Create)
-        
-        const columns = collection.fields?.map((field) => ({
-            name: field.key,
-            type: convertEnumToFieldType(field.type),
-        }))
-
-        await this.storage.create(collection.id, columns)
+        await this.storage.create(collection.id, convertWixFormatFieldsToInputFields(collection.fields))
         await this.schemaInformation.refresh()
-        return collection
+        return { collection }
     }
 
-    async deleteCollection(collectionId: string) {
+    async deleteCollection(collectionId: string): Promise<DeleteCollectionResponse> {
         const collectionFields = await this.storage.describeCollection(collectionId)
-        const collectionFieldsNames = collectionFields.map(f => ({
-            key: f.field,
-            type: convertFieldTypeToEnum(f.type)
-        }))
         await this.storage.drop(collectionId)
         return { collection: {
             id: collectionId,
-            fields: collectionFieldsNames,
+            fields: convertResponseFieldToWixFormat(collectionFields),
         } }
     }
 
-    async updateCollection(collection: Collection) {
+    async updateCollection(collection: Collection): Promise<UpdateCollectionResponse> {
         await this.validateOperation(Create)
-        const collectionFieldsInDb = await this.storage.describeCollection(collection.id)
-        const collectionFieldsInDbNames = collectionFieldsInDb.map(f => f.field)
-        const collectionFieldsInRequestNames = collection.fields.map(f => f.key) 
-        const columnsToAdd = collection.fields.filter(f => !collectionFieldsInDbNames.includes(f.key))
-        const columnsToRemove = collectionFieldsInDb.filter(f => !collectionFieldsInRequestNames.includes(f.field))
-        const columnsToChangeType = collection.fields.filter(f => {
-            const fieldInDb = collectionFieldsInDb.find(field => field.field === f.key)
+        
+        const collectionColumnsInRequest = collection.fields
+        const collectionColumnsInDb = await this.storage.describeCollection(collection.id)
+        const collectionColumnsNamesInDb = collectionColumnsInDb.map(f => f.field)
+        const collectionColumnsNamesInRequest = collectionColumnsInRequest.map(f => f.key)
+
+        const columnsToAdd = collectionColumnsInRequest.filter(f => !collectionColumnsNamesInDb.includes(f.key))
+        const columnsToRemove = collectionColumnsInDb.filter(f => !collectionColumnsNamesInRequest.includes(f.field))
+        const columnsToChangeType = collectionColumnsInRequest.filter(f => {
+            const fieldInDb = collectionColumnsInDb.find(field => field.field === f.key)
             return fieldInDb && fieldInDb.type !== convertEnumToFieldType(f.type)
         })
-
 
         await Promise.all(columnsToAdd.map(async(field) => await this.storage.addColumn(collection.id, {
             name: field.key as string,
@@ -162,5 +154,6 @@ export default class SchemaService {
             type: convertEnumToFieldType(field.type)
         })))
 
+        return { collection }
     }
 }

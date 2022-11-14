@@ -264,6 +264,52 @@ export const createRouter = () => {
     })
     // ***********************************************
 
+    // *************** Collections API **********************
+
+    router.post('/collections/get', async(req, res, next) => {
+
+        const { collectionIds } = req.body
+        try {
+            const data = await schemaService.listCollections(collectionIds)
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
+    })
+
+
+    router.post('/collections/create', async(req, res, next) => {
+        const { collection } = req.body
+
+        try {
+            const data = await schemaService.createCollection(collection)
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
+    })
+
+    router.post('/collections/update', async(req, res, next) => {
+        const { collection  } = req.body
+
+        try {
+            const data = await schemaService.updateCollection(collection)
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
+    })
+
+    router.post('/collections/delete', async(req, res, next) => {
+
+        const { collectionId } = req.body
+        try {
+            const data = await schemaService.deleteCollection(collectionId)
+            res.json(data)
+        } catch (e) {
+            next(e)
+        }
+    })
 
     // *************** Schema API **********************
     router.post('/schemas/list', async(req, res, next) => {
