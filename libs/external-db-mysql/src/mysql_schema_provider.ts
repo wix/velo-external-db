@@ -5,7 +5,7 @@ import { escapeId, escapeTable } from './mysql_utils'
 import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { Pool as MySqlPool } from 'mysql'
 import { MySqlQuery } from './types'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, ColumnCapabilities, DbCapabilities } from '@wix-velo/velo-external-db-types'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export default class SchemaProvider implements ISchemaProvider {
@@ -62,6 +62,10 @@ export default class SchemaProvider implements ISchemaProvider {
                   .catch( err => translateErrorCodes(err, collectionName) )
     }
 
+    changeColumnType(_collectionName: string, _column: InputField): Promise<void> {
+        throw new Error('Method not implemented.')
+    }
+
     async removeColumn(collectionName: string, columnName: string): Promise<void> {
         await validateSystemFields(columnName)
         return await this.query(`ALTER TABLE ${escapeTable(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
@@ -80,7 +84,7 @@ export default class SchemaProvider implements ISchemaProvider {
         return row
     }
 
-    getColumnCapabilitiesFor(columnType: string): { sortable: boolean; columnQueryOperators: string[] } {
+    columnCapabilitiesFor(columnType: string): ColumnCapabilities {
         switch (columnType) {
             case 'text':
             case 'url':
@@ -116,6 +120,14 @@ export default class SchemaProvider implements ISchemaProvider {
 
             default:
                 throw new Error(`${columnType} - Unsupported field type`)
+        }
+    }
+
+    capabilities(): DbCapabilities {
+        return {
+            dataOperations: [],
+            fieldTypes: [],
+            collectionOperations: [],
         }
     }
 }

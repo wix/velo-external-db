@@ -141,6 +141,46 @@ export type InputField = FieldAttributes & { name: string }
 
 export type ResponseField = FieldAttributes & { field: string }
 
+export type ColumnCapabilities = {
+    sortable: boolean,
+    columnQueryOperators: string[],
+}
+
+export enum DataOperation {
+    query = 'query',
+    count = 'count',
+    queryReferenced = 'queryReferenced',
+    aggregate = 'aggregate',
+    insert = 'insert',
+    update = 'update',
+    remove = 'remove',
+    truncate = 'truncate',
+    insertReferences = 'insertReferences',
+    removeReferences = 'removeReferences',
+}
+
+export enum FieldType {
+    text = 'text',
+    number = 'number',
+    boolean = 'boolean',
+    datetime = 'datetime',
+    object = 'object',
+    longText = 'longText',
+    singleReference = 'singleReference',
+    multiReference = 'multiReference',
+}
+
+export enum CollectionOperation {
+    update = 'update',
+    remove = 'remove',
+}
+
+
+export type DbCapabilities = {
+    dataOperations: string[],
+    fieldTypes: string[],
+    collectionOperations: string[]
+}
 export interface ISchemaProvider {
     list(): Promise<Table[]>
     listHeaders(): Promise<string[]>
@@ -148,10 +188,12 @@ export interface ISchemaProvider {
     create(collectionName: string, columns?: InputField[]): Promise<void>
     addColumn(collectionName: string, column: InputField): Promise<void>
     removeColumn(collectionName: string, columnName: string): Promise<void>
+    changeColumnType(collectionName: string, column: InputField): Promise<void>
     describeCollection(collectionName: string): Promise<ResponseField[]>
     drop(collectionName: string): Promise<void>
     translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
-    getColumnCapabilitiesFor(columnType: string): { sortable: boolean, columnQueryOperators: string[] }
+    columnCapabilitiesFor(columnType: string): ColumnCapabilities
+    capabilities(): DbCapabilities
 }
 
 export interface IBaseHttpError extends Error {}

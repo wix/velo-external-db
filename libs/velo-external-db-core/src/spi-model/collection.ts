@@ -14,7 +14,7 @@ export interface ListCollectionsResponsePart {
     collection?: Collection[];
 }
 export interface DeleteCollectionRequest {
-    collectionId?: string;
+    collectionId: string;
 }
 export interface DeleteCollectionResponse {
     collection?: Collection;
@@ -34,7 +34,7 @@ export interface UpdateCollectionResponse {
 export interface Collection {
     id: string;
     fields: Field[];
-    capabilities: CollectionCapabilities;
+    capabilities?: CollectionCapabilities;
 }
 
 export interface Field {
