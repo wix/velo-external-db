@@ -68,14 +68,18 @@ describe('Hooks Utils', () => {
             expect(dataPayloadFor(DataOperations.Get, randomBodyWith({ itemId: ctx.itemId, projection: ctx.projection }))).toEqual({ itemId: ctx.itemId, projection: ctx.projection })
         })
         test('Payload for Aggregate should return Aggregation query', () => {
-            expect(dataPayloadFor(DataOperations.Aggregate, randomBodyWith({ filter: ctx.filter, processingStep: ctx.processingStep, postFilteringStep: ctx.postFilteringStep })))
-                .toEqual(
-                    {
-                        filter: ctx.filter,
-                        processingStep: ctx.processingStep,
-                        postFilteringStep: ctx.postFilteringStep
-                    }
-                )
+            expect(dataPayloadFor(DataOperations.Aggregate, randomBodyWith({
+                initialFilter: ctx.filter, group: ctx.group, finalFilter: ctx.finalFilter, distinct: ctx.distinct
+                , paging: ctx.paging, sort: ctx.sort, projection: ctx.projection
+            }))).toEqual({
+                initialFilter: ctx.filter,
+                distinct: ctx.distinct,
+                group: ctx.group,
+                finalFilter: ctx.finalFilter,
+                sort: ctx.sort,
+                paging: ctx.paging,
+            }
+            )
         })
     })
 
@@ -90,8 +94,10 @@ describe('Hooks Utils', () => {
         items: Uninitialized,
         itemId: Uninitialized,
         itemIds: Uninitialized,
-        processingStep: Uninitialized,
-        postFilteringStep: Uninitialized
+        group: Uninitialized,
+        finalFilter: Uninitialized,
+        distinct: Uninitialized,
+        paging: Uninitialized,
     }
 
     beforeEach(() => {
@@ -104,5 +110,9 @@ describe('Hooks Utils', () => {
         ctx.items = chance.word()
         ctx.itemId = chance.word()
         ctx.itemIds = chance.word()
+        ctx.group = chance.word()
+        ctx.finalFilter = chance.word()
+        ctx.distinct = chance.word()
+        ctx.paging = chance.word()
     })
 })

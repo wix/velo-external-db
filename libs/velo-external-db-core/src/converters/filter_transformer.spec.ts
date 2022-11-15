@@ -144,6 +144,42 @@ describe('Filter Transformer', () => {
                 value: [env.FilterTransformer.transform(ctx.filter)]
             })
         })
+    }), 
+
+    describe('transform sort', () => { 
+        test('should handle wrong sort', () => {
+            expect(env.FilterTransformer.transformSort('')).toEqual([])
+            expect(env.FilterTransformer.transformSort(undefined)).toEqual([])
+            expect(env.FilterTransformer.transformSort(null)).toEqual([])
+        })
+
+        test('transform empty sort', () => {
+            expect(env.FilterTransformer.transformSort([])).toEqual([])
+        })
+
+        test('transform sort', () => {
+            const sort = [
+                { fieldName: ctx.fieldName, order: 'ASC' },
+            ]
+            expect(env.FilterTransformer.transformSort(sort)).toEqual([{
+                fieldName: ctx.fieldName,
+                direction: 'asc'
+            }])
+        })
+
+        test('transform sort with multiple fields', () => {
+            const sort = [
+                { fieldName: ctx.fieldName, order: 'ASC' },
+                { fieldName: ctx.anotherFieldName, order: 'DESC' },
+            ]
+            expect(env.FilterTransformer.transformSort(sort)).toEqual([{
+                fieldName: ctx.fieldName,
+                direction: 'asc'
+            }, {
+                fieldName: ctx.anotherFieldName,
+                direction: 'desc'
+            }])
+        })
     })
 
     interface Enviorment {
@@ -158,6 +194,7 @@ describe('Filter Transformer', () => {
         filter: Uninitialized,
         anotherFilter: Uninitialized,
         fieldName: Uninitialized,
+        anotherFieldName: Uninitialized,
         fieldValue: Uninitialized,
         operator: Uninitialized,
         fieldListValue: Uninitialized,
@@ -168,6 +205,7 @@ describe('Filter Transformer', () => {
         ctx.filter = gen.randomFilter()
         ctx.anotherFilter = gen.randomFilter()
         ctx.fieldName = chance.word()
+        ctx.anotherFieldName = chance.word()
         ctx.fieldValue = chance.word()
         ctx.operator = gen.randomOperator() as WixDataMultiFieldOperators | WixDataSingleFieldOperators
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
