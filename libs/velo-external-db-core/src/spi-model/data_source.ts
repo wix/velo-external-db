@@ -38,8 +38,8 @@ export interface Options {
 }
 
 enum SortOrder {
-    ASC = 'ASC',
-    DESC = 'DESC'
+    ASC = 0,
+    DESC = 1
 }
 
 export interface QueryResponsePart {
