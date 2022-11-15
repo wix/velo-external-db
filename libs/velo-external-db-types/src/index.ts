@@ -116,11 +116,12 @@ export type AdapterAggregation = {
 export interface IDataProvider {
     find(collectionName: string, filter: AdapterFilter, sort: any, skip: number, limit: number, projection: string[]): Promise<Item[]>;
     count(collectionName: string, filter: AdapterFilter): Promise<number>;
-    insert(collectionName: string, items: Item[], fields?: ResponseField[]): Promise<number>;
+    insert(collectionName: string, items: Item[], fields?: ResponseField[], upsert?: boolean): Promise<number>;
     update(collectionName: string, items: Item[], fields?: any): Promise<number>;
     delete(collectionName: string, itemIds: string[]): Promise<number>;
     truncate(collectionName: string): Promise<void>;
-    aggregate?(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation): Promise<Item[]>;
+    // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
+    aggregate?(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation, sort?: Sort[], skip?: number, limit?: number ): Promise<Item[]>;
 }
 
 export type TableHeader = {
@@ -224,15 +225,6 @@ export enum WixDataFunction {
     $max = '$max',
     $min = '$min',
     $sum = '$sum',
-}
-
-export type WixDataAggregation = {
-    processingStep: {
-        _id: string |  { [key: string]: any }
-        [key: string]: any
-        // [fieldAlias: string]: {[key in WixDataFunction]: string | number },
-    }
-    postFilteringStep: WixDataFilter
 }
 
 export type WixDataRole = 'OWNER' | 'BACKEND_CODE' | 'MEMBER' | 'VISITOR'
