@@ -1,5 +1,6 @@
 import { Item, WixDataFilter } from '@wix-velo/velo-external-db-types'
-import { AggregationQuery, FindQuery, RequestContext } from './types'
+import { AggregateRequest } from './spi-model/data_source'
+import { FindQuery, RequestContext } from './types'
 
 
 export const DataHooksForAction: { [key: string]: string[] } = {
@@ -92,10 +93,13 @@ export const dataPayloadFor = (operation: DataOperations, body: any) => {
             return { itemIds: body.itemIds as string[] }
         case DataOperations.Aggregate:
             return {
-                filter: body.filter,
-                processingStep: body.processingStep,
-                postFilteringStep: body.postFilteringStep
-            } as AggregationQuery
+                initialFilter: body.initialFilter,
+                distinct: body.distinct,
+                group: body.group,
+                finalFilter: body.finalFilter,
+                sort: body.sort,
+                paging: body.paging,
+            } as Partial<AggregateRequest>
         case DataOperations.Count:
             return { filter: body.filter as WixDataFilter }
     }

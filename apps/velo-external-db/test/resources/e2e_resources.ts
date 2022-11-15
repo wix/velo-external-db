@@ -57,7 +57,7 @@ export const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 export const supportedOperations = testedSuit().supportedOperations
 
 export const setupDb = () => testedSuit().setUpDb()
-export const currentDbImplementationName = () => testedSuit().name
+export const currentDbImplementationName = () => testedSuit().currentDbImplementationName
 export const initApp = async() => {
     env = await testedSuit().initApp()
 }

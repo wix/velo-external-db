@@ -11,6 +11,10 @@ export const stubEmptyFilterFor = (filter: any) => {
         .mockReturnValue(EmptyFilter)
 }
 
+export const stubEmptyFilterForUndefined = () => {
+    stubEmptyFilterFor(undefined)
+}
+
 export const givenFilterByIdWith = (id: any, filter: any) => {
     when(filterTransformer.transform).calledWith(filter)
                                 .mockReturnValue({
