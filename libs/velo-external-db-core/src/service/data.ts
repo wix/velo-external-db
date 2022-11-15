@@ -1,4 +1,4 @@
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, IDataProvider, Item, ResponseField } from '@wix-velo/velo-external-db-types'
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, IDataProvider, Item, ResponseField, Sort } from '@wix-velo/velo-external-db-types'
 import { asWixData } from '../converters/data_utils'
 import { getByIdFilterFor } from '../utils/data_utils'
 
@@ -9,13 +9,14 @@ export default class DataService {
         this.storage = storage
     }
 
-    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any, omitTotalCount?: boolean) {
+    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any, omitTotalCount?: boolean): Promise<{items: any[], totalCount?: number}> {
         const items = this.storage.find(collectionName, _filter, sort, skip, limit, projection)
         const totalCount = omitTotalCount? undefined : this.storage.count(collectionName, _filter)
+
         return {
             items: (await items).map(asWixData),
             totalCount: await totalCount
-        }
+        }     
     }
 
     async getById(collectionName: string, itemId: string, projection: any) {
@@ -32,6 +33,11 @@ export default class DataService {
     async insert(collectionName: string, item: Item, fields?: ResponseField[]) {
         const resp = await this.bulkInsert(collectionName, [item], fields)
         return { item: asWixData(resp.items[0]) }
+    }
+
+    async bulkUpsert(collectionName: string, items: Item[], fields?: ResponseField[]) {
+        await this.storage.insert(collectionName, items, fields, true)
+        return { items: items.map( asWixData ) }
     }
 
     async bulkInsert(collectionName: string, items: Item[], fields?: ResponseField[]) {
@@ -63,11 +69,14 @@ export default class DataService {
         return this.storage.truncate(collectionName)
     }
 
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation) {
+
+    // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number) {
+        const totalCount = this.storage.count(collectionName, filter)
         return {
-            items: ((await this.storage.aggregate?.(collectionName, filter, aggregation)) || [])
+            items: ((await this.storage.aggregate?.(collectionName, filter, aggregation, sort, skip, limit)) || [])
                                       .map( asWixData ),
-            totalCount: 0
+            totalCount: await totalCount
         }
     }
 }

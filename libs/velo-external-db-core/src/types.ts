@@ -1,6 +1,7 @@
 import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
+import { AggregateRequest, Group, Paging, Sorting } from './spi-model/data_source';
 
 
 export interface FindQuery {
@@ -11,20 +12,17 @@ export interface FindQuery {
     omitTotalCount?: boolean;
 }
 
-export type AggregationQuery = {
-    filter?: WixDataFilter,
-    processingStep?: WixDataFilter,
-    postProcessingStep?: WixDataFilter
-}
+
 
 export interface Payload {
     filter?: WixDataFilter | AdapterFilter
-    sort?: Sort;
+    sort?: Sort[] | Sorting[];
     skip?: number;
     limit?: number;
-    postProcessingStep?: WixDataFilter | AdapterFilter;
-    processingStep?: WixDataFilter | AdapterFilter;
-    postFilteringStep?: WixDataFilter | AdapterFilter;
+    initialFilter: WixDataFilter | AdapterFilter;
+    group?: Group;
+    finalFilter?: WixDataFilter | AdapterFilter;
+    paging?: Paging;
     item?: Item;
     items?: Item[];
     itemId?: string;
@@ -86,7 +84,7 @@ export interface DataHooks {
     afterRemove?: Hook<{ itemId: string }>
     beforeBulkRemove?: Hook<{ itemIds: string[] }>
     afterBulkRemove?: Hook<{ itemIds: string[] }>
-    beforeAggregate?: Hook<AggregationQuery>
+    beforeAggregate?: Hook<AggregateRequest>
     afterAggregate?: Hook<{ items: Item[] }>
     beforeCount?: Hook<WixDataFilter>
     afterCount?: Hook<{ totalCount: number }>
