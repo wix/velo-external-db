@@ -15,10 +15,10 @@ describe ('Schema Aware Data Service', () => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.transformedFilter) 
         queryValidator.givenValidProjectionForDefaultFieldsOf(SystemFields)
-        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultFields)  
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultFields, false)  
         patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities)
 
-        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({
+        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, undefined, false)).resolves.toEqual({
                                                                                                                         items: ctx.patchedEntities,
                                                                                                                         totalCount: ctx.totalCount
                                                                                                                     })
@@ -95,9 +95,9 @@ describe ('Schema Aware Data Service', () => {
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter) 
         queryValidator.givenValidAggregationForDefaultFieldsOf(ctx.aggregation)
         
-        data.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
+        data.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
         
-        return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
+        return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
     })
 
     test('schema with _id - find will trigger find request with projection includes _id even if it is not in the projection', async() => {

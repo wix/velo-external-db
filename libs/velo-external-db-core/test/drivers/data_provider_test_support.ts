@@ -18,8 +18,8 @@ export const givenCountResult = (total: any, forCollectionName: any, filter: any
     when(dataProvider.count).calledWith(forCollectionName, filter)
                             .mockResolvedValue(total)
 
-export const givenAggregateResult = (total: any, forCollectionName: any, filter: any, andAggregation: any) =>
-    when(dataProvider.aggregate).calledWith(forCollectionName, filter, andAggregation)
+export const givenAggregateResult = (total: any, forCollectionName: any, filter: any, andAggregation: any, sort: any, skip: any, limit: any) =>
+    when(dataProvider.aggregate).calledWith(forCollectionName, filter, andAggregation, sort, skip, limit)
                                 .mockResolvedValue(total)
 
 export const expectInsertFor = (items: string | any[], forCollectionName: any) =>
