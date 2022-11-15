@@ -8,10 +8,8 @@ export const projectionFieldFor = (fieldName: any, fieldAlias?: string) => {
 }
 
 export const projectionFunctionFor = (fieldName: string | number, fieldAlias: any, func: any) => {
-    if (isCountFunc(func, fieldName))
+    if (func === AdapterFunctions.count)
         return { alias: fieldAlias, function: AdapterFunctions.count, name: '*' }
-    const name = (fieldName as string).substring(1)
-    return { name, alias: fieldAlias || name, function: func }
+    
+    return { name: fieldName as string, alias: fieldAlias || fieldName as string, function: func }
 }
-
-const isCountFunc = (func: any, value: any ) => (func === AdapterFunctions.sum && value === 1)

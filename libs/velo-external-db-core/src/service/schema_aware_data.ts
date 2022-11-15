@@ -1,4 +1,4 @@
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Item, ItemWithId, ResponseField } from '@wix-velo/velo-external-db-types'
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Item, ItemWithId, ResponseField, Sort } from '@wix-velo/velo-external-db-types'
 import QueryValidator from '../converters/query_validator'
 import DataService from './data'
 import CacheableSchemaInformation from './schema_information'
@@ -15,14 +15,15 @@ export default class SchemaAwareDataService {
         this.itemTransformer = itemTransformer
     }
 
-    async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any, omitTotalCount?: boolean): Promise<{ items: ItemWithId[], totalCount: number | undefined}> {
+    async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any, omitTotalCount?: boolean): Promise<{ items: ItemWithId[], totalCount?: number }> {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         await this.validateFilter(collectionName, filter, fields)
         const projection = await this.projectionFor(collectionName, _projection)
         await this.validateProjection(collectionName, projection, fields)
+        await this.dataService.find(collectionName, filter, sort, skip, limit, projection, omitTotalCount)
 
         const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection, omitTotalCount)
-        return { items: this.itemTransformer.patchItems(items, fields), totalCount }
+        return { items: this.itemTransformer.patchItems(items, fields), totalCount }    
     }
 
     async getById(collectionName: string, itemId: string, _projection?: any) {
@@ -44,6 +45,12 @@ export default class SchemaAwareDataService {
         return await this.dataService.insert(collectionName, prepared[0], fields)
     }
     
+    async bulkUpsert(collectionName: string, items: Item[]) {
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        const prepared = await this.prepareItemsForInsert(fields, items)
+        return await this.dataService.bulkUpsert(collectionName, prepared, fields)
+    }
+
     async bulkInsert(collectionName: string, items: Item[]) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         const prepared = await this.prepareItemsForInsert(fields, items)
@@ -72,10 +79,11 @@ export default class SchemaAwareDataService {
         return await this.dataService.truncate(collectionName)
     }
     
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation) {
+    // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number) {
         await this.validateAggregation(collectionName, aggregation)
         await this.validateFilter(collectionName, filter)
-        return await this.dataService.aggregate(collectionName, filter, aggregation)
+        return await this.dataService.aggregate(collectionName, filter, aggregation, sort, skip, limit)
     }
 
     async validateFilter(collectionName: string, filter: Filter, _fields?: ResponseField[]) {
