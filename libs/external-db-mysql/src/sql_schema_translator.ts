@@ -41,14 +41,17 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
                 return 'text'
 
             case 'tinyint':
+            case 'bit':
+            case 'boolean':
+            case 'bool':
                 return 'boolean'
-                
+
             case 'json':
                 return 'object'
 
             default:
-                console.log(type)
-                throw Error(type)
+                console.log('Unknown type', type)
+                return 'text'
         }
     }
 

@@ -37,14 +37,15 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
                 return { type: 'text', subtype: 'string' }
 
             case 'bool':
+            case 'bit':
                 return { type: 'boolean' }
 
             case 'json':
                 return { type: 'object' }
 
             default:
-                console.log(type)
-                throw Error(type)
+                console.log('Unknown type', type)
+                return { type: 'text' }
         }
     }
 

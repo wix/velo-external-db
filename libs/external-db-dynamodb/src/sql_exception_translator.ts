@@ -14,6 +14,8 @@ export const notThrowingTranslateErrorCodes = (err: any) => {
     switch (err.message) {
         case 'Region is missing':
             return new DbConnectionError('Region is missing')
+        case 'Cannot read properties of undefined (reading \'sso_session\')':
+            return new DbConnectionError('AWS_SECRET_ACCESS_KEY or AWS_ACCESS_KEY_ID are missing')
         default:
             return new Error(`default ${err.message}`)
     }

@@ -124,9 +124,13 @@ describe('Sql Schema Column Translator', () => {
 
         describe('other fields', () => {
             test('boolean', () => {
-                ['tinyint'].forEach(t => {
+                ['tinyint', 'bit'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual('boolean')
                 })
+            })
+            
+            test('unknown type should return text', () => { 
+                expect( env.schemaTranslator.translateType('unknown') ).toEqual('text')
             })
         })
     })
