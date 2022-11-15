@@ -95,9 +95,10 @@ describe('Data Service', () => {
     })
 
     test('aggregate api', async() => {
-        driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
+        driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
+        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
 
-        return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
+        return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({ items: ctx.entities, totalCount: ctx.total })
     })
 
 

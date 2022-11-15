@@ -3,12 +3,11 @@ import { AdapterAggregation, AdapterFunctions, FieldProjection, FunctionProjecti
 import { IFilterTransformer } from './filter_transformer'
 import { projectionFieldFor, projectionFunctionFor } from './utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
+import { Aggregation, Group } from '../spi-model/data_source'
 const { InvalidQuery } = errors
 
 interface IAggregationTransformer {
-    transform(aggregation: any): AdapterAggregation
-    extractProjectionFunctions(functionsObj: { [x: string]: { [s: string]: string | number } }): FunctionProjection[]
-    extractProjectionFields(fields: { [fieldName: string]: string } | string): FieldProjection[]
+    transform(aggregation: { group: Group, finalFilter?: any }): AdapterAggregation
     wixFunctionToAdapterFunction(wixFunction: string): AdapterFunctions
 }
 
@@ -18,13 +17,13 @@ export default class AggregationTransformer implements IAggregationTransformer {
         this.filterTransformer = filterTransformer
     }
 
-    transform({ processingStep, postFilteringStep }: any): AdapterAggregation {        
-        const { _id: fields, ...functions } = processingStep
+    transform({ group, finalFilter }: { group: Group, finalFilter?: any }): AdapterAggregation {        
+        const { by: fields, aggregation } = group
 
-        const projectionFields = this.extractProjectionFields(fields)
-        const projectionFunctions = this.extractProjectionFunctions(functions)
-
-        const postFilter = this.filterTransformer.transform(postFilteringStep)
+        const projectionFields = fields.map(f => ({ name: f }))
+        const projectionFunctions = this.aggregationToProjectionFunctions(aggregation)
+        
+        const postFilter = this.filterTransformer.transform(finalFilter)
 
         const projection = [...projectionFields, ...projectionFunctions]
 
@@ -34,48 +33,19 @@ export default class AggregationTransformer implements IAggregationTransformer {
         }
     }
 
-    extractProjectionFunctions(functionsObj: { [x: string]: { [s: string]: string | number } }) {
-        const projectionFunctions: { name: any; alias: any; function: any }[] = []
-        Object.keys(functionsObj)
-              .forEach(fieldAlias => {
-                  Object.entries(functionsObj[fieldAlias])
-                        .forEach(([func, field]) => {
-                            projectionFunctions.push(projectionFunctionFor(field, fieldAlias, this.wixFunctionToAdapterFunction(func)))
-                        })
-                })
-
-        return projectionFunctions
-    }
-
-    extractProjectionFields(fields: { [fieldName: string]: string } | string) {
-        const projectionFields = []
-
-        if (isObject(fields)) {
-            projectionFields.push(...Object.values(fields).map(f => projectionFieldFor(f)) )
-        } else {
-            projectionFields.push(projectionFieldFor(fields))
-        }
-        
-        return projectionFields
+    aggregationToProjectionFunctions(aggregations: Aggregation[]) {
+        return aggregations.map(aggregation => {
+            const { name: fieldAlias, ...rest } = aggregation
+            const [func, field] = Object.entries(rest)[0]
+            return projectionFunctionFor(field, fieldAlias, this.wixFunctionToAdapterFunction(func))
+        })
     }
 
     wixFunctionToAdapterFunction(func: string): AdapterFunctions {
-        return this.wixFunctionToAdapterFunctionString(func) as AdapterFunctions
-    }
-
-    private wixFunctionToAdapterFunctionString(func: string): string {
-        switch (func) {
-            case '$avg':
-                return AdapterFunctions.avg
-            case '$max':
-                return AdapterFunctions.max
-            case '$min':
-                return AdapterFunctions.min
-            case '$sum':
-                return AdapterFunctions.sum
-            
-            default:
-                throw new InvalidQuery(`Unrecognized function ${func}`)
+        if (Object.values(AdapterFunctions).includes(func as any)) {
+            return AdapterFunctions[func as AdapterFunctions] as AdapterFunctions
         }
+
+        throw new InvalidQuery(`Unrecognized function ${func}`)
     }
 }
