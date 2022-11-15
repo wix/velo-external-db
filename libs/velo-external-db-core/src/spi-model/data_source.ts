@@ -44,7 +44,23 @@ enum SortOrder {
 
 export interface QueryResponsePart {
     item?: any;
-    pagingMetadata?: PagingMetadataV2
+    pagingMetadata?: PagingMetadataV2;
+}
+
+export class QueryResponsePart {
+    static item(item: any): QueryResponsePart {
+        return {
+            item: item
+        } as QueryResponsePart
+    }
+
+    static pagingMetadata(count?: number, offset?: number, total?: number): QueryResponsePart {
+        return {
+            pagingMetadata: {
+                count, offset, total, tooManyToCount: false
+            } as PagingMetadataV2
+        }
+    }
 }
 
 export interface PagingMetadataV2 {
@@ -161,22 +177,24 @@ export interface Group {
     // properties to group by, if empty single group would be created
     by: string[];
     // aggregations, resulted group will contain field with given name and aggregation value
-    aggregation: Aggregation;
+    aggregation: Aggregation[];
 }
 
 export interface Aggregation {
     // result property name
     name: string;
+
+    //TODO: should be one of the following
     // property to calculate average of
-    avg: string;
+    avg?: string;
     // property to calculate min of
-    min: string;
+    min?: string;
     // property to calculate max of
-    max: string;
+    max?: string;
     // property to calculate sum of
-    sum: string;
+    sum?: string;
     // count items, value is always 1
-    count: number;
+    count?: number;
 }
 
 export interface AggregateResponsePart {
@@ -206,6 +224,22 @@ export interface AggregateResponsePart {
     pagingMetadata?: PagingMetadataV2;
 }
 
+export class AggregateResponsePart {
+    static item(item: any) {
+        return {
+            item
+        } as AggregateResponsePart
+    }
+
+    static pagingMetadata(count?: number, offset?: number, total?: number): QueryResponsePart {
+        return {
+            pagingMetadata: {
+                count, offset, total, tooManyToCount: false
+            } as PagingMetadataV2
+        }
+    }
+}
+
 export interface InsertRequest {
     // collection name
     collectionId: string;
@@ -223,6 +257,20 @@ export interface InsertResponsePart {
     item?: any;
     // error from [errors list](errors.proto)
     error?: ApplicationError;
+}
+
+export class InsertResponsePart {
+    static item(item: any) {
+        return {
+            item
+        } as InsertResponsePart
+    }
+
+    static error(error: ApplicationError) {
+        return {
+            error
+        } as InsertResponsePart
+    }
 }
 
 export interface UpdateRequest {
@@ -243,6 +291,20 @@ export interface UpdateResponsePart {
     error?: ApplicationError;
 }
 
+export class UpdateResponsePart {
+    static item(item: any) {
+        return {
+            item
+        } as UpdateResponsePart
+    }
+
+    static error(error: ApplicationError) {
+        return {
+            error
+        } as UpdateResponsePart
+    }
+}
+
 export interface RemoveRequest {
     // collection name
     collectionId: string;
@@ -260,6 +322,20 @@ export interface RemoveResponsePart {
     item?: any;
     // error from [errors list](errors.proto)
     error?: ApplicationError;
+}
+
+export class RemoveResponsePart {
+    static item(item: any) {
+        return {
+            item
+        } as RemoveResponsePart
+    }
+
+    static error(error: ApplicationError) {
+        return {
+            error
+        } as RemoveResponsePart
+    }
 }
 
 export interface TruncateRequest {
