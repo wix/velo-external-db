@@ -127,9 +127,13 @@ describe('Sql Schema Column Translator', () => {
 
         describe('other fields', () => {
             test('boolean', () => {
-                ['BOOL'].forEach(t => {
+                ['BOOL', 'bit'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'boolean' })
                 })
+            })
+            
+            test('unknown type should return text', () => { 
+                expect( env.schemaTranslator.translateType('unknown') ).toEqual({ type: 'text' })
             })
         })
     })
