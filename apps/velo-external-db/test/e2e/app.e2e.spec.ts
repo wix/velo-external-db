@@ -22,6 +22,15 @@ describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
         expect((await axios.post('/provision', { }, authOwner)).data).toEqual(expect.objectContaining({ protocolVersion: 2, vendor: 'azure' }))
     })
 
+    test('answer capability', async() => {
+                                  
+        expect((await axios.get('/capabilities', { }, authOwner)).data).toEqual(expect.objectContaining({ 
+            capabilities: {
+                collection: [0]
+            }
+         }))
+    })
+
 
     afterAll(async() => await teardownApp())
 
