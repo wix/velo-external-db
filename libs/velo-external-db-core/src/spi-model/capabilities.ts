@@ -12,5 +12,5 @@ export interface Capabilities {
 
 export enum CollectionCapability {
     // Supports creating new collections.
-    CREATE = 0
+    CREATE = 'CREATE'
 }

@@ -26,7 +26,7 @@ describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
                                   
         expect((await axios.get('/capabilities', { }, authOwner)).data).toEqual(expect.objectContaining({ 
             capabilities: {
-                collection: [0]
+                collection: ['CREATE']
             }
          }))
     })
