@@ -1,6 +1,7 @@
 import { authOwner } from '@wix-velo/external-db-testkit'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } from '../resources/e2e_resources'
 
+import { CollectionCapability } from '@wix-velo/velo-external-db-core'
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
@@ -26,7 +27,7 @@ describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
                                   
         expect((await axios.get('/capabilities', { }, authOwner)).data).toEqual(expect.objectContaining({ 
             capabilities: {
-                collection: ['CREATE']
+                collection: [CollectionCapability.CREATE]
             }
          }))
     })
