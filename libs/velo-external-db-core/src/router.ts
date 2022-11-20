@@ -24,6 +24,7 @@ import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
 import * as dataSource from './spi-model/data_source'
+import * as capabilities from './spi-model/capabilities'
 
 const { InvalidRequest, ItemNotFound } = errors
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
@@ -84,7 +85,7 @@ export const createRouter = () => {
     router.use(express.json())
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
-    router.use(unless(['/', '/provision', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: cfg.secretKey })))
+    router.use(unless(['/', '/provision', '/capabilities', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: cfg.secretKey })))
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
@@ -103,6 +104,16 @@ export const createRouter = () => {
         const appInfoPage = await getAppInfoPage(appInfo)
 
         res.send(appInfoPage)
+    })
+
+    router.get('/capabilities', async(req, res) => {
+        const capabilitiesResponse = {
+            capabilities: {
+                collection: [capabilities.CollectionCapability.CREATE]
+            } as capabilities.Capabilities
+        } as capabilities.GetCapabilitiesResponse
+
+        res.json(capabilitiesResponse)
     })
 
     router.post('/provision', async(req, res) => {
