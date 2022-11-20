@@ -16,6 +16,7 @@ import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } from '@wix-velo/external-db-config'
 import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
+import { CollectionCapability } from './spi-model/capabilities'
 
 export class ExternalDbRouter {
     connector: DbConnector
@@ -66,4 +67,4 @@ export class ExternalDbRouter {
     }
 }
 
-export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext }
+export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext, CollectionCapability }
