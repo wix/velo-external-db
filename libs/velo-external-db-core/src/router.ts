@@ -271,7 +271,7 @@ export const createRouter = () => {
         const { collectionIds } = req.body
         try {
             const data = await schemaService.listCollections(collectionIds)
-            res.json(data)
+            streamCollection(data.collection, res)
         } catch (e) {
             next(e)
         }
@@ -283,29 +283,29 @@ export const createRouter = () => {
 
         try {
             const data = await schemaService.createCollection(collection)
-            res.json(data)
+            streamCollection([data.collection], res)
         } catch (e) {
             next(e)
         }
     })
 
     router.post('/collections/update', async(req, res, next) => {
-        const { collection  } = req.body
+        const { collection } = req.body
 
         try {
             const data = await schemaService.updateCollection(collection)
-            res.json(data)
+            streamCollection([data.collection], res)
         } catch (e) {
             next(e)
         }
     })
 
     router.post('/collections/delete', async(req, res, next) => {
-
         const { collectionId } = req.body
+
         try {
             const data = await schemaService.deleteCollection(collectionId)
-            res.json(data)
+            streamCollection([data.collection], res)
         } catch (e) {
             next(e)
         }
