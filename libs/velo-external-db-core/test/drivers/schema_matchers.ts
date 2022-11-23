@@ -28,7 +28,7 @@ export const schemaHeadersListFor = (collections: any) => toHaveSchemas(collecti
 export const schemasWithReadOnlyCapabilitiesFor = (collections: any) => toHaveSchemas(collections, collectionToHaveReadOnlyCapability)
 
 
-const toHaveCollection = ( collections: any[], functionOnEachCollection: any, ...args: any ) => ({
+const toHaveCollection = ( collections: any[], functionOnEachCollection: any, ...args: any ) =>  expect.objectContaining({
     collection: collections.map((c: any) => functionOnEachCollection(c, args))
 })
 
@@ -71,7 +71,7 @@ export const capabilitiesInNewWixFormat = () => expect.objectContaining({
     collectionOperations: expect.any(Array),
 })
 
-export const collectionInNewWixFormat = (collection: any, args: any) => {
+export const collectionsInNewWixFormat = (collection: any, args: any) => {
     const [collectionsCapabilities] = args
     return expect.objectContaining({
         id: collection.id,
@@ -82,4 +82,4 @@ export const collectionInNewWixFormat = (collection: any, args: any) => {
     })
 }
 
-export const collectionsListFor = (collections: any, collectionsCapabilities: any) => toHaveCollection(collections, collectionInNewWixFormat, collectionsCapabilities)
+export const collectionsListFor = (collections: any, collectionsCapabilities: any) => toHaveCollection(collections, collectionsInNewWixFormat, collectionsCapabilities)

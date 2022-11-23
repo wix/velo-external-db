@@ -93,8 +93,10 @@ describe('Schema Service', () => {
             driver.givenAllSchemaOperations()
             driver.expectCreateOf(ctx.collectionName)
             schema.expectSchemaRefresh()
-    
-            await expect(env.schemaService.createCollection({ id: ctx.collectionName, fields: [] })).resolves.toEqual({ id: ctx.collectionName, fields: [] })
+
+            await expect(env.schemaService.createCollection({ id: ctx.collectionName, fields: [] })).resolves.toEqual({
+                collection: { id: ctx.collectionName, fields: [] } 
+            })
         })
 
         test('create collection name with fields', async() => {
@@ -106,7 +108,9 @@ describe('Schema Service', () => {
             schema.expectSchemaRefresh()            
             driver.expectCreateWithFieldsOf(ctx.collectionName, fields)
     
-            await expect(env.schemaService.createCollection({ id: ctx.collectionName, fields })).resolves.toEqual({ id: ctx.collectionName, fields })
+            await expect(env.schemaService.createCollection({ id: ctx.collectionName, fields })).resolves.toEqual({
+                collection: { id: ctx.collectionName, fields }
+            })
         })
     })
     
@@ -119,11 +123,11 @@ describe('Schema Service', () => {
         invalidOperations: Uninitialized,
     }
 
-    interface Enviorment {
+    interface Environment {
         schemaService: SchemaService
     }
 
-    const env: Enviorment = {
+    const env: Environment = {
         schemaService: Uninitialized,
     }
 
