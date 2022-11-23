@@ -71,6 +71,12 @@ export default class SchemaService {
     }
 
     async listCollections(collectionIds: string[]): Promise<ListCollectionsResponsePart> {
+        
+        // remove in the end of development
+        if (!this.storage.capabilities || !this.storage.columnCapabilitiesFor) {
+            throw new Error('Your storage does not support the new collection capabilities API')
+        }
+        
         const collections = collectionIds.length === 0 ? 
             await this.storage.list() : 
             await Promise.all(collectionIds.map(async(collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
@@ -87,6 +93,10 @@ export default class SchemaService {
 
     formatFields(fields: ResponseField[]): Field[] {
         const getFieldCapabilities = (type: string): FieldCapabilities => {
+            // remove in the end of development
+            if (!this.storage.columnCapabilitiesFor) {
+                throw new Error('Your storage does not support the new collection capabilities API')
+            }
             const { sortable, columnQueryOperators } = this.storage.columnCapabilitiesFor(type)
             return {
                 sortable,
@@ -130,6 +140,11 @@ export default class SchemaService {
     async updateCollection(collection: Collection): Promise<UpdateCollectionResponse> {
         await this.validateOperation(Create)
         
+        // remove in the end of development
+        if (!this.storage.changeColumnType) {
+            throw new Error('Your storage does not support the new collection capabilities API')
+        }
+
         const collectionColumnsInRequest = collection.fields
         const collectionColumnsInDb = await this.storage.describeCollection(collection.id)
         const collectionColumnsNamesInDb = collectionColumnsInDb.map(f => f.field)
@@ -149,7 +164,8 @@ export default class SchemaService {
 
         await Promise.all(columnsToRemove.map(async(field) => await this.storage.removeColumn(collection.id, field.field)))
 
-        await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType(collection.id, {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType!(collection.id, {
             name: field.key,
             type: convertEnumToFieldType(field.type)
         })))

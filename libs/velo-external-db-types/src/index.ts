@@ -188,12 +188,12 @@ export interface ISchemaProvider {
     create(collectionName: string, columns?: InputField[]): Promise<void>
     addColumn(collectionName: string, column: InputField): Promise<void>
     removeColumn(collectionName: string, columnName: string): Promise<void>
-    changeColumnType(collectionName: string, column: InputField): Promise<void>
+    changeColumnType?(collectionName: string, column: InputField): Promise<void>
     describeCollection(collectionName: string): Promise<ResponseField[]>
     drop(collectionName: string): Promise<void>
     translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
-    columnCapabilitiesFor(columnType: string): ColumnCapabilities
-    capabilities(): DbCapabilities
+    columnCapabilitiesFor?(columnType: string): ColumnCapabilities
+    capabilities?(): DbCapabilities
 }
 
 export interface IBaseHttpError extends Error {}

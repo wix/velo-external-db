@@ -11,25 +11,25 @@ export interface ListCollectionsRequest {
     collectionIds: string[];
 }
 export interface ListCollectionsResponsePart {
-    collection?: Collection[];
+    collection: Collection[];
 }
 export interface DeleteCollectionRequest {
     collectionId: string;
 }
 export interface DeleteCollectionResponse {
-    collection?: Collection;
+    collection: Collection;
 }
 export interface CreateCollectionRequest {
-    collection?: Collection;
+    collection: Collection;
 }
 export interface CreateCollectionResponse {
-    collection?: Collection;
+    collection: Collection;
 }
 export interface UpdateCollectionRequest {
-    collection?: Collection;
+    collection: Collection;
 }
 export interface UpdateCollectionResponse {
-    collection?: Collection;
+    collection: Collection;
 }
 export interface Collection {
     id: string;
