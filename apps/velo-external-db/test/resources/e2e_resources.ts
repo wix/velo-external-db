@@ -41,17 +41,19 @@ export let env:{
     externalDbRouter: Uninitialized
 }
 
+const createAppWithWixDataBaseUrl = createApp.bind(null, wixDataBaseUrl())
+
 const testSuits = {
-    mysql: new E2EResources(mysql, createApp(wixDataBaseUrl())),
-    postgres: new E2EResources(postgres, createApp()),
-    spanner: new E2EResources(spanner, createApp()),
-    firestore: new E2EResources(firestore, createApp()),
-    mssql: new E2EResources(mssql, createApp()),
-    mongo: new E2EResources(mongo, createApp()),
-    'google-sheet': new E2EResources(googleSheet, createApp()),
-    airtable: new E2EResources(airtable, createApp()),
-    dynamodb: new E2EResources(dynamo, createApp()),
-    bigquery: new E2EResources(bigquery, createApp()),
+    mysql: new E2EResources(mysql, createAppWithWixDataBaseUrl),
+    postgres: new E2EResources(postgres, createApp),
+    spanner: new E2EResources(spanner, createApp),
+    firestore: new E2EResources(firestore, createApp),
+    mssql: new E2EResources(mssql, createApp),
+    mongo: new E2EResources(mongo, createApp),
+    'google-sheet': new E2EResources(googleSheet, createApp),
+    airtable: new E2EResources(airtable, createApp),
+    dynamodb: new E2EResources(dynamo, createApp),
+    bigquery: new E2EResources(bigquery, createApp),
 }
 
 export const testedSuit = () => testSuits[process.env.TEST_ENGINE]

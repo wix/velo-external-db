@@ -40,7 +40,7 @@ const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
     return { externalDbRouter, cleanup: async() => await cleanup(), schemaProvider: providers.schemaProvider }
 }
 
-export const createApp = (wixDataBaseUrl?: string) => async() => {
+export const createApp = async(wixDataBaseUrl?: string) => {
     const app = express()
     const initConnectorResponse = await initConnector(wixDataBaseUrl)
     app.use(initConnectorResponse.externalDbRouter.router)
