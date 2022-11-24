@@ -1,4 +1,8 @@
 import { WixDataFacade } from '../../src/web/wix_data_facade'
+import * as jwt from "jsonwebtoken";
+import {decodeBase64} from "../../src/utils/base64_utils";
+import { authConfig } from '@wix-velo/test-commons'
+
 
 export const requestBodyWith = (role?: string | undefined, path?: string | undefined, authHeader?: string | undefined) => ({
     path: path || '/',
@@ -7,9 +11,11 @@ export const requestBodyWith = (role?: string | undefined, path?: string | undef
             role: role || 'OWNER',
             settings: {
             } } },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    header(name: string) { return authHeader }
+    header(_name: string) { return authHeader }
 } )
+
+export const signedToken = (payload: Object, expiration: string = '10000ms') =>
+    jwt.sign(payload, decodeBase64(authConfig.authPrivateKey), { algorithm: 'RS256', expiresIn: expiration })
 
 export class WixDataFacadeMock implements WixDataFacade {
     publicKeys: string[]
@@ -20,8 +26,7 @@ export class WixDataFacadeMock implements WixDataFacade {
         this.index = 0
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    getPublicKey(externalDatabaseId: string): Promise<string> {
+    getPublicKey(_externalDatabaseId: string): Promise<string> {
         const publicKeyToReturn = this.publicKeys[this.index]
         if (this.index < this.publicKeys.length-1) {
             this.index++

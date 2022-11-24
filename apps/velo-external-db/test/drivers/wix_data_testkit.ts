@@ -7,18 +7,18 @@ app.set('case sensitive routing', true)
 
 app.use(express.json())
 
-app.get('/v1/external-databases/:externalDatabaseId', (req, res) => {
+app.get('/v1/external-databases/:externalDatabaseId', (_req, res) => {
     res.json({
         publicKey: authConfig.authPublicKey
     })
 })
 
-app.use(function(req, res) {
+app.use((_req, res) => {
     res.status(404)
     res.json({ error: 'NOT_FOUND' })
 })
 
-app.use((err, req, res, next) => {
+app.use((err, _req, res, next) => {
     res.status(err.status)
     res.json({
         error: {
@@ -29,5 +29,3 @@ app.use((err, req, res, next) => {
     })
     next()
 })
-
-module.exports = { app }

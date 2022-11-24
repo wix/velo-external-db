@@ -29,12 +29,12 @@ const appendJWTHeaderToRequest = (dataRaw: string, headers: AxiosRequestHeaders)
 
 const TOKEN_ISSUER = 'wix-data.wix.com'
 
-function createJwtHeader(): string {
+const createJwtHeader = () => {
     const token = jwt.sign({ iss: TOKEN_ISSUER, metasite: allowedMetasite }, decodeBase64(authConfig.authPrivateKey), { algorithm: 'RS256' })
     return `Bearer ${token}`
 }
 
-function decodeBase64(data: string): string {
+const decodeBase64 = (data: string) => {
     const buff = Buffer.from(data, 'base64')
     return buff.toString('ascii')
 }
