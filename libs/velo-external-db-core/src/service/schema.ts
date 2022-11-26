@@ -1,7 +1,7 @@
 import { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, errors } from '@wix-velo/velo-external-db-commons'
 import { InputField, ISchemaProvider, Table, SchemaOperations, ResponseField, DbCapabilities } from '@wix-velo/velo-external-db-types'
 import { Collection, CollectionCapabilities, CollectionOperation, CreateCollectionResponse, DataOperation, DeleteCollectionResponse, Field, FieldCapabilities, FieldType, ListCollectionsResponsePart, UpdateCollectionResponse } from '../spi-model/collection'
-import { convertQueriesToQueryOperatorsEnum, convertFieldTypeToEnum, convertEnumToFieldType, convertWixFormatFieldsToInputFields, convertResponseFieldToWixFormat } from '../utils/schema_utils'
+import { convertQueriesToQueryOperatorsEnum, convertFieldTypeToEnum, convertEnumToFieldType, convertWixFormatFieldsToInputFields, convertResponseFieldToWixFormat, subtypeToFieldType } from '../utils/schema_utils'
 import CacheableSchemaInformation from './schema_information'
 const { Create, AddColumn, RemoveColumn } = SchemaOperations
 
@@ -157,13 +157,17 @@ export default class SchemaService {
             return fieldInDb && fieldInDb.type !== convertEnumToFieldType(f.type)
         })
 
+        // Adding columns
         await Promise.all(columnsToAdd.map(async(field) => await this.storage.addColumn(collection.id, {
             name: field.key as string,
-            type: convertEnumToFieldType(field.type)
+            type: convertEnumToFieldType(field.type),
+            subtype: subtypeToFieldType(field.type)
         })))
 
+        // Removing columns
         await Promise.all(columnsToRemove.map(async(field) => await this.storage.removeColumn(collection.id, field.field)))
 
+        // Changing columns type
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType!(collection.id, {
             name: field.key,

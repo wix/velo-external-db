@@ -45,6 +45,29 @@ export const convertEnumToFieldType = (fieldEnum: number): string => {
     }
 }
 
+export const subtypeToFieldType = (fieldEnum: number): string => {
+    switch (fieldEnum) {
+        case FieldType.text:
+        case FieldType.longText:
+            return 'string'
+        case FieldType.number:
+            return 'int'
+        case FieldType.datetime:
+            return 'datetime'
+        case FieldType.boolean:
+            return ''
+        case FieldType.object:
+            return ''
+
+        case FieldType.singleReference:
+        case FieldType.multiReference:
+        default:
+            // TODO: throw specific error
+            throw new Error(`There is no subtype for this type: ${fieldEnum}`)
+    }
+
+}
+
 export const convertQueryOperatorsToEnum = (queryOperator: string): QueryOperator => {
     switch (queryOperator) {
         case eq:
