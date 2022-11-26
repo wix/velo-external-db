@@ -40,3 +40,35 @@ const toHaveCollections = (collections: string[]) => expect.objectContaining( {
 const listToHaveCollection = (collectionName: string) => expect.objectContaining( {
     schemas: expect.arrayContaining( [ expect.objectContaining( { id: collectionName } ) ] )
 } )
+
+const collectionCapabilities = (_collectionOperations: any[], _dataOperations: any[], _fieldTypes: any[]) =>
+    expect.objectContaining({
+        collectionOperations: expect.any(Array),
+        dataOperations: expect.any(Array),
+        fieldTypes: expect.any(Array)
+    })
+
+const fieldCapabilitiesMatcher = () => expect.objectContaining({
+    queryOperators: expect.any(Array),
+    sortable: expect.any(Boolean),
+})
+
+const filedMatcher = (field: InputField) => expect.objectContaining({
+    key: field.name,
+    capabilities: fieldCapabilitiesMatcher(),
+    encrypted: expect.any(Boolean),
+    type: expect.any(Number)
+})
+
+const fieldsMatcher = (fields: InputField[]) => expect.objectContaining(fields.map(filedMatcher))
+
+export const collectionResponse = (collectionName: string, fields: InputField[]) => expect.objectContaining({
+    id: collectionName,
+    capabilities: collectionCapabilities([], [], []),
+    fields: fieldsMatcher(fields),
+})
+
+export const createCollectionResponse = (collectionName: string, fields: InputField[]) => expect.objectContaining({
+    id: collectionName,
+    fields: fieldsMatcher(fields),
+})
