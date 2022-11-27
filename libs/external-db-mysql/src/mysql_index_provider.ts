@@ -1,11 +1,11 @@
 import { promisify } from 'util'
 import { Pool as MySqlPool } from 'mysql'
 import { MySqlQuery } from './types'
-import { DomainIndex } from '@wix-velo/velo-external-db-types'
+import { DomainIndex, IIndexProvider } from '@wix-velo/velo-external-db-types'
 import { escapeId, escapeTable } from './mysql_utils'
 import { translateErrorCodes } from './sql_exception_translator'
 
-export default class IndexProvider {
+export default class IndexProvider implements IIndexProvider{
     pool: MySqlPool
     query: MySqlQuery
     constructor(pool: any) {
