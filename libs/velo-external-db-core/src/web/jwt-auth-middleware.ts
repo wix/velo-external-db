@@ -8,7 +8,7 @@ import { WixDataFacade } from './wix_data_facade'
 export const TOKEN_ISSUER = 'wix-data.wix.com'
 
 export class JwtAuthenticator {
-    publicKey: string | undefined = undefined
+    publicKey: string | undefined
     externalDatabaseId: string
     allowedMetasites: string[]
     wixDataFacade: WixDataFacade
@@ -23,12 +23,9 @@ export class JwtAuthenticator {
         return async(req: express.Request, res: express.Response, next: express.NextFunction) => {
             try {
                 const token = this.extractToken(req.header('Authorization'))
-                if (this.publicKey === undefined) {
-                    this.publicKey = await this.wixDataFacade.getPublicKey(this.externalDatabaseId)
-                }
+                this.publicKey = this.publicKey ?? await this.wixDataFacade.getPublicKey(this.externalDatabaseId)
                 await this.verify(token)
-            } catch (err) {
-                // @ts-ignore
+            } catch (err: any) {
                 console.error('Authorization failed: ' + err.message)
                 next(new UnauthorizedError('You are not authorized'))
             }
@@ -46,16 +43,12 @@ export class JwtAuthenticator {
     }
 
     async verify(token: string) {
-        const { iss, metasite } = await this.verifyWithRetry(token) as { iss: string, metasite: string }
+        const { iss, metasite } = await this.verifyWithRetry(token) as JwtPayload
 
-        if (iss === undefined || iss !== TOKEN_ISSUER) {
-            // console.error(`Unauthorized: ${iss ? `wrong issuer ${iss}` : 'no issuer'}`)
-            // throw new UnauthorizedError('You are not authorized')
+        if (iss !== TOKEN_ISSUER) {
             throw new UnauthorizedError(`Unauthorized: ${iss ? `wrong issuer ${iss}` : 'no issuer'}`)
         }
         if (metasite === undefined || !this.allowedMetasites.includes(metasite)) {
-            // console.error(`Unauthorized: ${metasite ? `metasite not allowed ${metasite}` : 'no metasite'}`)
-            // throw new UnauthorizedError('You are not authorized')
             throw new UnauthorizedError(`Unauthorized: ${metasite ? `metasite not allowed ${metasite}` : 'no metasite'}`)
         }
     }

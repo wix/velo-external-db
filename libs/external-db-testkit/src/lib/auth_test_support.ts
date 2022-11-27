@@ -2,6 +2,7 @@ import * as Chance from 'chance'
 import { AxiosRequestHeaders } from 'axios'
 import * as jwt from 'jsonwebtoken'
 import { authConfig } from '@wix-velo/test-commons'
+import { decodeBase64 } from '@wix-velo/velo-external-db-core'
 
 const chance = Chance()
 const axios = require('axios').create({
@@ -32,11 +33,6 @@ const TOKEN_ISSUER = 'wix-data.wix.com'
 const createJwtHeader = () => {
     const token = jwt.sign({ iss: TOKEN_ISSUER, metasite: allowedMetasite }, decodeBase64(authConfig.authPrivateKey), { algorithm: 'RS256' })
     return `Bearer ${token}`
-}
-
-const decodeBase64 = (data: string) => {
-    const buff = Buffer.from(data, 'base64')
-    return buff.toString('ascii')
 }
 
 export const authAdmin = { transformRequest: axios.defaults

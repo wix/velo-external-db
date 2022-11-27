@@ -17,7 +17,7 @@ describe('JWT Auth Middleware', () => {
 
     test('should authorize when JWT valid', async() => {
         const token = signedToken({iss: TOKEN_ISSUER, metasite: ctx.metasite})
-        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), Uninitialized, ctx.next)
+        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), null, ctx.next)
 
         expect(ctx.next).toHaveBeenCalledWith()
     })
@@ -25,35 +25,35 @@ describe('JWT Auth Middleware', () => {
     test('should authorize when JWT valid, only with second public key', async() => {
         const token = signedToken({iss: TOKEN_ISSUER, metasite: ctx.metasite})
         env.auth = new JwtAuthenticator(ctx.externalDatabaseId, ctx.allowedMetasites, new WixDataFacadeMock(decodeBase64(authConfig.otherAuthPublicKey), decodeBase64(authConfig.authPublicKey))).authorizeJwt()
-        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), Uninitialized, ctx.next)
+        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), null, ctx.next)
 
         expect(ctx.next).toHaveBeenCalledWith()
     })
 
     test('should throw when JWT metasite is not allowed', async() => {
         const token = signedToken({iss: TOKEN_ISSUER, metasite: chance.word()})
-        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), Uninitialized, ctx.next)
+        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), null, ctx.next)
 
         expect(ctx.next).toHaveBeenCalledWith(new UnauthorizedError('You are not authorized'))
     })
 
     test('should throw when JWT has no metasite claim', async() => {
         const token = signedToken({iss: TOKEN_ISSUER})
-        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), Uninitialized, ctx.next)
+        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), null, ctx.next)
 
         expect(ctx.next).toHaveBeenCalledWith(new UnauthorizedError('You are not authorized'))
     })
 
     test('should throw when JWT issuer is not Wix-Data', async() => {
         const token = signedToken({iss: chance.word(), metasite: ctx.metasite})
-        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), Uninitialized, ctx.next)
+        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), null, ctx.next)
 
         expect(ctx.next).toHaveBeenCalledWith(new UnauthorizedError('You are not authorized'))
     })
 
     test('should throw when JWT has no issuer', async() => {
         const token = signedToken({metasite: ctx.metasite})
-        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), Uninitialized, ctx.next)
+        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), null, ctx.next)
 
         expect(ctx.next).toHaveBeenCalledWith(new UnauthorizedError('You are not authorized'))
     })
@@ -61,7 +61,7 @@ describe('JWT Auth Middleware', () => {
     test('should throw when JWT is expired', async() => {
         const token = signedToken({iss: TOKEN_ISSUER, metasite: ctx.metasite}, '10ms')
         await sleep(1000)
-        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), Uninitialized, ctx.next)
+        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), null, ctx.next)
 
         expect(ctx.next).toHaveBeenCalledWith(new UnauthorizedError('You are not authorized'))
     })

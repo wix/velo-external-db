@@ -1,6 +1,6 @@
 import { WixDataFacade } from '../../src/web/wix_data_facade'
-import * as jwt from "jsonwebtoken";
-import {decodeBase64} from "../../src/utils/base64_utils";
+import * as jwt from 'jsonwebtoken'
+import { decodeBase64 } from '../../src/utils/base64_utils'
 import { authConfig } from '@wix-velo/test-commons'
 
 

@@ -26,8 +26,6 @@ export class WixDataFacadeImpl implements WixDataFacade {
             },
         })
         if (status !== 200) {
-            // console.error(`failed to get public key: status ${status}`)
-            // throw new UnauthorizedError('You are not authorized')
             throw new UnauthorizedError(`failed to get public key: status ${status}`)
         }
         return decodeBase64(data.publicKey)
