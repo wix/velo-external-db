@@ -13,14 +13,13 @@ export default class IndexProvider implements IIndexProvider{
         this.query = promisify(this.pool.query).bind(this.pool)
     }
 
-    async listIndexes(collectionName: string): Promise<DomainIndex[]> {
+    async list(collectionName: string): Promise<DomainIndex[]> {
         const res = await this.query(`SHOW INDEXES FROM ${escapeTable(collectionName)}`)
                               .catch( translateErrorCodes )
         const indexes: {[x:string]: DomainIndex} = {}
         res.forEach((r: { Key_name: string; Column_name: string; Non_unique: number }) => {
             if (!indexes[r.Key_name]) {
                 indexes[r.Key_name] = {
-                    collectionName,
                     name: r.Key_name,
                     columns: [],
                     isUnique: r.Non_unique === 0,
@@ -33,16 +32,16 @@ export default class IndexProvider implements IIndexProvider{
         return Object.values(indexes)
     }
 
-    async createIndex(index: DomainIndex): Promise<DomainIndex> {
+    async create(collectionName: string, index: DomainIndex): Promise<DomainIndex> {
         const unique = index.isUnique ? 'UNIQUE' : ''
         //TODO: support caseSensitive? 
-        await this.query(`CREATE ${unique} INDEX ${escapeId(index.name)} ON ${escapeTable(index.collectionName)} (${index.columns.map(escapeId).join(', ')})`)
+        await this.query(`CREATE ${unique} INDEX ${escapeId(index.name)} ON ${escapeTable(collectionName)} (${index.columns.map(escapeId).join(', ')})`)
                   .catch( translateErrorCodes )
         return index
     }
 
-    async removeIndex(index: DomainIndex): Promise<void> {
-        await this.query(`DROP INDEX ${escapeId(index.name)} ON ${escapeTable(index.collectionName)}`)
+    async remove(collectionName: string, indexName: string): Promise<void> {
+        await this.query(`DROP INDEX ${escapeId(indexName)} ON ${escapeTable(collectionName)}`)
                   .catch( translateErrorCodes )
     }
 }

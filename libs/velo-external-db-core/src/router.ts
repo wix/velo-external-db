@@ -26,20 +26,25 @@ import { JwtAuthenticator } from './web/jwt-auth-middleware'
 import * as dataSource from './spi-model/data_source'
 import * as capabilities from './spi-model/capabilities'
 import { WixDataFacade } from './web/wix_data_facade'
+import { json } from 'stream/consumers';
+import DataService from './service/data';
+import IndexService from './service';
 
 
 const { InvalidRequest } = errors
 // const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
 const { Aggregate: AGGREGATE } = DataOperations
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks //schemaHooks: SchemaHooks
+let schemaService: SchemaService, operationService: OperationService, indexService:IndexService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks //, schemaHooks: SchemaHooks
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
-                             _externalDbConfigClient: ConfigValidator, _cfg: { externalDatabaseId: string, allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string },
+                             _indexService: IndexService, _externalDbConfigClient: ConfigValidator,
+                             _cfg: { externalDatabaseId: string, allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string },
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
                              _roleAuthorizationService: RoleAuthorizationService, _hooks?: Hooks) => {
     schemaService = _schemaService
     operationService = _operationService
+    indexService = _indexService
     externalDbConfigClient = _externalDbConfigClient
     cfg = _cfg
     schemaAwareDataService = _schemaAwareDataService

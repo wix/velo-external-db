@@ -170,6 +170,13 @@ export interface ISchemaProvider {
 
 export interface IBaseHttpError extends Error {}
 
+export interface IIndexProvider {
+    list(collectionName: string): Promise<DomainIndex[]>
+    create(collectionName: string, index: DomainIndex): Promise<DomainIndex>
+    remove(collectionName: string, indexName: string): Promise<void>
+}
+
+
 type ValidConnectionResult = { valid: true }
 type InvalidConnectionResult = { valid: false, error: IBaseHttpError }
 
@@ -186,6 +193,7 @@ export type ConnectionCleanUp = () => Promise<void> | void
 export type DbProviders<T> = {
     dataProvider: IDataProvider
     schemaProvider: ISchemaProvider
+    indexProvider?: IIndexProvider
     databaseOperations: IDatabaseOperations
     connection: T
     cleanup: ConnectionCleanUp
@@ -264,7 +272,6 @@ export interface IImplementationResources {
 
 
 export interface DomainIndex {
-    collectionName: string
     name: string
     columns: string[]
     isUnique: boolean

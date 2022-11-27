@@ -1,4 +1,4 @@
-interface Index {
+export interface Index {
     // Index name
     name: string;
 
@@ -16,10 +16,10 @@ interface Index {
 
     // Contains details about failure reason when index is in *FAILED* status
     //  wix.api.ApplicationError failure = 8 [(wix.api.readOnly) = true];
-    failure: ApplicationError;
+    failure?: ApplicationError;
 }
 
-enum IndexStatus {
+export enum IndexStatus {
     UNKNOWN = 0,
     BUILDING = 1,
     ACTIVE = 2,
@@ -29,7 +29,7 @@ enum IndexStatus {
     INVALID = 6
 }
 
-interface IndexField {
+export interface IndexField {
     // Order determines how values are ordered in the index. This is important when
     // ordering and/or range querying by indexed fields.
     order: IndexFieldOrder;
@@ -38,9 +38,9 @@ interface IndexField {
     path: string;
 }
 
-enum IndexFieldOrder {
-    ASC = 0,
-    DESC = 1
+export enum IndexFieldOrder {
+    ASC = 'ASC',
+    DESC = 'DESC'
 }
 
 interface ApplicationError {
@@ -50,9 +50,9 @@ interface ApplicationError {
 }
 
 export abstract class IndexingService {
-    abstract ListIndexes(req: ListIndexesRequest): Promise<ListIndexesResponse> //stream of Indexes
-    abstract CreateIndex(req: CreateIndexRequest): Promise<CreateIndexResponse>
-    abstract RemoveIndex(req: RemoveIndexRequest): Promise<RemoveIndexResponse>
+    abstract List(req: ListIndexesRequest): Promise<ListIndexesResponse> //stream of Indexes
+    abstract Create(req: CreateIndexRequest): Promise<CreateIndexResponse>
+    abstract Remove(req: RemoveIndexRequest): Promise<RemoveIndexResponse>
 }
 
 interface ListIndexesRequest {

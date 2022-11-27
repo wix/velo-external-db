@@ -18,6 +18,7 @@ import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
 import { CollectionCapability } from './spi-model/capabilities'
 import { decodeBase64 } from './utils/base64_utils'
+import IndexService from './service'
 
 export class ExternalDbRouter {
     connector: DbConnector
@@ -31,6 +32,7 @@ export class ExternalDbRouter {
     itemTransformer: ItemTransformer
     schemaAwareDataService: SchemaAwareDataService
     schemaService: SchemaService
+    indexService: IndexService
     roleAuthorizationService: RoleAuthorizationService
     cleanup: ConnectionCleanUp
     router: Router
@@ -49,16 +51,17 @@ export class ExternalDbRouter {
         this.itemTransformer = new ItemTransformer()
         this.schemaAwareDataService = new SchemaAwareDataService(this.dataService, this.queryValidator, this.schemaInformation, this.itemTransformer)
         this.schemaService = new SchemaService(connector.schemaProvider, this.schemaInformation)
+        this.indexService = new IndexService(connector.indexProvider)
 
         this.roleAuthorizationService = new RoleAuthorizationService(config.authorization?.roleConfig?.collectionPermissions) 
         this.cleanup = connector.cleanup
         
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.indexService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
         this.router = createRouter()
     }
 
     reloadHooks(hooks?: Hooks) {
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.indexService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
     }
 
     isInitialized(connector: DbConnector) {
