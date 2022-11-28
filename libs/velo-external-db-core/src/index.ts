@@ -18,7 +18,7 @@ import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
 import { CollectionCapability } from './spi-model/capabilities'
 import { decodeBase64 } from './utils/base64_utils'
-import IndexService from './service'
+import IndexService from './service/indexing'
 
 export class ExternalDbRouter {
     connector: DbConnector

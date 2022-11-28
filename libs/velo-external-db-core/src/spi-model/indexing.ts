@@ -6,7 +6,7 @@ export interface Index {
     fields: IndexField[];
 
     // Indicates current status of index
-    status: IndexStatus;
+    status?: IndexStatus;
 
     // If true index will enforce that values in the field are unique in scope of a collection. Default is false.
     unique: boolean;
@@ -55,7 +55,7 @@ export abstract class IndexingService {
     abstract Remove(req: RemoveIndexRequest): Promise<RemoveIndexResponse>
 }
 
-interface ListIndexesRequest {
+export interface ListIndexesRequest {
     // collection to list indexes from
     dataCollectionId: string;
     // optional namespace assigned to collection/installation
@@ -64,12 +64,12 @@ interface ListIndexesRequest {
     consistentRead: boolean;
 }
 
-interface ListIndexesResponse {
+export interface ListIndexesResponse {
     // stream of Indexes
     index: Index[];
 }
 
-interface CreateIndexRequest {
+export interface CreateIndexRequest {
     // collection to list indexes from
     dataCollectionId: string;
     // optional namespace assigned to collection/installation
@@ -78,12 +78,12 @@ interface CreateIndexRequest {
     index: Index;
 }
 
-interface CreateIndexResponse {
+export interface CreateIndexResponse {
     // created index and it's status
     index: Index;
 }
 
-interface RemoveIndexRequest {
+export interface RemoveIndexRequest {
     // collection to delete index from
     dataCollectionId: string;
     // optional namespace assigned to collection/installation
@@ -92,4 +92,4 @@ interface RemoveIndexRequest {
     indexName: string;
 }
 
-interface RemoveIndexResponse {}
+export interface RemoveIndexResponse {}
