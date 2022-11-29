@@ -77,7 +77,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [] }, { ...authOwner, responseType: 'stream' })
             const [collectionGetRes] = await streamToArray(collectionGetStream.data) as any[]            
             
-            expect(collectionGetRes).toEqual(matchers.collectionResponse(ctx.collectionName, []))
+            expect(collectionGetRes).toEqual(matchers.collectionResponsesWith(ctx.collectionName, []))
         })
 
         test('collection create', async() => {        
@@ -105,24 +105,15 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             const collectionUpdateStream = await axiosClient.post('/collections/update', { collection: collectionGetRes }, { ...authOwner, responseType: 'stream' })
             const [collectionUpdateRes] = await streamToArray(collectionUpdateStream.data) as any[]            
             
-            expect(collectionUpdateRes).toEqual(matchers.collectionResponse(ctx.collectionName, []))
+            expect(collectionUpdateRes).toEqual(matchers.collectionResponsesWith(ctx.collectionName, []))
 
         })
 
-        // test('collection delete', async() => {
-        //     await schema.givenNewCollection(ctx.collectionName, [], authOwner)
-        
-        //     await axiosClient.post('/collections/delete', { collectionId: ctx.collectionName }, { ...authOwner, responseType: 'stream' })
-
-        //     const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [ctx.collectionName+'1'] }, { ...authOwner, responseType: 'stream' })
-
-        //     const [collectionGetRes] = await streamToArray(collectionGetStream.data) as any[]
-            
-        //     expect(collectionGetRes).toEqual([])
-        // })
-
-
-
+        test('collection delete', async() => {
+            await schema.givenNewCollection(ctx.collectionName, [], authOwner)
+            await axiosClient.post('/collections/delete', { collectionId: ctx.collectionName }, { ...authOwner, responseType: 'stream' })
+            await expect(axiosClient.post('/collections/get', { collectionIds: [ctx.collectionName] }, { ...authOwner, responseType: 'stream' }) ).rejects.toThrow('404')
+        })
     })
 
     const ctx = {

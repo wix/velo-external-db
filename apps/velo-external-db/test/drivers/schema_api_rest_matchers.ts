@@ -62,7 +62,7 @@ const filedMatcher = (field: InputField) => expect.objectContaining({
 
 const fieldsMatcher = (fields: InputField[]) => expect.objectContaining(fields.map(filedMatcher))
 
-export const collectionResponse = (collectionName: string, fields: InputField[]) => expect.objectContaining({
+export const collectionResponsesWith = (collectionName: string, fields: InputField[]) => expect.objectContaining({
     id: collectionName,
     capabilities: collectionCapabilities([], [], []),
     fields: fieldsMatcher(fields),
