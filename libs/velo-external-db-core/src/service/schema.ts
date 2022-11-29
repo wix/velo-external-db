@@ -77,7 +77,7 @@ export default class SchemaService {
             throw new Error('Your storage does not support the new collection capabilities API')
         }
         
-        const collections = collectionIds.length === 0 ? 
+        const collections = (!collectionIds || collectionIds.length === 0) ? 
             await this.storage.list() : 
             await Promise.all(collectionIds.map(async(collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
                 
@@ -131,6 +131,7 @@ export default class SchemaService {
     async deleteCollection(collectionId: string): Promise<DeleteCollectionResponse> {
         const collectionFields = await this.storage.describeCollection(collectionId)
         await this.storage.drop(collectionId)
+        await this.schemaInformation.refresh()
         return { collection: {
             id: collectionId,
             fields: convertResponseFieldToWixFormat(collectionFields),
