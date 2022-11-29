@@ -25,7 +25,7 @@ import { ConfigValidator } from '@wix-velo/external-db-config'
 import { JwtAuthenticator } from './web/jwt-auth-middleware'
 import * as dataSource from './spi-model/data_source'
 import * as capabilities from './spi-model/capabilities'
-import { WixDataFacadeImpl } from './web/wix_data_facade'
+import { WixDataFacade } from './web/wix_data_facade'
 
 
 const { InvalidRequest, ItemNotFound } = errors
@@ -87,7 +87,7 @@ export const createRouter = () => {
     router.use(express.json())
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
-    const jwtAuthenticator = new JwtAuthenticator(cfg.externalDatabaseId, cfg.allowedMetasites, new WixDataFacadeImpl(cfg.wixDataBaseUrl))
+    const jwtAuthenticator = new JwtAuthenticator(cfg.externalDatabaseId, cfg.allowedMetasites, new WixDataFacade(cfg.wixDataBaseUrl))
     router.use(unless(['/', '/id', '/capabilities', '/favicon.ico'], jwtAuthenticator.authorizeJwt()))
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))

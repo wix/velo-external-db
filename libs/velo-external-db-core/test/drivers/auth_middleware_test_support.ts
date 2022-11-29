@@ -1,4 +1,4 @@
-import { WixDataFacade } from '../../src/web/wix_data_facade'
+import { IWixDataFacade } from '../../src/web/wix_data_facade'
 import * as jwt from 'jsonwebtoken'
 import { decodeBase64 } from '../../src/utils/base64_utils'
 import { authConfig } from '@wix-velo/test-commons'
@@ -14,10 +14,10 @@ export const requestBodyWith = (role?: string | undefined, path?: string | undef
     header(_name: string) { return authHeader }
 } )
 
-export const signedToken = (payload: Object, expiration: string = '10000ms') =>
+export const signedToken = (payload: Object, expiration= '10000ms') =>
     jwt.sign(payload, decodeBase64(authConfig.authPrivateKey), { algorithm: 'RS256', expiresIn: expiration })
 
-export class WixDataFacadeMock implements WixDataFacade {
+export class WixDataFacadeMock implements IWixDataFacade {
     publicKeys: string[]
     index: number
 

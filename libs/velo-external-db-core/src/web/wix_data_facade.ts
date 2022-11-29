@@ -7,11 +7,11 @@ type PublicKeyResponse = {
     publicKey: string;
 };
 
-export interface WixDataFacade {
+export interface IWixDataFacade {
     getPublicKey(externalDatabaseId: string): Promise<string>
 }
 
-export class WixDataFacadeImpl implements WixDataFacade {
+export class WixDataFacade implements IWixDataFacade {
     baseUrl: string
 
     constructor(baseUrl: string) {

@@ -1,5 +1,5 @@
 import { authConfig } from '@wix-velo/test-commons'
-const express = require('express')
+import * as express from 'express'
 
 export const app = express()
 
