@@ -17,6 +17,7 @@ import { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } 
 import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
 import { CollectionCapability } from './spi-model/capabilities'
+import { decodeBase64 } from "./utils/base64_utils";
 
 export class ExternalDbRouter {
     connector: DbConnector
@@ -37,7 +38,7 @@ export class ExternalDbRouter {
     constructor({ connector, config, hooks }: { connector: DbConnector, config: ExternalDbRouterConfig, hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks}}) {
         this.isInitialized(connector)
         this.connector = connector
-        this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), new CommonConfigValidator({ secretKey: config.secretKey, vendor: config.vendor, type: config.adapterType }, config.commonExtended))
+        this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), new CommonConfigValidator({ externalDatabaseId: config.externalDatabaseId, allowedMetasites: config.allowedMetasites, vendor: config.vendor, type: config.adapterType }, config.commonExtended))
         this.config = config
         this.operationService = new OperationService(connector.databaseOperations)
         this.schemaInformation = new CacheableSchemaInformation(connector.schemaProvider)
@@ -67,4 +68,4 @@ export class ExternalDbRouter {
     }
 }
 
-export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext, CollectionCapability }
+export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext, CollectionCapability, decodeBase64 }

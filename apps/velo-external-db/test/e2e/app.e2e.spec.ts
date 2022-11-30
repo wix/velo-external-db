@@ -21,7 +21,7 @@ describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
     })
 
     test('answer provision with stub response', async() => {
-        expect((await axios.post('/provision', { }, authOwner)).data).toEqual(expect.objectContaining({ protocolVersion: 2, vendor: 'azure' }))
+        expect((await axios.post('/provision', { }, authOwner)).data).toEqual(expect.objectContaining({ protocolVersion: 3, vendor: 'azure' }))
     })
 
     test('answer app info with stub response', async() => {
