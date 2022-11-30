@@ -13,8 +13,8 @@ export class AwsConfigReader implements IConfigReader {
 
   async readConfig() {
     const { config } = await this.readExternalAndLocalConfig()
-    const { host, username, password, DB, SECRET_KEY } = config
-    return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY }
+    const { host, username, password, DB, EXTERNAL_DATABASE_ID, ALLOWED_METASITES } = config
+    return { host: host, user: username, password: password, db: DB, externalDatabaseId: EXTERNAL_DATABASE_ID, allowedMetasites: ALLOWED_METASITES }
   }
 
   async readExternalConfig() {
@@ -29,8 +29,8 @@ export class AwsConfigReader implements IConfigReader {
 
   async readExternalAndLocalConfig() { 
     const { externalConfig, secretMangerError }: {[key: string]: any} = await this.readExternalConfig()
-    const { host, username, password, DB, SECRET_KEY, HOST, PASSWORD, USER }: {[key: string]: string} = { ...process.env, ...externalConfig }
-    const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, SECRET_KEY }
+    const { host, username, password, DB, EXTERNAL_DATABASE_ID, ALLOWED_METASITES, HOST, PASSWORD, USER }: {[key: string]: string} = { ...process.env, ...externalConfig }
+    const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, EXTERNAL_DATABASE_ID, ALLOWED_METASITES }
     return { config, secretMangerError }
   }
 }
@@ -46,15 +46,15 @@ export class AwsDynamoConfigReader implements IConfigReader {
     async readConfig() {
       const { config } = await this.readExternalAndLocalConfig()
       if (process.env['NODE_ENV'] === 'test') {
-        return { region: this.region, secretKey: config.SECRET_KEY, endpoint: process.env['ENDPOINT_URL'] }
+        return { region: this.region, externalDatabaseId: config.EXTERNAL_DATABASE_ID, endpoint: process.env['ENDPOINT_URL'] }
       }
-      return { region: this.region, secretKey: config.SECRET_KEY }
+      return { region: this.region, externalDatabaseId: config.EXTERNAL_DATABASE_ID, allowedMetasites: config.ALLOWED_METASITES }
     }
     
     async readExternalAndLocalConfig() { 
       const { externalConfig, secretMangerError }: {[key: string]: any} = await this.readExternalConfig()
-      const { SECRET_KEY = undefined } = { ...process.env, ...externalConfig }
-      const config = { SECRET_KEY }
+      const { EXTERNAL_DATABASE_ID = undefined, ALLOWED_METASITES = undefined } = { ...process.env, ...externalConfig }
+      const config = { EXTERNAL_DATABASE_ID, ALLOWED_METASITES }
 
       return { config, secretMangerError: secretMangerError }
     }
@@ -90,8 +90,8 @@ export class AwsMongoConfigReader implements IConfigReader {
 
   async readExternalAndLocalConfig() { 
     const { externalConfig, secretMangerError } :{[key: string]: any} = await this.readExternalConfig()
-    const { SECRET_KEY, URI }: {SECRET_KEY: string, URI: string} = { ...process.env, ...externalConfig }
-    const config = { SECRET_KEY, URI }
+    const { EXTERNAL_DATABASE_ID, ALLOWED_METASITES, URI }: {EXTERNAL_DATABASE_ID: string, ALLOWED_METASITES: string, URI: string} = { ...process.env, ...externalConfig }
+    const config = { EXTERNAL_DATABASE_ID, ALLOWED_METASITES, URI }
 
     return { config, secretMangerError: secretMangerError }
   }
@@ -99,8 +99,8 @@ export class AwsMongoConfigReader implements IConfigReader {
   async readConfig() {
     const { config } = await this.readExternalAndLocalConfig()
 
-    const { SECRET_KEY, URI } = config
+    const { EXTERNAL_DATABASE_ID, ALLOWED_METASITES, URI } = config
 
-    return { secretKey: SECRET_KEY, connectionUri: URI }
+    return { externalDatabaseId: EXTERNAL_DATABASE_ID, allowedMetasites: ALLOWED_METASITES, connectionUri: URI }
   }
 }
