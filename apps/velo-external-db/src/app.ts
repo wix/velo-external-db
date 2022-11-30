@@ -6,18 +6,18 @@ import { engineConnectorFor } from './storage/factory'
 
 process.env.CLOUD_VENDOR = 'azure'
 process.env.TYPE = 'mysql'
-process.env.SECRET_KEY = 'myKey'
+process.env.EXTERNAL_DATABASE_ID = ''
+process.env.ALLOWED_METASITES = ''
 process.env['TYPE'] = 'mysql'
 process.env['HOST'] = 'localhost'
 process.env['USER'] = 'test-user'
 process.env['PASSWORD'] = 'password'
 process.env['DB'] = 'test-db'
 
-const initConnector = async(hooks?: Hooks) => {
-    const { vendor, type: adapterType, hideAppInfo } = readCommonConfig()
-
+const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
+    const { vendor, type: adapterType, externalDatabaseId, allowedMetasites, hideAppInfo } = readCommonConfig()
     const configReader = create()
-    const { authorization, secretKey, ...dbConfig } = await configReader.readConfig()
+    const { authorization, ...dbConfig } = await configReader.readConfig()
 
     const { connector: engineConnector, providers, cleanup } = await engineConnectorFor(adapterType, dbConfig)
 
@@ -27,11 +27,13 @@ const initConnector = async(hooks?: Hooks) => {
             authorization: {
                 roleConfig: authorization
             },
-            secretKey,
+            externalDatabaseId,
+            allowedMetasites,
             vendor,
             adapterType,
             commonExtended: true,
-            hideAppInfo
+            hideAppInfo,
+            wixDataBaseUrl: wixDataBaseUrl || 'www.wixapis.com/wix-data'
         },
         hooks,
     })
@@ -39,12 +41,12 @@ const initConnector = async(hooks?: Hooks) => {
     return { externalDbRouter, cleanup: async() => await cleanup(), schemaProvider: providers.schemaProvider }
 }
 
-export const createApp = async() => {
+export const createApp = async(wixDataBaseUrl?: string) => {
     const app = express()
-    const initConnectorResponse = await initConnector()
+    const initConnectorResponse = await initConnector(wixDataBaseUrl)
     app.use(initConnectorResponse.externalDbRouter.router)
     const port = process.env.PORT || 8080
     const server = app.listen(port, () => console.log(`Connector listening on port ${port}`))
 
-    return { server, ...initConnectorResponse, reload: () => initConnector() }
+    return { server, ...initConnectorResponse, reload: () => initConnector(wixDataBaseUrl) }
 }
