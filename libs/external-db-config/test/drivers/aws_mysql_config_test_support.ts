@@ -26,8 +26,11 @@ export const defineValidConfig = (config: MySqlConfig) => {
     if (config.db) {
         awsConfig['DB'] = config.db
     }
-    if (config.secretKey) {
-        awsConfig['SECRET_KEY'] = config.secretKey
+    if (config.externalDatabaseId) {
+        awsConfig['EXTERNAL_DATABASE_ID'] = config.externalDatabaseId
+    }
+    if (config.allowedMetasites) {
+        awsConfig['ALLOWED_METASITES'] = config.allowedMetasites
     }
     if (config.authorization) {
         awsConfig['PERMISSIONS'] = JSON.stringify(config.authorization)
@@ -48,8 +51,11 @@ const defineLocalEnvs = (config: MySqlConfig) => {
     if (config.db) {
         process.env['DB'] = config.db
     }
-    if (config.secretKey) {
-        process.env['SECRET_KEY'] = config.secretKey
+    if (config.externalDatabaseId) {
+        process.env['EXTERNAL_DATABASE_ID'] = config.externalDatabaseId
+    }
+    if (config.allowedMetasites) {
+        process.env['ALLOWED_METASITES'] = config.allowedMetasites
     }
     if (config.authorization) {
         process.env['PERMISSIONS'] = JSON.stringify(config.authorization)
@@ -70,7 +76,8 @@ export const validConfig = (): MySqlConfig => ({
     user: chance.word(),
     password: chance.word(),
     db: chance.word(),
-    secretKey: chance.word(),
+    externalDatabaseId: chance.word(),
+    allowedMetasites: chance.word(),
 })
 
 export const validConfigWithAuthorization = (): MySqlConfig => ({
@@ -89,8 +96,8 @@ export const validConfigWithAuthConfig = () => ({
     } 
 })
 
-export const ExpectedProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY', 'PERMISSIONS']
-export const RequiredProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY']
+export const ExpectedProperties = ['host', 'username', 'password', 'DB', 'EXTERNAL_DATABASE_ID', 'ALLOWED_METASITES', 'PERMISSIONS']
+export const RequiredProperties = ['host', 'username', 'password', 'DB', 'EXTERNAL_DATABASE_ID', 'ALLOWED_METASITES']
 
 export const reset = () => { 
     mockedAwsSdk.reset()

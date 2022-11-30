@@ -4,7 +4,7 @@ export default class CommonConfigReader implements IConfigReader {
     constructor() { }
 
     readConfig() {
-        const { CLOUD_VENDOR, TYPE, REGION, SECRET_NAME, HIDE_APP_INFO } = process.env
-        return { vendor: CLOUD_VENDOR, type: TYPE, region: REGION, secretId: SECRET_NAME, hideAppInfo: HIDE_APP_INFO ? HIDE_APP_INFO === 'true' : undefined }
+        const { CLOUD_VENDOR, TYPE, REGION, SECRET_NAME, EXTERNAL_DATABASE_ID, ALLOWED_METASITES, HIDE_APP_INFO } = process.env
+        return { vendor: CLOUD_VENDOR, type: TYPE, region: REGION, secretId: SECRET_NAME, externalDatabaseId: EXTERNAL_DATABASE_ID, allowedMetasites: ALLOWED_METASITES, hideAppInfo: HIDE_APP_INFO ? HIDE_APP_INFO === 'true' : undefined }
     }
 }
