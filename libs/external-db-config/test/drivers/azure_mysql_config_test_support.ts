@@ -17,8 +17,11 @@ export const defineValidConfig = (config: MySqlConfig) => {
     if (config.db) {
         process.env['DB'] = config.db
     }
-    if (config.secretKey) {
-        process.env['SECRET_KEY'] = config.secretKey
+    if (config.externalDatabaseId) {
+        process.env['EXTERNAL_DATABASE_ID'] = config.externalDatabaseId
+    }
+    if (config.allowedMetasites) {
+        process.env['ALLOWED_METASITES'] = config.allowedMetasites
     }
     if (config.authorization) {
         process.env['PERMISSIONS'] = JSON.stringify( config.authorization )
@@ -39,7 +42,8 @@ export const validConfig = (): MySqlConfig => ({
     user: chance.word(),
     password: chance.word(),
     db: chance.word(),
-    secretKey: chance.word(),
+    externalDatabaseId: chance.word(),
+    allowedMetasites: chance.word(),
 })
 
 export const validConfigWithAuthorization = (): MySqlConfig => ({
@@ -58,7 +62,7 @@ export const validConfigWithAuthConfig = () => ({
 
 export const defineInvalidConfig = () => defineValidConfig({})
 
-export const ExpectedProperties = ['HOST', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'PERMISSIONS']
+export const ExpectedProperties = ['HOST', 'USER', 'PASSWORD', 'DB', 'EXTERNAL_DATABASE_ID', 'ALLOWED_METASITES', 'callbackUrl', 'clientId', 'clientSecret', 'PERMISSIONS']
 
 export const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 

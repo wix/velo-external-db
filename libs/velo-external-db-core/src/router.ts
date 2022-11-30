@@ -8,7 +8,6 @@ import { appInfoFor } from './health/app_info'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { extractRole } from './web/auth-role-middleware'
 import { config } from './roles-config.json'
-import { secretKeyAuthMiddleware } from './web/auth-middleware'
 import { authRoleMiddleware } from './web/auth-role-middleware'
 import { unless, includes } from './web/middleware-support'
 import { getAppInfoPage } from './utils/router_utils'
@@ -23,16 +22,19 @@ import AggregationTransformer from './converters/aggregation_transformer'
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
+import { JwtAuthenticator } from './web/jwt-auth-middleware'
 import * as dataSource from './spi-model/data_source'
 import * as capabilities from './spi-model/capabilities'
+import { WixDataFacade } from './web/wix_data_facade'
+
 
 const { InvalidRequest, ItemNotFound } = errors
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
-                             _externalDbConfigClient: ConfigValidator, _cfg: { secretKey?: string, type?: string, vendor?: string },
+                             _externalDbConfigClient: ConfigValidator, _cfg: { externalDatabaseId: string, allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string },
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
                              _roleAuthorizationService: RoleAuthorizationService, _hooks?: Hooks) => {
     schemaService = _schemaService
@@ -85,7 +87,8 @@ export const createRouter = () => {
     router.use(express.json())
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
-    router.use(unless(['/', '/provision', '/capabilities', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: cfg.secretKey })))
+    const jwtAuthenticator = new JwtAuthenticator(cfg.externalDatabaseId, cfg.allowedMetasites, new WixDataFacade(cfg.wixDataBaseUrl))
+    router.use(unless(['/', '/id', '/capabilities', '/favicon.ico'], jwtAuthenticator.authorizeJwt()))
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
@@ -118,7 +121,12 @@ export const createRouter = () => {
 
     router.post('/provision', async(req, res) => {
         const { type, vendor } = cfg
-        res.json({ type, vendor, protocolVersion: 2 })
+        res.json({ type, vendor, protocolVersion: 3 })
+    })
+
+    router.get('/id', async(req, res) => {
+        const { externalDatabaseId } = cfg
+        res.json({ externalDatabaseId })
     })
 
     // *************** Data API **********************
@@ -132,9 +140,9 @@ export const createRouter = () => {
         const data = await schemaAwareDataService.find(
             queryRequest.collectionId, 
             filterTransformer.transform(query.filter), 
-            filterTransformer.transformSort(query.sort), 
-            offset, 
-            limit, 
+            filterTransformer.transformSort(query.sort),
+            offset,
+            limit,
             query.fields,
             queryRequest.omitTotalCount
         )
@@ -150,7 +158,7 @@ export const createRouter = () => {
 
     router.post('/data/count', async(req, res, next) => {
         const countRequest: dataSource.CountRequest = req.body;
-        
+
         const data = await schemaAwareDataService.count(
             countRequest.collectionId, 
             filterTransformer.transform(countRequest.filter), 
@@ -169,8 +177,8 @@ export const createRouter = () => {
 
             const collectionName = insertRequest.collectionId
 
-            const data = insertRequest.overwriteExisting ? 
-                            await schemaAwareDataService.bulkUpsert(collectionName, insertRequest.items) : 
+            const data = insertRequest.overwriteExisting ?
+                            await schemaAwareDataService.bulkUpsert(collectionName, insertRequest.items) :
                             await schemaAwareDataService.bulkInsert(collectionName, insertRequest.items)
 
             const responseParts = data.items.map(dataSource.InsertResponsePart.item)
@@ -208,14 +216,14 @@ export const createRouter = () => {
             const objectsBeforeRemove = (await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), undefined, 0, removeRequest.itemIds.length)).items
 
             await schemaAwareDataService.bulkDelete(collectionName, removeRequest.itemIds)
-            
+
             const responseParts = objectsBeforeRemove.map(dataSource.RemoveResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {
             next(e)
         }
-    })    
+    })
 
     router.post('/data/aggregate', async (req, res, next) => {
         try {

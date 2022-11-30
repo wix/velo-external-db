@@ -16,6 +16,7 @@ import { Uninitialized } from '@wix-velo/test-commons'
 import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
 import { Server } from 'http'
 import { ConnectionCleanUp, ISchemaProvider } from '@wix-velo/velo-external-db-types'
+import { initWixDataEnv, shutdownWixDataEnv, wixDataBaseUrl } from '../drivers/wix_data_resources'
 
 interface App {
     server: Server;
@@ -40,8 +41,10 @@ export let env:{
     externalDbRouter: Uninitialized
 }
 
+const createAppWithWixDataBaseUrl = createApp.bind(null, wixDataBaseUrl())
+
 const testSuits = {
-    mysql: new E2EResources(mysql, createApp),
+    mysql: new E2EResources(mysql, createAppWithWixDataBaseUrl),
     postgres: new E2EResources(postgres, createApp),
     spanner: new E2EResources(spanner, createApp),
     firestore: new E2EResources(firestore, createApp),
@@ -56,10 +59,16 @@ const testSuits = {
 export const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 export const supportedOperations = testedSuit().supportedOperations
 
-export const setupDb = () => testedSuit().setUpDb()
+export const setupDb = async() => {
+    await initWixDataEnv()
+    await testedSuit().setUpDb()
+}
 export const currentDbImplementationName = () => testedSuit().currentDbImplementationName
 export const initApp = async() => {
     env = await testedSuit().initApp()
 }
-export const teardownApp = async() => testedSuit().teardownApp()
+export const teardownApp = async() => {
+    await testedSuit().teardownApp()
+    await shutdownWixDataEnv()
+}
 export const dbTeardown = async() => testedSuit().dbTeardown()

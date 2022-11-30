@@ -11,9 +11,9 @@ describe('MySqlConfigValidator', () => {
         expect(env.CommonConfigValidator.validate()).toEqual({ missingRequiredSecretsKeys: [] })
     })
 
-    test('not extended common config validator will return if secretKey is missing', () => {
+    test('not extended common config validator will return if externalDatabaseId or allowedMetasites are missing', () => {
         env.CommonConfigValidator = new CommonConfigValidator({})
-        expect(env.CommonConfigValidator.validate()).toEqual({ missingRequiredSecretsKeys: ['secretKey'] })
+        expect(env.CommonConfigValidator.validate()).toEqual({ missingRequiredSecretsKeys: ['externalDatabaseId', 'allowedMetasites'] })
     })
 
     each(

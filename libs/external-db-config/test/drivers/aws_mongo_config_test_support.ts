@@ -17,8 +17,11 @@ export const defineValidConfig = (config: MongoConfig) => {
     if (config.connectionUri) {
         awsConfig['URI'] = config.connectionUri
     }
-    if (config.secretKey) {
-        awsConfig['SECRET_KEY'] = config.secretKey
+    if (config.externalDatabaseId) {
+        awsConfig['EXTERNAL_DATABASE_ID'] = config.externalDatabaseId
+    }
+    if (config.allowedMetasites) {
+        awsConfig['ALLOWED_METASITES'] = config.allowedMetasites
     }
     if (config.authorization) {
         awsConfig['PERMISSIONS'] = JSON.stringify( config.authorization )
@@ -30,8 +33,11 @@ const defineLocalEnvs = (config: MongoConfig) => {
     if (config.connectionUri) {
         process.env['URI'] = config.connectionUri
     }
-    if (config.secretKey) {
-        process.env['SECRET_KEY'] = config.secretKey
+    if (config.externalDatabaseId) {
+        process.env['EXTERNAL_DATABASE_ID'] = config.externalDatabaseId
+    }
+    if (config.allowedMetasites) {
+        process.env['ALLOWED_METASITES'] = config.allowedMetasites
     }
     if (config.authorization) {
         process.env['PERMISSIONS'] = JSON.stringify( config.authorization )
@@ -42,7 +48,8 @@ export const defineInvalidConfig = () => defineValidConfig({})
 
 export const validConfig = () => ({
     connectionUri: chance.word(),
-    secretKey: chance.word()
+    externalDatabaseId: chance.word(),
+    allowedMetasites: chance.word()
 })
 
 export const defineSplittedConfig = (config: MongoConfig) => {
@@ -56,8 +63,8 @@ export const validConfigWithAuthorization = () => ({
     authorization: validAuthorizationConfig.collectionPermissions 
 })
 
-export const ExpectedProperties = ['URI', 'SECRET_KEY', 'PERMISSIONS']
-export const RequiredProperties = ['URI', 'SECRET_KEY']
+export const ExpectedProperties = ['URI', 'EXTERNAL_DATABASE_ID', 'ALLOWED_METASITES', 'PERMISSIONS']
+export const RequiredProperties = ['URI', 'EXTERNAL_DATABASE_ID', 'ALLOWED_METASITES']
 
 export const reset = () => { 
     mockedAwsSdk.reset()
