@@ -27,9 +27,9 @@ export const givenValidConfig = () =>
     when(configValidator.validate).calledWith()
                                .mockReturnValue({ missingRequiredSecretsKeys: [] })
 
-export const givenCommonConfig = (secretKey: any) => 
+export const givenCommonConfig = (externalDatabaseId: any, allowedMetasites: any) =>
     when(commonConfigValidator.readConfig).calledWith()
-                                        .mockReturnValue({ secretKey })
+                                        .mockReturnValue({ externalDatabaseId, allowedMetasites })
 
 export const givenValidCommonConfig = () =>
     when(commonConfigValidator.validate).calledWith()
