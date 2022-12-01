@@ -1,7 +1,7 @@
 import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, NotEmptyAdapterFilter, AdapterFunctions } from '@wix-velo/velo-external-db-types'
 import { EmptyFilter, EmptySort, isObject, isEmptyFilter, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { escapeIdentifier, wildCardWith } from './bigquery_utils'
+import { escapeIdentifier } from './bigquery_utils'
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains, and, or, not, urlized, matches } = AdapterOperators
 const { avg, max, min, sum, count } = AdapterFunctions
 const { InvalidQuery } = errors
@@ -161,7 +161,7 @@ export default class FilterParser {
             if (isNull(value) || value.length === 0) {
                 throw new InvalidQuery('$hasSome cannot have an empty list of arguments')
             }
-            return `(${wildCardWith(value.length, '?')})`
+            return 'UNNEST(?)'
         } else if ((operator === eq || operator === ne) && isNull(value)) {
             return ''
         }

@@ -128,6 +128,19 @@ describe('Sql Parser', () => {
                 expect( () => env.filterParser.parseFilter(filter) ).toThrow(InvalidQuery)
             })
 
+            test('correctly transform operator [include]', () => {
+                const filter = {
+                    operator: include,
+                    fieldName: ctx.fieldName,
+                    value: ctx.fieldListValue
+                }
+
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    filterExpr: `${escapeId(ctx.fieldName)} IN UNNEST(?)`,
+                    parameters: [ctx.fieldListValue]
+                }])
+            })
+
             each([
                 undefined, null
             ]).test('correctly transform operator [eq] with null value [%s]', (value) => {
