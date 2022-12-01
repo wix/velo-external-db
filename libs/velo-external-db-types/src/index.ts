@@ -277,4 +277,12 @@ export interface DomainIndex {
     isUnique: boolean
     caseInsensitive: boolean
     order : 'ASC' | 'DESC'
+    status?: DomainIndexStatus
+    error?: any
+}
+
+export enum DomainIndexStatus {
+    ACTIVE = 'ACTIVE',
+    BUILDING = 'BUILDING',
+    FAILED = 'FAILED'
 }

@@ -37,7 +37,7 @@ export default class IndexService {
             fields: domainIndex.columns.map(column => ({ path: column, order: domainIndex.order })) as IndexField[],
             unique: domainIndex.isUnique,
             caseInsensitive: domainIndex.caseInsensitive,
-            status: IndexStatus.ACTIVE,
+            status: IndexStatus[domainIndex.status as keyof typeof IndexStatus],
         }
     }
 
