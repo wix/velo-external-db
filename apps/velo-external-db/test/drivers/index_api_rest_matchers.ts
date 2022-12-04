@@ -1,25 +1,13 @@
-import { IndexFieldOrder, IndexStatus } from "libs/velo-external-db-core/src/spi-model/indexing";
+import { IndexFieldOrder, IndexStatus, Index } from "libs/velo-external-db-core/src/spi-model/indexing";
 
-// const responseWith = (matcher: any) => expect.objectContaining({ data: matcher })
-
+const responseWith = (matcher: any) => expect.objectContaining({ data: matcher })
 
 export const listIndexResponseWithDefaultIndex = () =>
     expect.arrayContaining([toHaveDefaultIndex()])
 
-// export const listIndexResponseWith = (indexes: any) =>
-//     expect.arrayContaining(
-//         [...indexes.map((index: any) => expect.objectContaining({
-//             ...index,
-//             status: IndexStatus.ACTIVE
-//         }))]
-//     )
-export const listIndexResponseWith = (indexes: any) =>
+export const listIndexResponseWith = (indexes: Index[]) =>
     expect.arrayContaining(
-        [...indexes.map((index: any) => ({
-            ...index,
-            status: IndexStatus.ACTIVE,
-            caseInsensitive: expect.any(Boolean), // TODO: remove this when we support case insensitive indexes
-        }))]
+        [...indexes.map((index: Index) => indexWith(index, { status: IndexStatus.ACTIVE }))]
     )
 
 export const toHaveDefaultIndex = () => ({
@@ -36,5 +24,16 @@ export const toHaveDefaultIndex = () => ({
 })
 
 
-// [{"caseInsensitive": false, "fields": [{"order": "ASC", "path": "cebi"}], "name": "dak", "status": 2, "unique": true}]
-// {"caseInsensitive": true, "fields": [{"order": "ASC", "path": "cebi"}], "name": "dak", "status": 2, "unique": true}]
+export const createIndexResponseWith = (index: Index) => responseWith(({ index: indexWith(index, { status: IndexStatus.BUILDING }) }))
+
+export const removeIndexResponse = () => responseWith(({}))
+
+const indexWith = (index: Index, extraProps: Partial<Index>) => ({
+    ...index,
+    fields: index.fields.map(field => ({
+        ...field,
+        order: expect.toBeOneOf([IndexFieldOrder.ASC, IndexFieldOrder.DESC]),
+    })),
+    caseInsensitive: expect.any(Boolean), // TODO: remove this when we support case insensitive indexes
+    ...extraProps
+})

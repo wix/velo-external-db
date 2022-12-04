@@ -14,16 +14,8 @@ export default class IndexService {
 
     async create(collectionName: string, index: SpiIndex) {
         const domainIndex = this.spiIndexToDomainIndex(index)
-        try {
-            const createdIndex = await this.storage.create(collectionName, domainIndex)
-            return this.domainIndexToSpiIndex(createdIndex)
-        } catch (e: any) {
-            return {
-                ...index,
-                status: IndexStatus.FAILED,
-                error: e.message,
-            } as SpiIndex
-        } 
+        const createdIndex = await this.storage.create(collectionName, domainIndex)
+        return this.domainIndexToSpiIndex(createdIndex)
     }
 
     async remove(collectionName: string, indexName: string) {
@@ -41,7 +33,7 @@ export default class IndexService {
         }
     }
 
-    private spiIndexToDomainIndex(spiIndex: SpiIndex): DomainIndex{
+    private spiIndexToDomainIndex(spiIndex: SpiIndex): DomainIndex {
         return {
             name: spiIndex.name,
             columns: spiIndex.fields.map(field => field.path),
