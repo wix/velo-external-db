@@ -15,24 +15,6 @@ const axiosServer = axios.create({
 })
 
 
-export const streamToArray = async (stream) => { //todo: move this to utils
-
-    return new Promise((resolve, reject) => {
-        const arr = []
-
-        stream.on('data', data => {
-            arr.push(JSON.parse(data.toString()))
-        });
-
-        stream.on('end', () => {
-            resolve(arr)
-        });
-
-        stream.on('error', (err) => reject(err))
-
-    })
-}
-
 describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
     beforeAll(async () => {
         await setupDb()
@@ -46,24 +28,14 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
     test('list', async () => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-        const response = await axiosServer.post('/indexes/list', {
-            dataCollectionId: ctx.collectionName
-        }, { responseType: 'stream', ...authOwner })
-
-        // expect(streamToArray(response.data)).
-        expect(streamToArray(response.data)).resolves.toEqual(matchers.listIndexResponseWithDefaultIndex())
+        expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.toEqual(matchers.listIndexResponseWithDefaultIndex())
     })
 
     test('list with multiple indexes', async () => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await index.givenIndexes(ctx.collectionName, [ctx.index], authOwner)
 
-        await eventually(async () => {
-            const response = await axiosServer.post('/indexes/list', {
-                dataCollectionId: ctx.collectionName
-            }, { responseType: 'stream', ...authOwner })
-            await expect(streamToArray(response.data)).resolves.toEqual(matchers.listIndexResponseWith([ctx.index]))
-        })
+        await expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.toEqual(matchers.listIndexResponseWith([ctx.index]))
     })
 
     test('create', async () => {
@@ -76,51 +48,47 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
         }, authOwner)).resolves.toEqual(matchers.createIndexResponseWith(ctx.index))
 
         // active
-        await eventually(async () => {
-            const response = await axiosServer.post('/indexes/list', {
-                dataCollectionId: ctx.collectionName
-            }, { responseType: 'stream', ...authOwner })
-            await expect(streamToArray(response.data)).resolves.toEqual(matchers.listIndexResponseWith([ctx.index]))
-        })
+        await eventually(async () =>
+            await expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.toEqual(matchers.listIndexResponseWith([ctx.index]))
+        )
     })
 
     test('create with existing index', async () => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await index.givenIndexes(ctx.collectionName, [ctx.index], authOwner)
 
-        eventually(async () => {
-            await expect(axiosServer.post('/indexes/create', {
-                dataCollectionId: ctx.collectionName,
-                index: ctx.index
-            }, authOwner)).rejects.toThrow()
-        }, {
-            timeout: 5000,
-            interval: 1000
-        })
+        await expect(axiosServer.post('/indexes/create', {
+            dataCollectionId: ctx.collectionName,
+            index: ctx.index
+        }, authOwner)).rejects.toThrow()
     })
 
-    test.only('remove', async() => {
+    test('remove', async () => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await index.givenIndexes(ctx.collectionName, [ctx.index], authOwner)
-        
-        await eventually(async () => {
-            await expect(axiosServer.post('/indexes/remove', {
-                dataCollectionId: ctx.collectionName,
-                indexName: ctx.index.name
-                }, authOwner)).resolves.toEqual(matchers.removeIndexResponse()).catch()
-        })
 
-        // await expect(axiosServer.post('/indexes/remove', {
-        //     dataCollectionId: ctx.collectionName,
-        //     index: ctx.index
-        // }, authOwner)).resolves.toEqual(matchers.removeIndexResponse())
+        await expect(axiosServer.post('/indexes/remove', {
+            dataCollectionId: ctx.collectionName,
+            indexName: ctx.index.name
+        }, authOwner)).resolves.toEqual(matchers.removeIndexResponse()).catch()
 
-        // const response = await axiosServer.post('/indexes/list', {
-        //     dataCollectionId: ctx.collectionName
-        // }, { responseType: 'stream', ...authOwner })
-        // await expect(streamToArray(response.data)).resolves.not.toEqual(matchers.listIndexResponseWith([ctx.index]))
+        await expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.not.toEqual(matchers.listIndexResponseWith([ctx.index]))
     })
 
+
+    test('get failed indexes', async () => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        
+        await axiosServer.post('/indexes/create', {
+            dataCollectionId: ctx.collectionName,
+            index: ctx.invalidIndex
+        }, authOwner).catch(e=>{})
+        
+
+        await eventually(async () =>
+            await expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.toEqual(matchers.listIndexResponseWithFailedIndex(ctx.invalidIndex))
+        )
+    })
 
     afterAll(async () => {
         await teardownApp()
@@ -130,11 +98,13 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
         collectionName: Uninitialized,
         column: Uninitialized,
         index: Uninitialized,
+        invalidIndex: Uninitialized,
     }
 
     beforeEach(() => {
         ctx.collectionName = chance.word()
         ctx.column = gen.randomColumn()
         ctx.index = gen.spiIndexFor(ctx.collectionName, [ctx.column.name])
+        ctx.invalidIndex = gen.spiIndexFor(ctx.collectionName, ['wrongColumn'])
     })
 });

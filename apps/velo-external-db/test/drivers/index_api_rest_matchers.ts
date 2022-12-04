@@ -2,6 +2,18 @@ import { IndexFieldOrder, IndexStatus, Index } from "libs/velo-external-db-core/
 
 const responseWith = (matcher: any) => expect.objectContaining({ data: matcher })
 
+
+const indexWith = (index: Index, extraProps: Partial<Index>) => ({
+    ...index,
+    fields: index.fields.map(field => ({
+        ...field,
+        order: expect.toBeOneOf([IndexFieldOrder.ASC, IndexFieldOrder.DESC]),
+    })),
+    caseInsensitive: expect.any(Boolean), // TODO: remove this when we support case insensitive indexes
+    ...extraProps
+})
+
+
 export const listIndexResponseWithDefaultIndex = () =>
     expect.arrayContaining([toHaveDefaultIndex()])
 
@@ -28,12 +40,6 @@ export const createIndexResponseWith = (index: Index) => responseWith(({ index: 
 
 export const removeIndexResponse = () => responseWith(({}))
 
-const indexWith = (index: Index, extraProps: Partial<Index>) => ({
-    ...index,
-    fields: index.fields.map(field => ({
-        ...field,
-        order: expect.toBeOneOf([IndexFieldOrder.ASC, IndexFieldOrder.DESC]),
-    })),
-    caseInsensitive: expect.any(Boolean), // TODO: remove this when we support case insensitive indexes
-    ...extraProps
-})
+export const listIndexResponseWithFailedIndex = (index: Index) => {
+    return expect.arrayContaining([indexWith(index, { status: IndexStatus.FAILED })])
+}
