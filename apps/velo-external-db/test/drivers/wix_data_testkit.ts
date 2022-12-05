@@ -7,9 +7,11 @@ app.set('case sensitive routing', true)
 
 app.use(express.json())
 
-app.get('/v1/external-databases/:externalDatabaseId', (_req, res) => {
+app.get('/v1/external-databases/:externalDatabaseId/public-keys', (_req, res) => {
     res.json({
-        publicKey: authConfig.authPublicKey
+        publicKeys: [
+            { id: authConfig.kid, base64PublicKey: authConfig.authPublicKey },
+        ]
     })
 })
 

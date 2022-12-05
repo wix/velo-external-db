@@ -2,6 +2,7 @@ import { IWixDataFacade } from '../../src/web/wix_data_facade'
 import * as jwt from 'jsonwebtoken'
 import { decodeBase64 } from '../../src/utils/base64_utils'
 import { authConfig } from '@wix-velo/test-commons'
+import { SignOptions } from 'jsonwebtoken'
 
 
 export const requestBodyWith = (role?: string | undefined, path?: string | undefined, authHeader?: string | undefined) => ({
@@ -14,19 +15,21 @@ export const requestBodyWith = (role?: string | undefined, path?: string | undef
     header(_name: string) { return authHeader }
 } )
 
-export const signedToken = (payload: Object, expiration= '10000ms') =>
-    jwt.sign(payload, decodeBase64(authConfig.authPrivateKey), { algorithm: 'RS256', expiresIn: expiration })
+export const signedToken = (payload: Object, keyid?: string, expiration= '10000ms') => {
+    let options = keyid ? {algorithm: 'RS256', expiresIn: expiration, keyid: keyid} : {algorithm: 'RS256', expiresIn: expiration};
+    return jwt.sign(payload, decodeBase64(authConfig.authPrivateKey), options as SignOptions)
+}
 
 export class WixDataFacadeMock implements IWixDataFacade {
-    publicKeys: string[]
+    publicKeys: { [key: string]: string }[]
     index: number
 
-    constructor(...publicKeys: string[]) {
+    constructor(...publicKeys: { [key: string]: string }[]) {
         this.publicKeys = publicKeys
         this.index = 0
     }
 
-    getPublicKey(_externalDatabaseId: string): Promise<string> {
+    getPublicKeys(_externalDatabaseId: string): Promise<{ [key: string]: string }> {
         const publicKeyToReturn = this.publicKeys[this.index]
         if (this.index < this.publicKeys.length-1) {
             this.index++

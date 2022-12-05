@@ -4,11 +4,14 @@ import axios from 'axios'
 import { decodeBase64 } from '../utils/base64_utils'
 
 type PublicKeyResponse = {
-    publicKey: string;
+    publicKeys: {
+        id: string,
+        base64PublicKey: string
+    }[];
 };
 
 export interface IWixDataFacade {
-    getPublicKey(externalDatabaseId: string): Promise<string>
+    getPublicKeys(externalDatabaseId: string): Promise<{ [key: string]: string }>
 }
 
 export class WixDataFacade implements IWixDataFacade {
@@ -18,16 +21,19 @@ export class WixDataFacade implements IWixDataFacade {
         this.baseUrl = baseUrl
     }
 
-    async getPublicKey(externalDatabaseId: string): Promise<string> {
-        const url = `${this.baseUrl}/v1/external-databases/${externalDatabaseId}`
+    async getPublicKeys(externalDatabaseId: string): Promise<{ [key: string]: string }> {
+        const url = `${this.baseUrl}/v1/external-databases/${externalDatabaseId}/public-keys`
         const { data, status } = await axios.get<PublicKeyResponse>(url, {
             headers: {
                 Accept: 'application/json',
             },
         })
         if (status !== 200) {
-            throw new UnauthorizedError(`failed to get public key: status ${status}`)
+            throw new UnauthorizedError(`failed to get public keys: status ${status}`)
         }
-        return decodeBase64(data.publicKey)
+        return data.publicKeys.reduce((m: { [key: string]: string }, { id, base64PublicKey }) => {
+            m[id] = decodeBase64(base64PublicKey);
+            return m;
+        }, {});
     }
 }
