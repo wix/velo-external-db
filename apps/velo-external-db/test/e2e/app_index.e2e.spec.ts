@@ -8,7 +8,7 @@ import * as index from '../drivers/index_api_rest_test_support'
 import * as gen from '../gen'
 import axios from 'axios'
 const chance = new Chance()
-import { eventually } from '../drivers/eventually'
+import { eventually } from '../utils/eventually'
 
 const axiosServer = axios.create({
     baseURL: 'http://localhost:8080'

@@ -92,7 +92,7 @@ export default class IndexProvider implements IIndexProvider {
         return new Promise((resolve, reject) => {
             promise.catch((e: any) => {
                 console.log('failed to create index', e);
-                this.failedIndexes[index.name] = ({ ...index, status: DomainIndexStatus.FAILED, error: e.message })
+                this.failedIndexes[index.name] = ({ ...index, status: DomainIndexStatus.FAILED, error: this.translateErrorCodes(e) })
                 reject(this.translateErrorCodes(e))
             })
 
