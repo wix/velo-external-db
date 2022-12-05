@@ -2,20 +2,20 @@ import { errors } from '@wix-velo/velo-external-db-commons'
 const { UnauthorizedError } = errors
 import { JwtHeader, JwtPayload, SigningKeyCallback, verify } from 'jsonwebtoken'
 import * as express from 'express'
-import { IWixDataFacade } from './wix_data_facade'
+import { IWixDataFacade, PublicKeyMap } from './wix_data_facade'
 
 
 export const TOKEN_ISSUER = 'wix-data.wix.com'
 
 export class JwtAuthenticator {
-    publicKeys: { [key: string]: string } | undefined
+    publicKeys: PublicKeyMap | undefined
     externalDatabaseId: string
     allowedMetasites: string[]
     wixDataFacade: IWixDataFacade
 
     constructor(externalDatabaseId: string, allowedMetasites: string, wixDataFacade: IWixDataFacade) {
         this.externalDatabaseId = externalDatabaseId
-        this.allowedMetasites = allowedMetasites.split(',')
+        this.allowedMetasites = allowedMetasites ? allowedMetasites.split(',') : []
         this.wixDataFacade = wixDataFacade
     }
 
@@ -33,7 +33,7 @@ export class JwtAuthenticator {
         }
     }
 
-    getKey = (header: JwtHeader, callback: SigningKeyCallback) => {
+    getKey(header: JwtHeader, callback: SigningKeyCallback) {
         if (header.kid === undefined) {
             callback(new UnauthorizedError('No kid set on JWT header'))
             return
@@ -46,9 +46,9 @@ export class JwtAuthenticator {
         }
     }
 
-    verifyJwt = (token: string) => {
+    verifyJwt(token: string)  {
         return new Promise<JwtPayload | string>((resolve, reject) =>
-            verify(token, this.getKey, {audience: this.externalDatabaseId, issuer: TOKEN_ISSUER}, (err, decoded) =>
+            verify(token, this.getKey.bind(this), {audience: this.externalDatabaseId, issuer: TOKEN_ISSUER}, (err, decoded) =>
                 (err) ? reject(err) : resolve(decoded!)
             ));
     }

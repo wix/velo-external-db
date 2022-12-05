@@ -10,8 +10,10 @@ type PublicKeyResponse = {
     }[];
 };
 
+export type PublicKeyMap = { [key: string]: string }
+
 export interface IWixDataFacade {
-    getPublicKeys(externalDatabaseId: string): Promise<{ [key: string]: string }>
+    getPublicKeys(externalDatabaseId: string): Promise<PublicKeyMap>
 }
 
 export class WixDataFacade implements IWixDataFacade {
@@ -21,7 +23,7 @@ export class WixDataFacade implements IWixDataFacade {
         this.baseUrl = baseUrl
     }
 
-    async getPublicKeys(externalDatabaseId: string): Promise<{ [key: string]: string }> {
+    async getPublicKeys(externalDatabaseId: string): Promise<PublicKeyMap> {
         const url = `${this.baseUrl}/v1/external-databases/${externalDatabaseId}/public-keys`
         const { data, status } = await axios.get<PublicKeyResponse>(url, {
             headers: {
@@ -31,7 +33,7 @@ export class WixDataFacade implements IWixDataFacade {
         if (status !== 200) {
             throw new UnauthorizedError(`failed to get public keys: status ${status}`)
         }
-        return data.publicKeys.reduce((m: { [key: string]: string }, { id, base64PublicKey }) => {
+        return data.publicKeys.reduce((m: PublicKeyMap, { id, base64PublicKey }) => {
             m[id] = decodeBase64(base64PublicKey);
             return m;
         }, {});

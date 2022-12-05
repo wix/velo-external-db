@@ -10,6 +10,7 @@ import {
 } from '../../test/drivers/auth_middleware_test_support'
 import { decodeBase64 } from '../utils/base64_utils'
 import { authConfig } from '@wix-velo/test-commons'
+import { PublicKeyMap } from './wix_data_facade'
 
 const chance = Chance()
 
@@ -122,9 +123,9 @@ describe('JWT Auth Middleware', () => {
         ctx.keyId = chance.word()
         const otherKeyId = chance.word()
         ctx.next = jest.fn().mockName('next')
-        const publicKeys: { [key: string]: string } = {}
+        const publicKeys: PublicKeyMap = {}
         publicKeys[ctx.keyId] = decodeBase64(authConfig.authPublicKey)
-        const otherPublicKeys: { [key: string]: string } = {}
+        const otherPublicKeys: PublicKeyMap = {}
         otherPublicKeys[otherKeyId] = decodeBase64(authConfig.otherAuthPublicKey)
         ctx.otherWixDataMock = new WixDataFacadeMock(otherPublicKeys, publicKeys)
         env.auth = new JwtAuthenticator(ctx.externalDatabaseId, ctx.allowedMetasites, new WixDataFacadeMock(publicKeys)).authorizeJwt()

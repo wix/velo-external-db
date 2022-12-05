@@ -1,4 +1,4 @@
-import { IWixDataFacade } from '../../src/web/wix_data_facade'
+import {IWixDataFacade, PublicKeyMap} from '../../src/web/wix_data_facade'
 import * as jwt from 'jsonwebtoken'
 import { decodeBase64 } from '../../src/utils/base64_utils'
 import { authConfig } from '@wix-velo/test-commons'
@@ -21,15 +21,15 @@ export const signedToken = (payload: Object, keyid?: string, expiration= '10000m
 }
 
 export class WixDataFacadeMock implements IWixDataFacade {
-    publicKeys: { [key: string]: string }[]
+    publicKeys: PublicKeyMap[]
     index: number
 
-    constructor(...publicKeys: { [key: string]: string }[]) {
+    constructor(...publicKeys: PublicKeyMap[]) {
         this.publicKeys = publicKeys
         this.index = 0
     }
 
-    getPublicKeys(_externalDatabaseId: string): Promise<{ [key: string]: string }> {
+    getPublicKeys(_externalDatabaseId: string): Promise<PublicKeyMap> {
         const publicKeyToReturn = this.publicKeys[this.index]
         if (this.index < this.publicKeys.length-1) {
             this.index++
