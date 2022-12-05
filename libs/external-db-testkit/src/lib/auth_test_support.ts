@@ -31,7 +31,7 @@ const appendJWTHeaderToRequest = (dataRaw: string, headers: AxiosRequestHeaders)
 const TOKEN_ISSUER = 'wix-data.wix.com'
 
 const createJwtHeader = () => {
-    const token = jwt.sign({ iss: TOKEN_ISSUER, metasite: allowedMetasite }, decodeBase64(authConfig.authPrivateKey), { algorithm: 'RS256' })
+    const token = jwt.sign({ iss: TOKEN_ISSUER, siteId: allowedMetasite, aud: externalDatabaseId }, decodeBase64(authConfig.authPrivateKey), { algorithm: 'RS256', keyid: authConfig.kid })
     return `Bearer ${token}`
 }
 
