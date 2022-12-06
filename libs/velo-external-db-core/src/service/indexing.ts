@@ -1,5 +1,5 @@
 import { DomainIndex, IIndexProvider } from '@wix-velo/velo-external-db-types'
-import { Index as SpiIndex, IndexField, IndexFieldOrder, IndexStatus } from '../spi-model/indexing'
+import { Index as SpiIndex, IndexField, IndexStatus } from '../spi-model/indexing'
 
 export default class IndexService {
     storage: IIndexProvider
