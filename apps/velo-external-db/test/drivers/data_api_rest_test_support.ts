@@ -1,5 +1,4 @@
 import { Item } from '@wix-velo/velo-external-db-types'
-import { Options, QueryRequest, QueryV2 } from 'libs/velo-external-db-core/src/spi-model/data_source'
 
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
