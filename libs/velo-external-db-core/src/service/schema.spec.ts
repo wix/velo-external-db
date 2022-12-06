@@ -89,7 +89,7 @@ describe('Schema Service', () => {
             await expect( env.schemaService.listCollections([]) ).resolves.toEqual( collectionsListFor(ctx.dbsWithIdColumn, collectionCapabilities))
         })
 
-        test('create collection name without fields', async() => {
+        test('create new collection without fields', async() => {
             driver.givenAllSchemaOperations()
             driver.expectCreateOf(ctx.collectionName)
             schema.expectSchemaRefresh()
@@ -99,7 +99,7 @@ describe('Schema Service', () => {
             })
         })
 
-        test('create collection name with fields', async() => {
+        test('create new collection with fields', async() => {
             const fields = [{
                 key: ctx.column.name,
                 type: convertFieldTypeToEnum(ctx.column.type),
@@ -112,6 +112,72 @@ describe('Schema Service', () => {
                 collection: { id: ctx.collectionName, fields }
             })
         })
+
+        test('compareColumnsInDbAndRequest function - add columns', async() => {
+            const { compareColumnsInDbAndRequest } = env.schemaService
+            const columnsInDb = [{
+                field: ctx.column.name,
+                type: ctx.column.type
+            }]
+            const columnsInRequest = [{
+                key: ctx.column.name,
+                type: convertFieldTypeToEnum(ctx.column.type),
+            }]
+            const newColumn = {
+                key: ctx.anotherColumn.name,
+                type: convertFieldTypeToEnum(ctx.anotherColumn.type)
+            }
+            expect(compareColumnsInDbAndRequest([], []).columnsToAdd).toEqual([])
+            expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToAdd).toEqual([])
+            expect(compareColumnsInDbAndRequest(columnsInDb, []).columnsToAdd).toEqual([])
+            expect(compareColumnsInDbAndRequest([], columnsInRequest).columnsToAdd).toEqual([...columnsInRequest])
+            expect(compareColumnsInDbAndRequest(columnsInDb, [...columnsInRequest, newColumn]).columnsToAdd).toEqual([newColumn])
+        })
+
+        test('compareColumnsInDbAndRequest function - remove columns', async() => {
+            const { compareColumnsInDbAndRequest } = env.schemaService
+            const columnsInDb = [{
+                field: ctx.column.name,
+                type: ctx.column.type
+            }]
+            const columnsInRequest = [{
+                key: ctx.column.name,
+                type: convertFieldTypeToEnum(ctx.column.type),
+            }]
+            const newColumn = {
+                key: ctx.anotherColumn.name,
+                type: convertFieldTypeToEnum(ctx.anotherColumn.type)
+            }
+            expect(compareColumnsInDbAndRequest([], []).columnsToRemove).toEqual([])
+            expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToRemove).toEqual([])
+            expect(compareColumnsInDbAndRequest(columnsInDb, [...columnsInRequest, newColumn]).columnsToRemove).toEqual([])
+            expect(compareColumnsInDbAndRequest(columnsInDb, []).columnsToRemove).toEqual([...columnsInDb])
+            expect(compareColumnsInDbAndRequest(columnsInDb, [newColumn]).columnsToRemove).toEqual(columnsInDb)
+        })
+
+        test('compareColumnsInDbAndRequest function - change column type', async() => {
+            const { compareColumnsInDbAndRequest } = env.schemaService
+            const columnsInDb = [{
+                field: ctx.column.name,
+                type: 'text'
+            }]
+
+            const columnsInRequest = [{
+                key: ctx.column.name,
+                type: convertFieldTypeToEnum('text'),
+            }]
+
+            const changedColumnType = {
+                key: ctx.column.name,
+                type: convertFieldTypeToEnum('number')
+            }
+
+            expect(compareColumnsInDbAndRequest([], []).columnsToChangeType).toEqual([])
+            expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToChangeType).toEqual([])
+            expect(compareColumnsInDbAndRequest(columnsInDb, [changedColumnType]).columnsToChangeType).toEqual([changedColumnType])
+
+        })
+
     })
     
     const ctx = {
@@ -120,6 +186,7 @@ describe('Schema Service', () => {
         collections: Uninitialized,
         collectionName: Uninitialized,
         column: Uninitialized,
+        anotherColumn: Uninitialized,
         invalidOperations: Uninitialized,
     }
 
@@ -141,6 +208,7 @@ describe('Schema Service', () => {
         ctx.collections = gen.randomCollections()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
+        ctx.anotherColumn = gen.randomColumn()
 
         ctx.invalidOperations = [chance.word(), chance.word()]
         

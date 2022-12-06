@@ -138,6 +138,28 @@ export default class SchemaService {
         } }
     }
 
+    compareColumnsInDbAndRequest(columnsInDb: ResponseField[], columnsInRequest: Field[]): {
+        columnsToAdd: Field[]
+        columnsToRemove: ResponseField[]
+        columnsToChangeType: Field[]
+    } {
+        const collectionColumnsNamesInDb = columnsInDb.map(f => f.field)
+        const collectionColumnsNamesInRequest = columnsInRequest.map(f => f.key)
+
+        const columnsToAdd = columnsInRequest.filter(f => !collectionColumnsNamesInDb.includes(f.key))
+        const columnsToRemove = columnsInDb.filter(f => !collectionColumnsNamesInRequest.includes(f.field))
+        const columnsToChangeType = columnsInRequest.filter(f => {
+            const fieldInDb = columnsInDb.find(field => field.field === f.key)
+            return fieldInDb && fieldInDb.type !== convertEnumToFieldType(f.type)
+        })
+
+        return {
+            columnsToAdd,
+            columnsToRemove,
+            columnsToChangeType
+        }
+    }
+
     async updateCollection(collection: Collection): Promise<UpdateCollectionResponse> {
         await this.validateOperation(Create)
         
@@ -148,15 +170,12 @@ export default class SchemaService {
 
         const collectionColumnsInRequest = collection.fields
         const collectionColumnsInDb = await this.storage.describeCollection(collection.id)
-        const collectionColumnsNamesInDb = collectionColumnsInDb.map(f => f.field)
-        const collectionColumnsNamesInRequest = collectionColumnsInRequest.map(f => f.key)
 
-        const columnsToAdd = collectionColumnsInRequest.filter(f => !collectionColumnsNamesInDb.includes(f.key))
-        const columnsToRemove = collectionColumnsInDb.filter(f => !collectionColumnsNamesInRequest.includes(f.field))
-        const columnsToChangeType = collectionColumnsInRequest.filter(f => {
-            const fieldInDb = collectionColumnsInDb.find(field => field.field === f.key)
-            return fieldInDb && fieldInDb.type !== convertEnumToFieldType(f.type)
-        })
+        const {
+            columnsToAdd,
+            columnsToRemove,
+            columnsToChangeType
+        } = this.compareColumnsInDbAndRequest(collectionColumnsInDb, collectionColumnsInRequest)
 
         // Adding columns
         await Promise.all(columnsToAdd.map(async(field) => await this.storage.addColumn(collection.id, {
@@ -169,7 +188,6 @@ export default class SchemaService {
         await Promise.all(columnsToRemove.map(async(field) => await this.storage.removeColumn(collection.id, field.field)))
 
         // Changing columns type
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType!(collection.id, {
             name: field.key,
             type: convertEnumToFieldType(field.type)

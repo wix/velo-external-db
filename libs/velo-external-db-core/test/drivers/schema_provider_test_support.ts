@@ -12,6 +12,7 @@ export const schemaProvider = {
     supportedOperations: jest.fn(),
     columnCapabilitiesFor: jest.fn(),
     capabilities: jest.fn(),
+    changeColumnType: jest.fn(),
 }
 
 export const givenListResult = (dbs: any) =>
@@ -76,4 +77,5 @@ export const reset = () => {
     schemaProvider.supportedOperations.mockClear()
     schemaProvider.columnCapabilitiesFor.mockClear()
     schemaProvider.capabilities.mockClear()
+    schemaProvider.changeColumnType.mockClear()
 }
