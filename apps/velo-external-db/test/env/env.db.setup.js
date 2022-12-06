@@ -3,16 +3,16 @@ import { registerTsProject } from 'nx/src/utils/register'
 registerTsProject('.', 'tsconfig.base.json')
 
 
-const { testResources: postgres } = require ('@wix-velo/external-db-postgres')
+// const { testResources: postgres } = require ('@wix-velo/external-db-postgres')
 const { testResources: mysql } = require ('@wix-velo/external-db-mysql')
-const { testResources: spanner } = require ('@wix-velo/external-db-spanner')
-const { testResources: firestore } = require ('@wix-velo/external-db-firestore')
-const { testResources: mssql } = require ('@wix-velo/external-db-mssql')
-const { testResources: mongo } = require ('@wix-velo/external-db-mongo')
-const { testResources: googleSheet } = require('@wix-velo/external-db-google-sheets')
-const { testResources: airtable } = require('@wix-velo/external-db-airtable')
-const { testResources: dynamoDb } = require('@wix-velo/external-db-dynamodb')
-const { testResources: bigquery } = require('@wix-velo/external-db-bigquery')
+// const { testResources: spanner } = require ('@wix-velo/external-db-spanner')
+// const { testResources: firestore } = require ('@wix-velo/external-db-firestore')
+// const { testResources: mssql } = require ('@wix-velo/external-db-mssql')
+// const { testResources: mongo } = require ('@wix-velo/external-db-mongo')
+// const { testResources: googleSheet } = require('@wix-velo/external-db-google-sheets')
+// const { testResources: airtable } = require('@wix-velo/external-db-airtable')
+// const { testResources: dynamoDb } = require('@wix-velo/external-db-dynamodb')
+// const { testResources: bigquery } = require('@wix-velo/external-db-bigquery')
 
 const { sleep } = require('@wix-velo/test-commons')
 const ci = require('./ci_utils')
@@ -23,40 +23,40 @@ const initEnv = async(testEngine) => {
             await mysql.initEnv()
             break
 
-        case 'spanner':
-            await spanner.initEnv()
-            break
+        // case 'spanner':
+        //     await spanner.initEnv()
+        //     break
 
-        case 'postgres':
-            await postgres.initEnv()
-            break
+        // case 'postgres':
+        //     await postgres.initEnv()
+        //     break
 
-        case 'firestore':
-            await firestore.initEnv()
-            break
+        // case 'firestore':
+        //     await firestore.initEnv()
+        //     break
 
-        case 'mssql':
-            await mssql.initEnv()
-            break
+        // case 'mssql':
+        //     await mssql.initEnv()
+        //     break
 
-        case 'mongo':
-            await mongo.initEnv()
-            break
-        case 'google-sheet':
-            await googleSheet.initEnv()
-            break
+        // case 'mongo':
+        //     await mongo.initEnv()
+        //     break
+        // case 'google-sheet':
+        //     await googleSheet.initEnv()
+        //     break
 
-        case 'airtable':
-            await airtable.initEnv()
-            break
+        // case 'airtable':
+        //     await airtable.initEnv()
+        //     break
         
-        case 'dynamodb':
-            await dynamoDb.initEnv()
-            break
+        // case 'dynamodb':
+        //     await dynamoDb.initEnv()
+        //     break
 
-        case 'bigquery':
-            await bigquery.initEnv()
-            break
+        // case 'bigquery':
+        //     await bigquery.initEnv()
+        //     break
     }
 }
 
@@ -66,37 +66,37 @@ const cleanup = async(testEngine) => {
             await mysql.cleanup()
             break
 
-        case 'spanner':
-            await spanner.cleanup()
-            break
+        // case 'spanner':
+        //     await spanner.cleanup()
+        //     break
 
-        case 'postgres':
-            await postgres.cleanup()
-            break
+        // case 'postgres':
+        //     await postgres.cleanup()
+        //     break
 
-        case 'firestore':
-            await firestore.cleanup()
-            break
+        // case 'firestore':
+        //     await firestore.cleanup()
+        //     break
 
-        case 'mssql':
-            await mssql.cleanup()
-            break
+        // case 'mssql':
+        //     await mssql.cleanup()
+        //     break
 
-        case 'google-sheet':
-            await googleSheet.cleanup()
-            break
+        // case 'google-sheet':
+        //     await googleSheet.cleanup()
+        //     break
 
-        case 'mongo':
-            await mongo.cleanup()
-            break
+        // case 'mongo':
+        //     await mongo.cleanup()
+        //     break
         
-        case 'dynamodb':
-            await dynamoDb.cleanup()
-            break
+        // case 'dynamodb':
+        //     await dynamoDb.cleanup()
+        //     break
 
-        case 'bigquery':
-            await bigquery.cleanup()
-            break
+        // case 'bigquery':
+        //     await bigquery.cleanup()
+        //     break
     }
 }
 
