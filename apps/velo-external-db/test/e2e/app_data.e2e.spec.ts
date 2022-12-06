@@ -87,7 +87,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
         const expectedItems = [dataSpi.QueryResponsePart.item(ctx.items[0])]
 
-        await expect(response).rejects.toThrow('400')
+        await expect(response).rejects.toThrow('409')
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(expect.toIncludeAllMembers(
             [ 

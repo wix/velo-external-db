@@ -13,6 +13,6 @@ export default class DatabaseOperations implements IDatabaseOperations {
 
     async validateConnection() {
         return await this.query('SELECT 1').then(() => { return { valid: true } })
-                         .catch((e: any) => { return { valid: false, error: notThrowingTranslateErrorCodes(e) } })
+                            .catch((e: any) => { return { valid: false, error: notThrowingTranslateErrorCodes(e, '') } })
     }
 }

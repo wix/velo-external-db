@@ -139,7 +139,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                     })
 
                     await expect(axios.post('/schemas/column/remove', { collectionName: ctx.collectionName, columnName: ctx.column.name }, authOwner)).rejects.toMatchObject(
-                        errorResponseWith(400, 'Should not be removed')
+                        errorResponseWith(500, 'Should not be removed')
                     )
                 })
         })
@@ -188,14 +188,13 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 schemaHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
                         const error = new Error('message')
-                        error['status'] = '409'
                         throw error                    
                     }
                 }
             })
 
             await expect(axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)).rejects.toMatchObject(
-                errorResponseWith(409, 'message')
+                errorResponseWith(500, 'message')
             )
         })
         
@@ -210,7 +209,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             })
 
             await expect(axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)).rejects.toMatchObject(
-                errorResponseWith(400, 'message')
+                errorResponseWith(500, 'message')
             )
         })
 
@@ -224,7 +223,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             })
 
             await expect(axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)).rejects.toMatchObject(
-                errorResponseWith(400, 'message')
+                errorResponseWith(500, 'message')
             )
         })
     })

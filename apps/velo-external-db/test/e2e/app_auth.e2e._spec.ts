@@ -25,9 +25,10 @@ describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () 
     //         return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
     // })
 
-    test('request with no JWT will throw an appropriate error with the right format', async() => {
-        return expect(() => axios.post('/schemas/list', {}, authOwnerWithoutJwt)).rejects.toMatchObject(errorResponseWith(401, 'You are not authorized'))
-    })
+    // test('wrong secretKey will throw an appropriate error with the right format', async() => {
+    //     return expect(() => axios.post('/schemas/list', {}, authOwnerWithoutSecretKey)).rejects.toMatchObject(errorResponseWith(401, 'You are not authorized'))
+    // })
+
 
     const ctx = {
         collectionName: Uninitialized,
