@@ -16,14 +16,6 @@ jobs:
         with:
           node-version: lts/*
 
-      - name: Restore Dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
-
       - name: Installing Dependencies
         run: npm install
 

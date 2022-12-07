@@ -94,7 +94,7 @@ jobs:
         run: |
           cd apps/velo-external-db/test/resources
           docker compose down
-        
+
   # test_bigquery:
   #   runs-on: ubuntu-latest
   #   strategy:
