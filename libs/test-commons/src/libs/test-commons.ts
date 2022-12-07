@@ -20,18 +20,18 @@ export const testSupportedOperations = (supportedOperations: SchemaOperations[],
     })
 }
 
-export const streamToArray = async (stream: any) => {
+export const streamToArray = async(stream: any) => {
 
     return new Promise((resolve, reject) => {
         const arr: any[] = []
     
         stream.on('data', (data: any) => {
             arr.push(JSON.parse(data.toString()))
-        });
+        })
         
         stream.on('end', () => {
             resolve(arr)
-        });
+        })
 
         stream.on('error', (err: Error) => reject(err))
         

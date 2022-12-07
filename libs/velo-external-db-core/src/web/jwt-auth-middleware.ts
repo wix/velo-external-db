@@ -38,7 +38,7 @@ export class JwtAuthenticator {
             callback(new UnauthorizedError('No kid set on JWT header'))
             return
         }
-        const publicKey = this.publicKeys![header.kid!];
+        const publicKey = this.publicKeys![header.kid!]
         if (publicKey === undefined) {
             callback(new UnauthorizedError(`No public key fetched for kid ${header.kid}. Available keys: ${JSON.stringify(this.publicKeys)}`))
         } else {
@@ -48,18 +48,18 @@ export class JwtAuthenticator {
 
     verifyJwt(token: string)  {
         return new Promise<JwtPayload | string>((resolve, reject) =>
-            verify(token, this.getKey.bind(this), {audience: this.externalDatabaseId, issuer: TOKEN_ISSUER}, (err, decoded) =>
+            verify(token, this.getKey.bind(this), { audience: this.externalDatabaseId, issuer: TOKEN_ISSUER }, (err, decoded) =>
                 (err) ? reject(err) : resolve(decoded!)
-            ));
+            ))
     }
 
 
     async verifyWithRetry(token: string): Promise<JwtPayload | string> {
         try {
-            return await this.verifyJwt(token);
+            return await this.verifyJwt(token)
         } catch (err) {
             this.publicKeys = await this.wixDataFacade.getPublicKeys(this.externalDatabaseId)
-            return await this.verifyJwt(token);
+            return await this.verifyJwt(token)
         }
     }
 
