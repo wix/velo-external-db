@@ -1,6 +1,5 @@
 import { Uninitialized, gen } from '@wix-velo/test-commons'
-import { authVisitor, authOwnerWithoutJwt, errorResponseWith } from '@wix-velo/external-db-testkit'
-import each from 'jest-each'
+import { authOwnerWithoutJwt, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } from '../resources/e2e_resources'
 
 

@@ -17,7 +17,7 @@ import { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } 
 import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
 import { CollectionCapability } from './spi-model/capabilities'
-import { decodeBase64 } from "./utils/base64_utils";
+import { decodeBase64 } from './utils/base64_utils'
 
 export class ExternalDbRouter {
     connector: DbConnector
@@ -68,4 +68,5 @@ export class ExternalDbRouter {
     }
 }
 
+export * as dataSpi from './spi-model/data_source'
 export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext, CollectionCapability, decodeBase64 }

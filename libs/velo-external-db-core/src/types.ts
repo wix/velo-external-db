@@ -1,7 +1,7 @@
 import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
-import { AggregateRequest, Group, Paging, Sorting } from './spi-model/data_source';
+import { AggregateRequest, Group, Paging, Sorting } from './spi-model/data_source'
 
 
 export interface FindQuery {
