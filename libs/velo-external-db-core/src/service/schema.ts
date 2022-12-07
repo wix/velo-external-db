@@ -1,7 +1,7 @@
 import { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, errors } from '@wix-velo/velo-external-db-commons'
 import { InputField, ISchemaProvider, Table, SchemaOperations, ResponseField, DbCapabilities } from '@wix-velo/velo-external-db-types'
 import { Collection, CollectionCapabilities, CollectionOperation, CreateCollectionResponse, DataOperation, DeleteCollectionResponse, Field, FieldCapabilities, FieldType, ListCollectionsResponsePart, UpdateCollectionResponse } from '../spi-model/collection'
-import { convertQueriesToQueryOperatorsEnum, convertFieldTypeToEnum, convertEnumToFieldType, convertWixFormatFieldsToInputFields, convertResponseFieldToWixFormat, subtypeToFieldType } from '../utils/schema_utils'
+import { convertQueriesToQueryOperatorsEnum, convertFieldTypeToEnum, convertEnumToFieldType, convertWixFormatFieldsToInputFields, convertResponseFieldToWixFormat, convertWixFormatFieldToInputFields } from '../utils/schema_utils'
 import CacheableSchemaInformation from './schema_information'
 const { Create, AddColumn, RemoveColumn } = SchemaOperations
 
@@ -139,19 +139,26 @@ export default class SchemaService {
     }
 
     compareColumnsInDbAndRequest(columnsInDb: ResponseField[], columnsInRequest: Field[]): {
-        columnsToAdd: Field[]
-        columnsToRemove: ResponseField[]
-        columnsToChangeType: Field[]
+        columnsToAdd: InputField[]
+        columnsToRemove: string[]
+        columnsToChangeType: InputField[]
     } {
         const collectionColumnsNamesInDb = columnsInDb.map(f => f.field)
         const collectionColumnsNamesInRequest = columnsInRequest.map(f => f.key)
 
-        const columnsToAdd = columnsInRequest.filter(f => !collectionColumnsNamesInDb.includes(f.key))
-        const columnsToRemove = columnsInDb.filter(f => !collectionColumnsNamesInRequest.includes(f.field))
-        const columnsToChangeType = columnsInRequest.filter(f => {
-            const fieldInDb = columnsInDb.find(field => field.field === f.key)
-            return fieldInDb && fieldInDb.type !== convertEnumToFieldType(f.type)
-        })
+        const columnsToAdd = columnsInRequest
+                            .filter(f => !collectionColumnsNamesInDb.includes(f.key))
+                            .map(convertWixFormatFieldToInputFields)
+        const columnsToRemove = columnsInDb
+                                .filter(f => !collectionColumnsNamesInRequest.includes(f.field))
+                                .map(f => f.field)
+        
+        const columnsToChangeType = columnsInRequest
+                                    .filter(f => {
+                                        const fieldInDb = columnsInDb.find(field => field.field === f.key)
+                                        return fieldInDb && fieldInDb.type !== convertEnumToFieldType(f.type)
+                                    })
+                                    .map(convertWixFormatFieldToInputFields)
 
         return {
             columnsToAdd,
@@ -178,20 +185,12 @@ export default class SchemaService {
         } = this.compareColumnsInDbAndRequest(collectionColumnsInDb, collectionColumnsInRequest)
 
         // Adding columns
-        await Promise.all(columnsToAdd.map(async(field) => await this.storage.addColumn(collection.id, {
-            name: field.key as string,
-            type: convertEnumToFieldType(field.type),
-            subtype: subtypeToFieldType(field.type)
-        })))
-
+        await Promise.all(columnsToAdd.map(async(field) => await this.storage.addColumn(collection.id, field)))
         // Removing columns
-        await Promise.all(columnsToRemove.map(async(field) => await this.storage.removeColumn(collection.id, field.field)))
+        await Promise.all(columnsToRemove.map(async(fieldName) => await this.storage.removeColumn(collection.id, fieldName)))
 
         // Changing columns type
-        await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType!(collection.id, {
-            name: field.key,
-            type: convertEnumToFieldType(field.type)
-        })))
+        await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType!(collection.id, field)))
 
         return { collection }
     }
