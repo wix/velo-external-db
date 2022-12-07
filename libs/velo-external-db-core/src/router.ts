@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as BPromise from 'bluebird'
 import * as express from 'express'
-import type {Response} from 'express';
+import type { Response } from 'express'
 import * as compression from 'compression'
 import { errorMiddleware } from './web/error-middleware'
 import { appInfoFor } from './health/app_info'
@@ -28,8 +28,9 @@ import * as capabilities from './spi-model/capabilities'
 import { WixDataFacade } from './web/wix_data_facade'
 
 
-const { InvalidRequest, ItemNotFound } = errors
-const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
+const { InvalidRequest } = errors
+// const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
+const { Aggregate: AGGREGATE } = DataOperations
 
 let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
 
@@ -132,49 +133,56 @@ export const createRouter = () => {
 
     // *************** Data API **********************
     router.post('/data/query', async(req, res, next) => {
-        const queryRequest: dataSource.QueryRequest = req.body;
-        const query = queryRequest.query
+        try {
+            const queryRequest: dataSource.QueryRequest = req.body
+            const query = queryRequest.query
 
-        const offset = query.paging? query.paging.offset: 0
-        const limit = query.paging? query.paging.limit: 50
+            const offset = query.paging ? query.paging.offset : 0
+            const limit = query.paging ? query.paging.limit : 50
 
-        const data = await schemaAwareDataService.find(
-            queryRequest.collectionId, 
-            filterTransformer.transform(query.filter), 
-            filterTransformer.transformSort(query.sort),
-            offset,
-            limit,
-            query.fields,
-            queryRequest.omitTotalCount
-        )
+            const data = await schemaAwareDataService.find(
+                queryRequest.collectionId,
+                filterTransformer.transform(query.filter),
+                filterTransformer.transformSort(query.sort),
+                offset,
+                limit,
+                query.fields,
+                queryRequest.omitTotalCount
+            )
 
-        const responseParts = data.items.map(dataSource.QueryResponsePart.item)
+            const responseParts = data.items.map(dataSource.QueryResponsePart.item)
 
-        const metadata = dataSource.QueryResponsePart.pagingMetadata(responseParts.length, offset, data.totalCount)
+            const metadata = dataSource.QueryResponsePart.pagingMetadata(responseParts.length, offset, data.totalCount)
 
 
-        streamCollection([...responseParts, ...[metadata]], res)
+            streamCollection([...responseParts, ...[metadata]], res)
+        } catch (e) {
+            next(e)
+        }
     })
 
-
     router.post('/data/count', async(req, res, next) => {
-        const countRequest: dataSource.CountRequest = req.body;
+        try {
+            const countRequest: dataSource.CountRequest = req.body
 
-        const data = await schemaAwareDataService.count(
-            countRequest.collectionId, 
-            filterTransformer.transform(countRequest.filter), 
-        )
+            const data = await schemaAwareDataService.count(
+                countRequest.collectionId,
+                filterTransformer.transform(countRequest.filter),
+            )
 
-        const response = {
-            totalCount: data.totalCount
-        } as dataSource.CountResponse
+            const response = {
+                totalCount: data.totalCount
+            } as dataSource.CountResponse
 
-        res.json(response)
+            res.json(response)
+        } catch (e) {
+            next(e)
+        }
     })
 
     router.post('/data/insert', async(req, res, next) => {
         try {
-            const insertRequest: dataSource.InsertRequest = req.body;
+            const insertRequest: dataSource.InsertRequest = req.body
 
             const collectionName = insertRequest.collectionId
 
@@ -193,7 +201,7 @@ export const createRouter = () => {
     router.post('/data/update', async(req, res, next) => {
         
         try {
-            const updateRequest: dataSource.UpdateRequest = req.body;
+            const updateRequest: dataSource.UpdateRequest = req.body
 
             const collectionName = updateRequest.collectionId
 
@@ -209,10 +217,10 @@ export const createRouter = () => {
 
     router.post('/data/remove', async(req, res, next) => {
         try {
-            const removeRequest: dataSource.RemoveRequest = req.body;
+            const removeRequest: dataSource.RemoveRequest = req.body
             const collectionName = removeRequest.collectionId
-            const idEqExpression = removeRequest.itemIds.map(itemId => ({_id: {$eq: itemId}}))
-            const filter = {$or: idEqExpression}
+            const idEqExpression = removeRequest.itemIds.map(itemId => ({ _id: { $eq: itemId } }))
+            const filter = { $or: idEqExpression }
 
             const objectsBeforeRemove = (await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), undefined, 0, removeRequest.itemIds.length)).items
 
@@ -226,7 +234,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/aggregate', async (req, res, next) => {
+    router.post('/data/aggregate', async(req, res, next) => {
         try {
             const aggregationRequest = req.body as dataSource.AggregateRequest
             const { collectionId, paging, sort } = aggregationRequest
