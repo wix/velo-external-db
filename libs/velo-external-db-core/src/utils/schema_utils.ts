@@ -114,9 +114,10 @@ export const convertResponseFieldToWixFormat = (fields: ResponseField[]): Field[
     })
 }
 
-export const convertWixFormatFieldsToInputFields = (fields: Field[]): InputField[] => {
-    return fields.map( field => ({
-        name: field.key,
-        type: convertEnumToFieldType(field.type)
-    }))
-}
+export const convertWixFormatFieldToInputFields = (field: Field): InputField => ({
+    name: field.key,
+    type: convertEnumToFieldType(field.type),
+    subtype: subtypeToFieldType(field.type)
+})
+
+export const convertWixFormatFieldsToInputFields = (fields: Field[]): InputField[] => fields.map(convertWixFormatFieldToInputFields)
