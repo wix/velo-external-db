@@ -34,8 +34,8 @@ export class WixDataFacade implements IWixDataFacade {
             throw new UnauthorizedError(`failed to get public keys: status ${status}`)
         }
         return data.publicKeys.reduce((m: PublicKeyMap, { id, base64PublicKey }) => {
-            m[id] = decodeBase64(base64PublicKey);
-            return m;
-        }, {});
+            m[id] = decodeBase64(base64PublicKey)
+            return m
+        }, {})
     }
 }
