@@ -5,7 +5,7 @@ const defaults = {
     interval: 200
 }
 
-export const eventually = async (fn: any, opts?: { timeout?: number; interval?: number }) => {
+export const eventually = async(fn: any, opts?: { timeout?: number; interval?: number }) => {
     return Promise.resolve().then(() => {
         let error = null
         const action = () => Promise.resolve().then(fn).catch(err => {

@@ -26,10 +26,8 @@ import { JwtAuthenticator } from './web/jwt-auth-middleware'
 import * as dataSource from './spi-model/data_source'
 import * as capabilities from './spi-model/capabilities'
 import { WixDataFacade } from './web/wix_data_facade'
-import { json } from 'stream/consumers';
-import DataService from './service/data';
-import IndexService from './service/indexing';
-import { CreateIndexRequest, ListIndexesRequest, RemoveIndexRequest } from './spi-model/indexing';
+import IndexService from './service/indexing'
+import { CreateIndexRequest, ListIndexesRequest, RemoveIndexRequest } from './spi-model/indexing'
 
 
 const { InvalidRequest } = errors
@@ -320,7 +318,7 @@ export const createRouter = () => {
 
     // *************** Indexes API **********************
 
-    router.post('/indexes/list', async (req, res, next) => {
+    router.post('/indexes/list', async(req, res, next) => {
         try {
             const { dataCollectionId: collectionId } = req.body as ListIndexesRequest
             const indexes = await indexService.list(collectionId)
@@ -330,7 +328,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/indexes/create', async (req, res, next) => {
+    router.post('/indexes/create', async(req, res, next) => {
         try {
             const { dataCollectionId: collectionId, index } = req.body as CreateIndexRequest
             const createdIndex = await indexService.create(collectionId, index)
@@ -342,7 +340,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/indexes/remove', async (req, res, next) => {
+    router.post('/indexes/remove', async(req, res, next) => {
         try {
             const { dataCollectionId: collectionId, indexName } = req.body as RemoveIndexRequest
             await indexService.remove(collectionId, indexName)

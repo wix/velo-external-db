@@ -59,22 +59,22 @@ export default class IndexProvider implements IIndexProvider {
     }
 
     private async getInProgressIndexesFor(collectionName: string): Promise<{ [x: string]: DomainIndex }> {
-        const databaseName = this.pool.config.connectionConfig.database;
-        const inProgressIndexes = await this.query(`SELECT * FROM information_schema.processlist WHERE db = ? AND info LIKE 'CREATE%INDEX%'`, [databaseName])
-        const domainIndexesForCollection = inProgressIndexes.map((r: any) => this.extractIndexFromQueryForCollection(collectionName, r.INFO)).filter(Boolean) as DomainIndex[];
+        const databaseName = this.pool.config.connectionConfig.database
+        const inProgressIndexes = await this.query('SELECT * FROM information_schema.processlist WHERE db = ? AND info LIKE \'CREATE%INDEX%\'', [databaseName])
+        const domainIndexesForCollection = inProgressIndexes.map((r: any) => this.extractIndexFromQueryForCollection(collectionName, r.INFO)).filter(Boolean) as DomainIndex[]
         return domainIndexesForCollection.reduce((acc, index) => {
-            acc[index.name] = index;
-            return acc;
-        }, {} as { [x: string]: DomainIndex });
+            acc[index.name] = index
+            return acc
+        }, {} as { [x: string]: DomainIndex })
     }
 
     private extractIndexFromQueryForCollection(collectionName: string, createIndexQuery: string): DomainIndex | undefined {
-        const regex = /CREATE\s+(UNIQUE)?\s?INDEX\s+`(\w+)`\s+ON\s+`(\w+)`\s+\(([\w\s`,]+)\)/;
-        const match = createIndexQuery.match(regex);
+        const regex = /CREATE\s+(UNIQUE)?\s?INDEX\s+`(\w+)`\s+ON\s+`(\w+)`\s+\(([\w\s`,]+)\)/
+        const match = createIndexQuery.match(regex)
         if (match) {
-            const [, isUnique, name, collection, columnsString] = match;
+            const [, isUnique, name, collection, columnsString] = match
             if (collection === collectionName) {
-                const columns = columnsString.replace(/`/g, '').split(',').map((column) => column.trim());
+                const columns = columnsString.replace(/`/g, '').split(',').map((column) => column.trim())
                 return {
                     name,
                     columns,
@@ -82,16 +82,16 @@ export default class IndexProvider implements IIndexProvider {
                     caseInsensitive: true,
                     order: 'ASC',
                     status: DomainIndexStatus.BUILDING
-                };
+                }
             }
         }
-        return;
+        return
     }
 
     private async returnStatusAfterXSeconds(x: number, promise: Promise<any>, index: DomainIndex): Promise<DomainIndexStatus> {
         return new Promise((resolve, reject) => {
             promise.catch((e: any) => {
-                console.log('failed to create index', e);
+                console.log('failed to create index', e)
                 this.failedIndexes[index.name] = ({ ...index, status: DomainIndexStatus.FAILED, error: this.translateErrorCodes(e) })
                 reject(this.translateErrorCodes(e))
             })

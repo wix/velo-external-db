@@ -1,5 +1,5 @@
 import Chance = require('chance')
-import { Uninitialized } from '@wix-velo/test-commons';
+import { Uninitialized } from '@wix-velo/test-commons'
 import { authOwner } from '@wix-velo/external-db-testkit'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } from '../resources/e2e_resources'
 import * as schema from '../drivers/schema_api_rest_test_support'
@@ -16,29 +16,29 @@ const axiosServer = axios.create({
 
 
 describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
-    beforeAll(async () => {
+    beforeAll(async() => {
         await setupDb()
         await initApp()
     })
 
-    afterAll(async () => {
+    afterAll(async() => {
         await dbTeardown()
     }, 20000)
 
-    test('list', async () => {
+    test('list', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-        expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.toEqual(matchers.listIndexResponseWithDefaultIndex())
+        await expect(index.retrieveIndexesFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.listIndexResponseWithDefaultIndex())
     })
 
-    test('list with multiple indexes', async () => {
+    test('list with multiple indexes', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await index.givenIndexes(ctx.collectionName, [ctx.index], authOwner)
 
-        await expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.toEqual(matchers.listIndexResponseWith([ctx.index]))
+        await expect(index.retrieveIndexesFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.listIndexResponseWith([ctx.index]))
     })
 
-    test('create', async () => {
+    test('create', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
         // in-progress
@@ -48,12 +48,12 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
         }, authOwner)).resolves.toEqual(matchers.createIndexResponseWith(ctx.index))
 
         // active
-        await eventually(async () =>
-            await expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.toEqual(matchers.listIndexResponseWith([ctx.index]))
+        await eventually(async() =>
+            await expect(index.retrieveIndexesFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.listIndexResponseWith([ctx.index]))
         )
     })
 
-    test('create with existing index', async () => {
+    test('create with existing index', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await index.givenIndexes(ctx.collectionName, [ctx.index], authOwner)
 
@@ -63,7 +63,7 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
         }, authOwner)).rejects.toThrow()
     })
 
-    test('remove', async () => {
+    test('remove', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await index.givenIndexes(ctx.collectionName, [ctx.index], authOwner)
 
@@ -72,25 +72,25 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
             indexName: ctx.index.name
         }, authOwner)).resolves.toEqual(matchers.removeIndexResponse()).catch()
 
-        await expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.not.toEqual(matchers.listIndexResponseWith([ctx.index]))
+        await expect(index.retrieveIndexesFor(ctx.collectionName, authOwner)).resolves.not.toEqual(matchers.listIndexResponseWith([ctx.index]))
     })
 
 
-    test('get failed indexes', async () => {
+    test('get failed indexes', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         
         await axiosServer.post('/indexes/create', {
             dataCollectionId: ctx.collectionName,
             index: ctx.invalidIndex
-        }, authOwner).catch(e=>{})
+        }, authOwner).catch(_e => {})
         
 
-        await eventually(async () =>
-            await expect(index.retrieveIndexesFor(ctx.collectionName)).resolves.toEqual(matchers.listIndexResponseWithFailedIndex(ctx.invalidIndex))
+        await eventually(async() =>
+            await expect(index.retrieveIndexesFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.listIndexResponseWithFailedIndex(ctx.invalidIndex))
         )
     })
 
-    afterAll(async () => {
+    afterAll(async() => {
         await teardownApp()
     })
 
@@ -107,4 +107,4 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
         ctx.index = gen.spiIndexFor(ctx.collectionName, [ctx.column.name])
         ctx.invalidIndex = gen.spiIndexFor(ctx.collectionName, ['wrongColumn'])
     })
-});
+})

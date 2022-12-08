@@ -12,7 +12,7 @@ export const givenListResult = (indexes: DomainIndex[], collectionName: string) 
 }
 
 export const givenCreateResult = (index: DomainIndex, collectionName: string) => {
-    const {status, ...indexWithoutStatus} = index
+    const { status, ...indexWithoutStatus } = index
     when(indexProvider.create).calledWith(collectionName, indexWithoutStatus).mockResolvedValue(index)
 }
 
