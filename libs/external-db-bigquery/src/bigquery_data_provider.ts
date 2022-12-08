@@ -50,12 +50,11 @@ export default class DataProvider implements IDataProvider {
                                 .join(';')
         const updateTables = items.map((item: Item) => [...this.updateFieldsWithoutNulls(item), '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {}))
                                 .map((u: any) => asParamArrays( patchDateTime(u) ))
-        console.log({ updateTables: updateTables.flatMap(i => i), queries })
                                     
         const resultSet = await this.pool.query({ query: queries, params: updateTables.flatMap(i => i) })
                                     .catch( translateErrorCodes )
 
-        return resultSet[0].length   
+        return resultSet[0].length
     }
 
     async delete(collectionName: string, itemIds: string[]) {
