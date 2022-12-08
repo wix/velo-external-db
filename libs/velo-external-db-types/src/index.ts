@@ -1,5 +1,6 @@
 import { CollectionCapabilities, ColumnCapabilities } from './collection_types'
 export * from './collection_types'
+import * as indexing from './indexing-types'
 
 export enum AdapterOperator { //in velo-external-db-core
     eq = 'eq',
@@ -170,13 +171,6 @@ export interface ISchemaProvider {
 
 export interface IBaseHttpError extends Error {}
 
-export interface IIndexProvider {
-    list(collectionName: string): Promise<DomainIndex[]>
-    create(collectionName: string, index: DomainIndex): Promise<DomainIndex>
-    remove(collectionName: string, indexName: string): Promise<void>
-}
-
-
 type ValidConnectionResult = { valid: true }
 type InvalidConnectionResult = { valid: false, error: IBaseHttpError }
 
@@ -193,7 +187,7 @@ export type ConnectionCleanUp = () => Promise<void> | void
 export type DbProviders<T> = {
     dataProvider: IDataProvider
     schemaProvider: ISchemaProvider
-    indexProvider?: IIndexProvider
+    indexProvider?: indexing.IIndexProvider
     databaseOperations: IDatabaseOperations
     connection: T
     cleanup: ConnectionCleanUp
@@ -270,19 +264,4 @@ export interface IImplementationResources {
     name: string
 }
 
-
-export interface DomainIndex {
-    name: string
-    columns: string[]
-    isUnique: boolean
-    caseInsensitive: boolean
-    order : 'ASC' | 'DESC'
-    status?: DomainIndexStatus
-    error?: any
-}
-
-export enum DomainIndexStatus {
-    ACTIVE = 'ACTIVE',
-    BUILDING = 'BUILDING',
-    FAILED = 'FAILED'
-}
+export * from './indexing-types'
