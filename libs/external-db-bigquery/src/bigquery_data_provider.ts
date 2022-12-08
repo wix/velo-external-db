@@ -45,13 +45,19 @@ export default class DataProvider implements IDataProvider {
         return items.length
     }
 
-    async update(collectionName: string, items: Item[]) {        
-        const updateFields = updateFieldsFor(items[0])
-        const queries = items.map(() => `UPDATE ${escapeIdentifier(collectionName)} SET ${updateFields.map(f => `${escapeIdentifier(f)} = ?`).join(', ')} WHERE _id = ?` )
-                             .join(';')
-        const updateTables = items.map((i: Item) => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}))
+    async update(collectionName: string, items: Item[]) {   
+        // revert to this update when this bug is fixed - 
+        // https://community.retool.com/t/parameter-types-must-be-provided-for-null-values-via-the-types-field-in-query-options/13648/6
+        // const updateFields = updateFieldsFor(items[0])
+        // const queries = items.map(() => `UPDATE ${escapeIdentifier(collectionName)} SET ${updateFields.map(f => `${escapeIdentifier(f)} = ?`).join(', ')} WHERE _id = ?` )
+        //                      .join(';')
+        // const updateTables = items.map((i: Item) => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}))
+        //                         .map((u: any) => asParamArrays( patchDateTime(u) ))
+
+        const queries = items.map((item) => `UPDATE ${escapeIdentifier(collectionName)} SET ${this.updateFieldsWithoutNulls(item).map(f => `${escapeIdentifier(f)} = ?`).join(', ')} WHERE _id = ?` )
+                                .join(';')
+        const updateTables = items.map((item: Item) => [...this.updateFieldsWithoutNulls(item), '_id'].reduce((obj, key) => ({ ...obj, [key]: item[key] }), {}))
                                 .map((u: any) => asParamArrays( patchDateTime(u) ))
-                                
                                     
         const resultSet = await this.pool.query({ query: queries, params: updateTables.flatMap(i => i) })
                                     .catch( translateErrorCodes )
@@ -83,6 +89,10 @@ export default class DataProvider implements IDataProvider {
                                     .catch( translateErrorCodes )
 
         return resultSet[0].map( unPatchDateTime )
+    }
+
+    updateFieldsWithoutNulls(item: Item) {
+        return updateFieldsFor(item).filter(f => item[f] !== null)
     }
 }
 
