@@ -17,7 +17,8 @@ const axios = require('axios').create({
     baseURL: 'http://localhost:8080'
 })
 
-describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () => {
+// eslint-disable-next-line jest/no-disabled-tests
+describe.skip(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {
         await setupDb()
 
