@@ -186,6 +186,7 @@ export default class SchemaService {
 
         // Adding columns
         await Promise.all(columnsToAdd.map(async(field) => await this.storage.addColumn(collection.id, field)))
+        
         // Removing columns
         await Promise.all(columnsToRemove.map(async(fieldName) => await this.storage.removeColumn(collection.id, fieldName)))
 
