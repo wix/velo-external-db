@@ -1,22 +1,20 @@
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField } from '@wix-velo/velo-external-db-types'
-import { Field, FieldType, QueryOperator } from '../spi-model/collection'
+import { InputField, ResponseField, FieldType } from '@wix-velo/velo-external-db-types'
+import { Field, FieldType as VeloFieldTypeEnum, QueryOperator } from '../spi-model/collection'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
-export const convertFieldTypeToEnum = ( fieldType: string ): FieldType => {
+export const convertFieldTypeToEnum = ( fieldType: string ): VeloFieldTypeEnum => {
     switch (fieldType) {
-        case 'text':
-        case 'url':
-            return FieldType.text
-        case 'number':
-            return FieldType.number
-        case 'boolean':
-            return FieldType.boolean
-        case 'image':
-        case 'object':
-            return FieldType.object
-        case 'datetime':
-            return FieldType.datetime
+        case FieldType.text:
+            return VeloFieldTypeEnum.text
+        case FieldType.number:
+            return VeloFieldTypeEnum.number
+        case FieldType.boolean:
+            return VeloFieldTypeEnum.boolean
+        case FieldType.object:
+            return VeloFieldTypeEnum.object
+        case FieldType.datetime:
+            return VeloFieldTypeEnum.datetime
         
         default:
            throw new Error(`${fieldType} - Unsupported field type`)
@@ -25,20 +23,20 @@ export const convertFieldTypeToEnum = ( fieldType: string ): FieldType => {
 
 export const convertEnumToFieldType = (fieldEnum: number): string => {
     switch (fieldEnum) {
-        case FieldType.text:
-        case FieldType.longText:
-            return 'text'
-        case FieldType.number:
-            return 'number'
-        case FieldType.datetime:
-            return 'datetime'
-        case FieldType.boolean:
-            return 'boolean'
-        case FieldType.object:
-            return 'object'
+        case VeloFieldTypeEnum.text:
+        case VeloFieldTypeEnum.longText:
+            return FieldType.text
+        case VeloFieldTypeEnum.number:
+            return FieldType.number
+        case VeloFieldTypeEnum.datetime:
+            return FieldType.datetime
+        case VeloFieldTypeEnum.boolean:
+            return FieldType.boolean
+        case VeloFieldTypeEnum.object:
+            return FieldType.object
 
-        case FieldType.singleReference:
-        case FieldType.multiReference:
+        case VeloFieldTypeEnum.singleReference:
+        case VeloFieldTypeEnum.multiReference:
         default:
             // TODO: throw specific error
             throw new Error(`Unsupported field type: ${fieldEnum}`)
@@ -47,20 +45,20 @@ export const convertEnumToFieldType = (fieldEnum: number): string => {
 
 export const subtypeToFieldType = (fieldEnum: number): string => {
     switch (fieldEnum) {
-        case FieldType.text:
-        case FieldType.longText:
+        case VeloFieldTypeEnum.text:
+        case VeloFieldTypeEnum.longText:
             return 'string'
-        case FieldType.number:
+        case VeloFieldTypeEnum.number:
             return 'int'
-        case FieldType.datetime:
+        case VeloFieldTypeEnum.datetime:
             return 'datetime'
-        case FieldType.boolean:
+        case VeloFieldTypeEnum.boolean:
             return ''
-        case FieldType.object:
+        case VeloFieldTypeEnum.object:
             return ''
 
-        case FieldType.singleReference:
-        case FieldType.multiReference:
+        case VeloFieldTypeEnum.singleReference:
+        case VeloFieldTypeEnum.multiReference:
         default:
             // TODO: throw specific error
             throw new Error(`There is no subtype for this type: ${fieldEnum}`)
