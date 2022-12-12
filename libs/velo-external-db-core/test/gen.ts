@@ -39,7 +39,7 @@ export const randomCollectionName = () => chance.word({ length: 5 })
 
 export const randomCollections = () => randomArrayOf( randomCollectionName )
 
-export const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'url', 'datetime', 'image', 'object' ])
+export const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'datetime', 'object' ])
 
 export const randomDbField = () => ( { field: chance.word(), type: randomWixDataType(), subtype: chance.word(), isPrimary: chance.bool() } )
 
