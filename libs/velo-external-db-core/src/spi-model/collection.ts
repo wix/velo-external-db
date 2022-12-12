@@ -1,9 +1,9 @@
-
-
-
 export type listCollections = (req: ListCollectionsRequest) => Promise<ListCollectionsResponsePart>
+
 export type createCollection = (req: CreateCollectionRequest) => Promise<CreateCollectionResponse>
+
 export type updateCollection = (req: UpdateCollectionRequest) => Promise<UpdateCollectionResponse>
+
 export type deleteCollection = (req: DeleteCollectionRequest) => Promise<DeleteCollectionResponse>
 export abstract class CollectionService {
 }
@@ -160,6 +160,3 @@ export enum FieldType {
     singleReference = 6,
     multiReference = 7,
 }
-
-
-
