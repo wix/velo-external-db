@@ -191,8 +191,8 @@ describe('Schema Service', () => {
             await env.schemaService.updateCollection({ id: ctx.collectionName, fields: newFields })
 
             expect(driver.schemaProvider.addColumn).toBeCalledTimes(1)    
-            expect(driver.schemaProvider.removeColumn).toBeCalledTimes(0)    
-            expect(driver.schemaProvider.changeColumnType).toBeCalledTimes(0)    
+            expect(driver.schemaProvider.removeColumn).not.toBeCalled()
+            expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
         })
 
         test('update collection - add new column to non empty collection', async() => {
@@ -225,8 +225,8 @@ describe('Schema Service', () => {
             } = env.schemaService.compareColumnsInDbAndRequest(currentFields, wantedFields)
 
             expect(driver.schemaProvider.addColumn).toBeCalledWith(ctx.collectionName, columnsToAdd[0])
-            expect(driver.schemaProvider.removeColumn).toBeCalledTimes(0)    
-            expect(driver.schemaProvider.changeColumnType).toBeCalledTimes(0)    
+            expect(driver.schemaProvider.removeColumn).not.toBeCalled()   
+            expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
         })
 
         test('update collection - remove column', async() => {
@@ -249,8 +249,8 @@ describe('Schema Service', () => {
             await env.schemaService.updateCollection({ id: ctx.collectionName, fields: [] })
 
             expect(driver.schemaProvider.removeColumn).toBeCalledWith( ctx.collectionName, columnsToRemove[0])
-            expect(driver.schemaProvider.addColumn).toBeCalledTimes(0)
-            expect(driver.schemaProvider.changeColumnType).toBeCalledTimes(0)  
+            expect(driver.schemaProvider.addColumn).not.toBeCalled()
+            expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
 
         })
 
@@ -279,8 +279,8 @@ describe('Schema Service', () => {
             await env.schemaService.updateCollection({ id: ctx.collectionName, fields: [changedColumnType] })
             
             expect(driver.schemaProvider.changeColumnType).toBeCalledWith(ctx.collectionName, columnsToChangeType[0])
-            expect(driver.schemaProvider.addColumn).toBeCalledTimes(0)
-            expect(driver.schemaProvider.removeColumn).toBeCalledTimes(0)
+            expect(driver.schemaProvider.addColumn).not.toBeCalled()
+            expect(driver.schemaProvider.removeColumn).not.toBeCalled()
 
         })
 
