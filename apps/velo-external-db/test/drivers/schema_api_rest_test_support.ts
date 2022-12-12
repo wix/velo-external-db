@@ -7,17 +7,13 @@ const axiosClient = axios.create({
 })
 
 export const givenCollection = async(name: string, columns: InputField[], auth: any) => {
-    await axiosClient.post('/schemas/create', { collectionName: name }, auth)
-    for (const column of columns) {
-        await axiosClient.post('/schemas/column/add', { collectionName: name, column: column }, auth)
-    }
-}
-
-export const givenNewCollection = async(name: string, columns: InputField[], auth: any) => {
     const collection = {
         id: name,
-        // todo: add convert the type to enum value dynamically
-        fields: columns.map(c => ({ key: c.name, type: 0 }))
+        fields: columns.map(c => ({ 
+            key: c.name,
+            // TODO: convert to enum based on column type 
+            type: 0 
+        }))
     }
     await axiosClient.post('/collections/create', { collection }, { ...auth, responseType: 'stream' })
 }
@@ -33,4 +29,8 @@ export const deleteAllCollections = async(auth: any) => {
 
 }
 
-export const retrieveSchemaFor = async(collectionName: string, auth: any) => axiosClient.post('/schemas/find', { schemaIds: [collectionName] }, auth)
+export const retrieveSchemaFor = async(collectionName: string, auth: any) => {
+    const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [collectionName] }, { ...auth, responseType: 'stream' })
+    const [collectionGetRes] = await streamToArray(collectionGetStream.data) as any[]
+    return collectionGetRes
+}

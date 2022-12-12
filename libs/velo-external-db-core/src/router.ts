@@ -312,93 +312,93 @@ export const createRouter = () => {
     })
 
     // *************** Schema API **********************
-    router.post('/schemas/list', async(req, res, next) => {
-        try {
-            const customContext = {}
-            await executeSchemaHooksFor(SchemaActions.BeforeList, schemaPayloadFor(SchemaOperations.List, req.body), requestContextFor(SchemaOperations.List, req.body), customContext)
+    // router.post('/schemas/list', async(req, res, next) => {
+    //     try {
+    //         const customContext = {}
+    //         await executeSchemaHooksFor(SchemaActions.BeforeList, schemaPayloadFor(SchemaOperations.List, req.body), requestContextFor(SchemaOperations.List, req.body), customContext)
 
-            const data = await schemaService.list()
+    //         const data = await schemaService.list()
 
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterList, data, requestContextFor(SchemaOperations.List, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
+    //         const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterList, data, requestContextFor(SchemaOperations.List, req.body), customContext)
+    //         res.json(dataAfterAction)
+    //     } catch (e) {
+    //         next(e)
+    //     }
+    // })
 
-    router.post('/schemas/list/headers', async(req, res, next) => {
-        try {
-            const customContext = {}
-            await executeSchemaHooksFor(SchemaActions.BeforeListHeaders, schemaPayloadFor(SchemaOperations.ListHeaders, req.body), requestContextFor(SchemaOperations.ListHeaders, req.body), customContext)
-            const data = await schemaService.listHeaders()
+    // router.post('/schemas/list/headers', async(req, res, next) => {
+    //     try {
+    //         const customContext = {}
+    //         await executeSchemaHooksFor(SchemaActions.BeforeListHeaders, schemaPayloadFor(SchemaOperations.ListHeaders, req.body), requestContextFor(SchemaOperations.ListHeaders, req.body), customContext)
+    //         const data = await schemaService.listHeaders()
 
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterListHeaders, data, requestContextFor(SchemaOperations.ListHeaders, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
+    //         const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterListHeaders, data, requestContextFor(SchemaOperations.ListHeaders, req.body), customContext)
+    //         res.json(dataAfterAction)
+    //     } catch (e) {
+    //         next(e)
+    //     }
+    // })
 
-    router.post('/schemas/find', async(req, res, next) => {
-        try {
-            const customContext = {}
-            const { schemaIds } = await executeSchemaHooksFor(SchemaActions.BeforeFind, schemaPayloadFor(SchemaOperations.Find, req.body), requestContextFor(SchemaOperations.Find, req.body), customContext)
+    // router.post('/schemas/find', async(req, res, next) => {
+    //     try {
+    //         const customContext = {}
+    //         const { schemaIds } = await executeSchemaHooksFor(SchemaActions.BeforeFind, schemaPayloadFor(SchemaOperations.Find, req.body), requestContextFor(SchemaOperations.Find, req.body), customContext)
 
-            if (schemaIds && schemaIds.length > 10) {
-                throw new InvalidRequest('Too many schemas requested')
-            }
-            const data = await schemaService.find(schemaIds)
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterFind, data, requestContextFor(SchemaOperations.Find, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
+    //         if (schemaIds && schemaIds.length > 10) {
+    //             throw new InvalidRequest('Too many schemas requested')
+    //         }
+    //         const data = await schemaService.find(schemaIds)
+    //         const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterFind, data, requestContextFor(SchemaOperations.Find, req.body), customContext)
+    //         res.json(dataAfterAction)
+    //     } catch (e) {
+    //         next(e)
+    //     }
+    // })
 
-    router.post('/schemas/create', async(req, res, next) => {
-        try {
-            const customContext = {}
-            const { collectionName } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(SchemaOperations.Create, req.body), requestContextFor(SchemaOperations.Create, req.body), customContext)
-            const data = await schemaService.create(collectionName)
+    // router.post('/schemas/create', async(req, res, next) => {
+    //     try {
+    //         const customContext = {}
+    //         const { collectionName } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(SchemaOperations.Create, req.body), requestContextFor(SchemaOperations.Create, req.body), customContext)
+    //         const data = await schemaService.create(collectionName)
 
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterCreate, data, requestContextFor(SchemaOperations.Create, req.body), customContext)
+    //         const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterCreate, data, requestContextFor(SchemaOperations.Create, req.body), customContext)
 
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
+    //         res.json(dataAfterAction)
+    //     } catch (e) {
+    //         next(e)
+    //     }
+    // })
 
-    router.post('/schemas/column/add', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { column } = await executeSchemaHooksFor(SchemaActions.BeforeColumnAdd, schemaPayloadFor(SchemaOperations.ColumnAdd, req.body), requestContextFor(SchemaOperations.ColumnAdd, req.body), customContext)
+    // router.post('/schemas/column/add', async(req, res, next) => {
+    //     try {
+    //         const { collectionName } = req.body
+    //         const customContext = {}
+    //         const { column } = await executeSchemaHooksFor(SchemaActions.BeforeColumnAdd, schemaPayloadFor(SchemaOperations.ColumnAdd, req.body), requestContextFor(SchemaOperations.ColumnAdd, req.body), customContext)
 
-            const data = await schemaService.addColumn(collectionName, column)
+    //         const data = await schemaService.addColumn(collectionName, column)
 
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterColumnAdd, data, requestContextFor(SchemaOperations.ColumnAdd, req.body), customContext)
+    //         const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterColumnAdd, data, requestContextFor(SchemaOperations.ColumnAdd, req.body), customContext)
 
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
+    //         res.json(dataAfterAction)
+    //     } catch (e) {
+    //         next(e)
+    //     }
+    // })
 
-    router.post('/schemas/column/remove', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { columnName } = await executeSchemaHooksFor(SchemaActions.BeforeColumnRemove, schemaPayloadFor(SchemaOperations.ColumnRemove, req.body), requestContextFor(SchemaOperations.ColumnRemove, req.body), customContext)
+    // router.post('/schemas/column/remove', async(req, res, next) => {
+    //     try {
+    //         const { collectionName } = req.body
+    //         const customContext = {}
+    //         const { columnName } = await executeSchemaHooksFor(SchemaActions.BeforeColumnRemove, schemaPayloadFor(SchemaOperations.ColumnRemove, req.body), requestContextFor(SchemaOperations.ColumnRemove, req.body), customContext)
 
-            const data = await schemaService.removeColumn(collectionName, columnName)
+    //         const data = await schemaService.removeColumn(collectionName, columnName)
 
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterColumnRemove, data, requestContextFor(SchemaOperations.ColumnRemove, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
+    //         const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterColumnRemove, data, requestContextFor(SchemaOperations.ColumnRemove, req.body), customContext)
+    //         res.json(dataAfterAction)
+    //     } catch (e) {
+    //         next(e)
+    //     }
+    // })
     // ***********************************************
 
     router.use(errorMiddleware)
