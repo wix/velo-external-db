@@ -97,9 +97,9 @@ describe(`Velo External Errors REST API: ${currentDbImplementationName()}`,  () 
 
     test('create the same collection twice', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        // await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         
-        
+
     })
 
     const ctx = {

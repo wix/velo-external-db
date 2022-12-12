@@ -62,7 +62,6 @@ describe(`Velo External DB Schema REST API: ${currentDbImplementationName()}`,  
         await expect( schema.retrieveSchemaFor(ctx.collectionName, authOwner) ).resolves.not.toEqual( matchers.collectionResponseHasField( ctx.column ) )
     })
 
-
     const ctx = {
         collectionName: Uninitialized,
         column: Uninitialized,

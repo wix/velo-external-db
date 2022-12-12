@@ -8,8 +8,8 @@ const extractUnknownColumn = (error: any) => extractValueFromErrorMessage(error.
 const extractValueFromErrorMessage = (msg: string, regex: RegExp) => {
     try {
         const match = msg.match(regex)
-        const id = (match && match[1])
-        return id || ''
+        const value = (match && match[1])
+        return value || ''
     } catch(e) {
         return ''
     }

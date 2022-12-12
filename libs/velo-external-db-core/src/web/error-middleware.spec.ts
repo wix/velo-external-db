@@ -2,7 +2,8 @@ import * as Chance from 'chance'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { errorMiddleware } from './error-middleware'
 import { Uninitialized } from '@wix-velo/test-commons'
-import { domainToSpiErrorsTranslator } from './error-middleware'
+import { domainToSpiErrorTranslator } from './domain-to-spi-error-translator'
+
 const chance = Chance()
 
 describe('Error Middleware', () => {
@@ -33,9 +34,7 @@ describe('Error Middleware', () => {
             .forEach(Exception => {
               const err = new Exception(chance.word())
               errorMiddleware(err, null, ctx.res)
-
-              const spiError = domainToSpiErrorsTranslator(err)
-              
+              const spiError = domainToSpiErrorTranslator(err)
               // expect(ctx.res.status).toHaveBeenCalledWith(err.status)
               expect(ctx.res.send).toHaveBeenCalledWith( spiError.message )
 
