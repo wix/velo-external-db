@@ -6,71 +6,71 @@ import * as driver from '../../test/drivers/schema_provider_test_support'
 import * as schema from '../../test/drivers/schema_information_test_support'
 import * as matchers from '../../test/drivers/schema_matchers'
 import * as gen from '../../test/gen'
-import { convertFieldTypeToEnum, convertWixFormatFieldsToInputFields } from '../utils/schema_utils'
-const { schemasListFor, schemaHeadersListFor, schemasWithReadOnlyCapabilitiesFor, collectionsListFor } = matchers
+import { convertFieldTypeToEnum, convertWixFormatFieldsToInputFields, compareColumnsInDbAndRequest } from '../utils/schema_utils'
+const { collectionsListFor } = matchers
 const chance = Chance()
 
 describe('Schema Service', () => {
 
-    test('retrieve all collections from provider', async() => {
-        driver.givenAllSchemaOperations()
-        driver.givenListResult(ctx.dbsWithIdColumn)
+    // test('retrieve all collections from provider', async() => {
+    //     driver.givenAllSchemaOperations()
+    //     driver.givenListResult(ctx.dbsWithIdColumn)
 
-        await expect( env.schemaService.list() ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
-    })
+    //     await expect( env.schemaService.list() ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
+    // })
 
-    test('retrieve short list of all collections from provider', async() => {
-        driver.givenListHeadersResult(ctx.collections)
+    // test('retrieve short list of all collections from provider', async() => {
+    //     driver.givenListHeadersResult(ctx.collections)
 
 
-        await expect( env.schemaService.listHeaders() ).resolves.toEqual( schemaHeadersListFor(ctx.collections) )
-    })
+    //     await expect( env.schemaService.listHeaders() ).resolves.toEqual( schemaHeadersListFor(ctx.collections) )
+    // })
 
-    test('retrieve collections by ids from provider', async() => {
-        driver.givenAllSchemaOperations()
-        schema.givenSchemaFieldsResultFor(ctx.dbsWithIdColumn)
+    // test('retrieve collections by ids from provider', async() => {
+    //     driver.givenAllSchemaOperations()
+    //     schema.givenSchemaFieldsResultFor(ctx.dbsWithIdColumn)
 
-        await expect( env.schemaService.find(ctx.dbsWithIdColumn.map((db: { id: any }) => db.id)) ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
-    })
+    //     await expect( env.schemaService.find(ctx.dbsWithIdColumn.map((db: { id: any }) => db.id)) ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
+    // })
 
-    test('create collection name', async() => {
-        driver.givenAllSchemaOperations()
-        driver.expectCreateOf(ctx.collectionName)
-        schema.expectSchemaRefresh()
+    // test('create collection name', async() => {
+    //     driver.givenAllSchemaOperations()
+    //     driver.expectCreateOf(ctx.collectionName)
+    //     schema.expectSchemaRefresh()
 
-        await expect(env.schemaService.create(ctx.collectionName)).resolves.toEqual({})
-    })
+    //     await expect(env.schemaService.create(ctx.collectionName)).resolves.toEqual({})
+    // })
 
-    test('add column for collection name', async() => {
-        driver.givenAllSchemaOperations()
-        driver.expectCreateColumnOf(ctx.column, ctx.collectionName)
-        schema.expectSchemaRefresh()
+    // test('add column for collection name', async() => {
+    //     driver.givenAllSchemaOperations()
+    //     driver.expectCreateColumnOf(ctx.column, ctx.collectionName)
+    //     schema.expectSchemaRefresh()
 
-        await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).resolves.toEqual({})
-    })
+    //     await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).resolves.toEqual({})
+    // })
 
-    test('remove column from collection name', async() => {
-        driver.givenAllSchemaOperations()
-        driver.expectRemoveColumnOf(ctx.column, ctx.collectionName)
-        schema.expectSchemaRefresh()
+    // test('remove column from collection name', async() => {
+    //     driver.givenAllSchemaOperations()
+    //     driver.expectRemoveColumnOf(ctx.column, ctx.collectionName)
+    //     schema.expectSchemaRefresh()
 
-        await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).resolves.toEqual({})
-    })
+    //     await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).resolves.toEqual({})
+    // })
 
-    test('collections without _id column will have read-only capabilities', async() => {
-        driver.givenAllSchemaOperations()
-        driver.givenListResult(ctx.dbsWithoutIdColumn)
+    // test('collections without _id column will have read-only capabilities', async() => {
+    //     driver.givenAllSchemaOperations()
+    //     driver.givenListResult(ctx.dbsWithoutIdColumn)
 
-        await expect( env.schemaService.list() ).resolves.toEqual( schemasWithReadOnlyCapabilitiesFor(ctx.dbsWithoutIdColumn) )
-    })
+    //     await expect( env.schemaService.list() ).resolves.toEqual( schemasWithReadOnlyCapabilitiesFor(ctx.dbsWithoutIdColumn) )
+    // })
 
-    test('run unsupported operations should throw', async() => {
-        driver.givenAdapterSupportedOperationsWith(ctx.invalidOperations)
+    // test('run unsupported operations should throw', async() => {
+    //     driver.givenAdapterSupportedOperationsWith(ctx.invalidOperations)
 
-        await expect(env.schemaService.create(ctx.collectionName)).rejects.toThrow(errors.UnsupportedOperation)
-        await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).rejects.toThrow(errors.UnsupportedOperation)
-        await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).rejects.toThrow(errors.UnsupportedOperation)
-    })
+    //     await expect(env.schemaService.create(ctx.collectionName)).rejects.toThrow(errors.UnsupportedOperation)
+    //     await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).rejects.toThrow(errors.UnsupportedOperation)
+    //     await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).rejects.toThrow(errors.UnsupportedOperation)
+    // })
 
     describe('Collection new SPI', () => {
         test('retrieve all collections from provider', async() => {
@@ -79,14 +79,14 @@ describe('Schema Service', () => {
                 fieldTypes: [],
                 collectionOperations: [],
             }
-            
+
             driver.givenAllSchemaOperations()
             driver.givenCollectionCapabilities(collectionCapabilities)
             driver.givenColumnCapabilities()
             driver.givenListResult(ctx.dbsWithIdColumn)
-            
 
-            await expect( env.schemaService.listCollections([]) ).resolves.toEqual( collectionsListFor(ctx.dbsWithIdColumn, collectionCapabilities))
+
+            await expect( env.schemaService.list([]) ).resolves.toEqual(collectionsListFor(ctx.dbsWithIdColumn, collectionCapabilities))
         })
 
         test('create new collection without fields', async() => {
@@ -94,7 +94,7 @@ describe('Schema Service', () => {
             driver.expectCreateOf(ctx.collectionName)
             schema.expectSchemaRefresh()
 
-            await expect(env.schemaService.createCollection({ id: ctx.collectionName, fields: [] })).resolves.toEqual({
+            await expect(env.schemaService.create({ id: ctx.collectionName, fields: [] })).resolves.toEqual({
                 collection: { id: ctx.collectionName, fields: [] } 
             })
         })
@@ -108,13 +108,13 @@ describe('Schema Service', () => {
             schema.expectSchemaRefresh()            
             driver.expectCreateWithFieldsOf(ctx.collectionName, fields)
     
-            await expect(env.schemaService.createCollection({ id: ctx.collectionName, fields })).resolves.toEqual({
+            await expect(env.schemaService.create({ id: ctx.collectionName, fields })).resolves.toEqual({
                 collection: { id: ctx.collectionName, fields }
             })
         })
 
+        // TODO: move it to schema utils tets
         test('compareColumnsInDbAndRequest function - add columns', async() => {
-            const { compareColumnsInDbAndRequest } = env.schemaService
             const columnsInDb = [{
                 field: ctx.column.name,
                 type: ctx.column.type
@@ -134,8 +134,8 @@ describe('Schema Service', () => {
             expect(compareColumnsInDbAndRequest(columnsInDb, [...columnsInRequest, newColumn]).columnsToAdd).toEqual(convertWixFormatFieldsToInputFields([newColumn]))
         })
 
+        // TODO: move it to schema utils tets
         test('compareColumnsInDbAndRequest function - remove columns', async() => {
-            const { compareColumnsInDbAndRequest } = env.schemaService
             const columnsInDb = [{
                 field: ctx.column.name,
                 type: ctx.column.type
@@ -155,8 +155,8 @@ describe('Schema Service', () => {
             expect(compareColumnsInDbAndRequest(columnsInDb, [newColumn]).columnsToRemove).toEqual(columnsInDb.map(f => f.field))
         })
 
+        // TODO: move it to schema utils tets
         test('compareColumnsInDbAndRequest function - change column type', async() => {
-            const { compareColumnsInDbAndRequest } = env.schemaService
             const columnsInDb = [{
                 field: ctx.column.name,
                 type: 'text'
@@ -175,7 +175,6 @@ describe('Schema Service', () => {
             expect(compareColumnsInDbAndRequest([], []).columnsToChangeType).toEqual([])
             expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToChangeType).toEqual([])
             expect(compareColumnsInDbAndRequest(columnsInDb, [changedColumnType]).columnsToChangeType).toEqual(convertWixFormatFieldsToInputFields([changedColumnType]))
-
         })
 
         test('update collection - add new columns', async() => { 
@@ -188,7 +187,7 @@ describe('Schema Service', () => {
             schema.expectSchemaRefresh()            
             driver.givenFindResults([ { id: ctx.collectionName, fields: [] } ])
 
-            await env.schemaService.updateCollection({ id: ctx.collectionName, fields: newFields })
+            await env.schemaService.update({ id: ctx.collectionName, fields: newFields })
 
             expect(driver.schemaProvider.addColumn).toBeCalledTimes(1)    
             expect(driver.schemaProvider.removeColumn).not.toBeCalled()
@@ -218,11 +217,9 @@ describe('Schema Service', () => {
                 fields: currentFields
             }])
 
-            await env.schemaService.updateCollection({ id: ctx.collectionName, fields: wantedFields })
+            await env.schemaService.update({ id: ctx.collectionName, fields: wantedFields })
 
-            const {
-                columnsToAdd
-            } = env.schemaService.compareColumnsInDbAndRequest(currentFields, wantedFields)
+            const { columnsToAdd } = compareColumnsInDbAndRequest(currentFields, wantedFields)
 
             expect(driver.schemaProvider.addColumn).toBeCalledWith(ctx.collectionName, columnsToAdd[0])
             expect(driver.schemaProvider.removeColumn).not.toBeCalled()   
@@ -242,11 +239,9 @@ describe('Schema Service', () => {
                 fields: currentFields
             }])
 
-            const {
-                columnsToRemove
-            } = env.schemaService.compareColumnsInDbAndRequest(currentFields, [])
+            const { columnsToRemove } = compareColumnsInDbAndRequest(currentFields, [])
 
-            await env.schemaService.updateCollection({ id: ctx.collectionName, fields: [] })
+            await env.schemaService.update({ id: ctx.collectionName, fields: [] })
 
             expect(driver.schemaProvider.removeColumn).toBeCalledWith( ctx.collectionName, columnsToRemove[0])
             expect(driver.schemaProvider.addColumn).not.toBeCalled()
@@ -272,11 +267,9 @@ describe('Schema Service', () => {
                 fields: [currentField]
             }])
 
-            const {
-                columnsToChangeType
-            } = env.schemaService.compareColumnsInDbAndRequest([currentField], [changedColumnType])
+            const { columnsToChangeType } = compareColumnsInDbAndRequest([currentField], [changedColumnType])
 
-            await env.schemaService.updateCollection({ id: ctx.collectionName, fields: [changedColumnType] })
+            await env.schemaService.update({ id: ctx.collectionName, fields: [changedColumnType] })
             
             expect(driver.schemaProvider.changeColumnType).toBeCalledWith(ctx.collectionName, columnsToChangeType[0])
             expect(driver.schemaProvider.addColumn).not.toBeCalled()

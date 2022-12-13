@@ -119,3 +119,32 @@ export const convertWixFormatFieldToInputFields = (field: Field): InputField => 
 })
 
 export const convertWixFormatFieldsToInputFields = (fields: Field[]): InputField[] => fields.map(convertWixFormatFieldToInputFields)
+
+export const compareColumnsInDbAndRequest = (
+  columnsInDb: ResponseField[],
+  columnsInRequest: Field[]
+): {
+  columnsToAdd: InputField[];
+  columnsToRemove: string[];
+  columnsToChangeType: InputField[];
+} => {
+  const collectionColumnsNamesInDb = columnsInDb.map((f) => f.field)
+  const collectionColumnsNamesInRequest = columnsInRequest.map((f) => f.key)
+
+  const columnsToAdd = columnsInRequest.filter((f) => !collectionColumnsNamesInDb.includes(f.key))
+                                       .map(convertWixFormatFieldToInputFields)
+  const columnsToRemove = columnsInDb.filter((f) => !collectionColumnsNamesInRequest.includes(f.field))
+                                     .map((f) => f.field)
+
+  const columnsToChangeType = columnsInRequest.filter((f) => {
+      const fieldInDb = columnsInDb.find((field) => field.field === f.key)
+      return fieldInDb && fieldInDb.type !== convertEnumToFieldType(f.type)
+    })
+    .map(convertWixFormatFieldToInputFields)
+
+  return {
+    columnsToAdd,
+    columnsToRemove,
+    columnsToChangeType,
+  }
+}

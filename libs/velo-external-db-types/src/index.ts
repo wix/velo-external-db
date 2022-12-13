@@ -23,6 +23,7 @@ export enum SchemaOperations {
     Drop = 'dropCollection',
     AddColumn = 'addColumn',
     RemoveColumn = 'removeColumn',
+    ChangeColumnType = 'changeColumnType',
     Describe = 'describeCollection',
     FindWithSort = 'findWithSort',
     Aggregate = 'aggregate',
