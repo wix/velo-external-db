@@ -22,9 +22,9 @@ export const randomEntities = (columns?: any) => {
     return arr
 }
 
-const newDate = () => {
-    const d = new Date()
-    d.setMilliseconds(0)
+const newDate = (year?: number) => {
+    const d = year? new Date(year, 1) : new Date()
+    d.setMilliseconds(0)    
     return d
 }
 
@@ -65,6 +65,8 @@ export const randomEntity = (columns?: any[]) => {
 }
 
 export const veloDate = () => ( { $date: newDate().toISOString() } )
+
+export const pastVeloDate = () => ( { $date: newDate(2019).toISOString() } )
 
 export const randomObjectFromArray = (array: any[]) => array[chance.integer({ min: 0, max: array.length - 1 })]
 

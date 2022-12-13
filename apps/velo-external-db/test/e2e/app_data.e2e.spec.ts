@@ -1,6 +1,6 @@
 import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection } = SchemaOperations
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField } = SchemaOperations
 import { testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
 import * as gen from '../gen'
 import * as schema from '../drivers/schema_api_rest_test_support'
@@ -35,6 +35,20 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             expect.objectContaining({ data: {
                     items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
                     totalCount: 2
+                } }))
+    })
+    
+    testIfSupportedOperationsIncludes(supportedOperations, [FilterByEveryField])('find api - filter by date', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+        const filterByDate = {
+            _createdDate: { $gte: genCommon.pastVeloDate() }
+        }
+
+        await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: filterByDate, skip: 0, limit: 25 }, authOwner) ).resolves.toEqual(
+            expect.objectContaining({ data: {
+                    items: [ ctx.item ],
+                    totalCount: 1
                 } }))
     })
     
