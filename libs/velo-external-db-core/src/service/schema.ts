@@ -1,5 +1,5 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { ISchemaProvider, SchemaOperations, ResponseField, DbCapabilities } from '@wix-velo/velo-external-db-types'
+import { ISchemaProvider, SchemaOperations, ResponseField, DbCapabilities, Table } from '@wix-velo/velo-external-db-types'
 import { Collection, CollectionCapabilities, CollectionOperation, CreateCollectionResponse, DataOperation, DeleteCollectionResponse, Field, FieldCapabilities, FieldType, ListCollectionsResponsePart, UpdateCollectionResponse } from '../spi-model/collection'
 import { convertQueriesToQueryOperatorsEnum, convertFieldTypeToEnum, convertWixFormatFieldsToInputFields, convertResponseFieldToWixFormat, compareColumnsInDbAndRequest } from '../utils/schema_utils'
 import CacheableSchemaInformation from './schema_information'
@@ -13,24 +13,13 @@ export default class SchemaService {
         this.schemaInformation = schemaInformation
     }
 
-    async list(collectionIds: string[]): Promise<ListCollectionsResponsePart> {
-        
-        // remove in the end of development
-        if (!this.storage.capabilities || !this.storage.columnCapabilitiesFor) {
-            throw new Error('Your storage does not support the new collection capabilities API')
-        }
-        
+    async list(collectionIds: string[]): Promise<ListCollectionsResponsePart> {        
         const collections = (!collectionIds || collectionIds.length === 0) ? 
             await this.storage.list() : 
             await Promise.all(collectionIds.map(async(collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
                 
-        const capabilities = this.formatCollectionCapabilities(this.storage.capabilities())
         return { 
-            collection: collections.map((collection) => ({
-                id: collection.id,
-                fields: this.formatFields(collection.fields),
-                capabilities
-            }))
+            collection: this.formatCollections(collections)
         }
     }
 
@@ -95,6 +84,21 @@ export default class SchemaService {
 
         if (!allowedSchemaOperations.includes(operationName)) 
             throw new errors.UnsupportedOperation(`Your database doesn't support ${operationName} operation`)
+    }
+
+    private formatCollections(collections: Table[]): Collection[] {
+        // remove in the end of development
+        if (!this.storage.capabilities || !this.storage.columnCapabilitiesFor) {
+            throw new Error('Your storage does not support the new collection capabilities API')
+        }
+
+        const capabilities = this.formatCollectionCapabilities(this.storage.capabilities())
+        return collections.map((collection) => ({
+            id: collection.id,
+            fields: this.formatFields(collection.fields),
+            capabilities
+        }))
+
     }
 
     private formatFields(fields: ResponseField[]): Field[] {
