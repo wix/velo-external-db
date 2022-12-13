@@ -1,4 +1,4 @@
-import { errors } from '@wix-velo/velo-external-db-commons'
+import { errors, patchDateTimeValue } from '@wix-velo/velo-external-db-commons'
 import { isEmptyFilter } from '@wix-velo/velo-external-db-commons'
 import { attributeValueNameWithCounter, EmptyFilter, fieldNameWithCounter as attributeNameWithCounter } from './dynamo_utils'
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
@@ -38,7 +38,8 @@ export default class FilterParser {
             return []
         }
         
-        const { operator, fieldName, value } =  filter as NotEmptyFilter
+        const { operator, fieldName, value: _value } =  filter as NotEmptyFilter
+        const value = patchDateTimeValue(_value)
         
         switch (operator) {
             case and:
