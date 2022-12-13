@@ -193,6 +193,8 @@ export default class SchemaService {
         // Changing columns type
         await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType!(collection.id, field)))
 
+        await this.schemaInformation.refresh()
+
         return { collection }
     }
 }

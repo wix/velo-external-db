@@ -1,5 +1,5 @@
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
-import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes, streamToArray } from '@wix-velo/test-commons'
+import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 const { RemoveColumn } = SchemaOperations
 import * as schema from '../drivers/schema_api_rest_test_support'
@@ -50,34 +50,29 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         test('collection update - add column', async() => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
 
-            const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [ctx.collectionName] }, { ...authOwner, responseType: 'stream' })
-            const [collectionGetRes] = await streamToArray(collectionGetStream.data) as any[]
+            const collection: any = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
 
-            collectionGetRes.fields.push({
+            collection.fields.push({
                 key: ctx.column.name,
                 type: 0
             })
         
-            const collectionUpdateStream = await axiosClient.post('/collections/update', { collection: collectionGetRes }, { ...authOwner, responseType: 'stream' })
-            const [collectionUpdateRes] = await streamToArray(collectionUpdateStream.data) as any[]
+            await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' })
 
-            expect(collectionUpdateRes).toEqual(matchers.collectionResponsesWith(ctx.collectionName, []))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, []))
         })
 
         testIfSupportedOperationsIncludes(supportedOperations, [ RemoveColumn ])('collection update - remove column', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-            const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [ctx.collectionName] }, { ...authOwner, responseType: 'stream' })
-            const [collectionGetRes] = await streamToArray(collectionGetStream.data) as any[]
+            const collection: any = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
 
             const systemFieldsNames = SystemFields.map(f => f.name)
-            collectionGetRes.fields = collectionGetRes.fields.filter((f: any) => systemFieldsNames.includes(f.key))
+            collection.fields = collection.fields.filter((f: any) => systemFieldsNames.includes(f.key))
 
-            const collectionUpdateStream = await axiosClient.post('/collections/update', { collection: collectionGetRes }, { ...authOwner, responseType: 'stream' })
-            const [collectionUpdateRes] = await streamToArray(collectionUpdateStream.data) as any[]            
+            await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' })       
             
-            expect(collectionUpdateRes).toEqual(matchers.collectionResponsesWith(ctx.collectionName, []))
-
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, []))
         })
 
         test('collection delete', async() => {
