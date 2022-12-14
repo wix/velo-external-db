@@ -16,6 +16,7 @@ const extractValueFromErrorMessage = (msg: string, regex: RegExp) => {
 }
 
 export const notThrowingTranslateErrorCodes = (err: any, collectionName: string) => {
+    console.log({err})
     switch (err.code) {
         case 'ER_CANT_DROP_FIELD_OR_KEY':
             return new FieldDoesNotExist('Collection does not contain a field with this name', collectionName, extractUnknownColumn(err))

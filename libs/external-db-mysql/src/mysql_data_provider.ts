@@ -50,6 +50,8 @@ export default class DataProvider implements IDataProvider {
     }
 
     async update(collectionName: string, items: Item[]): Promise<number> {
+        console.log({items})
+
         const updateFields = updateFieldsFor(items[0])
         const queries = items.map(() => `UPDATE ${escapeTable(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ?`).join(', ')} WHERE _id = ?` )
                              .join(';')
