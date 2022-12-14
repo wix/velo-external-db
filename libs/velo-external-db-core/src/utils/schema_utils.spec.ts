@@ -1,58 +1,58 @@
 import { FieldType as VeloFieldTypeEnum } from '../spi-model/collection'
 import { 
-    // convertQueriesToQueryOperatorsEnum, 
-    convertFieldTypeToEnum, 
-    convertEnumToFieldType,
+    // queriesToWixDataQueryOperators, 
+    fieldTypeToWixDataEnum, 
+    wixDataEnumToFieldType,
     subtypeToFieldType, 
     // convertWixFormatFieldsToInputFields, 
-    // convertResponseFieldToWixFormat, 
-    // convertWixFormatFieldToInputFields 
+    // responseFieldToWixFormat, 
+    // wixFormatFieldToInputFields 
 } from './schema_utils'
 
 
 describe('Schema utils functions', () => {
     describe('translate our field type to velo field type emun', () => {
         test('text type', () => {
-            expect(convertFieldTypeToEnum('text')).toBe(VeloFieldTypeEnum.text)
+            expect(fieldTypeToWixDataEnum('text')).toBe(VeloFieldTypeEnum.text)
         })
         test('number type', () => {
-            expect(convertFieldTypeToEnum('number')).toBe(VeloFieldTypeEnum.number)
+            expect(fieldTypeToWixDataEnum('number')).toBe(VeloFieldTypeEnum.number)
         })
         test('boolean type', () => {
-            expect(convertFieldTypeToEnum('boolean')).toBe(VeloFieldTypeEnum.boolean)
+            expect(fieldTypeToWixDataEnum('boolean')).toBe(VeloFieldTypeEnum.boolean)
         })
         test('object type', () => {
-            expect(convertFieldTypeToEnum('object')).toBe(VeloFieldTypeEnum.object)
+            expect(fieldTypeToWixDataEnum('object')).toBe(VeloFieldTypeEnum.object)
         })
         test('datetime type', () => {
-            expect(convertFieldTypeToEnum('datetime')).toBe(VeloFieldTypeEnum.datetime)
+            expect(fieldTypeToWixDataEnum('datetime')).toBe(VeloFieldTypeEnum.datetime)
         })
 
         test('unsupported type will throw an error', () => {
-            expect(() => convertFieldTypeToEnum('unsupported-type')).toThrowError()
+            expect(() => fieldTypeToWixDataEnum('unsupported-type')).toThrowError()
         })
     })
 
     describe('translate velo field type emun to our field type', () => {
         test('text type', () => {
-            expect(convertEnumToFieldType(VeloFieldTypeEnum.text)).toBe('text')
+            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.text)).toBe('text')
         })
         test('number type', () => {
-            expect(convertEnumToFieldType(VeloFieldTypeEnum.number)).toBe('number')
+            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.number)).toBe('number')
         })
         test('boolean type', () => {
-            expect(convertEnumToFieldType(VeloFieldTypeEnum.boolean)).toBe('boolean')
+            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.boolean)).toBe('boolean')
         })
         test('object type', () => {
-            expect(convertEnumToFieldType(VeloFieldTypeEnum.object)).toBe('object')
+            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.object)).toBe('object')
         })
 
         test('datetime type', () => {
-            expect(convertEnumToFieldType(VeloFieldTypeEnum.datetime)).toBe('datetime')
+            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.datetime)).toBe('datetime')
         })
 
         test('unsupported type will throw an error', () => {
-            expect(() => convertEnumToFieldType(100)).toThrowError()
+            expect(() => wixDataEnumToFieldType(100)).toThrowError()
         })
     })
 
@@ -75,7 +75,7 @@ describe('Schema utils functions', () => {
         })
 
         test('unsupported type will throw an error', () => {
-            expect(() => convertEnumToFieldType(100)).toThrowError()
+            expect(() => wixDataEnumToFieldType(100)).toThrowError()
         })
 
     })

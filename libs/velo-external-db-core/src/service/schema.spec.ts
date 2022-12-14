@@ -1,77 +1,27 @@
 import * as Chance from 'chance'
 import SchemaService from './schema'
-import { AllSchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
+import { errors } from '@wix-velo/velo-external-db-commons'
 import { Uninitialized } from '@wix-velo/test-commons'
 import * as driver from '../../test/drivers/schema_provider_test_support'
 import * as schema from '../../test/drivers/schema_information_test_support'
 import * as matchers from '../../test/drivers/schema_matchers'
 import * as gen from '../../test/gen'
-import { convertFieldTypeToEnum, convertWixFormatFieldsToInputFields, compareColumnsInDbAndRequest } from '../utils/schema_utils'
+import { 
+    fieldTypeToWixDataEnum, 
+    WixFormatFieldsToInputFields, 
+    compareColumnsInDbAndRequest,
+    InputFieldsToWixFormatFields,
+    InputFieldToWixFormatField,
+} from '../utils/schema_utils'
+import { 
+    Table,
+    InputField
+ } from '@wix-velo/velo-external-db-types'
+ 
 const { collectionsListFor } = matchers
 const chance = Chance()
 
 describe('Schema Service', () => {
-
-    // test('retrieve all collections from provider', async() => {
-    //     driver.givenAllSchemaOperations()
-    //     driver.givenListResult(ctx.dbsWithIdColumn)
-
-    //     await expect( env.schemaService.list() ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
-    // })
-
-    // test('retrieve short list of all collections from provider', async() => {
-    //     driver.givenListHeadersResult(ctx.collections)
-
-
-    //     await expect( env.schemaService.listHeaders() ).resolves.toEqual( schemaHeadersListFor(ctx.collections) )
-    // })
-
-    // test('retrieve collections by ids from provider', async() => {
-    //     driver.givenAllSchemaOperations()
-    //     schema.givenSchemaFieldsResultFor(ctx.dbsWithIdColumn)
-
-    //     await expect( env.schemaService.find(ctx.dbsWithIdColumn.map((db: { id: any }) => db.id)) ).resolves.toEqual( schemasListFor(ctx.dbsWithIdColumn, AllSchemaOperations) )
-    // })
-
-    // test('create collection name', async() => {
-    //     driver.givenAllSchemaOperations()
-    //     driver.expectCreateOf(ctx.collectionName)
-    //     schema.expectSchemaRefresh()
-
-    //     await expect(env.schemaService.create(ctx.collectionName)).resolves.toEqual({})
-    // })
-
-    // test('add column for collection name', async() => {
-    //     driver.givenAllSchemaOperations()
-    //     driver.expectCreateColumnOf(ctx.column, ctx.collectionName)
-    //     schema.expectSchemaRefresh()
-
-    //     await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).resolves.toEqual({})
-    // })
-
-    // test('remove column from collection name', async() => {
-    //     driver.givenAllSchemaOperations()
-    //     driver.expectRemoveColumnOf(ctx.column, ctx.collectionName)
-    //     schema.expectSchemaRefresh()
-
-    //     await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).resolves.toEqual({})
-    // })
-
-    // test('collections without _id column will have read-only capabilities', async() => {
-    //     driver.givenAllSchemaOperations()
-    //     driver.givenListResult(ctx.dbsWithoutIdColumn)
-
-    //     await expect( env.schemaService.list() ).resolves.toEqual( schemasWithReadOnlyCapabilitiesFor(ctx.dbsWithoutIdColumn) )
-    // })
-
-    // test('run unsupported operations should throw', async() => {
-    //     driver.givenAdapterSupportedOperationsWith(ctx.invalidOperations)
-
-    //     await expect(env.schemaService.create(ctx.collectionName)).rejects.toThrow(errors.UnsupportedOperation)
-    //     await expect(env.schemaService.addColumn(ctx.collectionName, ctx.column)).rejects.toThrow(errors.UnsupportedOperation)
-    //     await expect(env.schemaService.removeColumn(ctx.collectionName, ctx.column.name)).rejects.toThrow(errors.UnsupportedOperation)
-    // })
-
     describe('Collection new SPI', () => {
         test('retrieve all collections from provider', async() => {
             const collectionCapabilities = {
@@ -102,7 +52,7 @@ describe('Schema Service', () => {
         test('create new collection with fields', async() => {
             const fields = [{
                 key: ctx.column.name,
-                type: convertFieldTypeToEnum(ctx.column.type),
+                type: fieldTypeToWixDataEnum(ctx.column.type),
             }]
             driver.givenAllSchemaOperations()
             schema.expectSchemaRefresh()            
@@ -121,17 +71,17 @@ describe('Schema Service', () => {
             }]
             const columnsInRequest = [{
                 key: ctx.column.name,
-                type: convertFieldTypeToEnum(ctx.column.type),
+                type: fieldTypeToWixDataEnum(ctx.column.type),
             }]
             const newColumn = {
                 key: ctx.anotherColumn.name,
-                type: convertFieldTypeToEnum(ctx.anotherColumn.type)
+                type: fieldTypeToWixDataEnum(ctx.anotherColumn.type)
             }
             expect(compareColumnsInDbAndRequest([], []).columnsToAdd).toEqual([])
             expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToAdd).toEqual([])
             expect(compareColumnsInDbAndRequest(columnsInDb, []).columnsToAdd).toEqual([])
-            expect(compareColumnsInDbAndRequest([], columnsInRequest).columnsToAdd).toEqual(convertWixFormatFieldsToInputFields(columnsInRequest))
-            expect(compareColumnsInDbAndRequest(columnsInDb, [...columnsInRequest, newColumn]).columnsToAdd).toEqual(convertWixFormatFieldsToInputFields([newColumn]))
+            expect(compareColumnsInDbAndRequest([], columnsInRequest).columnsToAdd).toEqual(WixFormatFieldsToInputFields(columnsInRequest))
+            expect(compareColumnsInDbAndRequest(columnsInDb, [...columnsInRequest, newColumn]).columnsToAdd).toEqual(WixFormatFieldsToInputFields([newColumn]))
         })
 
         // TODO: move it to schema utils tets
@@ -142,11 +92,11 @@ describe('Schema Service', () => {
             }]
             const columnsInRequest = [{
                 key: ctx.column.name,
-                type: convertFieldTypeToEnum(ctx.column.type),
+                type: fieldTypeToWixDataEnum(ctx.column.type),
             }]
             const newColumn = {
                 key: ctx.anotherColumn.name,
-                type: convertFieldTypeToEnum(ctx.anotherColumn.type)
+                type: fieldTypeToWixDataEnum(ctx.anotherColumn.type)
             }
             expect(compareColumnsInDbAndRequest([], []).columnsToRemove).toEqual([])
             expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToRemove).toEqual([])
@@ -164,23 +114,23 @@ describe('Schema Service', () => {
 
             const columnsInRequest = [{
                 key: ctx.column.name,
-                type: convertFieldTypeToEnum('text'),
+                type: fieldTypeToWixDataEnum('text'),
             }]
 
             const changedColumnType = {
                 key: ctx.column.name,
-                type: convertFieldTypeToEnum('number')
+                type: fieldTypeToWixDataEnum('number')
             }
 
             expect(compareColumnsInDbAndRequest([], []).columnsToChangeType).toEqual([])
             expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToChangeType).toEqual([])
-            expect(compareColumnsInDbAndRequest(columnsInDb, [changedColumnType]).columnsToChangeType).toEqual(convertWixFormatFieldsToInputFields([changedColumnType]))
+            expect(compareColumnsInDbAndRequest(columnsInDb, [changedColumnType]).columnsToChangeType).toEqual(WixFormatFieldsToInputFields([changedColumnType]))
         })
 
         test('update collection - add new columns', async() => { 
             const newFields = [{
                 key: ctx.column.name,
-                type: convertFieldTypeToEnum(ctx.column.type),
+                type: fieldTypeToWixDataEnum(ctx.column.type),
             }]
 
             driver.givenAllSchemaOperations()
@@ -189,7 +139,13 @@ describe('Schema Service', () => {
 
             await env.schemaService.update({ id: ctx.collectionName, fields: newFields })
 
+
             expect(driver.schemaProvider.addColumn).toBeCalledTimes(1)    
+            expect(driver.schemaProvider.addColumn).toBeCalledWith(ctx.collectionName, {
+                name: ctx.column.name,
+                type: ctx.column.type,
+                subtype: ctx.column.subtype 
+            })    
             expect(driver.schemaProvider.removeColumn).not.toBeCalled()
             expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
         })
@@ -199,16 +155,7 @@ describe('Schema Service', () => {
                 field: ctx.column.name,
                 type: ctx.column.type
             }]
-            const wantedFields = [
-                {
-                    key: ctx.column.name,
-                    type: convertFieldTypeToEnum(ctx.column.type),
-                },
-                {
-                    key: ctx.anotherColumn.name,
-                    type: convertFieldTypeToEnum(ctx.anotherColumn.type),
-                }
-            ]
+            const wantedFields = InputFieldsToWixFormatFields([ ctx.column, ctx.anotherColumn ])
 
             driver.givenAllSchemaOperations()
             schema.expectSchemaRefresh()            
@@ -221,7 +168,7 @@ describe('Schema Service', () => {
 
             const { columnsToAdd } = compareColumnsInDbAndRequest(currentFields, wantedFields)
 
-            expect(driver.schemaProvider.addColumn).toBeCalledWith(ctx.collectionName, columnsToAdd[0])
+            columnsToAdd.forEach(c => expect(driver.schemaProvider.addColumn).toBeCalledWith(ctx.collectionName, c))
             expect(driver.schemaProvider.removeColumn).not.toBeCalled()   
             expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
         })
@@ -243,7 +190,7 @@ describe('Schema Service', () => {
 
             await env.schemaService.update({ id: ctx.collectionName, fields: [] })
 
-            expect(driver.schemaProvider.removeColumn).toBeCalledWith( ctx.collectionName, columnsToRemove[0])
+            columnsToRemove.forEach(c => expect(driver.schemaProvider.removeColumn).toBeCalledWith(ctx.collectionName, c))
             expect(driver.schemaProvider.addColumn).not.toBeCalled()
             expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
 
@@ -257,7 +204,7 @@ describe('Schema Service', () => {
 
             const changedColumnType = {
                 key: ctx.column.name,
-                type: convertFieldTypeToEnum('number')
+                type: fieldTypeToWixDataEnum('number')
             }
 
             driver.givenAllSchemaOperations()
@@ -271,15 +218,54 @@ describe('Schema Service', () => {
 
             await env.schemaService.update({ id: ctx.collectionName, fields: [changedColumnType] })
             
-            expect(driver.schemaProvider.changeColumnType).toBeCalledWith(ctx.collectionName, columnsToChangeType[0])
+            columnsToChangeType.forEach(c => expect(driver.schemaProvider.changeColumnType).toBeCalledWith(ctx.collectionName, c))
             expect(driver.schemaProvider.addColumn).not.toBeCalled()
             expect(driver.schemaProvider.removeColumn).not.toBeCalled()
 
         })
 
+        // TODO: create a test for the case
+        // test('collections without _id column will have read-only capabilities', async() => {})
+
+        //TODO: create a test for the case
+        test('run unsupported operations should throw', async() => {
+            schema.expectSchemaRefresh()         
+            driver.givenAdapterSupportedOperationsWith(ctx.invalidOperations)
+            const field = InputFieldToWixFormatField({
+                name: ctx.column.name,
+                type: 'text'
+            })
+            const changedTypeField = InputFieldToWixFormatField({
+                name: ctx.column.name,
+                type: 'number'
+            })
+        
+            driver.givenFindResults([ { id: ctx.collectionName, fields: [] } ])
+
+            await expect(env.schemaService.update({ id: ctx.collectionName, fields: [field] })).rejects.toThrow(errors.UnsupportedOperation)
+
+            driver.givenFindResults([ { id: ctx.collectionName, fields: [field] }])
+
+            await expect(env.schemaService.update({ id: ctx.collectionName, fields: [] })).rejects.toThrow(errors.UnsupportedOperation)
+            await expect(env.schemaService.update({ id: ctx.collectionName, fields: [changedTypeField] })).rejects.toThrow(errors.UnsupportedOperation)
+
+
+        })
+
     })
+
+    interface Ctx {
+        dbsWithoutIdColumn: Table[],
+        dbsWithIdColumn: Table[],
+        collections: string[],
+        collectionName: string,
+        column: InputField,
+        anotherColumn: InputField,
+        invalidOperations: string[],
+    }
     
-    const ctx = {
+    
+    const ctx: Ctx = {
         dbsWithoutIdColumn: Uninitialized,
         dbsWithIdColumn: Uninitialized,
         collections: Uninitialized,

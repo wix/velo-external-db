@@ -3,7 +3,7 @@ import { InputField, ResponseField, FieldType } from '@wix-velo/velo-external-db
 import { Field, FieldType as VeloFieldTypeEnum, QueryOperator } from '../spi-model/collection'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
-export const convertFieldTypeToEnum = ( fieldType: string ): VeloFieldTypeEnum => {
+export const fieldTypeToWixDataEnum = ( fieldType: string ): VeloFieldTypeEnum => {
     switch (fieldType) {
         case FieldType.text:
             return VeloFieldTypeEnum.text
@@ -21,7 +21,7 @@ export const convertFieldTypeToEnum = ( fieldType: string ): VeloFieldTypeEnum =
     }
 }
 
-export const convertEnumToFieldType = (fieldEnum: number): string => {
+export const wixDataEnumToFieldType = (fieldEnum: number): string => {
     switch (fieldEnum) {
         case VeloFieldTypeEnum.text:
         case VeloFieldTypeEnum.longText:
@@ -66,7 +66,7 @@ export const subtypeToFieldType = (fieldEnum: number): string => {
 
 }
 
-export const convertQueryOperatorsToEnum = (queryOperator: string): QueryOperator => {
+export const queryOperatorsToWixDataQueryOperators = (queryOperator: string): QueryOperator => {
     switch (queryOperator) {
         case eq:
             return QueryOperator.eq
@@ -99,26 +99,32 @@ export const convertQueryOperatorsToEnum = (queryOperator: string): QueryOperato
     }    
 } 
 
-export const convertQueriesToQueryOperatorsEnum = (queryOperators: string[]): QueryOperator[] => {
-    return queryOperators.map(convertQueryOperatorsToEnum)
-}
+export const queriesToWixDataQueryOperators = (queryOperators: string[]): QueryOperator[] => queryOperators.map(queryOperatorsToWixDataQueryOperators)
 
-export const convertResponseFieldToWixFormat = (fields: ResponseField[]): Field[] => {
+
+export const responseFieldToWixFormat = (fields: ResponseField[]): Field[] => {
     return fields.map(field => {
         return {
             key: field.field,
-            type: convertFieldTypeToEnum(field.type)
+            type: fieldTypeToWixDataEnum(field.type)
         }
     })
 }
 
-export const convertWixFormatFieldToInputFields = (field: Field): InputField => ({
+export const wixFormatFieldToInputFields = (field: Field): InputField => ({
     name: field.key,
-    type: convertEnumToFieldType(field.type),
+    type: wixDataEnumToFieldType(field.type),
     subtype: subtypeToFieldType(field.type)
 })
 
-export const convertWixFormatFieldsToInputFields = (fields: Field[]): InputField[] => fields.map(convertWixFormatFieldToInputFields)
+export const InputFieldToWixFormatField = (field: InputField): Field => ({
+    key: field.name,
+    type: fieldTypeToWixDataEnum(field.type)
+})
+
+export const WixFormatFieldsToInputFields = (fields: Field[]): InputField[] => fields.map(wixFormatFieldToInputFields)
+
+export const InputFieldsToWixFormatFields = (fields: InputField[]): Field[] =>  fields.map(InputFieldToWixFormatField)
 
 export const compareColumnsInDbAndRequest = (
   columnsInDb: ResponseField[],
@@ -132,15 +138,15 @@ export const compareColumnsInDbAndRequest = (
   const collectionColumnsNamesInRequest = columnsInRequest.map((f) => f.key)
 
   const columnsToAdd = columnsInRequest.filter((f) => !collectionColumnsNamesInDb.includes(f.key))
-                                       .map(convertWixFormatFieldToInputFields)
+                                       .map(wixFormatFieldToInputFields)
   const columnsToRemove = columnsInDb.filter((f) => !collectionColumnsNamesInRequest.includes(f.field))
                                      .map((f) => f.field)
 
   const columnsToChangeType = columnsInRequest.filter((f) => {
       const fieldInDb = columnsInDb.find((field) => field.field === f.key)
-      return fieldInDb && fieldInDb.type !== convertEnumToFieldType(f.type)
+      return fieldInDb && fieldInDb.type !== wixDataEnumToFieldType(f.type)
     })
-    .map(convertWixFormatFieldToInputFields)
+    .map(wixFormatFieldToInputFields)
 
   return {
     columnsToAdd,

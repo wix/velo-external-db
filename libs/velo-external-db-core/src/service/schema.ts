@@ -1,8 +1,27 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { ISchemaProvider, SchemaOperations, ResponseField, DbCapabilities, Table } from '@wix-velo/velo-external-db-types'
-import { Collection, CollectionCapabilities, CollectionOperation, CreateCollectionResponse, DataOperation, DeleteCollectionResponse, Field, FieldCapabilities, FieldType, ListCollectionsResponsePart, UpdateCollectionResponse } from '../spi-model/collection'
-import { convertQueriesToQueryOperatorsEnum, convertFieldTypeToEnum, convertWixFormatFieldsToInputFields, convertResponseFieldToWixFormat, compareColumnsInDbAndRequest } from '../utils/schema_utils'
+import { Collection, 
+    CollectionCapabilities, 
+    CollectionOperation, 
+    CreateCollectionResponse, 
+    DataOperation, 
+    DeleteCollectionResponse, 
+    Field, 
+    FieldCapabilities, 
+    FieldType, 
+    ListCollectionsResponsePart, 
+    UpdateCollectionResponse 
+} from '../spi-model/collection'
 import CacheableSchemaInformation from './schema_information'
+import { 
+    queriesToWixDataQueryOperators, 
+    fieldTypeToWixDataEnum, 
+    WixFormatFieldsToInputFields, 
+    responseFieldToWixFormat, 
+    compareColumnsInDbAndRequest 
+} from '../utils/schema_utils'
+
+
 const { Create, AddColumn, RemoveColumn, ChangeColumnType } = SchemaOperations
 
 export default class SchemaService {
@@ -24,7 +43,7 @@ export default class SchemaService {
     }
 
     async create(collection: Collection): Promise<CreateCollectionResponse> {                
-        await this.storage.create(collection.id, convertWixFormatFieldsToInputFields(collection.fields))
+        await this.storage.create(collection.id, WixFormatFieldsToInputFields(collection.fields))
         await this.schemaInformation.refresh()
         return { collection }
     }
@@ -75,7 +94,7 @@ export default class SchemaService {
         await this.schemaInformation.refresh()
         return { collection: {
             id: collectionId,
-            fields: convertResponseFieldToWixFormat(collectionFields),
+            fields: responseFieldToWixFormat(collectionFields),
         } }
     }
 
@@ -110,7 +129,7 @@ export default class SchemaService {
             const { sortable, columnQueryOperators } = this.storage.columnCapabilitiesFor(type)
             return {
                 sortable,
-                queryOperators: convertQueriesToQueryOperatorsEnum(columnQueryOperators)
+                queryOperators: queriesToWixDataQueryOperators(columnQueryOperators)
             }
         }
 
@@ -118,7 +137,7 @@ export default class SchemaService {
             key: f.field,
             // TODO: think about how to implement this
             encrypted: false,
-            type: convertFieldTypeToEnum(f.type),
+            type: fieldTypeToWixDataEnum(f.type),
             capabilities: fieldCapabilitiesFor(f.type)
         }))
     }

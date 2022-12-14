@@ -1,6 +1,11 @@
 import * as Chance from 'chance'
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { gen as genCommon } from '@wix-velo/test-commons'
+import { 
+    InputField,
+    ResponseField,
+    Table,
+ } from '@wix-velo/velo-external-db-types'
 
 const chance = Chance()
 
@@ -10,8 +15,7 @@ export const invalidOperatorForType = (validOperators: string | string[]) => ran
 
 export const randomObjectFromArray = (array: any[]) => array[chance.integer({ min: 0, max: array.length - 1 })]
 
-export const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
-
+export const randomColumn = (): InputField => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 
 export const randomWixType = () => randomObjectFromArray(['number', 'text', 'boolean', 'url', 'datetime', 'object'])
 
@@ -26,7 +30,7 @@ export const randomFilter = () => {
     }
 }
 
-export const randomArrayOf = (gen: any) => {
+export const randomArrayOf= <T>(gen: any): T[] => {
     const arr = []
     const num = chance.natural({ min: 2, max: 20 })
     for (let i = 0; i < num; i++) {
@@ -35,21 +39,21 @@ export const randomArrayOf = (gen: any) => {
     return arr
 }
 
-export const randomCollectionName = () => chance.word({ length: 5 })
+export const randomCollectionName = ():string => chance.word({ length: 5 })
 
-export const randomCollections = () => randomArrayOf( randomCollectionName )
+export const randomCollections = () => randomArrayOf<string>( randomCollectionName )
 
 export const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'datetime', 'object' ])
 
-export const randomDbField = () => ( { field: chance.word(), type: randomWixDataType(), subtype: chance.word(), isPrimary: chance.bool() } )
+export const randomDbField = (): ResponseField => ( { field: chance.word(), type: randomWixDataType(), subtype: chance.word(), isPrimary: chance.bool() } )
 
-export const randomDbFields = () => randomArrayOf( randomDbField )
+export const randomDbFields = () => randomArrayOf<ResponseField>( randomDbField )
 
-export const randomDb = () => ( { id: randomCollectionName(), fields: randomDbFields() })
+export const randomDb = (): Table => ( { id: randomCollectionName(), fields: randomDbFields() })
 
-export const randomDbs = () => randomArrayOf( randomDb )
+export const randomDbs = (): Table[] => randomArrayOf( randomDb )
 
-export const randomDbsWithIdColumn = () => randomDbs().map(i => ({ ...i, fields: [ ...i.fields, { field: '_id', type: 'text' }] }))
+export const randomDbsWithIdColumn = (): Table[] => randomDbs().map(i => ({ ...i, fields: [ ...i.fields, { field: '_id', type: 'text' }] }))
 
 export const truthyValue = () => chance.pickone(['true', '1', 1, true])
 export const falsyValue = () => chance.pickone(['false', '0', 0, false])

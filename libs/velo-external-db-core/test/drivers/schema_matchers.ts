@@ -1,5 +1,5 @@
 import { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders, ReadOnlyOperations, AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { convertFieldTypeToEnum, convertQueriesToQueryOperatorsEnum } from '../../src/utils/schema_utils'
+import { fieldTypeToWixDataEnum, queriesToWixDataQueryOperators } from '../../src/utils/schema_utils'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 const appendAllowedOperationsToDbs = (dbs: any[], allowedSchemaOperations: any) => {
@@ -56,11 +56,11 @@ export const queryOperatorsFor = (fieldType: string): string[] => {
 
 export const fieldInNewWixFormat = (field: any) => expect.objectContaining({
     key: field.field,
-    type: convertFieldTypeToEnum(field.type),
+    type: fieldTypeToWixDataEnum(field.type),
     encrypted: false,
     capabilities: expect.objectContaining({
         sortable: expect.any(Boolean),
-        queryOperators: convertQueriesToQueryOperatorsEnum(queryOperatorsFor(field.type))
+        queryOperators: queriesToWixDataQueryOperators(queryOperatorsFor(field.type))
     })
 
 })
