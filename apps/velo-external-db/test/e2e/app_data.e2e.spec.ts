@@ -245,7 +245,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         ).rejects.toThrow('404')
     })
 
-    test('insert api on non existing collection should fail with 404', async() => {
+    test.only('insert api on non existing collection should fail with 404', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
         const response = axiosInstance.post('/data/insert', insertRequest(gen.randomCollectionName(), ctx.items, false),  {responseType: 'stream', transformRequest: authAdmin.transformRequest})
