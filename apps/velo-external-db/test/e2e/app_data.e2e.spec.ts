@@ -54,7 +54,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     test('insert api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', ...authAdmin })
 
         const expectedItems = ctx.items.map(item => ({ item }))
 
@@ -71,7 +71,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[0] ], ctx.collectionName, authAdmin)
 
-        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', ...authAdmin })
 
         const expectedItems = [dataSpi.QueryResponsePart.item(ctx.items[0])]
 
@@ -89,7 +89,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.item ], ctx.collectionName, authAdmin)
 
-        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.modifiedItem], true),  { responseType: 'stream', transformRequest: authOwner.transformRequest })
+        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.modifiedItem], true),  { responseType: 'stream', ...authOwner })
         const expectedItems = [dataSpi.QueryResponsePart.item(ctx.modifiedItem)]
 
         await expect(streamToArray(response.data)).resolves.toEqual(expectedItems)
@@ -146,7 +146,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
         const response = await axiosInstance.post('/data/remove', { 
             collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
-        }, { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+        }, { responseType: 'stream', ...authAdmin })
 
         const expectedItems = ctx.items.map(item => ({ item }))
 
@@ -196,7 +196,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
-        const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+        const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  { responseType: 'stream', ...authAdmin })
 
         const expectedItems = ctx.modifiedItems.map(dataSpi.QueryResponsePart.item)
 
