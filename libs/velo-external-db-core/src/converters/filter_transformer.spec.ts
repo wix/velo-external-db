@@ -110,7 +110,7 @@ describe('Filter Transformer', () => {
     describe('handle filter by date', () => {
         test('transform velo date to date object', () => {
             const filter = {
-                [ctx.fieldName]: { $gt: genCommon.veloDate() }
+                [ctx.fieldName]: { $gt: ctx.veloDate }
             }
             expect(env.FilterTransformer.transform(filter)).toEqual({
                 fieldName: ctx.fieldName, operator: env.FilterTransformer.wixOperatorToAdapterOperator('$gt'), value: new Date(genCommon.veloDate().$date)
@@ -161,6 +161,7 @@ describe('Filter Transformer', () => {
         fieldValue: Uninitialized,
         operator: Uninitialized,
         fieldListValue: Uninitialized,
+        veloDate: Uninitialized
     }
 
     beforeEach(() => {
@@ -170,6 +171,7 @@ describe('Filter Transformer', () => {
         ctx.fieldValue = chance.word()
         ctx.operator = gen.randomOperator() as WixDataMultiFieldOperators | WixDataSingleFieldOperators
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
+        ctx.veloDate = genCommon.veloDate()
     })
 })
 

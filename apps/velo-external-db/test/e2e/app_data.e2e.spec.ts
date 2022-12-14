@@ -42,7 +42,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
         const filterByDate = {
-            _createdDate: { $gte: genCommon.pastVeloDate() }
+            _createdDate: { $gte: ctx.pastVeloDate }
         }
 
         await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: filterByDate, skip: 0, limit: 25 }, authOwner) ).resolves.toEqual(
@@ -199,6 +199,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         anotherItem: Uninitialized,
         numberItem: Uninitialized,
         anotherNumberItem: Uninitialized,
+        pastVeloDate: Uninitialized,
     }
 
     afterAll(async() => await teardownApp())
@@ -214,5 +215,6 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         ctx.anotherItem = genCommon.randomEntity([ctx.column.name])
         ctx.numberItem = gen.randomNumberDbEntity(ctx.numberColumns)
         ctx.anotherNumberItem = gen.randomNumberDbEntity(ctx.numberColumns)
+        ctx.pastVeloDate = genCommon.pastVeloDate()
     })
 })
