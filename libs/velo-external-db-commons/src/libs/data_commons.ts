@@ -16,17 +16,26 @@ export const patchDateTime = (item: { [x: string]: any }) => {
     const obj: { [x: string]: any } = {}
     for (const key of Object.keys(item)) {
         const value = item[key]
-        const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
-
-        if (value instanceof Date) {
-            obj[key] = moment(value).format('YYYY-MM-DD HH:mm:ss')
-        } else if (reISO.test(value)) {
-            obj[key] = moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss')
-        } else {
-            obj[key] = value
-        }
+        obj[key] = patchDateTimeValue(value)
     }
     return obj
+}
+
+export const patchDateTimeValue = (value: any) => {
+    const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
+        if (value instanceof Date) {
+            return moment(value).format('YYYY-MM-DD HH:mm:ss')
+        } else if (reISO.test(value)) {
+            return moment(new Date(value)).format('YYYY-MM-DD HH:mm:ss')
+        }
+    return value
+}
+
+export const patchVeloDateValue = (value: any) => {
+    if (isObject(value) && isDate(value.$date)) {
+        return new Date(value.$date)
+    } 
+    return value
 }
 
 export const asParamArrays = (item: { [s: string]: unknown } | ArrayLike<unknown>) => Object.values(item)
@@ -34,8 +43,9 @@ export const asParamArrays = (item: { [s: string]: unknown } | ArrayLike<unknown
 export const isObject = (o: any) => typeof o === 'object' && o !== null
 
 export const isDate = (d: any) => {
-    const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/
-    return d instanceof Date || Object.prototype.toString.call(d) === '[object Date]' || (typeof d === 'string' && reISO.test(d))
+    const reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/ 
+    const reISO2 = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:Z|(\+|-)([\d|:]*))?$/
+    return d instanceof Date || Object.prototype.toString.call(d) === '[object Date]' || (typeof d === 'string' && (reISO.test(d) || reISO2.test(d)))
 }
 
 export const updateFieldsFor = (item: object) => {

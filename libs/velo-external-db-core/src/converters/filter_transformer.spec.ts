@@ -1,13 +1,13 @@
-import { Uninitialized } from '@wix-velo/test-commons'
+import each from 'jest-each'
+import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
+import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { WixDataMultiFieldOperators, WixDataSingleFieldOperators } from '@wix-velo/velo-external-db-types'
+import { errors } from '@wix-velo/velo-external-db-commons'
 import * as gen from '../../test/gen'
 import FilterTransformer from './filter_transformer'
 import { EmptyFilter } from './utils'
-import each from 'jest-each'
 import Chance = require('chance')
-import { errors } from '@wix-velo/velo-external-db-commons'
 const chance = Chance()
-import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { WixDataMultiFieldOperators, WixDataSingleFieldOperators } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
 
 describe('Filter Transformer', () => {
@@ -104,6 +104,18 @@ describe('Filter Transformer', () => {
                 })
             })
         })
+
+    })
+
+    describe('handle filter by date', () => {
+        test('transform velo date to date object', () => {
+            const filter = {
+                [ctx.fieldName]: { $gt: ctx.veloDate }
+            }
+            expect(env.FilterTransformer.transform(filter)).toEqual({
+                fieldName: ctx.fieldName, operator: env.FilterTransformer.wixOperatorToAdapterOperator('$gt'), value: new Date(genCommon.veloDate().$date)
+            })
+        })
     })
 
     describe('handle multi field operator', () => {
@@ -149,6 +161,7 @@ describe('Filter Transformer', () => {
         fieldValue: Uninitialized,
         operator: Uninitialized,
         fieldListValue: Uninitialized,
+        veloDate: Uninitialized
     }
 
     beforeEach(() => {
@@ -158,6 +171,7 @@ describe('Filter Transformer', () => {
         ctx.fieldValue = chance.word()
         ctx.operator = gen.randomOperator() as WixDataMultiFieldOperators | WixDataSingleFieldOperators
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
+        ctx.veloDate = genCommon.veloDate()
     })
 })
 
