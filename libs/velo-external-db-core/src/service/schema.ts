@@ -2,7 +2,7 @@ import { errors } from '@wix-velo/velo-external-db-commons'
 import { ISchemaProvider, 
     SchemaOperations, 
     ResponseField, 
-    DbCapabilities, 
+    CollectionCapabilities, 
     Table 
 } from '@wix-velo/velo-external-db-types'
 import * as collectionSpi from '../spi-model/collection'
@@ -75,7 +75,7 @@ export default class SchemaService {
         if (columnsToChangeType.length > 0) {
             await this.validateOperation(ChangeColumnType)
         }
-        await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType!(collection.id, field)))
+        await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType?.(collection.id, field)))
 
         await this.schemaInformation.refresh()
 
@@ -134,7 +134,7 @@ export default class SchemaService {
         }))
     }
 
-    private formatCollectionCapabilities(capabilities: DbCapabilities): collectionSpi.CollectionCapabilities {
+    private formatCollectionCapabilities(capabilities: CollectionCapabilities): collectionSpi.CollectionCapabilities {
         return {
             dataOperations: capabilities.dataOperations as unknown as collectionSpi.DataOperation[],
             fieldTypes: capabilities.fieldTypes as unknown as collectionSpi.FieldType[],

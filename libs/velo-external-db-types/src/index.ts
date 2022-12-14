@@ -1,3 +1,6 @@
+import { CollectionCapabilities } from './collection_types'
+export * from './collection_types'
+
 export enum AdapterOperator { //in velo-external-db-core
     eq = 'eq',
     gt = 'gt',
@@ -129,7 +132,10 @@ export type TableHeader = {
     id: string
 }
 
-export type Table = TableHeader & { fields: ResponseField[] }
+export type Table = TableHeader & { 
+    fields: ResponseField[]
+    capabilities?:  CollectionCapabilities
+} 
 
 export type FieldAttributes = {
     type: string,
@@ -140,47 +146,17 @@ export type FieldAttributes = {
 
 export type InputField = FieldAttributes & { name: string }
 
-export type ResponseField = FieldAttributes & { field: string }
+export type ResponseField = FieldAttributes & { 
+    field: string
+    capabilities?: {
+        sortable: boolean
+        columnQueryOperators: string[]
+    }
+}
 
 export type ColumnCapabilities = {
     sortable: boolean,
     columnQueryOperators: string[],
-}
-
-export enum DataOperation {
-    query = 'query',
-    count = 'count',
-    queryReferenced = 'queryReferenced',
-    aggregate = 'aggregate',
-    insert = 'insert',
-    update = 'update',
-    remove = 'remove',
-    truncate = 'truncate',
-    insertReferences = 'insertReferences',
-    removeReferences = 'removeReferences',
-}
-
-export enum FieldType {
-    text = 'text',
-    number = 'number',
-    boolean = 'boolean',
-    datetime = 'datetime',
-    object = 'object',
-    longText = 'longText',
-    singleReference = 'singleReference',
-    multiReference = 'multiReference',
-}
-
-export enum CollectionOperation {
-    update = 'update',
-    remove = 'remove',
-}
-
-
-export type DbCapabilities = {
-    dataOperations: string[],
-    fieldTypes: string[],
-    collectionOperations: string[]
 }
 export interface ISchemaProvider {
     list(): Promise<Table[]>
@@ -194,7 +170,7 @@ export interface ISchemaProvider {
     drop(collectionName: string): Promise<void>
     translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
     columnCapabilitiesFor?(columnType: string): ColumnCapabilities
-    capabilities?(): DbCapabilities
+    capabilities?(): CollectionCapabilities
 }
 
 export interface IBaseHttpError extends Error {}

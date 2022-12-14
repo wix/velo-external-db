@@ -5,7 +5,7 @@ import { escapeId, escapeTable, columnCapabilitiesFor } from './mysql_utils'
 import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
 import { Pool as MySqlPool } from 'mysql'
 import { MySqlQuery } from './types'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, ColumnCapabilities, DbCapabilities } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, ColumnCapabilities, CollectionCapabilities } from '@wix-velo/velo-external-db-types'
 
 
 export default class SchemaProvider implements ISchemaProvider {
@@ -90,7 +90,7 @@ export default class SchemaProvider implements ISchemaProvider {
         return columnCapabilitiesFor(columnType)
     }
 
-    capabilities(): DbCapabilities {
+    capabilities(): CollectionCapabilities {
         return {
             dataOperations: [],
             fieldTypes: [],
