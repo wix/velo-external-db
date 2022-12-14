@@ -1,17 +1,11 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { ISchemaProvider, SchemaOperations, ResponseField, DbCapabilities, Table } from '@wix-velo/velo-external-db-types'
-import { Collection, 
-    CollectionCapabilities, 
-    CollectionOperation, 
-    CreateCollectionResponse, 
-    DataOperation, 
-    DeleteCollectionResponse, 
-    Field, 
-    FieldCapabilities, 
-    FieldType, 
-    ListCollectionsResponsePart, 
-    UpdateCollectionResponse 
-} from '../spi-model/collection'
+import { ISchemaProvider, 
+    SchemaOperations, 
+    ResponseField, 
+    DbCapabilities, 
+    Table 
+} from '@wix-velo/velo-external-db-types'
+import * as collectionSpi from '../spi-model/collection'
 import CacheableSchemaInformation from './schema_information'
 import { 
     queriesToWixDataQueryOperators, 
@@ -32,23 +26,23 @@ export default class SchemaService {
         this.schemaInformation = schemaInformation
     }
 
-    async list(collectionIds: string[]): Promise<ListCollectionsResponsePart> {        
+    async list(collectionIds: string[]): Promise<collectionSpi.ListCollectionsResponsePart> {        
         const collections = (!collectionIds || collectionIds.length === 0) ? 
             await this.storage.list() : 
             await Promise.all(collectionIds.map(async(collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
                 
         return { 
-            collection: this.formatCollections(collections)
+            collection: collections.map(this.formatCollection.bind(this))
         }
     }
 
-    async create(collection: Collection): Promise<CreateCollectionResponse> {                
+    async create(collection: collectionSpi.Collection): Promise<collectionSpi.CreateCollectionResponse> {                
         await this.storage.create(collection.id, WixFormatFieldsToInputFields(collection.fields))
         await this.schemaInformation.refresh()
         return { collection }
     }
 
-    async update(collection: Collection): Promise<UpdateCollectionResponse> {
+    async update(collection: collectionSpi.Collection): Promise<collectionSpi.UpdateCollectionResponse> {
         await this.validateOperation(Create)
         
         // remove in the end of development
@@ -88,7 +82,7 @@ export default class SchemaService {
         return { collection }
     }
 
-    async delete(collectionId: string): Promise<DeleteCollectionResponse> {
+    async delete(collectionId: string): Promise<collectionSpi.DeleteCollectionResponse> {
         const collectionFields = await this.storage.describeCollection(collectionId)
         await this.storage.drop(collectionId)
         await this.schemaInformation.refresh()
@@ -105,23 +99,21 @@ export default class SchemaService {
             throw new errors.UnsupportedOperation(`Your database doesn't support ${operationName} operation`)
     }
 
-    private formatCollections(collections: Table[]): Collection[] {
+    private formatCollection(collection: Table): collectionSpi.Collection {
         // remove in the end of development
         if (!this.storage.capabilities || !this.storage.columnCapabilitiesFor) {
             throw new Error('Your storage does not support the new collection capabilities API')
         }
-
         const capabilities = this.formatCollectionCapabilities(this.storage.capabilities())
-        return collections.map((collection) => ({
+        return {
             id: collection.id,
             fields: this.formatFields(collection.fields),
             capabilities
-        }))
-
+        }
     }
 
-    private formatFields(fields: ResponseField[]): Field[] {
-        const fieldCapabilitiesFor = (type: string): FieldCapabilities => {
+    private formatFields(fields: ResponseField[]): collectionSpi.Field[] {
+        const fieldCapabilitiesFor = (type: string): collectionSpi.FieldCapabilities => {
             // remove in the end of development
             if (!this.storage.columnCapabilitiesFor) {
                 throw new Error('Your storage does not support the new collection capabilities API')
@@ -142,11 +134,11 @@ export default class SchemaService {
         }))
     }
 
-    private formatCollectionCapabilities(capabilities: DbCapabilities): CollectionCapabilities {
+    private formatCollectionCapabilities(capabilities: DbCapabilities): collectionSpi.CollectionCapabilities {
         return {
-            dataOperations: capabilities.dataOperations as unknown as DataOperation[],
-            fieldTypes: capabilities.fieldTypes as unknown as FieldType[],
-            collectionOperations: capabilities.collectionOperations as unknown as CollectionOperation[],
+            dataOperations: capabilities.dataOperations as unknown as collectionSpi.DataOperation[],
+            fieldTypes: capabilities.fieldTypes as unknown as collectionSpi.FieldType[],
+            collectionOperations: capabilities.collectionOperations as unknown as collectionSpi.CollectionOperation[],
         }
     }
 
