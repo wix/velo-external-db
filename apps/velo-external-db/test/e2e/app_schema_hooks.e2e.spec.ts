@@ -198,7 +198,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             )
         })
         
-        test('If not specified should throw 400 - Error object', async() => {
+        test('If not specified should throw 500 - Error object', async() => {
             env.externalDbRouter.reloadHooks({
                 schemaHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
@@ -213,7 +213,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             )
         })
 
-        test('If not specified should throw 400 - string', async() => { 
+        test('If not specified should throw 500 - string', async() => { 
             env.externalDbRouter.reloadHooks({
                 schemaHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
