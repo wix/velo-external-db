@@ -239,16 +239,16 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
     test('count api on non existing collection should fail with 404', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
         await expect( 
-            axiosInstance.post('/data/count', countRequest(gen.randomCollectionName()), authAdmin) 
+            axiosInstance.post('/data/count', data.countRequest(gen.randomCollectionName()), authAdmin) 
         ).rejects.toThrow('404')
     })
 
     test('insert api on non existing collection should fail with 404', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-        const response = axiosInstance.post('/data/insert', insertRequest(gen.randomCollectionName(), ctx.items, false),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+        const response = axiosInstance.post('/data/insert', data.insertRequest(gen.randomCollectionName(), ctx.items, false),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
 
         await expect(response).rejects.toThrow('404')
     })
