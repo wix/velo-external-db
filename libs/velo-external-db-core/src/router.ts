@@ -12,7 +12,7 @@ import { authRoleMiddleware } from './web/auth-role-middleware'
 import { unless, includes } from './web/middleware-support'
 import { getAppInfoPage } from './utils/router_utils'
 import { DataHooksForAction, DataOperations, dataPayloadFor, DataActions, requestContextFor } from './data_hooks_utils'
-import { SchemaHooksForAction, SchemaOperations, schemaPayloadFor, SchemaActions } from './schema_hooks_utils'
+// import { SchemaHooksForAction } from './schema_hooks_utils'
 import SchemaService from './service/schema'
 import OperationService from './service/operation'
 import { AnyFixMe, Item } from '@wix-velo/velo-external-db-types'
@@ -32,7 +32,7 @@ const { InvalidRequest } = errors
 // const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
 const { Aggregate: AGGREGATE } = DataOperations
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks //schemaHooks: SchemaHooks
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
                              _externalDbConfigClient: ConfigValidator, _cfg: { externalDatabaseId: string, allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string },
@@ -47,7 +47,7 @@ export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _s
     aggregationTransformer = _aggregationTransformer
     roleAuthorizationService = _roleAuthorizationService
     dataHooks = _hooks?.dataHooks || {}
-    schemaHooks = _hooks?.schemaHooks || {}
+    // schemaHooks = _hooks?.schemaHooks || {}
 }
 
 const serviceContext = (): ServiceContext => ({
@@ -62,11 +62,11 @@ const executeDataHooksFor = async(action: string, payload: AnyFixMe, requestCont
     }, payload)
 }
 
-const executeSchemaHooksFor = async(action: string, payload: any, requestContext: RequestContext, customContext: any) => {
-    return BPromise.reduce(SchemaHooksForAction[action], async(lastHookResult: any, hookName: string) => {
-        return await executeHook(schemaHooks, hookName, lastHookResult, requestContext, customContext)
-    }, payload)
-}
+// const executeSchemaHooksFor = async(action: string, payload: any, requestContext: RequestContext, customContext: any) => {
+//     return BPromise.reduce(SchemaHooksForAction[action], async(lastHookResult: any, hookName: string) => {
+//         return await executeHook(schemaHooks, hookName, lastHookResult, requestContext, customContext)
+//     }, payload)
+// }
 
 const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
     const actionName = _actionName as keyof typeof hooks
