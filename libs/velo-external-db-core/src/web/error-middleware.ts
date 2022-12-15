@@ -6,9 +6,6 @@ export const errorMiddleware = (err: any, _req: any, res: Response, _next?: Next
     console.error(err)
   }
 
-
-  console.log({err})
-
   const errorMsg = domainToSpiErrorTranslator(err)
   res.status(errorMsg.httpCode).send(errorMsg.message)
 }
