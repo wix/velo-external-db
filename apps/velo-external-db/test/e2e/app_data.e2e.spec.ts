@@ -1,90 +1,22 @@
-import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
+import axios from 'axios'
+import Chance = require('chance')
+import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes, streamToArray } from '@wix-velo/test-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField } = SchemaOperations
 import { dataSpi } from '@wix-velo/velo-external-db-core'
-import { testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
+import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit'
 import * as gen from '../gen'
 import * as schema from '../drivers/schema_api_rest_test_support'
 import * as matchers from '../drivers/schema_api_rest_matchers'
-import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit'
+import * as data from '../drivers/data_api_rest_test_support'
 import * as authorization from '../drivers/authorization_test_support'
-import Chance = require('chance')
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
 
-
-import axios from 'axios'
-import { streamToArray } from '@wix-velo/test-commons'
-
 const chance = Chance()
-
 
 const axiosInstance = axios.create({
     baseURL: 'http://localhost:8080'
 })
-
-const queryRequest = (collectionName, sort, fields, filter?: any) => ({ 
-    collectionId: collectionName,
-    query: {
-        filter: filter ? filter : '',
-        sort: sort,
-        fields: fields,
-        fieldsets: undefined,
-        paging: {
-            limit: 25,
-            offset: 0,
-        },
-        cursorPaging: null
-    } as dataSpi.QueryV2,
-    includeReferencedItems: [],
-    options: {
-        consistentRead: false,
-        appOptions: {},
-    } as dataSpi.Options,
-    omitTotalCount: false
-} as dataSpi.QueryRequest)
-
-
-
-const queryCollectionAsArray = (collectionName, sort, fields, filter?: any) => axiosInstance.post('/data/query', 
-            queryRequest(collectionName, sort, fields, filter), 
-            { responseType: 'stream', transformRequest: authVisitor.transformRequest }).then(response => streamToArray(response.data))
-
-const countRequest = (collectionName) => ({
-    collectionId: collectionName,
-    filter: '',
-    options: {
-        consistentRead: false,
-        appOptions: {},
-    } as dataSpi.Options,
-}) as dataSpi.CountRequest  
-
-const updateRequest = (collectionName, items) => ({
-    // collection name
-    collectionId: collectionName,
-    // Optional namespace assigned to collection/installation
-   // Items to update, must include _id
-   items: items,
-   // request options
-   options: {
-        consistentRead: false,
-        appOptions: {},
-    } as dataSpi.Options,
-}) as dataSpi.UpdateRequest
-
-const insertRequest = (collectionName, items, overwriteExisting) => ({
-    collectionId: collectionName,
-    items: items,
-    overwriteExisting: overwriteExisting,
-    options: {
-        consistentRead: false,
-        appOptions: {},
-    } as dataSpi.Options,
-} as dataSpi.InsertRequest)
-
-const givenItems = async(items, collectionName, auth) => 
-    axiosInstance.post('/data/insert', insertRequest(collectionName, items, false),  { responseType: 'stream', transformRequest: auth.transformRequest })
-
-const pagingMetadata = (total, count) => ({ pagingMetadata: { count: count, offset: 0, total: total, tooManyToCount: false } } as dataSpi.QueryResponsePart)
 
 describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  () => {
     beforeAll(async() => {
@@ -98,13 +30,13 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
     testIfSupportedOperationsIncludes(supportedOperations, [ FindWithSort ])('find api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
         await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
 
         const itemsByOrder = [ctx.item, ctx.anotherItem].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1).map(item => ({ item }))
         
-        await expect(queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: 'ASC' }], undefined)).resolves.toEqual(
-            ([...itemsByOrder, pagingMetadata(2, 2)])
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: dataSpi.SortOrder.ASC }], undefined, authVisitor)).resolves.toEqual(
+            ([...itemsByOrder, data.pagingMetadata(2, 2)])
         )
     })
     
@@ -125,11 +57,10 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('find api with projection', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item ], ctx.collectionName, authAdmin)
-        await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', skip: 0, limit: 25, projection: [ctx.column.name] }, authOwner) ).resolves.toEqual(
-            expect.objectContaining({ data: {
-                    items: [ ctx.item ].map(item => ({ [ctx.column.name]: item[ctx.column.name], _id: ctx.item._id })),
-                    totalCount: 1
-                } }))
+       
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], [ctx.column.name], authOwner)).resolves.toEqual(
+            expect.toIncludeSameMembers([{ item: { [ctx.column.name]: ctx.item[ctx.column.name], _id: ctx.item._id } }, data.pagingMetadata(1, 1)])
+        )                
     })
     
     //todo: create another test without sort for these implementations
@@ -137,49 +68,49 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     test('insert api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-        const response = await axiosInstance.post('/data/insert', insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', ...authAdmin })
 
-        const expectedItems = ctx.items.map(item => ({ item: item } as dataSpi.QueryResponsePart))
+        const expectedItems = ctx.items.map(item => ({ item }))
 
         await expect(streamToArray(response.data)).resolves.toEqual(expectedItems)
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(expect.toIncludeSameMembers(
             [ 
                 ...expectedItems, 
-                pagingMetadata(ctx.items.length, ctx.items.length)
+                data.pagingMetadata(ctx.items.length, ctx.items.length)
             ])
         )
     })
 
     test('insert api should fail if item already exists', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ ctx.items[0] ], ctx.collectionName, authAdmin)
+        await data.givenItems([ ctx.items[0] ], ctx.collectionName, authAdmin)
 
-        const response = axiosInstance.post('/data/insert', insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', ...authAdmin })
 
         const expectedItems = [dataSpi.QueryResponsePart.item(ctx.items[0])]
 
         await expect(response).rejects.toThrow('400')
 
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(expect.toIncludeAllMembers(
             [ 
                 ...expectedItems, 
-                pagingMetadata(expectedItems.length, expectedItems.length)
+                data.pagingMetadata(expectedItems.length, expectedItems.length)
             ])
         )
     })
 
     test('insert api should succeed if item already exists and overwriteExisting is on', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ ctx.item ], ctx.collectionName, authAdmin)
+        await data.givenItems([ ctx.item ], ctx.collectionName, authAdmin)
 
-        const response = await axiosInstance.post('/data/insert', insertRequest(ctx.collectionName, [ctx.modifiedItem], true),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.modifiedItem], true),  { responseType: 'stream', ...authOwner })
         const expectedItems = [dataSpi.QueryResponsePart.item(ctx.modifiedItem)]
 
         await expect(streamToArray(response.data)).resolves.toEqual(expectedItems)
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(expect.toIncludeAllMembers(
             [ 
                 ...expectedItems, 
-                pagingMetadata(expectedItems.length, expectedItems.length)
+                data.pagingMetadata(expectedItems.length, expectedItems.length)
             ])
         )
     })
@@ -187,7 +118,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api', async() => {
         
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
-        await givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authAdmin)
+        await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authOwner) 
         const response = await axiosInstance.post('/data/aggregate',
         {
             collectionId: ctx.collectionName,
@@ -203,104 +134,108 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
                         sum: ctx.numberColumns[1].name
                     }
                 ]
-            } as dataSpi.Group,
+            },
             finalFilter: {
                 $and: [
                     { myAvg: { $gt: 0 } },
                     { mySum: { $gt: 0 } }
                 ],
             },
-        }, { responseType: 'stream', ...authAdmin })
+        }, { responseType: 'stream', ...authOwner })
         
         await expect(streamToArray(response.data)).resolves.toEqual(
-            expect.arrayContaining([{ item: { 
+            expect.toIncludeSameMembers([{ item: { 
                 _id: ctx.numberItem._id,
                 _owner: ctx.numberItem._owner,
                 myAvg: ctx.numberItem[ctx.numberColumns[0].name],
                 mySum: ctx.numberItem[ctx.numberColumns[1].name]
                 } },
-                pagingMetadata(1, 1)
+                data.pagingMetadata(1, 1)
         ]))
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('bulk delete api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems(ctx.items, ctx.collectionName, authAdmin)
+        await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 
         const response = await axiosInstance.post('/data/remove', { 
-            collectionId: ctx.collectionName, itemIds: ctx.items.map((i: { _id: any }) => i._id) 
-        } as dataSpi.RemoveRequest, { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+            collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
+        }, { responseType: 'stream', ...authAdmin })
 
-        const expectedItems = ctx.items.map(item => ({ item: item } as dataSpi.RemoveResponsePart))
+        const expectedItems = ctx.items.map(item => ({ item }))
 
-        await expect(streamToArray(response.data)).resolves.toEqual(expect.arrayContaining(expectedItems))
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual([pagingMetadata(0, 0)])
+        await expect(streamToArray(response.data)).resolves.toEqual(expect.toIncludeSameMembers(expectedItems))
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual([data.pagingMetadata(0, 0)])
     })
 
     test('query by id api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ctx.item], ctx.collectionName, authAdmin) 
+        await data.givenItems([ctx.item], ctx.collectionName, authAdmin) 
 
         const filter = {
             _id: { $eq: ctx.item._id }
         }
 
-        await expect(queryCollectionAsArray(ctx.collectionName, undefined, undefined, filter)).resolves.toEqual(
-            ([...[dataSpi.QueryResponsePart.item(ctx.item)], pagingMetadata(1, 1)])
+        await expect(data.queryCollectionAsArray(ctx.collectionName, undefined, undefined, authOwner, filter)).resolves.toEqual(expect.toIncludeSameMembers(
+            [...[dataSpi.QueryResponsePart.item(ctx.item)], data.pagingMetadata(1, 1)])
         )
     })
 
     test('query by id api should return empty result if not found', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ctx.item], ctx.collectionName, authAdmin)
+        await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
         const filter = {
             _id: { $eq: 'wrong' }
         }
 
-        await expect(queryCollectionAsArray(ctx.collectionName, undefined, undefined, filter)).resolves.toEqual(
-            ([pagingMetadata(0, 0)])
+        await expect(data.queryCollectionAsArray(ctx.collectionName, undefined, undefined, authOwner, filter)).resolves.toEqual(
+            ([data.pagingMetadata(0, 0)])
         )
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('query by id api with projection', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ctx.item], ctx.collectionName, authAdmin)
+        await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
-        await expect(axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id, projection: [ctx.column.name] }, authAdmin)).resolves.toEqual(
-            matchers.responseWith({
-                item: { [ctx.column.name]: ctx.item[ctx.column.name], _id: ctx.item._id }
-            }))
+        const filter = {
+            _id: { $eq: ctx.item._id }
+        }
+
+        await expect(data.queryCollectionAsArray(ctx.collectionName, undefined, [ctx.column.name], authOwner, filter)).resolves.toEqual(expect.toIncludeSameMembers(
+            [dataSpi.QueryResponsePart.item({ [ctx.column.name]: ctx.item[ctx.column.name], _id: ctx.item._id }), data.pagingMetadata(1, 1)])
+        )
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems(ctx.items, ctx.collectionName, authAdmin)
-        const response = await axiosInstance.post('/data/update', updateRequest(ctx.collectionName, ctx.modifiedItems),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+        await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
+        const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  { responseType: 'stream', ...authAdmin })
 
-        const expectedItems = ctx.modifiedItems.map(item => ({ item: item } as dataSpi.QueryResponsePart))
+        const expectedItems = ctx.modifiedItems.map(dataSpi.QueryResponsePart.item)
 
         await expect(streamToArray(response.data)).resolves.toEqual(expectedItems)
 
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual(expect.arrayContaining(
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(expect.toIncludeSameMembers(
             [ 
                 ...expectedItems, 
-                pagingMetadata(ctx.modifiedItems.length, ctx.modifiedItems.length)
+                data.pagingMetadata(ctx.modifiedItems.length, ctx.modifiedItems.length)
             ]))
     })
 
     test('count api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-        await expect( axiosInstance.post('/data/count', countRequest(ctx.collectionName), authAdmin) ).resolves.toEqual(matchers.responseWith( { totalCount: 2 } ))
+        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        await expect( axiosInstance.post('/data/count', data.countRequest(ctx.collectionName), authAdmin) ).resolves.toEqual(
+            matchers.responseWith( { totalCount: 2 } ))
     })
 
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Truncate ])('truncate api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-        await axiosInstance.post('/data/truncate', { collectionId: ctx.collectionName } as dataSpi.TruncateRequest, authAdmin)
-        await expect(queryCollectionAsArray(ctx.collectionName, [], undefined)).resolves.toEqual([pagingMetadata(0, 0)])
+        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        await axiosInstance.post('/data/truncate', { collectionId: ctx.collectionName }, authAdmin)
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual([data.pagingMetadata(0, 0)])
     })
 
     test('insert undefined to number columns should inserted as null', async() => {
