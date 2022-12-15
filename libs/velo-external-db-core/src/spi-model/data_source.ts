@@ -9,13 +9,15 @@ export interface QueryRequest {
 }
 
 export interface QueryV2 {
-    filter: any;
+    filter: Filter;
     sort?: Sorting[];
     fields: string[];
     fieldsets: string[];
     paging?: Paging;
     cursorPaging?: CursorPaging;
 }
+
+export type Filter = any; 
 
 export interface Sorting {
     fieldName: string;
@@ -37,7 +39,7 @@ export interface Options {
     appOptions: any;
 }
 
-enum SortOrder {
+export enum SortOrder {
     ASC = 'ASC',
     DESC = 'DESC'
 }
