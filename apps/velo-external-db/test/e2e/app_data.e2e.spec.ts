@@ -3,8 +3,8 @@ import Chance = require('chance')
 import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes, streamToArray } from '@wix-velo/test-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { dataSpi } from '@wix-velo/velo-external-db-core'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField } = SchemaOperations
 import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit'
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField } = SchemaOperations
 import * as gen from '../gen'
 import * as schema from '../drivers/schema_api_rest_test_support'
 import * as matchers from '../drivers/schema_api_rest_matchers'
@@ -47,11 +47,15 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             _createdDate: { $gte: ctx.pastVeloDate }
         }
 
-        await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: filterByDate, skip: 0, limit: 25 }, authOwner) ).resolves.toEqual(
-            expect.objectContaining({ data: {
-                    items: [ ctx.item ],
-                    totalCount: 1
-                } }))
+
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner, filterByDate)).resolves.toEqual(
+            expect.toIncludeSameMembers([{ item: ctx.item }, data.pagingMetadata(1, 1)])
+        )
+        // await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: filterByDate, skip: 0, limit: 25 }, authOwner) ).resolves.toEqual(
+        //     expect.objectContaining({ data: {
+        //             items: [ ctx.item ],
+        //             totalCount: 1
+        //         } }))
     })
     
     testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('find api with projection', async() => {
