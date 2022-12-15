@@ -40,7 +40,6 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         )
     })
     
-    //@ts-ignore
     testIfSupportedOperationsIncludes(supportedOperations, [FilterByEveryField])('find api - filter by date', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
