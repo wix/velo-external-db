@@ -2,7 +2,7 @@ import axios from 'axios'
 import Chance = require('chance')
 import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes, streamToArray } from '@wix-velo/test-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField } = SchemaOperations
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection } = SchemaOperations
 import { dataSpi } from '@wix-velo/velo-external-db-core'
 import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit'
 import * as gen from '../gen'
@@ -40,7 +40,8 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         )
     })
     
-    testIfSupportedOperationsIncludes(supportedOperations, [FilterByEveryField])('find api - filter by date', async() => {
+    //@ts-ignore
+    test.skip('find api - filter by date', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
         const filterByDate = {
