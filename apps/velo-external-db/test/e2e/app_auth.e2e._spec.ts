@@ -1,12 +1,6 @@
 import { Uninitialized, gen } from '@wix-velo/test-commons'
-import { authOwnerWithoutJwt, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } from '../resources/e2e_resources'
 
-
-
-const axios = require('axios').create({
-    baseURL: 'http://localhost:8080'
-})
 
 describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {
