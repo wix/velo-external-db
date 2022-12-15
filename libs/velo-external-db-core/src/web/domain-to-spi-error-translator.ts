@@ -1,4 +1,4 @@
-import { errors as domainErrors} from '@wix-velo/velo-external-db-commons' 
+import { errors as domainErrors } from '@wix-velo/velo-external-db-commons' 
 import { ErrorMessage } from '../spi-model/errors'
 
 export const domainToSpiErrorTranslator = (err: any) => {

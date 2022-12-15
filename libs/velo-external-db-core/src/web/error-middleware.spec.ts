@@ -26,7 +26,7 @@ describe('Error Middleware', () => {
       errorMiddleware(err, null, ctx.res)
 
       expect(ctx.res.status).toHaveBeenCalledWith(500)
-      expect(ctx.res.send).toHaveBeenCalledWith( { description: err.message, code: "WDE0054" } )
+      expect(ctx.res.send).toHaveBeenCalledWith( { description: err.message, code: 'WDE0054' } )
     })
 
     test('converts exceptions to http error response', () => {
