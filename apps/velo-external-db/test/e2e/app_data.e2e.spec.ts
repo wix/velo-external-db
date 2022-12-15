@@ -2,7 +2,6 @@ import axios from 'axios'
 import Chance = require('chance')
 import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes, streamToArray } from '@wix-velo/test-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection } = SchemaOperations
 import { dataSpi } from '@wix-velo/velo-external-db-core'
 import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit'
 import * as gen from '../gen'
@@ -11,6 +10,7 @@ import * as matchers from '../drivers/schema_api_rest_matchers'
 import * as data from '../drivers/data_api_rest_test_support'
 import * as authorization from '../drivers/authorization_test_support'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField } = SchemaOperations
 
 const chance = Chance()
 
@@ -41,18 +41,16 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
     
     //@ts-ignore
-    test.skip('find api - filter by date', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [FilterByEveryField])('find api - filter by date', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
         const filterByDate = {
             _createdDate: { $gte: ctx.pastVeloDate }
         }
 
-        await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: filterByDate, skip: 0, limit: 25 }, authOwner) ).resolves.toEqual(
-            expect.objectContaining({ data: {
-                    items: [ ctx.item ],
-                    totalCount: 1
-                } }))
+
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner, filterByDate)).resolves.toEqual(
+            expect.toIncludeSameMembers([{ item: ctx.item }, data.pagingMetadata(1, 1)]))
     })
     
     testIfSupportedOperationsIncludes(supportedOperations, [ Projection ])('find api with projection', async() => {
