@@ -81,7 +81,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
     test('insert api should fail if item already exists', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ ctx.items[0] ], ctx.collectionName, authAdmin)
+        await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
         const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', ...authAdmin })
 
