@@ -151,9 +151,7 @@ export const createRouter = () => {
             )
 
             const responseParts = data.items.map(dataSource.QueryResponsePart.item)
-
             const metadata = dataSource.QueryResponsePart.pagingMetadata(responseParts.length, offset, data.totalCount)
-
 
             streamCollection([...responseParts, ...[metadata]], res)
         } catch (e) {

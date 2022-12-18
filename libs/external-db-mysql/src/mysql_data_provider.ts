@@ -26,7 +26,7 @@ export default class DataProvider implements IDataProvider {
         const sql = `SELECT ${projectionExpr} FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
 
         const resultset = await this.query(sql, [...parameters, skip, limit])
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
         return resultset
     }
 
@@ -34,7 +34,7 @@ export default class DataProvider implements IDataProvider {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const sql = `SELECT COUNT(*) AS num FROM ${escapeTable(collectionName)} ${filterExpr}`
         const resultset = await this.query(sql, parameters)
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
         return resultset[0]['num']
     }
 
@@ -45,7 +45,7 @@ export default class DataProvider implements IDataProvider {
         
         const data = items.map((item: Item) => asParamArrays( patchItem(item) ) )
         const resultset = await this.query(sql, [data])
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
         return resultset.affectedRows
     }
 
@@ -58,7 +58,7 @@ export default class DataProvider implements IDataProvider {
         
         // @ts-ignore
         const resultset = await this.query(queries, [].concat(...updatables))
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
 
         return Array.isArray(resultset) ? resultset.reduce((s, r) => s + r.changedRows, 0) : resultset.changedRows
     }
@@ -66,12 +66,12 @@ export default class DataProvider implements IDataProvider {
     async delete(collectionName: string, itemIds: string[]): Promise<number> {
         const sql = `DELETE FROM ${escapeTable(collectionName)} WHERE _id IN (${wildCardWith(itemIds.length, '?')})`
         const rs = await this.query(sql, itemIds)
-                             .catch( translateErrorCodes )
+                             .catch( err => translateErrorCodes(err, collectionName) )
         return rs.affectedRows
     }
 
     async truncate(collectionName: string): Promise<void> {
-        await this.query(`TRUNCATE ${escapeTable(collectionName)}`).catch( translateErrorCodes )
+        await this.query(`TRUNCATE ${escapeTable(collectionName)}`).catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number): Promise<Item[]> {
@@ -81,7 +81,7 @@ export default class DataProvider implements IDataProvider {
 
         const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter} ${sortExpr} LIMIT ?, ?`
         const resultset = await this.query(sql, [...whereParameters, ...parameters, skip, limit])
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
         return resultset
     }
 }

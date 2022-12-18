@@ -153,9 +153,7 @@ export interface ISchemaProvider {
     translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
 }
 
-export interface IBaseHttpError extends Error {
-    status: number;
-}
+export interface IBaseHttpError extends Error {}
 
 type ValidConnectionResult = { valid: true }
 type InvalidConnectionResult = { valid: false, error: IBaseHttpError }
