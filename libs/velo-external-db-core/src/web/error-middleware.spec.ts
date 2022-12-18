@@ -2,6 +2,8 @@ import * as Chance from 'chance'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { errorMiddleware } from './error-middleware'
 import { Uninitialized } from '@wix-velo/test-commons'
+import { domainToSpiErrorTranslator } from './domain-to-spi-error-translator'
+
 const chance = Chance()
 
 describe('Error Middleware', () => {
@@ -24,7 +26,7 @@ describe('Error Middleware', () => {
       errorMiddleware(err, null, ctx.res)
 
       expect(ctx.res.status).toHaveBeenCalledWith(500)
-      expect(ctx.res.send).toHaveBeenCalledWith( { message: err.message } )
+      expect(ctx.res.send).toHaveBeenCalledWith( { description: err.message, code: 'WDE0054' } )
     })
 
     test('converts exceptions to http error response', () => {
@@ -32,9 +34,9 @@ describe('Error Middleware', () => {
             .forEach(Exception => {
               const err = new Exception(chance.word())
               errorMiddleware(err, null, ctx.res)
-
-              expect(ctx.res.status).toHaveBeenCalledWith(err.status)
-              expect(ctx.res.send).toHaveBeenCalledWith( { message: err.message } )
+              const spiError = domainToSpiErrorTranslator(err)
+              // expect(ctx.res.status).toHaveBeenCalledWith(err.status)
+              expect(ctx.res.send).toHaveBeenCalledWith( spiError.message )
 
               ctx.res.status.mockClear()
               ctx.res.send.mockClear()

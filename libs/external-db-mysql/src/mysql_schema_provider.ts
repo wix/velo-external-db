@@ -47,29 +47,29 @@ export default class SchemaProvider implements ISchemaProvider {
 
         await this.query(`CREATE TABLE IF NOT EXISTS ${escapeTable(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
                          [...(columns || []).map((c: { name: any }) => c.name)])
-                  .catch( translateErrorCodes )
+                  .catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async drop(collectionName: string): Promise<void> {
         await this.query(`DROP TABLE IF EXISTS ${escapeTable(collectionName)}`)
-                  .catch( translateErrorCodes )
+                  .catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async addColumn(collectionName: string, column: InputField): Promise<void> {
         await validateSystemFields(column.name)
         await this.query(`ALTER TABLE ${escapeTable(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
-                  .catch( translateErrorCodes )
+                  .catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async removeColumn(collectionName: string, columnName: string): Promise<void> {
         await validateSystemFields(columnName)
         return await this.query(`ALTER TABLE ${escapeTable(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
-                         .catch( translateErrorCodes )
+                         .catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async describeCollection(collectionName: string): Promise<ResponseField[]> {
         const res = await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
-                              .catch( translateErrorCodes )
+                              .catch( err => translateErrorCodes(err, collectionName) )
         return res.map((r: { Field: string; Type: string }) => ({ field: r.Field, type: r.Type }))
                   .map( this.translateDbTypes.bind(this) )
     }
