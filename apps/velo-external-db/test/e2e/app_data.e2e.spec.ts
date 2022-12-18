@@ -81,13 +81,13 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
     test('insert api should fail if item already exists', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ ctx.items[0] ], ctx.collectionName, authAdmin)
+        await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
         const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', ...authAdmin })
 
-        const expectedItems = [dataSpi.QueryResponsePart.item(ctx.items[0])]
+        const expectedItems = [dataSpi.QueryResponsePart.item(ctx.items[1])]
 
-        await expect(response).rejects.toThrow('400')
+        await expect(response).rejects.toThrow('409')
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(expect.toIncludeAllMembers(
             [ 
@@ -236,6 +236,22 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual([data.pagingMetadata(0, 0)])
     })
 
+
+    test('count api on non existing collection should fail with 404', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        await expect( 
+            axiosInstance.post('/data/count', data.countRequest(gen.randomCollectionName()), authAdmin) 
+        ).rejects.toThrow('404')
+    })
+
+    test('insert api on non existing collection should fail with 404', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+
+        const response = axiosInstance.post('/data/insert', data.insertRequest(gen.randomCollectionName(), ctx.items, false),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
+
+        await expect(response).rejects.toThrow('404')
+    })
 
 
     const ctx = {

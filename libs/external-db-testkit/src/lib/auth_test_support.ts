@@ -51,4 +51,4 @@ export const authOwnerWithoutJwt = { transformRequest: axios.defaults
                                       .transformRequest
                                       .concat( appendRoleToRequest('OWNER' ) ) }
 
-export const errorResponseWith = (status: any, message: string) => ({ response: { data: { message: expect.stringContaining(message) }, status } })
+export const errorResponseWith = (status: any, message: string) => ({ response: { data: { description: expect.stringContaining(message) }, status } })
