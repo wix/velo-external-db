@@ -1,12 +1,6 @@
 import { Uninitialized, gen } from '@wix-velo/test-commons'
-import { authOwnerWithoutJwt, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } from '../resources/e2e_resources'
 
-
-
-const axios = require('axios').create({
-    baseURL: 'http://localhost:8080'
-})
 
 describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {
@@ -25,9 +19,10 @@ describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () 
     //         return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
     // })
 
-    test('request with no JWT will throw an appropriate error with the right format', async() => {
-        return expect(() => axios.post('/schemas/list', {}, authOwnerWithoutJwt)).rejects.toMatchObject(errorResponseWith(401, 'You are not authorized'))
-    })
+    // test('wrong secretKey will throw an appropriate error with the right format', async() => {
+    //     return expect(() => axios.post('/schemas/list', {}, authOwnerWithoutSecretKey)).rejects.toMatchObject(errorResponseWith(401, 'You are not authorized'))
+    // })
+
 
     const ctx = {
         collectionName: Uninitialized,
