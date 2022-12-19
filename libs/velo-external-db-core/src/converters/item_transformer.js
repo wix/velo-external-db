@@ -15,8 +15,19 @@ class ItemTransformer {
         return items.map(i => this.prepareForUpdate(i, fields))
     }
 
-    prepareForInsert(item, fields) {        
-        return this.unpackDates(fields.reduce((pv, f) => ({ ...pv, [f.field]: item[f.field] || this.defaultValueFor(f) }), {}))
+    prepareForInsert(item, fields) {
+        return this.unpackDates(fields.reduce((pv, f) => ({ ...pv, [f.field]: this.patchItemForInsert(item[f.field], f.subtype) || this.defaultValueFor(f) }), {}))
+    }
+
+    patchItemForInsert(item, subtype) {
+        if (!subtype) {
+            return item
+        }
+
+        switch (subtype) {
+            case 'float':
+                return item.toFixed(2)
+        }           
     }
 
     prepareForUpdate(item, fields) {

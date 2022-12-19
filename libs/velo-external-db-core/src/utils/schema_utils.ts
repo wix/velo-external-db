@@ -49,7 +49,7 @@ export const subtypeToFieldType = (fieldEnum: number): string => {
         case VeloFieldTypeEnum.longText:
             return 'string'
         case VeloFieldTypeEnum.number:
-            return 'int'
+            return 'float'
         case VeloFieldTypeEnum.datetime:
             return 'datetime'
         case VeloFieldTypeEnum.boolean:
@@ -63,6 +63,14 @@ export const subtypeToFieldType = (fieldEnum: number): string => {
             // TODO: throw specific error
             throw new Error(`There is no subtype for this type: ${fieldEnum}`)
     }
+}
+
+export const precisionToFieldType = (fieldEnum: number): string | undefined => {
+    switch (fieldEnum) {
+        case VeloFieldTypeEnum.number:
+            return '10, 2'
+    }
+    return 
 
 }
 
@@ -114,7 +122,8 @@ export const responseFieldToWixFormat = (fields: ResponseField[]): Field[] => {
 export const wixFormatFieldToInputFields = (field: Field): InputField => ({
     name: field.key,
     type: wixDataEnumToFieldType(field.type),
-    subtype: subtypeToFieldType(field.type)
+    subtype: subtypeToFieldType(field.type),
+    precision: precisionToFieldType(field.type)
 })
 
 export const InputFieldToWixFormatField = (field: InputField): Field => ({

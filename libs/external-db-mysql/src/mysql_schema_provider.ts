@@ -82,8 +82,8 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     translateDbTypes(row: ResponseField): ResponseField {
-        row.type = this.sqlSchemaTranslator.translateType(row.type)
-        return row
+        const { type, subtype } = this.sqlSchemaTranslator.translateType(row.type)
+        return { ...row, type, subtype }
     }
 
     columnCapabilitiesFor(columnType: string): ColumnCapabilities {

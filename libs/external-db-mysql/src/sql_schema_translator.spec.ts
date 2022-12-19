@@ -1,5 +1,6 @@
 import SchemaColumnTranslator from './sql_schema_translator'
 import { Uninitialized } from '@wix-velo/test-commons'
+import { FieldType, FieldSubType } from '@wix-velo/velo-external-db-types'
 import * as Chance from 'chance'
 import { escapeId } from './mysql_utils'
 const chance = Chance()
@@ -95,21 +96,26 @@ describe('Sql Schema Column Translator', () => {
 
             test('integer', () => {
                 ['INT', 'INTEGER', 'INTEGER(10)', 'BIGINT', 'SMALLINT'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('number')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: FieldType.number, subtype: FieldSubType.int })
                 })
             })
 
             test('decimal float', () => {
                 ['FLOAT', 'FLOAT(5,2)', 'DOUBLE', 'DOUBLE(5,2)', 'DECIMAL', 'DECIMAL(5,2)'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('number')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: FieldType.number, subtype: FieldSubType.float })
                 })
             })
         })
 
         describe('string fields', () => {
-            test('string', () => {
-                ['VARCHAR', 'VARCHAR(2048)', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('text')
+            test('string - short', () => {
+                ['VARCHAR', 'VARCHAR(2048)', 'TEXT', 'MEDIUMTEXT'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: FieldType.text })
+                })
+            })
+            test('string - long', () => {
+                ['LONGTEXT'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: FieldType.longText })
                 })
             })
         })
@@ -117,7 +123,7 @@ describe('Sql Schema Column Translator', () => {
         describe('date time fields', () => {
             test('date', () => {
                 ['DATE', 'DATETIME', 'TIMESTAMP', 'TIME', 'YEAR'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: FieldType.datetime })
                 })
             })
         })
@@ -125,12 +131,12 @@ describe('Sql Schema Column Translator', () => {
         describe('other fields', () => {
             test('boolean', () => {
                 ['tinyint', 'bit'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('boolean')
+                    expect( env.schemaTranslator.translateType(t) ).toEqual({ type: FieldType.boolean })
                 })
             })
             
             test('unknown type should return text', () => { 
-                expect( env.schemaTranslator.translateType('unknown') ).toEqual('text')
+                expect( env.schemaTranslator.translateType('unknown') ).toEqual({ type: FieldType.text, subtype: FieldSubType.unknownType })
             })
         })
     })

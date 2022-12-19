@@ -22,6 +22,12 @@ export enum FieldType {
     multiReference = 'multiReference',
 }
 
+export enum FieldSubType {
+    int = 'int',
+    float = 'float',
+    unknownType = 'unknownType',
+}
+
 export enum CollectionOperation {
     update = 'update',
     remove = 'remove',

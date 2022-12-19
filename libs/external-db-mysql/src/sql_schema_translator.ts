@@ -1,9 +1,8 @@
-import { InputField } from '@wix-velo/velo-external-db-types'
+import { InputField, FieldType, FieldSubType } from '@wix-velo/velo-external-db-types'
 import { escapeId } from './mysql_utils'
 
-
 export interface IMySqlSchemaColumnTranslator {
-    translateType(dbType: string): string
+    translateType(dbType: string): { type: string, subtype?: string }
     dbTypeFor(field: InputField): string
     columnToDbColumnSql(field: InputField): string
 }
@@ -22,36 +21,40 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
             case 'integer':
             case 'bigint':
             case 'smallint':
+                return { type: FieldType.number, subtype: FieldSubType.int }
+            
             case 'float':
             case 'double':
             case 'decimal':
-                return 'number'
+                return { type: FieldType.number, subtype: FieldSubType.float }
 
             case 'date':
             case 'datetime':
             case 'timestamp':
             case 'time':
             case 'year':
-                return 'datetime'
+                return { type: FieldType.datetime }
 
             case 'varchar':
             case 'text':
             case 'mediumtext':
+                return { type: FieldType.text }
+            
             case 'longtext':
-                return 'text'
+                return { type: FieldType.longText }
 
             case 'tinyint':
             case 'bit':
             case 'boolean':
             case 'bool':
-                return 'boolean'
+                return { type: FieldType.boolean }
 
             case 'json':
-                return 'object'
+                return { type: FieldType.object }
 
             default:
                 console.log('Unknown type', type)
-                return 'text'
+                return { type: FieldType.text, subtype: FieldSubType.unknownType }
         }
     }
 
