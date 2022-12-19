@@ -89,7 +89,7 @@ export const createRouter = () => {
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
     const jwtAuthenticator = new JwtAuthenticator(cfg.externalDatabaseId, cfg.allowedMetasites, new WixDataFacade(cfg.wixDataBaseUrl))
-    router.use(unless(['/', '/id', '/capabilities', '/favicon.ico'], jwtAuthenticator.authorizeJwt()))
+    router.use(unless(['/', '/info', '/capabilities', '/favicon.ico'], jwtAuthenticator.authorizeJwt()))
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
@@ -122,12 +122,12 @@ export const createRouter = () => {
 
     router.post('/provision', async(req, res) => {
         const { type, vendor } = cfg
-        res.json({ type, vendor, protocolVersion: 3 })
+        res.json({ type, vendor, protocolVersion: 3, adapterVersion: 'v1' })
     })
 
-    router.get('/id', async(req, res) => {
+    router.get('/info', async(req, res) => {
         const { externalDatabaseId } = cfg
-        res.json({ externalDatabaseId })
+        res.json({ dataSourceId: externalDatabaseId })
     })
 
     // *************** Data API **********************

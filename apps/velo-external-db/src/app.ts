@@ -32,7 +32,7 @@ const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
             vendor,
             adapterType,
             commonExtended: true,
-            wixDataBaseUrl: wixDataBaseUrl || 'www.wixapis.com/wix-data'
+            wixDataBaseUrl: wixDataBaseUrl || 'https://www.wixapis.com/wix-data'
         },
         hooks
     })
