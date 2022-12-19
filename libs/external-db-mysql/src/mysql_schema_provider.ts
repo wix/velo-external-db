@@ -65,7 +65,7 @@ export default class SchemaProvider implements ISchemaProvider {
     async changeColumnType(collectionName: string, column: InputField): Promise<void> {
         await validateSystemFields(column.name)
         await this.query(`ALTER TABLE ${escapeTable(collectionName)} MODIFY ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
-                  .catch( translateErrorCodes )
+                  .catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async removeColumn(collectionName: string, columnName: string): Promise<void> {
