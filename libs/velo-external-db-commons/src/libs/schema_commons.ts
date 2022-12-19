@@ -38,7 +38,7 @@ const QueryOperationsByFieldType: {[x: string]: any} = {
 
 export const AllSchemaOperations = Object.values(SchemaOperations)
 
-export const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove']
+export const ReadWriteOperations = ['get', 'find', 'count', 'update', 'insert', 'remove', 'bulkRemove', 'bulkInsert', 'bulkUpdate']
 export const ReadOnlyOperations = ['get']
 
 export const asWixSchema = ({ id, allowedOperations, allowedSchemaOperations, fields }: { id: string, allowedOperations: string[], fields: FieldWithQueryOperators[], [x: string]: any }): AsWixSchema => {
