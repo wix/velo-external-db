@@ -1,5 +1,6 @@
 import { SystemFields, asWixSchemaHeaders } from '@wix-velo/velo-external-db-commons'
 import { InputField } from '@wix-velo/velo-external-db-types'
+import { schemaUtils } from '@wix-velo/velo-external-db-core'
 
 export const responseWith = (matcher: any) => expect.objectContaining( { data: matcher } )
 
@@ -41,34 +42,34 @@ const listToHaveCollection = (collectionName: string) => expect.objectContaining
     schemas: expect.arrayContaining( [ expect.objectContaining( { id: collectionName } ) ] )
 } )
 
-const collectionCapabilities = (_collectionOperations: any[], _dataOperations: any[], _fieldTypes: any[]) =>
-    expect.objectContaining({
-        collectionOperations: expect.any(Array),
-        dataOperations: expect.any(Array),
-        fieldTypes: expect.any(Array)
-    })
+const collectionCapabilities = (_collectionOperations: any[], _dataOperations: any[], _fieldTypes: any[]) => ({
+    collectionOperations: expect.any(Array),
+    dataOperations: expect.any(Array),
+    fieldTypes: expect.any(Array)
+})
 
 const fieldCapabilitiesMatcher = () => expect.objectContaining({
     queryOperators: expect.any(Array),
     sortable: expect.any(Boolean),
 })
 
-const filedMatcher = (field: InputField) => expect.objectContaining({
+const filedMatcher = (field: InputField) => ({
     key: field.name,
     capabilities: fieldCapabilitiesMatcher(),
     encrypted: expect.any(Boolean),
-    type: expect.any(Number)
+    type: schemaUtils.fieldTypeToWixDataEnum(field.type)
 })
 
-const fieldsMatcher = (fields: InputField[]) => expect.objectContaining(fields.map(filedMatcher))
+const fieldsMatcher = (fields: InputField[]) => expect.toIncludeSameMembers(fields.map(filedMatcher))
 
-export const collectionResponsesWith = (collectionName: string, fields: InputField[]) => expect.objectContaining({
+export const collectionResponsesWith = (collectionName: string, fields: InputField[]) => ({
     id: collectionName,
     capabilities: collectionCapabilities([], [], []),
     fields: fieldsMatcher(fields),
 })
 
-export const createCollectionResponse = (collectionName: string, fields: InputField[]) => expect.objectContaining({
+export const createCollectionResponse = (collectionName: string, fields: InputField[]) => ({
     id: collectionName,
+    capabilities: collectionCapabilities([], [], []),
     fields: fieldsMatcher(fields),
 })

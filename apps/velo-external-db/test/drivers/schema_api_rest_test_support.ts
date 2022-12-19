@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { InputField } from '@wix-velo/velo-external-db-types'
 import { streamToArray } from '@wix-velo/test-commons'
+import { schemaUtils } from '@wix-velo/velo-external-db-core'
+
 
 const axiosClient = axios.create({
     baseURL: 'http://localhost:8080'
@@ -9,11 +11,7 @@ const axiosClient = axios.create({
 export const givenCollection = async(name: string, columns: InputField[], auth: any) => {
     const collection = {
         id: name,
-        fields: columns.map(c => ({ 
-            key: c.name,
-            // TODO: convert to enum based on column type 
-            type: 0 
-        }))
+        fields: columns.map(schemaUtils.InputFieldToWixFormatField)
     }
     await axiosClient.post('/collections/create', { collection }, { ...auth, responseType: 'stream' })
 }

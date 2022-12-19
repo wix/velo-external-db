@@ -1,9 +1,10 @@
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
-import { SchemaOperations } from '@wix-velo/velo-external-db-types'
-const { RemoveColumn } = SchemaOperations
+import { InputField, SchemaOperations } from '@wix-velo/velo-external-db-types'
+const { RemoveColumn, ChangeColumnType } = SchemaOperations
 import * as schema from '../drivers/schema_api_rest_test_support'
 import * as matchers from '../drivers/schema_api_rest_matchers'
+import { schemaUtils } from '@wix-velo/velo-external-db-core'
 import { authOwner } from '@wix-velo/external-db-testkit'
 import * as gen from '../gen'
 import Chance = require('chance')
@@ -34,10 +35,10 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         test('collection get', async() => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, []))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields]))
         })
 
-        test('collection create', async() => {        
+        test('collection create - collection without fields', async() => {        
             const collection = {
                 id: ctx.collectionName,
                 fields: []
@@ -47,19 +48,27 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponse(ctx.collectionName, [...SystemFields]))
         })
 
+        test('collection create - collection with fields', async() => {       
+            const collection = {
+                id: ctx.collectionName,
+                fields: [ctx.column].map(schemaUtils.InputFieldToWixFormatField)
+            }
+
+            await axiosClient.post('/collections/create', { collection }, { ...authOwner, responseType: 'stream' })
+
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponse(ctx.collectionName, [...SystemFields, ctx.column]))
+        })
+
         test('collection update - add column', async() => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
 
             const collection: any = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
 
-            collection.fields.push({
-                key: ctx.column.name,
-                type: 0
-            })
+            collection.fields.push(schemaUtils.InputFieldToWixFormatField(ctx.column))
         
             await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' })
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, []))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields, ctx.column]))
         })
 
         testIfSupportedOperationsIncludes(supportedOperations, [ RemoveColumn ])('collection update - remove column', async() => {
@@ -72,7 +81,19 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
             await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' })       
             
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, []))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields]))
+        })
+
+        testIfSupportedOperationsIncludes(supportedOperations, [ ChangeColumnType ])('collection update - change column type', async() => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            const collection: any = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
+
+            const columnIndex = collection.fields.findIndex((f: any) => f.key === ctx.column.name)
+            collection.fields[columnIndex].type = schemaUtils.fieldTypeToWixDataEnum('number') 
+
+            await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' }) 
+
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponse(ctx.collectionName, [...SystemFields, { name: ctx.column.name, type: 'number' }]))
         })
 
         test('collection delete', async() => {
@@ -82,7 +103,20 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         })
     })
 
-    const ctx = {
+    interface Ctx {
+        collectionName: string
+        column: InputField
+        numberColumns: InputField[],
+        item: { [x: string]: any }
+        items: { [x: string]: any}[]
+        modifiedItem: { [x: string]: any }
+        modifiedItems: { [x: string]: any }
+        anotherItem: { [x: string]: any }
+        numberItem: { [x: string]: any }
+        anotherNumberItem: { [x: string]: any }
+    }
+
+    const ctx: Ctx = {
         collectionName: Uninitialized,
         column: Uninitialized,
         numberColumns: Uninitialized,

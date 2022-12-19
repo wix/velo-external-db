@@ -1,4 +1,4 @@
-import { CollectionCapabilities } from './collection_types'
+import { CollectionCapabilities, ColumnCapabilities } from './collection_types'
 export * from './collection_types'
 
 export enum AdapterOperator { //in velo-external-db-core
@@ -152,11 +152,6 @@ export type ResponseField = FieldAttributes & {
         sortable: boolean
         columnQueryOperators: string[]
     }
-}
-
-export type ColumnCapabilities = {
-    sortable: boolean,
-    columnQueryOperators: string[],
 }
 export interface ISchemaProvider {
     list(): Promise<Table[]>
