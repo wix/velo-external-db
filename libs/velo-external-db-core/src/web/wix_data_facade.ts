@@ -1,12 +1,11 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 const { UnauthorizedError } = errors
 import axios from 'axios'
-import { decodeBase64 } from '../utils/base64_utils'
 
 type PublicKeyResponse = {
     publicKeys: {
         id: string,
-        base64PublicKey: string
+        publicKeyPem: string
     }[];
 };
 
@@ -33,8 +32,8 @@ export class WixDataFacade implements IWixDataFacade {
         if (status !== 200) {
             throw new UnauthorizedError(`failed to get public keys: status ${status}`)
         }
-        return data.publicKeys.reduce((m: PublicKeyMap, { id, base64PublicKey }) => {
-            m[id] = decodeBase64(base64PublicKey)
+        return data.publicKeys.reduce((m: PublicKeyMap, { id, publicKeyPem }) => {
+            m[id] = publicKeyPem
             return m
         }, {})
     }
