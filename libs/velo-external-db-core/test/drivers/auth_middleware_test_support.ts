@@ -1,6 +1,5 @@
 import { IWixDataFacade, PublicKeyMap } from '../../src/web/wix_data_facade'
 import * as jwt from 'jsonwebtoken'
-import { decodeBase64 } from '../../src/utils/base64_utils'
 import { authConfig } from '@wix-velo/test-commons'
 import { SignOptions } from 'jsonwebtoken'
 
@@ -16,8 +15,8 @@ export const requestBodyWith = (role?: string | undefined, path?: string | undef
 } )
 
 export const signedToken = (payload: Record<string, unknown>, keyid?: string, expiration= '10000ms') => {
-    const options = keyid ? { algorithm: 'RS256', expiresIn: expiration, keyid: keyid } : { algorithm: 'RS256', expiresIn: expiration }
-    return jwt.sign(payload, decodeBase64(authConfig.authPrivateKey), options as SignOptions)
+    const options = keyid ? { algorithm: 'ES256', expiresIn: expiration, keyid: keyid } : { algorithm: 'ES256', expiresIn: expiration }
+    return jwt.sign(payload, authConfig.authPrivateKey, options as SignOptions)
 }
 
 export class WixDataFacadeMock implements IWixDataFacade {
