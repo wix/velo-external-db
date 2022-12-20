@@ -10,7 +10,7 @@ app.use(express.json())
 app.get('/v1/external-databases/:externalDatabaseId/public-keys', (_req, res) => {
     res.json({
         publicKeys: [
-            { id: authConfig.kid, base64PublicKey: authConfig.authPublicKey },
+            { id: authConfig.kid, publicKeyPem: authConfig.authPublicKey },
         ]
     })
 })
