@@ -22,7 +22,7 @@ export class JwtAuthenticator {
     authorizeJwt() {
         return async(req: express.Request, res: express.Response, next: express.NextFunction) => {
             try {
-                const token = this.extractToken(req.header('Authorization'))
+                const token = this.extractToken(req.header('authorization'))
                 this.publicKeys = this.publicKeys ?? await this.wixDataFacade.getPublicKeys(this.externalDatabaseId)
                 await this.verify(token)
             } catch (err: any) {
@@ -77,5 +77,3 @@ export class JwtAuthenticator {
         return header.replace(/^(Bearer )/, '')
     }
 }
-
-
