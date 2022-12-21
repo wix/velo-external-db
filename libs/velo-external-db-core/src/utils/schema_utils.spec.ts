@@ -61,7 +61,7 @@ describe('Schema utils functions', () => {
             expect(subtypeToFieldType(VeloFieldTypeEnum.text)).toBe('string')
         })
         test('number type', () => {
-            expect(subtypeToFieldType(VeloFieldTypeEnum.number)).toBe('int')
+            expect(subtypeToFieldType(VeloFieldTypeEnum.number)).toBe('float')
         })
         test('boolean type', () => {
             expect(subtypeToFieldType(VeloFieldTypeEnum.boolean)).toBe('')
