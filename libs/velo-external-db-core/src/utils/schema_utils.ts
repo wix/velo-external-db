@@ -49,7 +49,7 @@ export const subtypeToFieldType = (fieldEnum: number): string => {
         case VeloFieldTypeEnum.longText:
             return 'string'
         case VeloFieldTypeEnum.number:
-            return 'int'
+            return 'float'
         case VeloFieldTypeEnum.datetime:
             return 'datetime'
         case VeloFieldTypeEnum.boolean:
