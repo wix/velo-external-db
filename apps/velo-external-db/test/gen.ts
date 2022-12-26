@@ -73,12 +73,12 @@ export const randomObjectDbEntity = (columns: InputField[]) => {
     return entity
 }
 
-export const randomNumberColumns = () => {
+export const randomNumberColumns = (): InputField[] => {
     return [ { name: chance.word(), type: 'number', subtype: 'int', isPrimary: false },
              { name: chance.word(), type: 'number', subtype: 'decimal', precision: '10,2', isPrimary: false } ]
 }
 
-export const randomColumn = () => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
+export const randomColumn = (): InputField => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 
 export const randomObjectColumn = () => ( { name: chance.word(), type: 'object' } )
 

@@ -125,7 +125,7 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
             const parsed = precision.split(',').map((s: string) => s.trim()).map((s: string) => parseInt(s))
             return `(${parsed.join(',')})`
         } catch (e) {
-            return '(5,2)'
+            return '(15,2)'
         }
     }
 

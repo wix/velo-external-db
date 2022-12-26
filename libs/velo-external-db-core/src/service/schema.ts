@@ -1,7 +1,22 @@
-import { asWixSchema, asWixSchemaHeaders, allowedOperationsFor, appendQueryOperatorsTo, errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, Table, SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { errors } from '@wix-velo/velo-external-db-commons'
+import { ISchemaProvider, 
+    SchemaOperations, 
+    ResponseField, 
+    CollectionCapabilities, 
+    Table 
+} from '@wix-velo/velo-external-db-types'
+import * as collectionSpi from '../spi-model/collection'
 import CacheableSchemaInformation from './schema_information'
-const { Create, AddColumn, RemoveColumn } = SchemaOperations
+import { 
+    queriesToWixDataQueryOperators, 
+    fieldTypeToWixDataEnum, 
+    WixFormatFieldsToInputFields, 
+    responseFieldToWixFormat, 
+    compareColumnsInDbAndRequest 
+} from '../utils/schema_utils'
+
+
+const { Create, AddColumn, RemoveColumn, ChangeColumnType } = SchemaOperations
 
 export default class SchemaService {
     storage: ISchemaProvider
@@ -11,62 +26,120 @@ export default class SchemaService {
         this.schemaInformation = schemaInformation
     }
 
-    async list() {
-        const dbs = await this.storage.list()
-        const dbsWithAllowedOperations = this.appendAllowedOperationsTo(dbs)
-
-        return { schemas: dbsWithAllowedOperations.map( asWixSchema ) }
+    async list(collectionIds: string[]): Promise<collectionSpi.ListCollectionsResponsePart> {        
+        const collections = (!collectionIds || collectionIds.length === 0) ? 
+            await this.storage.list() : 
+            await Promise.all(collectionIds.map(async(collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
+                
+        return { 
+            collection: collections.map(this.formatCollection.bind(this))
+        }
     }
 
-    async listHeaders() {
-        const collections = await this.storage.listHeaders()
-        return { schemas: collections.map((collection) => asWixSchemaHeaders(collection)) }
+    async create(collection: collectionSpi.Collection): Promise<collectionSpi.CreateCollectionResponse> {                
+        await this.storage.create(collection.id, WixFormatFieldsToInputFields(collection.fields))
+        await this.schemaInformation.refresh()
+        return { collection }
     }
 
-    async find(collectionNames: string[]) {
-        const dbs: Table[] = await Promise.all(collectionNames.map(async(collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
-        const dbsWithAllowedOperations = this.appendAllowedOperationsTo(dbs)
-
-        return { schemas: dbsWithAllowedOperations.map( asWixSchema ) }
-    }
-
-    async create(collectionName: string) {
+    async update(collection: collectionSpi.Collection): Promise<collectionSpi.UpdateCollectionResponse> {
         await this.validateOperation(Create)
-        await this.storage.create(collectionName)
+        
+        // remove in the end of development
+        if (!this.storage.changeColumnType) {
+            throw new Error('Your storage does not support the new collection capabilities API')
+        }
+
+        const collectionColumnsInRequest = collection.fields
+        const collectionColumnsInDb = await this.storage.describeCollection(collection.id)
+
+        const {
+            columnsToAdd,
+            columnsToRemove,
+            columnsToChangeType
+        } = compareColumnsInDbAndRequest(collectionColumnsInDb, collectionColumnsInRequest)
+
+        // Adding columns
+        if (columnsToAdd.length > 0) {
+            await this.validateOperation(AddColumn)
+        }
+        await Promise.all(columnsToAdd.map(async(field) => await this.storage.addColumn(collection.id, field)))
+        
+        // Removing columns
+        if (columnsToRemove.length > 0) {
+            await this.validateOperation(RemoveColumn)
+        }
+        await Promise.all(columnsToRemove.map(async(fieldName) => await this.storage.removeColumn(collection.id, fieldName)))
+
+        // Changing columns type
+        if (columnsToChangeType.length > 0) {
+            await this.validateOperation(ChangeColumnType)
+        }
+        await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType?.(collection.id, field)))
+
         await this.schemaInformation.refresh()
-        return {}
+
+        return { collection }
     }
 
-    async addColumn(collectionName: string, column: InputField) {
-        await this.validateOperation(AddColumn)
-        await this.storage.addColumn(collectionName, column)
+    async delete(collectionId: string): Promise<collectionSpi.DeleteCollectionResponse> {
+        const collectionFields = await this.storage.describeCollection(collectionId)
+        await this.storage.drop(collectionId)
         await this.schemaInformation.refresh()
-        return {}
+        return { collection: {
+            id: collectionId,
+            fields: responseFieldToWixFormat(collectionFields),
+        } }
     }
 
-    async removeColumn(collectionName: string, columnName: string) {
-        await this.validateOperation(RemoveColumn)
-        await this.storage.removeColumn(collectionName, columnName)
-        await this.schemaInformation.refresh()
-        return {}
-    }
-
-    appendAllowedOperationsTo(dbs: Table[]) {
-        const allowedSchemaOperations = this.storage.supportedOperations()
-        return dbs.map((db: Table) => ({
-            ...db,
-            allowedSchemaOperations,
-            allowedOperations: allowedOperationsFor(db),
-            fields: appendQueryOperatorsTo(db.fields)
-        }))
-    }
-
-    
-    async validateOperation(operationName: SchemaOperations) {
+    private async validateOperation(operationName: SchemaOperations) {
         const allowedSchemaOperations = this.storage.supportedOperations()
 
         if (!allowedSchemaOperations.includes(operationName)) 
             throw new errors.UnsupportedOperation(`Your database doesn't support ${operationName} operation`)
+    }
+
+    private formatCollection(collection: Table): collectionSpi.Collection {
+        // remove in the end of development
+        if (!this.storage.capabilities || !this.storage.columnCapabilitiesFor) {
+            throw new Error('Your storage does not support the new collection capabilities API')
+        }
+        const capabilities = this.formatCollectionCapabilities(this.storage.capabilities())
+        return {
+            id: collection.id,
+            fields: this.formatFields(collection.fields),
+            capabilities
+        }
+    }
+
+    private formatFields(fields: ResponseField[]): collectionSpi.Field[] {
+        const fieldCapabilitiesFor = (type: string): collectionSpi.FieldCapabilities => {
+            // remove in the end of development
+            if (!this.storage.columnCapabilitiesFor) {
+                throw new Error('Your storage does not support the new collection capabilities API')
+            }
+            const { sortable, columnQueryOperators } = this.storage.columnCapabilitiesFor(type)
+            return {
+                sortable,
+                queryOperators: queriesToWixDataQueryOperators(columnQueryOperators)
+            }
+        }
+
+        return fields.map((f) => ({
+            key: f.field,
+            // TODO: think about how to implement this
+            encrypted: false,
+            type: fieldTypeToWixDataEnum(f.type),
+            capabilities: fieldCapabilitiesFor(f.type)
+        }))
+    }
+
+    private formatCollectionCapabilities(capabilities: CollectionCapabilities): collectionSpi.CollectionCapabilities {
+        return {
+            dataOperations: capabilities.dataOperations as unknown as collectionSpi.DataOperation[],
+            fieldTypes: capabilities.fieldTypes as unknown as collectionSpi.FieldType[],
+            collectionOperations: capabilities.collectionOperations as unknown as collectionSpi.CollectionOperation[],
+        }
     }
 
 }
