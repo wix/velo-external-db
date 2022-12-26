@@ -1,6 +1,7 @@
 import { escapeId } from 'mysql'
-import { errors, patchDateTime } from '@wix-velo/velo-external-db-commons'
-import { Item } from '@wix-velo/velo-external-db-types'
+import { errors, patchDateTime, AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { Item, ColumnCapabilities } from '@wix-velo/velo-external-db-types'
+const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export const wildCardWith = (n: number, char: string) => Array(n).fill(char, 0, n).join(', ')
 
@@ -27,3 +28,42 @@ export const patchItem = (item: Item) => {
 }
 
 export { escapeIdField as escapeId }
+
+export const columnCapabilitiesFor = (columnType: string): ColumnCapabilities => {
+    switch (columnType) {
+        case 'text':
+        case 'url':
+            return {
+               sortable: true,
+               columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte]
+            }
+        case 'number':
+            return {
+                sortable: true,
+                columnQueryOperators: [eq, ne, gt, gte, lt, lte, include]
+            }
+        case 'boolean':
+            return {
+                sortable: true,
+                columnQueryOperators: [eq]
+            }
+        case 'image':
+            return {
+                sortable: false,
+                columnQueryOperators: []
+            }
+        case 'object':
+            return {
+                sortable: true,
+                columnQueryOperators: [eq, ne]
+            }
+        case 'datetime':
+            return {
+                sortable: true,
+                columnQueryOperators: [eq, ne, gt, gte, lt, lte]
+            }
+
+        default:
+            throw new Error(`${columnType} - Unsupported field type`)
+    }
+}

@@ -29,6 +29,7 @@ export default class CacheableSchemaInformation {
     }
 
     async refresh() {
+        await this.clear()
         const schema = await this.schemaProvider.list()
         if (schema && schema.length) 
             schema.forEach((collection: { id: any; fields: any }) => {
