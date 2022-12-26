@@ -8,7 +8,6 @@ import * as matchers from '../../test/drivers/schema_matchers'
 import * as gen from '../../test/gen'
 import { 
     fieldTypeToWixDataEnum, 
-    WixFormatFieldsToInputFields, 
     compareColumnsInDbAndRequest,
     InputFieldsToWixFormatFields,
     InputFieldToWixFormatField,
@@ -61,70 +60,6 @@ describe('Schema Service', () => {
             await expect(env.schemaService.create({ id: ctx.collectionName, fields })).resolves.toEqual({
                 collection: { id: ctx.collectionName, fields }
             })
-        })
-
-        // TODO: move it to schema utils tets
-        test('compareColumnsInDbAndRequest function - add columns', async() => {
-            const columnsInDb = [{
-                field: ctx.column.name,
-                type: ctx.column.type
-            }]
-            const columnsInRequest = [{
-                key: ctx.column.name,
-                type: fieldTypeToWixDataEnum(ctx.column.type),
-            }]
-            const newColumn = {
-                key: ctx.anotherColumn.name,
-                type: fieldTypeToWixDataEnum(ctx.anotherColumn.type)
-            }
-            expect(compareColumnsInDbAndRequest([], []).columnsToAdd).toEqual([])
-            expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToAdd).toEqual([])
-            expect(compareColumnsInDbAndRequest(columnsInDb, []).columnsToAdd).toEqual([])
-            expect(compareColumnsInDbAndRequest([], columnsInRequest).columnsToAdd).toEqual(WixFormatFieldsToInputFields(columnsInRequest))
-            expect(compareColumnsInDbAndRequest(columnsInDb, [...columnsInRequest, newColumn]).columnsToAdd).toEqual(WixFormatFieldsToInputFields([newColumn]))
-        })
-
-        // TODO: move it to schema utils tets
-        test('compareColumnsInDbAndRequest function - remove columns', async() => {
-            const columnsInDb = [{
-                field: ctx.column.name,
-                type: ctx.column.type
-            }]
-            const columnsInRequest = [{
-                key: ctx.column.name,
-                type: fieldTypeToWixDataEnum(ctx.column.type),
-            }]
-            const newColumn = {
-                key: ctx.anotherColumn.name,
-                type: fieldTypeToWixDataEnum(ctx.anotherColumn.type)
-            }
-            expect(compareColumnsInDbAndRequest([], []).columnsToRemove).toEqual([])
-            expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToRemove).toEqual([])
-            expect(compareColumnsInDbAndRequest(columnsInDb, [...columnsInRequest, newColumn]).columnsToRemove).toEqual([])
-            expect(compareColumnsInDbAndRequest(columnsInDb, []).columnsToRemove).toEqual(columnsInDb.map(f => f.field))
-            expect(compareColumnsInDbAndRequest(columnsInDb, [newColumn]).columnsToRemove).toEqual(columnsInDb.map(f => f.field))
-        })
-
-        // TODO: move it to schema utils tets
-        test('compareColumnsInDbAndRequest function - change column type', async() => {
-            const columnsInDb = [{
-                field: ctx.column.name,
-                type: 'text'
-            }]
-
-            const columnsInRequest = [{
-                key: ctx.column.name,
-                type: fieldTypeToWixDataEnum('text'),
-            }]
-
-            const changedColumnType = {
-                key: ctx.column.name,
-                type: fieldTypeToWixDataEnum('number')
-            }
-
-            expect(compareColumnsInDbAndRequest([], []).columnsToChangeType).toEqual([])
-            expect(compareColumnsInDbAndRequest(columnsInDb, columnsInRequest).columnsToChangeType).toEqual([])
-            expect(compareColumnsInDbAndRequest(columnsInDb, [changedColumnType]).columnsToChangeType).toEqual(WixFormatFieldsToInputFields([changedColumnType]))
         })
 
         test('update collection - add new columns', async() => { 
