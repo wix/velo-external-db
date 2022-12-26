@@ -24,8 +24,17 @@ export default class IndexProvider implements IIndexProvider {
     async create(collectionName: string, index: DomainIndex): Promise<DomainIndex> {
         const unique = index.isUnique ? 'UNIQUE' : ''
 
-        const createIndexPromise = this.query(`CREATE ${unique} INDEX ${escapeId(index.name)} ON ${escapeTable(collectionName)} (${index.columns.map(escapeId).join(', ')})`)
-
+        const columnsToIndex = await Promise.all(index.columns.map(async(col: string) => {
+            const res = await this.query('SELECT DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?', [collectionName, col])
+            const type = res[0].DATA_TYPE
+            return {
+                name: col,
+                partialString: type === 'text' ? '(50)' : ''
+            }
+        }))
+        
+        const createIndexPromise = this.query(`CREATE ${unique} INDEX ${escapeId(index.name)} ON ${escapeTable(collectionName)} (${columnsToIndex.map((col: { name: string, partialString: string }) => `${escapeId(col.name)}${col.partialString}`)})`)
+        
         const status = await this.returnStatusAfterXSeconds(1, createIndexPromise, index)
 
         return { ...index, status }
