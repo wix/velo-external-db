@@ -1,3 +1,6 @@
+import { CollectionCapabilities, ColumnCapabilities } from './collection_types'
+export * from './collection_types'
+
 export enum AdapterOperator { //in velo-external-db-core
     eq = 'eq',
     gt = 'gt',
@@ -23,6 +26,7 @@ export enum SchemaOperations {
     Drop = 'dropCollection',
     AddColumn = 'addColumn',
     RemoveColumn = 'removeColumn',
+    ChangeColumnType = 'changeColumnType',
     Describe = 'describeCollection',
     FindWithSort = 'findWithSort',
     Aggregate = 'aggregate',
@@ -128,7 +132,10 @@ export type TableHeader = {
     id: string
 }
 
-export type Table = TableHeader & { fields: ResponseField[] }
+export type Table = TableHeader & { 
+    fields: ResponseField[]
+    capabilities?:  CollectionCapabilities
+} 
 
 export type FieldAttributes = {
     type: string,
@@ -139,8 +146,13 @@ export type FieldAttributes = {
 
 export type InputField = FieldAttributes & { name: string }
 
-export type ResponseField = FieldAttributes & { field: string }
-
+export type ResponseField = FieldAttributes & { 
+    field: string
+    capabilities?: {
+        sortable: boolean
+        columnQueryOperators: string[]
+    }
+}
 export interface ISchemaProvider {
     list(): Promise<Table[]>
     listHeaders(): Promise<string[]>
@@ -148,9 +160,12 @@ export interface ISchemaProvider {
     create(collectionName: string, columns?: InputField[]): Promise<void>
     addColumn(collectionName: string, column: InputField): Promise<void>
     removeColumn(collectionName: string, columnName: string): Promise<void>
+    changeColumnType?(collectionName: string, column: InputField): Promise<void>
     describeCollection(collectionName: string): Promise<ResponseField[]>
     drop(collectionName: string): Promise<void>
     translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
+    columnCapabilitiesFor?(columnType: string): ColumnCapabilities
+    capabilities?(): CollectionCapabilities
 }
 
 export interface IBaseHttpError extends Error {}
