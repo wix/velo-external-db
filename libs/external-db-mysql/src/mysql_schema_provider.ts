@@ -1,11 +1,12 @@
 import { promisify } from 'util'
 import { translateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator, { IMySqlSchemaColumnTranslator } from './sql_schema_translator'
-import { escapeId, escapeTable } from './mysql_utils'
+import { escapeId, escapeTable, columnCapabilitiesFor } from './mysql_utils'
 import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
 import { Pool as MySqlPool } from 'mysql'
 import { MySqlQuery } from './types'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, ColumnCapabilities, CollectionCapabilities } from '@wix-velo/velo-external-db-types'
+
 
 export default class SchemaProvider implements ISchemaProvider {
     pool: MySqlPool
@@ -61,6 +62,12 @@ export default class SchemaProvider implements ISchemaProvider {
                   .catch( err => translateErrorCodes(err, collectionName) )
     }
 
+    async changeColumnType(collectionName: string, column: InputField): Promise<void> {
+        await validateSystemFields(column.name)
+        await this.query(`ALTER TABLE ${escapeTable(collectionName)} MODIFY ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
+                  .catch( err => translateErrorCodes(err, collectionName) )
+    }
+
     async removeColumn(collectionName: string, columnName: string): Promise<void> {
         await validateSystemFields(columnName)
         return await this.query(`ALTER TABLE ${escapeTable(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
@@ -77,5 +84,17 @@ export default class SchemaProvider implements ISchemaProvider {
     translateDbTypes(row: ResponseField): ResponseField {
         row.type = this.sqlSchemaTranslator.translateType(row.type)
         return row
+    }
+
+    columnCapabilitiesFor(columnType: string): ColumnCapabilities {
+        return columnCapabilitiesFor(columnType)
+    }
+
+    capabilities(): CollectionCapabilities {
+        return {
+            dataOperations: [],
+            fieldTypes: [],
+            collectionOperations: [],
+        }
     }
 }
