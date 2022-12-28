@@ -5,8 +5,8 @@ import { escapeId, escapeTable, columnCapabilitiesFor } from './mysql_utils'
 import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
 import { Pool as MySqlPool } from 'mysql'
 import { MySqlQuery } from './types'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, ColumnCapabilities, CollectionCapabilities } from '@wix-velo/velo-external-db-types'
-
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, CollectionCapabilities } from '@wix-velo/velo-external-db-types'
+import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './mysql_capabilities'
 
 export default class SchemaProvider implements ISchemaProvider {
     pool: MySqlPool
@@ -24,10 +24,12 @@ export default class SchemaProvider implements ISchemaProvider {
         const currentDb = this.pool.config.connectionConfig.database
         const data = await this.query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION', currentDb)
         const tables: {[x:string]: {table_name: string, field: string, type: string}[]} = parseTableData( data )
+
         return Object.entries(tables)
                      .map(([collectionName, rs]) => ({
                          id: collectionName,
-                         fields: rs.map( this.translateDbTypes.bind(this) )
+                         fields: rs.map(this.appendAdditionalRowDetails.bind(this)),
+                         capabilities: this.collectionCapabilities(rs.map(r => r.field))
                      } ))
     }
 
@@ -74,11 +76,26 @@ export default class SchemaProvider implements ISchemaProvider {
                          .catch( err => translateErrorCodes(err, collectionName) )
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]> {
-        const res = await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
+    async describeCollection(collectionName: string): Promise<Table> {
+        interface describeTableResponse {
+            Field: string,
+            Type: string,
+        }
+        
+        const res: describeTableResponse[]= await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
                               .catch( err => translateErrorCodes(err, collectionName) )
-        return res.map((r: { Field: string; Type: string }) => ({ field: r.Field, type: r.Type }))
-                  .map( this.translateDbTypes.bind(this) )
+        const fields = res.map(r => ({ field: r.Field, type: r.Type })).map(this.appendAdditionalRowDetails.bind(this))
+        return {
+            id: collectionName,
+            fields: fields as ResponseField[],
+            capabilities: this.collectionCapabilities(res.map(f => f.Field))
+        }
+    }
+
+    appendAdditionalRowDetails(row: ResponseField) {
+        row.type = this.sqlSchemaTranslator.translateType(row.type)
+        row.capabilities = columnCapabilitiesFor(row.type)
+        return row
     }
 
     translateDbTypes(row: ResponseField): ResponseField {
@@ -86,15 +103,11 @@ export default class SchemaProvider implements ISchemaProvider {
         return row
     }
 
-    columnCapabilitiesFor(columnType: string): ColumnCapabilities {
-        return columnCapabilitiesFor(columnType)
-    }
-
-    capabilities(): CollectionCapabilities {
+    collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
         return {
-            dataOperations: [],
-            fieldTypes: [],
-            collectionOperations: [],
+            dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
         }
     }
 }

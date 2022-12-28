@@ -1,5 +1,6 @@
 import { when } from 'jest-when'
 import { AllSchemaOperations, AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { Table } from '@wix-velo/velo-external-db-types'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export const schemaProvider = {
@@ -30,8 +31,8 @@ export const givenAllSchemaOperations = () =>
     export const givenCollectionCapabilities = (capabilities: any) =>
     when(schemaProvider.capabilities).mockReturnValue(capabilities)
 
-export const givenFindResults = (dbs: any[]) =>
-    dbs.forEach((db: { id: any; fields: any }) => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db.fields) )
+export const givenFindResults = (tables: Table[]) =>
+    tables.forEach((table) => when(schemaProvider.describeCollection).calledWith(table.id).mockResolvedValue({ id: table.id, fields: table.fields, capabilities: table.capabilities }))
 
 export const expectCreateOf = (collectionName: any) =>
     when(schemaProvider.create).calledWith(collectionName)

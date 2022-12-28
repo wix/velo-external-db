@@ -2,8 +2,8 @@ import Chance = require('chance')
 import { errors, SystemFields } from '@wix-velo/velo-external-db-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { Uninitialized, gen, testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
-import { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/provider_resources'
-import { collectionWithDefaultFields, hasSameSchemaFieldsLike } from '../drivers/schema_provider_matchers'
+import { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations, currentDbCapabilities } from '../resources/provider_resources'
+import { collectionWithDefaultFields, collectionWithFields, defaultCollection, hasSameSchemaFieldsLike } from '../drivers/schema_provider_matchers'
 const chance = new Chance()
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = errors
 const { RemoveColumn } = SchemaOperations
@@ -49,9 +49,10 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
     })
 
     test('create collection with default columns', async() => {
+        const capabilities = currentDbCapabilities()
         await env.schemaProvider.create(ctx.collectionName)
 
-        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(collectionWithDefaultFields())
+        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(defaultCollection(ctx.collectionName, capabilities))
     })
 
     test('drop collection', async() => {
@@ -63,15 +64,17 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
     })
 
     test('collection name and variables are case sensitive', async() => {
+        const capabilities = currentDbCapabilities()
         await env.schemaProvider.create(ctx.collectionName.toUpperCase())
 
-        await expect( env.schemaProvider.describeCollection(ctx.collectionName.toUpperCase()) ).resolves.toEqual(collectionWithDefaultFields())
+        await expect( env.schemaProvider.describeCollection(ctx.collectionName.toUpperCase()) ).resolves.toEqual(defaultCollection(ctx.collectionName.toUpperCase(), capabilities))
     })
 
     test('retrieve collection data by collection name', async() => {
+        const capabilities = currentDbCapabilities()
         await env.schemaProvider.create(ctx.collectionName)
 
-        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(collectionWithDefaultFields())
+        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(defaultCollection(ctx.collectionName, capabilities))
     })
 
     test('create collection twice will do nothing', async() => {
@@ -85,9 +88,10 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
     })
 
     test('add column on a an existing collection', async() => {
+        const capabilities = currentDbCapabilities()
         await env.schemaProvider.create(ctx.collectionName, [])
         await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
-        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual( hasSameSchemaFieldsLike([{ field: ctx.columnName }]))
+        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(collectionWithFields(ctx.collectionName, [{ field: ctx.columnName, type: 'datetime' }], capabilities))
     })
 
     test('add duplicate column will fail', async() => {

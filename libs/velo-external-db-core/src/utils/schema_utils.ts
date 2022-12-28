@@ -1,20 +1,26 @@
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField, FieldType } from '@wix-velo/velo-external-db-types'
-import { Field, FieldType as VeloFieldTypeEnum, QueryOperator } from '../spi-model/collection'
+import { InputField, ResponseField, FieldType, DataOperation, CollectionOperation } from '@wix-velo/velo-external-db-types'
+import * as collectionSpi from '../spi-model/collection'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
-export const fieldTypeToWixDataEnum = ( fieldType: string ): VeloFieldTypeEnum => {
+export const fieldTypeToWixDataEnum = ( fieldType: string ): collectionSpi.FieldType => {
     switch (fieldType) {
         case FieldType.text:
-            return VeloFieldTypeEnum.text
+            return collectionSpi.FieldType.text
+        case FieldType.longText:
+            return collectionSpi.FieldType.longText
         case FieldType.number:
-            return VeloFieldTypeEnum.number
+            return collectionSpi.FieldType.number
         case FieldType.boolean:
-            return VeloFieldTypeEnum.boolean
+            return collectionSpi.FieldType.boolean
         case FieldType.object:
-            return VeloFieldTypeEnum.object
+            return collectionSpi.FieldType.object
         case FieldType.datetime:
-            return VeloFieldTypeEnum.datetime
+            return collectionSpi.FieldType.datetime
+        case FieldType.singleReference:
+            return collectionSpi.FieldType.singleReference
+        case FieldType.multiReference:
+            return collectionSpi.FieldType.multiReference
         
         default:
            throw new Error(`${fieldType} - Unsupported field type`)
@@ -23,20 +29,20 @@ export const fieldTypeToWixDataEnum = ( fieldType: string ): VeloFieldTypeEnum =
 
 export const wixDataEnumToFieldType = (fieldEnum: number): string => {
     switch (fieldEnum) {
-        case VeloFieldTypeEnum.text:
-        case VeloFieldTypeEnum.longText:
+        case collectionSpi.FieldType.text:
+        case collectionSpi.FieldType.longText:
             return FieldType.text
-        case VeloFieldTypeEnum.number:
+        case collectionSpi.FieldType.number:
             return FieldType.number
-        case VeloFieldTypeEnum.datetime:
+        case collectionSpi.FieldType.datetime:
             return FieldType.datetime
-        case VeloFieldTypeEnum.boolean:
+        case collectionSpi.FieldType.boolean:
             return FieldType.boolean
-        case VeloFieldTypeEnum.object:
+        case collectionSpi.FieldType.object:
             return FieldType.object
 
-        case VeloFieldTypeEnum.singleReference:
-        case VeloFieldTypeEnum.multiReference:
+        case collectionSpi.FieldType.singleReference:
+        case collectionSpi.FieldType.multiReference:
         default:
             // TODO: throw specific error
             throw new Error(`Unsupported field type: ${fieldEnum}`)
@@ -45,20 +51,20 @@ export const wixDataEnumToFieldType = (fieldEnum: number): string => {
 
 export const subtypeToFieldType = (fieldEnum: number): string => {
     switch (fieldEnum) {
-        case VeloFieldTypeEnum.text:
-        case VeloFieldTypeEnum.longText:
+        case collectionSpi.FieldType.text:
+        case collectionSpi.FieldType.longText:
             return 'string'
-        case VeloFieldTypeEnum.number:
+        case collectionSpi.FieldType.number:
             return 'float'
-        case VeloFieldTypeEnum.datetime:
+        case collectionSpi.FieldType.datetime:
             return 'datetime'
-        case VeloFieldTypeEnum.boolean:
+        case collectionSpi.FieldType.boolean:
             return ''
-        case VeloFieldTypeEnum.object:
+        case collectionSpi.FieldType.object:
             return ''
 
-        case VeloFieldTypeEnum.singleReference:
-        case VeloFieldTypeEnum.multiReference:
+        case collectionSpi.FieldType.singleReference:
+        case collectionSpi.FieldType.multiReference:
         default:
             // TODO: throw specific error
             throw new Error(`There is no subtype for this type: ${fieldEnum}`)
@@ -66,28 +72,28 @@ export const subtypeToFieldType = (fieldEnum: number): string => {
 
 }
 
-export const queryOperatorsToWixDataQueryOperators = (queryOperator: string): QueryOperator => {
+export const queryOperatorsToWixDataQueryOperators = (queryOperator: string): collectionSpi.QueryOperator => {
     switch (queryOperator) {
         case eq:
-            return QueryOperator.eq
+            return collectionSpi.QueryOperator.eq
         case lt:
-            return QueryOperator.lt
+            return collectionSpi.QueryOperator.lt
         case gt:
-            return QueryOperator.gt
+            return collectionSpi.QueryOperator.gt
         case ne:
-            return QueryOperator.ne
+            return collectionSpi.QueryOperator.ne
         case lte:
-            return QueryOperator.lte
+            return collectionSpi.QueryOperator.lte
         case gte:
-            return QueryOperator.gte
+            return collectionSpi.QueryOperator.gte
         case string_begins:
-            return QueryOperator.startsWith
+            return collectionSpi.QueryOperator.startsWith
         case string_ends:
-            return QueryOperator.endsWith
+            return collectionSpi.QueryOperator.endsWith
         case string_contains:
-            return QueryOperator.contains
+            return collectionSpi.QueryOperator.contains
         case include:
-            return QueryOperator.hasSome
+            return collectionSpi.QueryOperator.hasSome
         // case 'hasAll':
             // return QueryOperator.hasAll
         // case 'exists':
@@ -97,12 +103,52 @@ export const queryOperatorsToWixDataQueryOperators = (queryOperator: string): Qu
         default:
             throw new Error(`${queryOperator} - Unsupported query operator`)
     }    
-} 
+}
 
-export const queriesToWixDataQueryOperators = (queryOperators: string[]): QueryOperator[] => queryOperators.map(queryOperatorsToWixDataQueryOperators)
+export const dataOperationsToWixDataQueryOperators = (dataOperation: DataOperation): collectionSpi.DataOperation => {
+    switch (dataOperation) {
+        case DataOperation.query:
+            return collectionSpi.DataOperation.query
+        case DataOperation.count:
+            return collectionSpi.DataOperation.count
+        case DataOperation.queryReferenced:
+            return collectionSpi.DataOperation.queryReferenced
+        case DataOperation.aggregate:
+            return collectionSpi.DataOperation.aggregate
+        case DataOperation.insert:
+            return collectionSpi.DataOperation.insert
+        case DataOperation.update:
+            return collectionSpi.DataOperation.update
+        case DataOperation.remove:
+            return collectionSpi.DataOperation.remove
+        case DataOperation.truncate:
+            return collectionSpi.DataOperation.truncate
+        case DataOperation.insertReferences:
+            return collectionSpi.DataOperation.insertReferences
+        case DataOperation.removeReferences:
+            return collectionSpi.DataOperation.removeReferences
+
+        default:
+            throw new Error(`${dataOperation} - Unsupported data operation`)
+    }
+}
+
+export const collectionOperationsToWixDataCollectionOperations = (collectionOperations: CollectionOperation): collectionSpi.CollectionOperation => {
+    switch (collectionOperations) {
+        case CollectionOperation.update:
+            return collectionSpi.CollectionOperation.update
+        case CollectionOperation.remove:
+            return collectionSpi.CollectionOperation.remove
+        
+        default:
+            throw new Error(`${collectionOperations} - Unsupported collection operation`)
+    }
+}
+
+export const queriesToWixDataQueryOperators = (queryOperators: string[]): collectionSpi.QueryOperator[] => queryOperators.map(queryOperatorsToWixDataQueryOperators)
 
 
-export const responseFieldToWixFormat = (fields: ResponseField[]): Field[] => {
+export const responseFieldToWixFormat = (fields: ResponseField[]): collectionSpi.Field[] => {
     return fields.map(field => {
         return {
             key: field.field,
@@ -111,24 +157,24 @@ export const responseFieldToWixFormat = (fields: ResponseField[]): Field[] => {
     })
 }
 
-export const wixFormatFieldToInputFields = (field: Field): InputField => ({
+export const wixFormatFieldToInputFields = (field: collectionSpi.Field): InputField => ({
     name: field.key,
     type: wixDataEnumToFieldType(field.type),
     subtype: subtypeToFieldType(field.type)
 })
 
-export const InputFieldToWixFormatField = (field: InputField): Field => ({
+export const InputFieldToWixFormatField = (field: InputField): collectionSpi.Field => ({
     key: field.name,
     type: fieldTypeToWixDataEnum(field.type)
 })
 
-export const WixFormatFieldsToInputFields = (fields: Field[]): InputField[] => fields.map(wixFormatFieldToInputFields)
+export const WixFormatFieldsToInputFields = (fields: collectionSpi.Field[]): InputField[] => fields.map(wixFormatFieldToInputFields)
 
-export const InputFieldsToWixFormatFields = (fields: InputField[]): Field[] =>  fields.map(InputFieldToWixFormatField)
+export const InputFieldsToWixFormatFields = (fields: InputField[]): collectionSpi.Field[] =>  fields.map(InputFieldToWixFormatField)
 
 export const compareColumnsInDbAndRequest = (
   columnsInDb: ResponseField[],
-  columnsInRequest: Field[]
+  columnsInRequest: collectionSpi.Field[]
 ): {
   columnsToAdd: InputField[];
   columnsToRemove: string[];

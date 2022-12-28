@@ -12,7 +12,9 @@ import {
     fieldTypeToWixDataEnum, 
     WixFormatFieldsToInputFields, 
     responseFieldToWixFormat, 
-    compareColumnsInDbAndRequest 
+    compareColumnsInDbAndRequest,
+    dataOperationsToWixDataQueryOperators,
+    collectionOperationsToWixDataCollectionOperations,
 } from '../utils/schema_utils'
 
 
@@ -29,10 +31,10 @@ export default class SchemaService {
     async list(collectionIds: string[]): Promise<collectionSpi.ListCollectionsResponsePart> {        
         const collections = (!collectionIds || collectionIds.length === 0) ? 
             await this.storage.list() : 
-            await Promise.all(collectionIds.map(async(collectionName: string) => ({ id: collectionName, fields: await this.schemaInformation.schemaFieldsFor(collectionName) })))
+            await Promise.all(collectionIds.map(async(collectionName: string) => await this.schemaInformation.schemaFor(collectionName)))
                 
-        return { 
-            collection: collections.map(this.formatCollection.bind(this))
+            return { 
+        collection: collections.map(this.formatCollection.bind(this))
         }
     }
 
@@ -51,8 +53,8 @@ export default class SchemaService {
         }
 
         const collectionColumnsInRequest = collection.fields
-        const collectionColumnsInDb = await this.storage.describeCollection(collection.id)
-
+        const { fields: collectionColumnsInDb } = await this.storage.describeCollection(collection.id) as Table
+        
         const {
             columnsToAdd,
             columnsToRemove,
@@ -83,7 +85,7 @@ export default class SchemaService {
     }
 
     async delete(collectionId: string): Promise<collectionSpi.DeleteCollectionResponse> {
-        const collectionFields = await this.storage.describeCollection(collectionId)
+        const { fields: collectionFields } = await this.storage.describeCollection(collectionId) as Table
         await this.storage.drop(collectionId)
         await this.schemaInformation.refresh()
         return { collection: {
@@ -100,45 +102,30 @@ export default class SchemaService {
     }
 
     private formatCollection(collection: Table): collectionSpi.Collection {
-        // remove in the end of development
-        if (!this.storage.capabilities || !this.storage.columnCapabilitiesFor) {
-            throw new Error('Your storage does not support the new collection capabilities API')
-        }
-        const capabilities = this.formatCollectionCapabilities(this.storage.capabilities())
         return {
             id: collection.id,
             fields: this.formatFields(collection.fields),
-            capabilities
+            capabilities: this.formatCollectionCapabilities(collection.capabilities!)
         }
     }
 
     private formatFields(fields: ResponseField[]): collectionSpi.Field[] {
-        const fieldCapabilitiesFor = (type: string): collectionSpi.FieldCapabilities => {
-            // remove in the end of development
-            if (!this.storage.columnCapabilitiesFor) {
-                throw new Error('Your storage does not support the new collection capabilities API')
-            }
-            const { sortable, columnQueryOperators } = this.storage.columnCapabilitiesFor(type)
-            return {
-                sortable,
-                queryOperators: queriesToWixDataQueryOperators(columnQueryOperators)
-            }
-        }
-
-        return fields.map((f) => ({
-            key: f.field,
-            // TODO: think about how to implement this
+        return fields.map( field => ({
+            key: field.field,
             encrypted: false,
-            type: fieldTypeToWixDataEnum(f.type),
-            capabilities: fieldCapabilitiesFor(f.type)
+            type: fieldTypeToWixDataEnum(field.type),
+            capabilities: {
+                sortable: field.capabilities!.sortable,
+                queryOperators: queriesToWixDataQueryOperators(field.capabilities!.columnQueryOperators)
+            }
         }))
     }
 
     private formatCollectionCapabilities(capabilities: CollectionCapabilities): collectionSpi.CollectionCapabilities {
         return {
-            dataOperations: capabilities.dataOperations as unknown as collectionSpi.DataOperation[],
-            fieldTypes: capabilities.fieldTypes as unknown as collectionSpi.FieldType[],
-            collectionOperations: capabilities.collectionOperations as unknown as collectionSpi.CollectionOperation[],
+            dataOperations: capabilities.dataOperations.map(dataOperationsToWixDataQueryOperators),
+            fieldTypes: capabilities.fieldTypes.map(fieldTypeToWixDataEnum),
+            collectionOperations: capabilities.collectionOperations.map(collectionOperationsToWixDataCollectionOperations),
         }
     }
 

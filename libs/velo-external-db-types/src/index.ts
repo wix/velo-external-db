@@ -161,7 +161,7 @@ export interface ISchemaProvider {
     addColumn(collectionName: string, column: InputField): Promise<void>
     removeColumn(collectionName: string, columnName: string): Promise<void>
     changeColumnType?(collectionName: string, column: InputField): Promise<void>
-    describeCollection(collectionName: string): Promise<ResponseField[]>
+    describeCollection(collectionName: string): Promise<ResponseField[]> | Promise<Table>
     drop(collectionName: string): Promise<void>
     translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
     columnCapabilitiesFor?(columnType: string): ColumnCapabilities

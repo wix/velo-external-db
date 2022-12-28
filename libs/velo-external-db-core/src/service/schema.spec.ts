@@ -179,7 +179,7 @@ describe('Schema Service', () => {
 
             await expect(env.schemaService.update({ id: ctx.collectionName, fields: [field] })).rejects.toThrow(errors.UnsupportedOperation)
 
-            driver.givenFindResults([ { id: ctx.collectionName, fields: [field] }])
+            driver.givenFindResults([ { id: ctx.collectionName, fields: [{ field: ctx.column.name, type: 'text' }] }])
 
             await expect(env.schemaService.update({ id: ctx.collectionName, fields: [] })).rejects.toThrow(errors.UnsupportedOperation)
             await expect(env.schemaService.update({ id: ctx.collectionName, fields: [changedTypeField] })).rejects.toThrow(errors.UnsupportedOperation)

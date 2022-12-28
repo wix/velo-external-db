@@ -70,7 +70,7 @@ const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 const googleSheetTestEnvInit = async() => await dbInit(googleSheet)
 
 const testSuits = {
-    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.testResources.supportedOperations),
+    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.testResources),
     postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.testResources.supportedOperations),
     spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.testResources.supportedOperations),
     firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.testResources.supportedOperations),
@@ -86,3 +86,4 @@ const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 export const supportedOperations = testedSuit().supportedOperations
 export const setupDb = () => testedSuit().setup()
 export const currentDbImplementationName = () => testedSuit().name
+export const currentDbCapabilities = () => testedSuit().capabilities
