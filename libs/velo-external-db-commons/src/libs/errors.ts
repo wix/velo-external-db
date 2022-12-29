@@ -107,12 +107,12 @@ export class UnrecognizedError extends BaseHttpError {
 
 export class IndexAlreadyExists extends BaseHttpError {
     constructor(message: string) {
-        super(message, 400)
+        super(message)
     }
 }
 
 export class IndexDoesNotExist extends BaseHttpError {
     constructor(message: string) {
-        super(message, 404)
+        super(message)
     }
 }

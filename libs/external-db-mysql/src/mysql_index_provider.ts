@@ -25,11 +25,9 @@ export default class IndexProvider implements IIndexProvider {
         const unique = index.isUnique ? 'UNIQUE' : ''
 
         const columnsToIndex = await Promise.all(index.columns.map(async(col: string) => {
-            const res = await this.query('SELECT DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?', [collectionName, col])
-            const type = res[0].DATA_TYPE
             return {
                 name: col,
-                partialString: type === 'text' ? '(50)' : ''
+                partialString: await this.partialStringFor(col, collectionName)
             }
         }))
         
@@ -123,5 +121,23 @@ export default class IndexProvider implements IIndexProvider {
             default:
                 return new errors.UnrecognizedError(`Error while creating index: ${e.sqlMessage}`)
         }
+    }
+
+    private isTextType(type: string) {
+        return ['char', 'varchar', 'text', 'tinytext', 'mediumtext', 'longtext'].includes(type)
+    }
+
+    private async partialStringFor(col: string, collectionName: string) {
+        const typeResp = await this.query('SELECT DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?', [collectionName, col]).catch(_e => [])
+        const type = typeResp[0]?.DATA_TYPE
+
+        if (this.isTextType(type)) {
+            const lengthResp = await this.query('SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?', [collectionName, col])
+            const length = lengthResp[0].CHARACTER_MAXIMUM_LENGTH
+            if (length) {
+                return length > 767 ? '(767)' : `(${length})` // 767 is the max length for a text index
+            }
+        }
+        return ''
     }
 }
