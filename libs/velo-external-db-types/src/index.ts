@@ -128,11 +128,8 @@ export interface IDataProvider {
     aggregate?(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation, sort?: Sort[], skip?: number, limit?: number ): Promise<Item[]>;
 }
 
-export type TableHeader = {
-    id: string
-}
-
-export type Table = TableHeader & { 
+export type Table = { 
+    id: string,
     fields: ResponseField[]
     capabilities?:  CollectionCapabilities
 } 

@@ -12,7 +12,6 @@ export const schemaProvider = {
     removeColumn: jest.fn(),
     supportedOperations: jest.fn(),
     columnCapabilitiesFor: jest.fn(),
-    capabilities: jest.fn(),
     changeColumnType: jest.fn(),
 }
 
@@ -27,9 +26,6 @@ export const givenAdapterSupportedOperationsWith = (operations: any) =>
 
 export const givenAllSchemaOperations = () =>
     when(schemaProvider.supportedOperations).mockReturnValue(AllSchemaOperations)
-
-    export const givenCollectionCapabilities = (capabilities: any) =>
-    when(schemaProvider.capabilities).mockReturnValue(capabilities)
 
 export const givenFindResults = (tables: Table[]) =>
     tables.forEach((table) => when(schemaProvider.describeCollection).calledWith(table.id).mockResolvedValue({ id: table.id, fields: table.fields, capabilities: table.capabilities }))
@@ -77,6 +73,5 @@ export const reset = () => {
     schemaProvider.removeColumn.mockClear()
     schemaProvider.supportedOperations.mockClear()
     schemaProvider.columnCapabilitiesFor.mockClear()
-    schemaProvider.capabilities.mockClear()
     schemaProvider.changeColumnType.mockClear()
 }

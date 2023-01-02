@@ -23,19 +23,12 @@ const chance = Chance()
 describe('Schema Service', () => {
     describe('Collection new SPI', () => {
         test('retrieve all collections from provider', async() => {
-            const collectionCapabilities = {
-                dataOperations: [],
-                fieldTypes: [],
-                collectionOperations: [],
-            }
-
             driver.givenAllSchemaOperations()
-            driver.givenCollectionCapabilities(collectionCapabilities)
             driver.givenColumnCapabilities()
             driver.givenListResult(ctx.dbsWithIdColumn)
 
 
-            await expect( env.schemaService.list([]) ).resolves.toEqual(collectionsListFor(ctx.dbsWithIdColumn, collectionCapabilities))
+            await expect( env.schemaService.list([]) ).resolves.toEqual(collectionsListFor(ctx.dbsWithIdColumn))
         })
 
         test('create new collection without fields', async() => {

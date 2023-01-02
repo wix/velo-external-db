@@ -1,22 +1,9 @@
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import { ResponseField } from '@wix-velo/velo-external-db-types'
 
-export const hasSameSchemaFieldsLike = (fields: {field: string, [x: string]: any}[]) => expect.arrayContaining( fields.map((f: any) => expect.objectContaining( f ) ))
+export const hasSameSchemaFieldsLike = (fields: ResponseField[]) => expect.arrayContaining(fields.map((f) => expect.objectContaining( f )))
 
-export const collectionWithDefaultFields = () => hasSameSchemaFieldsLike([ { field: '_id', type: 'text' },
-                                                                          { field: '_createdDate', type: 'datetime' },
-                                                                          { field: '_updatedDate', type: 'datetime' },
-                                                                          { field: '_owner', type: 'text' } ])
-
-
-export const defaultCollection = (collectionName: string, capabilities: any) => ({
-    id: collectionName,
-    fields: collectionWithDefaultFields(),
-    capabilities: {
-        collectionOperations: capabilities.CollectionOperations,
-        dataOperations: capabilities.ReadWriteOperations,
-        fieldTypes: capabilities.FieldTypes 
-    }
-})
+export const defaultFields = () => hasSameSchemaFieldsLike(SystemFields.map(f => ({ field: f.name, type: f.type })))
 
 export const collectionWithFields = (collectionName: string, fields: ResponseField[], capabilities: any) => ({
     id: collectionName,
@@ -27,3 +14,5 @@ export const collectionWithFields = (collectionName: string, fields: ResponseFie
         fieldTypes: capabilities.FieldTypes 
     }
 })
+
+export const defaultCollection = (collectionName: string, capabilities: any) => collectionWithFields(collectionName, SystemFields.map(f => ({ field: f.name, type: f.type })), capabilities)

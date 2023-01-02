@@ -3,8 +3,11 @@ import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { gen as genCommon } from '@wix-velo/test-commons'
 import { 
     CollectionCapabilities,
+    CollectionOperation,
     InputField,
+    FieldType,
     ResponseField,
+    DataOperation,
     Table,
  } from '@wix-velo/velo-external-db-types'
 
@@ -16,11 +19,16 @@ export const invalidOperatorForType = (validOperators: string | string[]) => ran
     Object.values(AdapterOperators).filter(x => !validOperators.includes(x))
 )
 
-export const randomObjectFromArray = (array: any[]) => array[chance.integer({ min: 0, max: array.length - 1 })]
+export const randomObjectFromArray = <T>(array: any[]): T => array[chance.integer({ min: 0, max: array.length - 1 })]
 
 export const randomColumn = (): InputField => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 
+// TODO: random the wix-type filed from the enum 
 export const randomWixType = () => randomObjectFromArray(['number', 'text', 'boolean', 'url', 'datetime', 'object'])
+
+export const randomFieldType = () => randomObjectFromArray<FieldType>(Object.values(FieldType))
+
+export const randomCollectionOperation = () => randomObjectFromArray<CollectionOperation>(Object.values(CollectionOperation))
 
 export const randomOperator = () => (chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith']))
 
@@ -44,15 +52,19 @@ export const randomArrayOf= <T>(gen: any): T[] => {
 
 export const randomAdapterOperators = () => (chance.pickone([eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include]))
 
+export const randomDataOperations = () => (chance.pickone(Object.values(DataOperation)))
+
 export const randomColumnCapabilities = () => ({
     sortable: chance.bool(),
-    columnQueryOperators: randomArrayOf<string>(randomAdapterOperators)
+    columnQueryOperators: [ randomAdapterOperators() ] 
 })
 
+
+
 export const randomCollectionCapabilities = (): CollectionCapabilities => ({
-    dataOperations: [],
-    fieldTypes: [],
-    collectionOperations: [],
+    dataOperations: [ randomDataOperations() ],
+    fieldTypes: [ randomFieldType() ],
+    collectionOperations: [ randomCollectionOperation() ],
 })
 
 export const randomCollectionName = ():string => chance.word({ length: 5 })

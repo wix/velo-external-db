@@ -1,5 +1,15 @@
+import { 
+    Table,
+    CollectionCapabilities,
+    ResponseField
+} from '@wix-velo/velo-external-db-types'
 import { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders, ReadOnlyOperations } from '@wix-velo/velo-external-db-commons'
-import { fieldTypeToWixDataEnum } from '../../src/utils/schema_utils'
+import { 
+    fieldTypeToWixDataEnum, 
+    queryOperatorsToWixDataQueryOperators,
+    dataOperationsToWixDataQueryOperators,
+    collectionOperationsToWixDataCollectionOperations,
+} from '../../src/utils/schema_utils'
 
 const appendAllowedOperationsToDbs = (dbs: any[], allowedSchemaOperations: any) => {
     return dbs.map( (db: { fields: any }) => ({
@@ -26,37 +36,34 @@ export const schemaHeadersListFor = (collections: any) => toHaveSchemas(collecti
 
 export const schemasWithReadOnlyCapabilitiesFor = (collections: any) => toHaveSchemas(collections, collectionToHaveReadOnlyCapability)
 
-
-const toHaveCollection = ( collections: any[], functionOnEachCollection: any, ...args: any ) =>  expect.objectContaining({
-    collection: collections.map((c: any) => functionOnEachCollection(c, args))
-})
-
-export const fieldInNewWixFormat = (field: any) => expect.objectContaining({
+export const fieldInNewWixFormat = (field: ResponseField) => expect.objectContaining({
     key: field.field,
     type: fieldTypeToWixDataEnum(field.type),
-    encrypted: false,
     capabilities: expect.objectContaining({
-        sortable: expect.any(Boolean),
-        queryOperators: expect.any(Array),
+        sortable: field.capabilities!.sortable,
+        queryOperators: expect.arrayContaining(field.capabilities!.columnQueryOperators.map(c => queryOperatorsToWixDataQueryOperators(c)))
     })
-
 })
 
-export const capabilitiesInNewWixFormat = () => expect.objectContaining({
-    dataOperations: expect.any(Array),
-    fieldTypes: expect.any(Array),
-    collectionOperations: expect.any(Array),
+export const fieldsInWixFormat = (fields: ResponseField[]) => expect.arrayContaining(fields.map(f => fieldInNewWixFormat(f)))
+
+export const capabilitiesInWixFormat = (collectionsCapabilities: CollectionCapabilities) => expect.objectContaining({
+    dataOperations: expect.arrayContaining(collectionsCapabilities.dataOperations.map(d => dataOperationsToWixDataQueryOperators(d))),
+    fieldTypes: expect.arrayContaining(collectionsCapabilities.fieldTypes.map(f => fieldTypeToWixDataEnum(f))),
+    collectionOperations: expect.arrayContaining(collectionsCapabilities.collectionOperations.map(c => collectionOperationsToWixDataCollectionOperations(c))),
 })
 
-export const collectionsInNewWixFormat = (collection: any, args: any) => {
-    const [collectionsCapabilities] = args
-    return expect.objectContaining({
-        id: collection.id,
-        fields: expect.arrayContaining(
-            collection.fields.map((field: any) => fieldInNewWixFormat(field))
-        ),
-        capabilities: collectionsCapabilities
+export const collectionsInWixFormat = (collection: Table) => {
+   return expect.objectContaining({
+       id: collection.id,
+       fields: fieldsInWixFormat(collection.fields),
+       capabilities: capabilitiesInWixFormat(collection.capabilities!)
     })
 }
 
-export const collectionsListFor = (collections: any, collectionsCapabilities: any) => toHaveCollection(collections, collectionsInNewWixFormat, collectionsCapabilities)
+export const collectionsListFor = (collections: Table[]) => {
+    return expect.objectContaining({
+        collection: collections.map(collectionsInWixFormat)
+    })
+}
+

@@ -3,7 +3,7 @@ import { errors, SystemFields } from '@wix-velo/velo-external-db-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { Uninitialized, gen, testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
 import { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations, currentDbCapabilities } from '../resources/provider_resources'
-import { collectionWithDefaultFields, collectionWithFields, defaultCollection, hasSameSchemaFieldsLike } from '../drivers/schema_provider_matchers'
+import { defaultFields, collectionWithFields, defaultCollection, hasSameSchemaFieldsLike } from '../drivers/schema_provider_matchers'
 const chance = new Chance()
 const { CollectionDoesNotExists, FieldAlreadyExists, CannotModifySystemField, FieldDoesNotExist } = errors
 const { RemoveColumn } = SchemaOperations
@@ -39,11 +39,11 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
         await expect( env.schemaProvider.list() ).resolves.toEqual(expect.arrayContaining([
             expect.objectContaining({
                 id: ctx.collectionName,
-                fields: collectionWithDefaultFields()
+                fields: defaultFields()
             }),
             expect.objectContaining({
                 id: ctx.anotherCollectionName,
-                fields: collectionWithDefaultFields()
+                fields: defaultFields()
             })
         ]))
     })
