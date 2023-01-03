@@ -155,7 +155,6 @@ describe('Schema Service', () => {
         // TODO: create a test for the case
         // test('collections without _id column will have read-only capabilities', async() => {})
 
-        //TODO: create a test for the case
         test('run unsupported operations should throw', async() => {
             schema.expectSchemaRefresh()         
             driver.givenAdapterSupportedOperationsWith(ctx.invalidOperations)

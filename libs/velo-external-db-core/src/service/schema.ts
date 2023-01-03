@@ -34,8 +34,8 @@ export default class SchemaService {
             await Promise.all(collectionIds.map(async(collectionName: string) => await this.schemaInformation.schemaFor(collectionName)))
                 
             return { 
-        collection: collections.map(this.formatCollection.bind(this))
-        }
+                collection: collections.map(this.formatCollection.bind(this))
+            }
     }
 
     async create(collection: collectionSpi.Collection): Promise<collectionSpi.CreateCollectionResponse> {                
@@ -87,7 +87,7 @@ export default class SchemaService {
     async delete(collectionId: string): Promise<collectionSpi.DeleteCollectionResponse> {
         const { fields: collectionFields } = await this.storage.describeCollection(collectionId) as Table
         await this.storage.drop(collectionId)
-        await this.schemaInformation.refresh()
+        this.schemaInformation.refresh()
         return { collection: {
             id: collectionId,
             fields: responseFieldToWixFormat(collectionFields),
@@ -105,7 +105,7 @@ export default class SchemaService {
         return {
             id: collection.id,
             fields: this.formatFields(collection.fields),
-            capabilities: this.formatCollectionCapabilities(collection.capabilities!)
+            capabilities: collection.capabilities? this.formatCollectionCapabilities(collection.capabilities) : undefined
         }
     }
 
@@ -115,8 +115,8 @@ export default class SchemaService {
             encrypted: false,
             type: fieldTypeToWixDataEnum(field.type),
             capabilities: {
-                sortable: field.capabilities!.sortable,
-                queryOperators: queriesToWixDataQueryOperators(field.capabilities!.columnQueryOperators)
+                sortable: field.capabilities? field.capabilities.sortable: undefined, 
+                queryOperators: field.capabilities? queriesToWixDataQueryOperators(field.capabilities.columnQueryOperators): undefined
             }
         }))
     }

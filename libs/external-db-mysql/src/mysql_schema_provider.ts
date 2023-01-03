@@ -82,8 +82,8 @@ export default class SchemaProvider implements ISchemaProvider {
             Type: string,
         }
         
-        const res: describeTableResponse[]= await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
-                              .catch( err => translateErrorCodes(err, collectionName) )
+        const res: describeTableResponse[] = await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
+                                                       .catch( err => translateErrorCodes(err, collectionName) )
         const fields = res.map(r => ({ field: r.Field, type: r.Type })).map(this.appendAdditionalRowDetails.bind(this))
         return {
             id: collectionName,

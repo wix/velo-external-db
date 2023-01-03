@@ -31,11 +31,13 @@ export const env: {
     schemaProvider: ISchemaProvider
     cleanup: ConnectionCleanUp
     driver: AnyFixMe
+    capabilities: any
 } = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
     cleanup: Uninitialized,
     driver: Uninitialized,
+    capabilities: Uninitialized,
 }
 
 const dbInit = async(impl: any) => {
@@ -48,6 +50,7 @@ const dbInit = async(impl: any) => {
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
     env.schemaProvider = new impl.SchemaProvider(pool, testResources.schemaProviderTestVariables?.() )
     env.driver = driver
+    env.capabilities = impl.testResources.capabilities
     env.cleanup = cleanup
 }
 
@@ -56,6 +59,7 @@ export const dbTeardown = async() => {
     env.dataProvider = Uninitialized
     env.schemaProvider = Uninitialized
     env.driver = Uninitialized
+    env.capabilities = Uninitialized
 }
 
 const postgresTestEnvInit = async() => await dbInit(postgres)
@@ -86,4 +90,3 @@ const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 export const supportedOperations = testedSuit().supportedOperations
 export const setupDb = () => testedSuit().setup()
 export const currentDbImplementationName = () => testedSuit().name
-export const currentDbCapabilities = () => testedSuit().capabilities

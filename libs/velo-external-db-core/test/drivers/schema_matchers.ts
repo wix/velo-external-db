@@ -36,7 +36,7 @@ export const schemaHeadersListFor = (collections: any) => toHaveSchemas(collecti
 
 export const schemasWithReadOnlyCapabilitiesFor = (collections: any) => toHaveSchemas(collections, collectionToHaveReadOnlyCapability)
 
-export const fieldInNewWixFormat = (field: ResponseField) => expect.objectContaining({
+export const fieldInWixFormat = (field: ResponseField) => expect.objectContaining({
     key: field.field,
     type: fieldTypeToWixDataEnum(field.type),
     capabilities: expect.objectContaining({
@@ -45,7 +45,7 @@ export const fieldInNewWixFormat = (field: ResponseField) => expect.objectContai
     })
 })
 
-export const fieldsInWixFormat = (fields: ResponseField[]) => expect.arrayContaining(fields.map(f => fieldInNewWixFormat(f)))
+export const fieldsInWixFormat = (fields: ResponseField[]) => expect.arrayContaining(fields.map(f => fieldInWixFormat(f)))
 
 export const capabilitiesInWixFormat = (collectionsCapabilities: CollectionCapabilities) => expect.objectContaining({
     dataOperations: expect.arrayContaining(collectionsCapabilities.dataOperations.map(d => dataOperationsToWixDataQueryOperators(d))),
