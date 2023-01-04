@@ -31,7 +31,7 @@ export default class SchemaService {
     async list(collectionIds: string[]): Promise<collectionSpi.ListCollectionsResponsePart> {        
         const collections = (!collectionIds || collectionIds.length === 0) ? 
             await this.storage.list() : 
-            await Promise.all(collectionIds.map(async(collectionName: string) => await this.schemaInformation.schemaFor(collectionName)))
+            await Promise.all(collectionIds.map((collectionName: string) => this.schemaInformation.schemaFor(collectionName)))
                 
             return { 
                 collection: collections.map(this.formatCollection.bind(this))
