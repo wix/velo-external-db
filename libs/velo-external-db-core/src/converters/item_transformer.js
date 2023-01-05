@@ -80,11 +80,11 @@ class ItemTransformer {
                 switch (f.subtype) {
                     case 'int':
                     case 'bigint':
-                        return 0
+                        return undefined
                     case 'float':
                     case 'double':
                     case 'decimal':
-                        return 0.0
+                        return undefined
                 }
                 return 0  // default for number is 0 
             case 'text':
