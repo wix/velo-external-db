@@ -64,6 +64,28 @@ export const randomEntity = (columns?: any[]) => {
     return entity
 }
 
+export const randomNumberEntity = (columns: any[]) => {
+    const entity : {[x:string]: any} = {
+        _id: chance.guid(),
+        _createdDate: veloDate(),
+        _updatedDate: veloDate(),
+        _owner: chance.guid(),
+    }
+
+    const _columns = columns || []
+
+    _columns.forEach((column: any) => {
+        if (column.type === 'number' && column.subtype === 'int') {
+            entity[column.name] = chance.integer({ min: 0, max: 10000 })
+        } else if (column.type === 'number' && column.subtype === 'decimal') {
+            entity[column.name] = chance.floating({ min: 0, max: 10000, fixed: 2 })
+        }
+    })
+
+    return entity
+}
+
+
 export const veloDate = () => ( { $date: newDate().toISOString() } )
 
 export const pastVeloDate = () => ( { $date: newDate(2019).toISOString() } )
