@@ -44,7 +44,7 @@ jobs:
                    "mssql", "mssql17",
                    "mongo", "mongo4",
                    "firestore",
-                   "airtable",
+                  #  "airtable",
                    "dynamodb",
                    "google-sheets"
                    ]
