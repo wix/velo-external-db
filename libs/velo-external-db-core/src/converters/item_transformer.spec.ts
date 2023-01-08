@@ -26,15 +26,15 @@ describe('Item Transformer', () => {
             expect(env.itemTransformer.defaultValueFor( { type: 'boolean' } )).toBeFalsy()
         })
         
-        test('default value number int field 0', async() => {
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'int' } )).toEqual(0)
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'bigint' } )).toEqual(0)
+        test('default value number int field undefined', async() => {
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'int' } )).toEqual(undefined)
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'bigint' } )).toEqual(undefined)
         })
         
-        test('default value number float field 0.0', async() => {
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'float' } )).toEqual(0.0)
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'double' } )).toEqual(0.0)
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'decimal' } )).toEqual(0.0)
+        test('default value number float field undefined', async() => {
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'float' } )).toEqual(undefined)
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'double' } )).toEqual(undefined)
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'decimal' } )).toEqual(undefined)
         })
         
         test('default value datetime field is current datetime', async() => {
