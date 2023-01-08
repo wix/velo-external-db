@@ -76,17 +76,6 @@ class ItemTransformer {
     }
     defaultValueFor(f) {
         switch (f.type) {
-            case 'number':
-                switch (f.subtype) {
-                    case 'int':
-                    case 'bigint':
-                        return 0
-                    case 'float':
-                    case 'double':
-                    case 'decimal':
-                        return 0.0
-                }
-                return 0  // default for number is 0 
             case 'text':
                 return f.isPrimary || f.field ==='_id' ? uuidv4() : ''
             case 'datetime':

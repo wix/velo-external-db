@@ -2,6 +2,7 @@
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import { InputField } from '@wix-velo/velo-external-db-types'
 import * as Chance from 'chance'
+import { gen as genCommon } from '@wix-velo/test-commons'
 
 const chance = Chance()
 
@@ -40,8 +41,8 @@ export const randomDbEntities = (columns: string[]) => {
 export const randomNumberDbEntity = (columns: InputField[]) => {
     const entity = {
         _id: chance.guid(),
-        _createdDate: newDate(),
-        _updatedDate: newDate(),
+        _createdDate: genCommon.veloDate(),
+        _updatedDate: genCommon.veloDate(),
         _owner: chance.guid(),
     }
 
