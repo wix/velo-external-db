@@ -10,8 +10,8 @@ const rewiredItemTransformer = rewire('./item_transformer')
 describe('Item Transformer', () => {
     describe('default value for', () => {
         test('default value for non primary key text field is empty string', async() => {
-            expect(env.itemTransformer.defaultValueFor( { type: 'text' } )).toEqual( '' )
-            expect(env.itemTransformer.defaultValueFor( { type: 'text', isPrimary: false } )).toEqual( '' )
+            expect(env.itemTransformer.defaultValueFor( { type: 'text' } )).toBeNull()
+            expect(env.itemTransformer.defaultValueFor( { type: 'text', isPrimary: false } )).toBeNull()
         })
         
         test('default value for primary key text field is a random uuid v4', async() => {
@@ -23,25 +23,30 @@ describe('Item Transformer', () => {
         })
         
         test('default value boolean field is false', async() => {
-            expect(env.itemTransformer.defaultValueFor( { type: 'boolean' } )).toBeFalsy()
+            expect(env.itemTransformer.defaultValueFor( { type: 'boolean' } )).toBeNull()
         })
         
-        test('default value number int field undefined', async() => {
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'int' } )).toEqual(undefined)
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'bigint' } )).toEqual(undefined)
+        test('default value number int field null', async() => {
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'int' } )).toBeNull()
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'bigint' } )).toBeNull()
         })
         
-        test('default value number float field undefined', async() => {
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'float' } )).toEqual(undefined)
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'double' } )).toEqual(undefined)
-            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'decimal' } )).toEqual(undefined)
+        test('default value number float field null', async() => {
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'float' } )).toBeNull()
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'double' } )).toBeNull()
+            expect(env.itemTransformer.defaultValueFor( { type: 'number', subtype: 'decimal' } )).toBeNull()
         })
         
-        test('default value datetime field is current datetime', async() => {
+        test('default value datetime field is null - not systemFields', async() => {
             env.itemTransformerClass.__set__('dateTimeProvider', dateTimeProvider)
             env.itemTransformer = new env.itemTransformerClass()
         
-            expect(env.itemTransformer.defaultValueFor( { type: 'datetime' } )).toEqual(dateTimeProvider.currentDateTime())
+            expect(env.itemTransformer.defaultValueFor( { type: 'datetime' } )).toBeNull()
+        })
+
+        test('default value for createdDate field is current datetime', async() => {
+            expect(env.itemTransformer.defaultValueFor( { type: 'datetime', field: '_createdDate' } )).toEqual(dateTimeProvider.currentDateTime())
+            expect(env.itemTransformer.defaultValueFor( { type: 'datetime', field: '_updatedDate' } )).toEqual(dateTimeProvider.currentDateTime())
         })
     })
     
@@ -55,7 +60,7 @@ describe('Item Transformer', () => {
         })
         
         test('if item does not contain properties that exists in the schema, add default value for them', async() => {
-            expect(env.itemTransformer.prepareForInsert({ }, [{ field: ctx.property, type: 'text' }] )).toEqual({ [ctx.property]: '' } )
+            expect(env.itemTransformer.prepareForInsert({ }, [{ field: ctx.property, type: 'text' }] )).toEqual({ [ctx.property]: null } )
         })
 
         test('prepare for insert will unpack velo date', () => {

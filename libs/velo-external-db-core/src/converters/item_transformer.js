@@ -77,12 +77,10 @@ class ItemTransformer {
     defaultValueFor(f) {
         switch (f.type) {
             case 'text':
-                return f.isPrimary || f.field ==='_id' ? uuidv4() : ''
+                return f.isPrimary || f.field ==='_id' ? uuidv4() : null
             case 'datetime':
-                return dateTimeProvider.currentDateTime()
-            case 'boolean':
-                return false
-            case 'object':
+                return f.field === '_createdDate' || f.field === '_updatedDate' ? dateTimeProvider.currentDateTime() : null
+            default:
                 return null
         }
     }
