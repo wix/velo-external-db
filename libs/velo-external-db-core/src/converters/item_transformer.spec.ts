@@ -9,7 +9,7 @@ const rewiredItemTransformer = rewire('./item_transformer')
 
 describe('Item Transformer', () => {
     describe('default value for', () => {
-        test('default value for non primary key text field is empty string', async() => {
+        test('default value for non primary key text field is null', async() => {
             expect(env.itemTransformer.defaultValueFor( { type: 'text' } )).toBeNull()
             expect(env.itemTransformer.defaultValueFor( { type: 'text', isPrimary: false } )).toBeNull()
         })
@@ -22,7 +22,7 @@ describe('Item Transformer', () => {
             expect(validate(env.itemTransformer.defaultValueFor( { type: 'text', field: '_id' } ), 4)).toBeTruthy()
         })
         
-        test('default value boolean field is false', async() => {
+        test('default value boolean field is null', async() => {
             expect(env.itemTransformer.defaultValueFor( { type: 'boolean' } )).toBeNull()
         })
         
