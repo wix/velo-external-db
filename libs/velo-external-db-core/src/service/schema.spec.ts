@@ -23,19 +23,12 @@ const chance = Chance()
 describe('Schema Service', () => {
     describe('Collection new SPI', () => {
         test('retrieve all collections from provider', async() => {
-            const collectionCapabilities = {
-                dataOperations: [],
-                fieldTypes: [],
-                collectionOperations: [],
-            }
-
             driver.givenAllSchemaOperations()
-            driver.givenCollectionCapabilities(collectionCapabilities)
             driver.givenColumnCapabilities()
             driver.givenListResult(ctx.dbsWithIdColumn)
 
 
-            await expect( env.schemaService.list([]) ).resolves.toEqual(collectionsListFor(ctx.dbsWithIdColumn, collectionCapabilities))
+            await expect( env.schemaService.list([]) ).resolves.toEqual(collectionsListFor(ctx.dbsWithIdColumn))
         })
 
         test('create new collection without fields', async() => {
@@ -162,7 +155,6 @@ describe('Schema Service', () => {
         // TODO: create a test for the case
         // test('collections without _id column will have read-only capabilities', async() => {})
 
-        //TODO: create a test for the case
         test('run unsupported operations should throw', async() => {
             schema.expectSchemaRefresh()         
             driver.givenAdapterSupportedOperationsWith(ctx.invalidOperations)
@@ -179,7 +171,7 @@ describe('Schema Service', () => {
 
             await expect(env.schemaService.update({ id: ctx.collectionName, fields: [field] })).rejects.toThrow(errors.UnsupportedOperation)
 
-            driver.givenFindResults([ { id: ctx.collectionName, fields: [field] }])
+            driver.givenFindResults([ { id: ctx.collectionName, fields: [{ field: ctx.column.name, type: 'text' }] }])
 
             await expect(env.schemaService.update({ id: ctx.collectionName, fields: [] })).rejects.toThrow(errors.UnsupportedOperation)
             await expect(env.schemaService.update({ id: ctx.collectionName, fields: [changedTypeField] })).rejects.toThrow(errors.UnsupportedOperation)

@@ -2,10 +2,16 @@ import * as Chance from 'chance'
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { gen as genCommon } from '@wix-velo/test-commons'
 import { 
+    CollectionCapabilities,
+    CollectionOperation,
     InputField,
+    FieldType,
     ResponseField,
+    DataOperation,
     Table,
  } from '@wix-velo/velo-external-db-types'
+
+ const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 const chance = Chance()
 
@@ -13,11 +19,16 @@ export const invalidOperatorForType = (validOperators: string | string[]) => ran
     Object.values(AdapterOperators).filter(x => !validOperators.includes(x))
 )
 
-export const randomObjectFromArray = (array: any[]) => array[chance.integer({ min: 0, max: array.length - 1 })]
+export const randomObjectFromArray = <T>(array: any[]): T => array[chance.integer({ min: 0, max: array.length - 1 })]
 
 export const randomColumn = (): InputField => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
 
+// TODO: random the wix-type filed from the enum 
 export const randomWixType = () => randomObjectFromArray(['number', 'text', 'boolean', 'url', 'datetime', 'object'])
+
+export const randomFieldType = () => randomObjectFromArray<FieldType>(Object.values(FieldType))
+
+export const randomCollectionOperation = () => randomObjectFromArray<CollectionOperation>(Object.values(CollectionOperation))
 
 export const randomOperator = () => (chance.pickone(['$ne', '$lt', '$lte', '$gt', '$gte', '$hasSome', '$eq', '$contains', '$startsWith', '$endsWith']))
 
@@ -39,21 +50,38 @@ export const randomArrayOf= <T>(gen: any): T[] => {
     return arr
 }
 
+export const randomAdapterOperators = () => (chance.pickone([eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include]))
+
+export const randomDataOperations = () => (chance.pickone(Object.values(DataOperation)))
+
+export const randomColumnCapabilities = () => ({
+    sortable: chance.bool(),
+    columnQueryOperators: [ randomAdapterOperators() ] 
+})
+
+
+
+export const randomCollectionCapabilities = (): CollectionCapabilities => ({
+    dataOperations: [ randomDataOperations() ],
+    fieldTypes: [ randomFieldType() ],
+    collectionOperations: [ randomCollectionOperation() ],
+})
+
 export const randomCollectionName = ():string => chance.word({ length: 5 })
 
 export const randomCollections = () => randomArrayOf<string>( randomCollectionName )
 
 export const randomWixDataType = () => chance.pickone(['number', 'text', 'boolean', 'datetime', 'object' ])
 
-export const randomDbField = (): ResponseField => ( { field: chance.word(), type: randomWixDataType(), subtype: chance.word(), isPrimary: chance.bool() } )
+export const randomDbField = (): ResponseField => ( { field: chance.word(), type: randomWixDataType(), subtype: chance.word(), isPrimary: chance.bool(), capabilities: randomColumnCapabilities() } )
 
 export const randomDbFields = () => randomArrayOf<ResponseField>( randomDbField )
 
-export const randomDb = (): Table => ( { id: randomCollectionName(), fields: randomDbFields() })
+export const randomDb = (): Table => ( { id: randomCollectionName(), fields: randomDbFields(), capabilities: randomCollectionCapabilities() })
 
 export const randomDbs = (): Table[] => randomArrayOf( randomDb )
 
-export const randomDbsWithIdColumn = (): Table[] => randomDbs().map(i => ({ ...i, fields: [ ...i.fields, { field: '_id', type: 'text' }] }))
+export const randomDbsWithIdColumn = (): Table[] => randomDbs().map(i => ({ ...i, fields: [ ...i.fields, { field: '_id', type: 'text', capabilities: randomColumnCapabilities() }] }))
 
 export const truthyValue = () => chance.pickone(['true', '1', 1, true])
 export const falsyValue = () => chance.pickone(['false', '0', 0, false])

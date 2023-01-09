@@ -31,11 +31,13 @@ export const env: {
     schemaProvider: ISchemaProvider
     cleanup: ConnectionCleanUp
     driver: AnyFixMe
+    capabilities: any
 } = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
     cleanup: Uninitialized,
     driver: Uninitialized,
+    capabilities: Uninitialized,
 }
 
 const dbInit = async(impl: any) => {
@@ -48,6 +50,7 @@ const dbInit = async(impl: any) => {
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
     env.schemaProvider = new impl.SchemaProvider(pool, testResources.schemaProviderTestVariables?.() )
     env.driver = driver
+    env.capabilities = impl.testResources.capabilities
     env.cleanup = cleanup
 }
 
@@ -56,6 +59,7 @@ export const dbTeardown = async() => {
     env.dataProvider = Uninitialized
     env.schemaProvider = Uninitialized
     env.driver = Uninitialized
+    env.capabilities = Uninitialized
 }
 
 const postgresTestEnvInit = async() => await dbInit(postgres)
@@ -70,7 +74,7 @@ const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 const googleSheetTestEnvInit = async() => await dbInit(googleSheet)
 
 const testSuits = {
-    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.testResources.supportedOperations),
+    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.testResources),
     postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.testResources.supportedOperations),
     spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.testResources.supportedOperations),
     firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.testResources.supportedOperations),
