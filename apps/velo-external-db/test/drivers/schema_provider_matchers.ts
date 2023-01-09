@@ -3,9 +3,9 @@ import { ResponseField } from '@wix-velo/velo-external-db-types'
 
 export const hasSameSchemaFieldsLike = (fields: ResponseField[]) => expect.arrayContaining(fields.map((f) => expect.objectContaining( f )))
 
-export const defaultFields = () => hasSameSchemaFieldsLike(SystemFields.map(f => ({ field: f.name, type: f.type })))
+export const toContainDefaultFields = () => hasSameSchemaFieldsLike(SystemFields.map(f => ({ field: f.name, type: f.type })))
 
-export const collectionWithFields = (collectionName: string, fields: ResponseField[], capabilities: any) => ({
+export const collectionToContainFields = (collectionName: string, fields: ResponseField[], capabilities: any) => ({
     id: collectionName,
     fields: hasSameSchemaFieldsLike(fields),
     capabilities: {
@@ -15,4 +15,4 @@ export const collectionWithFields = (collectionName: string, fields: ResponseFie
     }
 })
 
-export const defaultCollection = (collectionName: string, capabilities: any) => collectionWithFields(collectionName, SystemFields.map(f => ({ field: f.name, type: f.type })), capabilities)
+export const toBeDefaultCollectionWith = (collectionName: string, capabilities: any) => collectionToContainFields(collectionName, SystemFields.map(f => ({ field: f.name, type: f.type })), capabilities)

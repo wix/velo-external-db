@@ -92,18 +92,13 @@ export default class SchemaProvider implements ISchemaProvider {
         }
     }
 
-    appendAdditionalRowDetails(row: ResponseField) {
+    private appendAdditionalRowDetails(row: ResponseField) {
         row.type = this.sqlSchemaTranslator.translateType(row.type)
         row.capabilities = columnCapabilitiesFor(row.type)
         return row
     }
 
-    translateDbTypes(row: ResponseField): ResponseField {
-        row.type = this.sqlSchemaTranslator.translateType(row.type)
-        return row
-    }
-
-    collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
+    private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
         return {
             dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
             fieldTypes: FieldTypes,

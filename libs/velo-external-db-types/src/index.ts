@@ -108,29 +108,6 @@ export interface IDataProvider {
     aggregate?(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation, sort?: Sort[], skip?: number, limit?: number ): Promise<Item[]>;
 }
 
-// export type Table = { 
-//     id: string,
-//     fields: ResponseField[]
-//     capabilities?:  CollectionCapabilities
-// } 
-
-// export type FieldAttributes = {
-//     type: string,
-//     subtype?: string,
-//     precision?: number | string,
-//     isPrimary?: boolean,
-// }
-
-// export type InputField = FieldAttributes & { name: string }
-
-// export type ResponseField = FieldAttributes & { 
-//     field: string
-//     capabilities?: {
-//         sortable: boolean
-//         columnQueryOperators: string[]
-//     }
-// }
-
 export interface IBaseHttpError extends Error {}
 
 type ValidConnectionResult = { valid: true }
