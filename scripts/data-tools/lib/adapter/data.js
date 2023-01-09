@@ -1,12 +1,4 @@
 const { randomEntity } = require('../generator/data')
-import { MongoClient } from 'mongodb'
-
-const client = new MongoClient('mongodb://master:master123@docdb-ue1-1.cluster-cnktnldnpl5g.us-east-1.docdb.amazonaws.com:27017/?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
-await client.connect();  
 
 const insert = async(items, collectionName, axios) => {
     await axios.post('/data/insert/bulk', { collectionName, items })
