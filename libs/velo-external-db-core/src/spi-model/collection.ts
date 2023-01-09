@@ -64,9 +64,9 @@ export interface MultiReferenceOptions {
     
 export interface FieldCapabilities {
     // Indicates if field can be used to sort items in collection. Defaults to false.
-    sortable: boolean;
+    sortable?: boolean;
     // Query operators (e.g. equals, less than) that can be used for this field.
-    queryOperators: QueryOperator[];
+    queryOperators?: QueryOperator[];
     singleReferenceOptions?: SingleReferenceOptions;
     multiReferenceOptions?: MultiReferenceOptions;
 }

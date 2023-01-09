@@ -1,6 +1,15 @@
-import { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders, ReadOnlyOperations, AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { fieldTypeToWixDataEnum, queriesToWixDataQueryOperators } from '../../src/utils/schema_utils'
-const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
+import { 
+    Table,
+    CollectionCapabilities,
+    ResponseField
+} from '@wix-velo/velo-external-db-types'
+import { asWixSchema, allowedOperationsFor, appendQueryOperatorsTo, asWixSchemaHeaders, ReadOnlyOperations } from '@wix-velo/velo-external-db-commons'
+import { 
+    fieldTypeToWixDataEnum, 
+    queryOperatorsToWixDataQueryOperators,
+    dataOperationsToWixDataQueryOperators,
+    collectionOperationsToWixDataCollectionOperations,
+} from '../../src/utils/schema_utils'
 
 const appendAllowedOperationsToDbs = (dbs: any[], allowedSchemaOperations: any) => {
     return dbs.map( (db: { fields: any }) => ({
@@ -27,59 +36,36 @@ export const schemaHeadersListFor = (collections: any) => toHaveSchemas(collecti
 
 export const schemasWithReadOnlyCapabilitiesFor = (collections: any) => toHaveSchemas(collections, collectionToHaveReadOnlyCapability)
 
-
-const toHaveCollection = ( collections: any[], functionOnEachCollection: any, ...args: any ) =>  expect.objectContaining({
-    collection: collections.map((c: any) => functionOnEachCollection(c, args))
+export const fieldCapabilitiesObjectFor = (fieldCapabilities: { sortable: boolean, columnQueryOperators: string[] }) => expect.objectContaining({
+    sortable: fieldCapabilities.sortable,
+    queryOperators: expect.arrayContaining(fieldCapabilities.columnQueryOperators.map(c => queryOperatorsToWixDataQueryOperators(c)))
 })
 
-export const queryOperatorsFor = (fieldType: string): string[] => {
-    switch (fieldType) {
-        case 'text':
-        case 'url':
-            return [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte]
-        case 'number':
-            return [eq, ne, gt, gte, lt, lte, include]
-        case 'boolean':
-            return [eq]
-        case 'image':
-            return []
-        case 'object':
-            return [eq, ne]
-        case 'datetime':
-            return [eq, ne, gt, gte, lt, lte]
-    
-        default:
-            throw new Error(`${fieldType} - Unsupported field type`)
-    }
-
-}
-
-export const fieldInNewWixFormat = (field: any) => expect.objectContaining({
+export const fieldInWixFormatFor = (field: ResponseField) => expect.objectContaining({
     key: field.field,
     type: fieldTypeToWixDataEnum(field.type),
-    encrypted: false,
-    capabilities: expect.objectContaining({
-        sortable: expect.any(Boolean),
-        queryOperators: queriesToWixDataQueryOperators(queryOperatorsFor(field.type))
-    })
-
+    capabilities: field.capabilities? fieldCapabilitiesObjectFor(field.capabilities) : undefined
 })
 
-export const capabilitiesInNewWixFormat = () => expect.objectContaining({
-    dataOperations: expect.any(Array),
-    fieldTypes: expect.any(Array),
-    collectionOperations: expect.any(Array),
+export const fieldsToBeInWixFormat = (fields: ResponseField[]) => expect.arrayContaining(fields.map(f => fieldInWixFormatFor(f)))
+
+export const collectionCapabilitiesObjectFor = (collectionsCapabilities: CollectionCapabilities) => expect.objectContaining({
+    dataOperations: expect.arrayContaining(collectionsCapabilities.dataOperations.map(d => dataOperationsToWixDataQueryOperators(d))),
+    fieldTypes: expect.arrayContaining(collectionsCapabilities.fieldTypes.map(f => fieldTypeToWixDataEnum(f))),
+    collectionOperations: expect.arrayContaining(collectionsCapabilities.collectionOperations.map(c => collectionOperationsToWixDataCollectionOperations(c))),
 })
 
-export const collectionsInNewWixFormat = (collection: any, args: any) => {
-    const [collectionsCapabilities] = args
-    return expect.objectContaining({
-        id: collection.id,
-        fields: expect.arrayContaining(
-            collection.fields.map((field: any) => fieldInNewWixFormat(field))
-        ),
-        capabilities: collectionsCapabilities
+export const collectionsInWixFormatFor = (collection: Table) => {
+   return expect.objectContaining({
+       id: collection.id,
+       fields: fieldsToBeInWixFormat(collection.fields),
+       capabilities: collection.capabilities? collectionCapabilitiesObjectFor(collection.capabilities): undefined
     })
 }
 
-export const collectionsListFor = (collections: any, collectionsCapabilities: any) => toHaveCollection(collections, collectionsInNewWixFormat, collectionsCapabilities)
+export const collectionsListFor = (collections: Table[]) => {
+    return expect.objectContaining({
+        collection: collections.map(collectionsInWixFormatFor)
+    })
+}
+
