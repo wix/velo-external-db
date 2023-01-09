@@ -14,7 +14,7 @@ export const escapeTable = (t: string) => {
 const escapeIdField = (f: string) => f === '*' ? '*' : escapeId(f)
 
 const patchObjectField = (item: Item) => Object.entries(item).reduce((acc: {[key:string]: any}, [key, value]) => {
-        acc[key] = typeof value === 'object' ? JSON.stringify(value) : value
+        acc[key] = (typeof value === 'object' && value !== null) ? JSON.stringify(value) : value
         return acc
     }, {})
 

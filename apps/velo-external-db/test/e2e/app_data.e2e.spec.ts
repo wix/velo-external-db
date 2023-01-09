@@ -186,6 +186,44 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await expect( data.expectAllDataIn(ctx.collectionName, authAdmin) ).resolves.toEqual({ items: [ ], totalCount: 0 })
     })
 
+    test('insert undefined to number columns should inserted as null', async() => {
+        await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
+        delete ctx.numberItem[ctx.numberColumns[0].name]
+        delete ctx.numberItem[ctx.numberColumns[1].name]
+
+        await axios.post('/data/insert', { collectionName: ctx.collectionName, item: ctx.numberItem }, authAdmin)
+
+
+        await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({
+            items: [
+                {
+                    ...ctx.numberItem,
+                    [ctx.numberColumns[0].name]: null,
+                    [ctx.numberColumns[1].name]: null,
+                }
+            ], totalCount: 1
+        })
+    })
+
+
+    test('update undefined to number columns should insert nulls', async() => {
+        await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
+        await data.givenItems([ctx.numberItem], ctx.collectionName, authAdmin)
+        ctx.numberItem[ctx.numberColumns[0].name] = null
+        ctx.numberItem[ctx.numberColumns[1].name] = null
+
+        await axios.post('/data/update', { collectionName: ctx.collectionName, item: ctx.numberItem }, authAdmin)
+
+        await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({
+            items: [
+                {
+                    ...ctx.numberItem,
+                    [ctx.numberColumns[0].name]: null,
+                    [ctx.numberColumns[1].name]: null,
+                }
+            ], totalCount: 1
+        })
+    })
 
 
     const ctx = {
@@ -213,8 +251,8 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         ctx.modifiedItems = ctx.items.map((i: any) => ( { ...i, [ctx.column.name]: chance.word() } ) )
         ctx.modifiedItem = { ...ctx.item, [ctx.column.name]: chance.word() }
         ctx.anotherItem = genCommon.randomEntity([ctx.column.name])
-        ctx.numberItem = gen.randomNumberDbEntity(ctx.numberColumns)
-        ctx.anotherNumberItem = gen.randomNumberDbEntity(ctx.numberColumns)
+        ctx.numberItem = genCommon.randomNumberEntity(ctx.numberColumns)
+        ctx.anotherNumberItem = genCommon.randomNumberEntity(ctx.numberColumns)
         ctx.pastVeloDate = genCommon.pastVeloDate()
     })
 })
