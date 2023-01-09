@@ -10,6 +10,8 @@ import {
     DataOperation,
     Table,
  } from '@wix-velo/velo-external-db-types'
+import { DomainIndex, DomainIndexStatus } from '@wix-velo/velo-external-db-types'
+import { Index as SpiIndex } from '../src/spi-model/indexing'
 
  const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
@@ -101,4 +103,23 @@ export const deleteRandomKeyObject = (obj: { [x: string]: any }) => {
 export const randomBodyWith = (obj: any) => ({
     ...genCommon.randomObject(),
     ...obj
+})
+
+export const randomDomainIndex = (): DomainIndex => ({
+    name: chance.word(),
+    columns: randomArrayOf(() => chance.word()),
+    isUnique: chance.bool(),
+    caseInsensitive: chance.bool(),
+    order: chance.pickone(['ASC', 'DESC']),
+    status: DomainIndexStatus.ACTIVE,
+})
+
+export const randomSpiIndex = (): SpiIndex => ({
+    name: chance.word(),
+    fields: randomArrayOf(() => ({
+        name: chance.word(),
+        order: chance.pickone(['ASC', 'DESC']),
+    })),
+    unique: chance.bool(),
+    caseInsensitive: chance.bool(),
 })

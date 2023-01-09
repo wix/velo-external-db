@@ -104,3 +104,15 @@ export class UnrecognizedError extends BaseHttpError {
         super(`Unrecognized Error: ${message}`)
     }
 }
+
+export class IndexAlreadyExists extends BaseHttpError {
+    constructor(message: string) {
+        super(message)
+    }
+}
+
+export class IndexDoesNotExist extends BaseHttpError {
+    constructor(message: string) {
+        super(message)
+    }
+}

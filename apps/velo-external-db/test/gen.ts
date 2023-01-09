@@ -1,7 +1,8 @@
-
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import { InputField } from '@wix-velo/velo-external-db-types'
 import * as Chance from 'chance'
+import { indexSpi } from '@wix-velo/velo-external-db-core'
+const { IndexFieldOrder } = indexSpi
 
 const chance = Chance()
 
@@ -104,4 +105,13 @@ export const randomMatchesValueWithDashes = () => {
         arr.push(chance.word())
     }
     return arr.join('-')
+}
+
+export const spiIndexFor = (_collectionName: string, columns: string[]): indexSpi.Index => { 
+    return {
+        name: chance.word(),
+        fields: columns.map((column: string) => ({ path: column, order: chance.pickone([IndexFieldOrder.ASC, IndexFieldOrder.DESC]) })),
+        unique: chance.bool(),
+        caseInsensitive: chance.bool(),
+    }
 }

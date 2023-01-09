@@ -5,6 +5,7 @@ import {
 } from './collection_types'
 
 export * from './collection_types'
+import * as indexing from './indexing-types'
 
 export enum AdapterOperator { //in velo-external-db-core
     eq = 'eq',
@@ -126,6 +127,7 @@ export type ConnectionCleanUp = () => Promise<void> | void
 export type DbProviders<T> = {
     dataProvider: IDataProvider
     schemaProvider: ISchemaProvider
+    indexProvider?: indexing.IIndexProvider
     databaseOperations: IDatabaseOperations
     connection: T
     cleanup: ConnectionCleanUp
@@ -201,3 +203,5 @@ export interface IImplementationResources {
     supportedOperations: SchemaOperations[]
     name: string
 }
+
+export * from './indexing-types'

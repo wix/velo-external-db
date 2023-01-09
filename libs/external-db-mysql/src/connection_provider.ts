@@ -5,6 +5,7 @@ import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './mysql_operations'
 import { DbProviders } from '@wix-velo/velo-external-db-types'
 import { MySqlConfig } from './types'
+import IndexProvider from './mysql_index_provider'
 
 
 export default (cfg: MySqlConfig, _poolOptions: Record<string, unknown>): DbProviders<mysql.Pool>  => {
@@ -32,6 +33,7 @@ export default (cfg: MySqlConfig, _poolOptions: Record<string, unknown>): DbProv
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool)
+    const indexProvider = new IndexProvider(pool)
 
-    return { dataProvider, schemaProvider, databaseOperations, connection: pool, cleanup: async() => await pool.end() }
+    return { dataProvider, schemaProvider, databaseOperations, indexProvider, connection: pool, cleanup: async() => await pool.end() }
 }
