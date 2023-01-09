@@ -22,7 +22,7 @@ const main = async(userInputs) => {
             await startSpinnerWith('Truncating collection', async() => await schema.truncate(collectionName, axios), 'Collection truncated successfully')
         }
         info('Loading sample data')
-        const chunkSize = 10
+        const chunkSize = 100
         const insertInParalel = () => {
             const numbers = Array.from({length: 100}, (_, i) => i + 1)
             const runs = Promise.all(numbers.map(_ => data.insertChunk(1, extraColumns, collectionName, axios)))
