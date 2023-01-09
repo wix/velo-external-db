@@ -21,7 +21,7 @@ const randomEntity = (columns) => {
     const _columns = columns || []
 
     for (const column of _columns) {
-        entity[column.name] = chance.word()
+        entity[column.name] = chance.word({length: 10000})
     }
     return entity
 }

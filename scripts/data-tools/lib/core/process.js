@@ -22,7 +22,7 @@ const main = async(userInputs) => {
             await startSpinnerWith('Truncating collection', async() => await schema.truncate(collectionName, axios), 'Collection truncated successfully')
         }
         info('Loading sample data')
-        const chunkSize = 100
+        const chunkSize = 1
         await startProgress('progress', userInputs.rowCount / chunkSize, async() => await data.insertChunk(chunkSize, extraColumns, collectionName, axios))
 
         blankLine()

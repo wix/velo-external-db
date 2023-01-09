@@ -4,6 +4,15 @@ import { ExternalDbRouter, Hooks } from '@wix-velo/velo-external-db-core'
 import { engineConnectorFor } from './storage/factory'
 
 
+process.env.CLOUD_VENDOR = 'azure'
+process.env.TYPE = 'mongo'
+process.env.SECRET_KEY = 'myKey'
+process.env['HOST'] = 'localhost'
+process.env['USER'] = 'admin'
+process.env['PASSWORD'] = 'admin123'
+process.env['DB'] = 'test-db'
+process.env['URI'] = 'mongodb://root:pass@localhost:27017'
+
 const initConnector = async(hooks?: Hooks) => {
     const { vendor, type: adapterType } = readCommonConfig()
     const configReader = create()
