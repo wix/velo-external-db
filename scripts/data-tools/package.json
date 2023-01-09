@@ -24,6 +24,7 @@
     "cli-progress": "^3.9.1",
     "cli-spinner": "^0.2.10",
     "inquirer": "^8.2.0",
-    "node-banner": "^1.4.0"
+    "node-banner": "^1.4.0",
+    "mongodb": "^4.6.0"
   }
 }
