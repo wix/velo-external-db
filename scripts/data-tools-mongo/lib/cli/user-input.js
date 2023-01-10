@@ -14,11 +14,6 @@ const askForMongoDetails = async() => {
             name: 'connectionString',
             message: 'Connection String:',
             validate: nonEmpty,
-        },
-        {
-            name: 'dbName',
-            message: 'Database Name:',
-            validate: nonEmpty,
         }
     ])
 }

@@ -17,7 +17,7 @@ const insertChunk = async(count, columns, collectionName, mongoCollection) => {
             await mongoCollection.insertOne(items[i])
             successes = successes + 1
         } catch (err) {
-
+            console.error(err)
             failures = failures + 1 
 
         }
