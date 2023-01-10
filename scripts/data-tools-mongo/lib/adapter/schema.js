@@ -1,19 +1,31 @@
 
-const create = async(collectionName, axios) => await axios.post('/schemas/create', { collectionName })
-const createCollection = async(collectionName, axios) => await create(collectionName, axios)
+const SystemTable = '_descriptor'
+const SystemFields = [
+    {
+        name: '_id', type: 'text', subtype: 'string', precision: '50', isPrimary: true
+    },
+    {
+        name: '_createdDate', type: 'datetime', subtype: 'datetime'
+    },
+    {
+        name: '_updatedDate', type: 'datetime', subtype: 'datetime'
+    },
+    {
+        name: '_owner', type: 'text', subtype: 'string', precision: '50'
+    }
+]
 
-const addColumn = async(collectionName, column, axios) => {
-    try{
-        return await axios.post('/schemas/column/add', { collectionName, column })
-    }catch(e) {console.log(e)}
-}
-
-const addColumnsToCollection = async(collectionName, newColumns, axios) => {
-    for (const c of newColumns) {
-        await addColumn(collectionName, c, axios)
+const createCollection = async(collectionName, extraColumns, mongoClient) => {
+    try {
+        await mongoClient.collection(SystemTable).insertOne({ _id: collectionName, fields: [...SystemFields, ...extraColumns] })
+    } catch (e) {
+        return Promise.reject(`${collectionName} exists in the ${SystemTable} table. Please use the truncate option to delete the collection.`)
     }
 }
 
-const truncate = (collectionName, axios) => axios.post('/data/truncate', { collectionName })
+const truncate = async(collectionName, mongoClient) => {
+    await mongoClient.collection(collectionName).deleteMany({})
+    await mongoClient.collection('_descriptor').deleteOne({ _id: collectionName })
+}
 
-module.exports = { addColumnsToCollection, createCollection, truncate }
+module.exports = { createCollection, truncate }
