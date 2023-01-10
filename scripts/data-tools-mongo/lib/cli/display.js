@@ -49,6 +49,8 @@ const startProgress = async(msg, iterations, f) => {
     }
     bar.stop()
 
+    blankLine()
+
     info(`totalSuccesses: ${totalSuccesses}`)
     info(`totalFailures ${totalFailures}`)
 

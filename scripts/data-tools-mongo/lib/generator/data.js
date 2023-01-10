@@ -8,7 +8,7 @@ const newDate = () => {
     return d
 }
 
-const veloDate = () => ( { $date: newDate().toISOString() } )
+const veloDate = () => (newDate().toISOString())
 
 const randomEntity = (columns) => {
     const entity = {

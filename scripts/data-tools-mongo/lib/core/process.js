@@ -1,4 +1,4 @@
-const { info, blankLine, startProgress } = require('../cli/display')
+const { info, blankLine, startSpinnerWith, startProgress } = require('../cli/display')
 const { mongoClientFor } = require('../utils/request')
 const data = require('../adapter/data')
 const gen = require('../generator/schema')
@@ -13,7 +13,12 @@ const main = async(userInputs) => {
         const collection = mongoClient.collection(collectionName)
 
         const extraColumns = gen.generateColumns(userInputs.columnCount)
-        info('Loading sample data')
+
+        if (userInputs.truncate) {
+            startSpinnerWith('Truncating collections', async() => {
+                await mongoClient.collection(collectionName).deleteMany({})
+            }, 'Collection truncated successfully')
+        }
 
         await startProgress('progress', userInputs.rowCount / userInputs.chunkSize, async() => await data.insertChunk(userInputs.chunkSize, extraColumns, collectionName, collection))
 
@@ -23,6 +28,5 @@ const main = async(userInputs) => {
     }
 
 }
-
 module.exports = { main }
 
