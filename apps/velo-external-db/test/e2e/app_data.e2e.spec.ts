@@ -206,7 +206,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
 
 
-    test('update undefined to number columns should insert nulls', async() => {
+    test('update explicit null to number columns should insert nulls', async() => {
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
         await data.givenItems([ctx.numberItem], ctx.collectionName, authAdmin)
         ctx.numberItem[ctx.numberColumns[0].name] = null
@@ -226,6 +226,28 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
 
 
+    test('update partial item should insert null for all the non-system fields', async() => {
+        await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
+        await data.givenItems([ctx.numberItem], ctx.collectionName, authOwner)
+
+        const itemToUpdate = {
+            _id: ctx.numberItem._id,
+            [ctx.numberColumns[0].name]: ctx.randomNumberColumnValue
+        }
+
+        await axios.post('/data/update', { collectionName: ctx.collectionName, item: itemToUpdate }, authAdmin)
+
+        await expect(data.expectAllDataIn(ctx.collectionName, authAdmin)).resolves.toEqual({
+            items: [
+                expect.objectContaining({
+                    _id: ctx.numberItem._id,
+                    [ctx.numberColumns[0].name]: ctx.randomNumberColumnValue,
+                    [ctx.numberColumns[1].name]: null,
+                })
+            ], totalCount: 1
+        })
+    })
+
     const ctx = {
         collectionName: Uninitialized,
         column: Uninitialized,
@@ -238,6 +260,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         numberItem: Uninitialized,
         anotherNumberItem: Uninitialized,
         pastVeloDate: Uninitialized,
+        randomNumberColumnValue: Uninitialized,
     }
 
     afterAll(async() => await teardownApp())
@@ -254,5 +277,6 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         ctx.numberItem = genCommon.randomNumberEntity(ctx.numberColumns)
         ctx.anotherNumberItem = genCommon.randomNumberEntity(ctx.numberColumns)
         ctx.pastVeloDate = genCommon.pastVeloDate()
+        ctx.randomNumberColumnValue = chance.integer({ min: 0, max: 100 })
     })
 })

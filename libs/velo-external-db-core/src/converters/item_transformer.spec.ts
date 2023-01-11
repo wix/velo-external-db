@@ -69,16 +69,7 @@ describe('Item Transformer', () => {
         })
     })
     
-    describe('prepare for update', () => {
-        test('prepare for update will remove non existing fields', async() => {
-            expect(env.itemTransformer.prepareForUpdate({ ...ctx.obj, someProp: 'whatever' }, ctx.objSchemaFields)).toEqual( ctx.obj )
-        })
 
-        test('prepare for insert will unpack velo date', () => {
-            const objWithVeloDate = { ...ctx.obj, [ctx.property]: ctx.veloDate }
-            expect(env.itemTransformer.prepareForUpdate(objWithVeloDate, [...ctx.objSchemaFields, { field: ctx.property, type: 'date' }])).toEqual(  { ...ctx.obj, [ctx.property]: new Date(ctx.veloDate.$date) } )
-        })
-    })
     
     describe('unpack dates', () => {
         test('unpack dates will duplicate object and do nothing is date is not there', async() => {

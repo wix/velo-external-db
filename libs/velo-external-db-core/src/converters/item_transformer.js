@@ -11,17 +11,10 @@ class ItemTransformer {
         return items.map(i => this.prepareForInsert(i, fields))
     }
 
-    prepareItemsForUpdate(items, fields) {
-        return items.map(i => this.prepareForUpdate(i, fields))
-    }
-
     prepareForInsert(item, fields) {        
         return this.unpackDates(fields.reduce((pv, f) => ({ ...pv, [f.field]: item[f.field] || this.defaultValueFor(f) }), {}))
     }
 
-    prepareForUpdate(item, fields) {
-         return this.unpackDates(fields.reduce((pv, f) => f.field in item ? ({ ...pv, [f.field]: item[f.field] }) : pv, {}))
-    }
     
     patchItemsBooleanFields(items, fields) { 
         return items.map(i => this.patchBoolean(i, fields.filter(f => f.type === 'boolean')))
