@@ -10,7 +10,7 @@ import * as matchers from '../drivers/schema_api_rest_matchers'
 import * as data from '../drivers/data_api_rest_test_support'
 import * as authorization from '../drivers/authorization_test_support'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField } = SchemaOperations
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields } = SchemaOperations
 
 const chance = Chance()
 
@@ -292,10 +292,24 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
 
 
+    testIfSupportedOperationsIncludes(supportedOperations, [ QueryNestedFields ])('query on nested fields', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.objectColumn], authOwner)
+        await data.givenItems([ctx.objectItem], ctx.collectionName, authAdmin)
+
+        const filter = {
+            [`${ctx.objectColumn.name}.${ctx.nestedFieldName}`]: { $eq: ctx.objectItem[ctx.objectColumn.name][ctx.nestedFieldName] }
+        }
+
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner, filter)).resolves.toEqual(expect.toIncludeSameMembers(
+            [ dataSpi.QueryResponsePart.item(ctx.objectItem), data.pagingMetadata(1, 1) ]
+        ))
+    })
+
     const ctx = {
         collectionName: Uninitialized,
         column: Uninitialized,
         numberColumns: Uninitialized,
+        objectColumn: Uninitialized,
         item: Uninitialized,
         items: Uninitialized,
         modifiedItem: Uninitialized,
@@ -303,6 +317,8 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         anotherItem: Uninitialized,
         numberItem: Uninitialized,
         anotherNumberItem: Uninitialized,
+        objectItem: Uninitialized,
+        nestedFieldName: Uninitialized,
         pastVeloDate: Uninitialized,
     }
 
@@ -312,6 +328,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         ctx.collectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
         ctx.numberColumns = gen.randomNumberColumns()
+        ctx.objectColumn = gen.randomObjectColumn()
         ctx.item = genCommon.randomEntity([ctx.column.name])
         ctx.items = Array.from({ length: 10 }, () => genCommon.randomEntity([ctx.column.name]))
         ctx.modifiedItems = ctx.items.map((i: any) => ( { ...i, [ctx.column.name]: chance.word() } ) )
@@ -319,6 +336,8 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         ctx.anotherItem = genCommon.randomEntity([ctx.column.name])
         ctx.numberItem = genCommon.randomNumberEntity(ctx.numberColumns)
         ctx.anotherNumberItem = genCommon.randomNumberEntity(ctx.numberColumns)
+        ctx.nestedFieldName = chance.word()
+        ctx.objectItem = { ...genCommon.randomEntity(), [ctx.objectColumn.name]: { [ctx.nestedFieldName]: chance.word() } }
         ctx.pastVeloDate = genCommon.pastVeloDate()
     })
 })
