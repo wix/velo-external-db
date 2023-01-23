@@ -39,6 +39,15 @@ describe('Query Validator utils spec', () => {
                                             })
                 ).toEqual([{ name: ctx.fieldName, operator: ctx.operator }, { name: ctx.anotherFieldName, operator: ctx.anotherOperator }])
         })
+
+        test('correctly extract fields and operators with nested field filter', () => {
+            expect(extractFieldsAndOperators({
+                                                fieldName: `${ctx.fieldName}.whatEver.nested`,
+                                                operator: ctx.operator,
+                                                value: ctx.value
+                                            })
+            ).toEqual([{ name: ctx.fieldName, operator: ctx.operator }])
+        })
     })
 
     describe ('queryAdapterOperatorsFor', () => {

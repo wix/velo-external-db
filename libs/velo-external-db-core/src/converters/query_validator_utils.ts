@@ -9,7 +9,7 @@ export const queryAdapterOperatorsFor = (type: string) => ( (QueryOperatorsByFie
 export const extractFieldsAndOperators = (_filter: AdapterFilter): { name: string, operator: AdapterOperator }[] => { 
     if (_filter === EmptyFilter) return []
     const filter = _filter as NotEmptyAdapterFilter
-    if (filter.fieldName) return [{ name: filter.fieldName, operator: filter.operator as AdapterOperator }]
+    if (filter.fieldName) return [{ name: filter.fieldName.split('.')[0], operator: filter.operator as AdapterOperator }]
     return filter.value.map((filter: any) =>  extractFieldsAndOperators(filter)).flat()
 }
 
