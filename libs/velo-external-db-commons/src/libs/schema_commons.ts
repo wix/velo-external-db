@@ -26,6 +26,8 @@ export const QueryOperatorsByFieldType = {
     object: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'matches', 'gt', 'gte', 'lt', 'lte'],
 }
 
+export const EmptyCapabilities = { sortable: false, columnQueryOperators: [] }
+
 const QueryOperationsByFieldType: {[x: string]: any} = {
     number: [...QueryOperatorsByFieldType.number, 'urlized'],
     text: [...QueryOperatorsByFieldType.text, 'urlized', 'isEmpty', 'isNotEmpty'],

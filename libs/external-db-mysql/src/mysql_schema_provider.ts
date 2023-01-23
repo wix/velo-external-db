@@ -1,12 +1,12 @@
+import { Pool as MySqlPool } from 'mysql'
 import { promisify } from 'util'
+import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, CollectionCapabilities } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator, { IMySqlSchemaColumnTranslator } from './sql_schema_translator'
-import { escapeId, escapeTable, columnCapabilitiesFor } from './mysql_utils'
-import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
-import { Pool as MySqlPool } from 'mysql'
+import { escapeId, escapeTable } from './mysql_utils'
 import { MySqlQuery } from './types'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, CollectionCapabilities } from '@wix-velo/velo-external-db-types'
-import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './mysql_capabilities'
+import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations, ColumnsCapabilities } from './mysql_capabilities'
 
 export default class SchemaProvider implements ISchemaProvider {
     pool: MySqlPool
@@ -23,7 +23,7 @@ export default class SchemaProvider implements ISchemaProvider {
     async list(): Promise<Table[]> {
         const currentDb = this.pool.config.connectionConfig.database
         const data = await this.query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION', currentDb)
-        const tables: {[x:string]: {table_name: string, field: string, type: string}[]} = parseTableData( data )
+        const tables: {[x:string]: { field: string, type: string}[]} = parseTableData( data )
 
         return Object.entries(tables)
                      .map(([collectionName, rs]) => ({
@@ -92,10 +92,13 @@ export default class SchemaProvider implements ISchemaProvider {
         }
     }
 
-    private appendAdditionalRowDetails(row: ResponseField) {
-        row.type = this.sqlSchemaTranslator.translateType(row.type)
-        row.capabilities = columnCapabilitiesFor(row.type)
-        return row
+    private appendAdditionalRowDetails(row: {field: string, type: string}) : ResponseField {        
+        const type = this.sqlSchemaTranslator.translateType(row.type) as keyof typeof ColumnsCapabilities
+        return {
+            field: row.field,
+            type,
+            capabilities: ColumnsCapabilities[type] ?? EmptyCapabilities
+        }
     }
 
     private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
