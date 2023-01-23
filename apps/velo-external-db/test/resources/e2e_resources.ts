@@ -15,7 +15,7 @@ import { E2EResources } from '@wix-velo/external-db-testkit'
 import { Uninitialized } from '@wix-velo/test-commons'
 import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
 import { Server } from 'http'
-import { ConnectionCleanUp, ISchemaProvider } from '@wix-velo/velo-external-db-types'
+import { ConnectionCleanUp, ISchemaProvider, DataOperation, FieldType, CollectionOperation  } from '@wix-velo/velo-external-db-types'
 import { initWixDataEnv, shutdownWixDataEnv, wixDataBaseUrl } from '../drivers/wix_data_resources'
 
 interface App {
@@ -29,16 +29,26 @@ interface App {
     externalDbRouter: ExternalDbRouter;
 }
 
+interface Capabilities {
+    ReadWriteOperations: DataOperation[]
+    ReadOnlyOperations: DataOperation[]
+    FieldTypes: FieldType[]
+    CollectionOperations: CollectionOperation[]
+    ColumnsCapabilities: { [x: string]: { sortable: boolean, columnQueryOperators: string[]}}
+}
+
 type Internals = () => App
 
 export let env:{
     app: App,
     externalDbRouter: ExternalDbRouter,
     internals: Internals
+    capabilities: Capabilities
 } = {
     app: Uninitialized,
     internals: Uninitialized,
-    externalDbRouter: Uninitialized
+    externalDbRouter: Uninitialized,
+    capabilities: Uninitialized
 }
 
 const createAppWithWixDataBaseUrl = createApp.bind(null, wixDataBaseUrl())
@@ -66,6 +76,7 @@ export const setupDb = async() => {
 export const currentDbImplementationName = () => testedSuit().currentDbImplementationName
 export const initApp = async() => {
     env = await testedSuit().initApp()
+    env.capabilities = testedSuit().implementation.capabilities
 }
 export const teardownApp = async() => {
     await testedSuit().teardownApp()

@@ -21,18 +21,28 @@ import * as bigquery from '@wix-velo/external-db-bigquery'
 
 import * as googleSheet from '@wix-velo/external-db-google-sheets'
 
-import { AnyFixMe, ConnectionCleanUp, IDataProvider, ISchemaProvider } from '@wix-velo/velo-external-db-types'
+import { AnyFixMe, ConnectionCleanUp, IDataProvider, ISchemaProvider, DataOperation, FieldType, CollectionOperation } from '@wix-velo/velo-external-db-types'
 
 // const googleSheet = require('@wix-velo/external-db-google-sheets')
 // const googleSheetTestEnv = require('./engines/google_sheets_resources')
 
-export const env: {
+interface Capabilities {
+    ReadWriteOperations: DataOperation[]
+    ReadOnlyOperations: DataOperation[]
+    FieldTypes: FieldType[]
+    CollectionOperations: CollectionOperation[]
+    ColumnsCapabilities: { [x: string]: { sortable: boolean, columnQueryOperators: string[]}}
+}
+
+interface Env {
     dataProvider: IDataProvider
     schemaProvider: ISchemaProvider
     cleanup: ConnectionCleanUp
     driver: AnyFixMe
-    capabilities: any
-} = {
+    capabilities: Capabilities
+}
+
+export const env: Env = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
     cleanup: Uninitialized,
