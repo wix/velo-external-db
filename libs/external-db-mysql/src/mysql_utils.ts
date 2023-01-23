@@ -55,7 +55,7 @@ export const columnCapabilitiesFor = (columnType: string): ColumnCapabilities =>
         case 'object':
             return {
                 sortable: true,
-                columnQueryOperators: [eq, ne]
+                columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte]
             }
         case 'datetime':
             return {
