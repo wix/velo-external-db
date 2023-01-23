@@ -4,8 +4,9 @@ import { escapeId, escapeTable } from './mssql_utils'
 import { SystemFields, validateSystemFields, parseTableData } from '@wix-velo/velo-external-db-commons'
 import { supportedOperations } from './supported_operations'
 import { ConnectionPool as MSSQLPool } from 'mssql'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { CollectionCapabilities, FieldAttributes, InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
 import { errors } from '@wix-velo/velo-external-db-commons'
+import { CollectionOperations, columnsCapabilities, EmptyCapabilities, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './mssql_capabilities'
 const { CollectionDoesNotExists, CollectionAlreadyExists } = errors
 
 export default class SchemaProvider implements ISchemaProvider {
@@ -29,7 +30,8 @@ export default class SchemaProvider implements ISchemaProvider {
         return Object.entries(tables)
                      .map(([collectionName, rs]) => ({
                          id: collectionName,
-                         fields: rs.map( this.translateDbTypes.bind(this) )
+                         fields: rs.map(this.appendAdditionalRowDetails.bind(this)),
+                         capabilities: this.collectionCapabilities(rs.map(r => r.field))
                      }))
     }
 
@@ -74,7 +76,7 @@ export default class SchemaProvider implements ISchemaProvider {
                               .catch( translateErrorCodes )
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]> {
+    async describeCollection(collectionName: string): Promise<Table> {
         const rs = await this.sql.request()
                                  .input('db', this.dbName)
                                  .input('tableName', collectionName)
@@ -83,12 +85,41 @@ export default class SchemaProvider implements ISchemaProvider {
         if (rs.recordset.length === 0) {
             throw new CollectionDoesNotExists('Collection does not exists')
         }
+        const fields = rs.recordset.map(this.appendAdditionalRowDetails.bind(this))
 
-        return rs.recordset.map( this.translateDbTypes.bind(this) )
+        return {
+            id: collectionName,
+            fields: fields as ResponseField[],
+            capabilities: this.collectionCapabilities(fields.map((f: ResponseField) => f.field))
+        }
+    }
+    
+    async changeColumnType(collectionName: string, column: InputField): Promise<void> {
+        console.log('here0');
+
+        await validateSystemFields(column.name)
+        console.log({column, collectionName});
+        console.log(`ALTER TABLE ${escapeTable(collectionName)} ALTER COLUMN ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`);
+        
+        await this.sql.query(`ALTER TABLE ${escapeTable(collectionName)} ALTER COLUMN ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
+            .catch((e: any) => {console.log({e}) ;return translateErrorCodes(e)})
+        console.log('here2');
     }
 
-    translateDbTypes(row: ResponseField) {
-        row.type = this.sqlSchemaTranslator.translateType(row.type)
-        return row
+    private appendAdditionalRowDetails(row: { field: string} & FieldAttributes): ResponseField {
+        return {
+            ...row,
+            type: this.sqlSchemaTranslator.translateType(row.type),
+            capabilities: Object.keys(columnsCapabilities).includes(row.type) ?
+                columnsCapabilities[row.type as keyof typeof columnsCapabilities] : EmptyCapabilities
+        }
+    }
+
+    private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
+        return {
+            dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
+        }
     }
 }
