@@ -15,13 +15,13 @@ const {
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export const columnsCapabilities = {
-    text: { sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte]},
-    url: { sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte]},
-    number: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include]},
-    boolean: { sortable: true, columnQueryOperators: [eq]},
-    image: { sortable: false, columnQueryOperators: []},
-    object: { sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte]},
-    datetime: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include]},
+    text: { sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] },
+    url: { sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] },
+    number: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include] },
+    boolean: { sortable: true, columnQueryOperators: [eq] },
+    image: { sortable: false, columnQueryOperators: [] },
+    object: { sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] },
+    datetime: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include] },
 }
 
 export const EmptyCapabilities = { sortable: false, columnQueryOperators: [] }
