@@ -23,7 +23,7 @@ export const QueryOperatorsByFieldType = {
     url: ['eq', 'ne', 'contains', 'hasSome'],
     datetime: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'],
     image: [],
-    object: ['eq', 'ne'],
+    object: ['eq', 'ne', 'contains', 'startsWith', 'endsWith', 'hasSome', 'matches', 'gt', 'gte', 'lt', 'lte'],
 }
 
 const QueryOperationsByFieldType: {[x: string]: any} = {
