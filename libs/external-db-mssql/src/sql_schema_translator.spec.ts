@@ -19,7 +19,7 @@ describe('Sql Schema Column Translator', () => {
             })
 
             test('decimal float', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float' }) ).toEqual(`${escapeId(ctx.fieldName)} FLOAT(15)`)
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float' }) ).toEqual(`${escapeId(ctx.fieldName)} DECIMAL(15, 2)`)
             })
 
             test('decimal float with precision', () => {
