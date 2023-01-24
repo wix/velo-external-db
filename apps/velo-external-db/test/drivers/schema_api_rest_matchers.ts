@@ -59,22 +59,22 @@ const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilitie
     encrypted: expect.any(Boolean)
 })
 
-const fieldsMatcher = (fields: InputField[], columnsCapabilities: ColumnsCapabilities) => expect.toIncludeSameMembers(fields.map(f => filedMatcher(f, columnsCapabilities)))
+const fieldsWith = (fields: InputField[], columnsCapabilities: ColumnsCapabilities) => expect.toIncludeSameMembers(fields.map(f => filedMatcher(f, columnsCapabilities)))
 
 export const collectionResponsesWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
     const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
     return {
         id: collectionName,
         capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
-        fields: fieldsMatcher(fields, capabilities.ColumnsCapabilities),
+        fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
     }
 }
 
-export const createCollectionResponse = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
+export const createCollectionResponseWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
     const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
     return {
         id: collectionName,
         capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
-        fields: fieldsMatcher(fields, capabilities.ColumnsCapabilities),
+        fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
     }
 }

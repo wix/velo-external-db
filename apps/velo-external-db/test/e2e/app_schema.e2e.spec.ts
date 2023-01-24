@@ -45,7 +45,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             }
             await axiosClient.post('/collections/create', { collection }, { ...authOwner, responseType: 'stream' })
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponse(ctx.collectionName, [...SystemFields], env.capabilities))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields], env.capabilities))
         })
 
         test('collection create - collection with fields', async() => {       
@@ -56,7 +56,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
             await axiosClient.post('/collections/create', { collection }, { ...authOwner, responseType: 'stream' })
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponse(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
         })
 
         test('collection update - add column', async() => {
@@ -93,7 +93,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
             await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' }) 
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponse(ctx.collectionName, [...SystemFields, { name: ctx.column.name, type: 'number' }], env.capabilities))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields, { name: ctx.column.name, type: 'number' }], env.capabilities))
         })
 
         test('collection delete', async() => {
