@@ -14,6 +14,6 @@ export const ColumnsCapabilities = {
     number: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include] },
     boolean: { sortable: true, columnQueryOperators: [eq] },
     image: { sortable: false, columnQueryOperators: [] },
-    object: { sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] },
+    object: { sortable: false, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] },
     datetime: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte] },
 }
