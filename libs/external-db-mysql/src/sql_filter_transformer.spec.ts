@@ -277,12 +277,12 @@ describe('Sql Parser', () => {
                     const filter = {
                         operator,
                         fieldName: `${ctx.fieldName}.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}`,
-                        value: ctx.fieldValue
+                        value: ctx.filter.value
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `${escapeId(ctx.fieldName)} ->> '$.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}' ${env.filterParser.adapterOperatorToMySqlOperator(operator, ctx.fieldValue)} ?`,
-                        parameters: [ctx.fieldValue]
+                        filterExpr: `${escapeId(ctx.fieldName)} ->> '$.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}' ${env.filterParser.adapterOperatorToMySqlOperator(operator, ctx.filter.value)} ?`,
+                        parameters: [ctx.filter.value].flat()
                     }])
                 })
             })
