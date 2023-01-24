@@ -25,8 +25,8 @@ export const escapeTable = (s: string) => {
     return escapeId(s)
 }
 
-export const patchFieldName = (s: any) => `x${SqlString.escape(s).substring(1).slice(0, -1)}`
-export const validateLiteral = (s: any) => `@${patchFieldName(s)}`
+export const patchFieldName = (s: any, i?: number) => i ? `x${SqlString.escape(s).substring(1).slice(0, -1)}${i}` : SqlString.escape(s).substring(1).slice(0, -1)
+export const validateLiteral = (s: any, i?: number) => `@${patchFieldName(s, i)}`
 
 export const validateLiteralWithCounter = (s: any, counter: Counter) => validateLiteral(`${s}${counter.valueCounter++}`)
 
