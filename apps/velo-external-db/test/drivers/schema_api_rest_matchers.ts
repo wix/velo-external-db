@@ -1,6 +1,7 @@
 import { SystemFields, asWixSchemaHeaders } from '@wix-velo/velo-external-db-commons'
 import { InputField, DataOperation, FieldType, CollectionOperation } from '@wix-velo/velo-external-db-types'
 import { schemaUtils } from '@wix-velo/velo-external-db-core'
+import { Capabilities, ColumnsCapabilities } from '../types'
 
 export const responseWith = (matcher: any) => expect.objectContaining( { data: matcher } )
 
@@ -48,7 +49,7 @@ const collectionCapabilities = (collectionOperations: CollectionOperation[], dat
     fieldTypes: expect.arrayContaining(fieldTypes.map(schemaUtils.fieldTypeToWixDataEnum)),
 })
 
-const filedMatcher = (field: InputField, columnsCapabilities: any) => ({
+const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilities) => ({
     key: field.name,
     type: schemaUtils.fieldTypeToWixDataEnum(field.type),
     capabilities: {
@@ -58,9 +59,9 @@ const filedMatcher = (field: InputField, columnsCapabilities: any) => ({
     encrypted: expect.any(Boolean)
 })
 
-const fieldsMatcher = (fields: InputField[], columnsCapabilities: any) => expect.toIncludeSameMembers(fields.map(f => filedMatcher(f, columnsCapabilities)))
+const fieldsMatcher = (fields: InputField[], columnsCapabilities: ColumnsCapabilities) => expect.toIncludeSameMembers(fields.map(f => filedMatcher(f, columnsCapabilities)))
 
-export const collectionResponsesWith = (collectionName: string, fields: InputField[], capabilities: any) => {
+export const collectionResponsesWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
     const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
     return {
         id: collectionName,
@@ -69,7 +70,7 @@ export const collectionResponsesWith = (collectionName: string, fields: InputFie
     }
 }
 
-export const createCollectionResponse = (collectionName: string, fields: InputField[], capabilities: any) => {
+export const createCollectionResponse = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
     const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
     return {
         id: collectionName,
