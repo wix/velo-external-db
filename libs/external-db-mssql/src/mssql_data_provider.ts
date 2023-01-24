@@ -2,7 +2,7 @@ import { escapeId, validateLiteral, escape, patchFieldName, escapeTable } from '
 import { updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
 import { ConnectionPool as MSSQLPool } from 'mssql'
-import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, Sort } from '@wix-velo/velo-external-db-types'
 import FilterParser from './sql_filter_transformer'
 
 export default class DataProvider implements IDataProvider {
@@ -72,11 +72,13 @@ export default class DataProvider implements IDataProvider {
         await this.sql.query(`TRUNCATE TABLE ${escapeTable(collectionName)}`).catch( translateErrorCodes )
     }
 
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<Item[]> {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number): Promise<Item[]> {
         const { filterExpr: whereFilterExpr, parameters: whereParameters } = this.filterParser.transform(filter)
         const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation)
+        const { sortExpr } = this.filterParser.orderBy(sort)
+        const pagingQueryStr = this.pagingQueryFor(skip, limit)
 
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter} ${sortExpr} ${pagingQueryStr}`
 
         return await this.query(sql, { ...whereParameters, ...parameters })
     }
