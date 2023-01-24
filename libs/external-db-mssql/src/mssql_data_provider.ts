@@ -38,14 +38,14 @@ export default class DataProvider implements IDataProvider {
     
     async insert(collectionName: string, items: any[], fields: any[], upsert?: boolean): Promise<number> {
         const fieldsNames = fields.map((f: { field: any }) => f.field)
-        let sql;
+        let sql
         if (upsert) {
             sql = `MERGE ${escapeTable(collectionName)} as target`
                         +` USING (VALUES ${items.map((item: any, i: any) => `(${Object.keys(item).map((key: string) => validateLiteral(key, i) ).join(', ')})`).join(', ')}) as source`
                         +` (${fieldsNames.map( escapeId ).join(', ')}) ON target._id = source._id`
-                        +` WHEN NOT MATCHED `
+                        +' WHEN NOT MATCHED '
                         +` THEN INSERT (${fieldsNames.map( escapeId ).join(', ')}) VALUES (${fieldsNames.map((f) => `source.${f}` ).join(', ')})`
-                        +` WHEN MATCHED`
+                        +' WHEN MATCHED'
                         +` THEN UPDATE SET ${fieldsNames.map((f) => `${escapeId(f)} = source.${f}`).join(', ')};`            
         }
         else {
