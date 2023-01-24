@@ -1,12 +1,12 @@
 import { translateErrorCodes, notThrowingTranslateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator from './sql_schema_translator'
 import { escapeId, escapeTable } from './mssql_utils'
-import { SystemFields, validateSystemFields, parseTableData } from '@wix-velo/velo-external-db-commons'
+import { SystemFields, validateSystemFields, parseTableData, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { supportedOperations } from './supported_operations'
 import { ConnectionPool as MSSQLPool } from 'mssql'
 import { CollectionCapabilities, FieldAttributes, InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { CollectionOperations, columnsCapabilities, EmptyCapabilities, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './mssql_capabilities'
+import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './mssql_capabilities'
 const { CollectionDoesNotExists, CollectionAlreadyExists } = errors
 
 export default class SchemaProvider implements ISchemaProvider {
@@ -101,11 +101,11 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     private appendAdditionalRowDetails(row: { field: string} & FieldAttributes): ResponseField {
+        const type = this.sqlSchemaTranslator.translateType(row.type) as keyof typeof ColumnsCapabilities
         return {
             ...row,
             type: this.sqlSchemaTranslator.translateType(row.type),
-            capabilities: Object.keys(columnsCapabilities).includes(row.type) ?
-                columnsCapabilities[row.type as keyof typeof columnsCapabilities] : EmptyCapabilities
+            capabilities: ColumnsCapabilities[type] ?? EmptyCapabilities    
         }
     }
 

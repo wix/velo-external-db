@@ -5,16 +5,10 @@ import {
     FieldType,
 } from '@wix-velo/velo-external-db-types'
 
-const {
-    query,
-    count,
-    queryReferenced,
-    aggregate,
-} = DataOperation
-
+const { query, count, queryReferenced, aggregate, } = DataOperation
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
-export const columnsCapabilities = {
+export const ColumnsCapabilities = {
     text: { sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] },
     url: { sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] },
     number: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include] },
@@ -24,7 +18,6 @@ export const columnsCapabilities = {
     datetime: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include] },
 }
 
-export const EmptyCapabilities = { sortable: false, columnQueryOperators: [] }
 export const ReadWriteOperations = Object.values(DataOperation)
 export const ReadOnlyOperations = [query, count, queryReferenced, aggregate]
 export const FieldTypes = Object.values(FieldType)
