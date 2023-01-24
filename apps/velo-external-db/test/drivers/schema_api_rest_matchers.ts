@@ -1,6 +1,7 @@
 import { SystemFields, asWixSchemaHeaders } from '@wix-velo/velo-external-db-commons'
-import { InputField } from '@wix-velo/velo-external-db-types'
+import { InputField, DataOperation, FieldType, CollectionOperation } from '@wix-velo/velo-external-db-types'
 import { schemaUtils } from '@wix-velo/velo-external-db-core'
+import { Capabilities, ColumnsCapabilities } from '../types'
 
 export const responseWith = (matcher: any) => expect.objectContaining( { data: matcher } )
 
@@ -42,34 +43,38 @@ const listToHaveCollection = (collectionName: string) => expect.objectContaining
     schemas: expect.arrayContaining( [ expect.objectContaining( { id: collectionName } ) ] )
 } )
 
-const collectionCapabilities = (_collectionOperations: any[], _dataOperations: any[], _fieldTypes: any[]) => ({
-    collectionOperations: expect.any(Array),
-    dataOperations: expect.any(Array),
-    fieldTypes: expect.any(Array)
+const collectionCapabilities = (collectionOperations: CollectionOperation[], dataOperations: DataOperation[], fieldTypes: FieldType[]) => ({
+    collectionOperations: expect.arrayContaining(collectionOperations.map(schemaUtils.collectionOperationsToWixDataCollectionOperations)),
+    dataOperations: expect.arrayContaining(dataOperations.map(schemaUtils.dataOperationsToWixDataQueryOperators)),
+    fieldTypes: expect.arrayContaining(fieldTypes.map(schemaUtils.fieldTypeToWixDataEnum)),
 })
 
-const fieldCapabilitiesMatcher = () => expect.objectContaining({
-    queryOperators: expect.any(Array),
-    sortable: expect.any(Boolean),
-})
-
-const filedMatcher = (field: InputField) => ({
+const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilities) => ({
     key: field.name,
-    capabilities: fieldCapabilitiesMatcher(),
-    encrypted: expect.any(Boolean),
-    type: schemaUtils.fieldTypeToWixDataEnum(field.type)
+    type: schemaUtils.fieldTypeToWixDataEnum(field.type),
+    capabilities: {
+        sortable: columnsCapabilities[field.type].sortable,
+        queryOperators: columnsCapabilities[field.type].columnQueryOperators.map(schemaUtils.queryOperatorsToWixDataQueryOperators)
+    },
+    encrypted: expect.any(Boolean)
 })
 
-const fieldsMatcher = (fields: InputField[]) => expect.toIncludeSameMembers(fields.map(filedMatcher))
+const fieldsWith = (fields: InputField[], columnsCapabilities: ColumnsCapabilities) => expect.toIncludeSameMembers(fields.map(f => filedMatcher(f, columnsCapabilities)))
 
-export const collectionResponsesWith = (collectionName: string, fields: InputField[]) => ({
-    id: collectionName,
-    capabilities: collectionCapabilities([], [], []),
-    fields: fieldsMatcher(fields),
-})
+export const collectionResponsesWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
+    const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
+    return {
+        id: collectionName,
+        capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
+        fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
+    }
+}
 
-export const createCollectionResponse = (collectionName: string, fields: InputField[]) => ({
-    id: collectionName,
-    capabilities: collectionCapabilities([], [], []),
-    fields: fieldsMatcher(fields),
-})
+export const createCollectionResponseWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
+    const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
+    return {
+        id: collectionName,
+        capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
+        fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
+    }
+}

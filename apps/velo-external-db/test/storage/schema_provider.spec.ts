@@ -39,11 +39,11 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
         await expect( env.schemaProvider.list() ).resolves.toEqual(expect.arrayContaining([
             expect.objectContaining({
                 id: ctx.collectionName,
-                fields: toContainDefaultFields()
+                fields: toContainDefaultFields(env.capabilities.ColumnsCapabilities)
             }),
             expect.objectContaining({
                 id: ctx.anotherCollectionName,
-                fields: toContainDefaultFields()
+                fields: toContainDefaultFields(env.capabilities.ColumnsCapabilities)
             })
         ]))
     })
