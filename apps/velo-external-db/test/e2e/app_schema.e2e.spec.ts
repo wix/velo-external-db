@@ -9,7 +9,7 @@ import { authOwner } from '@wix-velo/external-db-testkit'
 import * as gen from '../gen'
 import Chance = require('chance')
 import axios from 'axios'
-import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
+import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations, env } from '../resources/e2e_resources'
 const chance = Chance()
 
 const axiosClient = axios.create({
@@ -35,7 +35,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         test('collection get', async() => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields]))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields], env.capabilities))
         })
 
         test('collection create - collection without fields', async() => {        
@@ -45,7 +45,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             }
             await axiosClient.post('/collections/create', { collection }, { ...authOwner, responseType: 'stream' })
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponse(ctx.collectionName, [...SystemFields]))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields], env.capabilities))
         })
 
         test('collection create - collection with fields', async() => {       
@@ -56,7 +56,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
             await axiosClient.post('/collections/create', { collection }, { ...authOwner, responseType: 'stream' })
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponse(ctx.collectionName, [...SystemFields, ctx.column]))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
         })
 
         test('collection update - add column', async() => {
@@ -68,7 +68,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         
             await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' })
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields, ctx.column]))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
         })
 
         testIfSupportedOperationsIncludes(supportedOperations, [ RemoveColumn ])('collection update - remove column', async() => {
@@ -81,7 +81,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
             await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' })       
             
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields]))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields], env.capabilities))
         })
 
         testIfSupportedOperationsIncludes(supportedOperations, [ ChangeColumnType ])('collection update - change column type', async() => {
@@ -93,7 +93,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
             await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' }) 
 
-            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponse(ctx.collectionName, [...SystemFields, { name: ctx.column.name, type: 'number' }]))
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields, { name: ctx.column.name, type: 'number' }], env.capabilities))
         })
 
         test('collection delete', async() => {
