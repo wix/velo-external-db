@@ -112,8 +112,8 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.item ], ctx.collectionName, authAdmin)
 
-        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.modifiedItem], true),  { responseType: 'stream', ...authOwner })
-        const expectedItems = [dataSpi.QueryResponsePart.item(ctx.modifiedItem)]
+        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.modifiedItem, ...ctx.items], true),  { responseType: 'stream', ...authOwner })
+        const expectedItems = [ctx.modifiedItem, ...ctx.items].map(dataSpi.QueryResponsePart.item)
 
         await expect(streamToArray(response.data)).resolves.toEqual(expectedItems)
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(expect.toIncludeAllMembers(
