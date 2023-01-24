@@ -36,15 +36,28 @@ export default class DataProvider implements IDataProvider {
         return Object.entries(item).reduce((o, [k, v]) => ( { ...o, [patchFieldName(k)]: v } ), {})
     }
     
-    async insert(collectionName: string, items: any[], fields: any[]): Promise<number> {
+    async insert(collectionName: string, items: any[], fields: any[], upsert?: boolean): Promise<number> {
         const fieldsNames = fields.map((f: { field: any }) => f.field)
-        const rss = await Promise.all(items.map((item: any) => this.insertSingle(collectionName, item, fieldsNames)))
+        const actionFunction = upsert ? this.upsertSingle.bind(this) : this.insertSingle.bind(this)
+        const rss = await Promise.all(items.map((item: any) => actionFunction(collectionName, item, fieldsNames)))
 
         return rss.reduce((s, rs) => s + rs, 0)
     }
 
     insertSingle(collectionName: string, item: Item, fieldsNames: string[]): Promise<number> {
         const sql = `INSERT INTO ${escapeTable(collectionName)} (${fieldsNames.map( escapeId ).join(', ')}) VALUES (${Object.keys(item).map( validateLiteral ).join(', ')})`
+        return this.query(sql, this.patch(item), true)
+    }
+
+    upsertSingle(collectionName: string, item: Item, fieldsNames: string[]): Promise<number> {
+        const sql = `MERGE ${escapeTable(collectionName)} as target`
+                    +` USING (VALUES (${Object.keys(item).map( validateLiteral ).join(', ')})) as source`
+                    +` (${fieldsNames.map( escapeId ).join(', ')}) ON target._id = source._id`
+                    +` WHEN NOT MATCHED `
+                    +` THEN INSERT (${fieldsNames.map( escapeId ).join(', ')}) VALUES (${Object.keys(item).map( validateLiteral ).join(', ')})`
+                    +` WHEN MATCHED`
+                    +` THEN UPDATE SET ${fieldsNames.map(f => `${escapeId(f)} = ${validateLiteral(f)}`).join(', ')};`
+        console.log({sql})
         return this.query(sql, this.patch(item), true)
     }
 
