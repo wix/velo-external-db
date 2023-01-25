@@ -34,7 +34,7 @@ export default class DataProvider implements IDataProvider {
                                 .count(filterExpr)
     }
 
-    async insert(collectionName: string, items: Item[] ): Promise<number> {
+    async insert(collectionName: string, items: Item[], _fields: any[], _upsert?: boolean): Promise<number> {
         validateTable(collectionName)
         const result = await this.client.db()
                                         .collection(collectionName)

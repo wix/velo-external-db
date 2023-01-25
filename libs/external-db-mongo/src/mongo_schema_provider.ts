@@ -1,7 +1,9 @@
-import { SystemFields, validateSystemFields, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { SystemFields, validateSystemFields, AllSchemaOperations, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
+import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table, CollectionCapabilities } from '@wix-velo/velo-external-db-types'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('@wix-velo/velo-external-db-commons').errors
 import { validateTable, SystemTable } from './mongo_utils'
+import { CollectionOperations, FieldTypes, ReadWriteOperations, ColumnsCapabilities } from './mongo_capabilities'
+
 
 export default class SchemaProvider implements ISchemaProvider {
     client: any
@@ -9,10 +11,19 @@ export default class SchemaProvider implements ISchemaProvider {
         this.client = client
     }
 
-    reformatFields(field: InputField ) {
+    reformatFields(field: {name: string, type: string}): ResponseField {
         return {
             field: field.name,
             type: field.type,
+            capabilities: ColumnsCapabilities[field.type as keyof typeof ColumnsCapabilities] ?? EmptyCapabilities
+        }
+    }
+
+    private collectionCapabilities(): CollectionCapabilities {
+        return {
+            dataOperations: ReadWriteOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
         }
     }
 
@@ -27,7 +38,8 @@ export default class SchemaProvider implements ISchemaProvider {
         return Object.entries(tables)
                      .map(([collectionName, rs]: [string, any]) => ({
                          id: collectionName,
-                         fields: [...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) )
+                         fields: [...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) ),
+                         capabilities: this.collectionCapabilities()
                      }))
 
     }
@@ -98,14 +110,17 @@ export default class SchemaProvider implements ISchemaProvider {
                                     { $pull: { fields: { name: { $eq: columnName } } } } )
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]> {
+    async describeCollection(collectionName: string): Promise<Table> {
         validateTable(collectionName)
         const collection = await this.collectionDataFor(collectionName)
         if (!collection) {
             throw new CollectionDoesNotExists('Collection does not exists')
         }
-
-        return [...SystemFields, ...collection.fields].map( this.reformatFields.bind(this) )
+        return {
+            id: collectionName,
+            fields: [...SystemFields, ...collection.fields].map( this.reformatFields.bind(this) ),
+            capabilities: this.collectionCapabilities()
+        }
     }
 
     async drop(collectionName: string): Promise<void> {

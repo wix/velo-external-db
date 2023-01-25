@@ -23,10 +23,10 @@ export const engineConnectorFor = async(_type: string, config: any): Promise<Dat
             const { mySqlFactory } = require('@wix-velo/external-db-mysql')
             return await mySqlFactory(config)
         }
-        // case 'mongo': {
-        //     const { mongoFactory } = require('@wix-velo/external-db-mongo')
-        //     return await mongoFactory(config)
-        // }
+        case 'mongo': {
+            const { mongoFactory } = require('@wix-velo/external-db-mongo')
+            return await mongoFactory(config)
+        }
         // case 'google-sheet': {
         //     const { googleSheetFactory } = require('@wix-velo/external-db-google-sheets')
         //     return await googleSheetFactory(config)
