@@ -101,13 +101,13 @@ export interface CollectionCapabilities {
     // Supported field types.
     fieldTypes: FieldType[];
     // Describes what kind of reference capabilities is supported.
-    referenceCapabilities?: ReferenceCapabilities;
+    referenceCapabilities: ReferenceCapabilities;
     // Lists what kind of modifications this collection accept.
     collectionOperations: CollectionOperation[];
     // Defines which indexing operations is supported.
-    indexing?: IndexingCapabilityEnum[];
+    indexing: IndexingCapabilityEnum[];
     // Defines if/how encryption is supported.
-    encryption?: Encryption;
+    encryption: Encryption;
 }
 
 export enum DataOperation {
