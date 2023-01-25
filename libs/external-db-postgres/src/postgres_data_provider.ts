@@ -1,5 +1,5 @@
 import { Pool } from 'pg'
-import { escapeIdentifier, prepareStatementVariables } from './postgres_utils'
+import { escapeIdentifier, prepareStatementVariables, prepareStatementVariablesForBulkInsert } from './postgres_utils'
 import { asParamArrays, patchDateTime, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
 import { IDataProvider, AdapterFilter as Filter, Sort, Item, AdapterAggregation as Aggregation, ResponseField } from '@wix-velo/velo-external-db-types'
@@ -18,7 +18,8 @@ export default class DataProvider implements IDataProvider {
         const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
-        const resultSet = await this.pool.query(`SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
+        const q = `SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`
+        const resultSet = await this.pool.query(q, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultSet.rows
     }
@@ -30,16 +31,15 @@ export default class DataProvider implements IDataProvider {
         return parseInt(resultSet.rows[0]['num'], 10)
     }
 
-    async insert(collectionName: string, items: Item[], fields: ResponseField[]) {
+    async insert(collectionName: string, items: Item[], fields: ResponseField[], upsert?: boolean) {
+        const itemsAsParams = items.map((item: { [x: string]: any }) => asParamArrays( patchDateTime(item) ))
         const escapedFieldsNames = fields.map( (f: { field: string }) => escapeIdentifier(f.field)).join(', ')
-        const res = await Promise.all(
-            items.map(async(item: { [x: string]: any }) => {
-                const data = asParamArrays( patchDateTime(item) )
-                const res = await this.pool.query(`INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES (${prepareStatementVariables(fields.length)})`, data)
-                               .catch( translateErrorCodes )
-                return res.rowCount
-            } ) )
-        return res.reduce((sum, i) => i + sum, 0)
+        const upsertAddon = upsert ? ` ON CONFLICT (_id) DO UPDATE SET ${fields.map(f => `"${f.field}" = EXCLUDED."${f.field}"`).join(', ')}` : ''
+        const query = `INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES ${prepareStatementVariablesForBulkInsert(items.length, fields.length)}${upsertAddon}`
+
+        await this.pool.query(query, itemsAsParams.flat()).catch( translateErrorCodes )
+
+        return items.length
     }
 
     async update(collectionName: string, items: Item[]) {

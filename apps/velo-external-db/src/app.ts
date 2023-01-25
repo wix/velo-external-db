@@ -3,17 +3,6 @@ import { create, readCommonConfig } from '@wix-velo/external-db-config'
 import { ExternalDbRouter, Hooks } from '@wix-velo/velo-external-db-core'
 import { engineConnectorFor } from './storage/factory'
 
-
-process.env.CLOUD_VENDOR = 'azure'
-process.env.TYPE = 'mysql'
-process.env.EXTERNAL_DATABASE_ID = ''
-process.env.ALLOWED_METASITES = ''
-process.env['TYPE'] = 'mysql'
-process.env['HOST'] = 'localhost'
-process.env['USER'] = 'test-user'
-process.env['PASSWORD'] = 'password'
-process.env['DB'] = 'test-db'
-
 const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
     const { vendor, type: adapterType, externalDatabaseId, allowedMetasites } = readCommonConfig()
     const configReader = create()

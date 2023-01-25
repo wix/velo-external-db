@@ -180,15 +180,12 @@ export const createRouter = () => {
     router.post('/data/insert', async(req, res, next) => {
         try {
             const insertRequest: dataSource.InsertRequest = req.body
-
             const collectionName = insertRequest.collectionId
-
             const data = insertRequest.overwriteExisting ?
                             await schemaAwareDataService.bulkUpsert(collectionName, insertRequest.items) :
                             await schemaAwareDataService.bulkInsert(collectionName, insertRequest.items)
 
             const responseParts = data.items.map(dataSource.InsertResponsePart.item)
-
             streamCollection(responseParts, res)
         } catch (e) {
             next(e)
