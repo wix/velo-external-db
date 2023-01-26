@@ -17,8 +17,7 @@ export const domainToSpiErrorTranslator = (err: any) => {
       
       case domainErrors.FieldDoesNotExist:
         const fieldDoesNotExist: domainErrors.FieldDoesNotExist = err
-        return ErrorMessage.invalidProperty(fieldDoesNotExist.collectionName, fieldDoesNotExist.itemId)
-  
+        return ErrorMessage.invalidProperty(fieldDoesNotExist.collectionName, fieldDoesNotExist.propertyName, fieldDoesNotExist.message)
       default:
         return ErrorMessage.unknownError(err.message)  
     }

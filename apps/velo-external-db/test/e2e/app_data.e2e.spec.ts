@@ -1,4 +1,5 @@
 import axios from 'axios'
+import each from 'jest-each'
 import Chance = require('chance')
 import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes, streamToArray } from '@wix-velo/test-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
@@ -275,23 +276,6 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             ]))
     })
 
-    test('count api on non existing collection should fail with 404', async() => {
-        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-        await expect( 
-            axiosInstance.post('/data/count', data.countRequest(gen.randomCollectionName()), authAdmin) 
-        ).rejects.toThrow('404')
-    })
-
-    test('insert api on non existing collection should fail with 404', async() => {
-        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-
-        const response = axiosInstance.post('/data/insert', data.insertRequest(gen.randomCollectionName(), ctx.items, false),  { responseType: 'stream', transformRequest: authAdmin.transformRequest })
-
-        await expect(response).rejects.toThrow('404')
-    })
-
-
     testIfSupportedOperationsIncludes(supportedOperations, [ QueryNestedFields ])('query on nested fields', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.objectColumn], authOwner)
         await data.givenItems([ctx.objectItem], ctx.collectionName, authAdmin)
@@ -304,6 +288,67 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             [ dataSpi.QueryResponsePart.item(ctx.objectItem), data.pagingMetadata(1, 1) ]
         ))
     })
+
+    describe('error handling', () => {
+        test('insert api with duplicate _id should fail with WDE0074, 409', async() => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
+            
+            await expect (axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.item], false), authAdmin)
+                .catch(e => {
+                    expect(e.response.status).toEqual(409)
+                    expect(e.response.data.message).toEqual(expect.objectContaining({
+                        code: 'WDE0074',
+                        data: {
+                            itemId: ctx.item._id,
+                            collectionId: ctx.collectionName
+                        }
+                    }))
+                    throw e
+                })
+            ).rejects.toThrow()
+        })
+
+        each([
+            ['update', '/data/update', data.updateRequest.bind(null, 'nonExistingCollection', [])],
+            ['count', '/data/count', data.countRequest.bind(null, 'nonExistingCollection')],
+            ['insert', '/data/insert', data.insertRequest.bind(null, 'nonExistingCollection', [], false)],
+            ['query', '/data/query', data.queryRequest.bind(null, 'nonExistingCollection', [], undefined)],
+        ])
+        .test('%s api on non existing collection should fail with WDE0025, 404', async(_, api, request) => {
+            await expect(axiosInstance.post(api, request(), authAdmin)
+                .catch(e => {
+                    expect(e.response.status).toEqual(404)
+                    expect(e.response.data.message).toEqual(expect.objectContaining({
+                        code: 'WDE0025',
+                        data: {
+                            collectionId: 'nonExistingCollection'
+                        }
+                    }))
+                    throw e
+                })
+            ).rejects.toThrow()
+        })
+
+        test('filter non existing column should fail with WDE0147, 400', async() => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            
+            await expect(axiosInstance.post('/data/query', data.queryRequest(ctx.collectionName, [], undefined, { nonExistingColumn: { $eq: 'value' } }), authAdmin)
+                .catch(e => {
+                    expect(e.response.status).toEqual(400)
+                    expect(e.response.data.message).toEqual(expect.objectContaining({
+                        code: 'WDE0147',
+                        data: {
+                            collectionId: ctx.collectionName,
+                            propertyName: 'nonExistingColumn'
+                        }
+                    }))
+                    throw e
+                })
+            ).rejects.toThrow()
+        })
+    })
+
 
     const ctx = {
         collectionName: Uninitialized,
