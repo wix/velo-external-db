@@ -7,5 +7,5 @@ export const errorMiddleware = (err: any, _req: any, res: Response, _next?: Next
   }
 
   const errorMsg = domainToSpiErrorTranslator(err)
-  res.status(errorMsg.httpCode).send(errorMsg)
+  res.status(errorMsg.httpCode).send(errorMsg.message)
 }
