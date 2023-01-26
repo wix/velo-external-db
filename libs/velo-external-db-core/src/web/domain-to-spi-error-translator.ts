@@ -18,6 +18,11 @@ export const domainToSpiErrorTranslator = (err: any) => {
       case domainErrors.FieldDoesNotExist:
         const fieldDoesNotExist: domainErrors.FieldDoesNotExist = err
         return ErrorMessage.invalidProperty(fieldDoesNotExist.collectionName, fieldDoesNotExist.propertyName, fieldDoesNotExist.message)
+  
+      case domainErrors.UnsupportedSchemaOperation:
+        const unsupportedSchemaOperation: domainErrors.UnsupportedSchemaOperation = err
+        return ErrorMessage.operationIsNotSupportedByCollection(unsupportedSchemaOperation.collectionName, unsupportedSchemaOperation.operation, unsupportedSchemaOperation.message)
+        
       default:
         return ErrorMessage.unknownError(err.message)  
     }
