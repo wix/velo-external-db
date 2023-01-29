@@ -45,7 +45,7 @@ export default class SchemaService {
     }
 
     async update(collection: collectionSpi.Collection): Promise<collectionSpi.UpdateCollectionResponse> {
-        await this.validateOperation(Create)
+        await this.validateOperation(collection.id, Create)
         
         // remove in the end of development
         if (!this.storage.changeColumnType) {
@@ -63,19 +63,19 @@ export default class SchemaService {
 
         // Adding columns
         if (columnsToAdd.length > 0) {
-            await this.validateOperation(AddColumn)
+            await this.validateOperation(collection.id, AddColumn)
         }
         await Promise.all(columnsToAdd.map(async(field) => await this.storage.addColumn(collection.id, field)))
         
         // Removing columns
         if (columnsToRemove.length > 0) {
-            await this.validateOperation(RemoveColumn)
+            await this.validateOperation(collection.id, RemoveColumn)
         }
         await Promise.all(columnsToRemove.map(async(fieldName) => await this.storage.removeColumn(collection.id, fieldName)))
 
         // Changing columns type
         if (columnsToChangeType.length > 0) {
-            await this.validateOperation(ChangeColumnType)
+            await this.validateOperation(collection.id, ChangeColumnType)
         }
         await Promise.all(columnsToChangeType.map(async(field) => await this.storage.changeColumnType?.(collection.id, field)))
 
@@ -94,11 +94,11 @@ export default class SchemaService {
         } }
     }
 
-    private async validateOperation(operationName: SchemaOperations) {
+    private async validateOperation(collectionName: string, operationName: SchemaOperations) {
         const allowedSchemaOperations = this.storage.supportedOperations()
 
         if (!allowedSchemaOperations.includes(operationName)) 
-            throw new errors.UnsupportedOperation(`Your database doesn't support ${operationName} operation`)
+            throw new errors.UnsupportedSchemaOperation(`Your database doesn't support ${operationName} operation`, collectionName, operationName)
     }
 
     private formatCollection(collection: Table): collectionSpi.Collection {
