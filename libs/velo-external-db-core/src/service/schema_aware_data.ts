@@ -88,7 +88,7 @@ export default class SchemaAwareDataService {
 
     async validateFilter(collectionName: string, filter: Filter, _fields?: ResponseField[]) {
         const fields =  _fields ?? await this.schemaInformation.schemaFieldsFor(collectionName)
-        this.queryValidator.validateFilter(fields, filter)
+        this.queryValidator.validateFilter(fields, filter, collectionName)
     }
     
     async validateGetById(collectionName: string, itemId: string) {

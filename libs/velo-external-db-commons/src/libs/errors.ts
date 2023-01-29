@@ -49,11 +49,11 @@ export class ItemAlreadyExists extends BaseHttpError {
 }
 
 export class FieldDoesNotExist extends BaseHttpError {
-    itemId: string
+    propertyName: string
     collectionName: string
-    constructor(message: string, collectionName?: string, itemId?: string) {
+    constructor(message: string, collectionName?: string, propertyName?: string) {
         super(message)
-        this.itemId = itemId || ''
+        this.propertyName = propertyName || ''
         this.collectionName = collectionName || ''
     }
 }
@@ -87,9 +87,14 @@ export class ItemNotFound extends BaseHttpError {
     }
 }
 
-export class UnsupportedOperation extends BaseHttpError {
-    constructor(message: string) {
+export class UnsupportedSchemaOperation extends BaseHttpError {
+    collectionName: string
+    operation: string
+
+    constructor(message: string, collectionName?: string, operation?: string) {
         super(message)
+        this.collectionName = collectionName || ''
+        this.operation = operation || ''
     }
 }
 
