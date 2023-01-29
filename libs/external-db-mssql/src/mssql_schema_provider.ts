@@ -83,7 +83,7 @@ export default class SchemaProvider implements ISchemaProvider {
                                  .query('SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_CATALOG = @db AND TABLE_NAME = @tableName')
 
         if (rs.recordset.length === 0) {
-            throw new CollectionDoesNotExists('Collection does not exists')
+            throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }
         const fields = rs.recordset.map(this.appendAdditionalRowDetails.bind(this))
 

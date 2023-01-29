@@ -20,14 +20,14 @@ export default class DataProvider implements IDataProvider {
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
 
         const sql = `SELECT ${projectionExpr} FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} ${pagingQueryStr}`
-        return await this.query(sql, parameters)
+        return await this.query(sql, parameters, collectionName)
     }
 
     async count(collectionName: string, filter: Filter): Promise<number> {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
 
         const sql = `SELECT COUNT(*) as num FROM ${escapeTable(collectionName)} ${filterExpr}`
-        const rs = await this.query(sql, parameters)
+        const rs = await this.query(sql, parameters, collectionName)
 
         return rs[0]['num']
     }
@@ -52,7 +52,7 @@ export default class DataProvider implements IDataProvider {
             sql = `INSERT INTO ${escapeTable(collectionName)} (${fieldsNames.map( escapeId ).join(', ')}) VALUES ${items.map((item: any, i: any) => `(${Object.keys(item).map((key: string) => validateLiteral(key, i) ).join(', ')})`).join(', ')}`
         }
 
-        return await this.query(sql, items.reduce((p: any, t: any, i: any) => ( { ...p, ...this.patch(t, i) } ), {}), true)
+        return await this.query(sql, items.reduce((p: any, t: any, i: any) => ( { ...p, ...this.patch(t, i) } ), {}), collectionName, true)
     }
 
     async update(collectionName: string, items: Item[]): Promise<number> {
@@ -64,19 +64,19 @@ export default class DataProvider implements IDataProvider {
         const updateFields = updateFieldsFor(item)
         const sql = `UPDATE ${escapeTable(collectionName)} SET ${updateFields.map(f => `${escapeId(f)} = ${validateLiteral(f)}`).join(', ')} WHERE _id = ${validateLiteral('_id')}`
 
-        return await this.query(sql, this.patch(item), true)
+        return await this.query(sql, this.patch(item), collectionName, true)
     }
 
 
     async delete(collectionName: string, itemIds: string[]): Promise<number> {
         const sql = `DELETE FROM ${escapeTable(collectionName)} WHERE _id IN (${itemIds.map((t: any, i: any) => validateLiteral(`_id${i}`)).join(', ')})`
-        const rs = await this.query(sql, itemIds.reduce((p: any, t: any, i: any) => ( { ...p, [patchFieldName(`_id${i}`)]: t } ), {}), true)
-                             .catch( translateErrorCodes )
+        const rs = await this.query(sql, itemIds.reduce((p: any, t: any, i: any) => ( { ...p, [patchFieldName(`_id${i}`)]: t } ), {}), collectionName, true)
+                             .catch(e => translateErrorCodes(e, collectionName) )
         return rs
     }
 
     async truncate(collectionName: string): Promise<void> {
-        await this.sql.query(`TRUNCATE TABLE ${escapeTable(collectionName)}`).catch( translateErrorCodes )
+        await this.sql.query(`TRUNCATE TABLE ${escapeTable(collectionName)}`).catch(e => translateErrorCodes(e, collectionName))
     }
 
     async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number): Promise<Item[]> {
@@ -87,18 +87,18 @@ export default class DataProvider implements IDataProvider {
 
         const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter} ${sortExpr} ${pagingQueryStr}`
 
-        return await this.query(sql, { ...whereParameters, ...parameters })
+        return await this.query(sql, { ...whereParameters, ...parameters }, collectionName)
     }
 
-    async query(sql: string, parameters: any, op?: false): Promise<Item[]>
-    async query(sql: string, parameters: any, op?: true): Promise<number>
-    async query(sql: string, parameters: any, op?: boolean| undefined): Promise<Item[] | number> {
+    async query(sql: string, parameters: any, collectionName: string, op?: false): Promise<Item[]>
+    async query(sql: string, parameters: any, collectionName: string, op?: true): Promise<number>
+    async query(sql: string, parameters: any, collectionName: string, op?: boolean| undefined): Promise<Item[] | number> {
         const request = Object.entries(parameters)
                               .reduce((r, [k, v]) => r.input(k, v),
                                       this.sql.request())
 
         const rs = await request.query(sql)
-                                .catch( translateErrorCodes )
+                                .catch(e => translateErrorCodes(e, collectionName) )
 
         if (op) {
             return rs.rowsAffected[0]
@@ -118,5 +118,7 @@ export default class DataProvider implements IDataProvider {
         return `${offsetSql} ${limitSql}`.trim()
     }
 
-
+    translateErrorCodes(collectionName: string, e: any) {
+        return translateErrorCodes(e, collectionName)
+    }
 }

@@ -28,7 +28,7 @@ export default class CacheableSchemaInformation {
 
     async update(collectionName: string) {
         const collection = await this.schemaProvider.describeCollection(collectionName)
-        if (!collection) throw new CollectionDoesNotExists('Collection does not exists')
+        if (!collection) throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         this.cache.set(collectionName, collection, FiveMinutes)
     }
 
