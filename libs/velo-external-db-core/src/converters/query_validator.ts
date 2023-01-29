@@ -7,11 +7,11 @@ export default class QueryValidator {
     constructor() {
     }
 
-    validateFilter(fields: ResponseField[], filter: AdapterFilter ) {
+    validateFilter(fields: ResponseField[], filter: AdapterFilter, collectionName?: string) {
         const filterFieldsAndOpsObj = extractFieldsAndOperators(filter)
         const filterFields = filterFieldsAndOpsObj.map((f: { name: string }) => f.name)
         const fieldNames = fields.map((f: ResponseField) => f.field)
-        this.validateFieldsExists(fieldNames, filterFields)
+        this.validateFieldsExists(fieldNames, filterFields, collectionName)
         this.validateOperators(fields, filterFieldsAndOpsObj)
     }
     
@@ -33,11 +33,11 @@ export default class QueryValidator {
         this.validateFieldsExists(fieldNames, projectionFields)
     }
 
-    validateFieldsExists(allFields: string | any[], queryFields: any[]) { 
+    validateFieldsExists(allFields: string | any[], queryFields: any[], collectionName?: string) { 
         const nonExistentFields = queryFields.filter((field: any) => !allFields.includes(field)) 
 
         if (nonExistentFields.length) {
-            throw new InvalidQuery(`fields ${nonExistentFields.join(', ')} don't exist`)
+            throw new errors.FieldDoesNotExist(`fields [${nonExistentFields.join(', ')}] don't exist`, collectionName, nonExistentFields[0])
         }
     }
 

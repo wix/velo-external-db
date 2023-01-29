@@ -48,7 +48,7 @@ export class ErrorMessage {
             description,
             data: {
                 itemId,
-                collectionName
+                collectionId: collectionName
             } as InvalidItemDetails
         } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
     }
@@ -59,7 +59,7 @@ export class ErrorMessage {
             description,
             data: {
                 itemId,
-                collectionName
+                collectionId: collectionName
             } as InvalidItemDetails
         } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
     }
@@ -70,7 +70,7 @@ export class ErrorMessage {
             description,
             data: {
                 itemId,
-                collectionName
+                collectionId: collectionName
             } as InvalidItemDetails
         } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
     }
@@ -81,7 +81,7 @@ export class ErrorMessage {
             description,
             data: {
                 itemId,
-                collectionName
+                collectionId: collectionName
             } as InvalidItemDetails
         } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
     }
@@ -113,7 +113,7 @@ export class ErrorMessage {
             description,
             data: {
                 itemId,
-                collectionName
+                collectionId: collectionName
             } as InvalidItemDetails
         } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
     }
@@ -124,7 +124,7 @@ export class ErrorMessage {
             description,
             data: {
                 itemId,
-                collectionName
+                collectionId: collectionName
             } as InvalidItemDetails
         } as ErrorMessage, HttpStatusCode.NOT_FOUND)
     }
@@ -134,7 +134,7 @@ export class ErrorMessage {
             code: ApiErrors.WDE0025,
             description,
             data: {
-                collectionName
+                collectionId: collectionName
             } as InvalidCollectionDetails
         } as ErrorMessage, HttpStatusCode.NOT_FOUND)
     }
@@ -144,7 +144,7 @@ export class ErrorMessage {
             code: ApiErrors.WDE0026,
             description,
             data: {
-                collectionName
+                collectionId: collectionName
             } as InvalidCollectionDetails
         } as ErrorMessage, HttpStatusCode.NOT_FOUND)
     }
@@ -154,7 +154,7 @@ export class ErrorMessage {
             code: ApiErrors.WDE0024,
             description,
             data: {
-                collectionName,
+                collectionId: collectionName,
                 propertyName
             } as InvalidPropertyDetails
         } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
@@ -183,7 +183,7 @@ export class ErrorMessage {
             code: ApiErrors.WDE0020,
             description,
             data: {
-                collectionName,
+                collectionId: collectionName,
                 propertyName
             } as InvalidPropertyDetails
         } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
@@ -271,7 +271,7 @@ export class ErrorMessage {
             code: ApiErrors.WDE0104,
             description,
             data: {
-                collectionName
+                collectionId: collectionName
             } as InvalidCollectionDetails
         } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
     }
@@ -281,7 +281,7 @@ export class ErrorMessage {
             code: ApiErrors.WDE0147,
             description,
             data: {
-                collectionName,
+                collectionId: collectionName,
                 propertyName
             } as InvalidPropertyDetails
         } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
@@ -430,13 +430,13 @@ interface UnsupportedByCollectionDetails {
 }
 interface InvalidItemDetails {
     itemId: string
-    collectionName: string
+    collectionId: string
 }
 interface InvalidCollectionDetails {
-    collectionName: string
+    collectionId: string
 }
 interface InvalidPropertyDetails {
-    collectionName: string
+    collectionId: string
     propertyName: string
 }
 interface PermissionDeniedDetails {
