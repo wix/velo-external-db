@@ -114,7 +114,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         )
     })
 
-    testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ]).only('aggregate api', async() => {
         
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
         await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authOwner) 

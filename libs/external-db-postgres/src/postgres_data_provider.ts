@@ -66,12 +66,14 @@ export default class DataProvider implements IDataProvider {
         await this.pool.query(`TRUNCATE ${escapeIdentifier(collectionName)}`).catch( translateErrorCodes )
     }
 
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<Item[]> {
-        const { filterExpr: whereFilterExpr, parameters: whereParameters, offset } = this.filterParser.transform(filter)
-        const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters } = this.filterParser.parseAggregation(aggregation, offset)
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number): Promise<Item[]> {
 
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr}`
-        const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters])
+        const { filterExpr: whereFilterExpr, parameters: whereParameters, offset } = this.filterParser.transform(filter)
+        const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters, offset: offset2 } = this.filterParser.parseAggregation(aggregation, offset)
+        const { sortExpr } = this.filterParser.orderBy(sort)
+
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr} ${sortExpr} OFFSET $${offset2} LIMIT $${offset2+1}`
+        const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters, skip, limit])
                                   .catch( translateErrorCodes )
         return rs.rows
     }

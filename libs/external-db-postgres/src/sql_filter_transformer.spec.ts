@@ -342,7 +342,8 @@ describe('Sql Parser', () => {
                         fieldsStatement: escapeIdentifier(ctx.fieldName),
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
-                        parameters: []
+                        parameters: [],
+                        offset: 1,
                     })
                 })
 
@@ -359,6 +360,7 @@ describe('Sql Parser', () => {
                         groupByColumns: [ctx.fieldName, ctx.anotherFieldName],
                         havingFilter: '',
                         parameters: [],
+                        offset: 1,
                     })
                 })
 
@@ -380,6 +382,7 @@ describe('Sql Parser', () => {
                         groupByColumns: [ctx.fieldName],
                         havingFilter: `HAVING AVG(${escapeIdentifier(ctx.anotherFieldName)}) > $${ctx.offset}`,
                         parameters: [ctx.fieldValue],
+                        offset: ctx.offset + 1,
                     })
                 })
 
@@ -401,6 +404,7 @@ describe('Sql Parser', () => {
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
                         parameters: [],
+                        offset: 1,
                     })
                 })
 
@@ -417,6 +421,7 @@ describe('Sql Parser', () => {
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
                         parameters: [],
+                        offset: 1,
                     })
                 })
             })
