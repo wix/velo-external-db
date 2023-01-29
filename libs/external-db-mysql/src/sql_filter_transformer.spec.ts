@@ -273,16 +273,16 @@ describe('Sql Parser', () => {
 
             describe('handle queries on nested fields', () => {
                 test('correctly transform nested field query', () => {
-                    const operator = ctx.filter.operator
+                    const operator = ctx.filterWithoutInclude.operator
                     const filter = {
                         operator,
                         fieldName: `${ctx.fieldName}.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}`,
-                        value: ctx.filter.value
+                        value: ctx.filterWithoutInclude.value
                     }
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
-                        filterExpr: `${escapeId(ctx.fieldName)} ->> '$.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}' ${env.filterParser.adapterOperatorToMySqlOperator(operator, ctx.filter.value)} ?`,
-                        parameters: [ctx.filter.value].flat()
+                        filterExpr: `${escapeId(ctx.fieldName)} ->> '$.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}' ${env.filterParser.adapterOperatorToMySqlOperator(operator, ctx.filterWithoutInclude.value)} ?`,
+                        parameters: [ctx.filterWithoutInclude.value].flat()
                     }])
                 })
             })
@@ -438,6 +438,7 @@ describe('Sql Parser', () => {
         moreValue: Uninitialized,
         nestedFieldName: Uninitialized,
         anotherNestedFieldName: Uninitialized,
+        filterWithoutInclude: Uninitialized,
     }
     
     const env = {
@@ -458,6 +459,7 @@ describe('Sql Parser', () => {
 
         ctx.filter = gen.randomWrappedFilter()
         ctx.anotherFilter = gen.randomWrappedFilter()
+        ctx.filterWithoutInclude = gen.randomDomainFilterWithoutInclude()
     })
 
     beforeAll(function() {
