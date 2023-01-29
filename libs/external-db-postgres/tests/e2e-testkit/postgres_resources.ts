@@ -1,6 +1,7 @@
 import init from '../../src/connection_provider'
 export { supportedOperations } from '../../src/supported_operations'
 import * as compose from 'docker-compose'
+export * as capabilities from '../../src/postgres_capabilities'
 
 export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { max: 1 })
