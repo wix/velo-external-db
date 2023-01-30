@@ -3,8 +3,10 @@ import { CollectionOperation, DataOperation, FieldType } from '@wix-velo/velo-ex
 
 const { query, count, queryReferenced, aggregate, } = DataOperation
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
+const UnsupportedCapabilities = [DataOperation.insertReferences, DataOperation.removeReferences, DataOperation.queryReferenced]
 
-export const ReadWriteOperations = Object.values(DataOperation)
+
+export const ReadWriteOperations = Object.values(DataOperation).filter(op => !UnsupportedCapabilities.includes(op))
 export const ReadOnlyOperations = [query, count, queryReferenced, aggregate]
 export const FieldTypes = Object.values(FieldType)
 export const CollectionOperations = Object.values(CollectionOperation)
