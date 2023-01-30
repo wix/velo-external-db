@@ -36,8 +36,10 @@ export enum Encryption {
 export type CollectionCapabilities = {
     dataOperations: DataOperation[],
     fieldTypes: FieldType[],
+    referenceCapabilities: ReferenceCapabilities,
     collectionOperations: CollectionOperation[],
-    encryption?: Encryption,
+    indexing: IndexingCapabilityEnum[],
+    encryption: Encryption,
 }
 
 export type ColumnCapabilities = {
@@ -50,6 +52,13 @@ export type FieldAttributes = {
     subtype?: string,
     precision?: number | string,
     isPrimary?: boolean,
+}
+
+export interface ReferenceCapabilities {
+    supportedNamespaces: string[],
+}
+
+export interface IndexingCapabilityEnum {
 }
 
 export enum SchemaOperations {

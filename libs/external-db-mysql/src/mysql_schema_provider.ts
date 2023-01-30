@@ -1,7 +1,7 @@
 import { Pool as MySqlPool } from 'mysql'
 import { promisify } from 'util'
 import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, CollectionCapabilities } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, CollectionCapabilities, Encryption } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator, { IMySqlSchemaColumnTranslator } from './sql_schema_translator'
 import { escapeId, escapeTable } from './mysql_utils'
@@ -106,6 +106,9 @@ export default class SchemaProvider implements ISchemaProvider {
             dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
             fieldTypes: FieldTypes,
             collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported
         }
     }
 }

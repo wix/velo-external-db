@@ -126,6 +126,10 @@ export default class SchemaService {
             dataOperations: capabilities.dataOperations.map(dataOperationsToWixDataQueryOperators),
             fieldTypes: capabilities.fieldTypes.map(fieldTypeToWixDataEnum),
             collectionOperations: capabilities.collectionOperations.map(collectionOperationsToWixDataCollectionOperations),
+            // TODO: create functions that translate between the domains.
+            referenceCapabilities: { supportedNamespaces: capabilities.referenceCapabilities.supportedNamespaces },
+            indexing: [],
+            encryption: collectionSpi.Encryption.notSupported
         }
     }
 
