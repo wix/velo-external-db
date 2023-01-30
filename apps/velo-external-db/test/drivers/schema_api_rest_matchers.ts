@@ -47,6 +47,9 @@ const collectionCapabilities = (collectionOperations: CollectionOperation[], dat
     collectionOperations: expect.arrayContaining(collectionOperations.map(schemaUtils.collectionOperationsToWixDataCollectionOperations)),
     dataOperations: expect.arrayContaining(dataOperations.map(schemaUtils.dataOperationsToWixDataQueryOperators)),
     fieldTypes: expect.arrayContaining(fieldTypes.map(schemaUtils.fieldTypeToWixDataEnum)),
+    referenceCapabilities: expect.objectContaining({ supportedNamespaces: [] }),
+    indexing: [],
+    encryption: 0
 })
 
 const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilities) => ({

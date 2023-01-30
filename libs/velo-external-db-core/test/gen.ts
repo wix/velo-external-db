@@ -9,6 +9,7 @@ import {
     ResponseField,
     DataOperation,
     Table,
+    Encryption,
  } from '@wix-velo/velo-external-db-types'
 
  const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
@@ -59,12 +60,15 @@ export const randomColumnCapabilities = () => ({
     columnQueryOperators: [ randomAdapterOperators() ] 
 })
 
-
-
 export const randomCollectionCapabilities = (): CollectionCapabilities => ({
     dataOperations: [ randomDataOperations() ],
     fieldTypes: [ randomFieldType() ],
     collectionOperations: [ randomCollectionOperation() ],
+    indexing: [],
+    encryption: Encryption.notSupported,
+    referenceCapabilities: {
+        supportedNamespaces: []
+    }
 })
 
 export const randomCollectionName = ():string => chance.word({ length: 5 })
