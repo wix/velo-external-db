@@ -1,11 +1,11 @@
+import { ConnectionPool as MSSQLPool } from 'mssql'
+import { CollectionCapabilities, FieldAttributes, InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, Encryption } from '@wix-velo/velo-external-db-types'
+import { SystemFields, validateSystemFields, parseTableData, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
+import { errors } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes, notThrowingTranslateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator from './sql_schema_translator'
 import { escapeId, escapeTable } from './mssql_utils'
-import { SystemFields, validateSystemFields, parseTableData, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { supportedOperations } from './supported_operations'
-import { ConnectionPool as MSSQLPool } from 'mssql'
-import { CollectionCapabilities, FieldAttributes, InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
-import { errors } from '@wix-velo/velo-external-db-commons'
 import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './mssql_capabilities'
 const { CollectionDoesNotExists, CollectionAlreadyExists } = errors
 
@@ -114,6 +114,9 @@ export default class SchemaProvider implements ISchemaProvider {
             dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
             fieldTypes: FieldTypes,
             collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported,
         }
     }
 }
