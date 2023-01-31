@@ -2,6 +2,8 @@ import * as compose from 'docker-compose'
 import init from '../../src/connection_provider'
 export { supportedOperations } from '../../src/supported_operations'
 
+export * as capabilities from '../../src/spanner_capabilities' 
+
 const setEmulatorOn = () => process.env['SPANNER_EMULATOR_HOST'] = 'localhost:9010'
 
 export const connection = () => {

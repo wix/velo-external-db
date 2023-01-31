@@ -1,10 +1,11 @@
-import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
+import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import SchemaColumnTranslator from './sql_schema_translator'
 import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
 import { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, escapeFieldId } from './spanner_utils'
 import { Database as SpannerDb } from '@google-cloud/spanner'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { CollectionCapabilities, Encryption, InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './spanner_capabilities'
 const { CollectionDoesNotExists, CollectionAlreadyExists } = errors
 
 export default class SchemaProvider implements ISchemaProvider {
@@ -18,7 +19,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
     async list(): Promise<Table[]> {
         const query = {
-            sql: 'SELECT table_name, COLUMN_NAME, SPANNER_TYPE FROM information_schema.columns WHERE table_catalog = @tableCatalog and table_schema = @tableSchema',
+            sql: 'SELECT table_name, COLUMN_NAME as field, SPANNER_TYPE as type FROM information_schema.columns WHERE table_catalog = @tableCatalog and table_schema = @tableSchema',
             params: {
                 tableSchema: '',
                 tableCatalog: '',
@@ -26,14 +27,15 @@ export default class SchemaProvider implements ISchemaProvider {
         }
 
         const [rows] = await this.database.run(query)
-        const res = recordSetToObj(rows)
+        const res = recordSetToObj(rows) as { table_name: string, field: string, type: string }[]
 
-        const tables: {[x:string]: {table_name: string, field: string, type: string}[]} = parseTableData(res)
+        const tables = parseTableData(res)
 
         return Object.entries(tables)
                      .map(([collectionName, rs]) => ({
                          id: collectionName,
-                         fields: rs.map( this.reformatFields.bind(this) )
+                         fields: rs.map( this.appendAdditionalFieldDetails.bind(this) ),
+                         capabilities: this.collectionCapabilities(rs.map(r => r.field))
                      }))
     }
 
@@ -75,9 +77,9 @@ export default class SchemaProvider implements ISchemaProvider {
         await this.updateSchema(`ALTER TABLE ${escapeId(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]> {
+    async describeCollection(collectionName: string): Promise<Table> {
         const query = {
-            sql: 'SELECT table_name, COLUMN_NAME, SPANNER_TYPE FROM information_schema.columns WHERE table_catalog = @tableCatalog and table_schema = @tableSchema and table_name = @tableName',
+            sql: 'SELECT table_name, COLUMN_NAME as field, SPANNER_TYPE as type FROM information_schema.columns WHERE table_catalog = @tableCatalog and table_schema = @tableSchema and table_name = @tableName',
             params: {
                 tableSchema: '',
                 tableCatalog: '',
@@ -92,13 +94,20 @@ export default class SchemaProvider implements ISchemaProvider {
             throw new CollectionDoesNotExists('Collection does not exists')
         }
 
-        return res.map( this.reformatFields.bind(this) )
+        return {
+            id: collectionName,
+            fields: res.map( this.appendAdditionalFieldDetails.bind(this) ),
+            capabilities: this.collectionCapabilities(res.map(f => f.field))
+        }
     }
 
     async drop(collectionName: string): Promise<void> {
         await this.updateSchema(`DROP TABLE ${escapeId(collectionName)}`)
     }
 
+    async changeColumnType(collectionName: string, _column: InputField): Promise<void> {
+        throw new errors.UnsupportedSchemaOperation('changeColumnType is not supported', collectionName, 'changeColumnType')
+    }
 
     async updateSchema(sql: string, catching: any = undefined) {
         try {
@@ -113,16 +122,27 @@ export default class SchemaProvider implements ISchemaProvider {
         }
     }
 
-    fixColumn(c: InputField) {
+    private fixColumn(c: InputField) {
         return { ...c, name: patchFieldName(c.name) }
     }
 
-    reformatFields(r: { [x: string]: string }) {
-        const { type, subtype } = this.sqlSchemaTranslator.translateType(r['SPANNER_TYPE'])
+    private appendAdditionalFieldDetails(row: { field: string, type: string }) {
+        const type = this.sqlSchemaTranslator.translateType(row.type).type as keyof typeof ColumnsCapabilities
         return {
-            field: unpatchFieldName(r['COLUMN_NAME']),
+            field: unpatchFieldName(row.field),
             type,
-            subtype
+            capabilities: ColumnsCapabilities[type] ?? EmptyCapabilities
+        }
+    }
+
+    private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
+        return {
+            dataOperations: fieldNames.map(unpatchFieldName).includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported
         }
     }
 
