@@ -96,8 +96,12 @@ const img =  dbConnectionStatus === 'Connected to database successfully' ? '/ass
 				</div>
 			</button>
 		
+
+			<%
+			const authorizationToggleText = Number.isInteger(config.authorization) ? 'The number of permissions rules that were set successfully' : 'Config part that read successfully'
+			%>
 			<div id="roleConfig" style="display: none;" >
-				Config part that read successfully:
+				<%= authorizationToggleText %>
 				<pre style = "background-color:#d9cdcd1f;" aria-current="true" style="display:none; border:0; padding: 0;"><%= JSON.stringify(config.authorization, null, 2) %></pre>
 			</div>
 			<div class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=connectionColor%> py-3" aria-current="true"> 

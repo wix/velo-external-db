@@ -12,11 +12,26 @@ export const maskSensitiveData = (cfg: {[key: string]: any}) => {
 export const appInfoFor = async(operationService: AnyFixMe, configReaderClient: AnyFixMe) => {
     const connectionStatus = await operationService.connectionStatus()
     const { message: configReaderStatus, authorizationMessage: authorizationConfigStatus } = await configReaderClient.configStatus()
+    const config = maskSensitiveData(await configReaderClient.readConfig())
+    const debug = process.env['DEBUG'] === 'true'
+    
+    if (!debug) {
+        if (config['authorization'] ) {
+            config['authorization'] = Object.keys(config['authorization']).length
+        }
+        
+        Object.keys(config).forEach(key => {
+            if (key !== 'authorization') {
+                delete config[key]
+            }
+        })
+    }
     
     return {
         configReaderStatus: configReaderStatus,
         authorizationConfigStatus, 
-        config: maskSensitiveData(configReaderClient.readConfig()),
-        dbConnectionStatus: connectionStatus.error || connectionStatus.status 
+        config,
+        dbConnectionStatus: connectionStatus.error || connectionStatus.status,
+        debug
     }
 }
