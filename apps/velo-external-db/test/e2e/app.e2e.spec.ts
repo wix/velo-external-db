@@ -23,16 +23,14 @@ describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
         expect((await axios.post('/provision', { }, authOwner)).data).toEqual(expect.objectContaining({ protocolVersion: 2, vendor: 'azure' }))
     })
 
-    if (currentDbImplementationName() !== 'google-sheet') {
-        test('answer app info with stub response', async() => {
-            givenHideAppInfoEnvIsTrue()
-            const { data: appInfo } = await axios.get('/')
+    test('answer app info with stub response', async() => {
+        await givenHideAppInfoEnvIsTrue()
+        const { data: appInfo } = await axios.get('/')
 
-            Object.values(env.enviormentVariables).forEach(value => {
-                expect(appInfo).not.toContain(value)
-            })
+        Object.values(env.enviormentVariables).forEach(value => {
+            expect(appInfo).not.toContain(value)
         })
-    }
+    })
 
     afterAll(async() => await teardownApp())
 
