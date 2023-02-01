@@ -1,5 +1,5 @@
 import { translateErrorCodes } from './exception_translator'
-import { unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
+import { insertExpressionFor, unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
 import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item } from '@wix-velo/velo-external-db-types'
 import FilterParser from './sql_filter_transformer'
 import { MongoClient } from 'mongodb'
@@ -34,14 +34,14 @@ export default class DataProvider implements IDataProvider {
                                 .count(filterExpr)
     }
 
-    async insert(collectionName: string, items: Item[], _fields: any[], _upsert?: boolean): Promise<number> {
+    async insert(collectionName: string, items: Item[], _fields: any[], upsert = false): Promise<number> {
         validateTable(collectionName)
-        const result = await this.client.db()
-                                        .collection(collectionName)
-                                        //@ts-ignore - Type 'string' is not assignable to type 'ObjectId', objectId Can be a 24 character hex string, 12 byte binary Buffer, or a number. and we cant assume that on the _id input
-                                        .insertMany(items)
-                                        .catch(translateErrorCodes)
-        return result.insertedCount
+        const { insertedCount, upsertedCount } = await this.client.db()
+                                                                  .collection(collectionName) 
+                                                                  .bulkWrite(insertExpressionFor(items, upsert), { ordered: false })
+                                                                  .catch(e => translateErrorCodes(e, collectionName))
+        
+        return insertedCount + upsertedCount
     }
 
     async update(collectionName: string, items: Item[]): Promise<number> {
@@ -49,7 +49,7 @@ export default class DataProvider implements IDataProvider {
         const result = await this.client.db()
                                         .collection(collectionName)
                                         .bulkWrite( updateExpressionFor(items) )
-        return result.nModified
+                                        return result.nModified
     }
 
     async delete(collectionName: string, itemIds: string[]): Promise<number> {

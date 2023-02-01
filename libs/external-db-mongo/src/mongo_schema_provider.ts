@@ -134,7 +134,7 @@ export default class SchemaProvider implements ISchemaProvider {
         validateTable(collectionName)
         const collection = await this.collectionDataFor(collectionName)
         if (!collection) {
-            throw new CollectionDoesNotExists('Collection does not exists')
+            throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }
         return {
             id: collectionName,
