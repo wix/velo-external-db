@@ -32,8 +32,12 @@ export const shutdownEnv = async() => {
 }
 
 export const setActive = () => {
-    process.env['TYPE'] = 'google-sheet'
-    process.env['SHEET_ID'] = SHEET_ID
+    process.env = { ...process.env, ...enviormentVariables }
+}
+
+export const enviormentVariables = {
+    TYPE: 'google-sheet',
+    SHEET_ID: SHEET_ID
 }
 
 export const name = 'google-sheets'

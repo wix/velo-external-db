@@ -24,11 +24,15 @@ export const shutdownEnv = async() => {
 }
 
 export const setActive = () => {
-    process.env['TYPE'] = 'dynamodb'
-    process.env['REGION'] = 'us-west-2'
-    process.env['AWS_SECRET_ACCESS_KEY'] = 'TEST_SECRET_ACCESS_KEY'
-    process.env['AWS_ACCESS_KEY_ID'] = 'TEST_ACCESS_KEY_ID'
-    process.env['ENDPOINT_URL'] = 'http://localhost:8000'
+    process.env = { ...process.env, ...enviormentVariables }
+}
+
+export const enviormentVariables = {
+    TYPE: 'dynamodb',
+    REGION: 'us-west-2',
+    AWS_SECRET_ACCESS_KEY: 'TEST_SECRET_ACCESS_KEY',
+    AWS_ACCESS_KEY_ID: 'TEST_ACCESS_KEY_ID',
+    ENDPOINT_URL: 'http://localhost:8000'
 }
 
 const connectionConfig = () => ({ endpoint: 'http://localhost:8000',

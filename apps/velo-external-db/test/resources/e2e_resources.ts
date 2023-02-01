@@ -33,11 +33,13 @@ type Internals = () => App
 export let env:{
     app: App,
     externalDbRouter: ExternalDbRouter,
-    internals: Internals
+    internals: Internals,
+    enviormentVariables: Record<string, string>
 } = {
     app: Uninitialized,
     internals: Uninitialized,
-    externalDbRouter: Uninitialized
+    externalDbRouter: Uninitialized,
+    enviormentVariables: Uninitialized
 }
 
 const testSuits = {
@@ -54,12 +56,13 @@ const testSuits = {
 }
 
 export const testedSuit = () => testSuits[process.env.TEST_ENGINE]
-export const supportedOperations = testedSuit().supportedOperations
+export const supportedOperations = testedSuit().implementation.capabilities
 
 export const setupDb = () => testedSuit().setUpDb()
-export const currentDbImplementationName = () => testedSuit().name
+export const currentDbImplementationName = () => testedSuit().currentDbImplementationName
 export const initApp = async() => {
     env = await testedSuit().initApp()
+    env.enviormentVariables = testedSuit().implementation.enviormentVariables
 }
 export const teardownApp = async() => testedSuit().teardownApp()
 export const dbTeardown = async() => testedSuit().dbTeardown()

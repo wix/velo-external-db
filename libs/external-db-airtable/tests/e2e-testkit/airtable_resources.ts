@@ -30,11 +30,15 @@ export const shutdownEnv = async() => {
 }
 
 export const setActive = () => {
-    process.env['AIRTABLE_API_KEY'] = 'key123'
-    process.env['META_API_KEY'] = 'meta123'
-    process.env['TYPE'] = 'airtable'
-    process.env['BASE_ID'] = 'app123'
-    process.env['BASE_URL'] = 'http://localhost:9000'
+    process.env = { ...process.env, ...enviormentVariables }
+}
+
+export const enviormentVariables = {
+    TYPE: 'airtable',
+    AIRTABLE_API_KEY: 'key123',
+    META_API_KEY: 'meta123',
+    BASE_ID: 'app123',
+    BASE_URL: `http://localhost:${PORT}`
 }
 
 export const schemaProviderTestVariables = () => (

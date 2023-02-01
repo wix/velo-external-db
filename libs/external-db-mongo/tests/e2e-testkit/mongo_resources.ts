@@ -26,8 +26,12 @@ export const shutdownEnv = async() => {
 }
 
 export const setActive = () => {
-    process.env['TYPE'] = 'mongo'
-    process.env['URI'] = 'mongodb://root:pass@localhost/testdb'
+    process.env = { ...process.env, ...enviormentVariables }
+}
+
+export const enviormentVariables = {
+    TYPE: 'mongo',
+    URI: 'mongodb://root:pass@localhost/testdb'
 }
 
 export const name = 'mongo'

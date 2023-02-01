@@ -42,12 +42,16 @@ export const shutdownEnv = async() => {
 }
 
 export const setActive = () => {
-    process.env['TYPE'] = 'mssql'
-    process.env['HOST'] = 'localhost'
-    process.env['USER'] = 'sa'
-    process.env['PASSWORD'] = 't9D4:EHfU6Xgccs-'
-    process.env['DB'] = 'tempdb'
-    process.env['UNSECURED_ENV'] = 'true'
+    process.env = { ...process.env, ...enviormentVariables }
+}
+
+export const enviormentVariables = {
+    TYPE: 'mssql',
+    HOST: 'localhost',
+    USER: 'sa',
+    PASSWORD: 't9D4:EHfU6Xgccs-',
+    DB: 'tempdb',
+    UNSECURED_ENV: 'true'
 }
 
 export const name = 'mssql'

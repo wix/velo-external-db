@@ -19,9 +19,13 @@ export const cleanup = async() => {
 export const initEnv = async() => {}
 
 export const setActive = () => {
-    process.env['TYPE'] = 'bigquery'
-    process.env['PROJECT_ID'] = projectId
-    process.env['DATABASE_ID'] = databaseId
+    process.env = { ...process.env, ...enviormentVariables }
+}
+
+export const enviormentVariables = {
+    TYPE: 'bigquery',
+    PROJECT_ID: projectId,
+    DATABASE_ID: databaseId
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function

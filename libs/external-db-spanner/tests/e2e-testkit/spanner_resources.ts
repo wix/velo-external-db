@@ -28,10 +28,14 @@ export const initEnv = async() => {
 
 export const setActive = () => {
     setEmulatorOn()
-    process.env['TYPE'] = 'spanner'
-    process.env['PROJECT_ID'] = 'test-project'
-    process.env['INSTANCE_ID'] = 'test-instance'
-    process.env['DATABASE_ID'] = 'test-database'
+    process.env = { ...process.env, ...enviormentVariables }
+}
+
+export const enviormentVariables = {
+    TYPE: 'spanner',
+    PROJECT_ID: 'test-project',
+    INSTANCE_ID: 'test-instance',
+    DATABASE_ID: 'test-database'
 }
 
 export const shutdownEnv = async() => {
