@@ -1,12 +1,13 @@
-import { SystemFields, validateSystemFields, AllSchemaOperations, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table, CollectionCapabilities } from '@wix-velo/velo-external-db-types'
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = require('@wix-velo/velo-external-db-commons').errors
-import { validateTable, SystemTable } from './mongo_utils'
+import { MongoClient } from 'mongodb'
+import { SystemFields, validateSystemFields, AllSchemaOperations, EmptyCapabilities, errors } from '@wix-velo/velo-external-db-commons'
+import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table, CollectionCapabilities, Encryption } from '@wix-velo/velo-external-db-types'
+import { validateTable, SystemTable, updateExpressionFor, CollectionObject } from './mongo_utils'
 import { CollectionOperations, FieldTypes, ReadWriteOperations, ColumnsCapabilities } from './mongo_capabilities'
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
 
 
 export default class SchemaProvider implements ISchemaProvider {
-    client: any
+    client: MongoClient
     constructor(client: any) {
         this.client = client
     }
@@ -24,7 +25,10 @@ export default class SchemaProvider implements ISchemaProvider {
             dataOperations: ReadWriteOperations,
             fieldTypes: FieldTypes,
             collectionOperations: CollectionOperations,
-        }
+            encryption: Encryption.notSupported,
+            indexing: [],
+            referenceCapabilities: { supportedNamespaces: [] } 
+        } 
     }
 
     async list(): Promise<Table[]> {
@@ -32,7 +36,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
         const resp = await this.client.db()
                                       .collection(SystemTable)
-                                      .find({})
+                                      .find<CollectionObject>({})
         const l = await resp.toArray()
         const tables = l.reduce((o: any, d: { _id: string; fields: any }) => ({ ...o, [d._id]: { fields: d.fields } }), {})
         return Object.entries(tables)
@@ -49,7 +53,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
         const resp = await this.client.db()
                                       .collection(SystemTable)
-                                      .find({})
+                                      .find<CollectionObject>({})
         const data = await resp.toArray()
         return data.map((rs: { _id: string }) => rs._id)
     }
@@ -64,7 +68,7 @@ export default class SchemaProvider implements ISchemaProvider {
         if (!collection) {
             await this.client.db()
                              .collection(SystemTable)
-                             .insertOne( { _id: collectionName, fields: columns || [] })
+                             .insertOne({ _id: collectionName as any, fields: columns || [] })
             await this.client.db()
                              .createCollection(collectionName)
         }
@@ -110,6 +114,22 @@ export default class SchemaProvider implements ISchemaProvider {
                                     { $pull: { fields: { name: { $eq: columnName } } } } )
     }
 
+    async changeColumnType(collectionName: string, column: InputField): Promise<void> {
+        const collection = await this.collectionDataFor(collectionName)
+
+        if (!collection) {
+            throw new CollectionDoesNotExists('Collection does not exists')
+        }
+        
+        await this.client.db()
+                         .collection(SystemTable)
+                         .bulkWrite(updateExpressionFor([{ 
+                            _id: collection._id,
+                            fields: [...collection.fields.filter((f: InputField) => f.name !== column.name), column] 
+                        }]))
+
+    }
+
     async describeCollection(collectionName: string): Promise<Table> {
         validateTable(collectionName)
         const collection = await this.collectionDataFor(collectionName)
@@ -135,11 +155,11 @@ export default class SchemaProvider implements ISchemaProvider {
         }
     }
 
-    async collectionDataFor(collectionName: string): Promise<any> { //fixme: any
+    async collectionDataFor(collectionName: string) { //fixme: any
         validateTable(collectionName)
         return await this.client.db()
                                 .collection(SystemTable)
-                                .findOne({ _id: collectionName })
+                                .findOne<CollectionObject>({ _id: collectionName })
     }
 
     async ensureSystemTableExists(): Promise<void> {

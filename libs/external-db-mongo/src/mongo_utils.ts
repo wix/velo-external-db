@@ -42,6 +42,7 @@ const updateExpressionForItem = (item: { _id: any }) => ({
     }
 })
 
+
 export const updateExpressionFor = (items: any[]) => items.map(updateExpressionForItem)
 
 export const unpackIdFieldForItem = (item: { [x: string]: any, _id?: any }) => {
@@ -55,4 +56,9 @@ export const unpackIdFieldForItem = (item: { [x: string]: any, _id?: any }) => {
 
 export const EmptySort = {
     sortExpr: { sort: [] },
+}
+
+export interface CollectionObject {
+    _id: string,
+    fields: { name: string, type: string, subtype?: string }[]
 }
