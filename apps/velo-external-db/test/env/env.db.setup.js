@@ -78,9 +78,9 @@ const cleanup = async(testEngine) => {
         //     await firestore.cleanup()
         //     break
 
-        // case 'mssql':
-        //     await mssql.cleanup()
-        //     break
+        case 'mssql':
+            await mssql.cleanup()
+            break
 
         // case 'google-sheet':
         //     await googleSheet.cleanup()
