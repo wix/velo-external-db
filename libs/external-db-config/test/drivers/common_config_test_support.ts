@@ -10,14 +10,18 @@ export const defineValidConfig = (config: CommonConfig) => {
     if (config.type) {
         process.env['TYPE'] = config.type
     }
+    if (config.hideAppInfo !== undefined) {
+        process.env['HIDE_APP_INFO'] = config.hideAppInfo.toString()
+    }    
 }
 
 export const validConfig = (): CommonConfig => ({
     vendor: chance.word(),
-    type: chance.word()
+    type: chance.word(),
+    hideAppInfo: chance.bool(),
 })
 
-export const ExpectedProperties = ['CLOUD_VENDOR', 'TYPE']
+export const ExpectedProperties = ['CLOUD_VENDOR', 'TYPE', 'HIDE_APP_INFO']
 
 export const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 export const hasReadErrors = false

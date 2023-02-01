@@ -4,7 +4,6 @@ import * as driver from '../../test/drivers/app_info_test_support' //TODO: chang
 
 describe('App info Function', () => {
     test('get app info will retrieve valid config and will create app info object', async() => {
-        process.env['DEBUG'] = 'true'
         driver.defineValidConfigReaderClient(ctx.config)
         driver.defineValidOperationService()
         const appInfo = await appInfoFor(driver.operationService, driver.configReaderClient)
@@ -13,7 +12,18 @@ describe('App info Function', () => {
             configReaderStatus: driver.validConfigReaderStatus,
             config: maskSensitiveData(ctx.config),
             dbConnectionStatus: driver.validDBConnectionStatus,
-            debug: true
+        })
+    })
+
+    test('get app info will retrieve empty config when hideAppInfo is true', async() => {
+        driver.defineValidConfigReaderClient(ctx.config)
+        driver.defineValidOperationService()
+        const appInfo = await appInfoFor(driver.operationService, driver.configReaderClient, true)
+        
+        expect(appInfo).toEqual({
+            configReaderStatus: driver.validConfigReaderStatus,
+            config: {},
+            dbConnectionStatus: driver.validDBConnectionStatus,
         })
     })
 
@@ -42,7 +52,6 @@ describe('App info Function', () => {
     beforeEach(() => {
         driver.reset()
         ctx.config = genCommon.randomObject()
-        delete process.env['DEBUG']
     })
 
 

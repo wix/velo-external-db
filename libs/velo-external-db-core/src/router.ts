@@ -26,12 +26,12 @@ import { ConfigValidator } from '@wix-velo/external-db-config'
 const { InvalidRequest, ItemNotFound } = errors
 const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks, hideAppInfo: boolean
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
                              _externalDbConfigClient: ConfigValidator, _cfg: { secretKey?: string, type?: string, vendor?: string },
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
-                             _roleAuthorizationService: RoleAuthorizationService, _hooks?: Hooks) => {
+                             _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks, _hideAppInfo: boolean) => {
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient
@@ -42,6 +42,7 @@ export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _s
     roleAuthorizationService = _roleAuthorizationService
     dataHooks = _hooks?.dataHooks || {}
     schemaHooks = _hooks?.schemaHooks || {}
+    hideAppInfo = _hideAppInfo
 }
 
 const serviceContext = (): ServiceContext => ({
@@ -88,8 +89,8 @@ export const createRouter = () => {
 
     // *************** INFO **********************
     router.get('/', async(req, res) => {
-        const appInfo = await appInfoFor(operationService, externalDbConfigClient)
-        const appInfoPage = await getAppInfoPage(appInfo)
+        const appInfo = await appInfoFor(operationService, externalDbConfigClient, hideAppInfo)
+        const appInfoPage = await getAppInfoPage(appInfo, hideAppInfo) 
 
         res.send(appInfoPage)
     })

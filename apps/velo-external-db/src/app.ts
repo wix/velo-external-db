@@ -5,7 +5,8 @@ import { engineConnectorFor } from './storage/factory'
 
 
 const initConnector = async(hooks?: Hooks) => {
-    const { vendor, type: adapterType } = readCommonConfig()
+    const { vendor, type: adapterType, hideAppInfo } = readCommonConfig()
+
     const configReader = create()
     const { authorization, secretKey, ...dbConfig } = await configReader.readConfig()
 
@@ -22,7 +23,8 @@ const initConnector = async(hooks?: Hooks) => {
             adapterType,
             commonExtended: true
         },
-        hooks
+        hooks,
+        hideAppInfo
     })
 
     return { externalDbRouter, cleanup: async() => await cleanup(), schemaProvider: providers.schemaProvider }

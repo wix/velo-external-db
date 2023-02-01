@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang=en>
+<head>
+	<meta charset=utf-8>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Velo External DB</title>
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="preload" as="font">
+	<link type="image/png" href="https://www.wix.com/favicon.ico" rel="shortcut icon">
+    <link rel='stylesheet' href='/assets/stylesheets/style.css' />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+</head>
+
+
+<%
+const img =  dbConnectionStatus === 'Connected to database successfully' ? '/assets/wix-logo.svg': '/assets/sad-wix.svg' 
+%>
+
+<body>
+
+	<div class="container">
+		<div class="hero">
+			<div style="text-align:center;">
+				<picture>
+					<img src=<%=img%> width="427" height="231">
+				</picture>
+			</div>
+		</div>
+		<style>
+			.list-group {
+				width: auto;
+				max-width: 650px;
+				margin: 3rem auto;
+			}
+		</style>
+		
+		
+		<%
+		const connectionColor =  dbConnectionStatus === 'Connected to database successfully' ? 'success': 'danger' 
+		const configStatusColor = configReaderStatus === 'External DB Config read successfully' ? 'success' : 'danger'
+		let authorizationStatusColor
+		if (authorizationConfigStatus === 'Permissions config read successfully') {
+			authorizationStatusColor = 'success'
+		} else if (authorizationConfigStatus === 'Permissions config not defined, using default') {
+			authorizationStatusColor = 'warning'
+		} else {
+			authorizationStatusColor = 'danger'
+		}
+		%>
+
+		<div class="list-group">
+			<div class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=configStatusColor%> py-3" aria-current="true">
+				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+					<path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+				  </svg>
+				<div class="d-flex gap-2 w-100 justify-content-between">
+					<div>
+						<h6 class="mb-0">DB Config Status</h6>
+						<p class="mb-0 opacity-75">
+							<%= configReaderStatus %>
+						</p>
+					</div>
+				</div>
+			</div>
+		
+			<div class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=authorizationStatusColor%> py-3" aria-current="true">
+				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+					<path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+				  </svg>
+				<div class="d-flex gap-2 w-100 justify-content-between">
+					<div>
+						<h6 class="mb-0">Permissions Config Status</h6>
+						<p class="mb-0 opacity-75">
+							<%= authorizationConfigStatus %>
+						</p>
+					</div>
+				</div>
+			</div>
+		
+
+			<div id="roleConfig" style="display: none;" >
+				<pre style = "background-color:#d9cdcd1f;" aria-current="true" style="display:none; border:0; padding: 0;"><%= JSON.stringify(config.authorization, null, 2) %></pre>
+			</div>
+			<div class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=connectionColor%> py-3" aria-current="true"> 
+				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-hdd-stack"
+					viewBox="0 0 16 16">
+					<path
+						d="M14 10a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1h12zM2 9a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2H2z" />
+					<path
+						d="M5 11.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-2 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zM14 3a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2 2a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2z" />
+					<path d="M5 4.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-2 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" />
+				</svg>
+				<div class="d-flex gap-2 w-100 justify-content-between">
+					<div>
+						<h6 class="mb-0">Connection Status</h6>
+						<p class="mb-0 opacity-75">
+							<%= dbConnectionStatus %>
+						</p>
+					</div>
+				</div>
+			</div>
+		
+		
+		
+			<div class="clipboard-example align-items-center w-100 py-2">
+				<div class="input-group mb-3">
+					<span class="input-group-text">Configuration</span>
+					<input id="in01"
+						   type="text"
+						   class="form-control"
+						   aria-describedby="btn01"
+						   value='{"secretKey": "<your-secret-key>"}'
+		
+					>
+					<button id="btn01"
+							data-clipboard-target="#in01"
+							class="btn btn-secondary"
+							type="button"
+							data-clipboard-demo=""
+							data-clipboard-target="#in01"
+							data-bs-toggle="tooltip"
+							data-bs-placement="bottom"
+							title="Copy to Clipboard"
+					>Copy</button>
+					
+				</div>
+			</div>
+			<script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js"></script>
+			<script>
+				let btn = document.getElementById('btn01');
+				let clipboard = new ClipboardJS(btn);
+			</script>
+		</div>		
+	</div>
+</body>
+
+</html>
