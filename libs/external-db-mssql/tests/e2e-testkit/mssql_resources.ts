@@ -42,7 +42,7 @@ export const shutdownEnv = async() => {
 }
 
 export const setActive = () => {
-    process.env = { ...process.env, ...enviormentVariables }
+    process.env = { ...process.env, ...enviormentVariables, UNSECURED_ENV: 'true' }
 }
 
 export const enviormentVariables = {
@@ -51,7 +51,6 @@ export const enviormentVariables = {
     USER: 'sa',
     PASSWORD: 't9D4:EHfU6Xgccs-',
     DB: 'tempdb',
-    UNSECURED_ENV: 'true'
 }
 
 export const name = 'mssql'
