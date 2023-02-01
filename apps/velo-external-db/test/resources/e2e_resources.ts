@@ -56,7 +56,7 @@ const testSuits = {
 }
 
 export const testedSuit = () => testSuits[process.env.TEST_ENGINE]
-export const supportedOperations = testedSuit().implementation.capabilities
+export const supportedOperations = testedSuit().supportedOperations
 
 export const setupDb = () => testedSuit().setUpDb()
 export const currentDbImplementationName = () => testedSuit().currentDbImplementationName
