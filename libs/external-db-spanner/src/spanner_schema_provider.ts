@@ -130,7 +130,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const type = this.sqlSchemaTranslator.translateType(row.type).type as keyof typeof ColumnsCapabilities
         return {
             field: unpatchFieldName(row.field),
-            type,
+            ...this.sqlSchemaTranslator.translateType(row.type),
             capabilities: ColumnsCapabilities[type] ?? EmptyCapabilities
         }
     }
