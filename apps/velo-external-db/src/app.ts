@@ -21,10 +21,10 @@ const initConnector = async(hooks?: Hooks) => {
             secretKey,
             vendor,
             adapterType,
-            commonExtended: true
+            commonExtended: true,
+            hideAppInfo
         },
         hooks,
-        hideAppInfo
     })
 
     return { externalDbRouter, cleanup: async() => await cleanup(), schemaProvider: providers.schemaProvider }

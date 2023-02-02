@@ -116,6 +116,7 @@ export interface ExternalDbRouterConfig {
     vendor?: string
     adapterType?: string
     commonExtended?: boolean
+    hideAppInfo?: boolean
 }
 
 export type Hooks = {
