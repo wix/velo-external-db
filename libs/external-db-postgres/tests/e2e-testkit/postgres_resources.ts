@@ -20,12 +20,17 @@ export const initEnv = async() => {
 }
 
 export const setActive = () => {
-    process.env['TYPE'] = 'postgres'
-    process.env['HOST'] = 'localhost'
-    process.env['USER'] = 'test-user'
-    process.env['PASSWORD'] = 'password'
-    process.env['DB'] = 'test-db'
+    process.env = { ...process.env, ...enviormentVariables }
 }
+
+export const enviormentVariables = {
+    TYPE: 'postgres',
+    HOST: 'localhost',
+    USER: 'test-user',
+    PASSWORD: 'password',
+    DB: 'test-db'
+}
+
 
 export const shutdownEnv = async() => {
     await compose.stopOne('postgres', { cwd: __dirname, log: true })

@@ -6,12 +6,23 @@ describe('App info Function', () => {
     test('get app info will retrieve valid config and will create app info object', async() => {
         driver.defineValidConfigReaderClient(ctx.config)
         driver.defineValidOperationService()
-
         const appInfo = await appInfoFor(driver.operationService, driver.configReaderClient)
         
         expect(appInfo).toEqual({
             configReaderStatus: driver.validConfigReaderStatus,
             config: maskSensitiveData(ctx.config),
+            dbConnectionStatus: driver.validDBConnectionStatus,
+        })
+    })
+
+    test('get app info will retrieve empty config when hideAppInfo is true', async() => {
+        driver.defineValidConfigReaderClient(ctx.config)
+        driver.defineValidOperationService()
+        const appInfo = await appInfoFor(driver.operationService, driver.configReaderClient, true)
+        
+        expect(appInfo).toEqual({
+            configReaderStatus: driver.validConfigReaderStatus,
+            config: {},
             dbConnectionStatus: driver.validDBConnectionStatus,
         })
     })

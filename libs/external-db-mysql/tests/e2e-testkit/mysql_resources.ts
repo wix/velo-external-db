@@ -27,11 +27,15 @@ export const shutdownEnv = async() => {
 }
 
 export const setActive = () => {
-    process.env['TYPE'] = 'mysql'
-    process.env['HOST'] = 'localhost'
-    process.env['USER'] = 'test-user'
-    process.env['PASSWORD'] = 'password'
-    process.env['DB'] = 'test-db'
+    process.env = { ...process.env, ...enviormentVariables }
+}
+
+export const enviormentVariables = {
+    TYPE: 'mysql',
+    HOST: 'localhost',
+    USER: 'test-user',
+    PASSWORD: 'password',
+    DB: 'test-db'
 }
 
 export const name = 'mysql'

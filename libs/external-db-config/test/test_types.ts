@@ -35,6 +35,7 @@ export interface CommonConfig {
     type?: string
     vendor?: string
     secretKey?: string
+    hideAppInfo?: boolean
 }
 
 export interface FiresStoreConfig {

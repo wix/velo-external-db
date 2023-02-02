@@ -32,8 +32,12 @@ export const initEnv = async() => {
 
 export const setActive = () => {
     setEmulatorOn()
-    process.env['TYPE'] = 'firestore'
-    process.env['PROJECT_ID'] = 'test-project'
+    process.env = { ...process.env, ...enviormentVariables }
+}
+
+export const enviormentVariables = {
+    TYPE: 'firestore',
+    PROJECT_ID: 'test-project'
 }
 
 export const shutdownEnv = async() => {
