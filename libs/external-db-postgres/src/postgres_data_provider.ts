@@ -34,7 +34,7 @@ export default class DataProvider implements IDataProvider {
     async insert(collectionName: string, items: Item[], fields: ResponseField[], upsert?: boolean) {
         const itemsAsParams = items.map((item: Item) => asParamArrays( patchDateTime(item) ))
         const escapedFieldsNames = fields.map( (f: { field: string }) => escapeIdentifier(f.field)).join(', ')
-        const upsertAddon = upsert ? ` ON CONFLICT (_id) DO UPDATE SET ${fields.map(f => `"${escapeIdentifier(f.field)}" = EXCLUDED."${escapeIdentifier(f.field)}"`).join(', ')}` : ''
+        const upsertAddon = upsert ? ` ON CONFLICT (_id) DO UPDATE SET ${fields.map(f => `${escapeIdentifier(f.field)} = EXCLUDED.${escapeIdentifier(f.field)}`).join(', ')}` : ''
         const query = `INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES ${prepareStatementVariablesForBulkInsert(items.length, fields.length)}${upsertAddon}`
 
         await this.pool.query(query, itemsAsParams.flat()).catch( translateErrorCodes )
@@ -72,7 +72,7 @@ export default class DataProvider implements IDataProvider {
         const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters, offset: offsetAfterAggregation } = this.filterParser.parseAggregation(aggregation, offset)
         const { sortExpr } = this.filterParser.orderBy(sort)
 
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr} ${sortExpr} OFFSET $${offsetAfterAggregation} LIMIT $${offset2+1}`
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr} ${sortExpr} OFFSET $${offsetAfterAggregation} LIMIT $${offsetAfterAggregation+1}`
         const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters, skip, limit])
                                   .catch( translateErrorCodes )
         return rs.rows
