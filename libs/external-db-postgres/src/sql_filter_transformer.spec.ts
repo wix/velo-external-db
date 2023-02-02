@@ -280,6 +280,26 @@ describe('Sql Parser', () => {
             })
         })
 
+        describe('handle queries on nested fields', () => {
+            test('correctly transform nested field query', () => {
+                const operator = ctx.filter.operator
+                const filter = {
+                    operator,
+                    fieldName: `${ctx.fieldName}.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}`,
+                    value: ctx.filter.value
+                }
+
+                const parsedFilter = env.filterParser.parseFilter(filter, ctx.offset)
+
+                expect( parsedFilter ).toEqual([{
+                    filterExpr: `${escapeIdentifier(ctx.fieldName)} ->> '${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}' ${env.filterParser.adapterOperatorToMySqlOperator(operator, ctx.filter.value)} $${ctx.offset}`,
+                    parameters: [ctx.filter.value].flat(),
+                    filterColumns: [],
+                    offset: ctx.offset + 1,
+                }])
+            })
+        })
+
         describe('handle multi field operator', () => {
             each([
                 and, or
@@ -432,6 +452,8 @@ describe('Sql Parser', () => {
 
     const ctx = {
         fieldName: Uninitialized,
+        nestedFieldName: Uninitialized,
+        anotherNestedFieldName: Uninitialized,
         fieldValue: Uninitialized,
         anotherValue: Uninitialized,
         moreValue: Uninitialized,
@@ -451,6 +473,8 @@ describe('Sql Parser', () => {
 
     beforeEach(() => {
         ctx.fieldName = chance.word()
+        ctx.nestedFieldName = chance.word()
+        ctx.anotherNestedFieldName = chance.word()
         ctx.anotherFieldName = chance.word()
         ctx.moreFieldName = chance.word()
 
