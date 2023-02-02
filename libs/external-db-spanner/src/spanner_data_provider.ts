@@ -1,6 +1,6 @@
 import { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, patchFloat, extractFloatFields } from './spanner_utils'
 import { translateErrorCodes } from './sql_exception_translator'
-import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, Sort } from '@wix-velo/velo-external-db-types'
 import { Database as SpannerDb } from '@google-cloud/spanner'
 import FilterParser from './sql_filter_transformer'
 
@@ -45,13 +45,14 @@ export default class DataProvider implements IDataProvider {
         return objs[0]['num']
     }
 
-    async insert(collectionName: string, items: Item[], fields: any): Promise <number> {
+    async insert(collectionName: string, items: Item[], fields: any, upsert?: boolean): Promise <number> { 
         const floatFields = extractFloatFields(fields)
-        await this.database.table(collectionName)
-                            .insert(
-                                (items.map((item: any) => patchFloat(item, floatFields)))
-                                        .map(this.asDBEntity.bind(this))
-                            ).catch(translateErrorCodes)
+
+        const preparedItems = items.map((item: any) => patchFloat(item, floatFields)).map(this.asDBEntity.bind(this))
+        
+        upsert ? await this.database.table(collectionName).upsert(preparedItems).catch(translateErrorCodes) :
+                 await this.database.table(collectionName).insert(preparedItems).catch(translateErrorCodes)
+
         return items.length
     }
 
@@ -86,7 +87,7 @@ export default class DataProvider implements IDataProvider {
                            .update(
                                (items.map((item: any) => patchFloat(item, floatFields)))
                                      .map(this.asDBEntity.bind(this))
-                           )
+                           ).catch(translateErrorCodes)
         return items.length
     }
 
@@ -112,13 +113,14 @@ export default class DataProvider implements IDataProvider {
         await this.delete(collectionName, itemIds)
     }
 
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise <Item[]> {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: any, limit: any,): Promise <Item[]> {
         const { filterExpr: whereFilterExpr, parameters: whereParameters } = this.filterParser.transform(filter)
+        const { sortExpr } = this.filterParser.orderBy(sort)
 
         const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation)
         const query = {
-            sql: `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map(column => escapeId(column)).join(', ')} ${havingFilter}`,
-            params: { ...whereParameters, ...parameters },
+            sql: `SELECT ${fieldsStatement} FROM ${escapeId(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map(column => escapeId(column)).join(', ')} ${havingFilter} ${sortExpr} LIMIT @limit OFFSET @skip`,
+            params: { ...whereParameters, ...parameters, skip, limit },
         }
 
         const [rows] = await this.database.run(query)
