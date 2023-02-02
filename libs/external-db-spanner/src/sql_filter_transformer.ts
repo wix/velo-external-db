@@ -116,6 +116,16 @@ export default class FilterParser {
                 }]
         }
 
+        if (this.isNestedField(fieldName)) {
+            const [nestedFieldName, ...nestedFieldPath] = fieldName.split('.')
+            const literals = this.valueForOperator(nestedFieldName, value, operator, counter).sql
+
+            return [{
+                filterExpr: `JSON_VALUE(${this.inlineVariableIfNeeded(nestedFieldName, inlineFields)}, '$.${nestedFieldPath.join('.')}') ${this.adapterOperatorToMySqlOperator(operator, value)} ${literals}`.trim(),
+                parameters: this.parametersFor(nestedFieldName, value, counter)
+            }]
+        }
+
         if (this.isSingleFieldOperator(operator)) {
             const literals = this.valueForOperator(fieldName, value, operator, counter).sql
 
@@ -154,6 +164,10 @@ export default class FilterParser {
         }
 
         return []
+    }
+
+    isNestedField(fieldName: string) {
+        return fieldName.includes('.')
     }
 
     parametersFor(name: string, value: any, counter: Counter) {

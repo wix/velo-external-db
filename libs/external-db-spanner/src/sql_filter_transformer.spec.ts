@@ -301,6 +301,22 @@ describe('Sql Parser', () => {
             })
         })
 
+        describe('handle queries on nested fields', () => {
+            test('correctly transform nested field query', () => {
+                const operator = ctx.filterWithoutInclude.operator
+                const filter = {
+                    operator,
+                    fieldName: `${ctx.fieldName}.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}`,
+                    value: ctx.filterWithoutInclude.value
+                }
+
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    filterExpr: `JSON_VALUE(${escapeId(ctx.fieldName)}, '$.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}') ${env.filterParser.adapterOperatorToMySqlOperator(operator, ctx.filterWithoutInclude.value)} @${ctx.fieldName}0`,
+                    parameters: { [`${ctx.fieldName}0`]: ctx.filterWithoutInclude.value }
+                }])
+            })
+        })
+
         describe('handle multi field operator', () => {
             each([
                 and, or
@@ -455,6 +471,10 @@ describe('Sql Parser', () => {
         filter: Uninitialized,
         anotherFilter: Uninitialized,
         offset: Uninitialized,
+        filterWithoutInclude: Uninitialized,
+        nestedFieldName: Uninitialized,
+        anotherNestedFieldName: Uninitialized,
+
     }
 
     const env: {
@@ -467,6 +487,8 @@ describe('Sql Parser', () => {
         ctx.fieldName = chance.word()
         ctx.anotherFieldName = chance.word()
         ctx.moreFieldName = chance.word()
+        ctx.nestedFieldName = chance.word()
+        ctx.anotherNestedFieldName = chance.word()
 
         ctx.fieldValue = chance.word()
         ctx.anotherValue = chance.word()
@@ -478,6 +500,7 @@ describe('Sql Parser', () => {
         
 
         ctx.offset = chance.natural({ min: 2, max: 20 })
+        ctx.filterWithoutInclude = gen.randomDomainFilterWithoutInclude()
     })
 
     beforeAll(function() {

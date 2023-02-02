@@ -4,7 +4,7 @@ import SchemaColumnTranslator from './sql_schema_translator'
 import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
 import { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, escapeFieldId } from './spanner_utils'
 import { Database as SpannerDb } from '@google-cloud/spanner'
-import { CollectionCapabilities, Encryption, InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { CollectionCapabilities, Encryption, InputField, ISchemaProvider, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
 import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './spanner_capabilities'
 const { CollectionDoesNotExists, CollectionAlreadyExists } = errors
 
