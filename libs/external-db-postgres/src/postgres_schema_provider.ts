@@ -1,8 +1,15 @@
 import { Pool } from 'pg'
-import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
+import {
+    SystemFields,
+    validateSystemFields,
+    parseTableData,
+    AllSchemaOperations,
+    errors,
+    EmptyCapabilities
+} from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator from './sql_schema_translator'
-import { escapeIdentifier, columnCapabilitiesFor } from './postgres_utils'
+import { escapeIdentifier } from './postgres_utils'
 import {
     CollectionCapabilities,
     InputField,
@@ -10,7 +17,7 @@ import {
     ResponseField,
     Table
 } from '@wix-velo/velo-external-db-types'
-import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './postgres_capabilities'
+import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations, ColumnsCapabilities } from './postgres_capabilities'
 
 const { CollectionDoesNotExists } = errors
 
@@ -88,19 +95,12 @@ export default class SchemaProvider implements ISchemaProvider {
             throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }
 
-        // return res.rows.map( this.translateDbTypes.bind(this) )
         const fields = res.rows.map(r => ({ field: r.field, type: r.type })).map(r => this.appendAdditionalRowDetails(r))
         return  {
             id: collectionName,
             fields: fields,
             capabilities: this.collectionCapabilities(res.rows.map(r => r.field))
         }
-        // const fields = res.fields.map(f => ({ field: f.name, type: f.dataTypeID })).map(this.appendAdditionalRowDetails.bind(this))
-        // return {
-        //     id: collectionName,
-        //     fields: fields as ResponseField[],
-        //     capabilities: this.collectionCapabilities(res.map(f => f.Field))
-        // }
     }
 
     private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
@@ -112,9 +112,12 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     private appendAdditionalRowDetails(row: ResponseField) {
-        row.type = this.sqlSchemaTranslator.translateType(row.type)
-        row.capabilities = columnCapabilitiesFor(row.type)
-        return row
+        const type = this.sqlSchemaTranslator.translateType(row.type) as keyof typeof ColumnsCapabilities
+        return {
+            ...row,
+            type: this.sqlSchemaTranslator.translateType(row.type),
+            capabilities: ColumnsCapabilities[type] ?? EmptyCapabilities
+        }
     }
 
     translateDbTypes(row: ResponseField) {

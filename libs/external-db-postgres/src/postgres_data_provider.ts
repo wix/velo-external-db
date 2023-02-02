@@ -18,8 +18,8 @@ export default class DataProvider implements IDataProvider {
         const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
-        const q = `SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`
-        const resultSet = await this.pool.query(q, [...parameters, skip, limit])
+        const sql = `SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`
+        const resultSet = await this.pool.query(sql, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultSet.rows
     }
@@ -32,9 +32,9 @@ export default class DataProvider implements IDataProvider {
     }
 
     async insert(collectionName: string, items: Item[], fields: ResponseField[], upsert?: boolean) {
-        const itemsAsParams = items.map((item: { [x: string]: any }) => asParamArrays( patchDateTime(item) ))
+        const itemsAsParams = items.map((item: Item) => asParamArrays( patchDateTime(item) ))
         const escapedFieldsNames = fields.map( (f: { field: string }) => escapeIdentifier(f.field)).join(', ')
-        const upsertAddon = upsert ? ` ON CONFLICT (_id) DO UPDATE SET ${fields.map(f => `"${f.field}" = EXCLUDED."${f.field}"`).join(', ')}` : ''
+        const upsertAddon = upsert ? ` ON CONFLICT (_id) DO UPDATE SET ${fields.map(f => `"${escapeIdentifier(f.field)}" = EXCLUDED."${escapeIdentifier(f.field)}"`).join(', ')}` : ''
         const query = `INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES ${prepareStatementVariablesForBulkInsert(items.length, fields.length)}${upsertAddon}`
 
         await this.pool.query(query, itemsAsParams.flat()).catch( translateErrorCodes )
@@ -69,10 +69,10 @@ export default class DataProvider implements IDataProvider {
     async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number): Promise<Item[]> {
 
         const { filterExpr: whereFilterExpr, parameters: whereParameters, offset } = this.filterParser.transform(filter)
-        const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters, offset: offset2 } = this.filterParser.parseAggregation(aggregation, offset)
+        const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters, offset: offsetAfterAggregation } = this.filterParser.parseAggregation(aggregation, offset)
         const { sortExpr } = this.filterParser.orderBy(sort)
 
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr} ${sortExpr} OFFSET $${offset2} LIMIT $${offset2+1}`
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr} ${sortExpr} OFFSET $${offsetAfterAggregation} LIMIT $${offset2+1}`
         const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters, skip, limit])
                                   .catch( translateErrorCodes )
         return rs.rows

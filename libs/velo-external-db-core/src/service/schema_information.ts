@@ -14,8 +14,7 @@ export default class CacheableSchemaInformation {
     }
     
     async schemaFieldsFor(collectionName: string): Promise<ResponseField[]> {
-        const fields = (await this.schemaFor(collectionName)).fields
-        return fields
+        return (await this.schemaFor(collectionName)).fields
     }
 
     async schemaFor(collectionName: string): Promise<Table> {
@@ -24,9 +23,6 @@ export default class CacheableSchemaInformation {
             await this.update(collectionName)
             return this.cache.get(collectionName) as Table 
         }
-
-        console.log('schema: ', schema)
-
         return schema as Table
     }
 
