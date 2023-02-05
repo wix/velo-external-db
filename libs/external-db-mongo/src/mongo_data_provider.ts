@@ -1,6 +1,6 @@
 import { translateErrorCodes } from './exception_translator'
 import { insertExpressionFor, unpackIdFieldForItem, updateExpressionFor, validateTable } from './mongo_utils'
-import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, Sort,  } from '@wix-velo/velo-external-db-types'
 import FilterParser from './sql_filter_transformer'
 import { MongoClient } from 'mongodb'
 
@@ -67,17 +67,28 @@ export default class DataProvider implements IDataProvider {
                          .deleteMany({})
     }
 
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<Item[]> {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number): Promise<Item[]> {
         validateTable(collectionName)
+        const additionalAggregationStages = []
         const { fieldsStatement, havingFilter } = this.filterParser.parseAggregation(aggregation)
         const { filterExpr } = this.filterParser.transform(filter)
+        const sortExpr = this.filterParser.orderAggregationBy(sort)
+
+        const isNotEmpty = (obj: any) => Object.keys(obj).length !== 0 && obj.constructor === Object
+
+        isNotEmpty(sortExpr.$sort)? additionalAggregationStages.push(sortExpr) : null
+        skip? additionalAggregationStages.push({ $skip: skip }) : null
+        limit? additionalAggregationStages.push({ $limit: limit }) : null
+        
         const result = await this.client.db()
-                                    .collection(collectionName)
-                                    .aggregate( [ { $match: filterExpr },
-                                         fieldsStatement,
-                                         havingFilter
-                                    ] )
-                                    .toArray()
+                                        .collection(collectionName)
+                                        .aggregate([ 
+                                            { $match: filterExpr },
+                                            fieldsStatement,
+                                            havingFilter,
+                                            ...additionalAggregationStages
+                                        ])
+                                        .toArray()
 
         return result.map( unpackIdFieldForItem )
     }
