@@ -71,7 +71,7 @@ const googleSheetTestEnvInit = async() => await dbInit(googleSheet)
 const testSuits = {
     mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.testResources),
     postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.testResources),
-    spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.testResources.supportedOperations),
+    spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.testResources),
     firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.testResources.supportedOperations),
     mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.testResources),
     mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.testResources.supportedOperations),
