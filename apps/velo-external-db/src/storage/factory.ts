@@ -15,10 +15,10 @@ export const engineConnectorFor = async(_type: string, config: any): Promise<Dat
         //     const { firestoreFactory } = require('@wix-velo/external-db-firestore')
         //     return await firestoreFactory(config)
         // }
-        // case 'mssql': {
-        //     const { mssqlFactory } = require('@wix-velo/external-db-mssql')
-        //     return await mssqlFactory(config)
-        // }
+        case 'mssql': {
+            const { mssqlFactory } = require('@wix-velo/external-db-mssql')
+            return await mssqlFactory(config)
+        }
         case 'mysql': {
             const { mySqlFactory } = require('@wix-velo/external-db-mysql')
             return await mySqlFactory(config)

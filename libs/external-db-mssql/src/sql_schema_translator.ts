@@ -61,13 +61,11 @@ export default class SchemaColumnTranslator {
 
             case 'number_bigint':
                 return 'BIGINT'
-
-            case 'number_float':
-                return `FLOAT${this.parsePrecision(precision)}`
-
+  
             case 'number_double':
                 return `REAL${this.parsePrecision(precision)}`
 
+            case 'number_float':
             case 'number_decimal':
                 return `DECIMAL${this.parsePrecision(precision)}`
 
@@ -107,7 +105,7 @@ export default class SchemaColumnTranslator {
             const parsed = precision.split(',').map((s: string) => s.trim()).map((s: string) => parseInt(s))
             return `(${parsed.join(',')})`
         } catch (e) {
-            return '(5,2)'
+            return '(15, 2)'
         }
     }
 
