@@ -1,6 +1,6 @@
 const { testResources: postgres } = require ('@wix-velo/external-db-postgres')
 const { testResources: mysql } = require ('@wix-velo/external-db-mysql')
-// const { testResources: spanner } = require ('@wix-velo/external-db-spanner')
+const { testResources: spanner } = require ('@wix-velo/external-db-spanner')
 // const { testResources: firestore } = require ('@wix-velo/external-db-firestore')
 const { testResources: mssql } = require ('@wix-velo/external-db-mssql')
 // const { testResources: mongo } = require ('@wix-velo/external-db-mongo')
@@ -17,9 +17,9 @@ const shutdownEnv = async(testEngine) => {
             await mysql.shutdownEnv()
             break
 
-        // case 'spanner':
-        //     await spanner.shutdownEnv()
-        //     break
+        case 'spanner':
+            await spanner.shutdownEnv()
+            break
 
         case 'postgres':
             await postgres.shutdownEnv()
