@@ -97,7 +97,7 @@ export const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gt
 export const randomAdapterOperatorWithoutInclude = () => ( chance.pickone([ne, lt, lte, gt, gte, eq, string_contains, string_begins, string_ends]) )
 
 export const randomWrappedFilter = (_fieldName?: string, _operator?: string) => { // TODO: rename to randomDomainFilter
-const operator = randomAdapterOperator()
+    const operator = _operator ?? randomAdapterOperator()
     const fieldName =  _fieldName ?? chance.word()
     const value = operator === AdapterOperators.include ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
