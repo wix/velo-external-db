@@ -50,8 +50,8 @@ export default class DataProvider implements IDataProvider {
 
         const preparedItems = items.map((item: any) => patchFloat(item, floatFields)).map(this.asDBEntity.bind(this))
         
-        upsert ? await this.database.table(collectionName).upsert(preparedItems).catch(translateErrorCodes) :
-                 await this.database.table(collectionName).insert(preparedItems).catch(translateErrorCodes)
+        upsert ? await this.database.table(collectionName).upsert(preparedItems).catch((err) => translateErrorCodes(err, collectionName)) :
+                 await this.database.table(collectionName).insert(preparedItems).catch((err) => translateErrorCodes(err, collectionName))
 
         return items.length
     }
@@ -87,7 +87,7 @@ export default class DataProvider implements IDataProvider {
                            .update(
                                (items.map((item: any) => patchFloat(item, floatFields)))
                                      .map(this.asDBEntity.bind(this))
-                           ).catch(translateErrorCodes)
+                           ).catch((err) => translateErrorCodes(err, collectionName))
         return items.length
     }
 

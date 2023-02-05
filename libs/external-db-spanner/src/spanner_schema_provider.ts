@@ -62,19 +62,19 @@ export default class SchemaProvider implements ISchemaProvider {
                                                                   .join(', ')
         const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeFieldId(f.name)).join(', ')
 
-        await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (${primaryKeySql})`, CollectionAlreadyExists)
+        await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (${primaryKeySql})`, collectionName, CollectionAlreadyExists)
     }
 
     async addColumn(collectionName: string, column: InputField): Promise<void> {
         await validateSystemFields(column.name)
 
-        await this.updateSchema(`ALTER TABLE ${escapeId(collectionName)} ADD COLUMN ${this.sqlSchemaTranslator.columnToDbColumnSql(column)}`)
+        await this.updateSchema(`ALTER TABLE ${escapeId(collectionName)} ADD COLUMN ${this.sqlSchemaTranslator.columnToDbColumnSql(column)}`, collectionName)
     }
 
     async removeColumn(collectionName: string, columnName: string): Promise<void> {
         await validateSystemFields(columnName)
 
-        await this.updateSchema(`ALTER TABLE ${escapeId(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
+        await this.updateSchema(`ALTER TABLE ${escapeId(collectionName)} DROP COLUMN ${escapeId(columnName)}`, collectionName)
     }
 
     async describeCollection(collectionName: string): Promise<Table> {
@@ -102,20 +102,20 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async drop(collectionName: string): Promise<void> {
-        await this.updateSchema(`DROP TABLE ${escapeId(collectionName)}`)
+        await this.updateSchema(`DROP TABLE ${escapeId(collectionName)}`, collectionName)
     }
 
     async changeColumnType(collectionName: string, _column: InputField): Promise<void> {
         throw new errors.UnsupportedSchemaOperation('changeColumnType is not supported', collectionName, 'changeColumnType')
     }
 
-    async updateSchema(sql: string, catching: any = undefined) {
+    async updateSchema(sql: string, collectionName: string, catching: any = undefined ) {
         try {
             const [operation] = await this.database.updateSchema([sql])
 
             await operation.promise()
         } catch (err) {
-            const e = notThrowingTranslateErrorCodes(err)
+            const e = notThrowingTranslateErrorCodes(err, collectionName)
             if (!catching || (catching && !(e instanceof catching))) {
                 throw e
             }
