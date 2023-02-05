@@ -2,6 +2,8 @@ import * as compose from 'docker-compose'
 import init from '../../src/connection_provider'
 export { supportedOperations } from '../../src/supported_operations'
 
+export * as capabilities from '../../src/mssql_capabilities' 
+
 const testEnvConfig = {
     host: 'localhost',
     user: 'sa',
