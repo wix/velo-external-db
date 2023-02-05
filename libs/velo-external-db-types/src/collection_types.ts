@@ -85,6 +85,7 @@ export enum SchemaOperations {
     IncludeOperator = 'include',
     FilterByEveryField = 'filterByEveryField',
     QueryNestedFields = 'queryNestedFields',
+    continueInsertingOnError = 'continueInsertingOnError',
 }
 
 export type InputField = FieldAttributes & { name: string }
