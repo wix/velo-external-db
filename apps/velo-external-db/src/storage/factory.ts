@@ -7,10 +7,10 @@ export const engineConnectorFor = async(_type: string, config: any): Promise<Dat
             const { postgresFactory } = require('@wix-velo/external-db-postgres')
             return await postgresFactory(config)
         }
-        // case 'spanner': {
-        //     const { spannerFactory } = require('@wix-velo/external-db-spanner')
-        //     return await spannerFactory(config)
-        // }
+        case 'spanner': {
+            const { spannerFactory } = require('@wix-velo/external-db-spanner')
+            return await spannerFactory(config)
+        }
         // case 'firestore': {
         //     const { firestoreFactory } = require('@wix-velo/external-db-firestore')
         //     return await firestoreFactory(config)
