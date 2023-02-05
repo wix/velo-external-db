@@ -4,6 +4,7 @@
     "@wix-velo/external-db-config": "libs/external-db-config",
     "@wix-velo/external-db-postgres": "libs/external-db-postgres",
     "@wix-velo/external-db-mysql": "libs/external-db-mysql",
+    "@wix-velo/external-db-mssql": "libs/external-db-mssql",
     "@wix-velo/external-db-security": "libs/external-db-security",
     "@wix-velo/test-commons": "libs/test-commons",
     "@wix-velo/velo-external-db-commons": "libs/velo-external-db-commons",
