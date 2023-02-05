@@ -12,6 +12,7 @@ import SchemaColumnTranslator from './sql_schema_translator'
 import { escapeIdentifier } from './postgres_utils'
 import {
     CollectionCapabilities,
+    Encryption,
     InputField,
     ISchemaProvider,
     ResponseField,
@@ -108,6 +109,9 @@ export default class SchemaProvider implements ISchemaProvider {
             dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
             fieldTypes: FieldTypes,
             collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported
         }
     }
 
