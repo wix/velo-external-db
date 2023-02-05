@@ -13,10 +13,6 @@ export const shouldRunOnlyOn = (impl: string[], current: string) => impl.include
 //@ts-ignore
 export const testIfSupportedOperationsIncludes = (supportedOperations: SchemaOperations[], operation: string[]): any => operation.every((o: any) => supportedOperations.includes(o)) ? test : test.skip
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
-export const testIfSupportedOperationsNotIncludes = (supportedOperations: SchemaOperations[], operation: string[]): any => operation.every((o: any) => !supportedOperations.includes(o)) ? test : test.skip 
-
 export const testSupportedOperations = (supportedOperations: SchemaOperations[], arrayTable: any[][]): string[][] => {
     return arrayTable.filter(i => {
         const lastItem = i[i.length - 1]

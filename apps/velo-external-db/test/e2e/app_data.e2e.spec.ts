@@ -1,13 +1,7 @@
 import axios from 'axios'
 import each from 'jest-each'
 import * as Chance from 'chance'
-import { 
-    Uninitialized, 
-    gen as genCommon, 
-    testIfSupportedOperationsIncludes, 
-    streamToArray,
-    testIfSupportedOperationsNotIncludes 
-} from '@wix-velo/test-commons'
+import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes, streamToArray } from '@wix-velo/test-commons'
 import { InputField, SchemaOperations, Item } from '@wix-velo/velo-external-db-types'
 import { dataSpi } from '@wix-velo/velo-external-db-core'
 import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit'
@@ -17,7 +11,7 @@ import * as matchers from '../drivers/schema_api_rest_matchers'
 import * as data from '../drivers/data_api_rest_test_support'
 import * as authorization from '../drivers/authorization_test_support'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields, continueInsertingOnError } = SchemaOperations
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields, NonAtomicBulkInsert, AtomicBulkInsert } = SchemaOperations
 
 const chance = Chance()
 
@@ -86,7 +80,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         )
     })
 
-    testIfSupportedOperationsNotIncludes(supportedOperations, [continueInsertingOnError])('insert api should fail if item already exists', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [AtomicBulkInsert])('insert api should fail if item already exists', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
@@ -104,7 +98,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         )
     })
 
-    testIfSupportedOperationsIncludes(supportedOperations, [continueInsertingOnError])('insert api should throw 409 error if item already exists and continue inserting the rest', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [NonAtomicBulkInsert])('insert api should throw 409 error if item already exists and continue inserting the rest', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 

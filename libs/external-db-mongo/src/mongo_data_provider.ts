@@ -38,7 +38,7 @@ export default class DataProvider implements IDataProvider {
         validateTable(collectionName)
         const { insertedCount, upsertedCount } = await this.client.db()
                                                                   .collection(collectionName) 
-                                                                  .bulkWrite(insertExpressionFor(items, upsert))
+                                                                  .bulkWrite(insertExpressionFor(items, upsert), { ordered: false })
                                                                   .catch(e => translateErrorCodes(e, collectionName))
         
         return insertedCount + upsertedCount
