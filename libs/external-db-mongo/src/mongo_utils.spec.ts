@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-import { unpackIdFieldForItem, validateTable, insertExpressionFor } from './mongo_utils'
+import { unpackIdFieldForItem, validateTable, insertExpressionFor, isEmptyObject } from './mongo_utils'
 
 describe('Mongo Utils', () => {
     describe('unpackIdFieldForItem', () => {
@@ -62,5 +62,14 @@ describe('Mongo Utils', () => {
                                                                                         } 
                                                                             })
         })
+    })
+
+    describe('isEmptyObject', () => {
+        test('isEmptyObject will return true for empty object', () => {
+            expect(isEmptyObject({})).toBe(true)
+            expect(isEmptyObject({ a: {} }.a)).toBe(true)
+        }
+    )
+
     })
 })

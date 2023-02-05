@@ -155,7 +155,7 @@ export default class SchemaProvider implements ISchemaProvider {
         }
     }
 
-    async collectionDataFor(collectionName: string) { //fixme: any
+    async collectionDataFor(collectionName: string) {
         validateTable(collectionName)
         return await this.client.db()
                                 .collection(SystemTable)
