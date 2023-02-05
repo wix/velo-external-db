@@ -1,5 +1,5 @@
 import { Pool } from 'pg'
-import { escapeIdentifier, prepareStatementVariables } from './postgres_utils'
+import { escapeIdentifier, prepareStatementVariables, prepareStatementVariablesForBulkInsert } from './postgres_utils'
 import { asParamArrays, patchDateTime, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
 import { IDataProvider, AdapterFilter as Filter, Sort, Item, AdapterAggregation as Aggregation, ResponseField } from '@wix-velo/velo-external-db-types'
@@ -18,7 +18,8 @@ export default class DataProvider implements IDataProvider {
         const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
-        const resultSet = await this.pool.query(`SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
+        const sql = `SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`
+        const resultSet = await this.pool.query(sql, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         return resultSet.rows
     }
@@ -30,16 +31,15 @@ export default class DataProvider implements IDataProvider {
         return parseInt(resultSet.rows[0]['num'], 10)
     }
 
-    async insert(collectionName: string, items: Item[], fields: ResponseField[]) {
+    async insert(collectionName: string, items: Item[], fields: ResponseField[], upsert?: boolean) {
+        const itemsAsParams = items.map((item: Item) => asParamArrays( patchDateTime(item) ))
         const escapedFieldsNames = fields.map( (f: { field: string }) => escapeIdentifier(f.field)).join(', ')
-        const res = await Promise.all(
-            items.map(async(item: { [x: string]: any }) => {
-                const data = asParamArrays( patchDateTime(item) )
-                const res = await this.pool.query(`INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES (${prepareStatementVariables(fields.length)})`, data)
-                               .catch( translateErrorCodes )
-                return res.rowCount
-            } ) )
-        return res.reduce((sum, i) => i + sum, 0)
+        const upsertAddon = upsert ? ` ON CONFLICT (_id) DO UPDATE SET ${fields.map(f => `${escapeIdentifier(f.field)} = EXCLUDED.${escapeIdentifier(f.field)}`).join(', ')}` : ''
+        const query = `INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES ${prepareStatementVariablesForBulkInsert(items.length, fields.length)}${upsertAddon}`
+
+        await this.pool.query(query, itemsAsParams.flat()).catch( translateErrorCodes )
+
+        return items.length
     }
 
     async update(collectionName: string, items: Item[]) {
@@ -66,12 +66,14 @@ export default class DataProvider implements IDataProvider {
         await this.pool.query(`TRUNCATE ${escapeIdentifier(collectionName)}`).catch( translateErrorCodes )
     }
 
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<Item[]> {
-        const { filterExpr: whereFilterExpr, parameters: whereParameters, offset } = this.filterParser.transform(filter)
-        const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters } = this.filterParser.parseAggregation(aggregation, offset)
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number): Promise<Item[]> {
 
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr}`
-        const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters])
+        const { filterExpr: whereFilterExpr, parameters: whereParameters, offset } = this.filterParser.transform(filter)
+        const { fieldsStatement, groupByColumns, havingFilter: filterExpr, parameters: havingParameters, offset: offsetAfterAggregation } = this.filterParser.parseAggregation(aggregation, offset)
+        const { sortExpr } = this.filterParser.orderBy(sort)
+
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr} ${sortExpr} OFFSET $${offsetAfterAggregation} LIMIT $${offsetAfterAggregation+1}`
+        const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters, skip, limit])
                                   .catch( translateErrorCodes )
         return rs.rows
     }
