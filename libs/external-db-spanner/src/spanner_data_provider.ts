@@ -45,7 +45,7 @@ export default class DataProvider implements IDataProvider {
         return objs[0]['num']
     }
 
-    async insert(collectionName: string, items: Item[], fields: any, upsert?: boolean): Promise <number> { 
+    async insert(collectionName: string, items: Item[], fields: any, upsert = false): Promise <number> { 
         const floatFields = extractFloatFields(fields)
 
         const preparedItems = items.map((item: any) => patchFloat(item, floatFields)).map(this.asDBEntity.bind(this))
