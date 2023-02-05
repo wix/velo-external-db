@@ -3,10 +3,10 @@ import { DatabaseFactoryResponse } from '@wix-velo/velo-external-db-commons'
 export const engineConnectorFor = async(_type: string, config: any): Promise<DatabaseFactoryResponse> => {
     const type = _type || ''
     switch ( type.toLowerCase() ) {
-        // case 'postgres': {
-        //     const { postgresFactory } = require('@wix-velo/external-db-postgres')
-        //     return await postgresFactory(config)
-        // }
+        case 'postgres': {
+            const { postgresFactory } = require('@wix-velo/external-db-postgres')
+            return await postgresFactory(config)
+        }
         // case 'spanner': {
         //     const { spannerFactory } = require('@wix-velo/external-db-spanner')
         //     return await spannerFactory(config)

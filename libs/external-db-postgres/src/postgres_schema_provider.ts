@@ -1,9 +1,24 @@
 import { Pool } from 'pg'
-import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, errors } from '@wix-velo/velo-external-db-commons'
+import {
+    SystemFields,
+    validateSystemFields,
+    parseTableData,
+    AllSchemaOperations,
+    errors,
+    EmptyCapabilities
+} from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator from './sql_schema_translator'
 import { escapeIdentifier } from './postgres_utils'
-import { InputField, ISchemaProvider, ResponseField, Table } from '@wix-velo/velo-external-db-types'
+import {
+    CollectionCapabilities,
+    InputField,
+    ISchemaProvider,
+    ResponseField,
+    Table
+} from '@wix-velo/velo-external-db-types'
+import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations, ColumnsCapabilities } from './postgres_capabilities'
+
 const { CollectionDoesNotExists } = errors
 
 export default class SchemaProvider implements ISchemaProvider {
@@ -21,7 +36,8 @@ export default class SchemaProvider implements ISchemaProvider {
         return Object.entries(tables)
                      .map(([collectionName, rs]) => ({
                          id: collectionName,
-                         fields: rs.map( this.translateDbTypes.bind(this) )
+                         fields: rs.map( this.appendAdditionalRowDetails.bind(this) ),
+                         capabilities: this.collectionCapabilities(rs.map(r => r.field))
                      }))
     }
 
@@ -57,6 +73,13 @@ export default class SchemaProvider implements ISchemaProvider {
                   .catch( translateErrorCodes )
     }
 
+    async changeColumnType(collectionName: string, column: InputField): Promise<void> {
+        await validateSystemFields(column.name)
+        const query = `ALTER TABLE ${escapeIdentifier(collectionName)} ALTER COLUMN ${escapeIdentifier(column.name)} TYPE ${this.sqlSchemaTranslator.dbTypeFor(column)} USING (${escapeIdentifier(column.name)}::${this.sqlSchemaTranslator.dbTypeFor(column)})`
+        await this.pool.query(query)
+            .catch( err => translateErrorCodes(err) )
+    }
+
     async removeColumn(collectionName: string, columnName: string) {
         await validateSystemFields(columnName)
 
@@ -65,13 +88,36 @@ export default class SchemaProvider implements ISchemaProvider {
 
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]> {
+    async describeCollection(collectionName: string): Promise<Table> {
         const res = await this.pool.query('SELECT table_name, column_name AS field, data_type, udt_name AS type, character_maximum_length FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2 ORDER BY table_name', ['public', collectionName])
                               .catch( translateErrorCodes )
         if (res.rows.length === 0) {
-            throw new CollectionDoesNotExists('Collection does not exists')
+            throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }
-        return res.rows.map( this.translateDbTypes.bind(this) )
+
+        const fields = res.rows.map(r => ({ field: r.field, type: r.type })).map(r => this.appendAdditionalRowDetails(r))
+        return  {
+            id: collectionName,
+            fields: fields,
+            capabilities: this.collectionCapabilities(res.rows.map(r => r.field))
+        }
+    }
+
+    private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
+        return {
+            dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
+        }
+    }
+
+    private appendAdditionalRowDetails(row: ResponseField) {
+        const type = this.sqlSchemaTranslator.translateType(row.type) as keyof typeof ColumnsCapabilities
+        return {
+            ...row,
+            type: this.sqlSchemaTranslator.translateType(row.type),
+            capabilities: ColumnsCapabilities[type] ?? EmptyCapabilities
+        }
     }
 
     translateDbTypes(row: ResponseField) {

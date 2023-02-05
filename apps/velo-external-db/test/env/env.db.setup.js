@@ -3,7 +3,7 @@ import { registerTsProject } from 'nx/src/utils/register'
 registerTsProject('.', 'tsconfig.base.json')
 
 
-// const { testResources: postgres } = require ('@wix-velo/external-db-postgres')
+const { testResources: postgres } = require ('@wix-velo/external-db-postgres')
 const { testResources: mysql } = require ('@wix-velo/external-db-mysql')
 // const { testResources: spanner } = require ('@wix-velo/external-db-spanner')
 // const { testResources: firestore } = require ('@wix-velo/external-db-firestore')
@@ -27,9 +27,9 @@ const initEnv = async(testEngine) => {
         //     await spanner.initEnv()
         //     break
 
-        // case 'postgres':
-        //     await postgres.initEnv()
-        //     break
+        case 'postgres':
+            await postgres.initEnv()
+            break
 
         // case 'firestore':
         //     await firestore.initEnv()
@@ -70,9 +70,9 @@ const cleanup = async(testEngine) => {
         //     await spanner.cleanup()
         //     break
 
-        // case 'postgres':
-        //     await postgres.cleanup()
-        //     break
+        case 'postgres':
+            await postgres.cleanup()
+            break
 
         // case 'firestore':
         //     await firestore.cleanup()

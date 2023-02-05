@@ -55,13 +55,14 @@ export default class FilterParser {
 
         const havingFilter = this.parseFilter(aggregation.postFilter, offset, aliasToFunction)
 
-        const { filterExpr, parameters } = this.extractFilterExprAndParams(havingFilter)
+        const { filterExpr, parameters, offset: offsetAfterAggregation } = this.extractFilterExprAndParams(havingFilter)
 
         return {
             fieldsStatement: filterColumnsStr.join(', '),
             groupByColumns,
             havingFilter: filterExpr,
             parameters: parameters,
+            offset: offsetAfterAggregation
         }
     }
 
@@ -78,8 +79,8 @@ export default class FilterParser {
     }
 
     extractFilterExprAndParams(havingFilter: any[]) {
-        return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                                     parameters: parameters }))
+        return havingFilter.map(({ filterExpr, parameters, offset }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
+                                                                     parameters: parameters, offset }))
                            .concat(EmptyFilter)[0]
     }
 
@@ -119,6 +120,17 @@ export default class FilterParser {
                 }]
         }
 
+        if (this.isNestedField(fieldName)) {
+            const [nestedFieldName, ...nestedFieldPath] = fieldName.split('.')
+            const params = this.valueForOperator(value, operator, offset)
+            return [{
+                filterExpr: `${escapeIdentifier(nestedFieldName)} ->> '${nestedFieldPath.join('.')}' ${this.adapterOperatorToMySqlOperator(operator, value)} ${params.sql}`.trim(),
+                parameters: !isNull(value) ? [].concat( this.patchTrueFalseValue(value) ) : [],
+                offset: params.offset,
+                filterColumns: [],
+            }]
+        }
+
         if (this.isSingleFieldOperator(operator)) {
             const params = this.valueForOperator(value, operator, offset)
 
@@ -151,6 +163,10 @@ export default class FilterParser {
         }
 
         return []
+    }
+
+    isNestedField(fieldName: string) {
+        return fieldName.includes('.')
     }
 
     valueForStringOperator(operator: string, value: any) {
