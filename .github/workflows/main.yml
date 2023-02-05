@@ -41,6 +41,7 @@ jobs:
                    "postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
                    "mysql", "mysql5",
                    "mssql", "mssql17",
+                   spanner
                    ]
 
     env:

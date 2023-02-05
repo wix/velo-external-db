@@ -20,7 +20,7 @@ export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string
             }
         case 5:
             if (err.details.includes('Column')) {
-                return new FieldDoesNotExist(err.details)
+                return new FieldDoesNotExist(err.details, collectionName)
             } else if (err.details.includes('Instance')) {
                 return new DbConnectionError(`Access to database denied - wrong credentials or host is unavailable, sql message:  ${err.details} `)
             } else if (err.details.includes('Database')) {

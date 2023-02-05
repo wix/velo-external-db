@@ -91,7 +91,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const res = recordSetToObj(rows)
 
         if (res.length === 0) {
-            throw new CollectionDoesNotExists('Collection does not exists')
+            throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }
 
         return {
