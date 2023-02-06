@@ -147,7 +147,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
         await expect(axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id, projection: [ctx.column.name] }, authAdmin)).resolves.toEqual(
             matchers.responseWith({
-                item: { [ctx.column.name]: ctx.item[ctx.column.name] }
+                item: { [ctx.column.name]: ctx.item[ctx.column.name], _id: expect.any(String) }
             }))
     })
 
