@@ -31,7 +31,7 @@ export default async(cfg: MSSQLConfig, _poolOptions: { [key: string]: any }): Pr
         password: cfg.password,
         database: cfg.db,
         server: cfg.host,
-        port: 1433,
+        port: cfg.port || 1433,
         pool: {
             max: 10,
             min: 1,

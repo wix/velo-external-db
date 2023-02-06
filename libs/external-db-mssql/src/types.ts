@@ -17,5 +17,6 @@ export interface MSSQLConfig {
     db: string
     host: string
     unsecuredEnv?: any
+    port?: number
     [key: string]: any
 }

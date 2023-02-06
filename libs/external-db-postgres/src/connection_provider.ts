@@ -4,17 +4,17 @@ import SchemaProvider from './postgres_schema_provider'
 import DataProvider  from './postgres_data_provider'
 import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './postgres_operations'
-import { postgresConfig, postgresPoolOptions } from './types'
+import { PostgresConfig, postgresPoolOptions } from './types'
 
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
-export default (cfg: postgresConfig, _poolOptions: postgresPoolOptions) => {
+export default (cfg: PostgresConfig, _poolOptions: postgresPoolOptions) => {
     const config = {
         host: cfg.host,
         user: cfg.user,
         password: cfg.password,
         database: cfg.db,
-        port: 5432,
+        port: cfg.port || 5432,
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
