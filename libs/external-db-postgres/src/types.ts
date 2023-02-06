@@ -4,7 +4,7 @@ export interface PostgresConfig  {
     user: string
     password: string
     db: string
-    dbPort?: number
+    port?: number
 }
 
 export interface postgresPoolOptions {

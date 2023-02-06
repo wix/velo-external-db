@@ -14,7 +14,7 @@ export default (cfg: PostgresConfig, _poolOptions: postgresPoolOptions) => {
         user: cfg.user,
         password: cfg.password,
         database: cfg.db,
-        port: cfg.dbPort || 5432,
+        port: cfg.port || 5432,
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,

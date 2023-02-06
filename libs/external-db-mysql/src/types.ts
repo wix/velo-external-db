@@ -16,7 +16,7 @@ export interface MySqlConfig {
     password: string
     db: string
     cloudSqlConnectionName?: string
-    dbPort?: number
+    port?: number
 }
 
 export type MySqlQuery = (sql: string, values?: any) => Promise<any>

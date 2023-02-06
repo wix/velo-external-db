@@ -14,7 +14,7 @@ export class AwsConfigReader implements IConfigReader {
   async readConfig() {
     const { config } = await this.readExternalAndLocalConfig()
     const { host, username, password, DB, SECRET_KEY, DB_PORT } = config
-    return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY, dbPort: DB_PORT }
+    return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY, port: DB_PORT }
   }
 
   async readExternalConfig() {
