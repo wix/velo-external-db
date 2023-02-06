@@ -39,7 +39,8 @@ export interface E2E_ENV {
     app: App
     externalDbRouter: ExternalDbRouter
     internals: Internals
-    capabilities: Capabilities
+    capabilities: Capabilities,
+    enviormentVariables: { [key: string]: string }
 }
 
 export interface ProviderResourcesEnv {
