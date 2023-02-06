@@ -141,6 +141,15 @@ export default class FilterParser {
         }
     }
 
+    orderAggregationBy(sort: Sort[]) {
+        return {
+            $sort: sort.reduce((acc, s) => {
+                const direction = s.direction === 'asc'? 1 : -1 
+                return { ...acc, [s.fieldName]: direction }
+            }, {})
+        }
+    }
+
     parseSort({ fieldName, direction }: Sort): { expr: MongoFieldSort } | [] {
         if (typeof fieldName !== 'string') {
             return []
