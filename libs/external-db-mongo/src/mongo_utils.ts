@@ -35,14 +35,28 @@ export const isConnected = (client: { topology: { isConnected: () => any } }) =>
     return client && client.topology && client.topology.isConnected()
 }
 
-const updateExpressionForItem = (item: { _id: any }) => ({
-    updateOne: {
-        filter: { _id: item._id },
-        update: { $set: { ...item } }
+const insertExpressionForItem = (item: { _id: any }) => ({
+    insertOne: {
+        document: { ...item, _id: item._id as any } 
     }
 })
 
-export const updateExpressionFor = (items: any[]) => items.map(updateExpressionForItem)
+const updateExpressionForItem = (item: { _id: any }, upsert: boolean) => ({
+    updateOne: {
+        filter: { _id: item._id },
+        update: { $set: { ...item } },
+        upsert
+    }
+})
+
+export const insertExpressionFor = (items: any[], upsert: boolean) => {
+    return upsert?
+        items.map(i => updateExpressionForItem(i, upsert)):
+        items.map(i => insertExpressionForItem(i))
+}
+
+
+export const updateExpressionFor = (items: any[], upsert = false) => items.map(i => updateExpressionForItem(i, upsert))
 
 export const unpackIdFieldForItem = (item: { [x: string]: any, _id?: any }) => {
     if (isObject(item._id)) {
@@ -56,3 +70,10 @@ export const unpackIdFieldForItem = (item: { [x: string]: any, _id?: any }) => {
 export const EmptySort = {
     sortExpr: { sort: [] },
 }
+
+export interface CollectionObject {
+    _id: string,
+    fields: { name: string, type: string, subtype?: string }[]
+}
+
+export const isEmptyObject = (obj: any) => Object.keys(obj).length === 0 && obj.constructor === Object
