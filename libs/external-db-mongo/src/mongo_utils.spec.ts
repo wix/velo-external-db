@@ -1,5 +1,5 @@
 const { InvalidQuery } = require('@wix-velo/velo-external-db-commons').errors
-import { unpackIdFieldForItem, validateTable } from './mongo_utils'
+import { unpackIdFieldForItem, validateTable, insertExpressionFor, isEmptyObject } from './mongo_utils'
 
 describe('Mongo Utils', () => {
     describe('unpackIdFieldForItem', () => {
@@ -47,5 +47,29 @@ describe('Mongo Utils', () => {
         test('validateTable will not throw with valid table name', () => {
             expect(() => validateTable('someTable')).not.toThrow()
         })
+    })
+
+    describe('insertExpressionFor', () => {
+        test('insertExpressionFor with upsert set to false will return insert expression', () => {
+            expect(insertExpressionFor([{ _id: 'itemId' }], false)[0]).toEqual({ insertOne: { document: { _id: 'itemId' } } })
+        })
+        test('insertExpressionFor with upsert set to true will return update expression', () => {
+            expect(insertExpressionFor([{ _id: 'itemId' }], true)[0]).toEqual({
+                                                                                updateOne: { 
+                                                                                            filter: { _id: 'itemId' },
+                                                                                            update: { $set: { _id: 'itemId' } },
+                                                                                            upsert: true
+                                                                                        } 
+                                                                            })
+        })
+    })
+
+    describe('isEmptyObject', () => {
+        test('isEmptyObject will return true for empty object', () => {
+            expect(isEmptyObject({})).toBe(true)
+            expect(isEmptyObject({ a: {} }.a)).toBe(true)
+        }
+    )
+
     })
 })

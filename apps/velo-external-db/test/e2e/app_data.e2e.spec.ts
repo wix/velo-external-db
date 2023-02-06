@@ -1,8 +1,8 @@
 import axios from 'axios'
 import each from 'jest-each'
-import Chance = require('chance')
+import * as Chance from 'chance'
 import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes, streamToArray } from '@wix-velo/test-commons'
-import { SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { InputField, SchemaOperations, Item } from '@wix-velo/velo-external-db-types'
 import { dataSpi } from '@wix-velo/velo-external-db-core'
 import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit'
 import * as gen from '../gen'
@@ -11,7 +11,7 @@ import * as matchers from '../drivers/schema_api_rest_matchers'
 import * as data from '../drivers/data_api_rest_test_support'
 import * as authorization from '../drivers/authorization_test_support'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields } = SchemaOperations
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields, NonAtomicBulkInsert, AtomicBulkInsert } = SchemaOperations
 
 const chance = Chance()
 
@@ -91,7 +91,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         )
     })
 
-    test('insert api should fail if item already exists', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [AtomicBulkInsert])('insert api should fail if item already exists', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
@@ -101,6 +101,23 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
         await expect(response).rejects.toThrow('409')
 
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(expect.toIncludeAllMembers(
+            [ 
+                ...expectedItems, 
+                data.pagingMetadata(expectedItems.length, expectedItems.length)
+            ])
+        )
+    })
+
+    testIfSupportedOperationsIncludes(supportedOperations, [NonAtomicBulkInsert])('insert api should throw 409 error if item already exists and continue inserting the rest', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
+
+        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', ...authAdmin })
+
+        const expectedItems = ctx.items.map(i => dataSpi.QueryResponsePart.item(i))
+                
+        await expect(response).rejects.toThrow('409')
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(expect.toIncludeAllMembers(
             [ 
                 ...expectedItems, 
@@ -358,8 +375,24 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         })
     })
 
+    interface Ctx {
+        collectionName: string
+        column: InputField
+        numberColumns: InputField[]
+        objectColumn: InputField
+        item:  Item
+        items:  Item[]
+        modifiedItem: Item
+        modifiedItems: Item[]
+        anotherItem: Item
+        numberItem: Item
+        anotherNumberItem: Item
+        objectItem: Item
+        nestedFieldName: string
+        pastVeloDate: { $date: string; }
+    }
 
-    const ctx = {
+    const ctx: Ctx  = {
         collectionName: Uninitialized,
         column: Uninitialized,
         numberColumns: Uninitialized,
