@@ -22,7 +22,8 @@ export let env: E2E_ENV = {
     app: Uninitialized,
     internals: Uninitialized,
     externalDbRouter: Uninitialized,
-    capabilities: Uninitialized
+    capabilities: Uninitialized,
+    enviormentVariables: Uninitialized,
 }
 
 const createAppWithWixDataBaseUrl = createApp.bind(null, wixDataBaseUrl())
@@ -51,6 +52,7 @@ export const currentDbImplementationName = () => testedSuit().currentDbImplement
 export const initApp = async() => {
     env = await testedSuit().initApp()
     env.capabilities = testedSuit().implementation.capabilities
+    env.enviormentVariables = testedSuit().implementation.enviormentVariables
 }
 export const teardownApp = async() => {
     await testedSuit().teardownApp()
