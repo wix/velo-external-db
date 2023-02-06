@@ -2,13 +2,12 @@ import { isDate } from '@wix-velo/velo-external-db-commons'
 import { Item, ItemWithId } from '@wix-velo/velo-external-db-types'
 import * as crypto from 'crypto'
 
-export const asWixData = (item: Item, projection?: any) => { 
-    const projectionNotIncludesId = Array.isArray(projection) && !projection.includes('_id')
-    return generateIdsIfNeeded(packDates(item), projectionNotIncludesId)
+export const asWixData = (item: Item) => { 
+    return generateIdsIfNeeded(packDates(item))
 }
 
-export const generateIdsIfNeeded = (item: Item, projectionWithOutId?: boolean): ItemWithId => {
-    if ('_id' in item || projectionWithOutId)
+export const generateIdsIfNeeded = (item: Item): ItemWithId => {
+    if ('_id' in item)
         return item as ItemWithId
     const sha = crypto.createHash('sha1')
     const fieldsConcat = Object.values(item).join('')

@@ -33,9 +33,7 @@ describe('Converters', () => {
         expect(generateIdsIfNeeded(ctx.obj)._id).not.toEqual(generateIdsIfNeeded(ctx.anotherObj)._id)
     })
 
-    test('call asWixData with projection that doesn\'t includes id will not generate id', () => {
-        expect(asWixData(ctx.obj, [ctx.property])).not.toHaveProperty('_id')
-    })
+
 
     const ctx = {
         obj: Uninitialized,
