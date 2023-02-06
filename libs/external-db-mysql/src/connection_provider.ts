@@ -13,7 +13,7 @@ export default (cfg: MySqlConfig, _poolOptions: Record<string, unknown>): DbProv
         user: cfg.user,
         password: cfg.password,
         database: cfg.db,
-
+        port: cfg.port || 3306,
         multipleStatements: true,
 
         connectionLimit: 10,
