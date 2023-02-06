@@ -2,6 +2,8 @@ import * as compose from 'docker-compose'
 import init from '../../src/connection_provider'
 export { supportedOperations } from '../../src/supported_operations'
 
+export * as capabilities from '../../src/mongo_capabilities' 
+
 export const connection = async() => {
     const { connection, schemaProvider, cleanup } = await init({ connectionUri: 'mongodb://root:pass@localhost/testdb' })
 
