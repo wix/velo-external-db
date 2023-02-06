@@ -13,8 +13,8 @@ export class AwsConfigReader implements IConfigReader {
 
   async readConfig() {
     const { config } = await this.readExternalAndLocalConfig()
-    const { host, username, password, DB, SECRET_KEY } = config
-    return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY }
+    const { host, username, password, DB, SECRET_KEY, DB_PORT } = config
+    return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY, dbPort: DB_PORT }
   }
 
   async readExternalConfig() {
@@ -29,8 +29,8 @@ export class AwsConfigReader implements IConfigReader {
 
   async readExternalAndLocalConfig() { 
     const { externalConfig, secretMangerError }: {[key: string]: any} = await this.readExternalConfig()
-    const { host, username, password, DB, SECRET_KEY, HOST, PASSWORD, USER }: {[key: string]: string} = { ...process.env, ...externalConfig }
-    const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, SECRET_KEY }
+    const { host, username, password, DB, SECRET_KEY, HOST, PASSWORD, USER, DB_PORT }: {[key: string]: string} = { ...process.env, ...externalConfig }
+    const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, SECRET_KEY, DB_PORT }
     return { config, secretMangerError }
   }
 }

@@ -1,9 +1,10 @@
-export interface postgresConfig  {
+export interface PostgresConfig  {
     host?: string
     cloudSqlConnectionName?: string
     user: string
     password: string
     db: string
+    dbPort?: number
 }
 
 export interface postgresPoolOptions {
