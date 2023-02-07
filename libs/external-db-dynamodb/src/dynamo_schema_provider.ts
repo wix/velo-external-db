@@ -1,11 +1,11 @@
-import { SystemTable, validateTable, reformatFields } from './dynamo_utils'
+import { SystemTable, validateTable } from './dynamo_utils'
 import { translateErrorCodes } from './sql_exception_translator'
 import { SystemFields, validateSystemFields, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import * as dynamoRequests from './dynamo_schema_requests_utils'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
 import { CollectionCapabilities, Encryption, InputField, ISchemaProvider, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
-import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './dynamo_capabilities'
+import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadWriteOperations } from './dynamo_capabilities'
 import { supportedOperations } from './supported_operations'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
 
@@ -27,7 +27,7 @@ export default class SchemaProvider implements ISchemaProvider {
         return Items ? Items.map((table: { [x:string]: any, tableName?: any, fields?: any }) => ({
             id: table.tableName,
             fields: [...SystemFields, ...table.fields].map(this.appendAdditionalRowDetails),
-            capabilities: this.collectionCapabilities(table.fields)
+            capabilities: this.collectionCapabilities()
         })) : []
     }
 
@@ -105,7 +105,7 @@ export default class SchemaProvider implements ISchemaProvider {
         return {
             id: collectionName,
             fields: [...SystemFields, ...collection.fields].map(this.appendAdditionalRowDetails),
-            capabilities: this.collectionCapabilities(collection.fields)
+            capabilities: this.collectionCapabilities()
         }
     }
 
@@ -171,7 +171,7 @@ export default class SchemaProvider implements ISchemaProvider {
         }
     }
 
-    private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
+    private collectionCapabilities(): CollectionCapabilities {
         return {
             dataOperations: ReadWriteOperations,
             fieldTypes: FieldTypes,

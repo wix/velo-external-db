@@ -28,14 +28,6 @@ export const patchFixDates = (record: { [x: string]: any }) => {
     return fixedRecord
 }
 
-
-export const reformatFields = (field: InputField): ResponseField => {
-    return {
-        field: field.name,
-        type: field.type,
-    }
-}
-
 export const patchCollectionKeys = () => (['_id'])
 
 export const canQuery = (filterExpr: { ExpressionAttributeNames: { [s: string]: unknown } | ArrayLike<unknown> }, collectionKeys: unknown[]) => {
