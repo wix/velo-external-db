@@ -18,7 +18,7 @@ export default class SchemaAwareDataService {
     async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any): Promise<{ items: ItemWithId[], totalCount: number }> {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         await this.validateFilter(collectionName, filter, fields)
-        const projection = _projection ?? (await this.schemaInformation.schemaFieldsFor(collectionName)).map(f => f.field)
+        const projection = await this.projectionFor(collectionName, _projection)
         await this.validateProjection(collectionName, projection, fields)
 
         const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection)
@@ -27,9 +27,9 @@ export default class SchemaAwareDataService {
 
     async getById(collectionName: string, itemId: string, _projection?: any) {
         await this.validateGetById(collectionName, itemId)
-        const projection = _projection ?? (await this.schemaInformation.schemaFieldsFor(collectionName)).map(f => f.field)
-        this.validateProjection(collectionName, projection)
-
+        const projection = await this.projectionFor(collectionName, _projection)
+        this.validateProjection(collectionName, projection)        
+        
         return await this.dataService.getById(collectionName, itemId, projection)
     }
 
@@ -111,5 +111,11 @@ export default class SchemaAwareDataService {
     async schemaFieldNamesFor(collectionName: string, _fields?: ResponseField[]) {
         const fields = _fields ?? await this.schemaInformation.schemaFieldsFor(collectionName)
         return fields.map((f: { field: any }) => f.field)
+    }
+
+    private async projectionFor(collectionName: string, _projection?: string[]) {
+        const schemaContainsId = (await this.schemaInformation.schemaFieldsFor(collectionName)).some(f => f.field === '_id')
+        const projection = _projection ?? (await this.schemaInformation.schemaFieldsFor(collectionName)).map(f => f.field) 
+        return schemaContainsId ? Array.from(new Set(['_id', ...projection])) : projection
     }
 }

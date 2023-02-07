@@ -57,7 +57,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await data.givenItems([ctx.item ], ctx.collectionName, authAdmin)
         await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', skip: 0, limit: 25, projection: [ctx.column.name] }, authOwner) ).resolves.toEqual(
             expect.objectContaining({ data: {
-                    items: [ ctx.item ].map(item => ({ [ctx.column.name]: item[ctx.column.name] })),
+                    items: [ ctx.item ].map(item => ({ [ctx.column.name]: item[ctx.column.name], _id: ctx.item._id })),
                     totalCount: 1
                 } }))
     })
@@ -147,7 +147,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
         await expect(axios.post('/data/get', { collectionName: ctx.collectionName, itemId: ctx.item._id, projection: [ctx.column.name] }, authAdmin)).resolves.toEqual(
             matchers.responseWith({
-                item: { [ctx.column.name]: ctx.item[ctx.column.name], _id: expect.any(String) }
+                item: { [ctx.column.name]: ctx.item[ctx.column.name], _id: ctx.item._id }
             }))
     })
 

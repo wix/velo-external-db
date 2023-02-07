@@ -17,8 +17,8 @@ export const givenPreparedItemsForUpdateWith = (prepared: any, items: any) =>
     when(itemTransformer.prepareItemsForUpdate).calledWith(items, systemFields)
                                            .mockReturnValue(prepared)
 
-export const givenPatchedBooleanFieldsWith = (patched: any, items: any) =>
-    when(itemTransformer.patchItems).calledWith(items, systemFields)
+export const givenPatchedBooleanFieldsWith = (patched: any, items: any, fields?: { field: string, type: string, subtype?: string }[]) =>
+    when(itemTransformer.patchItems).calledWith(items, fields || systemFields)
                                       .mockReturnValue(patched)
 
 export const reset = () => {
