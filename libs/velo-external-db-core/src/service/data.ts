@@ -13,7 +13,7 @@ export default class DataService {
         const items = this.storage.find(collectionName, _filter, sort, skip, limit, projection)
         const totalCount = this.storage.count(collectionName, _filter)
         return {
-            items: (await items).map(item => asWixData(item)),
+            items: (await items).map(asWixData),
             totalCount: await totalCount
         }
     }
