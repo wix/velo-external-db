@@ -99,7 +99,46 @@ describe ('Schema Aware Data Service', () => {
         
         return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
     })
-    
+
+    test('schema with _id - find will trigger find request with projection includes _id even if it is not in the projection', async() => {
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter) 
+        queryValidator.givenValidProjectionForDefaultFieldsOf([ctx.column.field, '_id'])
+        
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ['_id', ctx.column.field])
+        patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities)
+
+
+        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])).resolves.toEqual({ 
+                                                                                                                        items: ctx.patchedEntities,
+                                                                                                                        totalCount: ctx.totalCount
+                                                                                                                    })
+    })
+
+    test('schema with _id - get will trigger get request with projection includes _id even if it is not in the projection', async() => {
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        queryValidator.givenValidGetByIdForDefaultFieldsFor(ctx.itemId)
+        queryValidator.givenValidProjectionForDefaultFieldsOf([ctx.column.field, '_id'])
+        data.givenGetByIdResult(ctx.entity, ctx.collectionName, ctx.itemId, ['_id', ctx.column.field])
+
+        return expect(env.schemaAwareDataService.getById(ctx.collectionName, ctx.itemId, [ctx.column.field])).resolves.toEqual({ item: ctx.entity })
+    })
+
+    test('schema without _id - find will trigger find request with projection without _id', async() => {
+        schema.givenSchemaFor(ctx.collectionName, [ctx.column])
+        queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter)
+        queryValidator.givenValidProjectionForDefaultFieldsOf([ctx.column.field])
+
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])
+        patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities, [ctx.column])
+
+        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])).resolves.toEqual({
+                                                                                                                        items: ctx.patchedEntities,
+                                                                                                                        totalCount: ctx.totalCount
+                                                                                                                    })
+    })
+
+
     const ctx = {
         collectionName: Uninitialized,
         entityWithoutId: Uninitialized,
@@ -123,6 +162,7 @@ describe ('Schema Aware Data Service', () => {
         defaultFields: Uninitialized,
         entityWithExtraProps: Uninitialized,
         entitiesWithExtraProps: Uninitialized,
+        column: Uninitialized,
     }
 
     interface Enviorment {
@@ -169,5 +209,6 @@ describe ('Schema Aware Data Service', () => {
         ctx.limit = chance.integer()
         ctx.projection = [chance.word()]
         ctx.defaultFields = SystemFields.map(f => f.name)
+        ctx.column = { field: chance.word(), type: 'string' }
     })
 })
