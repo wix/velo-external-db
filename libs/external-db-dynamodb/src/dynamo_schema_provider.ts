@@ -1,11 +1,14 @@
 import { SystemTable, validateTable, reformatFields } from './dynamo_utils'
 import { translateErrorCodes } from './sql_exception_translator'
-import { SystemFields, validateSystemFields, errors } from '@wix-velo/velo-external-db-commons'
+import { SystemFields, validateSystemFields, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import * as dynamoRequests from './dynamo_schema_requests_utils'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { CollectionCapabilities, Encryption, InputField, ISchemaProvider, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './dynamo_capabilities'
+import { supportedOperations } from './supported_operations'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
+
 
 export default class SchemaProvider implements ISchemaProvider {
     client: DynamoDB
@@ -23,7 +26,8 @@ export default class SchemaProvider implements ISchemaProvider {
 
         return Items ? Items.map((table: { [x:string]: any, tableName?: any, fields?: any }) => ({
             id: table.tableName,
-            fields: [...SystemFields, ...table.fields].map(reformatFields)
+            fields: [...SystemFields, ...table.fields].map(this.appendAdditionalRowDetails),
+            capabilities: this.collectionCapabilities(table.fields)
         })) : []
     }
 
@@ -36,9 +40,7 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     supportedOperations(): SchemaOperations[] {
-        const { List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately } = SchemaOperations
-
-        return [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately ]
+        return supportedOperations
     }
 
     async create(collectionName: string, columns: InputField[]): Promise<void> {
@@ -87,20 +89,40 @@ export default class SchemaProvider implements ISchemaProvider {
         const { fields } = await this.collectionDataFor(collectionName)
 
         if (!fields.some((f: { name: any }) => f.name === columnName)) {
-            throw new FieldDoesNotExist('Collection does not contain a field with this name')
+            throw new FieldDoesNotExist('Collection does not contain a field with this name', collectionName, columnName)
         }
         await this.docClient
-                  .update(dynamoRequests.removeColumnExpression(collectionName, fields.filter((f: { name: any }) => f.name !== columnName)))
+                  .update(dynamoRequests.updateColumnsExpression(collectionName, fields.filter((f: { name: any }) => f.name !== columnName)))
 
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]> {
+    async describeCollection(collectionName: string): Promise<Table> {
         await this.ensureSystemTableExists()
         validateTable(collectionName)
         
         const collection = await this.collectionDataFor(collectionName)
 
-        return [...SystemFields, ...collection.fields].map( reformatFields )
+        return {
+            id: collectionName,
+            fields: [...SystemFields, ...collection.fields].map(this.appendAdditionalRowDetails),
+            capabilities: this.collectionCapabilities(collection.fields)
+        }
+    }
+
+    async changeColumnType(collectionName: string, column: InputField): Promise<void> {
+        await this.ensureSystemTableExists()
+        validateTable(collectionName)
+        await validateSystemFields(column.name)
+        
+        const { fields } = await this.collectionDataFor(collectionName)
+
+        if (!fields.some((f: { name: any }) => f.name === column.name)) {
+            throw new FieldDoesNotExist('Collection does not contain a field with this name', collectionName, column.name)
+        }
+        
+        await this.docClient
+                    .update(dynamoRequests.updateColumnsExpression(collectionName, fields.map((f: { name: any }) => f.name === column.name ? column : f)))
+                    
     }
 
     async ensureSystemTableExists() {
@@ -138,5 +160,25 @@ export default class SchemaProvider implements ISchemaProvider {
                          .describeTable({ TableName: SystemTable })
                          .then(() => true)
                          .catch(() => false)
+    }
+
+
+    private appendAdditionalRowDetails(row: {name: string, type: string}) {        
+        return {
+            field: row.name,
+            type: row.type,
+            capabilities: ColumnsCapabilities[row.type as keyof typeof ColumnsCapabilities] ?? EmptyCapabilities
+        }
+    }
+
+    private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
+        return {
+            dataOperations: ReadWriteOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported
+        }
     }
 }
