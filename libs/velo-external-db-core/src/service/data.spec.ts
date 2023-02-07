@@ -17,6 +17,16 @@ describe('Data Service', () => {
                                                                                                                         totalCount: ctx.total
                                                                                                                     })
     })
+    
+    test('delegate request to data provider, translate data to velo format and generate _id', async() => {
+        driver.givenListResult(ctx.entitiesWithoutId, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)
+        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
+        
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)).resolves.toEqual({
+                                                                                                                        items: ctx.entitiesWithoutId.map((entity: any) => ({ ...entity, _id: expect.any(String) })),
+                                                                                                                        totalCount: ctx.total
+                                                                                                                    })
+    })
 
     test('count data from collection', async() => {
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
