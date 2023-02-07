@@ -1,5 +1,4 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField } from '@wix-velo/velo-external-db-types'
 import { Counter } from './sql_filter_transformer'
 const { InvalidQuery } = errors
 
