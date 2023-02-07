@@ -111,7 +111,7 @@ describe ('Schema Aware Data Service', () => {
 
         return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])).resolves.toEqual({ 
                                                                                                                         items: ctx.patchedEntities,
-                                                                                                              totalCount: ctx.totalCount
+                                                                                                                        totalCount: ctx.totalCount
                                                                                                                     })
     })
 
