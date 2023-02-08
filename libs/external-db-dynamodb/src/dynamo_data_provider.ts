@@ -41,12 +41,12 @@ export default class DataProvider implements IDataProvider {
         return Count || 0
     }
 
-    async insert(collectionName: string, items: Item[], _fields?: any[], upsert: boolean = false): Promise<number> {
+    async insert(collectionName: string, items: Item[], _fields?: any[], upsert = false): Promise<number> {
         validateTable(collectionName)
         await this.docClient
                   .transactWrite({
                       TransactItems: items.map((item: Item) => dynamoRequests.insertSingleItemCommand(collectionName, patchDateTime(item), upsert))
-                  }).catch(e => translateErrorCodes(e, collectionName, {items}))
+                  }).catch(e => translateErrorCodes(e, collectionName, { items }))
 
         return items.length
     }

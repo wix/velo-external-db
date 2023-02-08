@@ -47,9 +47,9 @@ export const deleteSingleItemCommand = (id: string) => ({
 
 export const insertSingleItemCommand = (collectionName: string, item: Item, upsert: boolean) => {
     const upsertCondition = upsert ? {} : {
-        ConditionExpression: "attribute_not_exists(#_id)",
+        ConditionExpression: 'attribute_not_exists(#_id)',
         ExpressionAttributeNames: {
-            "#_id": "_id"
+            '#_id': '_id'
         }
     }
     
