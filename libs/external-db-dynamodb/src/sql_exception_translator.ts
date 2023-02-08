@@ -5,7 +5,7 @@ const { CollectionDoesNotExists, DbConnectionError } = errors
 export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string, metaData?: { items?: Item[] }) => {
     switch (err.name) {
         case 'ResourceNotFoundException':
-            return new CollectionDoesNotExists('Collection does not exists')
+            return new CollectionDoesNotExists('Collection does not exists', collectionName)
         case 'CredentialsProviderError':
             return new DbConnectionError('AWS_SECRET_ACCESS_KEY or AWS_ACCESS_KEY_ID are missing')
         case 'InvalidSignatureException':

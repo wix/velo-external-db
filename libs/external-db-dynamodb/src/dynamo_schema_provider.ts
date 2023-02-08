@@ -151,7 +151,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const { Item } = await this.docClient
                                    .get(dynamoRequests.getCollectionFromSystemTableExpression(collectionName))
 
-        if (!Item && !toReturn ) throw new CollectionDoesNotExists('Collection does not exists')
+        if (!Item && !toReturn ) throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         return Item
     }
 

@@ -67,8 +67,6 @@ export default class FilterParser {
         const expressionAttributeName = attributeNameWithCounter(fieldName, counter)
        
         if (this.isNestedField(fieldName)) {
-            console.log('HERE')
-            
             const expressionAttributeValue = attributeValueNameWithCounter(fieldName, counter)
             return [{
                 filterExpr: {
