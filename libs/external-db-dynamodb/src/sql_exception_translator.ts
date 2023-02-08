@@ -1,7 +1,8 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
+import { Item } from '@wix-velo/velo-external-db-types'
 const { CollectionDoesNotExists, DbConnectionError } = errors
 
-export const notThrowingTranslateErrorCodes = (err: any) => {
+export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string, metaData?: { items?: Item[] }) => {
     switch (err.name) {
         case 'ResourceNotFoundException':
             return new CollectionDoesNotExists('Collection does not exists')
@@ -9,6 +10,11 @@ export const notThrowingTranslateErrorCodes = (err: any) => {
             return new DbConnectionError('AWS_SECRET_ACCESS_KEY or AWS_ACCESS_KEY_ID are missing')
         case 'InvalidSignatureException':
             return new DbConnectionError('AWS_SECRET_ACCESS_KEY or AWS_ACCESS_KEY_ID are invalid')
+        case 'TransactionCanceledException':
+            if (err.message.includes('ConditionalCheckFailed')) {
+                const itemId = metaData?.items?.[err.CancellationReasons.findIndex((reason: any) => reason.Code === 'ConditionalCheckFailed')]._id
+                return new errors.ItemAlreadyExists('Item already exists', collectionName, itemId)
+            }
     }
 
     switch (err.message) {
@@ -21,7 +27,7 @@ export const notThrowingTranslateErrorCodes = (err: any) => {
     }
 }
 
-export const translateErrorCodes = (err: any) => {
-    throw notThrowingTranslateErrorCodes(err)
+export const translateErrorCodes = (err: any, collectionName?: string, metaData?: {items?: Item[]}) => {
+    throw notThrowingTranslateErrorCodes(err, collectionName, metaData)
     
 }
