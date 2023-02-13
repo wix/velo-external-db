@@ -11,7 +11,7 @@ import { config } from './roles-config.json'
 import { authRoleMiddleware } from './web/auth-role-middleware'
 import { unless, includes } from './web/middleware-support'
 import { getAppInfoPage } from './utils/router_utils'
-import { requestContextFor, DataActionsV3, dataPayloadForV3, DataOperationsV3, DataHooksForActionV3 } from './data_hooks_utils'
+import { requestContextFor, DataActionsV3, dataPayloadForV3, DataHooksForActionV3 } from './data_hooks_utils'
 // import { SchemaHooksForAction } from './schema_hooks_utils'
 import SchemaService from './service/schema'
 import OperationService from './service/operation'
@@ -20,7 +20,7 @@ import SchemaAwareDataService from './service/schema_aware_data'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
-import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from './types'
+import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext, DataOperationsV3 } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
 import { JwtAuthenticator } from './web/jwt-auth-middleware'
 import * as dataSource from './spi-model/data_source'
@@ -29,7 +29,7 @@ import { WixDataFacade } from './web/wix_data_facade'
 
 
 const { InvalidRequest } = errors
-const { Query, Count, Aggregate } = DataOperationsV3
+const { Query, Count, Aggregate, Insert } = DataOperationsV3
 
 let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks //roleAuthorizationService: RoleAuthorizationService, schemaHooks: SchemaHooks, 
 
@@ -156,7 +156,7 @@ export const createRouter = () => {
 
     router.post('/data/count', async(req, res, next) => {
         try {
-            const {collectionId, filter} = await executeDataHooksFor(DataActionsV3.BeforeCount, dataPayloadForV3(Count, req.body), requestContextFor(Count, req.body), {}) as dataSource.CountRequest
+            const { collectionId, filter } = await executeDataHooksFor(DataActionsV3.BeforeCount, dataPayloadForV3(Count, req.body), requestContextFor(Count, req.body), {}) as dataSource.CountRequest
 
             const data = await schemaAwareDataService.count(
                 collectionId,
@@ -177,15 +177,14 @@ export const createRouter = () => {
 
     router.post('/data/insert', async(req, res, next) => {
         try {
-            const insertRequest: dataSource.InsertRequest = req.body
+            const { collectionId, items, overwriteExisting } = await executeDataHooksFor(DataActionsV3.BeforeInsert, dataPayloadForV3(Insert, req.body), requestContextFor(Insert, req.body), {}) as dataSource.InsertRequest
 
-            const collectionName = insertRequest.collectionId
+            const data = overwriteExisting ?
+                            await schemaAwareDataService.bulkUpsert(collectionId, items) :
+                            await schemaAwareDataService.bulkInsert(collectionId, items)
 
-            const data = insertRequest.overwriteExisting ?
-                            await schemaAwareDataService.bulkUpsert(collectionName, insertRequest.items) :
-                            await schemaAwareDataService.bulkInsert(collectionName, insertRequest.items)
-
-            const responseParts = data.items.map(dataSource.InsertResponsePart.item)
+            const dataAfterAction = await executeDataHooksFor(DataActionsV3.AfterInsert, data, requestContextFor(Insert, req.body), {})
+            const responseParts = dataAfterAction.items.map(dataSource.InsertResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {

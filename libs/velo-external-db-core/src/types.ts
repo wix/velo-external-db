@@ -1,8 +1,7 @@
 import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId } from '@wix-velo/velo-external-db-types'
-import { DataOperationsV3 } from './data_hooks_utils';
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
-import { AggregateRequest, CountRequest, CountResponse, Group, Paging, QueryRequest, Sorting } from './spi-model/data_source'
+import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2 } from './spi-model/data_source'
 
 
 export interface FindQuery {
@@ -12,14 +11,12 @@ export interface FindQuery {
     limit?: number;
 }
 
-
-
 export interface Payload {
     filter?: WixDataFilter | AdapterFilter
     sort?: Sort[] | Sorting[];
     skip?: number;
     limit?: number;
-    initialFilter: WixDataFilter | AdapterFilter;
+    initialFilter?: WixDataFilter | AdapterFilter;
     group?: Group;
     finalFilter?: WixDataFilter | AdapterFilter;
     paging?: Paging;
@@ -27,32 +24,31 @@ export interface Payload {
     items?: Item[];
     itemId?: string;
     itemIds?: string[];
+
+    //v3
+    collectionId: string;
+    options?: Options;
+    omitTotalCount?: boolean;
+    includeReferencedItems?: string[];
+    namespace?: string;
+    query?: QueryV2;
+    overwriteExisting?: boolean;
+    totalCount?: number;
 }
 
-enum ReadOperation {
-    GET = 'GET',
-    FIND = 'FIND',
+export enum DataOperationsV3 {
+    Query = 'query',
+    Count = 'count',
+    Aggregate = 'aggregate',
+    Insert = 'insert',
 }
 
-enum WriteOperation {
-    INSERT = 'INSERT',
-    UPDATE = 'UPDATE',
-    DELETE = 'DELETE',
+export enum SchemaOperationsV3 {
+    
 }
-
-type Operation = ReadOperation | WriteOperation;
 
 export interface RequestContext {
-    operation: Operation;
-    collectionId: string;
-    instanceId?: string;
-    role?: string;
-    memberId?: string;
-    settings?: any;
-}
-
-export interface RequestContextV3 {
-    operation: DataOperationsV3;
+    operation: DataOperationsV3 | SchemaOperationsV3; // data operation | schema operation
     collectionId: string;
     instanceId?: string;
     role?: string;
@@ -77,8 +73,8 @@ export interface DataHooks {
     afterWrite?: Hook<Payload>;
     beforeFind?: Hook<FindQuery>
     afterFind?: Hook<{ items: Item[] }>
-    beforeInsert?: Hook<{ item: Item }>
-    afterInsert?: Hook<{ item: Item }>
+    // beforeInsert?: Hook<{ item: Item }>
+    // afterInsert?: Hook<{ item: Item }>
     beforeBulkInsert?: Hook<{ items: Item[] }>
     afterBulkInsert?: Hook<{ items: Item[] }>
     beforeUpdate?: Hook<{ item: Item }>
@@ -103,7 +99,8 @@ export interface DataHooks {
     afterCount?: Hook<CountResponse>
     beforeAggregate?: Hook<AggregateRequest>
     afterAggregate?: Hook<{ items: ItemWithId[], totalCount?: number }>
-    
+    beforeInsert?: Hook<InsertRequest>
+    afterInsert?: Hook<{ items: Item[] }>
 }
 
 export type DataHook = DataHooks[keyof DataHooks];

@@ -1,6 +1,6 @@
 import { Item, WixDataFilter } from '@wix-velo/velo-external-db-types'
-import { AggregateRequest, CountRequest, QueryRequest } from './spi-model/data_source'
-import { FindQuery, RequestContext } from './types'
+import { AggregateRequest, CountRequest, InsertRequest, QueryRequest } from './spi-model/data_source'
+import { FindQuery, RequestContext, DataOperationsV3 } from './types'
 
 
 export const DataHooksForAction: { [key: string]: string[] } = {
@@ -33,6 +33,8 @@ export const DataHooksForActionV3: { [key: string]: string[] } = {
     afterCount: ['afterAll', 'afterRead', 'afterCount'],
     beforeAggregate: ['beforeAll', 'beforeRead', 'beforeAggregate'],
     afterAggregate: ['afterAll', 'afterRead', 'afterAggregate'],
+    beforeInsert: ['beforeAll', 'beforeWrite', 'beforeInsert'],
+    afterInsert: ['afterAll', 'afterWrite', 'afterInsert'],
 }
 
 
@@ -49,12 +51,6 @@ export enum DataOperations {
     Get = 'getById',
 }
 
-export enum DataOperationsV3 {
-    Query = 'query',
-    Count = 'count',
-    Aggregate = 'aggregate',
-}
-
 export enum DataActionsV3 {
     BeforeQuery = 'beforeQuery',
     AfterQuery = 'afterQuery',
@@ -62,6 +58,8 @@ export enum DataActionsV3 {
     AfterCount = 'afterCount',
     BeforeAggregate = 'beforeAggregate',
     AfterAggregate = 'afterAggregate',
+    BeforeInsert = 'beforeInsert',
+    AfterInsert = 'afterInsert',
 }
 
 export const DataActions = {
@@ -124,6 +122,15 @@ export const dataPayloadForV3 = (operation: DataOperationsV3, body: any) => {
                 options: body.options, // not supported
                 omitTotalCount: body.omitTotalCount
             } as AggregateRequest
+
+        case DataOperationsV3.Insert:
+            return {
+                collectionId: body.collectionId,
+                namespace: body.namespace, // not supported
+                items: body.items,
+                overwriteExisting: body.overwriteExisting,
+                options: body.options, // not supported
+            } as InsertRequest
     }
 }
 
