@@ -1,7 +1,8 @@
-import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from '@wix-velo/velo-external-db-types'
+import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId } from '@wix-velo/velo-external-db-types'
+import { DataOperationsV3 } from './data_hooks_utils';
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
-import { AggregateRequest, Group, Paging, Sorting } from './spi-model/data_source'
+import { AggregateRequest, CountRequest, CountResponse, Group, Paging, QueryRequest, Sorting } from './spi-model/data_source'
 
 
 export interface FindQuery {
@@ -43,7 +44,16 @@ type Operation = ReadOperation | WriteOperation;
 
 export interface RequestContext {
     operation: Operation;
-    collectionName: string;
+    collectionId: string;
+    instanceId?: string;
+    role?: string;
+    memberId?: string;
+    settings?: any;
+}
+
+export interface RequestContextV3 {
+    operation: DataOperationsV3;
+    collectionId: string;
     instanceId?: string;
     role?: string;
     memberId?: string;
@@ -79,10 +89,21 @@ export interface DataHooks {
     afterRemove?: Hook<{ itemId: string }>
     beforeBulkRemove?: Hook<{ itemIds: string[] }>
     afterBulkRemove?: Hook<{ itemIds: string[] }>
+    // beforeAggregate?: Hook<AggregateRequest>
+    // afterAggregate?: Hook<{ items: Item[] }>
+    // beforeCount?: Hook<WixDataFilter>
+    // afterCount?: Hook<{ totalCount: number }>
+
+
+
+    //V3
+    beforeQuery?: Hook<QueryRequest>
+    afterQuery?: Hook<{ items: ItemWithId[], totalCount?: number }>
+    beforeCount?: Hook<CountRequest>
+    afterCount?: Hook<CountResponse>
     beforeAggregate?: Hook<AggregateRequest>
-    afterAggregate?: Hook<{ items: Item[] }>
-    beforeCount?: Hook<WixDataFilter>
-    afterCount?: Hook<{ totalCount: number }>
+    afterAggregate?: Hook<{ items: ItemWithId[], totalCount?: number }>
+    
 }
 
 export type DataHook = DataHooks[keyof DataHooks];

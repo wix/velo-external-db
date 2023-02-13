@@ -1,5 +1,5 @@
 import { Item, WixDataFilter } from '@wix-velo/velo-external-db-types'
-import { AggregateRequest } from './spi-model/data_source'
+import { AggregateRequest, CountRequest, QueryRequest } from './spi-model/data_source'
 import { FindQuery, RequestContext } from './types'
 
 
@@ -26,6 +26,15 @@ export const DataHooksForAction: { [key: string]: string[] } = {
     afterGetById: ['afterAll', 'afterRead', 'afterGetById'],
 }
 
+export const DataHooksForActionV3: { [key: string]: string[] } = {
+    beforeQuery: ['beforeAll', 'beforeRead', 'beforeQuery'],
+    afterQuery: ['afterAll', 'afterRead', 'afterQuery'],
+    beforeCount: ['beforeAll', 'beforeRead', 'beforeCount'],
+    afterCount: ['afterAll', 'afterRead', 'afterCount'],
+    beforeAggregate: ['beforeAll', 'beforeRead', 'beforeAggregate'],
+    afterAggregate: ['afterAll', 'afterRead', 'afterAggregate'],
+}
+
 
 export enum DataOperations {
     Find = 'find',
@@ -38,6 +47,21 @@ export enum DataOperations {
     Aggregate = 'aggregate',
     Count = 'count',
     Get = 'getById',
+}
+
+export enum DataOperationsV3 {
+    Query = 'query',
+    Count = 'count',
+    Aggregate = 'aggregate',
+}
+
+export enum DataActionsV3 {
+    BeforeQuery = 'beforeQuery',
+    AfterQuery = 'afterQuery',
+    BeforeCount = 'beforeCount',
+    AfterCount = 'afterCount',
+    BeforeAggregate = 'beforeAggregate',
+    AfterAggregate = 'afterAggregate',
 }
 
 export const DataActions = {
@@ -68,6 +92,41 @@ export const DataActions = {
     BeforeWrite: 'beforeWrite',
     AfterWrite: 'afterWrite'
 }
+
+export const dataPayloadForV3 = (operation: DataOperationsV3, body: any) => {
+    switch (operation) {
+        case DataOperationsV3.Query:
+            return {
+                collectionId: body.collectionId,
+                namespace: body.namespace, // not supported
+                query: body.query,
+                includeReferencedItems: body.includeReferencedItems, // not supported
+                omitTotalCount: body.omitTotalCount,
+                options: body.options // not supported
+            } as QueryRequest
+        case DataOperationsV3.Count:
+            return {
+                collectionId: body.collectionId,
+                namespace: body.namespace, // not supported
+                filter: body.filter,
+                options: body.options // not supported
+            } as CountRequest
+        case DataOperationsV3.Aggregate:
+            return {
+                collectionId: body.collectionId,
+                namespace: body.namespace, // not supported
+                initialFilter: body.initialFilter,
+                distinct: body.distinct, // not supported
+                group: body.group,
+                finalFilter: body.finalFilter,
+                sort: body.sort,
+                paging: body.paging,
+                options: body.options, // not supported
+                omitTotalCount: body.omitTotalCount
+            } as AggregateRequest
+    }
+}
+
 
 export const dataPayloadFor = (operation: DataOperations, body: any) => {
     switch (operation) {
@@ -107,7 +166,7 @@ export const dataPayloadFor = (operation: DataOperations, body: any) => {
 
 export const requestContextFor = (operation: any, body: any): RequestContext => ({ 
     operation, 
-    collectionName: body.collectionName, 
+    collectionId: body.collectionId, 
     instanceId: body.requestContext.instanceId,
     memberId: body.requestContext.memberId,
     role: body.requestContext.role,
