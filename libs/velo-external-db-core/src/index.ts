@@ -70,5 +70,6 @@ export class ExternalDbRouter {
 
 export * as types from './types'
 export * as dataSpi from './spi-model/data_source'
+export * as collectionSpi from './spi-model/collection'
 export * as schemaUtils from '../src/utils/schema_utils'
 export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext, CollectionCapability, decodeBase64 }

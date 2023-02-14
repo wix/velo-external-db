@@ -1,6 +1,6 @@
 import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { streamToArray } from '@wix-velo/test-commons'
-import { dataSpi, types as coreTypes } from '@wix-velo/velo-external-db-core'
+import { dataSpi, types as coreTypes, collectionSpi } from '@wix-velo/velo-external-db-core'
 import { InputField, ItemWithId, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } from '../resources/e2e_resources'
@@ -217,69 +217,69 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     )
                 })
 
-                test('before remove request - should be able to modify the item id', async() => {
-                    await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                    await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+            test('before remove request - should be able to modify the item id', async() => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                await data.givenItems([ctx.item], ctx.collectionName, authOwner)
 
-                    const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.item._id)
+                const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.item._id)
 
-                    env.externalDbRouter.reloadHooks({
-                        dataHooks: {
-                            beforeAll: (payload: dataSpi.RemoveRequest, requestContext: coreTypes.RequestContext, _serviceContext) => {
-                                if (requestContext.operation !== coreTypes.DataOperationsV3.Query) {
-                                    return {
-                                        ...payload, itemIds: [ idPart1 ]
-                                    }
-                                }
-                            },
-                            beforeWrite: (payload: dataSpi.RemoveRequest, _requestContext, _serviceContext) => {
+                env.externalDbRouter.reloadHooks({
+                    dataHooks: {
+                        beforeAll: (payload: dataSpi.RemoveRequest, requestContext: coreTypes.RequestContext, _serviceContext) => {
+                            if (requestContext.operation !== coreTypes.DataOperationsV3.Query) {
                                 return {
-                                    ...payload, itemIds: [ `${payload.itemIds[0]}${idPart2}` ]
-                                }
-                            },
-                            beforeRemove: (payload: dataSpi.RemoveRequest, _requestContext, _serviceContext) => {
-                                return {
-                                    ...payload, itemIds: [ `${payload.itemIds[0]}${idPart3}` ]
+                                    ...payload, itemIds: [idPart1]
                                 }
                             }
-                        }
-                    })
-
-                    await axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.numberItem]), authOwner)
-
-                    await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
-                        expect.toIncludeSameMembers([data.pagingMetadata(0, 0)])
-                    )
-                })
-
-                test('before truncate request - should be able to modify the collection name', async() => {
-                    await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-                    await data.givenItems([ctx.item], ctx.collectionName, authOwner)
-
-                    const [collectionIdPart1, collectionIdPart2, collectionIdPart3] = hooks.splitIdToThreeParts(ctx.collectionName)
-
-                    env.externalDbRouter.reloadHooks({
-                        dataHooks: {
-                            beforeAll: (payload: dataSpi.TruncateRequest, requestContext: coreTypes.RequestContext, _serviceContext) => {
-                                if (requestContext.operation !== coreTypes.DataOperationsV3.Query) {
-                                    return { ...payload, collectionId: collectionIdPart1 }
-                                }
-                            },
-                            beforeWrite: (payload: dataSpi.TruncateRequest, _requestContext, _serviceContext) => {
-                                return hooks.concatToProperty(payload, 'collectionId', collectionIdPart2)
-                            },
-                            beforeTruncate: (payload: dataSpi.TruncateRequest, _requestContext, _serviceContext) => {
-                                return hooks.concatToProperty(payload, 'collectionId', collectionIdPart3)
+                        },
+                        beforeWrite: (payload: dataSpi.RemoveRequest, _requestContext, _serviceContext) => {
+                            return {
+                                ...payload, itemIds: [`${payload.itemIds[0]}${idPart2}`]
+                            }
+                        },
+                        beforeRemove: (payload: dataSpi.RemoveRequest, _requestContext, _serviceContext) => {
+                            return {
+                                ...payload, itemIds: [`${payload.itemIds[0]}${idPart3}`]
                             }
                         }
-                    })
-
-                    await axios.post('/data/truncate', hooks.writeRequestBodyWith('wrongCollectionId', []), authOwner)
-
-                    await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
-                        expect.toIncludeSameMembers([data.pagingMetadata(0, 0)])
-                    )
+                    }
                 })
+
+                await axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.numberItem]), authOwner)
+
+                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
+                    expect.toIncludeSameMembers([data.pagingMetadata(0, 0)])
+                )
+            })
+
+            test('before truncate request - should be able to modify the collection name', async() => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+
+                const [collectionIdPart1, collectionIdPart2, collectionIdPart3] = hooks.splitIdToThreeParts(ctx.collectionName)
+
+                env.externalDbRouter.reloadHooks({
+                    dataHooks: {
+                        beforeAll: (payload: dataSpi.TruncateRequest, requestContext: coreTypes.RequestContext, _serviceContext) => {
+                            if (requestContext.operation !== coreTypes.DataOperationsV3.Query) {
+                                return { ...payload, collectionId: collectionIdPart1 }
+                            }
+                        },
+                        beforeWrite: (payload: dataSpi.TruncateRequest, _requestContext, _serviceContext) => {
+                            return hooks.concatToProperty(payload, 'collectionId', collectionIdPart2)
+                        },
+                        beforeTruncate: (payload: dataSpi.TruncateRequest, _requestContext, _serviceContext) => {
+                            return hooks.concatToProperty(payload, 'collectionId', collectionIdPart3)
+                        }
+                    }
+                })
+
+                await axios.post('/data/truncate', hooks.writeRequestBodyWith('wrongCollectionId', []), authOwner)
+
+                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
+                    expect.toIncludeSameMembers([data.pagingMetadata(0, 0)])
+                )
+            })
         })
     })
 
@@ -478,7 +478,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             })
         })
     })
-    
+
     describe('Error Handling', () => {
         test('should handle error object and throw with the corresponding status', async() => {
             env.externalDbRouter.reloadHooks({
@@ -526,6 +526,63 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         })
     })
 
+    describe('Custom context, Service context', () => { //skip aggregate if needed!
+        each([
+            ['query', 'Read', 'beforeQuery', 'afterQuery', '/data/query'],
+            ['count', 'Read', 'beforeCount', 'afterCount', '/data/count'],
+            ['insert', 'Write', 'beforeInsert', 'afterInsert', '/data/insert'],
+            ['update', 'Write', 'beforeUpdate', 'afterUpdate', '/data/update'],
+            ['remove', 'Write', 'beforeRemove', 'afterRemove', '/data/remove'],
+            ['truncate', 'Write', 'beforeTruncate', 'afterTruncate', '/data/truncate'],
+        ]).test('%s - should be able to modify custom context from each hook, and use service context', async(operation, operationType, beforeHook, afterHook, api) => {
+            await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            if (operation !== 'insert') {
+                await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+            }
+
+            const beforeOperationHookName = `before${operationType}`
+            const afterOperationHookName = `after${operationType}`
+
+            env.externalDbRouter.reloadHooks({
+                dataHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['beforeAll'] = true
+                    },
+                    [beforeOperationHookName]: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['beforeOperation'] = true
+                    },
+                    [beforeHook]: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['beforeHook'] = true
+                    },
+                    afterAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['afterAll'] = true
+                    },
+                    [afterOperationHookName]: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['afterOperation'] = true
+                    },
+                    [afterHook]: async(payload, _requestContext, serviceContext: coreTypes.ServiceContext, customContext) => {
+                        customContext['afterHook'] = true
+
+                            if (customContext['beforeAll'] && customContext['beforeOperation'] &&
+                                customContext['beforeHook'] && customContext['afterAll'] &&
+                                customContext['afterOperation'] && customContext['afterHook']) {
+
+                                await serviceContext.schemaService.create(ctx.newCollection)
+                                await serviceContext.dataService.insert(ctx.newCollection.id, ctx.newItem)
+                            }
+                    }
+                }
+            })
+
+            await axios.post(api, hooks.requestBodyWith(ctx.collectionName, [ctx.item]), { responseType: 'stream', ...authOwner })
+
+            hooks.resetHooks(env.externalDbRouter)
+
+            await expect(data.queryCollectionAsArray(ctx.newCollection.id, [], undefined, authOwner)).resolves.toEqual(
+                expect.toIncludeSameMembers([{ item: ctx.newItem }, data.pagingMetadata(1, 1)]))
+        })
+    })
+
     interface Ctx {
         collectionName: string
         column: InputField
@@ -538,6 +595,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         afterWriteColumn: InputField
         afterHookColumn: InputField
         numberColumns: InputField[]
+        newCollection: collectionSpi.Collection
+        newItem: ItemWithId
     }
 
     const ctx: Ctx = {
@@ -552,10 +611,13 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         afterWriteColumn: Uninitialized,
         afterHookColumn: Uninitialized,
         numberColumns: Uninitialized,
+        newCollection: Uninitialized,
+        newItem: Uninitialized
     }
 
     beforeEach(async() => {
         ctx.collectionName = gen.randomCollectionName()
+        ctx.newCollection = gen.randomCollection()
         ctx.column = gen.randomColumn()
         ctx.afterAllColumn = { name: 'afterAll', type: 'boolean' }
         ctx.afterWriteColumn = { name: 'afterWrite', type: 'boolean' }
@@ -564,6 +626,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         ctx.item = genCommon.randomEntity([ctx.column.name]) as ItemWithId
         ctx.items = Array.from({ length: 10 }, () => genCommon.randomEntity([ctx.column.name])) as ItemWithId[]
 
+        ctx.newItem = genCommon.randomEntity([]) as ItemWithId
         ctx.numberColumns = gen.randomNumberColumns()
         ctx.numberItem = genCommon.randomNumberEntity(ctx.numberColumns) as ItemWithId
         ctx.anotherNumberItem = genCommon.randomNumberEntity(ctx.numberColumns) as ItemWithId
