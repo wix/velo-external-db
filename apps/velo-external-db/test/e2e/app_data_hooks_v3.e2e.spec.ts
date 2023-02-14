@@ -9,6 +9,7 @@ import schema = require('../drivers/schema_api_rest_test_support')
 import * as data from '../drivers/data_api_rest_test_support'
 import hooks = require('../drivers/hooks_test_support_v3')
 import * as matchers from '../drivers/schema_api_rest_matchers'
+import each from 'jest-each'
 
 const { Aggregate } = SchemaOperations
 
@@ -158,27 +159,31 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             }
         })
         describe('Write Operations', () => {
-            test('before insert request - should be able to modify the item', async() => {
-                await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.afterAllColumn, ctx.afterWriteColumn, ctx.afterHookColumn], authOwner)
+            each([
+                ['insert', 'beforeInsert', '/data/insert'],
+                ['update', 'beforeUpdate', '/data/update'],
+            ])
+                .test('before %s request - should be able to modify the item', async(operation, hookName, api) => {
+                    await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.afterAllColumn, ctx.afterWriteColumn, ctx.afterHookColumn], authOwner)
+                    if (operation !== 'insert') {
+                        await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+                    }
 
-                env.externalDbRouter.reloadHooks({
-                    dataHooks: {
-                        beforeAll: (_payload, requestContext: coreTypes.RequestContext, _serviceContext) => {
-                            if (requestContext.operation === coreTypes.DataOperationsV3.Insert) {
-                                const payload = _payload as dataSpi.InsertRequest
-                                return {
-                                    ...payload, items: payload.items.map(item => ({
-                                        ...item,
-                                        [ctx.afterAllColumn.name]: true,
-                                        [ctx.afterWriteColumn.name]: false,
-                                        [ctx.afterHookColumn.name]: false,
-                                    }))
+                    env.externalDbRouter.reloadHooks({
+                        dataHooks: {
+                            beforeAll: (payload, requestContext: coreTypes.RequestContext, _serviceContext) => {
+                                if (requestContext.operation !== coreTypes.DataOperationsV3.Query) {
+                                    return {
+                                        ...payload, items: payload.items.map(item => ({
+                                            ...item,
+                                            [ctx.afterAllColumn.name]: true,
+                                            [ctx.afterWriteColumn.name]: false,
+                                            [ctx.afterHookColumn.name]: false,
+                                        }))
+                                    }
                                 }
-                            }
-                        },
-                        beforeWrite: (_payload, requestContext: coreTypes.RequestContext, _serviceContext) => {
-                            if (requestContext.operation === coreTypes.DataOperationsV3.Insert) {
-                                const payload = _payload as dataSpi.InsertRequest
+                            },
+                            beforeWrite: (payload, _requestContext, _serviceContext) => {
                                 return {
                                     ...payload, items: payload.items.map(item => ({
                                         ...item,
@@ -186,32 +191,31 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                                         [ctx.afterHookColumn.name]: false,
                                     }))
                                 }
-                            }
-                        },
-                        beforeInsert: (payload, _requestContext, _serviceContext) => {
-                            return {
-                                ...payload, items: payload.items.map(item => ({
-                                    ...item,
-                                    [ctx.afterHookColumn.name]: true,
-                                }))
+                            },
+                            [hookName]: (payload, _requestContext, _serviceContext) => {
+                                return {
+                                    ...payload, items: payload.items.map(item => ({
+                                        ...item,
+                                        [ctx.afterHookColumn.name]: true,
+                                    }))
+                                }
                             }
                         }
-                    }
+                    })
+
+                    await axios.post(api, hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)
+
+                    await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
+                        expect.toIncludeSameMembers([{
+                            item: {
+                                ...ctx.item,
+                                [ctx.afterAllColumn.name]: true,
+                                [ctx.afterWriteColumn.name]: true,
+                                [ctx.afterHookColumn.name]: true,
+                            }
+                        }, data.pagingMetadata(1, 1)])
+                    )
                 })
-
-                await axios.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.item], false), authOwner)
-
-                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
-                    expect.toIncludeSameMembers([{
-                        item: {
-                            ...ctx.item,
-                            [ctx.afterAllColumn.name]: true,
-                            [ctx.afterWriteColumn.name]: true,
-                            [ctx.afterHookColumn.name]: true,
-                        }
-                    }, data.pagingMetadata(1, 1)])
-                )
-            })
         })
     })
 
@@ -350,6 +354,63 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
 
             }
+        })
+        describe('Write Operations', () => {
+            each([
+                ['insert', 'afterInsert', '/data/insert'],
+                ['update', 'afterUpdate', '/data/update'],
+            ]).test.only('after %s request - should be able to modify response', async(operation, hookName, api) => {
+                await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.afterAllColumn, ctx.afterWriteColumn, ctx.afterHookColumn], authOwner)
+                if (operation !== 'insert') {
+                    await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+                }
+
+                env.externalDbRouter.reloadHooks({
+                    dataHooks: {
+                        afterAll: (payload, requestContext: coreTypes.RequestContext, _serviceContext) => {
+                            if (requestContext.operation !== coreTypes.DataOperationsV3.Query) {
+                                return {
+                                    ...payload, items: payload.items.map(item => ({
+                                        ...item,
+                                        [ctx.afterAllColumn.name]: true,
+                                        [ctx.afterWriteColumn.name]: false,
+                                        [ctx.afterHookColumn.name]: false,
+                                    }))
+                                }
+                            }
+                        },
+                        afterWrite: (payload, _requestContext, _serviceContext) => {
+                            return {
+                                ...payload, items: payload.items.map(item => ({
+                                    ...item,
+                                    [ctx.afterWriteColumn.name]: true,
+                                    [ctx.afterHookColumn.name]: false,
+                                }))
+                            }
+                        },
+                        [hookName]: (payload, _requestContext, _serviceContext) => {
+                            return {
+                                ...payload, items: payload.items.map(item => ({
+                                    ...item,
+                                    [ctx.afterHookColumn.name]: true,
+                                }))
+                            }
+                        }
+                    }
+                })
+
+                const response = await axios.post(api, hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), { responseType: 'stream', ...authOwner })
+
+                await expect(streamToArray(response.data)).resolves.toEqual(
+                    expect.toIncludeSameMembers([{
+                        item: {
+                            ...ctx.item,
+                            [ctx.afterAllColumn.name]: true,
+                            [ctx.afterWriteColumn.name]: true,
+                            [ctx.afterHookColumn.name]: true,
+                        }
+                    }]))
+            })
         })
     })
 

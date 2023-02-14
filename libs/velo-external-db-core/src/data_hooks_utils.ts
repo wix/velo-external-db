@@ -35,6 +35,10 @@ export const DataHooksForActionV3: { [key: string]: string[] } = {
     afterAggregate: ['afterAll', 'afterRead', 'afterAggregate'],
     beforeInsert: ['beforeAll', 'beforeWrite', 'beforeInsert'],
     afterInsert: ['afterAll', 'afterWrite', 'afterInsert'],
+    beforeUpdate: ['beforeAll', 'beforeWrite', 'beforeUpdate'],
+    afterUpdate: ['afterAll', 'afterWrite', 'afterUpdate'],
+    beforeRemove: ['beforeAll', 'beforeWrite', 'beforeRemove'],
+    afterRemove: ['afterAll', 'afterWrite', 'afterRemove'],
 }
 
 
@@ -60,6 +64,10 @@ export enum DataActionsV3 {
     AfterAggregate = 'afterAggregate',
     BeforeInsert = 'beforeInsert',
     AfterInsert = 'afterInsert',
+    BeforeUpdate = 'beforeUpdate',
+    AfterUpdate = 'afterUpdate',
+    BeforeRemove = 'beforeRemove',
+    AfterRemove = 'afterRemove',
 }
 
 export const DataActions = {
@@ -131,6 +139,20 @@ export const dataPayloadForV3 = (operation: DataOperationsV3, body: any) => {
                 overwriteExisting: body.overwriteExisting,
                 options: body.options, // not supported
             } as InsertRequest
+        case DataOperationsV3.Update:
+            return {
+                collectionId: body.collectionId,
+                namespace: body.namespace, // not supported
+                items: body.items,
+                options: body.options, // not supported
+            }
+        case DataOperationsV3.Remove:
+            return {
+                collectionId: body.collectionId,
+                namespace: body.namespace, // not supported
+                itemIds: body.itemIds,
+                options: body.options, // not supported
+            }
     }
 }
 

@@ -29,7 +29,7 @@ import { WixDataFacade } from './web/wix_data_facade'
 
 
 const { InvalidRequest } = errors
-const { Query, Count, Aggregate, Insert } = DataOperationsV3
+const { Query, Count, Aggregate, Insert, Update, Remove } = DataOperationsV3
 
 let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks //roleAuthorizationService: RoleAuthorizationService, schemaHooks: SchemaHooks, 
 
@@ -195,13 +195,13 @@ export const createRouter = () => {
     router.post('/data/update', async(req, res, next) => {
         
         try {
-            const updateRequest: dataSource.UpdateRequest = req.body
+            const { collectionId, items } = await executeDataHooksFor(DataActionsV3.BeforeUpdate, dataPayloadForV3(Update, req.body), requestContextFor(Update, req.body), {}) as dataSource.UpdateRequest
+            
+            const data = await schemaAwareDataService.bulkUpdate(collectionId, items)
 
-            const collectionName = updateRequest.collectionId
+            const dataAfterAction = await executeDataHooksFor(DataActionsV3.AfterUpdate, data, requestContextFor(Update, req.body), {})
 
-            const data = await schemaAwareDataService.bulkUpdate(collectionName, updateRequest.items)
-
-            const responseParts = data.items.map(dataSource.UpdateResponsePart.item)
+            const responseParts = dataAfterAction.items.map(dataSource.UpdateResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {
@@ -211,16 +211,18 @@ export const createRouter = () => {
 
     router.post('/data/remove', async(req, res, next) => {
         try {
-            const removeRequest: dataSource.RemoveRequest = req.body
-            const collectionName = removeRequest.collectionId
-            const idEqExpression = removeRequest.itemIds.map(itemId => ({ _id: { $eq: itemId } }))
+            const { collectionId, itemIds } = await executeDataHooksFor(DataActionsV3.BeforeRemove, dataPayloadForV3(Remove, req.body), requestContextFor(Remove, req.body), {}) as dataSource.RemoveRequest
+            
+            const idEqExpression = itemIds.map(itemId => ({ _id: { $eq: itemId } }))
             const filter = { $or: idEqExpression }
+            
+            const objectsBeforeRemove = (await schemaAwareDataService.find(collectionId, filterTransformer.transform(filter), undefined, 0, itemIds.length, undefined, true)).items
+            
+            await schemaAwareDataService.bulkDelete(collectionId, itemIds)
+            
+            const dataAfterAction = await executeDataHooksFor(DataActionsV3.AfterRemove, objectsBeforeRemove, requestContextFor(Remove, req.body), {})
 
-            const objectsBeforeRemove = (await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), undefined, 0, removeRequest.itemIds.length)).items
-
-            await schemaAwareDataService.bulkDelete(collectionName, removeRequest.itemIds)
-
-            const responseParts = objectsBeforeRemove.map(dataSource.RemoveResponsePart.item)
+            const responseParts = dataAfterAction.map(dataSource.RemoveResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {

@@ -1,7 +1,7 @@
 import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
-import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2 } from './spi-model/data_source'
+import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest } from './spi-model/data_source'
 
 
 export interface FindQuery {
@@ -41,6 +41,8 @@ export enum DataOperationsV3 {
     Count = 'count',
     Aggregate = 'aggregate',
     Insert = 'insert',
+    Update = 'update',
+    Remove = 'remove',
 }
 
 export enum SchemaOperationsV3 {
@@ -77,12 +79,12 @@ export interface DataHooks {
     // afterInsert?: Hook<{ item: Item }>
     beforeBulkInsert?: Hook<{ items: Item[] }>
     afterBulkInsert?: Hook<{ items: Item[] }>
-    beforeUpdate?: Hook<{ item: Item }>
-    afterUpdate?: Hook<{ item: Item }>
+    // beforeUpdate?: Hook<{ item: Item }>
+    // afterUpdate?: Hook<{ item: Item }>
     beforeBulkUpdate?: Hook<{ items: Item[] }>
     afterBulkUpdate?: Hook<{ items: Item[] }>
-    beforeRemove?: Hook<{ itemId: string }>
-    afterRemove?: Hook<{ itemId: string }>
+    // beforeRemove?: Hook<{ itemId: string }>
+    // afterRemove?: Hook<{ itemId: string }>
     beforeBulkRemove?: Hook<{ itemIds: string[] }>
     afterBulkRemove?: Hook<{ itemIds: string[] }>
     // beforeAggregate?: Hook<AggregateRequest>
@@ -101,6 +103,10 @@ export interface DataHooks {
     afterAggregate?: Hook<{ items: ItemWithId[], totalCount?: number }>
     beforeInsert?: Hook<InsertRequest>
     afterInsert?: Hook<{ items: Item[] }>
+    beforeUpdate?: Hook<UpdateRequest>
+    afterUpdate?: Hook<{ items: Item[] }>
+    beforeRemove?: Hook<RemoveRequest>
+    afterRemove?: Hook<{ items: ItemWithId[] }>
 }
 
 export type DataHook = DataHooks[keyof DataHooks];
