@@ -219,11 +219,11 @@ export const createRouter = () => {
             const idEqExpression = itemIds.map(itemId => ({ _id: { $eq: itemId } }))
             const filter = { $or: idEqExpression }
             
-            const {items: objectsBeforeRemove} = (await schemaAwareDataService.find(collectionId, filterTransformer.transform(filter), undefined, 0, itemIds.length, undefined, true))
+            const { items: objectsBeforeRemove } = (await schemaAwareDataService.find(collectionId, filterTransformer.transform(filter), undefined, 0, itemIds.length, undefined, true))
             
             await schemaAwareDataService.bulkDelete(collectionId, itemIds)
             
-            const dataAfterAction = await executeDataHooksFor(DataActionsV3.AfterRemove, {items: objectsBeforeRemove}, requestContextFor(Remove, req.body), customContext)
+            const dataAfterAction = await executeDataHooksFor(DataActionsV3.AfterRemove, { items: objectsBeforeRemove }, requestContextFor(Remove, req.body), customContext)
 
             const responseParts = dataAfterAction.items.map(dataSource.RemoveResponsePart.item)
 

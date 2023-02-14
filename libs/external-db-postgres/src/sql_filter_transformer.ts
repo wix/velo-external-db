@@ -82,7 +82,7 @@ export default class FilterParser {
     extractFilterExprAndParams(havingFilter: any[], offset: number) {
         return havingFilter.map(({ filterExpr, parameters, offset }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
                                                                      parameters: parameters, offset }))
-                           .concat({ ...EmptyFilter, offset })[0]
+                           .concat({ ...EmptyFilter, offset: offset ?? 1 })[0]
     }
 
     parseFilter(filter: Filter, offset: number, inlineFields: { [key: string]: any }) : ParsedFilter[] {
