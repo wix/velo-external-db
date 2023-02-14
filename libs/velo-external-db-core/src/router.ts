@@ -27,9 +27,7 @@ import * as dataSource from './spi-model/data_source'
 import * as capabilities from './spi-model/capabilities'
 import { WixDataFacade } from './web/wix_data_facade'
 
-
-const { InvalidRequest } = errors
-const { Query, Count, Aggregate, Insert, Update, Remove } = DataOperationsV3
+const { Query, Count, Aggregate, Insert, Update, Remove, Truncate } = DataOperationsV3
 
 let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks //roleAuthorizationService: RoleAuthorizationService, schemaHooks: SchemaHooks, 
 
@@ -71,7 +69,7 @@ const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, p
             return payloadAfterHook || payload
         } catch (e: any) {
             if (e.status) throw e
-            throw new InvalidRequest(e.message || e)
+            throw new errors.UnrecognizedError(e.message || e)
         }
     }
     return payload
@@ -216,13 +214,13 @@ export const createRouter = () => {
             const idEqExpression = itemIds.map(itemId => ({ _id: { $eq: itemId } }))
             const filter = { $or: idEqExpression }
             
-            const objectsBeforeRemove = (await schemaAwareDataService.find(collectionId, filterTransformer.transform(filter), undefined, 0, itemIds.length, undefined, true)).items
+            const {items: objectsBeforeRemove} = (await schemaAwareDataService.find(collectionId, filterTransformer.transform(filter), undefined, 0, itemIds.length, undefined, true))
             
             await schemaAwareDataService.bulkDelete(collectionId, itemIds)
             
-            const dataAfterAction = await executeDataHooksFor(DataActionsV3.AfterRemove, objectsBeforeRemove, requestContextFor(Remove, req.body), {})
+            const dataAfterAction = await executeDataHooksFor(DataActionsV3.AfterRemove, {items: objectsBeforeRemove}, requestContextFor(Remove, req.body), {})
 
-            const responseParts = dataAfterAction.map(dataSource.RemoveResponsePart.item)
+            const responseParts = dataAfterAction.items.map(dataSource.RemoveResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {
@@ -252,8 +250,8 @@ export const createRouter = () => {
 
     router.post('/data/truncate', async(req, res, next) => {
         try {
-            const trancateRequest = req.body as dataSource.TruncateRequest
-            await schemaAwareDataService.truncate(trancateRequest.collectionId)
+            const { collectionId } = await executeDataHooksFor(DataActionsV3.BeforeTruncate, dataPayloadForV3(Truncate, req.body), requestContextFor(Truncate, req.body), {}) as dataSource.TruncateRequest
+            await schemaAwareDataService.truncate(collectionId)
             res.json({} as dataSource.TruncateResponse)
         } catch (e) {
             next(e)

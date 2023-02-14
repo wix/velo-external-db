@@ -1,7 +1,7 @@
 import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
-import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest } from './spi-model/data_source'
+import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
 
 
 export interface FindQuery {
@@ -43,6 +43,7 @@ export enum DataOperationsV3 {
     Insert = 'insert',
     Update = 'update',
     Remove = 'remove',
+    Truncate = 'truncate'
 }
 
 export enum SchemaOperationsV3 {
@@ -107,6 +108,8 @@ export interface DataHooks {
     afterUpdate?: Hook<{ items: Item[] }>
     beforeRemove?: Hook<RemoveRequest>
     afterRemove?: Hook<{ items: ItemWithId[] }>
+    beforeTruncate?: Hook<TruncateRequest>
+    afterTruncate?: Hook<void>
 }
 
 export type DataHook = DataHooks[keyof DataHooks];

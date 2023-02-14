@@ -39,6 +39,8 @@ export const DataHooksForActionV3: { [key: string]: string[] } = {
     afterUpdate: ['afterAll', 'afterWrite', 'afterUpdate'],
     beforeRemove: ['beforeAll', 'beforeWrite', 'beforeRemove'],
     afterRemove: ['afterAll', 'afterWrite', 'afterRemove'],
+    beforeTruncate: ['beforeAll', 'beforeWrite', 'beforeTruncate'],
+    afterTruncate: ['afterAll', 'afterWrite', 'afterTruncate'],
 }
 
 
@@ -68,6 +70,8 @@ export enum DataActionsV3 {
     AfterUpdate = 'afterUpdate',
     BeforeRemove = 'beforeRemove',
     AfterRemove = 'afterRemove',
+    BeforeTruncate = 'beforeTruncate',
+    AfterTruncate = 'afterTruncate',
 }
 
 export const DataActions = {
@@ -151,6 +155,12 @@ export const dataPayloadForV3 = (operation: DataOperationsV3, body: any) => {
                 collectionId: body.collectionId,
                 namespace: body.namespace, // not supported
                 itemIds: body.itemIds,
+                options: body.options, // not supported
+            }
+        case DataOperationsV3.Truncate:
+            return {
+                collectionId: body.collectionId,
+                namespace: body.namespace, // not supported
                 options: body.options, // not supported
             }
     }

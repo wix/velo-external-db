@@ -1,4 +1,4 @@
-import { authOwner } from '@wix-velo/external-db-testkit'
+import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { streamToArray } from '@wix-velo/test-commons'
 import { dataSpi, types as coreTypes } from '@wix-velo/velo-external-db-core'
 import { InputField, ItemWithId, SchemaOperations } from '@wix-velo/velo-external-db-types'
@@ -216,6 +216,70 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         }, data.pagingMetadata(1, 1)])
                     )
                 })
+
+                test('before remove request - should be able to modify the item id', async() => {
+                    await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                    await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+
+                    const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.item._id)
+
+                    env.externalDbRouter.reloadHooks({
+                        dataHooks: {
+                            beforeAll: (payload: dataSpi.RemoveRequest, requestContext: coreTypes.RequestContext, _serviceContext) => {
+                                if (requestContext.operation !== coreTypes.DataOperationsV3.Query) {
+                                    return {
+                                        ...payload, itemIds: [ idPart1 ]
+                                    }
+                                }
+                            },
+                            beforeWrite: (payload: dataSpi.RemoveRequest, _requestContext, _serviceContext) => {
+                                return {
+                                    ...payload, itemIds: [ `${payload.itemIds[0]}${idPart2}` ]
+                                }
+                            },
+                            beforeRemove: (payload: dataSpi.RemoveRequest, _requestContext, _serviceContext) => {
+                                return {
+                                    ...payload, itemIds: [ `${payload.itemIds[0]}${idPart3}` ]
+                                }
+                            }
+                        }
+                    })
+
+                    await axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.numberItem]), authOwner)
+
+                    await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
+                        expect.toIncludeSameMembers([data.pagingMetadata(0, 0)])
+                    )
+                })
+
+                test('before truncate request - should be able to modify the collection name', async() => {
+                    await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                    await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+
+                    const [collectionIdPart1, collectionIdPart2, collectionIdPart3] = hooks.splitIdToThreeParts(ctx.collectionName)
+
+                    env.externalDbRouter.reloadHooks({
+                        dataHooks: {
+                            beforeAll: (payload: dataSpi.TruncateRequest, requestContext: coreTypes.RequestContext, _serviceContext) => {
+                                if (requestContext.operation !== coreTypes.DataOperationsV3.Query) {
+                                    return { ...payload, collectionId: collectionIdPart1 }
+                                }
+                            },
+                            beforeWrite: (payload: dataSpi.TruncateRequest, _requestContext, _serviceContext) => {
+                                return hooks.concatToProperty(payload, 'collectionId', collectionIdPart2)
+                            },
+                            beforeTruncate: (payload: dataSpi.TruncateRequest, _requestContext, _serviceContext) => {
+                                return hooks.concatToProperty(payload, 'collectionId', collectionIdPart3)
+                            }
+                        }
+                    })
+
+                    await axios.post('/data/truncate', hooks.writeRequestBodyWith('wrongCollectionId', []), authOwner)
+
+                    await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
+                        expect.toIncludeSameMembers([data.pagingMetadata(0, 0)])
+                    )
+                })
         })
     })
 
@@ -359,7 +423,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             each([
                 ['insert', 'afterInsert', '/data/insert'],
                 ['update', 'afterUpdate', '/data/update'],
-            ]).test.only('after %s request - should be able to modify response', async(operation, hookName, api) => {
+                ['remove', 'afterRemove', '/data/remove'],
+            ]).test('after %s request - should be able to modify response', async(operation, hookName, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.afterAllColumn, ctx.afterWriteColumn, ctx.afterHookColumn], authOwner)
                 if (operation !== 'insert') {
                     await data.givenItems([ctx.item], ctx.collectionName, authOwner)
@@ -411,6 +476,53 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         }
                     }]))
             })
+        })
+    })
+    
+    describe('Error Handling', () => {
+        test('should handle error object and throw with the corresponding status', async() => {
+            env.externalDbRouter.reloadHooks({
+                dataHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        const error = new Error('message')
+                        error['status'] = '409'
+                        throw error
+                    }
+                }
+            })
+
+            await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
+                errorResponseWith(409, 'message')
+            )
+        })
+
+        test('If not specified should throw 500 - Error object', async() => {
+            env.externalDbRouter.reloadHooks({
+                dataHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        const error = new Error('message')
+                        throw error
+                    }
+                }
+            })
+
+            await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
+                errorResponseWith(500, 'message')
+            )
+        })
+
+        test('If not specified should throw 500 - string', async() => {
+            env.externalDbRouter.reloadHooks({
+                dataHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        throw 'message'
+                    }
+                }
+            })
+
+            await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
+                errorResponseWith(500, 'message')
+            )
         })
     })
 

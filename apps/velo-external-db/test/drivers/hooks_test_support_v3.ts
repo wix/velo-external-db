@@ -3,7 +3,7 @@ import { Item } from '@wix-velo/velo-external-db-types'
 
 
 export const writeRequestBodyWith = (collectionId: string, items: Item[]) => ({
-    collectionId, items, item: items[0], itemId: items[0]._id, itemIds: items.map((item: { _id: any }) => item._id), overWriteExisting: true
+    collectionId, items, item: items[0], itemId: items[0]?._id, itemIds: items.map((item: { _id: any }) => item._id), overWriteExisting: true
 })
 
 export const splitIdToThreeParts = (id: string) => {
