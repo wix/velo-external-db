@@ -1,4 +1,4 @@
-import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId } from '@wix-velo/velo-external-db-types'
+import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId, DataOperation } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
@@ -51,7 +51,7 @@ export enum SchemaOperationsV3 {
 }
 
 export interface RequestContext {
-    operation: DataOperationsV3 | SchemaOperationsV3; // data operation | schema operation
+    operation: DataOperation | SchemaOperationsV3; // data operation | schema operation
     collectionId: string;
     instanceId?: string;
     role?: string;
@@ -74,28 +74,6 @@ export interface DataHooks {
     afterRead?: Hook<Payload>;
     beforeWrite?: Hook<Payload>;
     afterWrite?: Hook<Payload>;
-    beforeFind?: Hook<FindQuery>
-    afterFind?: Hook<{ items: Item[] }>
-    // beforeInsert?: Hook<{ item: Item }>
-    // afterInsert?: Hook<{ item: Item }>
-    beforeBulkInsert?: Hook<{ items: Item[] }>
-    afterBulkInsert?: Hook<{ items: Item[] }>
-    // beforeUpdate?: Hook<{ item: Item }>
-    // afterUpdate?: Hook<{ item: Item }>
-    beforeBulkUpdate?: Hook<{ items: Item[] }>
-    afterBulkUpdate?: Hook<{ items: Item[] }>
-    // beforeRemove?: Hook<{ itemId: string }>
-    // afterRemove?: Hook<{ itemId: string }>
-    beforeBulkRemove?: Hook<{ itemIds: string[] }>
-    afterBulkRemove?: Hook<{ itemIds: string[] }>
-    // beforeAggregate?: Hook<AggregateRequest>
-    // afterAggregate?: Hook<{ items: Item[] }>
-    // beforeCount?: Hook<WixDataFilter>
-    // afterCount?: Hook<{ totalCount: number }>
-
-
-
-    //V3
     beforeQuery?: Hook<QueryRequest>
     afterQuery?: Hook<{ items: ItemWithId[], totalCount?: number }>
     beforeCount?: Hook<CountRequest>
