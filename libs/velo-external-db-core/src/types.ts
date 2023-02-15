@@ -1,31 +1,18 @@
-import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId, DataOperation } from '@wix-velo/velo-external-db-types'
+import { InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId, DataOperation } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
 
 
-export interface FindQuery {
-    filter?: WixDataFilter;
-    sort?: Sort;
-    skip?: number;
-    limit?: number;
-}
-
 export interface Payload {
-    filter?: WixDataFilter | AdapterFilter
+    filter?: WixDataFilter
     sort?: Sort[] | Sorting[];
-    skip?: number;
-    limit?: number;
-    initialFilter?: WixDataFilter | AdapterFilter;
+    initialFilter?: WixDataFilter;
     group?: Group;
-    finalFilter?: WixDataFilter | AdapterFilter;
+    finalFilter?: WixDataFilter 
     paging?: Paging;
-    item?: Item;
     items?: Item[];
-    itemId?: string;
     itemIds?: string[];
-
-    //v3
     collectionId: string;
     options?: Options;
     omitTotalCount?: boolean;
@@ -36,22 +23,8 @@ export interface Payload {
     totalCount?: number;
 }
 
-export enum DataOperationsV3 {
-    Query = 'query',
-    Count = 'count',
-    Aggregate = 'aggregate',
-    Insert = 'insert',
-    Update = 'update',
-    Remove = 'remove',
-    Truncate = 'truncate'
-}
-
-export enum SchemaOperationsV3 {
-    
-}
-
 export interface RequestContext {
-    operation: DataOperation | SchemaOperationsV3; // data operation | schema operation
+    operation: DataOperation // | SchemaOperation
     collectionId: string;
     instanceId?: string;
     role?: string;
