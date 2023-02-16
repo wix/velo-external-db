@@ -36,9 +36,6 @@ export default class DataProvider implements IDataProvider {
         const docs = (await projectedCollectionRef.limit(limit).offset(skip).get().catch(translateErrorCodes)).docs
 
         return docs.map((doc) => asEntity(doc))
-
-
-
     }
     
     async count(collectionName: string, filter: Filter): Promise<number> {

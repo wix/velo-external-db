@@ -181,10 +181,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         const expectedItems = ctx.items.map(item => ({ item }))
 
         await expect(streamToArray(response.data)).resolves.toEqual(expect.toIncludeSameMembers(expectedItems))
-
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual([data.pagingMetadata(0, 0)])
-
-        expect(1).toEqual(1)
     })
 
     test('query by id api', async() => {
