@@ -1,7 +1,20 @@
 import { Firestore } from '@google-cloud/firestore'
-import { SystemFields, validateSystemFields, errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, ResponseField, Table, SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { SystemFields, validateSystemFields, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
+import {
+    InputField,
+    ISchemaProvider,
+    Table,
+    SchemaOperations,
+    CollectionCapabilities, Encryption
+} from '@wix-velo/velo-external-db-types'
 import { table } from './types'
+import {
+    CollectionOperations,
+    FieldTypes,
+    ReadWriteOperations,
+    ColumnsCapabilities
+} from './firestore_capabilities'
+
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
 
 const SystemTable = '_descriptor'
@@ -15,17 +28,35 @@ export default class SchemaProvider implements ISchemaProvider {
         return {
             field: field.name,
             type: field.type,
+            capabilities: this.fieldCapabilities(field)
         }
     }
 
     async list(): Promise<Table[]> {
         const l = await this.database.collection(SystemTable).get()
         const tables: {[x:string]: table[]} = l.docs.reduce((o, d) => ({ ...o, [d.id]: d.data() }), {})
+
         return Object.entries(tables)
-                     .map(([collectionName, rs]: [string, any]) => ({
-                         id: collectionName,
-                         fields: [...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) )
-                     }))
+            .map(([collectionName, rs]: [string, any]) => ({
+                id: collectionName,
+                fields: [...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) ),
+                capabilities: this.collectionCapabilities()
+            }))
+    }
+
+    private fieldCapabilities(field: InputField) {
+        return ColumnsCapabilities[field.type as keyof typeof ColumnsCapabilities] ?? EmptyCapabilities
+    }
+
+    private collectionCapabilities(): CollectionCapabilities {
+        return {
+            dataOperations: ReadWriteOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported
+        }
     }
 
     async listHeaders() {
@@ -61,7 +92,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const collection = await collectionRef.get()
 
         if (!collection.exists) {
-            throw new CollectionDoesNotExists('Collection does not exists')
+            throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }
         const { fields } = collection.data() as any
 
@@ -81,7 +112,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const collection = await collectionRef.get()
 
         if (!collection.exists) {
-            throw new CollectionDoesNotExists('Collection does not exists')
+            throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }
         const { fields } = collection.data() as any
 
@@ -94,18 +125,26 @@ export default class SchemaProvider implements ISchemaProvider {
         })
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]> {
+    async changeColumnType(_collectionName: string, _column: InputField): Promise<void> {
+        throw new Error('Method not implemented.')
+    }
+
+    async describeCollection(collectionName: string): Promise<Table> {
         const collection = await this.database.collection(SystemTable)
-                                              .doc(collectionName)
-                                              .get()
+            .doc(collectionName)
+            .get()
 
         if (!collection.exists) {
-            throw new CollectionDoesNotExists('Collection does not exists')
+            throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }
 
         const { fields } = collection.data() as any
 
-        return [...SystemFields, ...fields].map(this.reformatFields.bind(this))
+        return {
+            id: collectionName,
+            fields: [...SystemFields, ...fields].map( this.reformatFields.bind(this) ),
+            capabilities: this.collectionCapabilities()
+        }
     }
 
     async drop(collectionName: string) {

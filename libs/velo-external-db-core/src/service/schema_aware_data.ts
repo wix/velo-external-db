@@ -20,7 +20,6 @@ export default class SchemaAwareDataService {
         await this.validateFilter(collectionName, filter, fields)
         const projection = await this.projectionFor(collectionName, _projection)
         await this.validateProjection(collectionName, projection, fields)
-        await this.dataService.find(collectionName, filter, sort, skip, limit, projection, omitTotalCount)
 
         const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection, omitTotalCount)
         return { items: this.itemTransformer.patchItems(items, fields), totalCount }    

@@ -1,7 +1,15 @@
 import { Firestore, WriteBatch, Query, DocumentData } from '@google-cloud/firestore'
-import { AdapterAggregation, AdapterFilter, IDataProvider, Item, AdapterFilter as Filter } from '@wix-velo/velo-external-db-types'
+import {
+    AdapterAggregation,
+    AdapterFilter,
+    IDataProvider,
+    Item,
+    AdapterFilter as Filter,
+    ResponseField
+} from '@wix-velo/velo-external-db-types'
 import FilterParser from './sql_filter_transformer'
 import { asEntity } from './firestore_utils'
+import { translateErrorCodes } from './sql_exception_translator'
 
 export default class DataProvider implements IDataProvider {
     database: Firestore
@@ -25,9 +33,12 @@ export default class DataProvider implements IDataProvider {
 
         const projectedCollectionRef = projection ? collectionRef2.select(...projection) : collectionRef2
 
-        const docs = (await projectedCollectionRef.limit(limit).offset(skip).get()).docs
+        const docs = (await projectedCollectionRef.limit(limit).offset(skip).get().catch(translateErrorCodes)).docs
 
         return docs.map((doc) => asEntity(doc))
+
+
+
     }
     
     async count(collectionName: string, filter: Filter): Promise<number> {
@@ -35,18 +46,25 @@ export default class DataProvider implements IDataProvider {
 
         const collectionRef = filterOperations.reduce((c:  Query<DocumentData>, { fieldName, opStr, value }) => c.where(fieldName, opStr, value), this.database.collection(collectionName))
 
-        return (await collectionRef.get()).size
+        return (await collectionRef.get().catch(translateErrorCodes)).size
     }
     
-    async insert(collectionName: string, items: Item[]): Promise<number> {
-        const batch = items.reduce((b, i) => b.set(this.database.doc(`${collectionName}/${i._id}`), i), this.database.batch())
-        return (await batch.commit()).length
+    async insert(collectionName: string, items: Item[], _fields?: ResponseField[], upsert?: boolean): Promise<number> {
+
+        const batch = items.reduce((b, i) =>
+            upsert
+                ? b.set(this.database.doc(`${collectionName}/${i._id}`), i)
+                : b.create(this.database.doc(`${collectionName}/${i._id}`), i)
+            , this.database.batch()
+        )
+
+        return (await batch.commit().catch(translateErrorCodes)).length
     }
      
     async update(collectionName: any, items: any[]): Promise<number> {
         const batch = items.reduce((b: { update: (arg0: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, arg1: any) => any }, i: { _id: any }) => b.update(this.database.doc(`${collectionName}/${i._id}`), i), this.database.batch())
 
-        return (await batch.commit()).length
+        return (await batch.commit().catch(translateErrorCodes)).length
     }
     
     async delete(collectionName: string, itemIds: any[]) {
