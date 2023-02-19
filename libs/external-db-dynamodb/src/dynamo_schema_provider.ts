@@ -73,7 +73,7 @@ export default class SchemaProvider implements ISchemaProvider {
         await validateSystemFields(column.name)
         
         const { fields } = await this.collectionDataFor(collectionName)
-        if (fields.find((f: { name: any }) => f.name === column.name)) {
+        if (fields.find((f) => f.name === column.name)) {
             throw new FieldAlreadyExists('Collection already has a field with the same name')
         }
 
@@ -88,7 +88,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
         const { fields } = await this.collectionDataFor(collectionName)
 
-        if (!fields.some((f: { name: any }) => f.name === columnName)) {
+        if (!fields.some((f) => f.name === columnName)) {
             throw new FieldDoesNotExist('Collection does not contain a field with this name', collectionName, columnName)
         }
         await this.docClient
@@ -116,7 +116,7 @@ export default class SchemaProvider implements ISchemaProvider {
         
         const { fields } = await this.collectionDataFor(collectionName)
 
-        if (!fields.some((f: { name: any }) => f.name === column.name)) {
+        if (!fields.some((f) => f.name === column.name)) {
             throw new FieldDoesNotExist('Collection does not contain a field with this name', collectionName, column.name)
         }
         
@@ -146,13 +146,13 @@ export default class SchemaProvider implements ISchemaProvider {
                   .delete(dynamoRequests.deleteTableFromSystemTableExpression(collectionName))
     }
     
-    async collectionDataFor(collectionName: string, toReturn?: boolean | undefined): Promise<any> {
+    async collectionDataFor(collectionName: string, toReturn?: boolean | undefined) {
         validateTable(collectionName)
         const { Item } = await this.docClient
                                    .get(dynamoRequests.getCollectionFromSystemTableExpression(collectionName))
 
         if (!Item && !toReturn ) throw new CollectionDoesNotExists('Collection does not exists', collectionName)
-        return Item
+        return Item as { tableName: string, fields: { name: string, type: string, subtype?: string }[] }
     }
 
     async systemTableExists() {
