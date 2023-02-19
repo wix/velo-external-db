@@ -12,7 +12,7 @@ const { testResources: mssql } = require ('@wix-velo/external-db-mssql')
 // const { testResources: googleSheet } = require('@wix-velo/external-db-google-sheets')
 // const { testResources: airtable } = require('@wix-velo/external-db-airtable')
 // const { testResources: dynamoDb } = require('@wix-velo/external-db-dynamodb')
-// const { testResources: bigquery } = require('@wix-velo/external-db-bigquery')
+const { testResources: bigquery } = require('@wix-velo/external-db-bigquery')
 
 const { sleep } = require('@wix-velo/test-commons')
 const ci = require('./ci_utils')
@@ -54,9 +54,9 @@ const initEnv = async(testEngine) => {
         //     await dynamoDb.initEnv()
         //     break
 
-        // case 'bigquery':
-        //     await bigquery.initEnv()
-        //     break
+        case 'bigquery':
+            await bigquery.initEnv()
+            break
     }
 }
 
@@ -94,9 +94,9 @@ const cleanup = async(testEngine) => {
         //     await dynamoDb.cleanup()
         //     break
 
-        // case 'bigquery':
-        //     await bigquery.cleanup()
-        //     break
+        case 'bigquery':
+            await bigquery.cleanup()
+            break
     }
 }
 

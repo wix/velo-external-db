@@ -77,7 +77,7 @@ const testSuits = {
     mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.testResources.supportedOperations),
     airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.testResources.supportedOperations),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.testResources.supportedOperations),
-    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.testResources.supportedOperations),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.testResources),
     'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
 }
 

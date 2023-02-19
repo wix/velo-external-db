@@ -39,10 +39,10 @@ export const engineConnectorFor = async(_type: string, config: any): Promise<Dat
         //     const { dynamoDbFactory } = require('@wix-velo/external-db-dynamodb')
         //     return await dynamoDbFactory(config)
         // }
-        // case 'bigquery': {
-        //     const { bigqueryFactory } = require('@wix-velo/external-db-bigquery')
-        //     return await bigqueryFactory(config)
-        // }
+        case 'bigquery': {
+            const { bigqueryFactory } = require('@wix-velo/external-db-bigquery')
+            return await bigqueryFactory(config)
+        }
         default: {
             const { stubFactory } = require('./stub-db/stub-connector')
             return await stubFactory(type, config)

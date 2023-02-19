@@ -7,7 +7,7 @@ const { testResources: mssql } = require ('@wix-velo/external-db-mssql')
 // const { testResources: googleSheet } = require('@wix-velo/external-db-google-sheets')
 // const { testResources: airtable } = require('@wix-velo/external-db-airtable')
 // const { testResources: dynamo } = require('@wix-velo/external-db-dynamodb')
-// const { testResources: bigquery } = require('@wix-velo/external-db-bigquery')
+const { testResources: bigquery } = require('@wix-velo/external-db-bigquery')
 
 const ci = require('./ci_utils')
 
@@ -49,9 +49,9 @@ const shutdownEnv = async(testEngine) => {
         //     await mongo.shutdownEnv()
         //     break
         
-        // case 'bigquery':
-        //     await bigquery.shutdownEnv()
-        //     break
+        case 'bigquery':
+            await bigquery.shutdownEnv()
+            break
     }
 }
 

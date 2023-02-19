@@ -4,6 +4,8 @@ export { supportedOperations } from '../../src/supported_operations'
 const databaseId = 'testDB'
 const projectId = 'corvid-managed-cfe9809c'
 
+export * as capabilities from '../../src/bigquery_capabilities' 
+
 export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ databaseId, projectId })
     return { pool: connection, schemaProvider, cleanup }
