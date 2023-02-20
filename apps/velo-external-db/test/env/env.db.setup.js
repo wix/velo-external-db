@@ -74,9 +74,9 @@ const cleanup = async(testEngine) => {
             await postgres.cleanup()
             break
 
-        // case 'firestore':
-        //     await firestore.cleanup()
-        //     break
+        case 'firestore':
+            await firestore.cleanup()
+            break
 
         case 'mssql':
             await mssql.cleanup()

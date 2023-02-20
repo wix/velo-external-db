@@ -44,21 +44,6 @@ export default class SchemaProvider implements ISchemaProvider {
             }))
     }
 
-    private fieldCapabilities(field: InputField) {
-        return ColumnsCapabilities[field.type as keyof typeof ColumnsCapabilities] ?? EmptyCapabilities
-    }
-
-    private collectionCapabilities(): CollectionCapabilities {
-        return {
-            dataOperations: ReadWriteOperations,
-            fieldTypes: FieldTypes,
-            collectionOperations: CollectionOperations,
-            referenceCapabilities: { supportedNamespaces: [] },
-            indexing: [],
-            encryption: Encryption.notSupported
-        }
-    }
-
     async listHeaders() {
         const l = await this.database.collection(SystemTable).get()
         return l.docs.map(rs => rs.id)
@@ -125,8 +110,19 @@ export default class SchemaProvider implements ISchemaProvider {
         })
     }
 
-    async changeColumnType(_collectionName: string, _column: InputField): Promise<void> {
-        throw new Error('Method not implemented.')
+    async changeColumnType(collectionName: string, column: InputField): Promise<void> {
+        const collectionRef = this.database.collection(SystemTable).doc(collectionName)
+        const collection = await collectionRef.get()
+
+        if (!collection.exists) {
+            throw new CollectionDoesNotExists('Collection does not exists', collectionName)
+        }
+
+        const { fields } = collection.data() as any
+
+        await collectionRef.update({
+            fields: [...fields, column]
+        })
     }
 
     async describeCollection(collectionName: string): Promise<Table> {
@@ -150,6 +146,21 @@ export default class SchemaProvider implements ISchemaProvider {
     async drop(collectionName: string) {
         // todo: drop collection https://firebase.google.com/docs/firestore/manage-data/delete-data
         await this.database.collection(SystemTable).doc(collectionName).delete()
+    }
+
+    private fieldCapabilities(field: InputField) {
+        return ColumnsCapabilities[field.type as keyof typeof ColumnsCapabilities] ?? EmptyCapabilities
+    }
+
+    private collectionCapabilities(): CollectionCapabilities {
+        return {
+            dataOperations: ReadWriteOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported
+        }
     }
 }
 
