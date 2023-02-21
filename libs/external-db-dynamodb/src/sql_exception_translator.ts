@@ -1,6 +1,6 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { Item } from '@wix-velo/velo-external-db-types'
-const { CollectionDoesNotExists, DbConnectionError } = errors
+const { CollectionDoesNotExists, DbConnectionError, ItemAlreadyExists } = errors
 
 export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string, metaData?: { items?: Item[] }) => {
     switch (err.name) {
@@ -13,7 +13,7 @@ export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string
         case 'TransactionCanceledException':
             if (err.message.includes('ConditionalCheckFailed')) {
                 const itemId = metaData?.items?.[err.CancellationReasons.findIndex((reason: any) => reason.Code === 'ConditionalCheckFailed')]._id
-                return new errors.ItemAlreadyExists('Item already exists', collectionName, itemId)
+                return new ItemAlreadyExists('Item already exists', collectionName, itemId)
             }
     }
 

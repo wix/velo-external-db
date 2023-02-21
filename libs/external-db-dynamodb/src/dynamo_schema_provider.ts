@@ -121,7 +121,7 @@ export default class SchemaProvider implements ISchemaProvider {
         }
         
         await this.docClient
-                    .update(dynamoRequests.updateColumnsExpression(collectionName, fields.map((f: { name: any }) => f.name === column.name ? column : f)))
+                    .update(dynamoRequests.updateColumnsExpression(collectionName, fields.map((f) => f.name === column.name ? column : f)))
                     
     }
 
