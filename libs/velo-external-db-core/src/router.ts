@@ -29,7 +29,7 @@ import { WixDataFacade } from './web/wix_data_facade'
 
 const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks //roleAuthorizationService: RoleAuthorizationService, schemaHooks: SchemaHooks, 
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks //roleAuthorizationService: RoleAuthorizationService, schemaHooks: SchemaHooks,
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
                              _externalDbConfigClient: ConfigValidator, _cfg: { externalDatabaseId: string, allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean },
@@ -92,7 +92,13 @@ export const createRouter = () => {
         })
         res.end()
     }
-    
+
+    const getItemsOneByOne = (collectionName: string, itemIds: string[]): Promise<any[]> => {
+        const idEqExpression = itemIds.map(itemId => ({ _id: { $eq: itemId } }))
+        return Promise.all(
+            idEqExpression.map(eqExp => schemaAwareDataService.find(collectionName, filterTransformer.transform(eqExp), undefined, 0, 1).then(r => r.items[0]))
+        )
+    }
 
     // *************** INFO **********************
     router.get('/', async(req, res) => {
@@ -126,7 +132,7 @@ export const createRouter = () => {
     // *************** Data API **********************
     router.post('/data/query', async(req, res, next) => {
         try {
-            const customContext = {}            
+            const customContext = {}
             const { collectionId, query, omitTotalCount } = await executeDataHooksFor(DataActions.BeforeQuery, dataPayloadFor(Query, req.body), requestContextFor(Query, req.body), customContext) as dataSource.QueryRequest
 
             const offset = query.paging ? query.paging.offset : 0
@@ -198,7 +204,7 @@ export const createRouter = () => {
         try {
             const customContext = {}
             const { collectionId, items } = await executeDataHooksFor(DataActions.BeforeUpdate, dataPayloadFor(Update, req.body), requestContextFor(Update, req.body), customContext) as dataSource.UpdateRequest
-            
+
             const data = await schemaAwareDataService.bulkUpdate(collectionId, items)
 
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterUpdate, data, requestContextFor(Update, req.body), customContext)
@@ -215,14 +221,11 @@ export const createRouter = () => {
         try {
             const customContext = {}
             const { collectionId, itemIds } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(Remove, req.body), requestContextFor(Remove, req.body), customContext) as dataSource.RemoveRequest
-            
-            const idEqExpression = itemIds.map(itemId => ({ _id: { $eq: itemId } }))
-            const filter = { $or: idEqExpression }
-            
-            const { items: objectsBeforeRemove } = (await schemaAwareDataService.find(collectionId, filterTransformer.transform(filter), undefined, 0, itemIds.length, undefined, true))
-            
+
+            const objectsBeforeRemove = await getItemsOneByOne(collectionId, itemIds)
+
             await schemaAwareDataService.bulkDelete(collectionId, itemIds)
-            
+
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterRemove, { items: objectsBeforeRemove }, requestContextFor(Remove, req.body), customContext)
 
             const responseParts = dataAfterAction.items.map(dataSource.RemoveResponsePart.item)
@@ -237,10 +240,10 @@ export const createRouter = () => {
         try {
             const customContext = {}
             const { collectionId, initialFilter, group, finalFilter, sort, paging } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(Aggregate, req.body), requestContextFor(Aggregate, req.body), customContext) as dataSource.AggregateRequest
-            
+
             const offset = paging ? paging.offset : 0
             const limit = paging ? paging.limit : 50
-            
+
             const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), aggregationTransformer.transform({ group, finalFilter }), filterTransformer.transformSort(sort), offset, limit)
 
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(Aggregate, req.body), customContext)
