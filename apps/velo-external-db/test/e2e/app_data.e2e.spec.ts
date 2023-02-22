@@ -293,7 +293,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             ]))
     })
 
-    testIfSupportedOperationsIncludes(supportedOperations, [ QueryNestedFields ]).only('query on nested fields', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ QueryNestedFields ])('query on nested fields', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.objectColumn], authOwner)
         await data.givenItems([ctx.objectItem], ctx.collectionName, authAdmin)
 
