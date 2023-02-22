@@ -72,7 +72,7 @@ const testSuits = {
     mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.testResources),
     postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.testResources),
     spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.testResources),
-    firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.testResources.supportedOperations),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.testResources),
     mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.testResources),
     mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.testResources),
     airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.testResources.supportedOperations),

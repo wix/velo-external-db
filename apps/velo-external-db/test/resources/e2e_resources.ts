@@ -32,7 +32,7 @@ const testSuits = {
     mysql: new E2EResources(mysql, createAppWithWixDataBaseUrl),
     postgres: new E2EResources(postgres, createAppWithWixDataBaseUrl),
     spanner: new E2EResources(spanner, createAppWithWixDataBaseUrl),
-    firestore: new E2EResources(firestore, createApp),
+    firestore: new E2EResources(firestore, createAppWithWixDataBaseUrl),
     mssql: new E2EResources(mssql, createAppWithWixDataBaseUrl),
     mongo: new E2EResources(mongo, createAppWithWixDataBaseUrl),
     'google-sheet': new E2EResources(googleSheet, createApp),
