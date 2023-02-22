@@ -5,6 +5,7 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb'
 import FilterParser from './sql_filter_transformer'
 import { IDataProvider, AdapterFilter as Filter, Item } from '@wix-velo/velo-external-db-types'
 import * as dynamoRequests from './dynamo_data_requests_utils'
+import { translateErrorCodes } from './sql_exception_translator'
 
 export default class DataProvider implements IDataProvider {
     filterParser: FilterParser
@@ -40,10 +41,13 @@ export default class DataProvider implements IDataProvider {
         return Count || 0
     }
 
-    async insert(collectionName: string, items: Item[]): Promise<number> {
+    async insert(collectionName: string, items: Item[], _fields?: any[], upsert = false): Promise<number> {
         validateTable(collectionName)
         await this.docClient
-                  .batchWrite(dynamoRequests.batchPutItemsCommand(collectionName, items.map(patchDateTime)))
+                  .transactWrite({
+                      TransactItems: items.map((item: Item) => dynamoRequests.insertSingleItemCommand(collectionName, patchDateTime(item), upsert))
+                  }).catch(e => translateErrorCodes(e, collectionName, { items }))
+
         return items.length
     }
 

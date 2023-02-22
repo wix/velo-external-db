@@ -37,7 +37,7 @@ const testSuits = {
     mongo: new E2EResources(mongo, createAppWithWixDataBaseUrl),
     'google-sheet': new E2EResources(googleSheet, createApp),
     airtable: new E2EResources(airtable, createApp),
-    dynamodb: new E2EResources(dynamo, createApp),
+    dynamodb: new E2EResources(dynamo, createAppWithWixDataBaseUrl),
     bigquery: new E2EResources(bigquery, createApp),
 }
 

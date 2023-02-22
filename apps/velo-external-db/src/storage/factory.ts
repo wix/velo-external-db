@@ -35,10 +35,10 @@ export const engineConnectorFor = async(_type: string, config: any): Promise<Dat
         //     const { airtableFactory } = require('@wix-velo/external-db-airtable')
         //     return await airtableFactory(config)
         // }
-        // case 'dynamodb': {
-        //     const { dynamoDbFactory } = require('@wix-velo/external-db-dynamodb')
-        //     return await dynamoDbFactory(config)
-        // }
+        case 'dynamodb': {
+            const { dynamoDbFactory } = require('@wix-velo/external-db-dynamodb')
+            return await dynamoDbFactory(config)
+        }
         // case 'bigquery': {
         //     const { bigqueryFactory } = require('@wix-velo/external-db-bigquery')
         //     return await bigqueryFactory(config)
