@@ -1,4 +1,16 @@
+import { AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
 import { SchemaOperations } from '@wix-velo/velo-external-db-types'
-const { List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately, Projection, StartWithCaseSensitive, NotOperator, FindObject, IncludeOperator, FilterByEveryField } = SchemaOperations
 
-export const supportedOperations =  [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately, Projection, StartWithCaseSensitive, NotOperator, FindObject, IncludeOperator, FilterByEveryField ]
+const notSupportedOperations = [
+    SchemaOperations.FindWithSort,
+    SchemaOperations.Aggregate,
+    SchemaOperations.StartWithCaseInsensitive,
+    SchemaOperations.FindObject,
+    SchemaOperations.IncludeOperator,
+    SchemaOperations.Matches,
+    SchemaOperations.NonAtomicBulkInsert
+]
+
+
+
+export const supportedOperations = AllSchemaOperations.filter(op => !notSupportedOperations.includes(op))

@@ -1,5 +1,4 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField } from '@wix-velo/velo-external-db-types'
 import { Counter } from './sql_filter_transformer'
 const { InvalidQuery } = errors
 
@@ -28,14 +27,6 @@ export const patchFixDates = (record: { [x: string]: any }) => {
     return fixedRecord
 }
 
-
-export const reformatFields = (field: InputField): ResponseField => {
-    return {
-        field: field.name,
-        type: field.type,
-    }
-}
-
 export const patchCollectionKeys = () => (['_id'])
 
 export const canQuery = (filterExpr: { ExpressionAttributeNames: { [s: string]: unknown } | ArrayLike<unknown> }, collectionKeys: unknown[]) => {
@@ -47,5 +38,5 @@ export const canQuery = (filterExpr: { ExpressionAttributeNames: { [s: string]: 
 
 export const isEmptyObject = (obj: Record<string, unknown>) => Object.keys(obj).length === 0
 
-export const fieldNameWithCounter = (fieldName: string, counter: Counter) => `#${fieldName}${counter.nameCounter++}`
-export const attributeValueNameWithCounter = (fieldName: any, counter: Counter) => `:${fieldName}${counter.valueCounter++}`
+export const fieldNameWithCounter = (fieldName: string, counter: Counter) => `#${fieldName.split('.').join('.#').split('.').map(s => s.concat(`${counter.nameCounter++}`)).join('.')}`
+export const attributeValueNameWithCounter = (fieldName: any, counter: Counter) => `:${fieldName.split('.')[0]}${counter.valueCounter++}`

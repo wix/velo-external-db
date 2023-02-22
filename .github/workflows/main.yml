@@ -43,6 +43,7 @@ jobs:
                    "mssql", "mssql17",
                    spanner,
                    "mongo", "mongo4",
+                   "dynamodb"
                    ]
 
     env:

@@ -1,7 +1,8 @@
 
+import { InputField } from '@wix-velo/velo-external-db-types'
 import { SystemTable } from './dynamo_utils'
 
-export const removeColumnExpression = (collectionName: any, columns: any) => ({
+export const updateColumnsExpression = (collectionName: any, columns: any) => ({
     TableName: SystemTable,
     Key: {
         tableName: collectionName
@@ -29,6 +30,22 @@ export const addColumnExpression = (collectionName: any, column: any) => ({
             ':attrValue': [column]
         },
         ReturnValues: 'UPDATED_NEW'
+})
+
+export const changeColumnTypeExpression = (collectionName: string, column: InputField) => ({
+    TableName: SystemTable,
+    Key: {
+        tableName: collectionName
+    },
+    UpdateExpression: 'SET #attrName = list_append(list_append(:attrValue1, list_remove(#attrName, :attrValue2)), :attrValue3)',
+    ExpressionAttributeNames: {
+        '#attrName': 'fields'
+    },
+    ExpressionAttributeValues: {
+        ':attrValue1': [column],
+        ':attrValue2': column.name,
+        ':attrValue3': [column]
+    },
 })
 
 export const createTableExpression = (collectionName: any) => ({

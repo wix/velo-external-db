@@ -65,7 +65,23 @@ export default class FilterParser {
         }
         
         const expressionAttributeName = attributeNameWithCounter(fieldName, counter)
-        
+       
+        if (this.isNestedField(fieldName)) {
+            const expressionAttributeValue = attributeValueNameWithCounter(fieldName, counter)
+            return [{
+                filterExpr: {
+                    FilterExpression: `${expressionAttributeName} ${this.adapterOperatorToDynamoOperator(operator)} ${expressionAttributeValue}`,
+                    ExpressionAttributeNames: expressionAttributeName.split('.').reduce((pV, cV) => ({
+                        ...pV,
+                        [cV]: cV.slice(1, cV.length - 1)
+                    }), {}),
+                    ExpressionAttributeValues: {
+                        [expressionAttributeValue]: this.valueForOperator(value, operator)
+                    }
+                }
+            }]
+        }
+
         if (this.isSingleFieldOperator(operator)) {
             const expressionAttributeValue = attributeValueNameWithCounter(fieldName, counter)
             return [{
@@ -80,7 +96,7 @@ export default class FilterParser {
                 }
             }]
         }
-
+        
         if (this.isSingleFieldStringOperator(operator)) {
             const expressionAttributeValue = attributeValueNameWithCounter(fieldName, counter)
             return [{
@@ -139,6 +155,10 @@ export default class FilterParser {
         }
 
         return value
+    }
+
+    isNestedField(fieldName: string) {
+        return fieldName.includes('.')
     }
 
     adapterOperatorToDynamoOperator(operator: any) {
