@@ -24,6 +24,6 @@ export const domainToSpiErrorTranslator = (err: any) => {
         return ErrorMessage.operationIsNotSupportedByCollection(unsupportedSchemaOperation.collectionName, unsupportedSchemaOperation.operation, unsupportedSchemaOperation.message)
         
       default:
-        return ErrorMessage.unknownError(err.message)  
+        return ErrorMessage.unknownError(err.message, err.status)  
     }
   }

@@ -1,9 +1,9 @@
 export class ErrorMessage {
-    static unknownError(description?: string) {
+    static unknownError(description?: string, status?: number) {
         return HttpError.create({
             code: ApiErrors.WDE0054,
             description
-        } as ErrorMessage, HttpStatusCode.INTERNAL)
+        } as ErrorMessage, status || HttpStatusCode.INTERNAL)
     }
 
     static operationTimeLimitExceeded(description?: string) {

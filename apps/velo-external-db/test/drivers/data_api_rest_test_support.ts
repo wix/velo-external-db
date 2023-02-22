@@ -26,9 +26,9 @@ export const updateRequest = (collectionName: string, items: Item[]): dataSpi.Up
     }
 })
 
-export const countRequest = (collectionName: string): dataSpi.CountRequest => ({
+export const countRequest = (collectionName: string, filter?: dataSpi.Filter): dataSpi.CountRequest => ({
     collectionId: collectionName,
-    filter: '',
+    filter: filter ?? '',
     options: {
         consistentRead: false,
         appOptions: {},
@@ -63,7 +63,7 @@ export const queryCollectionAsArray = (collectionName: string, sort: dataSpi.Sor
         .then(response => streamToArray(response.data))
 
 
-export const pagingMetadata = (total: number, count: number): dataSpi.QueryResponsePart => ({ pagingMetadata: { count: count, offset: 0, total: total, tooManyToCount: false } })
+export const pagingMetadata = (count: number, total?: number): dataSpi.QueryResponsePart => ({ pagingMetadata: { count: count, offset: 0, total: total, tooManyToCount: false } })
 
 
 export const givenItems = async(items: Item[], collectionName: string, auth: any) =>
