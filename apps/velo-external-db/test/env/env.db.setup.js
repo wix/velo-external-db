@@ -11,7 +11,7 @@ const { testResources: mssql } = require ('@wix-velo/external-db-mssql')
 const { testResources: mongo } = require ('@wix-velo/external-db-mongo')
 // const { testResources: googleSheet } = require('@wix-velo/external-db-google-sheets')
 // const { testResources: airtable } = require('@wix-velo/external-db-airtable')
-// const { testResources: dynamoDb } = require('@wix-velo/external-db-dynamodb')
+const { testResources: dynamoDb } = require('@wix-velo/external-db-dynamodb')
 // const { testResources: bigquery } = require('@wix-velo/external-db-bigquery')
 
 const { sleep } = require('@wix-velo/test-commons')
@@ -50,9 +50,9 @@ const initEnv = async(testEngine) => {
         //     await airtable.initEnv()
         //     break
         
-        // case 'dynamodb':
-        //     await dynamoDb.initEnv()
-        //     break
+        case 'dynamodb':
+            await dynamoDb.initEnv()
+            break
 
         // case 'bigquery':
         //     await bigquery.initEnv()
@@ -90,9 +90,9 @@ const cleanup = async(testEngine) => {
             await mongo.cleanup()
             break
         
-        // case 'dynamodb':
-        //     await dynamoDb.cleanup()
-        //     break
+        case 'dynamodb':
+            await dynamoDb.cleanup()
+            break
 
         // case 'bigquery':
         //     await bigquery.cleanup()
