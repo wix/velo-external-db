@@ -1,5 +1,6 @@
 
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
+import { collectionSpi } from '@wix-velo/velo-external-db-core'
 import { InputField } from '@wix-velo/velo-external-db-types'
 import * as Chance from 'chance'
 
@@ -104,4 +105,11 @@ export const randomMatchesValueWithDashes = () => {
         arr.push(chance.word())
     }
     return arr.join('-')
+}
+
+export const randomCollection = (): collectionSpi.Collection => {
+    return {
+        id: randomCollectionName(),
+        fields: [],
+    }
 }
