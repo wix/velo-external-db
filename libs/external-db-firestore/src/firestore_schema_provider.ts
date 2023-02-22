@@ -79,7 +79,7 @@ export default class SchemaProvider implements ISchemaProvider {
         if (!collection.exists) {
             throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }
-        const { fields } = collection.data() as { id: string, fields: { type: string,subtype: string, name: string}[]}
+        const { fields } = collection.data() as { id: string, fields: { type: string, subtype: string, name: string}[]}
 
         if (fields.find((f: { name: string }) => f.name === column.name)) {
             throw new FieldAlreadyExists('Collection already has a field with the same name')
