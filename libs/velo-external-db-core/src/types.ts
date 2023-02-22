@@ -1,49 +1,31 @@
-import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from '@wix-velo/velo-external-db-types'
+import { InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId, DataOperation } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
-import { AggregateRequest, Group, Paging, Sorting } from './spi-model/data_source'
-
-
-export interface FindQuery {
-    filter?: WixDataFilter;
-    sort?: Sort;
-    skip?: number;
-    limit?: number;
-}
-
+import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
 
 
 export interface Payload {
-    filter?: WixDataFilter | AdapterFilter
+    filter?: WixDataFilter
     sort?: Sort[] | Sorting[];
-    skip?: number;
-    limit?: number;
-    initialFilter: WixDataFilter | AdapterFilter;
+    initialFilter?: WixDataFilter;
     group?: Group;
-    finalFilter?: WixDataFilter | AdapterFilter;
+    finalFilter?: WixDataFilter 
     paging?: Paging;
-    item?: Item;
     items?: Item[];
-    itemId?: string;
     itemIds?: string[];
+    collectionId: string;
+    options?: Options;
+    omitTotalCount?: boolean;
+    includeReferencedItems?: string[];
+    namespace?: string;
+    query?: QueryV2;
+    overwriteExisting?: boolean;
+    totalCount?: number;
 }
-
-enum ReadOperation {
-    GET = 'GET',
-    FIND = 'FIND',
-}
-
-enum WriteOperation {
-    INSERT = 'INSERT',
-    UPDATE = 'UPDATE',
-    DELETE = 'DELETE',
-}
-
-type Operation = ReadOperation | WriteOperation;
 
 export interface RequestContext {
-    operation: Operation;
-    collectionName: string;
+    operation: DataOperation // | SchemaOperation
+    collectionId: string;
     instanceId?: string;
     role?: string;
     memberId?: string;
@@ -65,24 +47,20 @@ export interface DataHooks {
     afterRead?: Hook<Payload>;
     beforeWrite?: Hook<Payload>;
     afterWrite?: Hook<Payload>;
-    beforeFind?: Hook<FindQuery>
-    afterFind?: Hook<{ items: Item[] }>
-    beforeInsert?: Hook<{ item: Item }>
-    afterInsert?: Hook<{ item: Item }>
-    beforeBulkInsert?: Hook<{ items: Item[] }>
-    afterBulkInsert?: Hook<{ items: Item[] }>
-    beforeUpdate?: Hook<{ item: Item }>
-    afterUpdate?: Hook<{ item: Item }>
-    beforeBulkUpdate?: Hook<{ items: Item[] }>
-    afterBulkUpdate?: Hook<{ items: Item[] }>
-    beforeRemove?: Hook<{ itemId: string }>
-    afterRemove?: Hook<{ itemId: string }>
-    beforeBulkRemove?: Hook<{ itemIds: string[] }>
-    afterBulkRemove?: Hook<{ itemIds: string[] }>
+    beforeQuery?: Hook<QueryRequest>
+    afterQuery?: Hook<{ items: ItemWithId[], totalCount?: number }>
+    beforeCount?: Hook<CountRequest>
+    afterCount?: Hook<CountResponse>
     beforeAggregate?: Hook<AggregateRequest>
-    afterAggregate?: Hook<{ items: Item[] }>
-    beforeCount?: Hook<WixDataFilter>
-    afterCount?: Hook<{ totalCount: number }>
+    afterAggregate?: Hook<{ items: ItemWithId[], totalCount?: number }>
+    beforeInsert?: Hook<InsertRequest>
+    afterInsert?: Hook<{ items: Item[] }>
+    beforeUpdate?: Hook<UpdateRequest>
+    afterUpdate?: Hook<{ items: Item[] }>
+    beforeRemove?: Hook<RemoveRequest>
+    afterRemove?: Hook<{ items: ItemWithId[] }>
+    beforeTruncate?: Hook<TruncateRequest>
+    afterTruncate?: Hook<void>
 }
 
 export type DataHook = DataHooks[keyof DataHooks];

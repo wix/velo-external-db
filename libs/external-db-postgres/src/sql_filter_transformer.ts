@@ -55,7 +55,8 @@ export default class FilterParser {
 
         const havingFilter = this.parseFilter(aggregation.postFilter, offset, aliasToFunction)
 
-        const { filterExpr, parameters, offset: offsetAfterAggregation } = this.extractFilterExprAndParams(havingFilter)
+        const { filterExpr, parameters, offset: offsetAfterAggregation } = this.extractFilterExprAndParams(havingFilter, offset)
+
 
         return {
             fieldsStatement: filterColumnsStr.join(', '),
@@ -78,10 +79,10 @@ export default class FilterParser {
         return { filterColumnsStr, aliasToFunction }
     }
 
-    extractFilterExprAndParams(havingFilter: any[]) {
+    extractFilterExprAndParams(havingFilter: any[], offset: number) {
         return havingFilter.map(({ filterExpr, parameters, offset }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
                                                                      parameters: parameters, offset }))
-                           .concat(EmptyFilter)[0]
+                           .concat({ ...EmptyFilter, offset: offset ?? 1 })[0]
     }
 
     parseFilter(filter: Filter, offset: number, inlineFields: { [key: string]: any }) : ParsedFilter[] {
