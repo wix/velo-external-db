@@ -6,16 +6,16 @@ import * as compression from 'compression'
 import { errorMiddleware } from './web/error-middleware'
 import { appInfoFor } from './health/app_info'
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { extractRole } from './web/auth-role-middleware'
+
 import { config } from './roles-config.json'
 import { authRoleMiddleware } from './web/auth-role-middleware'
 import { unless, includes } from './web/middleware-support'
 import { getAppInfoPage } from './utils/router_utils'
-import { DataHooksForAction, DataOperations, dataPayloadFor, DataActions, requestContextFor } from './data_hooks_utils'
+import { requestContextFor, DataActions, dataPayloadFor, DataHooksForAction } from './data_hooks_utils'
 // import { SchemaHooksForAction } from './schema_hooks_utils'
 import SchemaService from './service/schema'
 import OperationService from './service/operation'
-import { AnyFixMe, Item } from '@wix-velo/velo-external-db-types'
+import { AnyFixMe, DataOperation, Item } from '@wix-velo/velo-external-db-types'
 import SchemaAwareDataService from './service/schema_aware_data'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
@@ -27,12 +27,9 @@ import * as dataSource from './spi-model/data_source'
 import * as capabilities from './spi-model/capabilities'
 import { WixDataFacade } from './web/wix_data_facade'
 
+const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
 
-const { InvalidRequest } = errors
-// const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
-const { Aggregate: AGGREGATE } = DataOperations
-
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks //schemaHooks: SchemaHooks
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks //roleAuthorizationService: RoleAuthorizationService, schemaHooks: SchemaHooks, 
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
                              _externalDbConfigClient: ConfigValidator, _cfg: { externalDatabaseId: string, allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean },
@@ -45,7 +42,7 @@ export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _s
     schemaAwareDataService = _schemaAwareDataService
     filterTransformer = _filterTransformer
     aggregationTransformer = _aggregationTransformer
-    roleAuthorizationService = _roleAuthorizationService
+    // roleAuthorizationService = _roleAuthorizationService
     dataHooks = _hooks?.dataHooks || {}
     // schemaHooks = _hooks?.schemaHooks || {}
 }
@@ -62,11 +59,6 @@ const executeDataHooksFor = async(action: string, payload: AnyFixMe, requestCont
     }, payload)
 }
 
-// const executeSchemaHooksFor = async(action: string, payload: any, requestContext: RequestContext, customContext: any) => {
-//     return BPromise.reduce(SchemaHooksForAction[action], async(lastHookResult: any, hookName: string) => {
-//         return await executeHook(schemaHooks, hookName, lastHookResult, requestContext, customContext)
-//     }, payload)
-// }
 
 const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
     const actionName = _actionName as keyof typeof hooks
@@ -77,7 +69,7 @@ const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, p
             return payloadAfterHook || payload
         } catch (e: any) {
             if (e.status) throw e
-            throw new InvalidRequest(e.message || e)
+            throw new errors.UnrecognizedError(e.message || e)
         }
     }
     return payload
@@ -134,24 +126,26 @@ export const createRouter = () => {
     // *************** Data API **********************
     router.post('/data/query', async(req, res, next) => {
         try {
-            const queryRequest: dataSource.QueryRequest = req.body
-            const query = queryRequest.query
+            const customContext = {}            
+            const { collectionId, query, omitTotalCount } = await executeDataHooksFor(DataActions.BeforeQuery, dataPayloadFor(Query, req.body), requestContextFor(Query, req.body), customContext) as dataSource.QueryRequest
 
             const offset = query.paging ? query.paging.offset : 0
             const limit = query.paging ? query.paging.limit : 50
 
             const data = await schemaAwareDataService.find(
-                queryRequest.collectionId,
+                collectionId,
                 filterTransformer.transform(query.filter),
                 filterTransformer.transformSort(query.sort),
                 offset,
                 limit,
                 query.fields,
-                queryRequest.omitTotalCount
+                omitTotalCount
             )
 
-            const responseParts = data.items.map(dataSource.QueryResponsePart.item)
-            const metadata = dataSource.QueryResponsePart.pagingMetadata(responseParts.length, offset, data.totalCount)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterQuery, data, requestContextFor(Query, req.body), customContext)
+            const responseParts = dataAfterAction.items.map(dataSource.QueryResponsePart.item)
+
+            const metadata = dataSource.QueryResponsePart.pagingMetadata(responseParts.length, offset, dataAfterAction.totalCount)
 
             streamCollection([...responseParts, ...[metadata]], res)
         } catch (e) {
@@ -161,15 +155,18 @@ export const createRouter = () => {
 
     router.post('/data/count', async(req, res, next) => {
         try {
-            const countRequest: dataSource.CountRequest = req.body
+            const customContext = {}
+            const { collectionId, filter } = await executeDataHooksFor(DataActions.BeforeCount, dataPayloadFor(Count, req.body), requestContextFor(Count, req.body), customContext) as dataSource.CountRequest
 
             const data = await schemaAwareDataService.count(
-                countRequest.collectionId,
-                filterTransformer.transform(countRequest.filter),
+                collectionId,
+                filterTransformer.transform(filter),
             )
 
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterCount, data, requestContextFor(Count, req.body), customContext)
+
             const response = {
-                totalCount: data.totalCount
+                totalCount: dataAfterAction.totalCount
             } as dataSource.CountResponse
 
             res.json(response)
@@ -180,15 +177,15 @@ export const createRouter = () => {
 
     router.post('/data/insert', async(req, res, next) => {
         try {
-            const insertRequest: dataSource.InsertRequest = req.body
+            const customContext = {}
+            const { collectionId, items, overwriteExisting } = await executeDataHooksFor(DataActions.BeforeInsert, dataPayloadFor(Insert, req.body), requestContextFor(Insert, req.body), customContext) as dataSource.InsertRequest
 
-            const collectionName = insertRequest.collectionId
+            const data = overwriteExisting ?
+                            await schemaAwareDataService.bulkUpsert(collectionId, items) :
+                            await schemaAwareDataService.bulkInsert(collectionId, items)
 
-            const data = insertRequest.overwriteExisting ?
-                            await schemaAwareDataService.bulkUpsert(collectionName, insertRequest.items) :
-                            await schemaAwareDataService.bulkInsert(collectionName, insertRequest.items)
-
-            const responseParts = data.items.map(dataSource.InsertResponsePart.item)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, data, requestContextFor(Insert, req.body), customContext)
+            const responseParts = dataAfterAction.items.map(dataSource.InsertResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {
@@ -199,13 +196,14 @@ export const createRouter = () => {
     router.post('/data/update', async(req, res, next) => {
         
         try {
-            const updateRequest: dataSource.UpdateRequest = req.body
+            const customContext = {}
+            const { collectionId, items } = await executeDataHooksFor(DataActions.BeforeUpdate, dataPayloadFor(Update, req.body), requestContextFor(Update, req.body), customContext) as dataSource.UpdateRequest
+            
+            const data = await schemaAwareDataService.bulkUpdate(collectionId, items)
 
-            const collectionName = updateRequest.collectionId
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterUpdate, data, requestContextFor(Update, req.body), customContext)
 
-            const data = await schemaAwareDataService.bulkUpdate(collectionName, updateRequest.items)
-
-            const responseParts = data.items.map(dataSource.UpdateResponsePart.item)
+            const responseParts = dataAfterAction.items.map(dataSource.UpdateResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {
@@ -215,16 +213,19 @@ export const createRouter = () => {
 
     router.post('/data/remove', async(req, res, next) => {
         try {
-            const removeRequest: dataSource.RemoveRequest = req.body
-            const collectionName = removeRequest.collectionId
-            const idEqExpression = removeRequest.itemIds.map(itemId => ({ _id: { $eq: itemId } }))
+            const customContext = {}
+            const { collectionId, itemIds } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(Remove, req.body), requestContextFor(Remove, req.body), customContext) as dataSource.RemoveRequest
+            
+            const idEqExpression = itemIds.map(itemId => ({ _id: { $eq: itemId } }))
             const filter = { $or: idEqExpression }
+            
+            const { items: objectsBeforeRemove } = (await schemaAwareDataService.find(collectionId, filterTransformer.transform(filter), undefined, 0, itemIds.length, undefined, true))
+            
+            await schemaAwareDataService.bulkDelete(collectionId, itemIds)
+            
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterRemove, { items: objectsBeforeRemove }, requestContextFor(Remove, req.body), customContext)
 
-            const objectsBeforeRemove = (await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), undefined, 0, removeRequest.itemIds.length)).items
-
-            await schemaAwareDataService.bulkDelete(collectionName, removeRequest.itemIds)
-
-            const responseParts = objectsBeforeRemove.map(dataSource.RemoveResponsePart.item)
+            const responseParts = dataAfterAction.items.map(dataSource.RemoveResponsePart.item)
 
             streamCollection(responseParts, res)
         } catch (e) {
@@ -234,16 +235,15 @@ export const createRouter = () => {
 
     router.post('/data/aggregate', async(req, res, next) => {
         try {
-            const aggregationRequest = req.body as dataSource.AggregateRequest
-            const { collectionId, paging, sort } = aggregationRequest
+            const customContext = {}
+            const { collectionId, initialFilter, group, finalFilter, sort, paging } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(Aggregate, req.body), requestContextFor(Aggregate, req.body), customContext) as dataSource.AggregateRequest
+            
             const offset = paging ? paging.offset : 0
             const limit = paging ? paging.limit : 50
-
-            const customContext = {}
-            const { initialFilter, group, finalFilter } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(AGGREGATE, aggregationRequest), requestContextFor(AGGREGATE, aggregationRequest), customContext)
-            roleAuthorizationService.authorizeRead(collectionId, extractRole(aggregationRequest))
+            
             const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), aggregationTransformer.transform({ group, finalFilter }), filterTransformer.transformSort(sort), offset, limit)
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(AGGREGATE, aggregationRequest), customContext)
+
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(Aggregate, req.body), customContext)
 
             const responseParts = dataAfterAction.items.map(dataSource.AggregateResponsePart.item)
             const metadata = dataSource.AggregateResponsePart.pagingMetadata((dataAfterAction.items as Item[]).length, offset, data.totalCount)
@@ -256,8 +256,10 @@ export const createRouter = () => {
 
     router.post('/data/truncate', async(req, res, next) => {
         try {
-            const trancateRequest = req.body as dataSource.TruncateRequest
-            await schemaAwareDataService.truncate(trancateRequest.collectionId)
+            const customContext = {}
+            const { collectionId } = await executeDataHooksFor(DataActions.BeforeTruncate, dataPayloadFor(Truncate, req.body), requestContextFor(Truncate, req.body), customContext) as dataSource.TruncateRequest
+            await schemaAwareDataService.truncate(collectionId)
+            await executeDataHooksFor(DataActions.AfterTruncate, {}, requestContextFor(Truncate, req.body), customContext)
             res.json({} as dataSource.TruncateResponse)
         } catch (e) {
             next(e)
