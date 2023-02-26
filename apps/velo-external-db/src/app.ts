@@ -6,7 +6,7 @@ import { engineConnectorFor } from './storage/factory'
 
 const initConnector = async(hooks?: Hooks) => {
     const { vendor, type: adapterType, hideAppInfo } = readCommonConfig()
-
+ 
     const configReader = create()
     const { authorization, secretKey, ...dbConfig } = await configReader.readConfig()
 
