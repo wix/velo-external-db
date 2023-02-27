@@ -54,7 +54,7 @@ services:
       - backend
 
   spanner:
-    image: roryq/spanner-emulator:1.4.8
+    image: roryq/spanner-emulator:latest
     ports:
       - 9010:9010
       - 9020:9020
