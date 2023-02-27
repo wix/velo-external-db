@@ -56,6 +56,7 @@ export const create = () => {
           break
         case 'mysql':
         case 'postgres':
+        case 'mssql':
           internalConfigReader = new gcp.GcpConfigReader()
           break
       }
