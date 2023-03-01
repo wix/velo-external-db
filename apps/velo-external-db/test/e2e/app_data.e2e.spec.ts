@@ -11,7 +11,7 @@ import * as matchers from '../drivers/schema_api_rest_matchers'
 import * as data from '../drivers/data_api_rest_test_support'
 import * as authorization from '../drivers/authorization_test_support'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields } = SchemaOperations
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields, PrimaryKey } = SchemaOperations
 
 const chance = Chance()
 
@@ -80,7 +80,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         )
     })
 
-    test('insert api should fail if item already exists', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ PrimaryKey ])('insert api should fail if item already exists', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
@@ -98,7 +98,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         )
     })
 
-    test('insert api should succeed if item already exists and overwriteExisting is on', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ PrimaryKey ])('insert api should succeed if item already exists and overwriteExisting is on', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.item ], ctx.collectionName, authAdmin)
 
@@ -256,7 +256,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
 
 
-    test('update undefined to number columns should insert nulls', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update undefined to number columns should insert nulls', async() => {
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
         await data.givenItems([ctx.numberItem], ctx.collectionName, authAdmin)
         ctx.numberItem[ctx.numberColumns[0].name] = null
@@ -290,7 +290,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
 
     describe('error handling', () => {
-        test('insert api with duplicate _id should fail with WDE0074, 409', async() => {
+        testIfSupportedOperationsIncludes(supportedOperations, [ PrimaryKey ])('insert api with duplicate _id should fail with WDE0074, 409', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
             let error
