@@ -30,11 +30,13 @@ const initConnector = async(hooks?: Hooks) => {
     return { externalDbRouter, cleanup: async() => await cleanup(), schemaProvider: providers.schemaProvider }
 }
 
-export const createApp = async() => {
+export const createApp = async(options?: { port?: string }) => {
+    const port = process.env.PORT || options?.port || 8080
     const app = express()
     const initConnectorResponse = await initConnector()
     app.use(initConnectorResponse.externalDbRouter.router)
-    const server = app.listen(8080, () => console.log('Connector listening on port 8080'))
+
+    const server = app.listen(port, () => console.log(`Connector listening on port ${port}`))
 
     return { server, ...initConnectorResponse, reload: () => initConnector() }
 }
