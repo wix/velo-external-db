@@ -2,6 +2,8 @@ import { AdapterFunctions } from '@wix-velo/velo-external-db-types'
 
 export const EmptyFilter = {}
 
+export const EmptyResultFilter = { emptyResult: true }
+
 export const projectionFieldFor = (fieldName: any, fieldAlias?: string) => {
     const field = { name: fieldName.substring(1) }
     return fieldAlias ? { ...field, ...{ alias: fieldAlias } } : field

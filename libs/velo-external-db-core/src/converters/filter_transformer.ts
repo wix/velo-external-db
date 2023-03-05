@@ -1,5 +1,5 @@
 import { AdapterOperators, isObject, patchVeloDateValue } from '@wix-velo/velo-external-db-commons'
-import { EmptyFilter } from './utils'
+import { EmptyFilter, EmptyResultFilter } from './utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { AdapterFilter, AdapterOperator, WixDataFilter, WixDataMultiFieldOperators, } from '@wix-velo/velo-external-db-types'
 const { InvalidQuery } = errors
@@ -33,7 +33,8 @@ export default class FilterTransformer implements IFilterTransformer {
         const fieldName = Object.keys(filter)[0]
         const wixOperator = Object.keys(filter[fieldName])[0]
         const operator = this.wixOperatorToAdapterOperator(wixOperator)
-        const value = filter[fieldName][wixOperator]           
+        const value = filter[fieldName][wixOperator]         
+        if ( operator === AdapterOperators.include && Array.isArray(value) && value.length === 0 ) return EmptyResultFilter 
         return { 
             operator: operator as AdapterOperator,
             fieldName,

@@ -67,6 +67,10 @@ export type AnyFixMe = any
 
 export type EmptyFilter = Record<string, never>
 
+export type EmptyResultFilter = {
+    emptyResult: boolean
+}
+
 export type NotEmptyAdapterFilter = {
     operator: AdapterOperator,
     fieldName: string,
@@ -78,7 +82,7 @@ export type MultiFieldAdapterFilter = {
     value: AdapterFilter[]
 } 
 
-export type AdapterFilter = EmptyFilter | NotEmptyAdapterFilter | MultiFieldAdapterFilter
+export type AdapterFilter = EmptyFilter | NotEmptyAdapterFilter | MultiFieldAdapterFilter | EmptyResultFilter
 
 export type Sort = {
     fieldName: string,

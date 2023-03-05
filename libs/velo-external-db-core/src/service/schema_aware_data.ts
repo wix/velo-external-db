@@ -1,4 +1,4 @@
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Item, ItemWithId, ResponseField } from '@wix-velo/velo-external-db-types'
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, EmptyResultFilter, Item, ItemWithId, ResponseField } from '@wix-velo/velo-external-db-types'
 import QueryValidator from '../converters/query_validator'
 import DataService from './data'
 import CacheableSchemaInformation from './schema_information'
@@ -16,6 +16,11 @@ export default class SchemaAwareDataService {
     }
 
     async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any): Promise<{ items: ItemWithId[], totalCount: number }> {
+        //TODO: fix this - the check should be recursive or in each provider / data.ts and return actual totalCount (? - wix data returns 0 as well)
+        if ((filter as EmptyResultFilter).emptyResult ) { 
+            return { items: [], totalCount: 0 }
+        }
+
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         await this.validateFilter(collectionName, filter, fields)
         const projection = await this.projectionFor(collectionName, _projection)
