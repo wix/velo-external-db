@@ -4,6 +4,8 @@ export { supportedOperations } from '../../src/supported_operations'
 const databaseId = 'testDB'
 const projectId = 'corvid-managed-cfe9809c'
 
+export * as capabilities from '../../src/bigquery_capabilities' 
+
 export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ databaseId, projectId })
     return { pool: connection, schemaProvider, cleanup }
@@ -18,9 +20,10 @@ export const cleanup = async() => {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const initEnv = async() => {}
 
-export const setActive = () => {
-    process.env = { ...process.env, ...enviormentVariables }
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export const shutdownEnv = async() => {}
+
+export const schemaProviderTestVariables = () => ({ projectId, databaseId })
 
 export const enviormentVariables = {
     TYPE: 'bigquery',
@@ -28,9 +31,9 @@ export const enviormentVariables = {
     DATABASE_ID: databaseId
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export const shutdownEnv = async() => {}
 
-export const schemaProviderTestVariables = () => ({ projectId, databaseId })
+export const setActive = () => {
+    process.env = { ...process.env, ...enviormentVariables }
+}
 
 export const name = 'bigquery'

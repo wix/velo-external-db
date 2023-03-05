@@ -38,14 +38,14 @@ export default class DataProvider implements IDataProvider {
         return resultSet[0][0]['num']
     }
 
-    async insert(collectionName: string, items: Item[]) {
-        const table = await this.pool.table(collectionName)
+    async insert(collectionName: string, items: Item[], _fields: any[], _upsert?: boolean): Promise<number> {
+        const table = this.pool.table(collectionName)
         await table.insert(items)
 
         return items.length
     }
 
-    async update(collectionName: string, items: Item[]) {   
+    async update(collectionName: string, items: Item[]) {
         // revert to this update when this bug is fixed - 
         // https://community.retool.com/t/parameter-types-must-be-provided-for-null-values-via-the-types-field-in-query-options/13648/6
         // const updateFields = updateFieldsFor(items[0])
