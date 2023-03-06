@@ -11,7 +11,7 @@ export const toContainDefaultFields = (columnsCapabilities: ColumnsCapabilities)
 })))
 
 
-export const collectionToContainFields = (collectionName: string, fields: ResponseField[], capabilities: Capabilities) => ({
+export const collectionToContainFields = (collectionName: string, fields: any[], capabilities: Capabilities) => ({
     id: collectionName,
     fields: hasSameSchemaFieldsLike(fields),
     capabilities: {

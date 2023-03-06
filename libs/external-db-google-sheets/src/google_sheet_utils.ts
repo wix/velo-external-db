@@ -27,7 +27,7 @@ export const sheetFor = async(sheetTitle: string, doc: GoogleSpreadsheet) => {
     }
 
     if (!doc.sheetsByTitle[sheetTitle]) {
-        throw new errors.CollectionDoesNotExists('Collection does not exists')
+        throw new errors.CollectionDoesNotExists('Collection does not exists', sheetTitle)
     }
     
     return doc.sheetsByTitle[sheetTitle]

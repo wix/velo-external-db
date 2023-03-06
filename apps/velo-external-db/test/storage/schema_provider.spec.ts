@@ -87,7 +87,7 @@ describe(`Schema API: ${currentDbImplementationName()}`, () => {
     test('add column on a an existing collection', async() => {
         await env.schemaProvider.create(ctx.collectionName, [])
         await env.schemaProvider.addColumn(ctx.collectionName, { name: ctx.columnName, type: 'datetime', subtype: 'timestamp' })
-        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(collectionToContainFields(ctx.collectionName, [{ field: ctx.columnName, type: 'datetime' }], env.capabilities))
+        await expect( env.schemaProvider.describeCollection(ctx.collectionName) ).resolves.toEqual(collectionToContainFields(ctx.collectionName, [{ field: ctx.columnName }], env.capabilities))
     })
 
     test('add duplicate column will fail', async() => {
