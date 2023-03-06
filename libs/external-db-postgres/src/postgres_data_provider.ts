@@ -15,19 +15,37 @@ export default class DataProvider implements IDataProvider {
     }
 
     async find(collectionName: string, filter: Filter, sort: Sort[], skip: number, limit: number, projection: string[]): Promise<Item[]> {
-        const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
-        const { sortExpr } = this.filterParser.orderBy(sort)
-        const projectionExpr = this.filterParser.selectFieldsFor(projection)
-        const resultSet = await this.pool.query(`SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
-                                    .catch( translateErrorCodes )
-        return resultSet.rows
+        try {
+            const { filterExpr, parameters, offset } = this.filterParser.transform(filter)
+            const { sortExpr } = this.filterParser.orderBy(sort)
+            const projectionExpr = this.filterParser.selectFieldsFor(projection)
+            const resultSet = await this.pool.query(`SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
+                .catch(translateErrorCodes)
+            return resultSet.rows
+        }
+        catch(e) {
+            if ((e as Error).message.includes('$hasSome')) {
+                
+                return []
+            }
+            throw e
+        }
     }
 
     async count(collectionName: string, filter: Filter) {
-        const { filterExpr, parameters } = this.filterParser.transform(filter)
-        const resultSet = await this.pool.query(`SELECT COUNT(*) AS num FROM ${escapeIdentifier(collectionName)} ${filterExpr}`, parameters)
-                                         .catch( translateErrorCodes )
-        return parseInt(resultSet.rows[0]['num'], 10)
+        try{
+            const { filterExpr, parameters } = this.filterParser.transform(filter)
+            const resultSet = await this.pool.query(`SELECT COUNT(*) AS num FROM ${escapeIdentifier(collectionName)} ${filterExpr}`, parameters)
+                .catch(translateErrorCodes)
+            return parseInt(resultSet.rows[0]['num'], 10)
+        }
+        catch(e) {
+            if ((e as Error).message.includes('$hasSome')) {
+
+                return 0
+            }
+            throw e
+        }
     }
 
     async insert(collectionName: string, items: Item[], fields: ResponseField[]) {
