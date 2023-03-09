@@ -3,7 +3,6 @@ import DataProvider from './dynamo_data_provider'
 import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './dynamo_operations'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import { DbProviders } from '@wix-velo/velo-external-db-types'
 import { DynamoConfig } from './types'
 
 
@@ -14,9 +13,9 @@ const extraOptions  = (cfg: DynamoConfig) => {
 }
 
 
-export default (cfg: DynamoConfig, _cfgOptions?: {[x: string]: any}) : DbProviders<DynamoDB> => { 
+export default (cfg: DynamoConfig, _cfgOptions?: {[x: string]: any}) => { 
     const options = _cfgOptions || {}
-    const client = new DynamoDB({ region: cfg.region, ...extraOptions(cfg), ...options })
+    const client = new DynamoDB({ region: cfg.region, ...extraOptions(cfg), ...options, logger: undefined })
     const databaseOperations = new DatabaseOperations(client)
 
     const filterParser = new FilterParser()
