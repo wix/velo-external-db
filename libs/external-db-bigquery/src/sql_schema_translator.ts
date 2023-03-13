@@ -34,6 +34,9 @@ export default class SchemaColumnTranslator {
             case 'bit':
                 return 'boolean'
 
+            case 'json':
+                return 'object'
+
             default:
                 console.log('Unknown type', type)
                 return 'text'
@@ -90,6 +93,9 @@ export default class SchemaColumnTranslator {
 
             case 'boolean_':
                 return 'BOOL'
+
+            case 'object_':
+                    return 'JSON'
 
             default:
                 throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)

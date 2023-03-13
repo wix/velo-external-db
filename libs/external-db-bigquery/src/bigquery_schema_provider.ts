@@ -70,7 +70,7 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async changeColumnType(_collectionName: string, _column: InputField): Promise<void> {
-        throw new Error('Method not implemented.')
+        throw new Error('Change column type is not supported')
     }
 
     async describeCollection(collectionName: string): Promise<Table> {        
@@ -87,7 +87,6 @@ export default class SchemaProvider implements ISchemaProvider {
             capabilities: this.collectionCapabilities(res.map(r => r.field))
         }
 
-        return res[0].map( this.translateDbTypes.bind(this) )
     }
     private appendAdditionalRowDetails(row: {field: string, type: string}) : ResponseField {
         const type = this.sqlSchemaTranslator.translateType(row.type)
@@ -97,12 +96,7 @@ export default class SchemaProvider implements ISchemaProvider {
             capabilities: ColumnsCapabilities[type] ?? EmptyCapabilities
         }
     }
-
-    translateDbTypes(row: ResponseField) {
-        row.type = this.sqlSchemaTranslator.translateType(row.type)
-        return row
-    }
-
+    
     private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
         return {
             dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,

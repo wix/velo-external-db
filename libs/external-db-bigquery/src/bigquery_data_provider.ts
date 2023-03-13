@@ -1,7 +1,7 @@
 import { Dataset } from '@google-cloud/bigquery'
-import { IDataProvider, AdapterFilter as Filter, Item, AdapterAggregation as Aggregation } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, Item, AdapterAggregation as Aggregation, Sort } from '@wix-velo/velo-external-db-types'
 import { asParamArrays, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
-import { unPatchDateTime, patchDateTime, escapeIdentifier } from './bigquery_utils'
+import { unPatchDateTime, patchDateTime, escapeIdentifier, patchObjectValueOfItems } from './bigquery_utils'
 import FilterParser from './sql_filter_transformer'
 import { translateErrorCodes } from './sql_exception_translator'
 
@@ -40,7 +40,9 @@ export default class DataProvider implements IDataProvider {
 
     async insert(collectionName: string, items: Item[], _fields: any[], _upsert?: boolean): Promise<number> {
         const table = this.pool.table(collectionName)
-        await table.insert(items)
+        const ItemsAfterPath = patchObjectValueOfItems(items, _fields)
+
+        await table.insert(ItemsAfterPath)
 
         return items.length
     }
@@ -79,11 +81,12 @@ export default class DataProvider implements IDataProvider {
                   .catch( translateErrorCodes )
     }
 
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation) {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number) {
         const { filterExpr: whereFilterExpr, parameters: whereParameters } = this.filterParser.transform(filter)
         const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation)
+        const { sortExpr } = this.filterParser.orderBy(sort)
 
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${havingFilter}`
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${havingFilter} ${sortExpr} LIMIT ${limit} OFFSET ${skip}`
 
         const resultSet = await this.pool.query({ query: sql, params: [...whereParameters, ...parameters] })
                                     .catch( translateErrorCodes )
