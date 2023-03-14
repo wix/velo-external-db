@@ -32,3 +32,8 @@ export const retrieveSchemaFor = async(collectionName: string, auth: any) => {
     const [collectionGetRes] = await streamToArray(collectionGetStream.data) as any[]
     return collectionGetRes
 }
+
+export const retrieveAllCollections = async(auth: any) => {
+    const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [] }, { ...auth, responseType: 'stream' })
+    return await streamToArray(collectionGetStream.data) as any[]
+}
