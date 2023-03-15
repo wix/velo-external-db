@@ -2,7 +2,7 @@ import {  Item, Sort, WixDataFilter, RoleConfig, ItemWithId, DataOperation, Coll
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
-import { Collection, CreateCollectionRequest, ListCollectionsRequest, UpdateCollectionRequest } from './spi-model/collection'
+import { Collection, CreateCollectionRequest, DeleteCollectionRequest, ListCollectionsRequest, UpdateCollectionRequest } from './spi-model/collection'
 
 export interface DataPayload {
     collectionId: string;
@@ -83,6 +83,9 @@ export interface SchemaHooks {
     beforeCreate?: Hook<CreateCollectionRequest>;
     //afterCreate?
     beforeUpdate?: Hook<UpdateCollectionRequest>;
+    //afterUpdate?
+    beforeDelete?: Hook<DeleteCollectionRequest>;
+    //afterDelete?
 }
 
 export interface ExternalDbRouterConfig {

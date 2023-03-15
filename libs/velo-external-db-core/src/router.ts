@@ -29,7 +29,7 @@ import * as capabilities from './spi-model/capabilities'
 import { WixDataFacade } from './web/wix_data_facade'
 
 const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
-const { Get, Create, Update: UpdateSchema } = CollectionOperationSPI
+const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
 
 let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
 
@@ -313,9 +313,8 @@ export const createRouter = () => {
     })
 
     router.post('/collections/delete', async(req, res, next) => {
-        const { collectionId } = req.body
-
         try {
+            const { collectionId } = await executeSchemaHooksFor(SchemaActions.BeforeDelete, schemaPayloadFor(Delete, req.body), requestContextFor(Delete, req.body), {}) as schemaSource.DeleteCollectionRequest
             const data = await schemaService.delete(collectionId)
             res.json(data)
         } catch (e) {

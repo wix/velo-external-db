@@ -140,6 +140,31 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 await axiosClient.post('/collections/update', { collection: collectionToUpdate }, { ...authOwner, responseType: 'stream' })
                 await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionId, [...SystemFields, ctx.column], env.capabilities))
             })
+
+            test('before delete collection request - should be able to modify the request, specific hooks should override non-specific', async() => {
+                await schema.givenCollection(ctx.collectionId, [], authOwner)
+
+                const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.collectionId)
+
+                env.externalDbRouter.reloadHooks({
+                    schemaHooks: {
+                        beforeAll: (payload: collectionSpi.DeleteCollectionRequest, _requestContext, _serviceContext) => {
+                            if (_requestContext.operation !== CollectionOperationSPI.Get) {
+                                return { collectionId: idPart1 }
+                            }
+                        },
+                        beforeWrite: (payload: collectionSpi.DeleteCollectionRequest, _requestContext, _serviceContext) => {
+                            return { ...hooks.concatToProperty(payload, 'collectionId', idPart2) }
+                        },
+                        beforeDelete: (payload: collectionSpi.DeleteCollectionRequest, _requestContext, _serviceContext) => {
+                            return { ...hooks.concatToProperty(payload, 'collectionId', idPart3) }
+                        }
+                    }
+                })
+                await axiosClient.post('/collections/delete', { collectionId: 'wrong' }, { ...authOwner, responseType: 'stream' })
+
+                await expect(schema.retrieveAllCollections(authOwner)).resolves.toEqual([])
+            })
         })
     })
 
