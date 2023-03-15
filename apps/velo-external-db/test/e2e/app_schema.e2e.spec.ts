@@ -32,10 +32,20 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             await schema.deleteAllCollections(authOwner)
         })
 
-        test('collection get', async() => {
+        test('collection get - retrieve a certain collection', async() => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
 
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields], env.capabilities))
+        })
+
+        test('collection get - retrieve all collections', async() => {
+            await schema.givenCollection(ctx.collectionName, [], authOwner)
+            await schema.givenCollection(ctx.anotherCollectionName, [], authOwner)
+
+            await expect(schema.retrieveAllCollections(authOwner)).resolves.toEqual(expect.arrayContaining([
+                matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields], env.capabilities),
+                matchers.collectionResponsesWith(ctx.anotherCollectionName, [...SystemFields], env.capabilities)
+            ]))
         })
 
         test('collection create - collection without fields', async() => {        
@@ -62,7 +72,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         test('collection update - add column', async() => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
 
-            const collection: any = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
+            const { collection } = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
 
             collection.fields.push(schemaUtils.InputFieldToWixFormatField(ctx.column))
         
@@ -74,7 +84,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         testIfSupportedOperationsIncludes(supportedOperations, [ RemoveColumn ])('collection update - remove column', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-            const collection: any = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
+            const { collection } = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
 
             const systemFieldsNames = SystemFields.map(f => f.name)
             collection.fields = collection.fields.filter((f: any) => systemFieldsNames.includes(f.key))
@@ -86,7 +96,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
         testIfSupportedOperationsIncludes(supportedOperations, [ ChangeColumnType ])('collection update - change column type', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-            const collection: any = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
+            const { collection } = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
 
             const columnIndex = collection.fields.findIndex((f: any) => f.key === ctx.column.name)
             collection.fields[columnIndex].type = schemaUtils.fieldTypeToWixDataEnum('number') 
@@ -105,6 +115,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
     interface Ctx {
         collectionName: string
+        anotherCollectionName: string
         column: InputField
         numberColumns: InputField[],
         item: { [x: string]: any }
@@ -118,6 +129,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
     const ctx: Ctx = {
         collectionName: Uninitialized,
+        anotherCollectionName: Uninitialized,
         column: Uninitialized,
         numberColumns: Uninitialized,
         item: Uninitialized,
@@ -133,6 +145,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
     beforeEach(async() => {
         ctx.collectionName = gen.randomCollectionName()
+        ctx.anotherCollectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
         ctx.numberColumns = gen.randomNumberColumns()
         ctx.item = genCommon.randomEntity([ctx.column.name])
