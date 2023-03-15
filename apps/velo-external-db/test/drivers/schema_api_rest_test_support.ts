@@ -19,7 +19,7 @@ export const givenCollection = async(name: string, columns: InputField[], auth: 
 export const deleteAllCollections = async(auth: any) => {
     const res = await axiosClient.post('/collections/get', { collectionIds: [] }, { ...auth, responseType: 'stream' })
     const dataRes = await streamToArray(res.data) as any []
-    const collectionIds = dataRes.map(d => d.id)
+    const collectionIds = dataRes.map(d => d.collection.id)
 
     for (const collectionId of collectionIds) {
         await axiosClient.post('/collections/delete', { collectionId }, { ...auth, responseType: 'stream' })

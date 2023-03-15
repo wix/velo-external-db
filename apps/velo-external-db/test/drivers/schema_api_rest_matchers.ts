@@ -67,17 +67,21 @@ const fieldsWith = (fields: InputField[], columnsCapabilities: ColumnsCapabiliti
 export const collectionResponsesWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
     const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
     return {
-        id: collectionName,
-        capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
-        fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
+        collection: {
+            id: collectionName,
+            capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
+            fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
+        }
     }
 }
 
 export const createCollectionResponseWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
     const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
     return {
-        id: collectionName,
-        capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
-        fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
+        collection: {
+            id: collectionName,
+            capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
+            fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
+        }
     }
 }
