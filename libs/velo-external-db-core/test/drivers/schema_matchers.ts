@@ -64,6 +64,6 @@ export const collectionsInWixFormatFor = (collection: Table) => {
 }
 
 export const collectionsListFor = (collections: Table[]) => {
-    return expect.arrayContaining(collections.map(c => ({ collection: collectionsInWixFormatFor(c) }) ))
+    return expect.objectContaining({ collections: expect.arrayContaining(collections.map(collectionsInWixFormatFor)) })
 }
 
