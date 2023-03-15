@@ -277,7 +277,8 @@ export const createRouter = () => {
         const { collectionIds } = req.body
         try {
             const data = await schemaService.list(collectionIds)
-            streamCollection(data.collection, res)
+            const responseParts = data.collections.map(collection => ({ collection })) 
+            streamCollection(responseParts, res)
         } catch (e) {
             next(e)
         }

@@ -1,4 +1,4 @@
-export type listCollections = (req: ListCollectionsRequest) => Promise<ListCollectionsResponsePart>
+export type listCollections = (req: ListCollectionsRequest) => Promise<ListCollectionsResponsePart[]>
 
 export type createCollection = (req: CreateCollectionRequest) => Promise<CreateCollectionResponse>
 
@@ -11,7 +11,7 @@ export interface ListCollectionsRequest {
     collectionIds: string[];
 }
 export interface ListCollectionsResponsePart {
-    collection: Collection[];
+    collection: Collection;
 }
 export interface DeleteCollectionRequest {
     collectionId: string;
