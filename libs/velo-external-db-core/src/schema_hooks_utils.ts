@@ -1,3 +1,4 @@
+import { CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 import { ListCollectionsRequest, DeleteCollectionRequest, CreateCollectionRequest, UpdateCollectionRequest } from './spi-model/collection'
 
 
@@ -11,14 +12,6 @@ export const SchemaHooksForAction: { [key: string]: string[] } = {
     afterUpdate: ['afterAll', 'afterWrite', 'afterUpdate'],
     beforeDelete: ['beforeAll', 'beforeWrite', 'beforeDelete'],
     afterDelete: ['afterAll', 'afterWrite', 'afterDelete']
-}
-
-
-export enum SchemaOperations {
-    Get = 'get',
-    Create = 'create',
-    Update = 'update',
-    Delete = 'delete',
 }
 
 
@@ -41,15 +34,15 @@ export const SchemaActions = {
 
 
 
-export const schemaPayloadFor = (operation: SchemaOperations, body: any) => {
+export const schemaPayloadFor = (operation: CollectionOperationSPI, body: any) => {
     switch (operation) {
-        case SchemaOperations.Get:
+        case CollectionOperationSPI.Get:
             return { collectionIds: body.collectionIds } as ListCollectionsRequest
-        case SchemaOperations.Create:
+        case CollectionOperationSPI.Create:
             return { collection: body.collection } as CreateCollectionRequest
-        case SchemaOperations.Update:
+        case CollectionOperationSPI.Update:
             return { collection: body.collection } as UpdateCollectionRequest
-        case SchemaOperations.Delete:
+        case CollectionOperationSPI.Delete:
             return { collectionId: body.collectionId } as DeleteCollectionRequest
         default:
             return body

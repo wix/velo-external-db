@@ -1,8 +1,8 @@
-import {  Item, Sort, WixDataFilter, RoleConfig, ItemWithId, DataOperation } from '@wix-velo/velo-external-db-types'
+import {  Item, Sort, WixDataFilter, RoleConfig, ItemWithId, DataOperation, CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
-import { ListCollectionsRequest } from './spi-model/collection'
+import { Collection, CreateCollectionRequest, ListCollectionsRequest, UpdateCollectionRequest } from './spi-model/collection'
 
 export interface DataPayload {
     collectionId: string;
@@ -26,10 +26,11 @@ export interface DataPayload {
 export interface SchemaPayload {
     collectionId?: string;
     collectionIds?: string[];
+    collection?: Collection;
 }
 
 export interface RequestContext {
-    operation: DataOperation // | SchemaOperation
+    operation: DataOperation | CollectionOperationSPI
     collectionId: string;
     instanceId?: string;
     role?: string;
@@ -78,6 +79,10 @@ export interface SchemaHooks {
     beforeWrite?: Hook<SchemaPayload>;
     afterWrite?: Hook<SchemaPayload>;
     beforeGet?: Hook<ListCollectionsRequest>;
+    //afterGet?
+    beforeCreate?: Hook<CreateCollectionRequest>;
+    //afterCreate?
+    beforeUpdate?: Hook<UpdateCollectionRequest>;
 }
 
 export interface ExternalDbRouterConfig {

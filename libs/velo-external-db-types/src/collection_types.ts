@@ -11,6 +11,13 @@ export enum DataOperation {
     removeReferences = 'removeReferences',
 }
 
+export enum CollectionOperationSPI { // rename it
+    Get = 'get',
+    Create = 'create',
+    Update = 'update',
+    Delete = 'delete',
+}
+
 export enum FieldType {
     text = 'text',
     number = 'number',
