@@ -2,7 +2,8 @@ import each from 'jest-each'
 import * as Chance from 'chance'
 import { Uninitialized } from '@wix-velo/test-commons'
 import { randomBodyWith } from '../test/gen'
-import { SchemaHooksForAction, SchemaOperations, schemaPayloadFor, SchemaActions } from './schema_hooks_utils'
+import { SchemaHooksForAction, schemaPayloadFor, SchemaActions } from './schema_hooks_utils'
+import { CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 const chance = Chance()
 
 describe('Hooks Utils', () => {
@@ -37,14 +38,14 @@ describe('Hooks Utils', () => {
         test('Payload for get should return schemaIds', () => {
             console.log('ctx.bodyWithAllProps', ctx.bodyWithAllProps)
             
-            expect(schemaPayloadFor(SchemaOperations.Get, ctx.bodyWithAllProps)).toEqual({ collectionIds: ctx.collectionIds })
+            expect(schemaPayloadFor(CollectionOperationSPI.Get, ctx.bodyWithAllProps)).toEqual({ collectionIds: ctx.collectionIds })
         })
-        each([SchemaOperations.Create, SchemaOperations.Update])
+        each([CollectionOperationSPI.Create, CollectionOperationSPI.Update])
         .test('Payload for %s should return collection', (operation) => {
             expect(schemaPayloadFor(operation, ctx.bodyWithAllProps)).toEqual({ collection: ctx.collection })
         })
         test('Payload for delete should return collectionId', () => {
-            expect(schemaPayloadFor(SchemaOperations.Delete, ctx.bodyWithAllProps)).toEqual({ collectionId: ctx.collectionId })
+            expect(schemaPayloadFor(CollectionOperationSPI.Delete, ctx.bodyWithAllProps)).toEqual({ collectionId: ctx.collectionId })
         })
     })
 
