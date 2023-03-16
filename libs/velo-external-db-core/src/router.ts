@@ -281,9 +281,10 @@ export const createRouter = () => {
 
     router.post('/collections/get', async(req, res, next) => {
         try {
-            const { collectionIds } = await executeSchemaHooksFor(SchemaActions.BeforeGet, schemaPayloadFor(Get, req.body), requestContextFor(Get, req.body), {}) as schemaSource.ListCollectionsRequest
+            const customContext = {}
+            const { collectionIds } = await executeSchemaHooksFor(SchemaActions.BeforeGet, schemaPayloadFor(Get, req.body), requestContextFor(Get, req.body), customContext) as schemaSource.ListCollectionsRequest
             const data = await schemaService.list(collectionIds)
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterGet, data, requestContextFor(Get, req.body), {})
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterGet, data, requestContextFor(Get, req.body), customContext)
             const responseParts = dataAfterAction.collections.map(collection => ({ collection })) 
             streamCollection(responseParts, res)
         } catch (e) {
@@ -294,9 +295,10 @@ export const createRouter = () => {
 
     router.post('/collections/create', async(req, res, next) => {
         try {
-            const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(Create, req.body), requestContextFor(Create, req.body), {}) as schemaSource.CreateCollectionRequest
+            const customContext = {}
+            const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(Create, req.body), requestContextFor(Create, req.body), customContext) as schemaSource.CreateCollectionRequest
             const data = await schemaService.create(collection)
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterCreate, data, requestContextFor(Create, req.body), {})
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterCreate, data, requestContextFor(Create, req.body), customContext)
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -305,9 +307,10 @@ export const createRouter = () => {
 
     router.post('/collections/update', async(req, res, next) => {
         try {
-            const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeUpdate, schemaPayloadFor(UpdateSchema, req.body), requestContextFor(UpdateSchema, req.body), {}) as schemaSource.UpdateCollectionRequest
+            const customContext = {}
+            const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeUpdate, schemaPayloadFor(UpdateSchema, req.body), requestContextFor(UpdateSchema, req.body), customContext) as schemaSource.UpdateCollectionRequest
             const data = await schemaService.update(collection)
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterUpdate, data, requestContextFor(UpdateSchema, req.body), {})
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterUpdate, data, requestContextFor(UpdateSchema, req.body), customContext)
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
@@ -316,9 +319,10 @@ export const createRouter = () => {
 
     router.post('/collections/delete', async(req, res, next) => {
         try {
-            const { collectionId } = await executeSchemaHooksFor(SchemaActions.BeforeDelete, schemaPayloadFor(Delete, req.body), requestContextFor(Delete, req.body), {}) as schemaSource.DeleteCollectionRequest
+            const customContext = {}
+            const { collectionId } = await executeSchemaHooksFor(SchemaActions.BeforeDelete, schemaPayloadFor(Delete, req.body), requestContextFor(Delete, req.body), customContext) as schemaSource.DeleteCollectionRequest
             const data = await schemaService.delete(collectionId)
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterDelete, data, requestContextFor(Delete, req.body), {})
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterDelete, data, requestContextFor(Delete, req.body), customContext)
             res.json(dataAfterAction)
         } catch (e) {
             next(e)

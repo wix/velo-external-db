@@ -2,8 +2,8 @@ import axios from 'axios'
 import each from 'jest-each'
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import { authOwner } from '@wix-velo/external-db-testkit'
-import { collectionSpi } from '@wix-velo/velo-external-db-core'
-import { Uninitialized } from '@wix-velo/test-commons'
+import { collectionSpi, types as coreTypes } from '@wix-velo/velo-external-db-core'
+import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
 import { CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 import { schemaUtils } from '@wix-velo/velo-external-db-core'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } from '../resources/e2e_resources'
@@ -11,6 +11,7 @@ import gen = require('../gen')
 import matchers = require('../drivers/schema_api_rest_matchers')
 import schema = require('../drivers/schema_api_rest_test_support')
 import hooks = require('../drivers/hooks_test_support_v3')
+import * as data from '../drivers/data_api_rest_test_support'
 
 const axiosClient = axios.create({
     baseURL: 'http://localhost:8080'
@@ -130,9 +131,9 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                     }
                 })
                 const { collection } = await schema.retrieveSchemaFor(ctx.collectionId, authOwner)
-                
+
                 const collectionToUpdate = { ...collection, fields: [...collection.fields, schemaUtils.InputFieldToWixFormatField({ ...ctx.column, name: 'wrong' })] }
-                
+
                 await axiosClient.post('/collections/update', { collection: collectionToUpdate }, authOwner)
                 await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionId, [...SystemFields, ctx.column], env.capabilities))
             })
@@ -244,6 +245,60 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
         })
     })
 
+    describe('Custom context, Service context', () => {
+        each([
+            ['get', 'Read', 'beforeGet', 'afterGet', '/collections/get', []],
+            ['create', 'Write', 'beforeCreate', 'afterCreate', '/collections/create', []],
+            ['update', 'Write', 'beforeUpdate', 'afterUpdate', '/collections/update', SystemFields],
+            ['delete', 'Write', 'beforeDelete', 'afterDelete', '/collections/delete', []]
+        ]).test('%s - should be able to modify custom context from each hook, and use service context', async(operation, operationType, beforeHook, afterHook, api, fields) => {
+
+            if (operation !== 'create') {
+                await schema.givenCollection(ctx.collectionId, [], authOwner)
+            }
+            const beforeOperationHookName = `before${operationType}`
+            const afterOperationHookName = `after${operationType}`
+
+            env.externalDbRouter.reloadHooks({
+                schemaHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['beforeAll'] = true
+                    },
+                    [beforeOperationHookName]: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['beforeOperation'] = true
+                    },
+                    [beforeHook]: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['beforeHook'] = true
+                    },
+                    afterAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['afterAll'] = true
+                    },
+                    [afterOperationHookName]: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['afterOperation'] = true
+                    },
+                    [afterHook]: async(_payload, _requestContext, serviceContext: coreTypes.ServiceContext, customContext) => {
+                        customContext['afterHook'] = true
+
+                        if (customContext['beforeAll'] && customContext['beforeOperation'] &&
+                            customContext['beforeHook'] && customContext['afterAll'] &&
+                            customContext['afterOperation'] && customContext['afterHook']) {
+
+                            await serviceContext.schemaService.create(ctx.newCollection)
+                            await serviceContext.dataService.insert(ctx.newCollection.id, ctx.newItem)
+                        }
+                    }
+                }
+            })
+
+
+            await axiosClient.post(api, hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: fields.map(schemaUtils.InputFieldToWixFormatField) }), authOwner)
+
+            hooks.resetHooks(env.externalDbRouter)
+            await expect(data.queryCollectionAsArray(ctx.newCollection.id, [], undefined, authOwner)).resolves.toEqual(
+                expect.toIncludeSameMembers([{ item: ctx.newItem }, data.pagingMetadata(1, 1)]))
+        })
+    })
+
 
 
     const ctx = {
@@ -251,6 +306,8 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
         anotherCollectionName: Uninitialized,
         column: Uninitialized,
         anotherColumn: Uninitialized,
+        newCollection: Uninitialized,
+        newItem: Uninitialized
     }
 
     beforeEach(async() => {
@@ -258,6 +315,9 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
         ctx.anotherCollectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
         ctx.anotherColumn = gen.randomColumn()
+        ctx.newCollection = gen.randomCollection()
+        ctx.newItem = genCommon.randomEntity([])
+
         hooks.resetHooks(env.externalDbRouter)
     })
 
