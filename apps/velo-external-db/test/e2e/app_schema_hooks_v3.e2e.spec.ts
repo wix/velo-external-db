@@ -1,7 +1,7 @@
 import axios from 'axios'
 import each from 'jest-each'
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
-import { authOwner } from '@wix-velo/external-db-testkit'
+import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { collectionSpi, types as coreTypes } from '@wix-velo/velo-external-db-core'
 import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
 import { CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
@@ -242,6 +242,53 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 const res = await axiosClient.post(api, hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: fields.map(schemaUtils.InputFieldToWixFormatField) }), authOwner)
                 expect(res.data.collection.id).toEqual(`${ctx.collectionId}123`)
             })
+        })
+    })
+    
+    describe('Error Handling', () => {
+        test('should handle error object and throw with the corresponding status', async() => {
+            env.externalDbRouter.reloadHooks({
+                schemaHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        const error = new Error('message')
+                        error['status'] = '409'
+                        throw error
+                    }
+                }
+            })
+
+            await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
+                errorResponseWith(409, 'message')
+            )
+        })
+
+        test('If not specified should throw 500 - Error object', async() => {
+            env.externalDbRouter.reloadHooks({
+                schemaHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        const error = new Error('message')
+                        throw error
+                    }
+                }
+            })
+
+            await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
+                errorResponseWith(500, 'message')
+            )
+        })
+
+        test('If not specified should throw 500 - string', async() => {
+            env.externalDbRouter.reloadHooks({
+                schemaHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext) => {
+                        throw 'message'
+                    }
+                }
+            })
+
+            await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
+                errorResponseWith(500, 'message')
+            )
         })
     })
 
