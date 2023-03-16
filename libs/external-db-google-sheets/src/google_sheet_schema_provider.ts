@@ -1,9 +1,10 @@
 import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet } from 'google-spreadsheet'
-import { SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { CollectionCapabilities, Encryption, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { SystemFields, validateSystemFields, parseTableData, errors } from '@wix-velo/velo-external-db-commons'
-import { ISchemaProvider, ResponseField, InputField, Table } from '@wix-velo/velo-external-db-types'
+import { ISchemaProvider, InputField, Table } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes } from './google_sheet_exception_translator'
 import { describeSheetHeaders, headersFrom, sheetFor } from './google_sheet_utils'
+import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations, ColumnsCapabilities } from './google_sheet_capabilities'
 
 export default class SchemaProvider implements ISchemaProvider {
     doc: GoogleSpreadsheet
@@ -25,7 +26,8 @@ export default class SchemaProvider implements ISchemaProvider {
         return Object.entries(parsedSheetsHeadersData)
                      .map(([collectionName, rs]) => ({
                          id: collectionName,
-                         fields: rs.map(this.translateDbTypes.bind(this))
+                         fields: rs.map(this.translateDbTypes.bind(this)),
+                         capabilities: this.collectionCapabilities(rs.map(r => r.field))
                      }))
     }
 
@@ -48,9 +50,14 @@ export default class SchemaProvider implements ISchemaProvider {
         }
     }
 
-    async describeCollection(collectionName: string) {
+    async describeCollection(collectionName: string): Promise<Table> {
         const sheet = await sheetFor(collectionName, this.doc)
-        return await describeSheetHeaders(sheet)
+        const fields = await describeSheetHeaders(sheet)
+        return {
+            id: collectionName,
+            fields,
+            capabilities: this.collectionCapabilities(fields.map(f => f.field)) 
+        }
     }
 
     async addColumn(collectionName: string, column: InputField) {
@@ -74,11 +81,27 @@ export default class SchemaProvider implements ISchemaProvider {
         await sheet.delete()
     }
 
-    translateDbTypes(row: ResponseField) {
+    translateDbTypes(row: { field: string, type: string }) {
         return {
             field: row.field,
-            type: row.type
+            type: row.type,
+            capabilities: ColumnsCapabilities[row.type as keyof typeof ColumnsCapabilities]
         }
+    }
+
+    private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
+        return {
+            dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported
+        }
+    }
+
+    async changeColumnType(_collectionName: string, _column: InputField): Promise<void> {
+        throw new Error('Method not implemented.')
     }
 }
 

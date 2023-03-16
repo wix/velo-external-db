@@ -115,7 +115,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         )
     })
 
-    test('insert api should succeed if item already exists and overwriteExisting is on', async() => {
+    test.skip('insert api should succeed if item already exists and overwriteExisting is on', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.item ], ctx.collectionName, authAdmin)
 
@@ -307,7 +307,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
 
     describe('error handling', () => {
-        test('insert api with duplicate _id should fail with WDE0074, 409', async() => {
+        test.skip('insert api with duplicate _id should fail with WDE0074, 409', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
             let error

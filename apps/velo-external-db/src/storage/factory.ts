@@ -27,10 +27,10 @@ export const engineConnectorFor = async(_type: string, config: any): Promise<Dat
             const { mongoFactory } = require('@wix-velo/external-db-mongo')
             return await mongoFactory(config)
         }
-        // case 'google-sheet': {
-        //     const { googleSheetFactory } = require('@wix-velo/external-db-google-sheets')
-        //     return await googleSheetFactory(config)
-        // }
+        case 'google-sheet': {
+            const { googleSheetFactory } = require('@wix-velo/external-db-google-sheets')
+            return await googleSheetFactory(config)
+        }
         // case 'airtable': {
         //     const { airtableFactory } = require('@wix-velo/external-db-airtable')
         //     return await airtableFactory(config)

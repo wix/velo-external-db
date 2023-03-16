@@ -23,10 +23,6 @@ import * as googleSheet from '@wix-velo/external-db-google-sheets'
 
 import { ProviderResourcesEnv } from '../types'
 
-// const googleSheet = require('@wix-velo/external-db-google-sheets')
-// const googleSheetTestEnv = require('./engines/google_sheets_resources')
-
-
 export const env: ProviderResourcesEnv = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
@@ -78,7 +74,7 @@ const testSuits = {
     airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.testResources.supportedOperations),
     dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.testResources),
     bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.testResources.supportedOperations),
-    'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
+    'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit, googleSheet.testResources),
 }
 
 const testedSuit = () => testSuits[process.env.TEST_ENGINE]

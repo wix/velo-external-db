@@ -7,7 +7,7 @@
     "build:full-image": "nx run velo-external-db:build-image ",
     "lint": "eslint --cache ./",
     "lint:fix": "eslint --cache --fix ./",
-    "test": "npm run test:core; npm run test:mysql; npm run test:postgres; npm run test:mssql; npm run test:spanner; npm run test:mongo; npm run test:dynamodb; npm run test:firestore",
+    "test": "npm run test:core; npm run test:mysql; npm run test:postgres; npm run test:mssql; npm run test:spanner; npm run test:mongo; npm run test:dynamodb; npm run test:firestore; npm run test:google-sheets",
     "test:core": "nx run-many --skip-nx-cache --target=test --projects=@wix-velo/external-db-config,@wix-velo/velo-external-db-core,@wix-velo/external-db-security",
     "test:postgres": "TEST_ENGINE=postgres nx run-many --skip-nx-cache --target=test --projects=@wix-velo/external-db-postgres,velo-external-db",
     "test:postgres13": "npm run test:postgres",

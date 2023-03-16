@@ -10,6 +10,8 @@ let _server: Server
 
 export { supportedOperations } from '../../src/supported_operations'
 
+export * as capabilities from '../../src/google_sheet_capabilities' 
+
 export const connection = async() => {
     const googleSheetsConfig = {
         sheetId: SHEET_ID,

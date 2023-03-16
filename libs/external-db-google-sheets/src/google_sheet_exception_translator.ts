@@ -17,7 +17,7 @@ export const notThrowingTranslateErrorCodes = (err: any) => {
         case '400':
             return new DbConnectionError('Client email is invalid')
         default : 
-            return new UnrecognizedError(`${err.message}`)
+            return new DbConnectionError(`${err.message}`)
     }
 }
 
