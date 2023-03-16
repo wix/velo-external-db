@@ -77,7 +77,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                         }
                     }
                 })
-                await axiosClient.post('/collections/create', { collection: { id: 'wrong', fields: [] } }, { ...authOwner, responseType: 'stream' })
+                await axiosClient.post('/collections/create', { collection: { id: 'wrong', fields: [] } }, authOwner)
 
                 await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionId, [...SystemFields], env.capabilities))
             })
@@ -129,11 +129,11 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                         }
                     }
                 })
-                const collection = await schema.retrieveSchemaFor(ctx.collectionId, authOwner)
-
+                const { collection } = await schema.retrieveSchemaFor(ctx.collectionId, authOwner)
+                
                 const collectionToUpdate = { ...collection, fields: [...collection.fields, schemaUtils.InputFieldToWixFormatField({ ...ctx.column, name: 'wrong' })] }
-
-                await axiosClient.post('/collections/update', { collection: collectionToUpdate }, { ...authOwner, responseType: 'stream' })
+                
+                await axiosClient.post('/collections/update', { collection: collectionToUpdate }, authOwner)
                 await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionId, [...SystemFields, ctx.column], env.capabilities))
             })
 
@@ -157,9 +157,9 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                         }
                     }
                 })
-                await axiosClient.post('/collections/delete', { collectionId: 'wrong' }, { ...authOwner, responseType: 'stream' })
+                await axiosClient.post('/collections/delete', { collectionId: 'wrong' }, authOwner)
 
-                await expect(schema.retrieveAllCollections(authOwner)).resolves.toEqual([])
+                await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).rejects.toThrow('404')
             })
         })
     })
@@ -197,7 +197,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                     }
                 })
 
-                await expect(schema.retrieveAllCollections(authOwner)).resolves.toEqual([matchers.createCollectionResponseWith(`${ctx.collectionId}123`, [...SystemFields], env.capabilities)])
+                await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(`${ctx.collectionId}123`, [...SystemFields], env.capabilities))
             })
         })
         describe('Write operations', () => {
@@ -205,7 +205,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 ['create', 'afterCreate', '/collections/create', []],
                 ['update', 'afterUpdate', '/collections/update', SystemFields],
                 ['delete', 'afterDelete', '/collections/delete', []]
-            ]).test.only('after %s collection request - should be able to modify the response (collection)', async(operation, hookName, api, fields) => {
+            ]).test('after %s collection request - should be able to modify the response (collection)', async(operation, hookName, api, fields) => {
                 if (operation !== 'create') {
                     await schema.givenCollection(ctx.collectionId, [], authOwner)
                 }
@@ -245,11 +245,12 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
     })
 
 
+
     const ctx = {
         collectionId: Uninitialized,
         anotherCollectionName: Uninitialized,
         column: Uninitialized,
-        anotherColumn: Uninitialized
+        anotherColumn: Uninitialized,
     }
 
     beforeEach(async() => {
@@ -257,7 +258,6 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
         ctx.anotherCollectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
         ctx.anotherColumn = gen.randomColumn()
-
         hooks.resetHooks(env.externalDbRouter)
     })
 
