@@ -53,7 +53,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
                 id: ctx.collectionName,
                 fields: []
             }
-            await axiosClient.post('/collections/create', { collection }, { ...authOwner, responseType: 'stream' })
+            await axiosClient.post('/collections/create', { collection }, authOwner)
 
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields], env.capabilities))
         })
@@ -64,7 +64,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
                 fields: [ctx.column].map(schemaUtils.InputFieldToWixFormatField)
             }
 
-            await axiosClient.post('/collections/create', { collection }, { ...authOwner, responseType: 'stream' })
+            await axiosClient.post('/collections/create', { collection }, authOwner)
 
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
         })
@@ -76,7 +76,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
             collection.fields.push(schemaUtils.InputFieldToWixFormatField(ctx.column))
         
-            await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' })
+            await axiosClient.post('/collections/update', { collection }, authOwner)
 
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
         })
@@ -89,7 +89,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             const systemFieldsNames = SystemFields.map(f => f.name)
             collection.fields = collection.fields.filter((f: any) => systemFieldsNames.includes(f.key))
 
-            await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' })       
+            await axiosClient.post('/collections/update', { collection }, authOwner)       
             
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields], env.capabilities))
         })
@@ -101,14 +101,14 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             const columnIndex = collection.fields.findIndex((f: any) => f.key === ctx.column.name)
             collection.fields[columnIndex].type = schemaUtils.fieldTypeToWixDataEnum('number') 
 
-            await axiosClient.post('/collections/update', { collection }, { ...authOwner, responseType: 'stream' }) 
+            await axiosClient.post('/collections/update', { collection }, authOwner) 
 
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields, { name: ctx.column.name, type: 'number' }], env.capabilities))
         })
 
         test('collection delete', async() => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
-            await axiosClient.post('/collections/delete', { collectionId: ctx.collectionName }, { ...authOwner, responseType: 'stream' })
+            await axiosClient.post('/collections/delete', { collectionId: ctx.collectionName }, authOwner)
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).rejects.toThrow('404')
         })
     })
