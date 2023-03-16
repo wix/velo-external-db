@@ -290,7 +290,7 @@ export const createRouter = () => {
 
         try {
             const data = await schemaService.create(collection)
-            streamCollection([data.collection], res)
+            res.json(data)
         } catch (e) {
             next(e)
         }
@@ -301,7 +301,7 @@ export const createRouter = () => {
 
         try {
             const data = await schemaService.update(collection)
-            streamCollection([data.collection], res)
+            res.json(data)
         } catch (e) {
             next(e)
         }
@@ -312,7 +312,7 @@ export const createRouter = () => {
 
         try {
             const data = await schemaService.delete(collectionId)
-            streamCollection([data.collection], res)
+            res.json(data)
         } catch (e) {
             next(e)
         }
