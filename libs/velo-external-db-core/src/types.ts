@@ -27,6 +27,7 @@ export interface SchemaPayload {
     collectionId?: string;
     collectionIds?: string[];
     collection?: Collection;
+    collections?: Collection[];
 }
 
 export interface RequestContext {
@@ -79,13 +80,13 @@ export interface SchemaHooks {
     beforeWrite?: Hook<SchemaPayload>;
     afterWrite?: Hook<SchemaPayload>;
     beforeGet?: Hook<ListCollectionsRequest>;
-    //afterGet?
+    afterGet?: Hook<{ collections: Collection[] }>;
     beforeCreate?: Hook<CreateCollectionRequest>;
-    //afterCreate?
+    afterCreate?: Hook<{ collection: Collection }>;
     beforeUpdate?: Hook<UpdateCollectionRequest>;
-    //afterUpdate?
+    afterUpdate?: Hook<{ collection: Collection }>;
     beforeDelete?: Hook<DeleteCollectionRequest>;
-    //afterDelete?
+    afterDelete?: Hook<{ collection: Collection }>;
 }
 
 export interface ExternalDbRouterConfig {

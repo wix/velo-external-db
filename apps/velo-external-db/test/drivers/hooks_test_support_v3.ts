@@ -1,4 +1,4 @@
-import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
+import { collectionSpi, ExternalDbRouter } from '@wix-velo/velo-external-db-core'
 import { Item } from '@wix-velo/velo-external-db-types'
 
 
@@ -12,6 +12,10 @@ export const writeRequestBodyWith = (collectionId: string, items: Item[]) => ({
 
 export const readRequestBodyWith = (collectionId: string) => ({
     collectionId, filter: {}, query: { filter: {} }, omitTotalCount: false, group: { by: [], aggregation: [] }, initialFilter: {}, finalFilter: {}, sort: [], paging: { offset: 0, limit: 10 }
+})
+
+export const collectionWriteRequestBodyWith = (collection: collectionSpi.Collection) => ({
+    collection, collectionId: collection.id, collectionIds: [collection.id]
 })
 
 export const splitIdToThreeParts = (id: string) => {

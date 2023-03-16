@@ -85,7 +85,7 @@ export default class SchemaService {
     async delete(collectionId: string): Promise<collectionSpi.DeleteCollectionResponse> {
         const { fields: collectionFields } = await this.storage.describeCollection(collectionId) as Table
         await this.storage.drop(collectionId)
-        this.schemaInformation.refresh()
+        await this.schemaInformation.refresh()
         return { collection: {
             id: collectionId,
             fields: responseFieldToWixFormat(collectionFields),

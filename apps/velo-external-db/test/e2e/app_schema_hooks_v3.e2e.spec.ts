@@ -1,20 +1,16 @@
 import axios from 'axios'
+import each from 'jest-each'
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import { authOwner } from '@wix-velo/external-db-testkit'
 import { collectionSpi } from '@wix-velo/velo-external-db-core'
-// import { SchemaOperations } from '@wix-velo/velo-external-db-types'
-// const each = require('jest-each').default
-import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } from '../resources/e2e_resources'
+import { Uninitialized } from '@wix-velo/test-commons'
+import { CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 import { schemaUtils } from '@wix-velo/velo-external-db-core'
+import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } from '../resources/e2e_resources'
 import gen = require('../gen')
 import matchers = require('../drivers/schema_api_rest_matchers')
 import schema = require('../drivers/schema_api_rest_test_support')
 import hooks = require('../drivers/hooks_test_support_v3')
-// const { RemoveColumn } = SchemaOperations
-
-
-import { Uninitialized } from '@wix-velo/test-commons'
-import { CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 
 const axiosClient = axios.create({
     baseURL: 'http://localhost:8080'
@@ -35,7 +31,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
 
     describe('Before Hooks', () => {
         describe('Read operations', () => {
-            test('before get collections request - should be able to modify the request, specific hooks should override non-specific', async() => {
+            test('before get collections request - should be able to modify the request (collectionIds)', async() => {
                 await schema.givenCollection(ctx.collectionId, [], authOwner)
 
                 const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.collectionId)
@@ -62,7 +58,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             })
         })
         describe('Write operations', () => {
-            test('before create collection request - should be able to modify the request, specific hooks should override non-specific', async() => {
+            test('before create collection request - should be able to modify the request (collection)', async() => {
                 const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.collectionId)
 
                 env.externalDbRouter.reloadHooks({
@@ -86,7 +82,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionId, [...SystemFields], env.capabilities))
             })
 
-            test('before update collection request - should be able to modify the request, specific hooks should override non-specific', async() => {
+            test('before update collection request - should be able to modify the request (collection)', async() => {
                 await schema.givenCollection(ctx.collectionId, [], authOwner)
 
                 const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.column.name)
@@ -141,7 +137,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionId, [...SystemFields, ctx.column], env.capabilities))
             })
 
-            test('before delete collection request - should be able to modify the request, specific hooks should override non-specific', async() => {
+            test('before delete collection request - should be able to modify the request (collectionId)', async() => {
                 await schema.givenCollection(ctx.collectionId, [], authOwner)
 
                 const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.collectionId)
@@ -170,10 +166,80 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
 
     describe('After Hooks', () => {
         describe('Read operations', () => {
-            test('after get collections request - should be able to modify the response, specific hooks should override non-specific', async() => {
+            test('after get collections request - should be able to modify the response', async() => {
                 await schema.givenCollection(ctx.collectionId, [], authOwner)
 
-                // await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.collectionResponsesWith('otherName', [...SystemFields], env.capabilities))
+                env.externalDbRouter.reloadHooks({
+                    schemaHooks: {
+                        afterAll: (payload: { collections: collectionSpi.Collection[] }, _requestContext, _serviceContext) => {
+                            if (_requestContext.operation === CollectionOperationSPI.Get) {
+                                return {
+                                    collections: payload.collections.map((collection) => {
+                                        return { ...collection, id: collection.id.concat('1') }
+                                    })
+                                }
+                            }
+                        },
+                        afterRead: (payload: { collections: collectionSpi.Collection[] }, _requestContext, _serviceContext) => {
+                            return {
+                                collections: payload.collections.map((collection) => {
+                                    return { ...collection, id: collection.id.concat('2') }
+                                })
+                            }
+                        },
+                        afterGet: (payload: { collections: collectionSpi.Collection[] }, _requestContext, _serviceContext) => {
+                            return {
+                                collections: payload.collections.map((collection) => {
+                                    return { ...collection, id: collection.id.concat('3') }
+                                })
+                            }
+                        }
+                    }
+                })
+
+                await expect(schema.retrieveAllCollections(authOwner)).resolves.toEqual([matchers.createCollectionResponseWith(`${ctx.collectionId}123`, [...SystemFields], env.capabilities)])
+            })
+        })
+        describe('Write operations', () => {
+            each([
+                ['create', 'afterCreate', '/collections/create', []],
+                ['update', 'afterUpdate', '/collections/update', SystemFields],
+                ['delete', 'afterDelete', '/collections/delete', []]
+            ]).test.only('after %s collection request - should be able to modify the response (collection)', async(operation, hookName, api, fields) => {
+                if (operation !== 'create') {
+                    await schema.givenCollection(ctx.collectionId, [], authOwner)
+                }
+
+                env.externalDbRouter.reloadHooks({
+                    schemaHooks: {
+                        afterAll: (payload: { collection: collectionSpi.Collection }, _requestContext, _serviceContext) => {
+                            if (_requestContext.operation !== CollectionOperationSPI.Get) {
+                                return {
+                                    collection: {
+                                        ...payload.collection, id: payload.collection.id.concat('1')
+                                    }
+                                }
+                            }
+                        },
+                        afterWrite: (payload: { collection: collectionSpi.Collection }, _requestContext, _serviceContext) => {
+                            return {
+                                collection: {
+                                    ...payload.collection, id: payload.collection.id.concat('2')
+                                }
+                            }
+                        },
+                        [hookName]: (payload: { collection: collectionSpi.Collection }, _requestContext, _serviceContext) => {
+                            return {
+                                collection: {
+                                    ...payload.collection, id: payload.collection.id.concat('3')
+                                }
+                            }
+                        }
+                    }
+                })
+
+                const res = await axiosClient.post(api, hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: fields.map(schemaUtils.InputFieldToWixFormatField) }), authOwner)
+                expect(res.data.collection.id).toEqual(`${ctx.collectionId}123`)
             })
         })
     })
