@@ -38,7 +38,7 @@ const testSuits = {
     'google-sheet': new E2EResources(googleSheet, createApp),
     airtable: new E2EResources(airtable, createApp),
     dynamodb: new E2EResources(dynamo, createAppWithWixDataBaseUrl),
-    bigquery: new E2EResources(bigquery, createApp),
+    bigquery: new E2EResources(bigquery, createAppWithWixDataBaseUrl),
 }
 
 export const testedSuit = () => testSuits[process.env.TEST_ENGINE]

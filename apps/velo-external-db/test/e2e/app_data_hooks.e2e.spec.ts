@@ -1,5 +1,5 @@
 import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
-import { streamToArray } from '@wix-velo/test-commons'
+import { streamToArray, testIfSupportedOperationsIncludes, testSupportedOperations } from '@wix-velo/test-commons'
 import { dataSpi, types as coreTypes, collectionSpi } from '@wix-velo/velo-external-db-core'
 import { DataOperation, InputField, ItemWithId, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
@@ -11,7 +11,7 @@ import hooks = require('../drivers/hooks_test_support_v3')
 import * as matchers from '../drivers/schema_api_rest_matchers'
 import each from 'jest-each'
 
-const { Aggregate } = SchemaOperations
+const { Aggregate, UpdateImmediately, DeleteImmediately } = SchemaOperations
 
 
 const axios = require('axios').create({
@@ -159,11 +159,12 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             }
         })
         describe('Write Operations', () => {
-            each([
-                ['insert', 'beforeInsert', '/data/insert'],
-                ['update', 'beforeUpdate', '/data/update'],
-            ])
-                .test('before %s request - should be able to modify the item', async(operation, hookName, api) => {
+            each(testSupportedOperations(supportedOperations, 
+                [
+                    ['insert', 'beforeInsert', '/data/insert'],
+                    ['update', 'beforeUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
+                ]
+                )).test('before %s request - should be able to modify the item', async(operation, hookName, api) => {
                     await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.afterAllColumn, ctx.afterWriteColumn, ctx.afterHookColumn], authOwner)
                     if (operation !== 'insert') {
                         await data.givenItems([ctx.item], ctx.collectionName, authOwner)
@@ -217,7 +218,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     )
                 })
 
-            test('before remove request - should be able to modify the item id', async() => {
+            testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('before remove request - should be able to modify the item id', async() => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 await data.givenItems([ctx.item], ctx.collectionName, authOwner)
 
@@ -420,11 +421,12 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             }
         })
         describe('Write Operations', () => {
-            each([
+            each(testSupportedOperations(supportedOperations, 
+            [
                 ['insert', 'afterInsert', '/data/insert'],
-                ['update', 'afterUpdate', '/data/update'],
-                ['remove', 'afterRemove', '/data/remove'],
-            ]).test('after %s request - should be able to modify response', async(operation, hookName, api) => {
+                ['update', 'afterUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
+                ['remove', 'afterRemove', '/data/remove', { neededOperations: [DeleteImmediately] }],
+            ])).test('after %s request - should be able to modify response', async(operation, hookName, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.afterAllColumn, ctx.afterWriteColumn, ctx.afterHookColumn], authOwner)
                 if (operation !== 'insert') {
                     await data.givenItems([ctx.item], ctx.collectionName, authOwner)
@@ -527,14 +529,15 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
     })
 
     describe('Custom context, Service context', () => { //skip aggregate if needed!
-        each([
+        each(testSupportedOperations(supportedOperations,
+        [ 
             ['query', 'Read', 'beforeQuery', 'afterQuery', '/data/query'],
             ['count', 'Read', 'beforeCount', 'afterCount', '/data/count'],
             ['insert', 'Write', 'beforeInsert', 'afterInsert', '/data/insert'],
-            ['update', 'Write', 'beforeUpdate', 'afterUpdate', '/data/update'],
-            ['remove', 'Write', 'beforeRemove', 'afterRemove', '/data/remove'],
+            ['update', 'Write', 'beforeUpdate', 'afterUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
+            ['remove', 'Write', 'beforeRemove', 'afterRemove', '/data/remove', { neededOperations: [DeleteImmediately] }],
             ['truncate', 'Write', 'beforeTruncate', 'afterTruncate', '/data/truncate'],
-        ]).test('%s - should be able to modify custom context from each hook, and use service context', async(operation, operationType, beforeHook, afterHook, api) => {
+        ])).test('%s - should be able to modify custom context from each hook, and use service context', async(operation, operationType, beforeHook, afterHook, api) => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             if (operation !== 'insert') {
                 await data.givenItems([ctx.item], ctx.collectionName, authOwner)
