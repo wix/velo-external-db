@@ -103,6 +103,13 @@ export default class FilterParser {
                 }]
         }
 
+        if (this.isNestedField(fieldName)) {            
+            return [{
+                filterExpr: `JSON_VALUE(${(fieldName)}) ${this.adapterOperatorToMySqlOperator(operator, value)} ${this.valueForOperator(value, operator)}`.trim(),
+                parameters: !isNull(value) ? [this.patchTrueFalseValue(value)] : []
+            }]      
+        }
+
         if (this.isSingleFieldOperator(operator)) {
             return [{
                 filterExpr: `${escapeIdentifier(fieldName)} ${this.adapterOperatorToMySqlOperator(operator, value)} ${this.valueForOperator(value, operator)}`.trim(),
@@ -154,6 +161,10 @@ export default class FilterParser {
 
     isSingleFieldStringOperator(operator: string) {
         return [string_contains, string_begins, string_ends].includes(operator)
+    }
+
+    isNestedField(fieldName: string) {
+        return fieldName.includes('.')
     }
 
     valueForOperator(value: any, operator: string) {
