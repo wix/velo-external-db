@@ -187,6 +187,8 @@ describe('Sql Parser', () => {
                 }])
             })
 
+        })
+
             describe('handle string operators', () => {
                 test('correctly transform operator [string_contains]', () => {
                     const filter = {
@@ -279,8 +281,28 @@ describe('Sql Parser', () => {
                         parameters: [`${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}`]
                     }])   
                 })
+
             })
-        })
+                
+            describe('handle queries on nested fields', () => {
+                test('correctly transform nested field query', () => {
+                    const operator = ctx.filterWithoutInclude.operator
+                    const filter = {
+                        operator,
+                        fieldName: `${ctx.fieldName}.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}`,
+                        value: ctx.filterWithoutInclude.value
+                    }
+
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                        filterExpr: `JSON_VALUE(${ctx.fieldName}.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}) ${env.filterParser.adapterOperatorToMySqlOperator(operator, ctx.filterWithoutInclude.value)} ?`,
+                        parameters: [ctx.filterWithoutInclude.value].flat()
+                    }])
+                })
+            })
+
+
+        
+
         describe('handle multi field operator', () => {
             each([
                 and, or
@@ -436,11 +458,14 @@ describe('Sql Parser', () => {
         fieldValue: Uninitialized,
         anotherValue: Uninitialized,
         moreValue: Uninitialized,
+        nestedFieldName: Uninitialized,
+        anotherNestedFieldName: Uninitialized,
         fieldListValue: Uninitialized,
         anotherFieldName: Uninitialized,
         moreFieldName: Uninitialized,
         filter: Uninitialized,
         anotherFilter: Uninitialized,
+        filterWithoutInclude: Uninitialized,
     }
 
     const env: {
@@ -453,6 +478,8 @@ describe('Sql Parser', () => {
         ctx.fieldName = chance.word()
         ctx.anotherFieldName = chance.word()
         ctx.moreFieldName = chance.word()
+        ctx.nestedFieldName = chance.word()
+        ctx.anotherNestedFieldName = chance.word()
 
         ctx.fieldValue = chance.word()
         ctx.anotherValue = chance.word()
@@ -461,6 +488,7 @@ describe('Sql Parser', () => {
 
         ctx.filter = gen.randomWrappedFilter()
         ctx.anotherFilter = gen.randomWrappedFilter()
+        ctx.filterWithoutInclude = gen.randomDomainFilterWithoutInclude()
         
     })
 

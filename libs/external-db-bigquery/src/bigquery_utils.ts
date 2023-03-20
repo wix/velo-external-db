@@ -40,3 +40,10 @@ export const unPatchDateTime = (item: any) => {
 
 const isNumber = (value: any) => value !== null && value.toNumber
 const isDate = (value: any) => reISO.test(value)
+
+export const patchObjectValueOfItems = (_items: any[], fields: any[]) => {
+    const items = [..._items]
+    const objectColumnNames = fields.filter(f => f.type === 'object').map(i => i.field)
+    items.forEach(i => objectColumnNames.forEach(oc => i[oc] = JSON.stringify(i[oc])))
+    return items
+}

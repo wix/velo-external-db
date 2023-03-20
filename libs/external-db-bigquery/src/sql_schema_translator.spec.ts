@@ -100,6 +100,12 @@ describe('Sql Schema Column Translator', () => {
             test('boolean', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'boolean' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'BOOL' })
             })
+
+            test('obejct', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+
         })
     })
 
@@ -141,6 +147,10 @@ describe('Sql Schema Column Translator', () => {
                 ['BOOL', 'bit'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual('boolean')
                 })
+            })
+
+            test('object', () => {
+                expect( env.schemaTranslator.translateType('json') ).toEqual('object')
             })
 
             test('unknown type should return text', () => { 

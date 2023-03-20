@@ -86,7 +86,8 @@ export enum SchemaOperations {
     FilterByEveryField = 'filterByEveryField',
     QueryNestedFields = 'queryNestedFields',
     NonAtomicBulkInsert = 'NonAtomicBulkInsert',
-    AtomicBulkInsert = 'AtomicBulkInsert'
+    AtomicBulkInsert = 'AtomicBulkInsert',
+    PrimaryKey = 'PrimaryKey',
 }
 
 export type InputField = FieldAttributes & { name: string }
