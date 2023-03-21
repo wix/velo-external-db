@@ -7,7 +7,7 @@ import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName,
 import gen = require('../gen')
 import schema = require('../drivers/schema_api_rest_test_support')
 import * as data from '../drivers/data_api_rest_test_support'
-import hooks = require('../drivers/hooks_test_support_v3')
+import hooks = require('../drivers/hooks_test_support')
 import * as matchers from '../drivers/schema_api_rest_matchers'
 import each from 'jest-each'
 

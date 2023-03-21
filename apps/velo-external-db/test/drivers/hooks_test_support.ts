@@ -1,38 +1,38 @@
-import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
-import { InputField, Item, WixDataFilter, SchemaOperations } from '@wix-velo/velo-external-db-types'
-const { Aggregate } = SchemaOperations
+import { collectionSpi, ExternalDbRouter } from '@wix-velo/velo-external-db-core'
+import { Item } from '@wix-velo/velo-external-db-types'
 
-export const resetHooks = (externalDbRouter: ExternalDbRouter) => externalDbRouter.reloadHooks()
 
-export const writeRequestBodyWith = (collectionName: string, items: Item[]) => ({
-    collectionName, items, item: items[0], itemId: items[0]._id, itemIds: items.map((item: { _id: any }) => item._id)
+export const requestBodyWith = (collectionId: string, items: Item[]) => ({
+    ...writeRequestBodyWith(collectionId, items), ...readRequestBodyWith(collectionId)
 })
 
-export const readRequestBodyWith = (collectionName: string, items: Item[]) => ({
-    collectionName, filter: {}, processingStep: { _id: { field1: '$_id' } }, postFilteringStep: {}, itemId: items[0]._id, skip: 0, limit: 10
+export const writeRequestBodyWith = (collectionId: string, items: Item[]) => ({
+    collectionId, items, item: items[0], itemId: items[0]?._id, itemIds: items.map((item: { _id: any }) => item._id), overWriteExisting: true
 })
 
-export const findRequestBodyWith = (collectionName: string, filter: WixDataFilter) => ({
-    collectionName, filter, skip: 0, limit: 10, sort: { _id: 1 }
+export const readRequestBodyWith = (collectionId: string) => ({
+    collectionId, filter: {}, query: { filter: {} }, omitTotalCount: false, group: { by: [], aggregation: [] }, initialFilter: {}, finalFilter: {}, sort: [], paging: { offset: 0, limit: 10 }
 })
 
-export const getRequestBodyWith = (collectionName: string, itemId: string) => ({
-    collectionName, itemId
+export const collectionWriteRequestBodyWith = (collection: collectionSpi.Collection) => ({
+    collection, collectionId: collection.id, collectionIds: [collection.id]
 })
 
-export const aggregateRequestBodyWith = (collectionName: string, filter: WixDataFilter) => ({
-    collectionName, filter, processingStep: { _id: { field1: '$_id' } }, postFilteringStep: {}
-})
-
-export const skipAggregationIfNotSupported = (hookName: string, supportedOperations: string[]) => {
-    return (hookName.includes('Aggregate') && !supportedOperations.includes(Aggregate))
+export const splitIdToThreeParts = (id: string) => {
+    return [id.slice(0, id.length / 3), id.slice(id.length / 3, id.length / 3 * 2), id.slice(id.length / 3 * 2)]
 }
 
+export const concatToProperty = <T>(obj: T, path: string, value: any): T => {
+    const pathArray = path.split('.')
+    const newObject = { ...obj }
+    let current = newObject
+  
+    for (let i = 0; i < pathArray.length - 1; i++) {
+      current = current[pathArray[i]]
+    }
+  
+    current[pathArray[pathArray.length - 1]] += value
+    return newObject
+  }
 
-export const writeSchemaRequestBodyWith = (collectionName: string, columnToRemove: InputField, columnToCreate: InputField) => ({
-    collectionName, column: columnToCreate, columnName: columnToRemove.name
-})
-
-export const readSchemaRequestBodyWith = (collectionName: string) => ({
-    schemaIds: [collectionName]
-})
+export const resetHooks = (externalDbRouter: ExternalDbRouter) => externalDbRouter.reloadHooks()
