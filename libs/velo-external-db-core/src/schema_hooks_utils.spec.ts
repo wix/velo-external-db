@@ -36,8 +36,6 @@ describe('Hooks Utils', () => {
 
     describe('Payload For', () => {
         test('Payload for get should return schemaIds', () => {
-            console.log('ctx.bodyWithAllProps', ctx.bodyWithAllProps)
-            
             expect(schemaPayloadFor(CollectionOperationSPI.Get, ctx.bodyWithAllProps)).toEqual({ collectionIds: ctx.collectionIds })
         })
         each([CollectionOperationSPI.Create, CollectionOperationSPI.Update])
