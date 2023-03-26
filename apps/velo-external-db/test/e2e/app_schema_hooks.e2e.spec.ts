@@ -1,24 +1,25 @@
+import axios from 'axios'
+import each from 'jest-each'
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
-import { testSupportedOperations } from '@wix-velo/test-commons'
-import { SchemaOperations } from '@wix-velo/velo-external-db-types'
-const each = require('jest-each').default
-import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } from '../resources/e2e_resources'
+import { collectionSpi, types as coreTypes } from '@wix-velo/velo-external-db-core'
+import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
+import { CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
+import { schemaUtils } from '@wix-velo/velo-external-db-core'
+import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } from '../resources/e2e_resources'
 import gen = require('../gen')
 import matchers = require('../drivers/schema_api_rest_matchers')
 import schema = require('../drivers/schema_api_rest_test_support')
 import hooks = require('../drivers/hooks_test_support')
-const { RemoveColumn } = SchemaOperations
+import * as data from '../drivers/data_api_rest_test_support'
 
-import { Uninitialized } from '@wix-velo/test-commons'
-
-import { ServiceContext } from '@wix-velo/velo-external-db-core'
-
-const axios = require('axios').create({
+const axiosClient = axios.create({
     baseURL: 'http://localhost:8080'
 })
 
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () => {
+
+
+describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {
         await setupDb()
 
@@ -29,160 +30,221 @@ describe.skip(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`,
         await dbTeardown()
     }, 20000)
 
-    describe('After Hooks', () => {
+    describe('Before Hooks', () => {
+        describe('Read operations', () => {
+            test('before get collections request - should be able to modify the request (collectionIds)', async() => {
+                await schema.givenCollection(ctx.collectionId, [], authOwner)
+
+                const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.collectionId)
+
+                env.externalDbRouter.reloadHooks({
+                    schemaHooks: {
+                        beforeAll: (payload: collectionSpi.ListCollectionsRequest, _requestContext, _serviceContext) => {
+                            return { ...payload, collectionIds: [idPart1] }
+                        },
+                        beforeRead: (payload: collectionSpi.ListCollectionsRequest, _requestContext, _serviceContext) => {
+                            return {
+                                ...payload, collectionIds: [payload.collectionIds[0].concat(idPart2)]
+                            }
+                        },
+                        beforeGet: (payload: collectionSpi.ListCollectionsRequest, _requestContext, _serviceContext) => {
+                            return {
+                                ...payload, collectionIds: [payload.collectionIds[0].concat(idPart3)]
+                            }
+                        }
+                    }
+                })
+
+                await expect(schema.retrieveSchemaFor('wrong', authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionId, [...SystemFields], env.capabilities))
+            })
+        })
         describe('Write operations', () => {
-            each(testSupportedOperations(supportedOperations, [
-                ['afterCreate', '/schemas/create'],
-                ['afterColumnAdd', '/schemas/column/add'],
-                ['afterColumnRemove', '/schemas/column/remove',  { neededOperations: [RemoveColumn] }]
-            ])).test('specific hook %s should overwrite non-specific and change payload', async(hookName: string, api: string) => {
-                if (!['afterCreate'].includes(hookName)) {
-                    await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+            test('before create collection request - should be able to modify the request (collection)', async() => {
+                const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.collectionId)
+
+                env.externalDbRouter.reloadHooks({
+                    schemaHooks: {
+                        beforeAll: (payload: collectionSpi.CreateCollectionRequest, _requestContext, _serviceContext) => {
+                            if (_requestContext.operation !== CollectionOperationSPI.Get) {
+                                return { collection: { ...payload.collection, id: idPart1 } }
+                            }
+                        },
+                        beforeWrite: (payload: collectionSpi.CreateCollectionRequest, _requestContext, _serviceContext) => {
+                            return { ...hooks.concatToProperty(payload, 'collection.id', idPart2) }
+                        },
+
+                        beforeCreate: (payload: collectionSpi.CreateCollectionRequest, _requestContext, _serviceContext) => {
+                            return { ...hooks.concatToProperty(payload, 'collection.id', idPart3) }
+                        }
+                    }
+                })
+                await axiosClient.post('/collections/create', { collection: { id: 'wrong', fields: [] } }, authOwner)
+
+                await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionId, [...SystemFields], env.capabilities))
+            })
+
+            test('before update collection request - should be able to modify the request (collection)', async() => {
+                await schema.givenCollection(ctx.collectionId, [], authOwner)
+
+                const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.column.name)
+
+                env.externalDbRouter.reloadHooks({
+                    schemaHooks: {
+                        beforeAll: (payload: collectionSpi.UpdateCollectionRequest, _requestContext, _serviceContext) => {
+                            if (_requestContext.operation !== CollectionOperationSPI.Get) {
+                                return {
+                                    ...payload, collection: {
+                                        ...payload.collection, fields: payload.collection.fields.map((field) => {
+                                            if (!SystemFields.map(f => f.name).includes(field.key)) {
+                                                return { ...field, key: idPart1 }
+                                            }
+                                            return field
+                                        })
+                                    }
+                                }
+                            }
+                        },
+                        beforeWrite: (payload: collectionSpi.UpdateCollectionRequest, _requestContext, _serviceContext) => {
+                            return {
+                                ...payload, collection: {
+                                    ...payload.collection, fields: payload.collection.fields.map((field) => {
+                                        if (!SystemFields.map(f => f.name).includes(field.key)) {
+                                            return { ...field, key: field.key.concat(idPart2) }
+                                        }
+                                        return field
+                                    })
+                                }
+                            }
+                        },
+                        beforeUpdate: (payload: collectionSpi.UpdateCollectionRequest, _requestContext, _serviceContext) => {
+                            return {
+                                ...payload, collection: {
+                                    ...payload.collection, fields: payload.collection.fields.map((field) => {
+                                        if (!SystemFields.map(f => f.name).includes(field.key)) {
+                                            return { ...field, key: field.key.concat(idPart3) }
+                                        }
+                                        return field
+                                    })
+                                }
+                            }
+                        }
+                    }
+                })
+                const { collection } = await schema.retrieveSchemaFor(ctx.collectionId, authOwner)
+
+                const collectionToUpdate = { ...collection, fields: [...collection.fields, schemaUtils.InputFieldToWixFormatField({ ...ctx.column, name: 'wrong' })] }
+
+                await axiosClient.post('/collections/update', { collection: collectionToUpdate }, authOwner)
+                await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionId, [...SystemFields, ctx.column], env.capabilities))
+            })
+
+            test('before delete collection request - should be able to modify the request (collectionId)', async() => {
+                await schema.givenCollection(ctx.collectionId, [], authOwner)
+
+                const [idPart1, idPart2, idPart3] = hooks.splitIdToThreeParts(ctx.collectionId)
+
+                env.externalDbRouter.reloadHooks({
+                    schemaHooks: {
+                        beforeAll: (payload: collectionSpi.DeleteCollectionRequest, _requestContext, _serviceContext) => {
+                            if (_requestContext.operation !== CollectionOperationSPI.Get) {
+                                return { collectionId: idPart1 }
+                            }
+                        },
+                        beforeWrite: (payload: collectionSpi.DeleteCollectionRequest, _requestContext, _serviceContext) => {
+                            return { ...hooks.concatToProperty(payload, 'collectionId', idPart2) }
+                        },
+                        beforeDelete: (payload: collectionSpi.DeleteCollectionRequest, _requestContext, _serviceContext) => {
+                            return { ...hooks.concatToProperty(payload, 'collectionId', idPart3) }
+                        }
+                    }
+                })
+                await axiosClient.post('/collections/delete', { collectionId: 'wrong' }, authOwner)
+
+                await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).rejects.toThrow('404')
+            })
+        })
+    })
+
+    describe('After Hooks', () => {
+        describe('Read operations', () => {
+            test('after get collections request - should be able to modify the response', async() => {
+                await schema.givenCollection(ctx.collectionId, [], authOwner)
+
+                env.externalDbRouter.reloadHooks({
+                    schemaHooks: {
+                        afterAll: (payload: { collections: collectionSpi.Collection[] }, _requestContext, _serviceContext) => {
+                            if (_requestContext.operation === CollectionOperationSPI.Get) {
+                                return {
+                                    collections: payload.collections.map((collection) => {
+                                        return { ...collection, id: collection.id.concat('1') }
+                                    })
+                                }
+                            }
+                        },
+                        afterRead: (payload: { collections: collectionSpi.Collection[] }, _requestContext, _serviceContext) => {
+                            return {
+                                collections: payload.collections.map((collection) => {
+                                    return { ...collection, id: collection.id.concat('2') }
+                                })
+                            }
+                        },
+                        afterGet: (payload: { collections: collectionSpi.Collection[] }, _requestContext, _serviceContext) => {
+                            return {
+                                collections: payload.collections.map((collection) => {
+                                    return { ...collection, id: collection.id.concat('3') }
+                                })
+                            }
+                        }
+                    }
+                })
+
+                await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(`${ctx.collectionId}123`, [...SystemFields], env.capabilities))
+            })
+        })
+        describe('Write operations', () => {
+            each([
+                ['create', 'afterCreate', '/collections/create', []],
+                ['update', 'afterUpdate', '/collections/update', SystemFields],
+                ['delete', 'afterDelete', '/collections/delete', []]
+            ]).test('after %s collection request - should be able to modify the response (collection)', async(operation, hookName, api, fields) => {
+                if (operation !== 'create') {
+                    await schema.givenCollection(ctx.collectionId, [], authOwner)
                 }
 
                 env.externalDbRouter.reloadHooks({
                     schemaHooks: {
-                        afterAll: (payload, _requestContext, _serviceContext) => {
-                            return { ...payload, [hookName]: false, afterAll: true, afterWrite: false }
-                        },
-                        afterWrite: (payload, _requestContext, _serviceContext) => {
-                            return { ...payload, [hookName]: false, afterWrite: true }
-                        },
-                        [hookName]: (payload, _requestContext, _serviceContext) => {
-                            return { ...payload, [hookName]: true }
-                        }
-                    }
-                })
-
-                await expect(axios.post(api, hooks.writeSchemaRequestBodyWith(ctx.collectionName, ctx.column, ctx.anotherColumn), authOwner)).resolves.toEqual(
-                    expect.objectContaining({ data: expect.objectContaining({ [hookName]: true, afterAll: true, afterWrite: true }) })
-                )
-            })
-        })
-
-        describe('Read operations', () => {
-            each([
-                ['afterFind', '/schemas/find'],
-                ['afterList', '/schemas/list'],
-                ['afterListHeaders', '/schemas/list/headers']
-            ]).test('specific hook %s should overwrite non-specific and change payload', async(hookName: string, api: string) => {
-                await schema.givenCollection(ctx.collectionName, [], authOwner)
-
-                env.externalDbRouter.reloadHooks({
-                    schemaHooks: {
-                        afterAll: (payload, _requestContext, _serviceContext) => {
-                            return { ...payload, [hookName]: false, afterAll: true, afterRead: false }
-                        }
-                        , afterRead: (payload, _requestContext, _serviceContext) => {
-                            return { ...payload, [hookName]: false, afterRead: true }
-                        }
-                        , [hookName]: (payload, _requestContext, _serviceContext) => {
-                            return { ...payload, [hookName]: true }
-                        }
-                    }
-                })
-
-                await expect(axios.post(api, hooks.readSchemaRequestBodyWith(ctx.collectionName), authOwner)).resolves.toEqual(
-                    expect.objectContaining({ data: expect.objectContaining({ [hookName]: true, afterAll: true, afterRead: true }) })
-                )
-            })
-        })
-    })
-
-    describe('Before hooks', () => {
-        describe('Write operations', () => {
-            each(['beforeAll', 'beforeWrite', 'beforeCreate'])
-                .test('Before create collection %s hook should change payload', async(hookName: string) => {
-                    env.externalDbRouter.reloadHooks({
-                        schemaHooks: {
-                            [hookName]: (payload, requestContext, _serviceContext) => {
-                                if (requestContext.operation === 'create')
-                                    return { ...payload, collectionName: ctx.anotherCollectionName }
+                        afterAll: (payload: { collection: collectionSpi.Collection }, _requestContext, _serviceContext) => {
+                            if (_requestContext.operation !== CollectionOperationSPI.Get) {
+                                return {
+                                    collection: {
+                                        ...payload.collection, id: payload.collection.id.concat('1')
+                                    }
+                                }
                             }
-                        }
-                    })
-
-                    await axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)
-
-                    await expect(schema.retrieveSchemaFor(ctx.anotherCollectionName, authOwner)).resolves.toEqual(matchers.collectionResponseWithDefaultFieldsFor(ctx.anotherCollectionName))
-                })
-
-            each(['beforeAll', 'beforeWrite', 'beforeColumnAdd'])
-                .test('Before add column %s hook should change payload', async(hookName: string) => {
-                    await schema.givenCollection(ctx.collectionName, [], authOwner)
-
-                    env.externalDbRouter.reloadHooks({
-                        schemaHooks: {
-                            [hookName]: (payload, requestContext, _serviceContext) => {
-                                if (requestContext.operation === 'columnAdd')
-                                    return { ...payload, column: ctx.anotherColumn }
+                        },
+                        afterWrite: (payload: { collection: collectionSpi.Collection }, _requestContext, _serviceContext) => {
+                            return {
+                                collection: {
+                                    ...payload.collection, id: payload.collection.id.concat('2')
+                                }
                             }
-                        }
-                    })
-
-                    await axios.post('/schemas/column/add', { collectionName: ctx.collectionName, column: ctx.column }, authOwner)
-
-                    await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponseHasField(ctx.anotherColumn))
-                })
-
-            each(['beforeAll', 'beforeWrite', 'beforeColumnRemove'])
-                .test('Before remove column %s hook should change payload', async(hookName: string) => {
-                    await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-
-                    env.externalDbRouter.reloadHooks({
-                        schemaHooks: {
-                            [hookName]: ({ columnName }, _requestContext, _serviceContext) => {
-                                if (columnName === ctx.column.name) {
-                                    throw ('Should not be removed')
+                        },
+                        [hookName]: (payload: { collection: collectionSpi.Collection }, _requestContext, _serviceContext) => {
+                            return {
+                                collection: {
+                                    ...payload.collection, id: payload.collection.id.concat('3')
                                 }
                             }
                         }
-                    })
-
-                    await expect(axios.post('/schemas/column/remove', { collectionName: ctx.collectionName, columnName: ctx.column.name }, authOwner)).rejects.toMatchObject(
-                        errorResponseWith(400, 'Should not be removed')
-                    )
-                })
-        })
-
-        describe('Read operations', () => {
-            each(['beforeAll', 'beforeRead', 'beforeFind'])
-                .test('Before find collection %s hook should change payload', async(hookName: string) => {
-                    await schema.givenCollection(ctx.anotherCollectionName, [], authOwner)
-                    env.externalDbRouter.reloadHooks({
-                        schemaHooks: {
-                            [hookName]: (payload, requestContext, _serviceContext) => {
-                                if (requestContext.operation === 'find')
-                                    return { ...payload, schemaIds: [ctx.anotherCollectionName] }
-                            }
-                        }
-                    })
-
-                    await expect(axios.post('/schemas/find', { schemaIds: [ctx.collectionName] }, authOwner)).resolves.toEqual(matchers.collectionResponseWithDefaultFieldsFor(ctx.anotherCollectionName))
-                })
-
-            each([
-                ['list', 'beforeAll', '/schemas/list'],
-                ['list', 'beforeRead', '/schemas/list'],
-                ['list', 'beforeList', '/schemas/list'],
-                ['listHeaders', 'beforeAll', '/schemas/list/headers'],
-                ['listHeaders', 'beforeRead', '/schemas/list/headers'],
-                ['listHeaders', 'beforeListHeaders', '/schemas/list/headers']
-            ]).test('before %s operation, %s hook should be able to create collection', async(operation: any, hookName: string, api: string) => {
-                env.externalDbRouter.reloadHooks({
-                    schemaHooks: {
-                        [hookName]: async(_payload, requestContext, serviceContext: ServiceContext) => {
-                            if (requestContext.operation === operation)
-                                await serviceContext.schemaService.create(ctx.collectionName)
-                        }
                     }
                 })
 
-                await expect(axios.post(api, {}, authOwner)).resolves.toEqual(matchers.listResponseWithCollection(ctx.collectionName))
+                const res = await axiosClient.post(api, hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: fields.map(schemaUtils.InputFieldToWixFormatField) }), authOwner)
+                expect(res.data.collection.id).toEqual(`${ctx.collectionId}123`)
             })
         })
     })
-
+    
     describe('Error Handling', () => {
         test('should handle error object and throw with the corresponding status', async() => {
             env.externalDbRouter.reloadHooks({
@@ -190,140 +252,118 @@ describe.skip(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`,
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
                         const error = new Error('message')
                         error['status'] = '409'
-                        throw error                    
+                        throw error
                     }
                 }
             })
 
-            await expect(axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)).rejects.toMatchObject(
+            await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
                 errorResponseWith(409, 'message')
             )
         })
-        
-        test('If not specified should throw 400 - Error object', async() => {
+
+        test('If not specified should throw 500 - Error object', async() => {
             env.externalDbRouter.reloadHooks({
                 schemaHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
                         const error = new Error('message')
-                        throw error                    
+                        throw error
                     }
                 }
             })
 
-            await expect(axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)).rejects.toMatchObject(
-                errorResponseWith(400, 'message')
+            await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
+                errorResponseWith(500, 'message')
             )
         })
 
-        test('If not specified should throw 400 - string', async() => { 
+        test('If not specified should throw 500 - string', async() => {
             env.externalDbRouter.reloadHooks({
                 schemaHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
-                        throw 'message'                    
+                        throw 'message'
                     }
                 }
             })
 
-            await expect(axios.post('/schemas/create', { collectionName: ctx.collectionName }, authOwner)).rejects.toMatchObject(
-                errorResponseWith(400, 'message')
+            await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
+                errorResponseWith(500, 'message')
             )
         })
     })
 
-    describe('Custom Context', () => {
-        describe ('Read Operations', () => {
-            each([
-               ['List', 'beforeList', 'afterList', '/schemas/list'],
-                ['ListHeaders', 'beforeListHeaders', 'afterListHeaders', '/schemas/list/headers'],
-                ['Find', 'beforeFind', 'afterFind', '/schemas/find']
-            ]).test('customContext should pass by ref on [%s]', async(_: any, beforeHook: string, afterHook: string | number, api: string) => {
-                await schema.givenCollection(ctx.collectionName, [], authOwner)
+    describe('Custom context, Service context', () => {
+        each([
+            ['get', 'Read', 'beforeGet', 'afterGet', '/collections/get', []],
+            ['create', 'Write', 'beforeCreate', 'afterCreate', '/collections/create', []],
+            ['update', 'Write', 'beforeUpdate', 'afterUpdate', '/collections/update', SystemFields],
+            ['delete', 'Write', 'beforeDelete', 'afterDelete', '/collections/delete', []]
+        ]).test('%s - should be able to modify custom context from each hook, and use service context', async(operation, operationType, beforeHook, afterHook, api, fields) => {
 
-                env.externalDbRouter.reloadHooks({
-                    schemaHooks: {
-                        beforeAll: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext['beforeAll'] = true
-                        },
-                        beforeRead: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext['beforeRead'] = true
-                        },
-                        [beforeHook]: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext[beforeHook] = true
-                        },
-                        afterAll: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext['afterAll'] = true
-                        },
-                        afterRead: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext['afterRead'] = true
-                        },
-                        [afterHook]: (payload, _requestContext, _serviceContext, customContext) => {
-                            customContext[afterHook] = true
-                            return { ...payload, customContext }
+            if (operation !== 'create') {
+                await schema.givenCollection(ctx.collectionId, [], authOwner)
+            }
+            const beforeOperationHookName = `before${operationType}`
+            const afterOperationHookName = `after${operationType}`
+
+            env.externalDbRouter.reloadHooks({
+                schemaHooks: {
+                    beforeAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['beforeAll'] = true
+                    },
+                    [beforeOperationHookName]: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['beforeOperation'] = true
+                    },
+                    [beforeHook]: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['beforeHook'] = true
+                    },
+                    afterAll: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['afterAll'] = true
+                    },
+                    [afterOperationHookName]: (_payload, _requestContext, _serviceContext, customContext) => {
+                        customContext['afterOperation'] = true
+                    },
+                    [afterHook]: async(_payload, _requestContext, serviceContext: coreTypes.ServiceContext, customContext) => {
+                        customContext['afterHook'] = true
+
+                        if (customContext['beforeAll'] && customContext['beforeOperation'] &&
+                            customContext['beforeHook'] && customContext['afterAll'] &&
+                            customContext['afterOperation'] && customContext['afterHook']) {
+
+                            await serviceContext.schemaService.create(ctx.newCollection)
+                            await serviceContext.dataService.insert(ctx.newCollection.id, ctx.newItem)
                         }
                     }
-                })
-
-                const response = await axios.post(api, hooks.readSchemaRequestBodyWith(ctx.collectionName), authOwner)
-                expect(response.data.customContext).toEqual({
-                    beforeAll: true, beforeRead: true, [beforeHook]: true, afterAll: true, afterRead: true, [afterHook]: true
-                })
-            })
-        })
-
-        describe ('Write Operations', () => {
-            each(testSupportedOperations(supportedOperations, [
-                ['Create', 'beforeCreate', 'afterCreate', '/schemas/create'],
-                ['Column Add', 'beforeColumnAdd', 'afterColumnAdd', '/schemas/column/add'],
-                ['Column Remove', 'beforeColumnRemove', 'afterColumnRemove', '/schemas/column/remove', { neededOperations: [RemoveColumn] }],
-            ])).test('customContext should pass by ref on [%s]', async(operation: string, beforeHook: string | number, afterHook: string | number, api: string) => {
-                if (operation !== 'Create') {
-                    await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                 }
-
-                env.externalDbRouter.reloadHooks({
-                    schemaHooks: {
-                        beforeAll: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext['beforeAll'] = true
-                        },
-                        beforeWrite: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext['beforeRead'] = true
-                        },
-                        [beforeHook]: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext[beforeHook] = true
-                        },
-                        afterAll: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext['afterAll'] = true
-                        },
-                        afterWrite: (_payload, _requestContext, _serviceContext, customContext) => {
-                            customContext['afterRead'] = true
-                        },
-                        [afterHook]: (payload, _requestContext, _serviceContext, customContext) => {
-                            customContext[afterHook] = true
-                            return { ...payload, customContext }
-                        }
-                    }
-                })
-
-                const response = await axios.post(api, hooks.writeSchemaRequestBodyWith(ctx.collectionName, ctx.column, ctx.anotherColumn), authOwner)
-                expect(response.data.customContext).toEqual({
-                    beforeAll: true, beforeRead: true, [beforeHook]: true, afterAll: true, afterRead: true, [afterHook]: true
-                })      
             })
+
+
+            await axiosClient.post(api, hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: fields.map(schemaUtils.InputFieldToWixFormatField) }), authOwner)
+
+            hooks.resetHooks(env.externalDbRouter)
+            await expect(data.queryCollectionAsArray(ctx.newCollection.id, [], undefined, authOwner)).resolves.toEqual(
+                expect.toIncludeSameMembers([{ item: ctx.newItem }, data.pagingMetadata(1, 1)]))
         })
     })
 
+
+
     const ctx = {
-        collectionName: Uninitialized,
+        collectionId: Uninitialized,
         anotherCollectionName: Uninitialized,
         column: Uninitialized,
-        anotherColumn: Uninitialized
+        anotherColumn: Uninitialized,
+        newCollection: Uninitialized,
+        newItem: Uninitialized
     }
 
     beforeEach(async() => {
-        ctx.collectionName = gen.randomCollectionName()
+        ctx.collectionId = gen.randomCollectionName()
         ctx.anotherCollectionName = gen.randomCollectionName()
         ctx.column = gen.randomColumn()
         ctx.anotherColumn = gen.randomColumn()
+        ctx.newCollection = gen.randomCollection()
+        ctx.newItem = genCommon.randomEntity([])
 
         hooks.resetHooks(env.externalDbRouter)
     })
