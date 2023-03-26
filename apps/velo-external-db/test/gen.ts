@@ -79,7 +79,7 @@ export const randomNumberColumns = (): InputField[] => {
              { name: chance.word(), type: 'number', subtype: 'decimal', precision: '10,2', isPrimary: false } ]
 }
 
-export const randomColumn = (): InputField => ( { name: chance.word(), type: 'text', subtype: 'string', precision: '256', isPrimary: false } )
+export const randomColumn = (): InputField => ({ name: chance.word({ length: 6 }), type: 'text', subtype: 'string', precision: '256', isPrimary: false })
 
 export const randomObjectColumn = () => ( { name: chance.word(), type: 'object' } )
 

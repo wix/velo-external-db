@@ -1,10 +1,11 @@
-import { InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig, ItemWithId, DataOperation } from '@wix-velo/velo-external-db-types'
+import {  Item, Sort, WixDataFilter, RoleConfig, ItemWithId, DataOperation, CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
+import { Collection, CreateCollectionRequest, DeleteCollectionRequest, ListCollectionsRequest, UpdateCollectionRequest } from './spi-model/collection'
 
-
-export interface Payload {
+export interface DataPayload {
+    collectionId: string;
     filter?: WixDataFilter
     sort?: Sort[] | Sorting[];
     initialFilter?: WixDataFilter;
@@ -13,7 +14,6 @@ export interface Payload {
     paging?: Paging;
     items?: Item[];
     itemIds?: string[];
-    collectionId: string;
     options?: Options;
     omitTotalCount?: boolean;
     includeReferencedItems?: string[];
@@ -23,8 +23,15 @@ export interface Payload {
     totalCount?: number;
 }
 
+export interface SchemaPayload {
+    collectionId?: string;
+    collectionIds?: string[];
+    collection?: Collection;
+    collections?: Collection[];
+}
+
 export interface RequestContext {
-    operation: DataOperation // | SchemaOperation
+    operation: DataOperation | CollectionOperationSPI
     collectionId: string;
     instanceId?: string;
     role?: string;
@@ -41,12 +48,12 @@ export interface ServiceContext {
 export type Hook<Payload> = (payload: Payload, requestContext: RequestContext, serviceContext: ServiceContext, customContext?: object) => (Promise<Payload> | Payload | void);
 
 export interface DataHooks {
-    beforeAll?: Hook<Payload>;
-    afterAll?: Hook<Payload>;
-    beforeRead?: Hook<Payload>;
-    afterRead?: Hook<Payload>;
-    beforeWrite?: Hook<Payload>;
-    afterWrite?: Hook<Payload>;
+    beforeAll?: Hook<DataPayload>;
+    afterAll?: Hook<DataPayload>;
+    beforeRead?: Hook<DataPayload>;
+    afterRead?: Hook<DataPayload>;
+    beforeWrite?: Hook<DataPayload>;
+    afterWrite?: Hook<DataPayload>;
     beforeQuery?: Hook<QueryRequest>
     afterQuery?: Hook<{ items: ItemWithId[], totalCount?: number }>
     beforeCount?: Hook<CountRequest>
@@ -66,24 +73,20 @@ export interface DataHooks {
 export type DataHook = DataHooks[keyof DataHooks];
 
 export interface SchemaHooks {
-    beforeAll?: Hook<Payload>;
-    afterAll?: Hook<Payload>;
-    beforeRead?: Hook<Payload>;
-    afterRead?: Hook<Payload>;
-    beforeWrite?: Hook<Payload>;
-    afterWrite?: Hook<Payload>;
-    beforeList?: Hook<Record<string, never>>
-    afterList?: Hook<{ schemas: AsWixSchema[] }>
-    beforeListHeaders?: Hook<Record<string, never>>
-    afterListHeaders?: Hook<{ schemas: AsWixSchemaHeaders[] }>
-    beforeFind?: Hook<string>
-    afterFind?: Hook<{ schemas: AsWixSchema[] }>
-    beforeCreate?: Hook<{ collectionName: string }>
-    afterCreate?: Hook<Record<string, never>>
-    beforeColumnAdd?: Hook<{ column: InputField }>
-    afterColumnAdd?: Hook<Record<string, never>>
-    beforeColumnRemove?: Hook<{ columnName: string }>
-    afterColumnRemove?: Hook<Record<string, never>>
+    beforeAll?: Hook<SchemaPayload>;
+    afterAll?: Hook<SchemaPayload>;
+    beforeRead?: Hook<SchemaPayload>;
+    afterRead?: Hook<SchemaPayload>;
+    beforeWrite?: Hook<SchemaPayload>;
+    afterWrite?: Hook<SchemaPayload>;
+    beforeGet?: Hook<ListCollectionsRequest>;
+    afterGet?: Hook<{ collections: Collection[] }>;
+    beforeCreate?: Hook<CreateCollectionRequest>;
+    afterCreate?: Hook<{ collection: Collection }>;
+    beforeUpdate?: Hook<UpdateCollectionRequest>;
+    afterUpdate?: Hook<{ collection: Collection }>;
+    beforeDelete?: Hook<DeleteCollectionRequest>;
+    afterDelete?: Hook<{ collection: Collection }>;
 }
 
 export interface ExternalDbRouterConfig {
