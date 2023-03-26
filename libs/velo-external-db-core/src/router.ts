@@ -12,10 +12,10 @@ import { authRoleMiddleware } from './web/auth-role-middleware'
 import { unless, includes } from './web/middleware-support'
 import { getAppInfoPage } from './utils/router_utils'
 import { requestContextFor, DataActions, dataPayloadFor, DataHooksForAction } from './data_hooks_utils'
-// import { SchemaHooksForAction } from './schema_hooks_utils'
+import { SchemaActions, SchemaHooksForAction, schemaPayloadFor } from './schema_hooks_utils'
 import SchemaService from './service/schema'
 import OperationService from './service/operation'
-import { AnyFixMe, DataOperation, Item } from '@wix-velo/velo-external-db-types'
+import { AnyFixMe, CollectionOperationSPI, DataOperation, Item } from '@wix-velo/velo-external-db-types'
 import SchemaAwareDataService from './service/schema_aware_data'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
@@ -24,12 +24,14 @@ import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from '.
 import { ConfigValidator } from '@wix-velo/external-db-config'
 import { JwtAuthenticator } from './web/jwt-auth-middleware'
 import * as dataSource from './spi-model/data_source'
+import * as schemaSource from './spi-model/collection'
 import * as capabilities from './spi-model/capabilities'
 import { WixDataFacade } from './web/wix_data_facade'
 
 const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
+const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks //roleAuthorizationService: RoleAuthorizationService, schemaHooks: SchemaHooks,
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
                              _externalDbConfigClient: ConfigValidator, _cfg: { externalDatabaseId: string, allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean },
@@ -44,7 +46,7 @@ export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _s
     aggregationTransformer = _aggregationTransformer
     // roleAuthorizationService = _roleAuthorizationService
     dataHooks = _hooks?.dataHooks || {}
-    // schemaHooks = _hooks?.schemaHooks || {}
+    schemaHooks = _hooks?.schemaHooks || {}
 }
 
 const serviceContext = (): ServiceContext => ({
@@ -53,12 +55,17 @@ const serviceContext = (): ServiceContext => ({
 })
 
 
-const executeDataHooksFor = async(action: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
+const executeDataHooksFor = async<T>(action: string, payload: T, requestContext: RequestContext, customContext: any): Promise<T> => {
     return BPromise.reduce(DataHooksForAction[action], async(lastHookResult: AnyFixMe, hookName: string) => {
         return await executeHook(dataHooks, hookName, lastHookResult, requestContext, customContext)
     }, payload)
 }
 
+const executeSchemaHooksFor = async<T>(action: string, payload: T, requestContext: RequestContext, customContext: any): Promise<T> => {
+    return BPromise.reduce(SchemaHooksForAction[action], async(lastHookResult: any, hookName: string) => {
+        return await executeHook(schemaHooks, hookName, lastHookResult, requestContext, customContext)
+    }, payload)
+}
 
 const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
     const actionName = _actionName as keyof typeof hooks
@@ -273,11 +280,12 @@ export const createRouter = () => {
     // *************** Collections API **********************
 
     router.post('/collections/get', async(req, res, next) => {
-
-        const { collectionIds } = req.body
         try {
+            const customContext = {}
+            const { collectionIds } = await executeSchemaHooksFor(SchemaActions.BeforeGet, schemaPayloadFor(Get, req.body), requestContextFor(Get, req.body), customContext) as schemaSource.ListCollectionsRequest
             const data = await schemaService.list(collectionIds)
-            const responseParts = data.collections.map(collection => ({ collection })) 
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterGet, data, requestContextFor(Get, req.body), customContext)
+            const responseParts = dataAfterAction.collections.map(collection => ({ collection })) 
             streamCollection(responseParts, res)
         } catch (e) {
             next(e)
@@ -286,33 +294,36 @@ export const createRouter = () => {
 
 
     router.post('/collections/create', async(req, res, next) => {
-        const { collection } = req.body
-
         try {
+            const customContext = {}
+            const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(Create, req.body), requestContextFor(Create, req.body), customContext) as schemaSource.CreateCollectionRequest
             const data = await schemaService.create(collection)
-            res.json(data)
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterCreate, data, requestContextFor(Create, req.body), customContext)
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
     })
 
     router.post('/collections/update', async(req, res, next) => {
-        const { collection } = req.body
-
         try {
+            const customContext = {}
+            const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeUpdate, schemaPayloadFor(UpdateSchema, req.body), requestContextFor(UpdateSchema, req.body), customContext) as schemaSource.UpdateCollectionRequest
             const data = await schemaService.update(collection)
-            res.json(data)
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterUpdate, data, requestContextFor(UpdateSchema, req.body), customContext)
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
     })
 
     router.post('/collections/delete', async(req, res, next) => {
-        const { collectionId } = req.body
-
         try {
+            const customContext = {}
+            const { collectionId } = await executeSchemaHooksFor(SchemaActions.BeforeDelete, schemaPayloadFor(Delete, req.body), requestContextFor(Delete, req.body), customContext) as schemaSource.DeleteCollectionRequest
             const data = await schemaService.delete(collectionId)
-            res.json(data)
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterDelete, data, requestContextFor(Delete, req.body), customContext)
+            res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }

@@ -13,7 +13,7 @@ export const givenCollection = async(name: string, columns: InputField[], auth: 
         id: name,
         fields: columns.map(schemaUtils.InputFieldToWixFormatField)
     }
-    await axiosClient.post('/collections/create', { collection }, { ...auth, responseType: 'stream' })
+    await axiosClient.post('/collections/create', { collection }, auth)
 }
 
 export const deleteAllCollections = async(auth: any) => {
@@ -22,7 +22,7 @@ export const deleteAllCollections = async(auth: any) => {
     const collectionIds = dataRes.map(d => d.collection.id)
 
     for (const collectionId of collectionIds) {
-        await axiosClient.post('/collections/delete', { collectionId }, { ...auth, responseType: 'stream' })
+        await axiosClient.post('/collections/delete', { collectionId }, auth)
     }
 
 }
