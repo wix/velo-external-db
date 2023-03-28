@@ -48,6 +48,7 @@
     "docker-compose": "^0.23.17",
     "ejs": "^3.1.8",
     "express": "^4.17.2",
+    "google-auth-library": "^8.7.0",
     "google-spreadsheet": "^3.3.0",
     "moment": "^2.29.3",
     "mongodb": "^4.6.0",

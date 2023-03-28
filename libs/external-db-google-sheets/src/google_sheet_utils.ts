@@ -1,6 +1,7 @@
 import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet } from 'google-spreadsheet'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { GoogleSheetsConfig } from './types'
+import { OAuth2Client } from 'google-auth-library'
 
 export const loadSheets = async(doc: GoogleSpreadsheet) => {
     try {
@@ -50,7 +51,21 @@ export const docAuthSetup = async(config: GoogleSheetsConfig, doc: GoogleSpreads
         doc.useRawAccessToken('mockup-token')
         return
     }
-    
+
+    if (config.access_token && config.refresh_token && config.expiry_date) {
+        const oauthClient = new OAuth2Client({
+            clientId: process.env['CLIENT_ID'],
+            clientSecret: process.env['CLIENT_SECRET']
+        })
+        
+        oauthClient.credentials.access_token = config.access_token
+        oauthClient.credentials.refresh_token = config.refresh_token
+        oauthClient.credentials.expiry_date = config.expiry_date
+
+        doc.useOAuth2Client(oauthClient)
+        return
+    } 
+
     try {
         await doc.useServiceAccountAuth({
             client_email: config.clientEmail as string,

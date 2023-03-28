@@ -31,6 +31,7 @@ export class ExternalDbRouter {
     schemaService: SchemaService
     roleAuthorizationService: RoleAuthorizationService
     cleanup: ConnectionCleanUp
+    hooks:  {schemaHooks?: SchemaHooks, dataHooks?: DataHooks}
     router: Router
     config: ExternalDbRouterConfig
     constructor({ connector, config, hooks }: { connector: DbConnector, config: ExternalDbRouterConfig, hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks}}) {
@@ -50,13 +51,33 @@ export class ExternalDbRouter {
 
         this.roleAuthorizationService = new RoleAuthorizationService(config.authorization?.roleConfig?.collectionPermissions) 
         this.cleanup = connector.cleanup
+        this.hooks = hooks
 
         initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
+        
         this.router = createRouter()
     }
 
     reloadHooks(hooks?: Hooks) {
         initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks || {})
+    }
+
+    reloadConfig({ connector }: { connector: DbConnector }) {
+        this.connector = connector
+        this.operationService = new OperationService(connector.databaseOperations)
+        this.schemaInformation = new CacheableSchemaInformation(connector.schemaProvider)
+        this.filterTransformer = new FilterTransformer()
+        this.aggregationTransformer = new AggregationTransformer(this.filterTransformer)
+        this.queryValidator = new QueryValidator()
+        this.dataService = new DataService(connector.dataProvider)
+        this.itemTransformer = new ItemTransformer()
+        this.schemaAwareDataService = new SchemaAwareDataService(this.dataService, this.queryValidator, this.schemaInformation, this.itemTransformer)
+        this.schemaService = new SchemaService(connector.schemaProvider, this.schemaInformation)
+
+        this.cleanup = connector.cleanup
+
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, this.hooks)
+        
     }
 
     isInitialized(connector: DbConnector) {
