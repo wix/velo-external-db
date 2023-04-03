@@ -1,12 +1,13 @@
 import { AdapterAggregation as Aggregation, AdapterFilter as Filter, IDataProvider, Item, ResponseField } from '@wix-velo/velo-external-db-types'
 import { asWixData } from '../converters/data_utils'
 import { getByIdFilterFor } from '../utils/data_utils'
+import MemoryDataProvider from './data_memory'
 
 
 export default class DataService {
     storage: IDataProvider
     constructor(storage: any) {
-        this.storage = storage
+        this.storage = new MemoryDataProvider(storage)
     }
 
     async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any) {
