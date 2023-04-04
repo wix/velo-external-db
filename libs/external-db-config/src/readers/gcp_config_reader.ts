@@ -38,8 +38,8 @@ export class GcpGoogleSheetsConfigReader implements IConfigReader {
   constructor() { }
 
   async readConfig() {
-    const { CLIENT_EMAIL, SHEET_ID, API_PRIVATE_KEY, SECRET_KEY } = process.env
-    return { clientEmail: CLIENT_EMAIL, apiPrivateKey: API_PRIVATE_KEY, sheetId: SHEET_ID, secretKey: SECRET_KEY }
+    const { CLIENT_EMAIL, SHEET_ID, API_PRIVATE_KEY, SECRET_KEY, STD_TTL, CHECK_PERIOD } = process.env
+    return { clientEmail: CLIENT_EMAIL, apiPrivateKey: API_PRIVATE_KEY, sheetId: SHEET_ID, secretKey: SECRET_KEY, stdTtl: STD_TTL, checkPeriod: CHECK_PERIOD }
   }
 
 }
