@@ -72,19 +72,19 @@ export interface FieldCapabilities {
 }
 
 export enum QueryOperator {
-    eq = 0,
-    lt = 1,
-    gt = 2,
-    ne = 3,
-    lte = 4,
-    gte = 5,
-    startsWith = 6,
-    endsWith = 7,
-    contains = 8,
-    hasSome = 9,
-    hasAll = 10,
-    exists = 11,
-    urlized = 12,
+    eq = 'EQ',
+    lt = 'LT',
+    gt = 'GT',
+    ne = 'NE',
+    lte = 'LTE',
+    gte = 'GTE',
+    startsWith = 'STARTS_WITH',
+    endsWith = 'ENDS_WITH',
+    contains = 'CONTAINS',
+    hasSome = 'HAS_SOME',
+    hasAll = 'HAS_ALL',
+    exists = 'EXISTS',
+    urlized = 'URLIZED',
 }
 export interface SingleReferenceOptions {
     // `true` when datasource supports `include_referenced_items` in query method natively.
@@ -111,16 +111,16 @@ export interface CollectionCapabilities {
 }
 
 export enum DataOperation {
-    query = 0,
-    count = 1,
-    queryReferenced = 2,
-    aggregate = 3,
-    insert = 4,
-    update = 5,
-    remove = 6,
-    truncate = 7,
-    insertReferences = 8,
-    removeReferences = 9,
+    query = 'QUERY',
+    count = 'COUNT',
+    queryReferenced = 'QUERY_REFERENCED',
+    aggregate = 'AGGREGATE',
+    insert = 'INSERT',
+    update = 'UPDATE',
+    remove = 'REMOVE',
+    truncate = 'TRUNCATE',
+    insertReferences = 'INSERT_REFERENCES',
+    removeReferences = 'REMOVE_REFERENCES',
 }
 
 export interface ReferenceCapabilities {
@@ -131,8 +131,8 @@ export interface CollectionOperationEnum {
 }
 
 export enum CollectionOperation {
-    update = 0,
-    remove = 1,
+    update = 'UPDATE',
+    remove = 'REMOVE',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -140,23 +140,23 @@ export interface IndexingCapabilityEnum {
 }
 
 export enum IndexingCapability {
-    list = 0,
-    create = 1,
-    remove = 2,
+    list = 'LIST',
+    create = 'CREATE',
+    remove = 'REMOVE',
 }
 
 export enum Encryption {
-    notSupported = 0,
-    wixDataNative = 1,
-    dataSourceNative = 2,
+    notSupported = 'NOT_SUPPORTED',
+    wixDataNative = 'WIX_DATA_NATIVE',
+    dataSourceNative = 'DATA_SOURCE_NATIVE',
 }
 export enum FieldType {
-    text = 0,
-    number = 1,
-    boolean = 2,
-    datetime = 3,
-    object = 4,
-    longText = 5,
-    singleReference = 6,
-    multiReference = 7,
+    text = 'TEXT',
+    number = 'NUMBER',
+    boolean = 'BOOLEAN',
+    timestamp = 'TIMESTAMP',
+    json = 'JSON',
+    longText = 'LONG_TEXT',
+    singleReference = 'SINGLE_REFERENCE',
+    multiReference = 'MULTI_REFERENCE',
 }
