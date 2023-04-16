@@ -95,7 +95,7 @@ export const createRouter = () => {
     const streamCollection = (collection: any[], res: Response) => {
         res.contentType('application/x-ndjson')
         collection.forEach(item => {
-            res.write(JSON.stringify(item))
+            res.write(`${JSON.stringify(item)}\n`)
         })
         res.end()
     }
