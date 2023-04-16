@@ -58,7 +58,7 @@ describe ('Schema Aware Data Service', () => {
 
     test('update will prepare item for update and call data service with the prepared item', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        patcher.givenPreparedItemsForUpdateWith([ctx.preparedEntity], [ctx.entityWithExtraProps])
+        patcher.givenPreparedItemsForInsertWith([ctx.preparedEntity], [ctx.entityWithExtraProps])
         data.givenUpdateResult(ctx.preparedEntity, ctx.collectionName)
 
         return expect(env.schemaAwareDataService.update(ctx.collectionName, ctx.entityWithExtraProps)).resolves.toEqual({ item: ctx.preparedEntity })
@@ -66,7 +66,7 @@ describe ('Schema Aware Data Service', () => {
 
     test('bulk update will prepare items for update and call data service with the prepared items', async() => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
-        patcher.givenPreparedItemsForUpdateWith(ctx.preparedEntities, ctx.entitiesWithExtraProps)
+        patcher.givenPreparedItemsForInsertWith(ctx.preparedEntities, ctx.entitiesWithExtraProps)
         data.givenBulkUpdateResult(ctx.preparedEntities, ctx.collectionName)
 
         return expect(env.schemaAwareDataService.bulkUpdate(ctx.collectionName, ctx.entitiesWithExtraProps)).resolves.toEqual({ items: ctx.preparedEntities })

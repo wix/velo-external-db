@@ -51,12 +51,14 @@ export default class SchemaAwareDataService {
     }
     
     async update(collectionName: string, item: Item) {
-        const prepared = await this.prepareItemsForUpdate(collectionName, [item])
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        const prepared = await this.prepareItemsForInsert(fields, [item])
         return await this.dataService.update(collectionName, prepared[0])
     }
 
     async bulkUpdate(collectionName: string, items: Item[]) {
-        const prepared = await this.prepareItemsForUpdate(collectionName, items)
+        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
+        const prepared = await this.prepareItemsForInsert(fields, items)
         return await this.dataService.bulkUpdate(collectionName, prepared)
     }
 
@@ -98,12 +100,6 @@ export default class SchemaAwareDataService {
         this.queryValidator.validateProjection(schemaFields, projection)
     }
 
-    async prepareItemsForUpdate(collectionName: string, items: Item[]): Promise<Item[]> {
-        const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
-
-        return this.itemTransformer.prepareItemsForUpdate(items, fields)
-    }
-    
     async prepareItemsForInsert(fields: any, items: any[]): Promise<Item[]> {
         return this.itemTransformer.prepareItemsForInsert(items, fields)
     }
