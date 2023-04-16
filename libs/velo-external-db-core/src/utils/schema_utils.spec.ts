@@ -24,10 +24,10 @@ describe('Schema utils functions', () => {
             expect(fieldTypeToWixDataEnum('boolean')).toBe(VeloFieldTypeEnum.boolean)
         })
         test('object type', () => {
-            expect(fieldTypeToWixDataEnum('object')).toBe(VeloFieldTypeEnum.object)
+            expect(fieldTypeToWixDataEnum('object')).toBe(VeloFieldTypeEnum.json)
         })
         test('datetime type', () => {
-            expect(fieldTypeToWixDataEnum('datetime')).toBe(VeloFieldTypeEnum.datetime)
+            expect(fieldTypeToWixDataEnum('datetime')).toBe(VeloFieldTypeEnum.timestamp)
         })
 
         test('unsupported type will throw an error', () => {
@@ -46,14 +46,15 @@ describe('Schema utils functions', () => {
             expect(wixDataEnumToFieldType(VeloFieldTypeEnum.boolean)).toBe('boolean')
         })
         test('object type', () => {
-            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.object)).toBe('object')
+            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.json)).toBe('object')
         })
 
         test('datetime type', () => {
-            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.datetime)).toBe('datetime')
+            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.timestamp)).toBe('datetime')
         })
 
         test('unsupported type will throw an error', () => {
+            // @ts-ignore
             expect(() => wixDataEnumToFieldType(100)).toThrowError()
         })
     })
@@ -69,14 +70,15 @@ describe('Schema utils functions', () => {
             expect(subtypeToFieldType(VeloFieldTypeEnum.boolean)).toBe('')
         })
         test('object type', () => {
-            expect(subtypeToFieldType(VeloFieldTypeEnum.object)).toBe('')
+            expect(subtypeToFieldType(VeloFieldTypeEnum.json)).toBe('')
         })
 
         test('datetime type', () => {
-            expect(subtypeToFieldType(VeloFieldTypeEnum.datetime)).toBe('datetime')
+            expect(subtypeToFieldType(VeloFieldTypeEnum.timestamp)).toBe('datetime')
         })
 
         test('unsupported type will throw an error', () => {
+            // @ts-ignore
             expect(() => wixDataEnumToFieldType(100)).toThrowError()
         })
     })
