@@ -2,7 +2,7 @@ import each from 'jest-each'
 import * as Chance from 'chance'
 import { Uninitialized } from '@wix-velo/test-commons'
 import { randomBodyWith } from '../test/gen'
-import { DataHooksForAction, dataPayloadFor, DataActions } from './data_hooks_utils'
+import { DataHooksForAction, dataPayloadFor, DataActions, requestContextFor } from './data_hooks_utils'
 import { DataOperation } from '@wix-velo/velo-external-db-types'
 
 const { query: Query, insert: Insert, update: Update, remove: Remove, count: Count, aggregate: Aggregate } = DataOperation
@@ -109,6 +109,16 @@ describe('Hooks Utils', () => {
         })
     })
 
+    describe('requestContextFor', () => {
+        test('should return request context object', () => {
+            expect(requestContextFor(ctx.randomOperation, ctx.bodyWithAllProps, { metaSiteId: ctx.metaSiteId }))
+                .toEqual({
+                    metaSiteId: ctx.metaSiteId,
+                    collectionIds: [ctx.collectionId],
+                    operation: ctx.randomOperation,
+                })
+        })
+    })
 
     const ctx = {
         filter: Uninitialized,
@@ -128,7 +138,9 @@ describe('Hooks Utils', () => {
         overwriteExisting: Uninitialized,
         bodyWithAllProps: Uninitialized,
         cursorPaging: Uninitialized,
-        initialFilter: Uninitialized
+        initialFilter: Uninitialized,
+        randomOperation: Uninitialized,
+        metaSiteId: Uninitialized,
     }
 
     beforeEach(() => {
@@ -152,6 +164,7 @@ describe('Hooks Utils', () => {
         ctx.bodyWithAllProps = randomBodyWith({
             ...ctx
         })
-
+        ctx.randomOperation = chance.pickone([Query, Insert, Update, Remove, Count, Aggregate])
+        ctx.metaSiteId = chance.word()
     })
 })
