@@ -107,11 +107,8 @@ export const dataPayloadFor = (operation: DataOperation, body: any) => {
     }
 }
 
-export const requestContextFor = (operation: any, body: any): RequestContext => ({ 
+export const requestContextFor = (operation: any, body: any, { metaSiteId }: Record<string, any>): RequestContext => ({ 
     operation, 
-    collectionId: body.collectionId, 
-    instanceId: body.requestContext.instanceId,
-    memberId: body.requestContext.memberId,
-    role: body.requestContext.role,
-    settings: body.requestContext.settings
+    collectionIds: body.collectionIds || [body.collectionId],
+    metaSiteId
 })
