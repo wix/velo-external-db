@@ -32,9 +32,8 @@ export default class FilterTransformer implements IFilterTransformer {
         }
         
         const fieldName = Object.keys(filter)[0]
-        const wixOperator = Object.keys(filter[fieldName])[0]
+        const { value, operator: wixOperator } = this.valueAndOperatorFromFilter(filter, fieldName)
         const operator = this.wixOperatorToAdapterOperator(wixOperator)
-        const value = filter[fieldName][wixOperator]           
         return { 
             operator: operator as AdapterOperator,
             fieldName,
@@ -116,5 +115,19 @@ export default class FilterTransformer implements IFilterTransformer {
 
     isSortObject(sort:any): boolean {
         return sort.fieldName && sort.order
+    }
+
+    valueAndOperatorFromFilter(filter: any, fieldName: string) {
+        // there are two options:
+        // { fieldName: { operator: value } }
+        // or
+        // { fieldName: value }
+        const filterValue = filter[fieldName]
+        const operator = isObject(filterValue) ? Object.keys(filterValue)[0] : '$eq'
+        const value = isObject(filterValue) ? filterValue[operator] : filterValue
+        return {
+            operator,
+            value
+        }
     }
 }
