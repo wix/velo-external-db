@@ -17,7 +17,7 @@ describe('JWT Auth Middleware', () => {
 
     test('should authorize when JWT valid', async() => {
         const token = signedToken({ iss: TOKEN_ISSUER, siteId: ctx.metasite, aud: ctx.externalDatabaseId }, ctx.keyId)
-        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), null, ctx.next)
+        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), ctx.res, ctx.next)
 
         expectAuthorized()
     })
@@ -25,7 +25,7 @@ describe('JWT Auth Middleware', () => {
     test('should authorize when JWT valid, only with second public key', async() => {
         const token = signedToken({ iss: TOKEN_ISSUER, siteId: ctx.metasite, aud: ctx.externalDatabaseId }, ctx.keyId)
         env.auth = new JwtAuthenticator(ctx.externalDatabaseId, ctx.allowedMetasites, ctx.otherWixDataMock).authorizeJwt()
-        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), null, ctx.next)
+        await env.auth(driver.requestBodyWith(Uninitialized, Uninitialized, `Bearer ${token}`), ctx.res, ctx.next)
         expectAuthorized()
     })
 
@@ -99,7 +99,8 @@ describe('JWT Auth Middleware', () => {
         allowedMetasites: Uninitialized,
         next: Uninitialized,
         keyId: Uninitialized,
-        otherWixDataMock: Uninitialized
+        otherWixDataMock: Uninitialized,
+        res: Uninitialized,
     }
 
     const env = {
@@ -127,6 +128,7 @@ describe('JWT Auth Middleware', () => {
         const otherPublicKeys: PublicKeyMap = {}
         otherPublicKeys[otherKeyId] = authConfig.otherAuthPublicKey
         ctx.otherWixDataMock = new WixDataFacadeMock(otherPublicKeys, publicKeys)
+        ctx.res = { locals: {} }
         env.auth = new JwtAuthenticator(ctx.externalDatabaseId, ctx.allowedMetasites, new WixDataFacadeMock(publicKeys)).authorizeJwt()
     })
 })
