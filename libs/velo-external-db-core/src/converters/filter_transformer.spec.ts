@@ -182,6 +182,19 @@ describe('Filter Transformer', () => {
         })
     })
 
+    describe('handle short syntax filter', () => {
+        test('correctly transform short syntax filter', () => {
+            const filter = {
+                [ctx.fieldName]: ctx.fieldValue
+            }
+            expect(env.FilterTransformer.transform(filter)).toEqual({
+                fieldName: ctx.fieldName,
+                operator: env.FilterTransformer.wixOperatorToAdapterOperator('$eq'),
+                value: ctx.fieldValue
+            })
+        })
+    })
+
     interface Enviorment {
         FilterTransformer: FilterTransformer
     }
