@@ -88,7 +88,7 @@ export const createRouter = () => {
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
     const jwtAuthenticator = new JwtAuthenticator(cfg.externalDatabaseId, cfg.allowedMetasites, new WixDataFacade(cfg.wixDataBaseUrl))
-    router.use(unless(['/', '/info', '/capabilities', '/favicon.ico'], jwtAuthenticator.authorizeJwt()))
+    router.use(unless(['/', '/info', '/capabilities', '/favicon.ico', '/provision'], jwtAuthenticator.authorizeJwt()))
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
