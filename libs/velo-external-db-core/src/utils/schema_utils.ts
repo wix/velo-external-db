@@ -14,9 +14,9 @@ export const fieldTypeToWixDataEnum = ( fieldType: string ): collectionSpi.Field
         case FieldType.boolean:
             return collectionSpi.FieldType.boolean
         case FieldType.object:
-            return collectionSpi.FieldType.object
+            return collectionSpi.FieldType.json
         case FieldType.datetime:
-            return collectionSpi.FieldType.datetime
+            return collectionSpi.FieldType.timestamp
         case FieldType.singleReference:
             return collectionSpi.FieldType.singleReference
         case FieldType.multiReference:
@@ -27,18 +27,18 @@ export const fieldTypeToWixDataEnum = ( fieldType: string ): collectionSpi.Field
     }
 }
 
-export const wixDataEnumToFieldType = (fieldEnum: number): string => {
+export const wixDataEnumToFieldType = (fieldEnum: collectionSpi.FieldType): string => {
     switch (fieldEnum) {
         case collectionSpi.FieldType.text:
         case collectionSpi.FieldType.longText:
             return FieldType.text
         case collectionSpi.FieldType.number:
             return FieldType.number
-        case collectionSpi.FieldType.datetime:
+        case collectionSpi.FieldType.timestamp:
             return FieldType.datetime
         case collectionSpi.FieldType.boolean:
             return FieldType.boolean
-        case collectionSpi.FieldType.object:
+        case collectionSpi.FieldType.json:
             return FieldType.object
 
         case collectionSpi.FieldType.singleReference:
@@ -49,18 +49,18 @@ export const wixDataEnumToFieldType = (fieldEnum: number): string => {
     }
 }
 
-export const subtypeToFieldType = (fieldEnum: number): string => {
+export const subtypeToFieldType = (fieldEnum: collectionSpi.FieldType): string => {
     switch (fieldEnum) {
         case collectionSpi.FieldType.text:
         case collectionSpi.FieldType.longText:
             return 'string'
         case collectionSpi.FieldType.number:
             return 'float'
-        case collectionSpi.FieldType.datetime:
+        case collectionSpi.FieldType.timestamp:
             return 'datetime'
         case collectionSpi.FieldType.boolean:
             return ''
-        case collectionSpi.FieldType.object:
+        case collectionSpi.FieldType.json:
             return ''
 
         case collectionSpi.FieldType.singleReference:
