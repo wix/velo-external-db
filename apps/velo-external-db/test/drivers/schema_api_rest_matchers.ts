@@ -49,7 +49,7 @@ const collectionCapabilities = (collectionOperations: CollectionOperation[], dat
     fieldTypes: expect.arrayContaining(fieldTypes.map(schemaUtils.fieldTypeToWixDataEnum)),
     referenceCapabilities: expect.objectContaining({ supportedNamespaces: [] }),
     indexing: [],
-    encryption: 0
+    encryption: 'NOT_SUPPORTED'
 })
 
 const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilities) => ({
