@@ -24,7 +24,7 @@ export class JwtAuthenticator {
             try {
                 const token = this.extractToken(req.header('authorization'))
                 this.publicKeys = this.publicKeys ?? await this.wixDataFacade.getPublicKeys(this.externalDatabaseId)
-                await this.verify(token)
+                res.locals['metaSiteId'] = await this.verify(token)
             } catch (err: any) {
                 console.error('Authorization failed: ' + err.message)
                 next(new UnauthorizedError('You are not authorized'))
@@ -68,6 +68,7 @@ export class JwtAuthenticator {
         if (siteId === undefined || !this.allowedMetasites.includes(siteId)) {
             throw new UnauthorizedError(`Unauthorized: ${siteId ? `site not allowed ${siteId}` : 'no siteId'}`)
         }
+        return siteId
     }
 
     private extractToken(header: string | undefined) {

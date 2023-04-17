@@ -32,11 +32,9 @@ export interface SchemaPayload {
 
 export interface RequestContext {
     operation: DataOperation | CollectionOperationSPI
-    collectionId: string;
-    instanceId?: string;
-    role?: string;
-    memberId?: string;
-    settings?: any;
+    collectionId?: string;
+    collectionIds?: string[];
+    metaSiteId: string;
 }
 
 export interface ServiceContext {
