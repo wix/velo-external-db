@@ -12,7 +12,7 @@ export default async(config: GoogleSheetsConfig): Promise<DbProviders<GoogleSpre
     await loadSheets(doc)
 
     const databaseOperations = new DatabaseOperations(doc)
-    const dataProvider = new DataProvider(doc)
+    const dataProvider = new DataProvider(doc, undefined, config.enableCache, config.stdTtl, config.checkPeriod)
     const schemaProvider = new SchemaProvider(doc)
 
     const cleanup = async() => { 

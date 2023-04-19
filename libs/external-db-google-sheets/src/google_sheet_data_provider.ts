@@ -18,14 +18,16 @@ export default class DataProvider implements IDataProvider {
     doc: GoogleSpreadsheet
     testSupport: any
     state: State
+    enableCache: boolean
     // Standard time to live in seconds.
     stdTTL: number
     // Time in seconds to check all data and delete expired keys
     checkPeriod: number
 
-    constructor(doc: GoogleSpreadsheet, testSupport?: any, stdTTL = 15, checkPeriod = 60) {
+    constructor(doc: GoogleSpreadsheet, testSupport?: any, enableCache = true, stdTTL = 15, checkPeriod = 60) {
         this.doc = doc
         this.testSupport = testSupport
+        this.enableCache = enableCache
         this.state = {}
         this.stdTTL = stdTTL
         this.checkPeriod = checkPeriod
@@ -51,7 +53,7 @@ export default class DataProvider implements IDataProvider {
         })
     }
 
-    private async insertItemToStateCollection(sheetName: string, _items: GoogleSpreadsheetRow[]) {
+    private async insertItemToStateCollection(sheetName: string, _items: GoogleSpreadsheetRow[]) {    
         
         // If sheet is in cache, add the new items to the existing ones
         if (this.state[sheetName]) {
@@ -80,6 +82,11 @@ export default class DataProvider implements IDataProvider {
     }
 
     private async rowsFor(sheet: GoogleSpreadsheetWorksheet, options?: any) {
+
+        // If cache is disabled, return rows without caching
+        if (!this.enableCache) {
+            return sheet.getRows(options)
+        }
         
         // Sheet is not in cache
         if (!this.state[sheet.title]) {
@@ -103,8 +110,6 @@ export default class DataProvider implements IDataProvider {
         return this.state[sheet.title].rows
     
     }
-
-
 
     // FIND RELATED FUNCTIONS ////////////////////////////////////////////////////////////////////////
 
