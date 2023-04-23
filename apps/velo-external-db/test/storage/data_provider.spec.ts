@@ -247,6 +247,18 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
 
         await expect( env.dataProvider.aggregate(ctx.numericCollectionName, ctx.filter, ctx.aggregation) ).resolves.toEqual([{ _id: ctx.numberEntity._id, [ctx.aliasColumns[0]]: ctx.numberEntity[ctx.numericColumns[0].name], [ctx.aliasColumns[1]]: ctx.numberEntity[ctx.numericColumns[1].name] }])
     })
+
+    test('reading from cache', async() => {
+        await givenCollectionWith([ctx.entity], ctx.collectionName, ctx.entityFields)
+        
+        const res = await env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 0, 50, ctx.projection)
+        
+        await env.dataDriver.addItemsToCollection(ctx.collectionName, [ctx.anotherEntity])
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+        await expect(env.dataProvider.find(ctx.collectionName, ctx.filter, ctx.sort, 0, 50, ctx.projection)).resolves.toEqual(res)
+    })
     
 
     const ctx = {

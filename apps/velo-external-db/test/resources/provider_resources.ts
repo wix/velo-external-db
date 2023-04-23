@@ -23,19 +23,19 @@ import * as googleSheet from '@wix-velo/external-db-google-sheets'
 
 import { AnyFixMe, ConnectionCleanUp, IDataProvider, ISchemaProvider } from '@wix-velo/velo-external-db-types'
 
-// const googleSheet = require('@wix-velo/external-db-google-sheets')
-// const googleSheetTestEnv = require('./engines/google_sheets_resources')
 
 export const env: {
     dataProvider: IDataProvider
     schemaProvider: ISchemaProvider
     cleanup: ConnectionCleanUp
     driver: AnyFixMe
+    dataDriver?: AnyFixMe
 } = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
     cleanup: Uninitialized,
     driver: Uninitialized,
+    dataDriver: Uninitialized
 }
 
 const dbInit = async(impl: any) => {
@@ -48,6 +48,9 @@ const dbInit = async(impl: any) => {
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
     env.schemaProvider = new impl.SchemaProvider(pool, testResources.schemaProviderTestVariables?.() )
     env.driver = driver
+    if (impl.dataDriver) {
+        env.dataDriver = impl.dataDriver()
+    }
     env.cleanup = cleanup
 }
 

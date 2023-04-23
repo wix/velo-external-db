@@ -11,6 +11,7 @@ import ConfigValidator from './google_sheet_config_validator'
 
 export const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 export const opsDriver = () => require('../tests/drivers/db_operations_test_support')
+export const dataDriver = () => require('../tests/drivers/data_provider_test_support')
 
 export class GoogleSheetConnector extends DbConnector {
     constructor() {

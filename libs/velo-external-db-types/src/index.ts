@@ -38,6 +38,7 @@ export enum SchemaOperations {
     NotOperator = 'not',
     IncludeOperator = 'include',
     FilterByEveryField = 'filterByEveryField',
+    Cache = 'cache',
 }
 
 export type FieldWithQueryOperators = ResponseField & { queryOperators: string[] }
