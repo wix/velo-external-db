@@ -30,6 +30,8 @@ export interface Payload {
     itemIds?: string[];
     schemas?: AsWixSchema[];
     collectionName?: string;
+    column?: InputField;
+    columnName?: string;
 }
 
 enum ReadOperation {
