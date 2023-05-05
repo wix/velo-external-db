@@ -37,4 +37,4 @@ export const createApp = async() => {
     const server = app.listen(8080, () => console.log('Connector listening on port 8080'))
 
     return { server, ...initConnectorResponse, reload: () => initConnector() }
-}
+} 
