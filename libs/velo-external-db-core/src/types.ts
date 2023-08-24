@@ -1,7 +1,7 @@
 import {  Item, Sort, WixDataFilter, RoleConfig, ItemWithId, DataOperation, CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
-import { AggregateRequest, CountRequest, CountResponse, Group, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
+import { AggregateRequest, CountRequest, CountResponse, Aggregation, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
 import { Collection, CreateCollectionRequest, DeleteCollectionRequest, ListCollectionsRequest, UpdateCollectionRequest } from './spi-model/collection'
 
 export interface DataPayload {
@@ -9,7 +9,7 @@ export interface DataPayload {
     filter?: WixDataFilter
     sort?: Sort[] | Sorting[];
     initialFilter?: WixDataFilter;
-    group?: Group;
+    aggregation : Aggregation;
     finalFilter?: WixDataFilter 
     paging?: Paging;
     items?: Item[];
@@ -17,7 +17,6 @@ export interface DataPayload {
     options?: Options;
     omitTotalCount?: boolean;
     includeReferencedItems?: string[];
-    namespace?: string;
     query?: QueryV2;
     overwriteExisting?: boolean;
     totalCount?: number;

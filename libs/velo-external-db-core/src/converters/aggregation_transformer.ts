@@ -2,11 +2,16 @@ import { AdapterAggregation, AdapterFunctions } from '@wix-velo/velo-external-db
 import { IFilterTransformer } from './filter_transformer'
 import { projectionFunctionFor } from './utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { Aggregation, Group } from '../spi-model/data_source'
+import { Operation, Aggregation, Filter } from '../spi-model/data_source'
 const { InvalidQuery } = errors
 
+type TransformAggregationParams = {
+    aggregation: Aggregation
+    finalFilter?: Filter
+}
+
 interface IAggregationTransformer {
-    transform(aggregation: { group: Group, finalFilter?: any }): AdapterAggregation
+    transform(aggregation: TransformAggregationParams): AdapterAggregation
     wixFunctionToAdapterFunction(wixFunction: string): AdapterFunctions
 }
 
@@ -16,11 +21,11 @@ export default class AggregationTransformer implements IAggregationTransformer {
         this.filterTransformer = filterTransformer
     }
 
-    transform({ group, finalFilter }: { group: Group, finalFilter?: any }): AdapterAggregation {        
-        const { by: fields, aggregation } = group
+    transform({ aggregation, finalFilter }: TransformAggregationParams): AdapterAggregation {        
+        const { groupingFields: fields, operations } = aggregation
 
         const projectionFields = fields.map(f => ({ name: f }))
-        const projectionFunctions = this.aggregationToProjectionFunctions(aggregation)
+        const projectionFunctions = this.operationToProjectionFunctions(operations)
         
         const postFilter = this.filterTransformer.transform(finalFilter)
 
@@ -32,11 +37,15 @@ export default class AggregationTransformer implements IAggregationTransformer {
         }
     }
 
-    aggregationToProjectionFunctions(aggregations: Aggregation[]) {
-        return aggregations.map(aggregation => {
-            const { name: fieldAlias, ...rest } = aggregation
-            const [func, field] = Object.entries(rest)[0]
-            return projectionFunctionFor(field, fieldAlias, this.wixFunctionToAdapterFunction(func))
+    operationToProjectionFunctions(operations: Operation[]) {
+        return operations.map(operation => {
+            const { resultFieldName, calculate } = operation
+            const [func, fieldNameItem] = Object.entries(calculate)[0]
+            const { itemFieldName: field } = fieldNameItem
+            
+
+            
+            return projectionFunctionFor(field, resultFieldName, this.wixFunctionToAdapterFunction(func))
         })
     }
 

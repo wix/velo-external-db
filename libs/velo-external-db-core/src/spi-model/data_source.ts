@@ -1,23 +1,43 @@
-
 export interface QueryRequest {
     collectionId: string;
-    namespace?: string;
     query: QueryV2;
-    includeReferencedItems: string[];
-    options: Options;
-    omitTotalCount: boolean;
+    // Reference fields to include referenced items for
+    // by default
+    //  - single reference field is returned as referenced item ID
+    //  - multiple reference field is not returned
+    // May not be supported if references are not supported.
+    // Included items SHOULD be sorted by reference creation date (which can be different from
+    // referencing and referenced items creation date) in ascending order
+    includeReferencedItems: ReferencedItemToInclude[];
+    consistentRead: boolean;
+    // When `true`, response MUST include total count of items matching the query.
+    returnTotalCount: boolean;
+}
+
+export interface QueryResponse {
+    items: Item[];
+    // TODO: implement CursorPaging type in the code
+    pagingMetadata?: PagingMetadataV2;
 }
 
 export interface QueryV2 {
     filter: Filter;
     sort?: Sorting[];
     fields: string[];
-    fieldsets: string[];
-    paging?: Paging;
-    cursorPaging?: CursorPaging;
+    // TODO: implement CursorPaging type in the code
+    pagingMethod: Paging;
 }
 
-export type Filter = any; 
+export interface ReferencedItemToInclude {
+    // Field in referencing collection
+    fieldKey: string;
+    // Max number of referenced items that should be returned
+    limit: number;
+}
+
+export type Filter = {
+    [fieldName: string]: string;
+};
 
 export interface Sorting {
     fieldName: string;
@@ -31,7 +51,7 @@ export interface Paging {
 
 export interface CursorPaging {
     limit: number;
-    cursor?: string;
+    cursor: string;
 }
 
 export interface Options {
@@ -43,42 +63,15 @@ export enum SortOrder {
     ASC = 'ASC',
     DESC = 'DESC'
 }
-
-export interface QueryResponsePart {
-    item?: any;
-    pagingMetadata?: PagingMetadataV2;
-}
-
-export class QueryResponsePart {
-    static item(item: any): QueryResponsePart {
-        return {
-            item: item
-        } as QueryResponsePart
-    }
-
-    static pagingMetadata(count?: number, offset?: number, total?: number): QueryResponsePart {
-        return {
-            pagingMetadata: {
-                count, offset, total, tooManyToCount: false
-            } as PagingMetadataV2
-        }
-    }
-}
-
 export interface PagingMetadataV2 {
+    // Will be implemented in the future
     count?: number;
-    // Offset that was requested.
+    // Will be implemented in the future
     offset?: number;
     // Total number of items that match the query. Returned if offset paging is used and the `tooManyToCount` flag is not set.
     total?: number;
-    // Flag that indicates the server failed to calculate the `total` field.
-    tooManyToCount?: boolean
     // Cursors to navigate through the result pages using `next` and `prev`. Returned if cursor paging is used.
     cursors?: Cursors
-    // Indicates if there are more results after the current page.
-    // If `true`, another page of results can be retrieved.
-    // If `false`, this is the last page.
-    has_next?: boolean
 }
 
 export interface Cursors {
@@ -90,12 +83,10 @@ export interface Cursors {
 export interface CountRequest {
     // collection name to query
     collectionId: string;
-    // Optional namespace assigned to collection/installation
-    namespace?: string;
     // query filter https://bo.wix.com/wix-docs/rnd/platformization-guidelines/api-query-language
-    filter?: any;
-    // request options
-    options: Options;
+    filter?: Filter;
+    // Indicates if the query should be strongly consistent in case data source works in eventually consistent mode.
+    consistentRead: boolean;
 }
 
 export interface CountResponse {
@@ -152,114 +143,59 @@ export interface QueryReferencedResponsePart {
 export interface AggregateRequest {
     // collection name
     collectionId: string;
-    // Optional namespace assigned to collection/installation
-    namespace?: string;
     // filter to apply before aggregation
-    initialFilter?: any
-    // group and aggregate
-    // property name to return unique values of
-    // may unwind array values or not, depending on implementation
-    distinct: string;
-    group: Group;
+    initialFilter?: Filter;
+    // Aggregation applied to the data.
+    aggregation : Aggregation;
     // filter to apply after aggregation
-    finalFilter?: any
+    finalFilter?: Filter
     // sorting
     sort?: Sorting[]
-    // paging
-    paging?: Paging;
-    cursorPaging?: CursorPaging;
-    // request options
-    options: Options;
-    // Indicates if total count calculation should be omitted.
-    // Only affects offset pagination, because cursor paging does not return total count.
-    omitTotalCount: boolean;    
-}
-  
-export interface Group {
-    // properties to group by, if empty single group would be created
-    by: string[];
-    // aggregations, resulted group will contain field with given name and aggregation value
-    aggregation: Aggregation[];
+    // Paging
+    // TODO: implement CursorPaging type in the code
+    pagingMethod: Paging;
+    // Indicates if the query should be strongly consistent in case data source works in eventually consistent mode.
+    // In other words, when a query is executed, it will always reflect the latest changes made to the data.
+    // TODO: currently not supported, maybe it will be implemented in the future
+    consistentRead: boolean;
+    // When `true`, response MUST include total count of items matching the query.
+    returnTotalCount: boolean; 
 }
 
 export interface Aggregation {
-    // result property name
-    name: string;
-
-    //TODO: should be one of the following
-    // property to calculate average of
-    avg?: string;
-    // property to calculate min of
-    min?: string;
-    // property to calculate max of
-    max?: string;
-    // property to calculate sum of
-    sum?: string;
-    // count items, value is always 1
-    count?: number;
+    // Fields by which to group items for the aggregation. If empty, result MUST contain a single group.
+    groupingFields: string[];
+    // Operations to carry out on the data in each grouping.
+    operations: Operation[];
 }
-
-export interface AggregateResponsePart {
-    // query response consists of any number of items plus single paging metadata
-    // Aggregation result item.
-    // In case of group request, it should contain a field for each `group.by` value
-    // and a field for each `aggregation.name`.
-    // For example, grouping
-    // ```
-    // {by: ["foo", "bar"], aggregation: {name: "someCount", calculate: {count: "baz"}}}
-    // ```
-    // could produce an item:
-    // ```
-    // {foo: "xyz", bar: "456", someCount: 123}
-    // ```
-    // When `group.by` and 'aggregation.name' clash, grouping key should be returned.
-    //
-    // In case of distinct request, it should contain single field, for example
-    // ```
-    // {distinct: "foo"}
-    // ```
-    // could produce an item:
-    // ```
-    // {foo: "xyz"}
-    // ```
-    item?: any;
-    pagingMetadata?: PagingMetadataV2;
-}
-
-export class AggregateResponsePart {
-    static item(item: any) {
-        return {
-            item
-        } as AggregateResponsePart
-    }
-
-    static pagingMetadata(count?: number, offset?: number, total?: number): QueryResponsePart {
-        return {
-            pagingMetadata: {
-                count, offset, total, tooManyToCount: false
-            } as PagingMetadataV2
-        }
-    }
-}
-
 export interface InsertRequest {
     // collection name
     collectionId: string;
-    // Optional namespace assigned to collection/installation
-    namespace?: string;
     // Items to insert
     items: any[];
-    // if true items would be overwritten by _id if present
-    overwriteExisting: boolean
-    // request options
-    options: Options;
 }
 
+// TODO: delete it at the end of the PR
 export interface InsertResponsePart {
     item?: any;
     // error from [errors list](errors.proto)
     error?: ApplicationError;
 }
+
+export interface InsertResponse {
+    // Either inserted item or error.
+    results: DataItemModificationResult[];
+}
+
+export interface DataItemModificationResult {
+     // Item that was inserted, updated or removed. MUST be empty in case of error.
+     // Error indicating why operation failed for a particular item. MUST be empty in case of success.
+    result: Item | ApplicationError;
+}
+
+export interface Item {
+    [fieldName: string]: string;
+};
 
 export class InsertResponsePart {
     static item(item: any) {
@@ -278,12 +214,12 @@ export class InsertResponsePart {
 export interface UpdateRequest {
      // collection name
      collectionId: string;
-     // Optional namespace assigned to collection/installation
-     namespace?: string;
     // Items to update, must include _id
-    items: any[];
-    // request options
-    options: Options;
+    items: Item[];
+}
+
+export interface UpdateResponse {
+    result: DataItemModificationResult[];
 }
   
 export interface UpdateResponsePart {
@@ -311,11 +247,7 @@ export interface RemoveRequest {
     // collection name
     collectionId: string;
     // Optional namespace assigned to collection/installation
-    namespace?: string;
-    // Items to update, must include _id
     itemIds: string[];
-    // request options
-    options: Options;
 }
   
 export interface RemoveResponsePart {
@@ -324,6 +256,10 @@ export interface RemoveResponsePart {
     item?: any;
     // error from [errors list](errors.proto)
     error?: ApplicationError;
+}
+
+export interface RemoveResponse {
+    result: DataItemModificationResult[];
 }
 
 export class RemoveResponsePart {
@@ -343,10 +279,6 @@ export class RemoveResponsePart {
 export interface TruncateRequest {
     // collection name
     collectionId: string;
-    // Optional namespace assigned to collection/installation
-    namespace?: string;
-    // request options
-    options: Options;
 }
   
 export interface TruncateResponse {}
@@ -406,3 +338,34 @@ export interface ApplicationError {
     description: string;
     data: any;
 }
+
+export interface Operation {
+    resultFieldName: string;
+    calculate: Average | Min | Max | Sum ;
+}
+
+export type Average =  {
+    average: {
+        itemFieldName: string;
+    }
+}
+
+export type Min =  {
+    min: {
+        itemFieldName: string;
+    }
+}
+
+export type Max = {
+    max: {
+        itemFieldName: string;
+    }
+}
+
+export type Sum = {
+    sum: {
+        itemFieldName: string;
+    }
+}
+
+export interface Count {}

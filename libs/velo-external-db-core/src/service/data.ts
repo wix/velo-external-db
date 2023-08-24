@@ -9,9 +9,9 @@ export default class DataService {
         this.storage = storage
     }
 
-    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any, omitTotalCount?: boolean): Promise<{items: any[], totalCount?: number}> {
+    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any, returnTotalCount?: boolean): Promise<{items: any[], totalCount?: number}> {
         const items = this.storage.find(collectionName, _filter, sort, skip, limit, projection)
-        const totalCount = omitTotalCount? undefined : this.storage.count(collectionName, _filter)
+        const totalCount = returnTotalCount? this.storage.count(collectionName, _filter) : undefined
 
         return {
             items: (await items).map(asWixData),
@@ -35,6 +35,7 @@ export default class DataService {
         return { item: asWixData(resp.items[0]) }
     }
 
+    // TODO: overwriteExisting is not platformized, this method needs to be removed
     async bulkUpsert(collectionName: string, items: Item[], fields?: ResponseField[]) {
         await this.storage.insert(collectionName, items, fields, true)
         return { items: items.map( asWixData ) }
@@ -71,8 +72,8 @@ export default class DataService {
 
 
     // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number) {
-        const totalCount = this.storage.count(collectionName, filter)
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number, returnTotalCount?: boolean) {
+        const totalCount = returnTotalCount ? this.storage.count(collectionName, filter) : undefined
         return {
             items: ((await this.storage.aggregate?.(collectionName, filter, aggregation, sort, skip, limit)) || [])
                                       .map( asWixData ),
