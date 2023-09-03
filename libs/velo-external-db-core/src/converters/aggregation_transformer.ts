@@ -38,19 +38,20 @@ export default class AggregationTransformer implements IAggregationTransformer {
     }
 
     operationToProjectionFunctions(operations: Operation[]) {
+        /*
+            Operations item looks like this: { resultFieldName: 'myAvg', average: { itemFieldName: 'myFieldName' } }
+            So after extraction the variables are as follows: resultFieldName(alias): MyAvg, func: average, fieldName: myFieldName
+        */
         return operations.map(operation => {
-            const { resultFieldName, calculate } = operation
+            const { resultFieldName, ...calculate } = operation
             const [func, fieldNameItem] = Object.entries(calculate)[0]
-            const { itemFieldName: field } = fieldNameItem
-            
-
-            
+            const field = fieldNameItem.itemFieldName        
             return projectionFunctionFor(field, resultFieldName, this.wixFunctionToAdapterFunction(func))
         })
     }
 
     wixFunctionToAdapterFunction(func: string): AdapterFunctions {
-        if (Object.values(AdapterFunctions).includes(func as any)) {
+        if (Object.keys(AdapterFunctions).includes(func as any)) {
             return AdapterFunctions[func as AdapterFunctions] as AdapterFunctions
         }
 

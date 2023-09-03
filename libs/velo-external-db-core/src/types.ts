@@ -1,26 +1,33 @@
-import {  Item, Sort, WixDataFilter, RoleConfig, ItemWithId, DataOperation, CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
+import {  Item, RoleConfig, ItemWithId, DataOperation, CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
-import { AggregateRequest, CountRequest, CountResponse, Aggregation, InsertRequest, Paging, QueryRequest, Sorting, Options, QueryV2, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
+import { AggregateRequest, CountRequest, CountResponse, InsertRequest, QueryRequest, UpdateRequest, RemoveRequest, TruncateRequest, QueryReferencedRequest, QueryResponse, InsertResponse, UpdateResponse, RemoveResponse, TruncateResponse, AggregateResponse } from './spi-model/data_source'
 import { Collection, CreateCollectionRequest, DeleteCollectionRequest, ListCollectionsRequest, UpdateCollectionRequest } from './spi-model/collection'
 
-export interface DataPayload {
-    collectionId: string;
-    filter?: WixDataFilter
-    sort?: Sort[] | Sorting[];
-    initialFilter?: WixDataFilter;
-    aggregation : Aggregation;
-    finalFilter?: WixDataFilter 
-    paging?: Paging;
-    items?: Item[];
-    itemIds?: string[];
-    options?: Options;
-    omitTotalCount?: boolean;
-    includeReferencedItems?: string[];
-    query?: QueryV2;
-    overwriteExisting?: boolean;
-    totalCount?: number;
-}
+// TODO: remove this comment in the end of the PR review
+// export interface DataPayload {
+//     collectionId: string;
+//     filter?: WixDataFilter
+//     sort?: Sort[] | Sorting[];
+//     initialFilter?: WixDataFilter;
+//     aggregation : Aggregation;
+//     finalFilter?: WixDataFilter 
+//     paging?: Paging;
+//     items?: Item[];
+//     itemIds?: string[];
+//     options?: Options;
+//     omitTotalCount?: boolean;
+//     includeReferencedItems?: string[];
+//     query?: QueryV2;
+//     overwriteExisting?: boolean;
+//     // totalCount its a count response field, why its here?
+//     totalCount?: number;
+// }
+
+export type DataPayloadBefore = QueryRequest | CountRequest | QueryReferencedRequest | AggregateRequest | InsertRequest | UpdateRequest | RemoveRequest | TruncateRequest;
+
+export type DataPayloadAfter = QueryResponse | CountResponse  | AggregateResponse | InsertResponse | UpdateResponse | RemoveResponse | TruncateResponse;
+
 
 export interface SchemaPayload {
     collectionId?: string;
@@ -42,15 +49,19 @@ export interface ServiceContext {
 }
 
 
-export type Hook<Payload> = (payload: Payload, requestContext: RequestContext, serviceContext: ServiceContext, customContext?: object) => (Promise<Payload> | Payload | void);
+export type Hook<Payload> = 
+    (payload: Payload, 
+    requestContext: RequestContext, 
+    serviceContext: ServiceContext, 
+    customContext?: object) => (Promise<Payload> | Payload | void);
 
 export interface DataHooks {
-    beforeAll?: Hook<DataPayload>;
-    afterAll?: Hook<DataPayload>;
-    beforeRead?: Hook<DataPayload>;
-    afterRead?: Hook<DataPayload>;
-    beforeWrite?: Hook<DataPayload>;
-    afterWrite?: Hook<DataPayload>;
+    beforeAll?: Hook<DataPayloadBefore>;
+    afterAll?: Hook<DataPayloadAfter>;
+    beforeRead?: Hook<DataPayloadBefore>;
+    afterRead?: Hook<DataPayloadAfter>;
+    beforeWrite?: Hook<DataPayloadBefore>;
+    afterWrite?: Hook<DataPayloadAfter>;
     beforeQuery?: Hook<QueryRequest>
     afterQuery?: Hook<{ items: ItemWithId[], totalCount?: number }>
     beforeCount?: Hook<CountRequest>

@@ -8,7 +8,7 @@ export interface QueryRequest {
     // May not be supported if references are not supported.
     // Included items SHOULD be sorted by reference creation date (which can be different from
     // referencing and referenced items creation date) in ascending order
-    includeReferencedItems: ReferencedItemToInclude[];
+    includeReferencedItems?: ReferencedItemToInclude[];
     consistentRead: boolean;
     // When `true`, response MUST include total count of items matching the query.
     returnTotalCount: boolean;
@@ -28,6 +28,8 @@ export interface QueryV2 {
     pagingMethod: Paging;
 }
 
+
+// TODO: will be changed in references SPI implementation pr
 export interface ReferencedItemToInclude {
     // Field in referencing collection
     fieldKey: string;
@@ -36,7 +38,7 @@ export interface ReferencedItemToInclude {
 }
 
 export type Filter = {
-    [fieldName: string]: string;
+    [fieldName: string]: any;
 };
 
 export interface Sorting {
@@ -93,6 +95,7 @@ export interface CountResponse {
     totalCount: number;
 }
 
+// TODO: will be changed in references SPI implementation pr
 export interface QueryReferencedRequest {
     // collection name of referencing item
     collectionId: string;
@@ -162,6 +165,12 @@ export interface AggregateRequest {
     returnTotalCount: boolean; 
 }
 
+export interface AggregateResponse {
+    items: Item[];
+    // TODO: implement CursorPaging type in the code
+    pagingMetadata?: PagingMetadataV2;
+}
+
 export interface Aggregation {
     // Fields by which to group items for the aggregation. If empty, result MUST contain a single group.
     groupingFields: string[];
@@ -175,41 +184,18 @@ export interface InsertRequest {
     items: any[];
 }
 
-// TODO: delete it at the end of the PR
-export interface InsertResponsePart {
-    item?: any;
-    // error from [errors list](errors.proto)
-    error?: ApplicationError;
-}
-
 export interface InsertResponse {
     // Either inserted item or error.
     results: DataItemModificationResult[];
 }
 
-export interface DataItemModificationResult {
-     // Item that was inserted, updated or removed. MUST be empty in case of error.
-     // Error indicating why operation failed for a particular item. MUST be empty in case of success.
-    result: Item | ApplicationError;
-}
+// Item that was inserted, updated or removed. MUST be empty in case of error.
+// Error indicating why operation failed for a particular item. MUST be empty in case of success.
+export type DataItemModificationResult = Item | ApplicationError;
 
 export interface Item {
     [fieldName: string]: string;
 };
-
-export class InsertResponsePart {
-    static item(item: any) {
-        return {
-            item
-        } as InsertResponsePart
-    }
-
-    static error(error: ApplicationError) {
-        return {
-            error
-        } as InsertResponsePart
-    }
-}
 
 export interface UpdateRequest {
      // collection name
@@ -221,28 +207,6 @@ export interface UpdateRequest {
 export interface UpdateResponse {
     result: DataItemModificationResult[];
 }
-  
-export interface UpdateResponsePart {
-    // results in order of request
-    item?: any;
-    // error from [errors list](errors.proto)
-    error?: ApplicationError;
-}
-
-export class UpdateResponsePart {
-    static item(item: any) {
-        return {
-            item
-        } as UpdateResponsePart
-    }
-
-    static error(error: ApplicationError) {
-        return {
-            error
-        } as UpdateResponsePart
-    }
-}
-
 export interface RemoveRequest {
     // collection name
     collectionId: string;
@@ -250,32 +214,9 @@ export interface RemoveRequest {
     itemIds: string[];
 }
   
-export interface RemoveResponsePart {
-    // results in order of request
-    // results in order of request
-    item?: any;
-    // error from [errors list](errors.proto)
-    error?: ApplicationError;
-}
-
 export interface RemoveResponse {
     result: DataItemModificationResult[];
 }
-
-export class RemoveResponsePart {
-    static item(item: any) {
-        return {
-            item
-        } as RemoveResponsePart
-    }
-
-    static error(error: ApplicationError) {
-        return {
-            error
-        } as RemoveResponsePart
-    }
-}
-
 export interface TruncateRequest {
     // collection name
     collectionId: string;
@@ -283,6 +224,7 @@ export interface TruncateRequest {
   
 export interface TruncateResponse {}
 
+// TODO: will be changed in references SPI implementation pr 
 export interface InsertReferencesRequest {
     // collection name
     collectionId: string;
@@ -296,6 +238,7 @@ export interface InsertReferencesRequest {
     options: Options;
 }
   
+// TODO: will be changed in references SPI implementation pr 
 export interface InsertReferencesResponsePart {
     reference: ReferenceId;
     // error from [errors list](errors.proto)
@@ -303,6 +246,7 @@ export interface InsertReferencesResponsePart {
     
 }
 
+// TODO: will be changed in references SPI implementation pr 
 export interface ReferenceId {
     // Id of item in requested collection
     referencingItemId: string;
@@ -310,6 +254,7 @@ export interface ReferenceId {
     referencedItemId: string;
 }
 
+// TODO: will be changed in references SPI implementation pr 
 export interface RemoveReferencesRequest {
     collectionId: string;
     // Optional namespace assigned to collection/installation
@@ -323,7 +268,8 @@ export interface RemoveReferencesRequest {
   
     
 }
-  
+
+// TODO: will be changed in references SPI implementation pr 
 export interface ReferenceMask {
     // Referencing item ID or any item if empty
     referencingItemId?: string;
@@ -331,6 +277,7 @@ export interface ReferenceMask {
     referencedItemId?: string;
 }
 
+// TODO: will be changed in references SPI implementation pr 
 export interface RemoveReferencesResponse {}
 
 export interface ApplicationError {
@@ -339,33 +286,15 @@ export interface ApplicationError {
     data: any;
 }
 
-export interface Operation {
-    resultFieldName: string;
-    calculate: Average | Min | Max | Sum ;
-}
+export type Operation = { resultFieldName: string } & Calculate;
 
-export type Average =  {
-    average: {
-        itemFieldName: string;
-    }
-}
 
-export type Min =  {
-    min: {
-        itemFieldName: string;
-    }
-}
+export type Calculate = ({ max: CalculateItem; } & { [key in 'min' | 'sum' | 'average' | 'count']?: never }) | 
+                        ({ min: CalculateItem; } & { [key in 'max' | 'sum' | 'average' | 'count']?: never }) |
+                        ({ sum: CalculateItem; } & { [key in 'max' | 'min' | 'average' | 'count']?: never }) |
+                        ({ average: CalculateItem; } & { [key in 'max' | 'min' | 'sum' | 'count']?: never }) |
+                        ({ count: Record<string, never>; } & { [key in 'max' | 'min' | 'sum' | 'average']?: never });
 
-export type Max = {
-    max: {
-        itemFieldName: string;
-    }
-}
 
-export type Sum = {
-    sum: {
-        itemFieldName: string;
-    }
-}
+export type CalculateItem = { itemFieldName: string }
 
-export interface Count {}

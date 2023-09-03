@@ -162,7 +162,7 @@ export const createRouter = () => {
 
             const { items, totalCount } = await executeDataHooksFor(DataActions.AfterQuery, data, requestContextFor(Query, req.body, res.locals), customContext)
 
-            res.json({ items, pagingMethod: { count: items.length, offset, total: totalCount } })
+            res.json({ items, pagingMetadata: { count: items.length, offset, total: totalCount } })
         } catch (e) {
             next(e)
         }
@@ -195,7 +195,7 @@ export const createRouter = () => {
             const data = await schemaAwareDataService.bulkInsert(collectionId, items)
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, data, requestContextFor(Insert, req.body, res.locals), customContext)
             
-            res.json({ results: dataAfterAction.items.map(i => ({ result: i })) })
+            res.json({ results: dataAfterAction.items })
         } catch (e) {
             next(e)
         }
@@ -212,7 +212,7 @@ export const createRouter = () => {
 
             const { items: ItemAfterAction } = await executeDataHooksFor(DataActions.AfterUpdate, data, requestContextFor(Update, req.body, res.locals), customContext)
 
-            res.json({ results: ItemAfterAction.map(i => ({ result: i })) })
+            res.json({ results: ItemAfterAction })
         } catch (e) {
             next(e)
         }
@@ -229,7 +229,8 @@ export const createRouter = () => {
 
             const { items } = await executeDataHooksFor(DataActions.AfterRemove, { items: objectsBeforeRemove }, requestContextFor(Remove, req.body, res.locals), customContext)
 
-            res.json({ results: items.map(i => ({ result: i })) })
+
+            res.json({ results: items })
         } catch (e) {
             next(e)
         }
@@ -248,8 +249,8 @@ export const createRouter = () => {
             const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), aggregationTransformer.transform({ aggregation, finalFilter }), filterTransformer.transformSort(sort), offset, limit, returnTotalCount)
             const { items, totalCount: total } = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(Aggregate, req.body, res.locals), customContext)
 
-            res.json({ items, pagingMethod: { count: items.length, offset, total } })
-        } catch (e) {
+            res.json({ items, pagingMetadata: { count: items.length, offset, total } })
+        } catch (e) {            
             next(e)
         }
     })
@@ -275,7 +276,6 @@ export const createRouter = () => {
         try {
             const customContext = {}
             const { collectionIds } = await executeSchemaHooksFor(SchemaActions.BeforeGet, schemaPayloadFor(Get, req.body), requestContextFor(Get, req.body, res.locals), customContext) as schemaSource.ListCollectionsRequest
-            console.log('requestContext', requestContextFor(Get, req.body, res.locals))
             
             const data = await schemaService.list(collectionIds)
             const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterGet, data, requestContextFor(Get, req.body, res.locals), customContext)
