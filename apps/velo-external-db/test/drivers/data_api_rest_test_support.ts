@@ -6,23 +6,23 @@ const axiosInstance = axios.create({
     baseURL: 'http://localhost:8080'
 })
 
-export const insertRequest = (collectionName: string, items: Item[], _overwriteExisting: boolean): dataSpi.InsertRequest => ({
+export const insertRequest = (collectionName: string, items: Item[]): dataSpi.InsertRequest => ({
     collectionId: collectionName,
     items: items,
 })
 
 export const updateRequest = (collectionName: string, items: Item[]): dataSpi.UpdateRequest => ({
     collectionId: collectionName,
-    items: items
+    items
 })
 
-export const countRequest = (collectionName: string, filter?: dataSpi.Filter): dataSpi.CountRequest => ({
+export const countRequest = (collectionName: string, filter: dataSpi.Filter = {}): dataSpi.CountRequest => ({
     collectionId: collectionName,
-    filter: filter ?? {},
+    filter: filter,
     consistentRead: true,
 })
 
-export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fields: string[], filter?: dataSpi.Filter): dataSpi.QueryRequest => ({
+export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fields: string[], filter?: dataSpi.Filter, consistentRead = true, returnTotalCount = true): dataSpi.QueryRequest => ({
     collectionId: collectionName,
     query: {
         filter: filter ?? {},
@@ -33,8 +33,8 @@ export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fi
             offset: 0,
         },
     },
-    consistentRead: true,
-    returnTotalCount: true
+    consistentRead,
+    returnTotalCount
 })
 
 
