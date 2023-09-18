@@ -12,7 +12,7 @@ describe('Data Service', () => {
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
         
-        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)).resolves.toEqual({
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection, true)).resolves.toEqual({
                                                                                                                         items: ctx.entities,
                                                                                                                         totalCount: ctx.total
                                                                                                                     })
@@ -22,7 +22,7 @@ describe('Data Service', () => {
         driver.givenListResult(ctx.entitiesWithoutId, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
         
-        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)).resolves.toEqual({
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection, true)).resolves.toEqual({
                                                                                                                         items: ctx.entitiesWithoutId.map((entity: any) => ({ ...entity, _id: expect.any(String) })),
                                                                                                                         totalCount: ctx.total
                                                                                                                     })
@@ -98,7 +98,7 @@ describe('Data Service', () => {
         driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
 
-        return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({ items: ctx.entities, totalCount: ctx.total })
+        return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit, true)).resolves.toEqual({ items: ctx.entities, totalCount: ctx.total })
     })
 
 

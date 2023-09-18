@@ -293,6 +293,7 @@ export type Calculate = ({ max: CalculateItem; } & { [key in 'min' | 'sum' | 'av
                         ({ min: CalculateItem; } & { [key in 'max' | 'sum' | 'average' | 'count']?: never }) |
                         ({ sum: CalculateItem; } & { [key in 'max' | 'min' | 'average' | 'count']?: never }) |
                         ({ average: CalculateItem; } & { [key in 'max' | 'min' | 'sum' | 'count']?: never }) |
+                        // Record<string, never> is a TypeScript type that represents an empty object.
                         ({ count: Record<string, never>; } & { [key in 'max' | 'min' | 'sum' | 'average']?: never });
 
 

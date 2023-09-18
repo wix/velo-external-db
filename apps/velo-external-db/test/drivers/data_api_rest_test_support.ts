@@ -47,4 +47,4 @@ export const pagingMetadata = (count: number, total?: number) => ({ count: count
 
 
 export const givenItems = async(items: Item[], collectionName: string, auth: any) =>
-    await axiosInstance.post('/data/insert', insertRequest(collectionName, items, false), { responseType: 'stream', transformRequest: auth.transformRequest })
+    await axiosInstance.post('/data/insert', insertRequest(collectionName, items), { transformRequest: auth.transformRequest })

@@ -95,9 +95,9 @@ describe ('Schema Aware Data Service', () => {
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter) 
         queryValidator.givenValidAggregationForDefaultFieldsOf(ctx.aggregation)
         
-        data.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
+        data.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit, true)
         
-        return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
+        return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit, true)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
     })
 
     test('schema with _id - find will trigger find request with projection includes _id even if it is not in the projection', async() => {
@@ -165,12 +165,12 @@ describe ('Schema Aware Data Service', () => {
         column: Uninitialized,
     }
 
-    interface Enviorment {
+    interface Environment {
         schemaAwareDataService: SchemaAwareDataService
         dataService: DataService
     }
 
-    const env: Enviorment = {
+    const env: Environment = {
         dataService: Uninitialized,
         schemaAwareDataService: Uninitialized,
     }

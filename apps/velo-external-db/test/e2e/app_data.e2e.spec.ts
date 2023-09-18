@@ -71,7 +71,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     test('insert api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false), { ...authAdmin })
+        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), { ...authAdmin })
 
         expect(response.data).toEqual({ results: expect.toIncludeSameMembers(ctx.items) })
     
@@ -85,7 +85,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
-        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', ...authAdmin })
+        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), { ...authAdmin })
 
         const expectedItems = [ctx.items[1]]
 
@@ -103,7 +103,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
-        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items, false),  { responseType: 'stream', ...authAdmin })
+        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items),  { ...authAdmin })
                 
         await expect(response).rejects.toThrow('409')
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
@@ -256,7 +256,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         delete ctx.numberItem[ctx.numberColumns[0].name]
         delete ctx.numberItem[ctx.numberColumns[1].name]
         
-        await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.numberItem], false), { ...authAdmin })
+        await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.numberItem]), { ...authAdmin })
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
             items: expect.toIncludeSameMembers([{
@@ -308,7 +308,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
             let error
 
-            await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.item], false), authAdmin).catch(e => error = e)
+            await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.item]), authAdmin).catch(e => error = e)
 
             expect(error).toBeDefined()
             expect(error.response.status).toEqual(409)

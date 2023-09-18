@@ -57,8 +57,8 @@ export const truncateResultTo = (forCollectionName: any) =>
     when(dataService.truncate).calledWith(forCollectionName)
                               .mockResolvedValue(1)
 
-export const givenAggregateResult = (items: any, forCollectionName: any, filter: any, aggregation: any, sort: any, skip: any, limit: any) =>    
-    when(dataService.aggregate).calledWith(forCollectionName, filter, aggregation, sort, skip, limit)
+export const givenAggregateResult = (items: any, forCollectionName: any, filter: any, aggregation: any, sort: any, skip: any, limit: any, returnTotalCount = true) =>    
+    when(dataService.aggregate).calledWith(forCollectionName, filter, aggregation, sort, skip, limit, returnTotalCount)
                                .mockResolvedValue({ items, totalCount: 0 })
 
 export const reset = () => {
