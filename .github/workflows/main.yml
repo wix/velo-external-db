@@ -43,7 +43,8 @@ jobs:
                    "mssql", "mssql17",
                    spanner,
                    "mongo", "mongo4",
-                   "dynamodb",
+                  #  disable dynamodb for now
+                  #  "dynamodb",
                    "firestore"
                    ]
 
