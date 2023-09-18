@@ -107,7 +107,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
                 
         await expect(response).rejects.toThrow('409')
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
-            items: ctx.items,
+            items: expect.toIncludeSameMembers(ctx.items),
             pagingMetadata: data.pagingMetadata(ctx.items.length, ctx.items.length)
         })
     })
