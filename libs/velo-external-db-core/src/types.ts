@@ -8,6 +8,7 @@ export interface FindQuery {
     sort?: Sort;
     skip?: number;
     limit?: number;
+    omitTotalCount?: boolean;
 }
 
 export type AggregationQuery = {

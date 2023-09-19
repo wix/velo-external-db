@@ -15,10 +15,10 @@ describe ('Schema Aware Data Service', () => {
         schema.givenDefaultSchemaFor(ctx.collectionName)
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.transformedFilter) 
         queryValidator.givenValidProjectionForDefaultFieldsOf(SystemFields)
-        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultFields)  
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultFields, false)  
         patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities)
 
-        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit)).resolves.toEqual({
+        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, undefined, false)).resolves.toEqual({
                                                                                                                         items: ctx.patchedEntities,
                                                                                                                         totalCount: ctx.totalCount
                                                                                                                     })
@@ -105,11 +105,11 @@ describe ('Schema Aware Data Service', () => {
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter) 
         queryValidator.givenValidProjectionForDefaultFieldsOf([ctx.column.field, '_id'])
         
-        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ['_id', ctx.column.field])
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ['_id', ctx.column.field], false)
         patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities)
 
 
-        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])).resolves.toEqual({ 
+        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field], false)).resolves.toEqual({ 
                                                                                                                         items: ctx.patchedEntities,
                                                                                                                         totalCount: ctx.totalCount
                                                                                                                     })
@@ -129,10 +129,10 @@ describe ('Schema Aware Data Service', () => {
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter)
         queryValidator.givenValidProjectionForDefaultFieldsOf([ctx.column.field])
 
-        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field], false)
         patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities, [ctx.column])
 
-        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])).resolves.toEqual({
+        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field], false)).resolves.toEqual({
                                                                                                                         items: ctx.patchedEntities,
                                                                                                                         totalCount: ctx.totalCount
                                                                                                                     })

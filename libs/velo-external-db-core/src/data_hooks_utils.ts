@@ -76,7 +76,8 @@ export const dataPayloadFor = (operation: DataOperations, body: any) => {
                 limit: body.limit,
                 skip: body.skip,
                 sort: body.sort,
-                projection: body.projection
+                projection: body.projection,
+                omitTotalCount: body.omitTotalCount
             } as FindQuery
         case DataOperations.Insert:
         case DataOperations.Update:

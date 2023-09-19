@@ -17,9 +17,9 @@ export const dataService = {
 
 const systemFields = SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) )
 
-export const givenListResult = (entities: any, totalCount: any, forCollectionName: any, filter: any, sort: any, skip: any, limit: any, projection: any) => 
-    when(dataService.find).calledWith(forCollectionName, filter, sort, skip, limit, projection)
-                          .mockResolvedValue( { items: entities, totalCount } )
+export const givenListResult = (entities: any, totalCount: any, forCollectionName: any, filter: any, sort: any, skip: any, limit: any, projection: any, omitTotalCount: any) => 
+    when(dataService.find).calledWith(forCollectionName, filter, sort, skip, limit, projection, omitTotalCount)
+                          .mockResolvedValue( { items: entities, totalCount: omitTotalCount? undefined: totalCount } )
 
 export const givenCountResult = (totalCount: any, forCollectionName: any, filter: any) =>
     when(dataService.count).calledWith(forCollectionName, filter)

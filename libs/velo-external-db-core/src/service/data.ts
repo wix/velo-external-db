@@ -9,9 +9,9 @@ export default class DataService {
         this.storage = storage
     }
 
-    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any) {
+    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any, omitTotalCount?: boolean) {
         const items = this.storage.find(collectionName, _filter, sort, skip, limit, projection)
-        const totalCount = this.storage.count(collectionName, _filter)
+        const totalCount = omitTotalCount? undefined : this.storage.count(collectionName, _filter)
         return {
             items: (await items).map(asWixData),
             totalCount: await totalCount

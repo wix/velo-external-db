@@ -61,6 +61,17 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
                     totalCount: 1
                 } }))
     })
+
+    testIfSupportedOperationsIncludes(supportedOperations, [ FindWithSort ])('find api with omitTotalCount flag set to true', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
+        await authorization.givenCollectionWithVisitorReadPolicy(ctx.collectionName)
+        await expect( axios.post('/data/find', { collectionName: ctx.collectionName, filter: '', sort: [{ fieldName: ctx.column.name }], skip: 0, limit: 25, omitTotalCount: true }, authVisitor) ).resolves.toEqual(
+            expect.objectContaining({ data: {
+                    items: [ ctx.item, ctx.anotherItem ].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1),
+                    totalCount: undefined
+                } }))
+    })
     
     //todo: create another test without sort for these implementations
 

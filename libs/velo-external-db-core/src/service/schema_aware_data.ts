@@ -15,13 +15,13 @@ export default class SchemaAwareDataService {
         this.itemTransformer = itemTransformer
     }
 
-    async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any): Promise<{ items: ItemWithId[], totalCount: number }> {
+    async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any, omitTotalCount?: boolean): Promise<{ items: ItemWithId[], totalCount: number | undefined}> {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         await this.validateFilter(collectionName, filter, fields)
         const projection = await this.projectionFor(collectionName, _projection)
         await this.validateProjection(collectionName, projection, fields)
 
-        const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection)
+        const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection, omitTotalCount)
         return { items: this.itemTransformer.patchItems(items, fields), totalCount }
     }
 
