@@ -71,7 +71,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     test('insert api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), { ...authAdmin })
+        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
 
         expect(response.data).toEqual({ results: expect.toIncludeSameMembers(ctx.items) })
     
@@ -85,7 +85,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
-        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), { ...authAdmin })
+        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
 
         const expectedItems = [ctx.items[1]]
 
@@ -103,7 +103,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
-        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items),  { ...authAdmin })
+        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items),  authAdmin)
                 
         await expect(response).rejects.toThrow('409')
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
@@ -111,21 +111,6 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             pagingMetadata: data.pagingMetadata(ctx.items.length, ctx.items.length)
         })
     })
-
-    // overwriteExisting field was removed from the insert api
-    // testIfSupportedOperationsIncludes(supportedOperations, [ PrimaryKey ])('insert api should succeed if item already exists and overwriteExisting is on', async() => {
-    //     await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-    //     await data.givenItems([ ctx.item ], ctx.collectionName, authAdmin)
-
-    //     const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.modifiedItem, ...ctx.items], true),  { responseType: 'stream', ...authOwner })
-    //     const expectedItems = [ctx.modifiedItem, ...ctx.items].map(item => item)
-
-    //     await expect(response.data.results).resolves.toEqual(expectedItems)
-    //     await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
-    //         items: expectedItems,
-    //         pagingMetadata: data.pagingMetadata(expectedItems.length, expectedItems.length)
-    //     })
-    // })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api', async() => {
         
@@ -148,7 +133,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
                 ],
             },
             returnTotalCount: true,
-        }, { ...authOwner })
+        }, authOwner)
         
         expect(response.data).toEqual({
             items: expect.toIncludeSameMembers([
@@ -169,7 +154,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
         const response = await axiosInstance.post('/data/remove', { 
             collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
-        }, { ...authAdmin })
+        }, authAdmin)
 
         expect(response.data.results).toEqual(expect.toIncludeSameMembers(ctx.items))
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
@@ -223,7 +208,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
-        const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  { ...authAdmin })
+        const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
 
         expect(response.data.results).toEqual(ctx.modifiedItems)
 
@@ -256,7 +241,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         delete ctx.numberItem[ctx.numberColumns[0].name]
         delete ctx.numberItem[ctx.numberColumns[1].name]
         
-        await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.numberItem]), { ...authAdmin })
+        await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.numberItem]), authAdmin)
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
             items: expect.toIncludeSameMembers([{
@@ -275,7 +260,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         ctx.numberItem[ctx.numberColumns[0].name] = null
         ctx.numberItem[ctx.numberColumns[1].name] = null
 
-        await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, [ctx.numberItem]), { ...authAdmin })
+        await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, [ctx.numberItem]), authAdmin)
         
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({

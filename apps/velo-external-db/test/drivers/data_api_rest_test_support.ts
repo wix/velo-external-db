@@ -2,13 +2,14 @@ import axios from 'axios'
 import { Item } from '@wix-velo/velo-external-db-types'
 import { dataSpi } from '@wix-velo/velo-external-db-core'
 
+
 const axiosInstance = axios.create({
     baseURL: 'http://localhost:8080'
 })
 
 export const insertRequest = (collectionName: string, items: Item[]): dataSpi.InsertRequest => ({
     collectionId: collectionName,
-    items: items,
+    items,
 })
 
 export const updateRequest = (collectionName: string, items: Item[]): dataSpi.UpdateRequest => ({
@@ -18,7 +19,7 @@ export const updateRequest = (collectionName: string, items: Item[]): dataSpi.Up
 
 export const countRequest = (collectionName: string, filter: dataSpi.Filter = {}): dataSpi.CountRequest => ({
     collectionId: collectionName,
-    filter: filter,
+    filter,
     consistentRead: true,
 })
 
@@ -26,8 +27,8 @@ export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fi
     collectionId: collectionName,
     query: {
         filter: filter ?? {},
-        sort: sort,
-        fields: fields,
+        sort,
+        fields,
         pagingMethod: {
             limit: 25,
             offset: 0,
@@ -43,7 +44,7 @@ export const queryCollectionAsArray = async(collectionName: string, sort: dataSp
         queryRequest(collectionName, sort, fields, filter), { transformRequest: auth.transformRequest }).then(res => res.data)
 
 
-export const pagingMetadata = (count: number, total?: number) => ({ count: count, offset: 0, total: total })
+export const pagingMetadata = (count: number, total?: number) => ({ count, offset: 0, total })
 
 
 export const givenItems = async(items: Item[], collectionName: string, auth: any) =>

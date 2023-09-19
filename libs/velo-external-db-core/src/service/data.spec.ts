@@ -17,6 +17,16 @@ describe('Data Service', () => {
                                                                                                                         totalCount: ctx.total
                                                                                                                     })
     })
+
+    test('delegate request to data provider and translate data to velo format with returnTotalCount flag set to false', async() => {
+        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)
+        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
+        
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection, false)).resolves.toEqual({
+                                                                                                                        items: ctx.entities,
+                                                                                                                        totalCount: undefined
+                                                                                                                    })
+    })
     
     test('delegate request to data provider, translate data to velo format and generate _id', async() => {
         driver.givenListResult(ctx.entitiesWithoutId, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)

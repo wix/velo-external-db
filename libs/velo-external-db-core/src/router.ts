@@ -246,7 +246,10 @@ export const createRouter = () => {
             const offset = pagingMethod ? pagingMethod.offset : 0
             const limit = pagingMethod ? pagingMethod.limit : 50
 
-            const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), aggregationTransformer.transform({ aggregation, finalFilter }), filterTransformer.transformSort(sort), offset, limit, returnTotalCount)
+            const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), 
+                                                                aggregationTransformer.transform({ aggregation, finalFilter }), 
+                                                                filterTransformer.transformSort(sort), offset, limit, returnTotalCount)
+                                                                
             const { items, totalCount: total } = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(Aggregate, req.body, res.locals), customContext)
 
             res.json({ items, pagingMetadata: { count: items.length, offset, total } })

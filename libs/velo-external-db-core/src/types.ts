@@ -4,26 +4,6 @@ import SchemaAwareDataService from './service/schema_aware_data'
 import { AggregateRequest, CountRequest, CountResponse, InsertRequest, QueryRequest, UpdateRequest, RemoveRequest, TruncateRequest, QueryReferencedRequest, QueryResponse, InsertResponse, UpdateResponse, RemoveResponse, TruncateResponse, AggregateResponse } from './spi-model/data_source'
 import { Collection, CreateCollectionRequest, DeleteCollectionRequest, ListCollectionsRequest, UpdateCollectionRequest } from './spi-model/collection'
 
-// TODO: remove this comment in the end of the PR review
-// export interface DataPayload {
-//     collectionId: string;
-//     filter?: WixDataFilter
-//     sort?: Sort[] | Sorting[];
-//     initialFilter?: WixDataFilter;
-//     aggregation : Aggregation;
-//     finalFilter?: WixDataFilter 
-//     paging?: Paging;
-//     items?: Item[];
-//     itemIds?: string[];
-//     options?: Options;
-//     omitTotalCount?: boolean;
-//     includeReferencedItems?: string[];
-//     query?: QueryV2;
-//     overwriteExisting?: boolean;
-//     // totalCount its a count response field, why its here?
-//     totalCount?: number;
-// }
-
 export type DataPayloadBefore = QueryRequest | CountRequest | QueryReferencedRequest | AggregateRequest | InsertRequest | UpdateRequest | RemoveRequest | TruncateRequest;
 
 export type DataPayloadAfter = QueryResponse | CountResponse  | AggregateResponse | InsertResponse | UpdateResponse | RemoveResponse | TruncateResponse;
