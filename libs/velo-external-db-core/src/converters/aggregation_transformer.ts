@@ -51,10 +51,20 @@ export default class AggregationTransformer implements IAggregationTransformer {
     }
 
     wixFunctionToAdapterFunction(func: string): AdapterFunctions {
-        if (Object.keys(AdapterFunctions).includes(func as any)) {
-            return AdapterFunctions[func as AdapterFunctions] as AdapterFunctions
+        switch (func) {
+            case 'average':
+                return AdapterFunctions.avg
+            case 'max':
+                return AdapterFunctions.max
+            case 'min':
+                return AdapterFunctions.min
+            case 'sum':
+                return AdapterFunctions.sum
+            case 'count':
+                return AdapterFunctions.count
+            default:
+                throw new InvalidQuery(`Unrecognized function ${func}`)
         }
 
-        throw new InvalidQuery(`Unrecognized function ${func}`)
     }
 }

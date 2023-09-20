@@ -18,7 +18,7 @@ describe('Aggregation Transformer', () => {
 
     describe('correctly transform Wix functions to adapter functions', () => {
         each([
-            'avg', 'max', 'min', 'sum', 'count'
+            'average', 'max', 'min', 'sum', 'count'
         ])
             .test('correctly transform [%s]', (f: string) => {
                 const AdapterFunction = f as AdapterFunctions
