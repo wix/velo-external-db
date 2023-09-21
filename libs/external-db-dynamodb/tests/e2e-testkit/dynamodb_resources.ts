@@ -31,8 +31,8 @@ export const setActive = () => {
 export const enviormentVariables = {
     TYPE: 'dynamodb',
     REGION: 'us-west-2',
-    AWS_SECRET_ACCESS_KEY: 'TEST_SECRET_ACCESS_KEY',
-    AWS_ACCESS_KEY_ID: 'TEST_ACCESS_KEY_ID',
+    AWS_SECRET_ACCESS_KEY: 'TestSecretAccessKey',
+    AWS_ACCESS_KEY_ID: 'TestAccessKeyId',
     ENDPOINT_URL: 'http://localhost:8000'
 }
 
@@ -40,7 +40,7 @@ const connectionConfig = () => ({ endpoint: 'http://localhost:8000',
                                   region: 'us-west-2',
                                })
 const accessOptions = () => ({
-                                credentials: { accessKeyId: 'TEST_ACCESS_KEY_ID', secretAccessKey: 'TEST_SECRET_ACCESS_KEY' }
+                                credentials: { accessKeyId: 'TestAccessKeyId', secretAccessKey: 'TestSecretAccessKey' }
                             })
 
 export const name = 'dynamodb'
