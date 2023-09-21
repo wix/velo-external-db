@@ -27,7 +27,6 @@ export class JWTVerifier {
             if (decodedToken && decodedToken.data && decodedToken.data.request) {
                 return decodedToken.data.request
             } else {
-                console.dir({ decodedToken }, { depth: 4 })
                 throw new UnauthorizedError('Authorization failed')
             }
         } catch (error: any) {
