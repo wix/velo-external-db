@@ -188,8 +188,8 @@ services:
       - 8000:8000
     environment:
       AWS_REGION: us-west-2
-      AWS_ACCESS_KEY_ID: TEST_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: TEST_SECRET_ACCESS_KEY
+      AWS_ACCESS_KEY_ID: TestAccessKeyId
+      AWS_SECRET_ACCESS_KEY: TestSecretAccessKey
     networks:
       - backend
 
