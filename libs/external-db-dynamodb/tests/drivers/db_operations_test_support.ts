@@ -40,6 +40,6 @@ export const misconfiguredDbOperationOptions = () => ([   ['pool connection with
                                         ])
 
 export const resetEnv = () => {
-    process.env['AWS_SECRET_ACCESS_KEY'] = 'TEST_SECRET_ACCESS_KEY'
-    process.env['AWS_ACCESS_KEY_ID'] = 'TEST_ACCESS_KEY_ID'
+    process.env['AWS_SECRET_ACCESS_KEY'] = 'TestSecretAccessKey'
+    process.env['AWS_ACCESS_KEY_ID'] = 'TestAccessKeyId'
 }

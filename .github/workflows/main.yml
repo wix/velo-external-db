@@ -44,8 +44,7 @@ jobs:
                    "mssql", "mssql17",
                    "mongo", "mongo4",
                    "firestore",
-                  #  TODO: fix dynamodbs tests
-                  #  "dynamodb",
+                   "dynamodb",
                    "google-sheets"
                    ]
 
