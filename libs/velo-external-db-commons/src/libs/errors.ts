@@ -48,6 +48,17 @@ export class ItemAlreadyExists extends BaseHttpError {
     }
 }
 
+export class ItemDoesNotExists extends BaseHttpError {
+    itemId: string
+    collectionName: string
+
+    constructor(message: string, collectionName?: string, itemId?: string) {
+        super(message)
+        this.itemId = itemId || ''
+        this.collectionName = collectionName || ''
+    }
+}
+
 export class FieldDoesNotExist extends BaseHttpError {
     propertyName: string
     collectionName: string
