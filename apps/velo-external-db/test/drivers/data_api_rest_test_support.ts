@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { Item } from '@wix-velo/velo-external-db-types'
-import { dataSpi } from '@wix-velo/velo-external-db-core'
+import { dataSpi, convertersUtils } from '@wix-velo/velo-external-db-core'
 
 
 const axiosInstance = axios.create({
@@ -26,7 +26,7 @@ export const countRequest = (collectionName: string, filter: dataSpi.Filter = {}
 export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fields: string[], filter?: dataSpi.Filter, consistentRead = true, returnTotalCount = true): dataSpi.QueryRequest => ({
     collectionId: collectionName,
     query: {
-        filter: filter ?? {},
+        filter: filter ?? convertersUtils.EmptyFilter,
         sort,
         fields,
         pagingMethod: {

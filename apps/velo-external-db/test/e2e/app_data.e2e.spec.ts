@@ -37,7 +37,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         const itemsByOrder = [ctx.item, ctx.anotherItem].sort((a, b) => (a[ctx.column.name] > b[ctx.column.name]) ? 1 : -1)
         
         await expect(data.queryCollectionAsArray(ctx.collectionName, [{ fieldName: ctx.column.name, order: dataSpi.SortOrder.ASC }], undefined, authVisitor)).resolves.toEqual({
-            items: expect.toIncludeSameMembers(itemsByOrder),
+            items: itemsByOrder,
             pagingMetadata: data.pagingMetadata(2, 2)
         })
     })
@@ -80,32 +80,40 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             pagingMetadata: data.pagingMetadata(ctx.items.length, ctx.items.length)
         })
     })
-
-    testIfSupportedOperationsIncludes(supportedOperations, [ AtomicBulkInsert, PrimaryKey ])('insert api should fail if item already exists', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ AtomicBulkInsert, PrimaryKey ])('insert api should return the inserted items if they don\'t exist and if they do, it should return an error object', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
-        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
+        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
 
-        const expectedItems = [ctx.items[1]]
 
-        await expect(response).rejects.toThrow('409')
+        expect(response.data.results).toEqual([
+            ctx.items[0],
+            expect.objectContaining({
+                code: 'WDE0074',
+            }),
+            ...ctx.items.slice(2, ctx.items.length),
+        ])
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
-            items: expectedItems,
-            pagingMetadata: data.pagingMetadata(expectedItems.length, expectedItems.length)
+            items: expect.toIncludeAllMembers(ctx.items),
+            pagingMetadata: data.pagingMetadata(ctx.items.length, ctx.items.length)
         })
 
 
     })
-
-    testIfSupportedOperationsIncludes(supportedOperations, [NonAtomicBulkInsert, PrimaryKey])('insert api should throw 409 error if item already exists and continue inserting the rest', async() => {
+     
+    testIfSupportedOperationsIncludes(supportedOperations, [NonAtomicBulkInsert, PrimaryKey])('insert api should return the inserted items if they don\'t exist and if they do, it should return an error object', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
-        const response = axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items),  authAdmin)
-                
-        await expect(response).rejects.toThrow('409')
+        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items),  authAdmin)
+
+        expect(response.data.results[1]).toEqual(expect.objectContaining({
+            code: 'WDE0074',
+        }))
+
+
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
             items: expect.toIncludeSameMembers(ctx.items),
             pagingMetadata: data.pagingMetadata(ctx.items.length, ctx.items.length)
@@ -151,7 +159,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('bulk delete api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
-
+await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         const response = await axiosInstance.post('/data/remove', { 
             collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
         }, authAdmin)
@@ -162,6 +170,31 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             pagingMetadata: data.pagingMetadata(0, 0)
         })
     })
+
+    testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('delete api should return deleted items if they exist and if they don\'t, it should return an error object', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems([ ctx.items[0] ], ctx.collectionName, authAdmin)
+
+        const response = await axiosInstance.post('/data/remove', { 
+            collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
+        }, authAdmin)
+
+        expect(response.data.results).toEqual([
+            ctx.items[0],
+            ...ctx.items.slice(1, ctx.items.length).map(_i => ({
+                code: 'WDE0112',
+                description: expect.any(String)
+            }))
+        ])
+
+
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
+            items: [],
+            pagingMetadata: data.pagingMetadata(0, 0)
+        })
+    })
+
+
 
     test('query by id api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
@@ -217,6 +250,28 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
                 pagingMetadata: data.pagingMetadata(ctx.modifiedItems.length, ctx.modifiedItems.length)
         })
     })
+
+    testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api should return updated items if they exist and if they don\'t, it should return an error object', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        await data.givenItems(ctx.items.slice(0, ctx.items.length - 1), ctx.collectionName, authAdmin)
+        const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
+
+        expect(response.data.results).toEqual([
+            ...ctx.modifiedItems.slice(0, ctx.items.length - 1),
+            {
+                code: 'WDE0112',
+                description: expect.any(String)
+            }
+        ])
+
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
+                items: expect.toIncludeSameMembers(ctx.modifiedItems.slice(0, ctx.items.length - 1)),
+                pagingMetadata: data.pagingMetadata(ctx.modifiedItems.length - 1, ctx.modifiedItems.length - 1)
+        })
+    })
+
+
+    
 
     test('count api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
@@ -291,18 +346,15 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         testIfSupportedOperationsIncludes(supportedOperations, [PrimaryKey])('insert api with duplicate _id should fail with WDE0074, 409', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
-            let error
 
-            await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.item]), authAdmin).catch(e => error = e)
+            const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.item]), authAdmin)
 
-            expect(error).toBeDefined()
-            expect(error.response.status).toEqual(409)
-            expect(error.response.data).toEqual(expect.objectContaining({
-                code: 'WDE0074',
-                data: {
-                    itemId: ctx.item._id,
-                    collectionId: ctx.collectionName
+            expect(response.data).toEqual(expect.objectContaining({
+                results: [{
+                    code: 'WDE0074',
+                    description: expect.stringContaining('already exists')
                 }
+                ]
             }))
         })
 

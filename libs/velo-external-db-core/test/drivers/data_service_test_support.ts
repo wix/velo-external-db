@@ -35,7 +35,7 @@ export const givenInsertResult = (item: any, forCollectionName: any) =>
 
 export const givenBulkInsertResult = (items: any, forCollectionName: any) =>
     when(dataService.bulkInsert).calledWith(forCollectionName, items, systemFields)
-                             .mockResolvedValue({ items: items })
+                             .mockResolvedValue({ items })
 
 export const givenUpdateResult = (item: any, forCollectionName: any) => 
     when(dataService.update).calledWith(forCollectionName, item)
@@ -45,12 +45,12 @@ export const givenBulkUpdateResult = (items: any, forCollectionName: any) =>
     when(dataService.bulkUpdate).calledWith(forCollectionName, items)
                             .mockResolvedValue({ items })
 
-export const deleteResultTo = (itemId: any, forCollectionName: any) => 
-    when(dataService.delete).calledWith(forCollectionName, itemId)
+export const deleteResultTo = (itemId: any, forCollectionName: any, projection: any) => 
+    when(dataService.delete).calledWith(forCollectionName, itemId, projection)
                             .mockResolvedValue({ item: {} })
 
-export const bulkDeleteResultTo = (itemIds: any, forCollectionName: any) => 
-    when(dataService.bulkDelete).calledWith(forCollectionName, itemIds)
+export const bulkDeleteResultTo = (itemIds: any, forCollectionName: any, projection: any) => 
+    when(dataService.bulkDelete).calledWith(forCollectionName, itemIds, projection)
                                 .mockResolvedValue({ items: [] })
 
 export const truncateResultTo = (forCollectionName: any) => 

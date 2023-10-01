@@ -283,7 +283,7 @@ export interface RemoveReferencesResponse {}
 export interface ApplicationError {
     code: string;
     description: string;
-    data: any;
+    data?: any;
 }
 
 export type Operation = { resultFieldName: string } & Calculate;

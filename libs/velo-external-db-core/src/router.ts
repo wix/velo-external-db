@@ -100,13 +100,6 @@ export const createRouter = () => {
         res.end()
     }
 
-    const getItemsOneByOne = (collectionName: string, itemIds: string[]): Promise<any[]> => {
-        const idEqExpression = itemIds.map(itemId => ({ _id: { $eq: itemId } }))
-        return Promise.all(
-            idEqExpression.map(eqExp => schemaAwareDataService.find(collectionName, filterTransformer.transform(eqExp), undefined, 0, 1).then(r => r.items[0]))
-        )
-    }
-
     // *************** INFO **********************
     router.get('/', async(req, res) => {
         const { hideAppInfo } = cfg
@@ -223,14 +216,12 @@ export const createRouter = () => {
             const customContext = {}
             const { collectionId, itemIds } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(Remove, req.body), requestContextFor(Remove, req.body, res.locals), customContext) as dataSource.RemoveRequest
 
-            const objectsBeforeRemove = await getItemsOneByOne(collectionId, itemIds)
+            const { items } = await schemaAwareDataService.bulkDelete(collectionId, itemIds)
 
-            await schemaAwareDataService.bulkDelete(collectionId, itemIds)
-
-            const { items } = await executeDataHooksFor(DataActions.AfterRemove, { items: objectsBeforeRemove }, requestContextFor(Remove, req.body, res.locals), customContext)
+            const { items: ItemAfterAction } = await executeDataHooksFor(DataActions.AfterRemove, { items }, requestContextFor(Remove, req.body, res.locals), customContext)
 
 
-            res.json({ results: items })
+            res.json({ results: ItemAfterAction })
         } catch (e) {
             next(e)
         }

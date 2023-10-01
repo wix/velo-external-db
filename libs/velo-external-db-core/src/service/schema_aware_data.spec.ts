@@ -73,13 +73,15 @@ describe ('Schema Aware Data Service', () => {
     })
 
     test('delete by item id will call data service', async() => {
-        data.deleteResultTo(ctx.itemId, ctx.collectionName)
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        data.deleteResultTo(ctx.itemId, ctx.collectionName, ctx.defaultFields)
 
         return expect(env.schemaAwareDataService.delete(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: {} })
     })
 
     test('bulk delete by item ids will call data service', async() => {
-        data.bulkDeleteResultTo(ctx.itemIds, ctx.collectionName)
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        data.bulkDeleteResultTo(ctx.itemIds, ctx.collectionName, ctx.defaultFields)
 
         return expect(env.schemaAwareDataService.bulkDelete(ctx.collectionName, ctx.itemIds)).resolves.toEqual({ items: [] })
     })

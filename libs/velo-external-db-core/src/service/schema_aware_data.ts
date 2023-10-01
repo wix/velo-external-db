@@ -67,11 +67,14 @@ export default class SchemaAwareDataService {
     }
 
     async delete(collectionName: string, itemId: string) {
-        return await this.dataService.delete(collectionName, itemId)
+        const projection = await this.projectionFor(collectionName)
+        return await this.dataService.delete(collectionName, itemId, projection)
     }
 
     async bulkDelete(collectionName: string, itemIds: string[]) {
-        return await this.dataService.bulkDelete(collectionName, itemIds)
+        const projection = await this.projectionFor(collectionName)        
+        
+        return await this.dataService.bulkDelete(collectionName, itemIds, projection)
     }
 
     async truncate(collectionName: string) {
