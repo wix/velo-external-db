@@ -66,7 +66,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
 
-        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner, undefined, true)).resolves.toEqual(
             expect.toIncludeSameMembers([{ item: ctx.item }, { item: ctx.anotherItem }, data.pagingMetadata(2)])
         )
     })
