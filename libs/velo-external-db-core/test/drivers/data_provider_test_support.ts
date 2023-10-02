@@ -1,4 +1,7 @@
 import { when } from 'jest-when'
+import { Item } from '@wix-velo/velo-external-db-types'
+import { getByIdFilterFor } from '../../src/utils/data_utils'
+import { errors as domainErrors } from '@wix-velo/velo-external-db-commons'
 
 export const dataProvider = {
     find: jest.fn(),
@@ -14,6 +17,11 @@ export const givenListResult = (entities: any, forCollectionName: any, filter: a
     when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit, projection)
                            .mockResolvedValue(entities)
 
+export const givenItemsById = (entities: Item[], forCollectionName: any, sort: any, skip: any, andLimit: any, projection: any) =>
+    entities.forEach( (entity) => when(dataProvider.find).calledWith(forCollectionName, getByIdFilterFor(entity._id!), '', 0, 1, projection)
+                                                         .mockResolvedValue([entity])
+    )
+
 export const givenCountResult = (total: any, forCollectionName: any, filter: any) =>
     when(dataProvider.count).calledWith(forCollectionName, filter)
                             .mockResolvedValue(total)
@@ -22,17 +30,20 @@ export const givenAggregateResult = (total: any, forCollectionName: any, filter:
     when(dataProvider.aggregate).calledWith(forCollectionName, filter, andAggregation, sort, skip, limit)
                                 .mockResolvedValue(total)
 
-export const expectInsertFor = (items: string | any[], forCollectionName: any) =>
-    when(dataProvider.insert).calledWith(forCollectionName, items)
-                             .mockResolvedValue(items.length)
+export const expectInsertFor = (items: any[], forCollectionName: any, projection: any) =>
+    items.forEach(i => when(dataProvider.insert).calledWith(forCollectionName, [i], projection).mockResolvedValue(1))
+
+export const expectInsertAlreadyExistsFor = (items: any[], forCollectionName: any, projection: any) =>
+    items.forEach(i => when(dataProvider.insert).calledWith(forCollectionName, [i], projection).mockRejectedValue(new domainErrors.ItemAlreadyExists('')))
 
 export const expectInsertMatchedFor = (items: any, forCollectionName: any) =>
     when(dataProvider.insert).calledWith(forCollectionName, expect.arrayContaining(items.map( expect.objectContaining )))
                              .mockResolvedValue(1)
 
-export const expectUpdateFor = (items: string | any[], forCollectionName: any) =>
-    when(dataProvider.update).calledWith(forCollectionName, items)
-                             .mockResolvedValue(items.length)
+export const expectUpdateFor = (items: any[], forCollectionName: any) =>
+    items.forEach(i => when(dataProvider.update).calledWith(forCollectionName, [i])
+                                                .mockResolvedValue(1)
+                )
 
 export const expectDeleteFor = (itemIds: string | any[], forCollectionName: any) =>
     when(dataProvider.delete).calledWith(forCollectionName, itemIds)

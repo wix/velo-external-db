@@ -15,13 +15,13 @@ export default class SchemaAwareDataService {
         this.itemTransformer = itemTransformer
     }
 
-    async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any, omitTotalCount?: boolean): Promise<{ items: ItemWithId[], totalCount?: number }> {
+    async find(collectionName: string, filter: Filter, sort: any, skip: number, limit: number, _projection?: any, returnTotalCount?: boolean): Promise<{ items: ItemWithId[], totalCount?: number }> {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         await this.validateFilter(collectionName, filter, fields)
         const projection = await this.projectionFor(collectionName, _projection)
         await this.validateProjection(collectionName, projection, fields)
 
-        const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection, omitTotalCount)
+        const { items, totalCount } = await this.dataService.find(collectionName, filter, sort, skip, limit, projection, returnTotalCount)
         return { items: this.itemTransformer.patchItems(items, fields), totalCount }    
     }
 
@@ -67,11 +67,14 @@ export default class SchemaAwareDataService {
     }
 
     async delete(collectionName: string, itemId: string) {
-        return await this.dataService.delete(collectionName, itemId)
+        const projection = await this.projectionFor(collectionName)
+        return await this.dataService.delete(collectionName, itemId, projection)
     }
 
     async bulkDelete(collectionName: string, itemIds: string[]) {
-        return await this.dataService.bulkDelete(collectionName, itemIds)
+        const projection = await this.projectionFor(collectionName)        
+        
+        return await this.dataService.bulkDelete(collectionName, itemIds, projection)
     }
 
     async truncate(collectionName: string) {
@@ -79,10 +82,10 @@ export default class SchemaAwareDataService {
     }
     
     // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number) {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number, returnTotalCount?: boolean) {
         await this.validateAggregation(collectionName, aggregation)
         await this.validateFilter(collectionName, filter)
-        return await this.dataService.aggregate(collectionName, filter, aggregation, sort, skip, limit)
+        return await this.dataService.aggregate(collectionName, filter, aggregation, sort, skip, limit, returnTotalCount)
     }
 
     async validateFilter(collectionName: string, filter: Filter, _fields?: ResponseField[]) {
