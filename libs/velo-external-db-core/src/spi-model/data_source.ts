@@ -205,7 +205,7 @@ export interface UpdateRequest {
 }
 
 export interface UpdateResponse {
-    result: DataItemModificationResult[];
+    results: DataItemModificationResult[];
 }
 export interface RemoveRequest {
     // collection name
@@ -215,7 +215,7 @@ export interface RemoveRequest {
 }
   
 export interface RemoveResponse {
-    result: DataItemModificationResult[];
+    results: DataItemModificationResult[];
 }
 export interface TruncateRequest {
     // collection name

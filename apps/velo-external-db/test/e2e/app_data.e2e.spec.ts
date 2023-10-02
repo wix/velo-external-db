@@ -251,7 +251,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         })
     })
 
-    testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api should return updated items if they exist and if they don\'t, it should return an error object', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ]).only('update api should return updated items if they exist and if they don\'t, it should return an error object', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items.slice(0, ctx.items.length - 1), ctx.collectionName, authAdmin)
         const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)

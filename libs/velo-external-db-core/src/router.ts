@@ -186,9 +186,10 @@ export const createRouter = () => {
             const { collectionId, items } = await executeDataHooksFor(DataActions.BeforeInsert, dataPayloadFor(Insert, req.body), requestContextFor(Insert, req.body, res.locals), customContext) as dataSource.InsertRequest
             
             const data = await schemaAwareDataService.bulkInsert(collectionId, items)
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, data, requestContextFor(Insert, req.body, res.locals), customContext)
-            
-            res.json({ results: dataAfterAction.items })
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, { results: [...data.items] }, requestContextFor(Insert, req.body, res.locals), customContext)
+
+
+            res.json({ results: dataAfterAction.results })
         } catch (e) {
             next(e)
         }

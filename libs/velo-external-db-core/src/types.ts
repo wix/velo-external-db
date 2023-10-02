@@ -2,7 +2,11 @@ import {  Item, RoleConfig, ItemWithId, DataOperation, CollectionOperationSPI } 
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { AggregateRequest, CountRequest, CountResponse, InsertRequest, QueryRequest, UpdateRequest, RemoveRequest, TruncateRequest, QueryReferencedRequest, QueryResponse, InsertResponse, UpdateResponse, RemoveResponse, TruncateResponse, AggregateResponse } from './spi-model/data_source'
+
 import { Collection, CreateCollectionRequest, DeleteCollectionRequest, ListCollectionsRequest, UpdateCollectionRequest } from './spi-model/collection'
+
+// those types are used by the app data hooks
+export * from './spi-model/data_source'
 
 export type DataPayloadBefore = QueryRequest | CountRequest | QueryReferencedRequest | AggregateRequest | InsertRequest | UpdateRequest | RemoveRequest | TruncateRequest;
 
