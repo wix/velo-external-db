@@ -35,7 +35,7 @@ export const countRequest = (collectionName: string, filter?: dataSpi.Filter): d
     },
 })
 
-export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fields: string[], filter?: dataSpi.Filter): dataSpi.QueryRequest => ({
+export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fields: string[], filter?: dataSpi.Filter, omitTotalCount = false): dataSpi.QueryRequest => ({
     collectionId: collectionName,
     query: {
         filter: filter ?? '',
@@ -53,13 +53,13 @@ export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fi
         consistentRead: false,
         appOptions: {},
     },
-    omitTotalCount: false
+    omitTotalCount,
 })
 
 
-export const queryCollectionAsArray = (collectionName: string, sort: dataSpi.Sorting[], fields: string[], auth: any, filter?: dataSpi.Filter) =>
+export const queryCollectionAsArray = (collectionName: string, sort: dataSpi.Sorting[], fields: string[], auth: any, filter?: dataSpi.Filter, omitTotalCount = false) =>
     axiosInstance.post('/data/query',
-        queryRequest(collectionName, sort, fields, filter), { responseType: 'stream', transformRequest: auth.transformRequest })
+        queryRequest(collectionName, sort, fields, filter, omitTotalCount), { responseType: 'stream', transformRequest: auth.transformRequest })
         .then(response => streamToArray(response.data))
 
 
