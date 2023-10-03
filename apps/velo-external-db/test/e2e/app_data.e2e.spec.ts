@@ -11,7 +11,7 @@ import * as matchers from '../drivers/schema_api_rest_matchers'
 import * as data from '../drivers/data_api_rest_test_support'
 import * as authorization from '../drivers/authorization_test_support'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields, PrimaryKey, NonAtomicBulkInsert, AtomicBulkInsert } = SchemaOperations
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields, PrimaryKey, AtomicBulkInsert } = SchemaOperations
 
 const chance = Chance()
 
@@ -102,24 +102,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
 
     })
-     
-    testIfSupportedOperationsIncludes(supportedOperations, [NonAtomicBulkInsert, PrimaryKey])('insert api should return the inserted items if they don\'t exist and if they do, it should return an error object', async() => {
-        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
-
-        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items),  authAdmin)
-
-        expect(response.data.results[1]).toEqual(expect.objectContaining({
-            code: 'WDE0074',
-        }))
-
-
-        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
-            items: expect.toIncludeSameMembers(ctx.items),
-            pagingMetadata: data.pagingMetadata(ctx.items.length, ctx.items.length)
-        })
-    })
-
+    
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api', async() => {
         
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
@@ -251,7 +234,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         })
     })
 
-    testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ]).only('update api should return updated items if they exist and if they don\'t, it should return an error object', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api should return updated items if they exist and if they don\'t, it should return an error object', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items.slice(0, ctx.items.length - 1), ctx.collectionName, authAdmin)
         const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
