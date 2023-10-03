@@ -34,7 +34,8 @@ export const createApp = async() => {
     const app = express()
     const initConnectorResponse = await initConnector()
     app.use(initConnectorResponse.externalDbRouter.router)
-    const server = app.listen(8080, () => console.log('Connector listening on port 8080'))
+    const port = process.env.PORT || 8080
+    const server = app.listen(port, () => console.log(`Connector listening on port ${port}`))
 
     return { server, ...initConnectorResponse, reload: () => initConnector() }
 }
