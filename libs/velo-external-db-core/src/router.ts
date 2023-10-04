@@ -179,14 +179,13 @@ export const createRouter = () => {
         }
     })
 
-    // TODO: implement error structure (ApplicationError type)
     router.post('/data/insert', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, items } = await executeDataHooksFor(DataActions.BeforeInsert, dataPayloadFor(Insert, req.body), requestContextFor(Insert, req.body, res.locals), customContext) as dataSource.InsertRequest
             
             const data = await schemaAwareDataService.bulkInsert(collectionId, items)
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, { results: [...data.items] }, requestContextFor(Insert, req.body, res.locals), customContext)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, { results: data.items }, requestContextFor(Insert, req.body, res.locals), customContext)
 
 
             res.json({ results: dataAfterAction.results })
@@ -195,7 +194,6 @@ export const createRouter = () => {
         }
     })
 
-    // TODO: implement error structure (ApplicationError type)
     router.post('/data/update', async(req, res, next) => {
         
         try {
@@ -204,9 +202,9 @@ export const createRouter = () => {
 
             const data = await schemaAwareDataService.bulkUpdate(collectionId, items)
 
-            const { items: ItemAfterAction } = await executeDataHooksFor(DataActions.AfterUpdate, data, requestContextFor(Update, req.body, res.locals), customContext)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterUpdate, data, requestContextFor(Update, req.body, res.locals), customContext)
 
-            res.json({ results: ItemAfterAction })
+            res.json({ results: dataAfterAction.items })
         } catch (e) {
             next(e)
         }
@@ -233,7 +231,6 @@ export const createRouter = () => {
             const customContext = {}
             const { collectionId, initialFilter, aggregation, finalFilter, sort, pagingMethod, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeAggregate,
                  dataPayloadFor(Aggregate, req.body), requestContextFor(Aggregate, req.body, res.locals), customContext) as dataSource.AggregateRequest
-
 
             const offset = pagingMethod ? pagingMethod.offset : 0
             const limit = pagingMethod ? pagingMethod.limit : 50

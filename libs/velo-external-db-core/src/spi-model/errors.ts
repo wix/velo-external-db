@@ -374,7 +374,7 @@ export enum ApiErrors {
     WDE0147='WDE0147'
 }
 
-enum HttpStatusCode {
+export enum HttpStatusCode {
     OK = 200,
 
     //Default error codes (applicable to all endpoints)

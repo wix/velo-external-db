@@ -89,9 +89,11 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
         expect(response.data.results).toEqual([
             ctx.items[0],
-            expect.objectContaining({
-                code: 'WDE0074',
-            }),
+            {
+                errorCode: 409,
+                errorMessage: expect.toInclude('Item already exists'),
+                data: expect.any(Object)
+            },
             ...ctx.items.slice(2, ctx.items.length),
         ])
 
@@ -165,8 +167,9 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         expect(response.data.results).toEqual([
             ctx.items[0],
             ...ctx.items.slice(1, ctx.items.length).map(_i => ({
-                code: 'WDE0112',
-                description: expect.any(String)
+                errorCode: 404,
+                errorMessage: expect.toInclude('Item doesn\'t exists'),
+                data: expect.any(Object)
             }))
         ])
 
@@ -242,8 +245,9 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         expect(response.data.results).toEqual([
             ...ctx.modifiedItems.slice(0, ctx.items.length - 1),
             {
-                code: 'WDE0112',
-                description: expect.any(String)
+                errorCode: 404,
+                errorMessage: expect.toInclude('Item doesn\'t exists'),
+                data: expect.any(Object)
             }
         ])
 
@@ -334,8 +338,9 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
             expect(response.data).toEqual(expect.objectContaining({
                 results: [{
-                    code: 'WDE0074',
-                    description: expect.stringContaining('already exists')
+                    errorCode: 409,
+                    errorMessage: expect.toInclude('Item already exists'),
+                    data: expect.any(Object)
                 }
                 ]
             }))

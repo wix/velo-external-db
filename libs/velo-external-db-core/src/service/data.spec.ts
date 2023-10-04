@@ -4,7 +4,7 @@ import * as driver from '../../test/drivers/data_provider_test_support'
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import Chance = require('chance')
 import { getByIdFilterFor } from '../utils/data_utils'
-import { ApiErrors } from '../spi-model/errors'
+import { HttpStatusCode } from '../spi-model/errors'
 const chance = new Chance()
 
 describe('Data Service', () => {
@@ -76,7 +76,7 @@ describe('Data Service', () => {
     test('insert already item will return error object', async() => {        
         driver.expectInsertAlreadyExistsFor([ctx.entity], ctx.collectionName,  ctx.defaultProjection)
 
-        return expect(env.dataService.insert(ctx.collectionName, ctx.entity, ctx.defaultProjection)).resolves.toEqual({ item: { code: ApiErrors.WDE0074, description: expect.any(String) } })
+        return expect(env.dataService.insert(ctx.collectionName, ctx.entity, ctx.defaultProjection)).resolves.toEqual({ item: { errorCode: HttpStatusCode.ALREADY_EXISTS, errorMessage: expect.any(String), data: expect.any(Object)  } })
     })
 
     test('update will update data into db', async() => {

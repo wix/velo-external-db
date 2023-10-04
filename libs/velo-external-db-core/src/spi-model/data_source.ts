@@ -194,7 +194,7 @@ export interface InsertResponse {
 export type DataItemModificationResult = Item | ApplicationError;
 
 export interface Item {
-    [fieldName: string]: string;
+    [fieldName: string]: string | boolean;
 };
 
 export interface UpdateRequest {

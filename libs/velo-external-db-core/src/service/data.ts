@@ -1,7 +1,8 @@
 import { AdapterAggregation as Aggregation, AdapterFilter as Filter, IDataProvider, Item, ResponseField, Sort } from '@wix-velo/velo-external-db-types'
-import { asWixData, domainToSpiErrorTranslator } from '../converters/data_utils'
+import { asWixData } from '../converters/data_utils'
 import { getByIdFilterFor } from '../utils/data_utils'
-
+import {  errors as domainErrors } from '@wix-velo/velo-external-db-commons'
+import { domainToSpiErrorObjectTranslator } from '../web/domain-to-spi-error-translator'
 
 export default class DataService {
     storage: IDataProvider
@@ -42,7 +43,7 @@ export default class DataService {
     async bulkInsert(collectionName: string, _items: Item[], fields?: ResponseField[]) {
         const items = await Promise.all((_items.map( item => this.storage.insert(collectionName, [item], fields)
                                                                           .then(_i => asWixData(item))
-                                                                          .catch(e => domainToSpiErrorTranslator(e)))
+                                                                          .catch(e => domainToSpiErrorObjectTranslator(e)))
                                           ))
         
         return { items }
@@ -56,8 +57,8 @@ export default class DataService {
     async bulkUpdate(collectionName: string, _items: Item[]) {
         const items = await Promise.all((_items.map( item => this.storage.update(collectionName, [item])
                                                                           // maybe we should throw from data provider if affectedRows equals to 0
-                                                                          .then(affectedRows => affectedRows === 1 ?asWixData(item) : Promise.reject(new Error('Item not found')))
-                                                                          .catch(e => domainToSpiErrorTranslator(e)))
+                                                                          .then(affectedRows => affectedRows === 1 ?asWixData(item) : Promise.reject(new domainErrors.ItemDoesNotExists(`Item doesn't exists: ${item._id}`, collectionName, item._id)))
+                                                                          .catch(e => domainToSpiErrorObjectTranslator(e)))
                                          ))
                                          
         return { items }
@@ -69,8 +70,8 @@ export default class DataService {
 
     async bulkDelete(collectionName: string, itemIds: string[], fields: any) {
         const items = await Promise.all(itemIds.map(itemId => this.getById(collectionName, itemId, fields)
-                                                                  .then(({ item }) => item ? item : Promise.reject(new Error('Item not found')))
-                                                                  .catch(e => domainToSpiErrorTranslator(e))
+                                                                  .then(({ item }) => item ? item : Promise.reject(new domainErrors.ItemDoesNotExists(`Item doesn't exists: ${itemId}`, collectionName, itemId)))
+                                                                  .catch(e => domainToSpiErrorObjectTranslator(e))
                                         ))
         
 

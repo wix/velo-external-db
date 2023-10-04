@@ -17,8 +17,8 @@ export const givenListResult = (entities: any, forCollectionName: any, filter: a
     when(dataProvider.find).calledWith(forCollectionName, filter, sort, skip, andLimit, projection)
                            .mockResolvedValue(entities)
 
-export const givenItemsById = (entities: Item[], forCollectionName: any, sort: any, skip: any, andLimit: any, projection: any) =>
-    entities.forEach( (entity) => when(dataProvider.find).calledWith(forCollectionName, getByIdFilterFor(entity._id!), '', 0, 1, projection)
+export const givenItemsById = (entities: Item[], forCollectionName: any, sort: any, skip: any, limit: any, projection: any) =>
+    entities.forEach( (entity) => when(dataProvider.find).calledWith(forCollectionName, getByIdFilterFor(entity._id!), sort, skip, limit, projection)
                                                          .mockResolvedValue([entity])
     )
 

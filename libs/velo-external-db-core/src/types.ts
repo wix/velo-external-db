@@ -1,4 +1,4 @@
-import {  Item, RoleConfig, ItemWithId, DataOperation, CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
+import {  RoleConfig, DataOperation, CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { AggregateRequest, CountRequest, CountResponse, InsertRequest, QueryRequest, UpdateRequest, RemoveRequest, TruncateRequest, QueryReferencedRequest, QueryResponse, InsertResponse, UpdateResponse, RemoveResponse, TruncateResponse, AggregateResponse } from './spi-model/data_source'
@@ -47,17 +47,17 @@ export interface DataHooks {
     beforeWrite?: Hook<DataPayloadBefore>;
     afterWrite?: Hook<DataPayloadAfter>;
     beforeQuery?: Hook<QueryRequest>
-    afterQuery?: Hook<{ items: ItemWithId[], totalCount?: number }>
+    afterQuery?: Hook<QueryResponse>
     beforeCount?: Hook<CountRequest>
     afterCount?: Hook<CountResponse>
     beforeAggregate?: Hook<AggregateRequest>
-    afterAggregate?: Hook<{ items: ItemWithId[], totalCount?: number }>
+    afterAggregate?: Hook<AggregateResponse>
     beforeInsert?: Hook<InsertRequest>
-    afterInsert?: Hook<{ items: Item[] }>
+    afterInsert?: Hook<InsertResponse>
     beforeUpdate?: Hook<UpdateRequest>
-    afterUpdate?: Hook<{ items: Item[] }>
+    afterUpdate?: Hook<UpdateResponse>
     beforeRemove?: Hook<RemoveRequest>
-    afterRemove?: Hook<{ items: ItemWithId[] }>
+    afterRemove?: Hook<RemoveResponse>
     beforeTruncate?: Hook<TruncateRequest>
     afterTruncate?: Hook<void>
 }
