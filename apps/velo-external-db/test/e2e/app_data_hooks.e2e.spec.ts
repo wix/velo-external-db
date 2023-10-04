@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
-import { streamToArray, testIfSupportedOperationsIncludes, testSupportedOperations } from '@wix-velo/test-commons'
+import { testIfSupportedOperationsIncludes, testSupportedOperations } from '@wix-velo/test-commons'
 import { dataSpi, types as coreTypes, collectionSpi } from '@wix-velo/velo-external-db-core'
 import { DataOperation, InputField, ItemWithId, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
@@ -448,8 +448,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             each(testSupportedOperations(supportedOperations, 
             [
                 ['insert', 'afterInsert', '/data/insert'],
-                // ['update', 'afterUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
-                // ['remove', 'afterRemove', '/data/remove', { neededOperations: [DeleteImmediately] }],
+                ['update', 'afterUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
+                ['remove', 'afterRemove', '/data/remove', { neededOperations: [DeleteImmediately] }],
             ])).test('after %s request - should be able to modify response', async(operation, hookName, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.afterAllColumn, ctx.afterWriteColumn, ctx.afterHookColumn], authOwner)
                 if (operation !== 'insert') {
@@ -504,8 +504,6 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         })
         
     })
-
-    /*
 
     describe('Error Handling', () => {
         test('should handle error object and throw with the corresponding status', async() => {
@@ -603,16 +601,18 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 }
             })
 
-            await axios.post(api, hooks.requestBodyWith(ctx.collectionName, [ctx.item]), { responseType: 'stream', ...authOwner })
+            await axios.post(api, hooks.requestBodyWith(ctx.collectionName, [ctx.item]), authOwner)
 
             hooks.resetHooks(env.externalDbRouter)
 
-            await expect(data.queryCollectionAsArray(ctx.newCollection.id, [], undefined, authOwner)).resolves.toEqual(
-                expect.toIncludeSameMembers([{ item: ctx.newItem }, data.pagingMetadata(1, 1)]))
+            await expect(data.queryCollectionAsArray(ctx.newCollection.id, [], undefined, authOwner)).resolves.toEqual({
+                items: [ctx.newItem],
+                pagingMetadata: data.pagingMetadata(1, 1)
+            })
         })
     })
 
-    */
+
 
     interface Ctx {
         collectionName: string

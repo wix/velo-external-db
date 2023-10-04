@@ -202,9 +202,9 @@ export const createRouter = () => {
 
             const data = await schemaAwareDataService.bulkUpdate(collectionId, items)
 
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterUpdate, data, requestContextFor(Update, req.body, res.locals), customContext)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterUpdate, { results: data.items }, requestContextFor(Update, req.body, res.locals), customContext)
 
-            res.json({ results: dataAfterAction.items })
+            res.json({ results: dataAfterAction.results })
         } catch (e) {
             next(e)
         }
@@ -215,12 +215,12 @@ export const createRouter = () => {
             const customContext = {}
             const { collectionId, itemIds } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(Remove, req.body), requestContextFor(Remove, req.body, res.locals), customContext) as dataSource.RemoveRequest
 
-            const { items } = await schemaAwareDataService.bulkDelete(collectionId, itemIds)
+            const data = await schemaAwareDataService.bulkDelete(collectionId, itemIds)
 
-            const { items: ItemAfterAction } = await executeDataHooksFor(DataActions.AfterRemove, { items }, requestContextFor(Remove, req.body, res.locals), customContext)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterRemove, { results: data.items }, requestContextFor(Remove, req.body, res.locals), customContext)
 
 
-            res.json({ results: ItemAfterAction })
+            res.json({ results: dataAfterAction.results })
         } catch (e) {
             next(e)
         }
