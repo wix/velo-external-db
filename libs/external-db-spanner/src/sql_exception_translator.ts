@@ -26,7 +26,7 @@ export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string
             } else if (err.details.includes('Database')) {
                 return new DbConnectionError(`Database does not exists or you don't have access to it, sql message: ${err.details}`)
             } else if (err.details.includes('Row') && err.details.includes('not found')) {
-                return new ItemDoesNotExists(`Item does not exists: ${err.details}`, collectionName, extractId(err.details))
+                return new ItemDoesNotExists(`Item doesn't exists: ${err.details}`, collectionName, extractId(err.details))
             } else if (err.details.includes('Table')) {
                 console.log({ details: err.details, collectionName })
                 

@@ -65,7 +65,8 @@ export default class DataService {
     }
 
     async delete(collectionName: string, itemId: string, fields: any) {
-        return { item: (await this.bulkDelete(collectionName, [itemId], fields)).items[0]  }
+        const { items } = await this.bulkDelete(collectionName, [itemId], fields)
+        return { item: items[0]  }
     }
 
     async bulkDelete(collectionName: string, itemIds: string[], fields: any) {
