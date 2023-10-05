@@ -98,9 +98,9 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             })
 
             
-            /*
+            
             if (supportedOperations.includes(Aggregate)) {
-                test.skip('before aggregate request - should be able to modify group, initialFilter and finalFilter', async() => {
+                test('before aggregate request - should be able to modify group, initialFilter and finalFilter', async() => {
                     await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
                     await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authOwner)
 
@@ -109,21 +109,21 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                             beforeAll: (payload: dataSpi.AggregateRequest, _requestContext, _serviceContext): dataSpi.AggregateRequest => {
                                 return {
                                     ...payload,
-                                    group: { ...payload.group, by: [] },
+                                    aggregation: { ...payload.aggregation, groupingFields: [] },
                                     initialFilter: { _id: { $eq: ctx.numberItem._id } },
                                 }
                             },
                             beforeRead: (payload: dataSpi.AggregateRequest, _requestContext, _serviceContext): dataSpi.AggregateRequest => {
                                 return {
                                     ...payload,
-                                    group: { ...payload.group, by: ['_id'] },
+                                    aggregation: { ...payload.aggregation, groupingFields: ['_id'] },
                                     finalFilter: { myAvg: { $gt: 0 } },
                                 }
                             },
                             beforeAggregate: (payload: dataSpi.AggregateRequest, _requestContext, _serviceContext): dataSpi.AggregateRequest => {
                                 return {
                                     ...payload,
-                                    group: { ...payload.group, by: ['_id', '_owner'] },
+                                    aggregation: { ...payload.aggregation, groupingFields: ['_id', '_owner'] },
                                 }
                             }
                         }
@@ -133,38 +133,39 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         {
                             collectionId: ctx.collectionName,
                             initialFilter: { _id: { $ne: ctx.numberItem._id } },
-                            group: {
-                                by: ['_id'], aggregation: [
+                            aggregation: {
+                                groupingFields: ['_id'], 
+                                operations: [
                                     {
-                                        name: 'myAvg',
-                                        avg: ctx.numberColumns[0].name
+                                        resultFieldName: 'myAvg',
+                                        average: { itemFieldName: ctx.numberColumns[0].name }
                                     },
                                     {
-                                        name: 'mySum',
-                                        sum: ctx.numberColumns[1].name
+                                        resultFieldName: 'mySum',
+                                        sum: { itemFieldName: ctx.numberColumns[1].name }
                                     }
                                 ]
                             },
                             finalFilter: { myAvg: { $lt: 0 } },
-                        }, { responseType: 'stream', ...authOwner })
+                            returnTotalCount: true
+                        }, authOwner )
 
-                    await expect(streamToArray(response.data)).resolves.toEqual(
-                        expect.toIncludeSameMembers([{
-                            item: {
-                                _id: ctx.numberItem._id,
-                                _owner: ctx.numberItem._owner,
-                                myAvg: ctx.numberItem[ctx.numberColumns[0].name],
-                                mySum: ctx.numberItem[ctx.numberColumns[1].name]
-                            }
-                        },
-                        data.pagingMetadata(1, 1)
-                        ]))
+
+                    expect(response.data).toEqual({
+                        items: [{
+                            _id: ctx.numberItem._id,
+                            _owner: ctx.numberItem._owner,
+                            myAvg: ctx.numberItem[ctx.numberColumns[0].name],
+                            mySum: ctx.numberItem[ctx.numberColumns[1].name]
+                        }],
+                        pagingMetadata: data.pagingMetadata(1, 1)
+                    })
 
                 })
 
 
             }
-            */
+            
             
         })
         
@@ -374,8 +375,6 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     matchers.responseWith({ totalCount: 3 }))
             })
 
-            
-            /*
             if (supportedOperations.includes(Aggregate)) {
                 test('after aggregate request - should be able to modify response', async() => {
                     await schema.givenCollection(ctx.collectionName, [ctx.afterAllColumn, ctx.afterReadColumn, ctx.afterHookColumn], authOwner)
@@ -384,7 +383,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                     env.externalDbRouter.reloadHooks({
                         dataHooks: {
-                            afterAll: (payload, _requestContext, _serviceContext) => {
+                            afterAll: (payload: coreTypes.AggregateResponse, _requestContext, _serviceContext) => {
                                 return {
                                     ...payload, items: payload.items.map(item => ({
                                         ...item,
@@ -394,7 +393,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                                     }))
                                 }
                             },
-                            afterRead: (payload, _requestContext, _serviceContext) => {
+                            afterRead: (payload: coreTypes.AggregateResponse, _requestContext, _serviceContext) => {
                                 return {
                                     ...payload, items: payload.items.map(item => ({
                                         ...item,
@@ -418,29 +417,28 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         {
                             collectionId: ctx.collectionName,
                             initialFilter: { _id: { $eq: ctx.item._id } },
-                            group: {
-                                by: [ctx.afterAllColumn.name, ctx.afterReadColumn.name, ctx.afterHookColumn.name],
-                                aggregation: []
+                            aggregation: {
+                                groupingFields: [ctx.afterAllColumn.name, ctx.afterReadColumn.name, ctx.afterHookColumn.name],
+                                operations: []
                             },
                             finalFilter: {},
-                        }, { responseType: 'stream', ...authOwner })
+                            returnTotalCount: true
+                        }, authOwner)
 
-                    await expect(streamToArray(response.data)).resolves.toEqual(
-                        expect.toIncludeSameMembers([{
-                            item: expect.objectContaining({
-                                [ctx.afterAllColumn.name]: true,
-                                [ctx.afterHookColumn.name]: true,
-                                [ctx.afterReadColumn.name]: true,
-                            })
-                        },
-                        data.pagingMetadata(1, 1)
-                        ]))
+                    expect((response.data)).toEqual({
+                        items: [{
+                            _id: expect.any(String),
+                            [ctx.afterAllColumn.name]: true,
+                            [ctx.afterHookColumn.name]: true,
+                            [ctx.afterReadColumn.name]: true,
+                        }],
+                        pagingMetadata: data.pagingMetadata(1, 1)
+                    })
 
                 })
 
-
             }
-            */
+        
 
         })
     
