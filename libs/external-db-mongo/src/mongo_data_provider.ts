@@ -49,7 +49,11 @@ export default class DataProvider implements IDataProvider {
         const result = await this.client.db()
                                         .collection(collectionName)
                                         .bulkWrite( updateExpressionFor(items) )
-                                        return result.nModified
+                                        
+        
+        // In case the updated item matches the item in the DB, nModified will be 0
+        //  But the update did not fail, the updated item is indeed in the db so in that case we will return nMatched
+        return result.nModified ? result.nModified: result.nMatched
     }
 
     async delete(collectionName: string, itemIds: string[]): Promise<number> {

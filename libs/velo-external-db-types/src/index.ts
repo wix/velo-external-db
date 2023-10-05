@@ -40,9 +40,7 @@ export interface AsWixSchema extends AsWixSchemaHeaders {
 }
 
 export enum AdapterFunctions {
-    // TODO: avg key is being used in some data providers, after we will remove it from each data provider we can remove it from here
     avg = 'avg',
-    average = 'avg',
     max = 'max',
     min = 'min',
     sum = 'sum',

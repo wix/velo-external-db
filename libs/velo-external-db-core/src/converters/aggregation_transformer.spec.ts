@@ -18,11 +18,14 @@ describe('Aggregation Transformer', () => {
 
     describe('correctly transform Wix functions to adapter functions', () => {
         each([
-            'average', 'max', 'min', 'sum', 'count'
+            { wixsFunc: 'average', adaptersFunc: AdapterFunctions.avg },
+            { wixsFunc: 'max', adaptersFunc: AdapterFunctions.max },
+            { wixsFunc: 'min', adaptersFunc: AdapterFunctions.min },
+            { wixsFunc: 'count', adaptersFunc: AdapterFunctions.count },
+            { wixsFunc: 'sum', adaptersFunc: AdapterFunctions.sum },
         ])
-            .test('correctly transform [%s]', (f: string) => {
-                const AdapterFunction = f as AdapterFunctions
-                expect(env.AggregationTransformer.wixFunctionToAdapterFunction(f)).toEqual(AdapterFunctions[AdapterFunction])
+            .test('correctly transform [%s]', ({ wixsFunc, adaptersFunc }: { wixsFunc: string, adaptersFunc: string}) => {
+                expect(env.AggregationTransformer.wixFunctionToAdapterFunction(wixsFunc)).toEqual(adaptersFunc)
             })
 
         test('transform unknown function will throw an exception', () => {
