@@ -31,3 +31,19 @@ export const translateErrorCodes = (err: any, collectionName?: string, metaData?
     throw notThrowingTranslateErrorCodes(err, collectionName, metaData)
     
 }
+
+
+export const translateUpdateErrors = (err:any) => {
+    const affectedRows = err.CancellationReasons.reduce((acc:any, reson: any) => {
+        switch (reson.Code) {
+            case 'None':
+                return acc + 1
+            case 'ConditionalCheckFailed':
+                return acc
+            default:
+                return acc
+        }
+    }, 0)
+
+    return { affectedRows }
+}
