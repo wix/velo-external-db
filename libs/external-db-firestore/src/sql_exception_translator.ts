@@ -1,5 +1,5 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-const { DbConnectionError, UnrecognizedError, ItemAlreadyExists } = errors
+const { DbConnectionError, UnrecognizedError, ItemAlreadyExists, ItemDoesNotExists } = errors
 
 const extractValue = (details: string, valueName: string) => extractValueFromErrorMessage(details, new RegExp(`${valueName}:\\s*"([^"]+)"`))
 
@@ -18,6 +18,8 @@ export const notThrowingTranslateErrorCodes = (err: any) => {
     const itemId = extractValue(err.details, 'name')
 
     switch (err.code) {
+        case 5:
+            return new ItemDoesNotExists(`Item doesn't exists: ${err.details}`, collectionName, itemId)
         case 6:
             return new ItemAlreadyExists(`Item already exists: ${err.details}`, collectionName, itemId)
         case 7:
