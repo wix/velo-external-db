@@ -80,7 +80,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             pagingMetadata: data.pagingMetadata(ctx.items.length, ctx.items.length)
         })
     })
-    testIfSupportedOperationsIncludes(supportedOperations, [ AtomicBulkInsert, PrimaryKey ])('insert api should return the inserted items if they don\'t exist and if they do, it should return an error object', async() => {
+    testIfSupportedOperationsIncludes(supportedOperations, [ AtomicBulkInsert, PrimaryKey ])('bulk insert api should return the inserted items if they don\'t exist and if they do, it should return an error object', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
