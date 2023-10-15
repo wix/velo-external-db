@@ -5,7 +5,7 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb'
 import FilterParser from './sql_filter_transformer'
 import { IDataProvider, AdapterFilter as Filter, Item } from '@wix-velo/velo-external-db-types'
 import * as dynamoRequests from './dynamo_data_requests_utils'
-import { translateErrorCodes } from './sql_exception_translator'
+import { translateErrorCodes, translateUpdateErrors } from './sql_exception_translator'
 
 export default class DataProvider implements IDataProvider {
     filterParser: FilterParser
@@ -53,10 +53,16 @@ export default class DataProvider implements IDataProvider {
 
     async update(collectionName: string, items: Item[]): Promise<number> {
         validateTable(collectionName)
-        await this.docClient.transactWrite({
-            TransactItems: items.map((item: { [x: string]: any }) => dynamoRequests.updateSingleItemCommand(collectionName, patchDateTime(item)))
+        const { affectedRows } = await this.docClient.transactWrite({
+            TransactItems: items.map(item => dynamoRequests.updateSingleItemCommand(collectionName, patchDateTime(item)))
         })
-        return items.length
+        .then(_res => ({ affectedRows: items.length }))
+        .catch(translateUpdateErrors)
+        // .catch(err => err.CancellationReasons[0].Code === 'ConditionalCheckFailed' ? 0 : err)
+
+
+
+        return affectedRows
     }
 
     async delete(collectionName: string, itemIds: string[]): Promise<number> {

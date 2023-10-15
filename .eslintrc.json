@@ -62,7 +62,8 @@
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/ban-ts-comment": "warn",
             "eol-last": [ "error", "always" ], 
-            "@typescript-eslint/no-empty-interface": "off"
+            "@typescript-eslint/no-empty-interface": "off",
+            "object-shorthand": ["warn", "always"]
           }
         }
       ]

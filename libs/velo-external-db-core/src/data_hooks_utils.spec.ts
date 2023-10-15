@@ -42,11 +42,10 @@ describe('Hooks Utils', () => {
             expect(dataPayloadFor(Query, ctx.bodyWithAllProps))
                 .toEqual({
                     collectionId: ctx.collectionId,
-                    namespace: ctx.namespace,
                     query: ctx.query,
                     includeReferencedItems: ctx.includeReferencedItems,
-                    omitTotalCount: ctx.omitTotalCount,
-                    options: ctx.options
+                    consistentRead: ctx.consistentRead,
+                    returnTotalCount: ctx.returnTotalCount,
                 })
         })
 
@@ -54,10 +53,7 @@ describe('Hooks Utils', () => {
             expect(dataPayloadFor(Insert, ctx.bodyWithAllProps))
                 .toEqual({
                     collectionId: ctx.collectionId,
-                    namespace: ctx.namespace,
                     items: ctx.items,
-                    overwriteExisting: ctx.overwriteExisting,
-                    options: ctx.options
                 })
         })
 
@@ -65,9 +61,7 @@ describe('Hooks Utils', () => {
             expect(dataPayloadFor(Update, ctx.bodyWithAllProps))
                 .toEqual({
                     collectionId: ctx.collectionId,
-                    namespace: ctx.namespace,
                     items: ctx.items,
-                    options: ctx.options
                 })
         })
 
@@ -75,9 +69,7 @@ describe('Hooks Utils', () => {
             expect(dataPayloadFor(Remove, ctx.bodyWithAllProps))
                 .toEqual({
                     collectionId: ctx.collectionId,
-                    namespace: ctx.namespace,
                     itemIds: ctx.itemIds,
-                    options: ctx.options
                 })
         })
 
@@ -85,9 +77,8 @@ describe('Hooks Utils', () => {
             expect(dataPayloadFor(Count, ctx.bodyWithAllProps))
                 .toEqual({
                     collectionId: ctx.collectionId,
-                    namespace: ctx.namespace,
                     filter: ctx.filter,
-                    options: ctx.options
+                    consistentRead: ctx.consistentRead,
                 })
         })
 
@@ -95,16 +86,13 @@ describe('Hooks Utils', () => {
             expect(dataPayloadFor(Aggregate, ctx.bodyWithAllProps))
                 .toEqual({
                     collectionId: ctx.collectionId,
-                    namespace: ctx.namespace,
                     initialFilter: ctx.initialFilter,
-                    distinct: ctx.distinct,
-                    group: ctx.group,
+                    aggregation: ctx.aggregation,
                     finalFilter: ctx.finalFilter,
                     sort: ctx.sort,
-                    paging: ctx.paging,
-                    cursorPaging: ctx.cursorPaging,
-                    options: ctx.options,
-                    omitTotalCount: ctx.omitTotalCount
+                    pagingMethod: ctx.pagingMethod,
+                    consistentRead: ctx.consistentRead,
+                    returnTotalCount: ctx.returnTotalCount,
                 })
         })
     })
@@ -128,12 +116,12 @@ describe('Hooks Utils', () => {
         group: Uninitialized,
         finalFilter: Uninitialized,
         distinct: Uninitialized,
-        paging: Uninitialized,
+        pagingMethod: Uninitialized,
         collectionId: Uninitialized,
         namespace: Uninitialized,
         query: Uninitialized,
         includeReferencedItems: Uninitialized,
-        omitTotalCount: Uninitialized,
+        returnTotalCount: Uninitialized,
         options: Uninitialized,
         overwriteExisting: Uninitialized,
         bodyWithAllProps: Uninitialized,
@@ -141,6 +129,8 @@ describe('Hooks Utils', () => {
         initialFilter: Uninitialized,
         randomOperation: Uninitialized,
         metaSiteId: Uninitialized,
+        consistentRead: Uninitialized,
+        aggregation: Uninitialized,
     }
 
     beforeEach(() => {
@@ -151,16 +141,18 @@ describe('Hooks Utils', () => {
         ctx.group = chance.word()
         ctx.finalFilter = chance.word()
         ctx.distinct = chance.word()
-        ctx.paging = chance.word()
+        ctx.pagingMethod = chance.word()
         ctx.collectionId = chance.word()
         ctx.namespace = chance.word()
         ctx.query = chance.word()
         ctx.includeReferencedItems = chance.word()
-        ctx.omitTotalCount = chance.word()
+        ctx.returnTotalCount = chance.word()
         ctx.options = chance.word()
         ctx.overwriteExisting = chance.word()
         ctx.cursorPaging = chance.word()
         ctx.initialFilter = chance.word()
+        ctx.consistentRead = chance.word()
+        ctx.aggregation = chance.word()
         ctx.bodyWithAllProps = randomBodyWith({
             ...ctx
         })

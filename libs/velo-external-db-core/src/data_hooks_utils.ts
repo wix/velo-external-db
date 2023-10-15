@@ -1,5 +1,5 @@
 import { DataOperation } from '@wix-velo/velo-external-db-types'
-import { AggregateRequest, CountRequest, InsertRequest, QueryRequest } from './spi-model/data_source'
+import { AggregateRequest, CountRequest, InsertRequest, QueryRequest, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
 import { RequestContext } from './types'
 
 export const DataHooksForAction: { [key: string]: string[] } = {
@@ -42,67 +42,51 @@ export const dataPayloadFor = (operation: DataOperation, body: any) => {
         case DataOperation.query:
             return {
                 collectionId: body.collectionId,
-                namespace: body.namespace, // not supported
                 query: body.query,
                 includeReferencedItems: body.includeReferencedItems, // not supported
-                omitTotalCount: body.omitTotalCount,
-                options: body.options // not supported
+                consistentRead: body.consistentRead,
+                returnTotalCount: body.returnTotalCount,
             } as QueryRequest
         case DataOperation.count:
             return {
                 collectionId: body.collectionId,
-                namespace: body.namespace, // not supported
                 filter: body.filter,
-                options: body.options // not supported
+                consistentRead: body.consistentRead,
             } as CountRequest
         case DataOperation.aggregate:
             return {
                 collectionId: body.collectionId,
-                namespace: body.namespace, // not supported
                 initialFilter: body.initialFilter,
-                distinct: body.distinct, // not supported
-                group: body.group,
+                aggregation: body.aggregation,
                 finalFilter: body.finalFilter,
                 sort: body.sort,
-                paging: body.paging,
-                options: body.options, // not supported
-                omitTotalCount: body.omitTotalCount,
-                cursorPaging: body.cursorPaging, // not supported
+                pagingMethod: body.pagingMethod,
+                consistentRead: body.consistentRead,
+                returnTotalCount: body.returnTotalCount,
             } as AggregateRequest
 
         case DataOperation.insert:
             return {
                 collectionId: body.collectionId,
-                namespace: body.namespace, // not supported
                 items: body.items,
-                overwriteExisting: body.overwriteExisting,
-                options: body.options, // not supported
             } as InsertRequest
         case DataOperation.update:
             return {
                 collectionId: body.collectionId,
-                namespace: body.namespace, // not supported
                 items: body.items,
-                options: body.options, // not supported
-            }
+            } as UpdateRequest
         case DataOperation.remove:
             return {
                 collectionId: body.collectionId,
-                namespace: body.namespace, // not supported
                 itemIds: body.itemIds,
-                options: body.options, // not supported
-            }
+            } as RemoveRequest
         case DataOperation.truncate:
             return {
                 collectionId: body.collectionId,
-                namespace: body.namespace, // not supported
-                options: body.options, // not supported
-            }
+            } as TruncateRequest
         default:
             return {
                 collectionId: body.collectionId,
-                namespace: body.namespace, // not supported
-                options: body.options, // not supported
             }
     }
 }
