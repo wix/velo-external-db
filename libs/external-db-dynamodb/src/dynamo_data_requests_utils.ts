@@ -62,10 +62,10 @@ export const insertSingleItemCommand = (collectionName: string, item: Item, upse
     }
 }
 
-export const updateSingleItemCommand = (collectionName: string, item: Item) => {
+export const updateSingleItemCommand = (collectionName: string, item: Item) =>  {
     const updateFields = updateFieldsFor(item)
     const updateExpression = `SET ${updateFields.map(f => `#${f} = :${f}`).join(', ')}`
-    const expressionAttributeNames = updateFields.reduce((pv, cv) => ({ ...pv, [`#${cv}`]: cv }), {})
+    const expressionAttributeNames = updateFields.reduce((pv, cv) => ({ ...pv, [`#${cv}`]: cv }), { '#_id': '_id' })
     const expressionAttributeValues = updateFields.reduce((pv, cv) => ({ ...pv, [`:${cv}`]: item[cv] }), {})
 
     return {
@@ -76,7 +76,8 @@ export const updateSingleItemCommand = (collectionName: string, item: Item) => {
             },
             UpdateExpression: updateExpression,
             ExpressionAttributeNames: expressionAttributeNames,
-            ExpressionAttributeValues: expressionAttributeValues
+            ExpressionAttributeValues: expressionAttributeValues,
+            ConditionExpression: 'attribute_exists(#_id)'
         }
     }
 }

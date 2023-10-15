@@ -22,8 +22,21 @@ export const domainToSpiErrorTranslator = (err: any) => {
       case domainErrors.UnsupportedSchemaOperation:
         const unsupportedSchemaOperation: domainErrors.UnsupportedSchemaOperation = err
         return ErrorMessage.operationIsNotSupportedByCollection(unsupportedSchemaOperation.collectionName, unsupportedSchemaOperation.operation, unsupportedSchemaOperation.message)
+      
+      case domainErrors.ItemDoesNotExists:
+        const itemDoesNotExists: domainErrors.ItemDoesNotExists = err
+        return ErrorMessage.itemNotFound(itemDoesNotExists.itemId, itemDoesNotExists.collectionName, itemDoesNotExists.message)
         
       default:
         return ErrorMessage.unknownError(err.message, err.status)  
+    }
+  }
+
+  export const domainToSpiErrorObjectTranslator = (err: any) => {
+    const { message, httpCode } = domainToSpiErrorTranslator(err)
+    return {
+      errorCode: httpCode,
+      errorMessage: message.description,
+      data: message.data
     }
   }

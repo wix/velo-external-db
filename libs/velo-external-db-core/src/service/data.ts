@@ -1,7 +1,8 @@
 import { AdapterAggregation as Aggregation, AdapterFilter as Filter, IDataProvider, Item, ResponseField, Sort } from '@wix-velo/velo-external-db-types'
 import { asWixData } from '../converters/data_utils'
 import { getByIdFilterFor } from '../utils/data_utils'
-
+import {  errors as domainErrors } from '@wix-velo/velo-external-db-commons'
+import { domainToSpiErrorObjectTranslator } from '../web/domain-to-spi-error-translator'
 
 export default class DataService {
     storage: IDataProvider
@@ -9,9 +10,9 @@ export default class DataService {
         this.storage = storage
     }
 
-    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any, omitTotalCount?: boolean): Promise<{items: any[], totalCount?: number}> {
+    async find(collectionName: string, _filter: Filter, sort: any, skip: any, limit: any, projection: any, returnTotalCount?: boolean): Promise<{items: any[], totalCount?: number}> {
         const items = this.storage.find(collectionName, _filter, sort, skip, limit, projection)
-        const totalCount = omitTotalCount? undefined : this.storage.count(collectionName, _filter)
+        const totalCount = returnTotalCount? this.storage.count(collectionName, _filter) : undefined
 
         return {
             items: (await items).map(asWixData),
@@ -21,7 +22,6 @@ export default class DataService {
 
     async getById(collectionName: string, itemId: string, projection: any) {
         const item = await this.storage.find(collectionName, getByIdFilterFor(itemId), '', 0, 1, projection)
-        
         return { item: item[0] ? asWixData(item[0]) : null }
     }
 
@@ -32,7 +32,7 @@ export default class DataService {
 
     async insert(collectionName: string, item: Item, fields?: ResponseField[]) {
         const resp = await this.bulkInsert(collectionName, [item], fields)
-        return { item: asWixData(resp.items[0]) }
+        return { item: resp.items[0] }
     }
 
     async bulkUpsert(collectionName: string, items: Item[], fields?: ResponseField[]) {
@@ -40,29 +40,44 @@ export default class DataService {
         return { items: items.map( asWixData ) }
     }
 
-    async bulkInsert(collectionName: string, items: Item[], fields?: ResponseField[]) {
-        await this.storage.insert(collectionName, items, fields)
-        return { items: items.map( asWixData ) }
+    async bulkInsert(collectionName: string, _items: Item[], fields?: ResponseField[]) {
+        const items = await Promise.all((_items.map( item => this.storage.insert(collectionName, [item], fields)
+                                                                          .then(_i => asWixData(item))
+                                                                          .catch(e => domainToSpiErrorObjectTranslator(e)))
+                                          ))
+        
+        return { items }
     }
 
     async update(collectionName: string, item: Item) {
         const resp = await this.bulkUpdate(collectionName, [item])
-        return { item: asWixData(resp.items[0]) }
+        return { item: resp.items[0] }  
     }
 
-    async bulkUpdate(collectionName: string, items: Item[]) {
-        await this.storage.update(collectionName, items)
-        return { items: items.map( asWixData ) }
+    async bulkUpdate(collectionName: string, _items: Item[]) {
+        const items = await Promise.all((_items.map( item => this.storage.update(collectionName, [item])
+                                                                          // maybe we should throw from data provider if affectedRows equals to 0
+                                                                          .then(affectedRows => affectedRows === 1 ?asWixData(item) : Promise.reject(new domainErrors.ItemDoesNotExists(`Item doesn't exists: ${item._id}`, collectionName, item._id)))
+                                                                          .catch(e => domainToSpiErrorObjectTranslator(e)))
+                                         ))
+                                         
+        return { items }
     }
 
-    async delete(collectionName: string, itemId: string) {
-        await this.bulkDelete(collectionName, [itemId])
-        return { item: {} }
+    async delete(collectionName: string, itemId: string, fields: any) {
+        const { items } = await this.bulkDelete(collectionName, [itemId], fields)
+        return { item: items[0]  }
     }
 
-    async bulkDelete(collectionName: string, itemIds: string[]): Promise<{ items: [] }> {
+    async bulkDelete(collectionName: string, itemIds: string[], fields: any) {
+        const items = await Promise.all(itemIds.map(itemId => this.getById(collectionName, itemId, fields)
+                                                                  .then(({ item }) => item ? item : Promise.reject(new domainErrors.ItemDoesNotExists(`Item doesn't exists: ${itemId}`, collectionName, itemId)))
+                                                                  .catch(e => domainToSpiErrorObjectTranslator(e))
+                                        ))
+        
+
         await this.storage.delete(collectionName, itemIds)
-        return { items: [] }
+        return { items }
     }
 
     async truncate(collectionName: string) {
@@ -71,8 +86,8 @@ export default class DataService {
 
 
     // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number) {
-        const totalCount = this.storage.count(collectionName, filter)
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number, returnTotalCount?: boolean) {
+        const totalCount = returnTotalCount ? this.storage.count(collectionName, filter) : undefined
         return {
             items: ((await this.storage.aggregate?.(collectionName, filter, aggregation, sort, skip, limit)) || [])
                                       .map( asWixData ),

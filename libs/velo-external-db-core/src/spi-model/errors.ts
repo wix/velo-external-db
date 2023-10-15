@@ -311,7 +311,7 @@ export interface ErrorMessage {
 
 
 
-enum ApiErrors {
+export enum ApiErrors {
     // Unknown error
     WDE0054='WDE0054',
     // Operation time limit exceeded.
@@ -374,7 +374,7 @@ enum ApiErrors {
     WDE0147='WDE0147'
 }
 
-enum HttpStatusCode {
+export enum HttpStatusCode {
     OK = 200,
 
     //Default error codes (applicable to all endpoints)

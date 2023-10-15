@@ -341,8 +341,10 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             await axiosClient.post(api, hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: fields.map(schemaUtils.InputFieldToWixFormatField) }), authOwner)
 
             hooks.resetHooks(env.externalDbRouter)
-            await expect(data.queryCollectionAsArray(ctx.newCollection.id, [], undefined, authOwner)).resolves.toEqual(
-                expect.toIncludeSameMembers([{ item: ctx.newItem }, data.pagingMetadata(1, 1)]))
+            await expect(data.queryCollectionAsArray(ctx.newCollection.id, [], undefined, authOwner)).resolves.toEqual({
+                items: [ctx.newItem],
+                pagingMetadata: data.pagingMetadata(1, 1)
+            })
         })
     })
 

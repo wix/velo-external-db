@@ -60,7 +60,7 @@ export default class DataProvider implements IDataProvider {
         const resultset = await this.query(queries, [].concat(...updatables))
                                     .catch( err => translateErrorCodes(err, collectionName) )
 
-        return Array.isArray(resultset) ? resultset.reduce((s, r) => s + r.changedRows, 0) : resultset.changedRows
+        return Array.isArray(resultset) ? resultset.reduce((s, r) => s + r.affectedRows, 0) : resultset.affectedRows
     }
 
     async delete(collectionName: string, itemIds: string[]): Promise<number> {

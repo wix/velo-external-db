@@ -1,5 +1,5 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, CollectionAlreadyExists, ItemAlreadyExists, InvalidQuery, UnrecognizedError } = errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, CollectionAlreadyExists, ItemAlreadyExists, InvalidQuery, UnrecognizedError, ItemDoesNotExists } = errors
 const extractId = (msg: string | null) => {
     msg = msg || ''
     const regex = /String\("([A-Za-z0-9-]+)"\)/i
@@ -25,6 +25,8 @@ export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string
                 return new DbConnectionError(`Access to database denied - wrong credentials or host is unavailable, sql message:  ${err.details} `)
             } else if (err.details.includes('Database')) {
                 return new DbConnectionError(`Database does not exists or you don't have access to it, sql message: ${err.details}`)
+            } else if (err.details.includes('Row') && err.details.includes('not found')) {
+                return new ItemDoesNotExists(`Item doesn't exists: ${err.details}`, collectionName, extractId(err.details))
             } else if (err.details.includes('Table')) {
                 console.log({ details: err.details, collectionName })
                 
