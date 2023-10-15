@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
-import { streamToArray, testIfSupportedOperationsIncludes, testSupportedOperations } from '@wix-velo/test-commons'
+import { testIfSupportedOperationsIncludes, testSupportedOperations } from '@wix-velo/test-commons'
 import { dataSpi, types as coreTypes, collectionSpi } from '@wix-velo/velo-external-db-core'
 import { DataOperation, InputField, ItemWithId, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
@@ -58,9 +59,13 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     }
                 })
 
-                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner, { _id: { $ne: ctx.item._id } })).resolves.toEqual(
-                    expect.toIncludeSameMembers([{ item: ctx.item }, data.pagingMetadata(1)]))
+                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner, { _id: { $ne: ctx.item._id } })).resolves.toEqual({
+                    items: expect.toIncludeSameMembers([ctx.item]),
+                    pagingMetadata: data.pagingMetadata(1, 1)
+                })
             })
+
+            
 
             test('before count request - should be able to modify the query, specific hooks should overwrite non-specific', async() => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
@@ -92,6 +97,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     matchers.responseWith({ totalCount: 1 }))
             })
 
+            
+            
             if (supportedOperations.includes(Aggregate)) {
                 test('before aggregate request - should be able to modify group, initialFilter and finalFilter', async() => {
                     await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
@@ -102,21 +109,21 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                             beforeAll: (payload: dataSpi.AggregateRequest, _requestContext, _serviceContext): dataSpi.AggregateRequest => {
                                 return {
                                     ...payload,
-                                    group: { ...payload.group, by: [] },
+                                    aggregation: { ...payload.aggregation, groupingFields: [] },
                                     initialFilter: { _id: { $eq: ctx.numberItem._id } },
                                 }
                             },
                             beforeRead: (payload: dataSpi.AggregateRequest, _requestContext, _serviceContext): dataSpi.AggregateRequest => {
                                 return {
                                     ...payload,
-                                    group: { ...payload.group, by: ['_id'] },
+                                    aggregation: { ...payload.aggregation, groupingFields: ['_id'] },
                                     finalFilter: { myAvg: { $gt: 0 } },
                                 }
                             },
                             beforeAggregate: (payload: dataSpi.AggregateRequest, _requestContext, _serviceContext): dataSpi.AggregateRequest => {
                                 return {
                                     ...payload,
-                                    group: { ...payload.group, by: ['_id', '_owner'] },
+                                    aggregation: { ...payload.aggregation, groupingFields: ['_id', '_owner'] },
                                 }
                             }
                         }
@@ -126,38 +133,42 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         {
                             collectionId: ctx.collectionName,
                             initialFilter: { _id: { $ne: ctx.numberItem._id } },
-                            group: {
-                                by: ['_id'], aggregation: [
+                            aggregation: {
+                                groupingFields: ['_id'], 
+                                operations: [
                                     {
-                                        name: 'myAvg',
-                                        avg: ctx.numberColumns[0].name
+                                        resultFieldName: 'myAvg',
+                                        average: { itemFieldName: ctx.numberColumns[0].name }
                                     },
                                     {
-                                        name: 'mySum',
-                                        sum: ctx.numberColumns[1].name
+                                        resultFieldName: 'mySum',
+                                        sum: { itemFieldName: ctx.numberColumns[1].name }
                                     }
                                 ]
                             },
                             finalFilter: { myAvg: { $lt: 0 } },
-                        }, { responseType: 'stream', ...authOwner })
+                            returnTotalCount: true
+                        }, authOwner )
 
-                    await expect(streamToArray(response.data)).resolves.toEqual(
-                        expect.toIncludeSameMembers([{
-                            item: {
-                                _id: ctx.numberItem._id,
-                                _owner: ctx.numberItem._owner,
-                                myAvg: ctx.numberItem[ctx.numberColumns[0].name],
-                                mySum: ctx.numberItem[ctx.numberColumns[1].name]
-                            }
-                        },
-                        data.pagingMetadata(1, 1)
-                        ]))
+
+                    expect(response.data).toEqual({
+                        items: [{
+                            _id: ctx.numberItem._id,
+                            _owner: ctx.numberItem._owner,
+                            myAvg: ctx.numberItem[ctx.numberColumns[0].name],
+                            mySum: ctx.numberItem[ctx.numberColumns[1].name]
+                        }],
+                        pagingMetadata: data.pagingMetadata(1, 1)
+                    })
 
                 })
 
 
             }
+            
+            
         })
+        
         describe('Write Operations', () => {
             each(testSupportedOperations(supportedOperations, 
                 [
@@ -172,7 +183,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                     env.externalDbRouter.reloadHooks({
                         dataHooks: {
-                            beforeAll: (payload, requestContext: coreTypes.RequestContext, _serviceContext) => {
+                            beforeAll: (payload: dataSpi.InsertRequest | dataSpi.UpdateRequest, requestContext: coreTypes.RequestContext, _serviceContext) => {
                                 if (requestContext.operation !== DataOperation.query) {
                                     return {
                                         ...payload, items: payload.items.map(item => ({
@@ -184,7 +195,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                                     }
                                 }
                             },
-                            beforeWrite: (payload, _requestContext, _serviceContext) => {
+                            beforeWrite: (payload: dataSpi.InsertRequest | dataSpi.UpdateRequest, _requestContext, _serviceContext) => {
                                 return {
                                     ...payload, items: payload.items.map(item => ({
                                         ...item,
@@ -193,7 +204,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                                     }))
                                 }
                             },
-                            [hookName]: (payload, _requestContext, _serviceContext) => {
+                            [hookName]: (payload: dataSpi.InsertRequest | dataSpi.UpdateRequest, _requestContext, _serviceContext) => {
                                 return {
                                     ...payload, items: payload.items.map(item => ({
                                         ...item,
@@ -206,17 +217,18 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                     await axios.post(api, hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)
 
-                    await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
-                        expect.toIncludeSameMembers([{
-                            item: {
-                                ...ctx.item,
-                                [ctx.afterAllColumn.name]: true,
-                                [ctx.afterWriteColumn.name]: true,
-                                [ctx.afterHookColumn.name]: true,
-                            }
-                        }, data.pagingMetadata(1, 1)])
-                    )
+                    await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
+                        items: expect.toIncludeSameMembers([{ 
+                            ...ctx.item,
+                            [ctx.afterAllColumn.name]: true,
+                            [ctx.afterWriteColumn.name]: true,
+                            [ctx.afterHookColumn.name]: true,
+                        }]),
+                        pagingMetadata: data.pagingMetadata(1, 1)
+                    })
                 })
+
+                
 
             testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('before remove request - should be able to modify the item id', async() => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
@@ -248,10 +260,13 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                 await axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.numberItem]), authOwner)
 
-                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
-                    expect.toIncludeSameMembers([data.pagingMetadata(0, 0)])
-                )
+                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
+                    items: [],
+                    pagingMetadata: data.pagingMetadata(0, 0)
+                })
             })
+
+
 
             test('before truncate request - should be able to modify the collection name', async() => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
@@ -277,12 +292,17 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                 await axios.post('/data/truncate', hooks.writeRequestBodyWith('wrongCollectionId', []), authOwner)
 
-                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
-                    expect.toIncludeSameMembers([data.pagingMetadata(0, 0)])
-                )
+                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
+                    items: [],
+                    pagingMetadata: data.pagingMetadata(0, 0)
+                })
             })
+
         })
+
+
     })
+    
 
     describe('After Hooks', () => {
         describe('Read Operations', () => {
@@ -292,7 +312,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                 env.externalDbRouter.reloadHooks({
                     dataHooks: {
-                        afterAll: (payload, _requestContext, _serviceContext) => {
+                        afterAll: (payload: coreTypes.QueryResponse, _requestContext, _serviceContext) => {
                             return {
                                 ...payload, items: payload.items.map(item => ({
                                     ...item,
@@ -302,7 +322,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                                 }))
                             }
                         },
-                        afterRead: (payload, _requestContext, _serviceContext) => {
+                        afterRead: (payload: coreTypes.QueryResponse, _requestContext, _serviceContext) => {
                             return {
                                 ...payload, items: payload.items.map(item => ({
                                     ...item,
@@ -322,15 +342,15 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     }
                 })
 
-                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual(
-                    expect.toIncludeSameMembers([{
-                        item: {
-                            ...ctx.item,
-                            [ctx.afterAllColumn.name]: true,
-                            [ctx.afterHookColumn.name]: true,
-                            [ctx.afterReadColumn.name]: true,
-                        }
-                    }, data.pagingMetadata(1, 1)]))
+                await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
+                    items: [{
+                        ...ctx.item,
+                        [ctx.afterAllColumn.name]: true,
+                        [ctx.afterHookColumn.name]: true,
+                        [ctx.afterReadColumn.name]: true,
+                    }],
+                    pagingMetadata: data.pagingMetadata(1, 1)
+                })
             })
 
             test('after count request - should be able to modify count response', async() => {
@@ -339,10 +359,10 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                 env.externalDbRouter.reloadHooks({
                     dataHooks: {
-                        afterAll: (payload, _requestContext, _serviceContext) => {
+                        afterAll: (payload: coreTypes.CountResponse, _requestContext, _serviceContext) => {
                             return { ...payload, totalCount: payload.totalCount + 2 }
                         },
-                        afterRead: (payload, _requestContext, _serviceContext) => {
+                        afterRead: (payload: coreTypes.CountResponse, _requestContext, _serviceContext) => {
                             return { ...payload, totalCount: payload.totalCount * 2 }
                         },
                         afterCount: (payload, _requestContext, _serviceContext) => {
@@ -363,7 +383,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                     env.externalDbRouter.reloadHooks({
                         dataHooks: {
-                            afterAll: (payload, _requestContext, _serviceContext) => {
+                            afterAll: (payload: coreTypes.AggregateResponse, _requestContext, _serviceContext) => {
                                 return {
                                     ...payload, items: payload.items.map(item => ({
                                         ...item,
@@ -373,7 +393,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                                     }))
                                 }
                             },
-                            afterRead: (payload, _requestContext, _serviceContext) => {
+                            afterRead: (payload: coreTypes.AggregateResponse, _requestContext, _serviceContext) => {
                                 return {
                                     ...payload, items: payload.items.map(item => ({
                                         ...item,
@@ -397,29 +417,31 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         {
                             collectionId: ctx.collectionName,
                             initialFilter: { _id: { $eq: ctx.item._id } },
-                            group: {
-                                by: [ctx.afterAllColumn.name, ctx.afterReadColumn.name, ctx.afterHookColumn.name],
-                                aggregation: []
+                            aggregation: {
+                                groupingFields: [ctx.afterAllColumn.name, ctx.afterReadColumn.name, ctx.afterHookColumn.name],
+                                operations: []
                             },
                             finalFilter: {},
-                        }, { responseType: 'stream', ...authOwner })
+                            returnTotalCount: true
+                        }, authOwner)
 
-                    await expect(streamToArray(response.data)).resolves.toEqual(
-                        expect.toIncludeSameMembers([{
-                            item: expect.objectContaining({
-                                [ctx.afterAllColumn.name]: true,
-                                [ctx.afterHookColumn.name]: true,
-                                [ctx.afterReadColumn.name]: true,
-                            })
-                        },
-                        data.pagingMetadata(1, 1)
-                        ]))
+                    expect((response.data)).toEqual({
+                        items: [{
+                            _id: expect.any(String),
+                            [ctx.afterAllColumn.name]: true,
+                            [ctx.afterHookColumn.name]: true,
+                            [ctx.afterReadColumn.name]: true,
+                        }],
+                        pagingMetadata: data.pagingMetadata(1, 1)
+                    })
 
                 })
 
-
             }
+        
+
         })
+    
         describe('Write Operations', () => {
             each(testSupportedOperations(supportedOperations, 
             [
@@ -434,10 +456,10 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                 env.externalDbRouter.reloadHooks({
                     dataHooks: {
-                        afterAll: (payload, requestContext: coreTypes.RequestContext, _serviceContext) => {
+                        afterAll: (payload: coreTypes.InsertResponse | coreTypes.UpdateResponse | coreTypes.RemoveResponse, requestContext: coreTypes.RequestContext, _serviceContext) => {
                             if (requestContext.operation !== DataOperation.query) {
                                 return {
-                                    ...payload, items: payload.items.map(item => ({
+                                    ...payload, results: payload.results.map(item => ({
                                         ...item,
                                         [ctx.afterAllColumn.name]: true,
                                         [ctx.afterWriteColumn.name]: false,
@@ -446,9 +468,9 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                                 }
                             }
                         },
-                        afterWrite: (payload, _requestContext, _serviceContext) => {
+                        afterWrite: (payload: coreTypes.InsertResponse | coreTypes.UpdateResponse | coreTypes.RemoveResponse, _requestContext, _serviceContext) => {
                             return {
-                                ...payload, items: payload.items.map(item => ({
+                                ...payload, results: payload.results.map(item => ({
                                     ...item,
                                     [ctx.afterWriteColumn.name]: true,
                                     [ctx.afterHookColumn.name]: false,
@@ -457,7 +479,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         },
                         [hookName]: (payload, _requestContext, _serviceContext) => {
                             return {
-                                ...payload, items: payload.items.map(item => ({
+                                ...payload, results: payload.results.map(item => ({
                                     ...item,
                                     [ctx.afterHookColumn.name]: true,
                                 }))
@@ -466,19 +488,19 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     }
                 })
 
-                const response = await axios.post(api, hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), { responseType: 'stream', ...authOwner })
+                const response = await axios.post(api, hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner )
 
-                await expect(streamToArray(response.data)).resolves.toEqual(
-                    expect.toIncludeSameMembers([{
-                        item: {
-                            ...ctx.item,
-                            [ctx.afterAllColumn.name]: true,
-                            [ctx.afterWriteColumn.name]: true,
-                            [ctx.afterHookColumn.name]: true,
-                        }
-                    }]))
+                await expect(response.data).toEqual({
+                    results: [{
+                        ...ctx.item,
+                        [ctx.afterAllColumn.name]: true,
+                        [ctx.afterWriteColumn.name]: true,
+                        [ctx.afterHookColumn.name]: true,
+                    }]
+                })
             })
         })
+        
     })
 
     describe('Error Handling', () => {
@@ -577,14 +599,18 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 }
             })
 
-            await axios.post(api, hooks.requestBodyWith(ctx.collectionName, [ctx.item]), { responseType: 'stream', ...authOwner })
+            await axios.post(api, hooks.requestBodyWith(ctx.collectionName, [ctx.item]), authOwner)
 
             hooks.resetHooks(env.externalDbRouter)
 
-            await expect(data.queryCollectionAsArray(ctx.newCollection.id, [], undefined, authOwner)).resolves.toEqual(
-                expect.toIncludeSameMembers([{ item: ctx.newItem }, data.pagingMetadata(1, 1)]))
+            await expect(data.queryCollectionAsArray(ctx.newCollection.id, [], undefined, authOwner)).resolves.toEqual({
+                items: [ctx.newItem],
+                pagingMetadata: data.pagingMetadata(1, 1)
+            })
         })
     })
+
+
 
     interface Ctx {
         collectionName: string

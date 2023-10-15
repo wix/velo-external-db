@@ -20,6 +20,7 @@ export const testSupportedOperations = (supportedOperations: SchemaOperations[],
     })
 }
 
+// TODO: remove it in the end
 export const streamToArray = async(stream: any) => {
 
     return new Promise((resolve, reject) => {
