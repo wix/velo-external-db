@@ -4,7 +4,7 @@ const NetworkProvision = require('./aws_network_provision')
 
 class DbProvision {
     constructor(credentials, region) {
-        this.rdsClient = new RDSClient( { region: region,
+        this.rdsClient = new RDSClient( { region,
                                           credentials: { accessKeyId: credentials.awsAccessKeyId,
                                                          secretAccessKey: credentials.awsSecretAccessKey } } )
         this.networkClient = new NetworkProvision(credentials, region)

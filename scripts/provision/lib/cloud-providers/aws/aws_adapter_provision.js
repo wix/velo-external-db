@@ -5,7 +5,7 @@ const AdapterImageUrl = 'public.ecr.aws/p2z5s3h8/wix-velo/velo-external-db:lates
 class AdapterProvision {
     constructor(credentials, region) {
         this.region = region
-        this.client = new AppRunnerClient( { region: region,
+        this.client = new AppRunnerClient( { region,
                                              credentials: { accessKeyId: credentials.awsAccessKeyId,
                                                             secretAccessKey: credentials.awsSecretAccessKey } } )
 

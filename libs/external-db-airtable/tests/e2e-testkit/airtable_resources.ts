@@ -10,7 +10,7 @@ export const connection = async() => {
     const { connection, schemaProvider, cleanup } = await init(connectionConfig(),
         { requestTimeout: 1000 })
 
-    return { pool: connection, schemaProvider, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup }
 }
 
 export const cleanup = async() => {

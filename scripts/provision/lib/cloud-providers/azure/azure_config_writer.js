@@ -68,13 +68,13 @@ class ConfigWriter {
         const keyVault = await this.keyVaultManagementClient.vaults.beginCreateOrUpdate(resourceGroupName, keyVaultName, {
             location: this.region,
             properties: {
-                tenantId: tenantId,
+                tenantId,
                 sku: { name: 'standard' },
                 networkAcls: { virtualNetworkRules: [{ id: `${virtualNetwork.id}/subnets/${subnetName}` }] },
                 accessPolicies:
                     [
                         {
-                            objectId: userObjectId, tenantId: tenantId,
+                            objectId: userObjectId, tenantId,
                             permissions: { secrets: ['backup', 'delete', 'set', 'list', 'get'] }
                         }
                     ]

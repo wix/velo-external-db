@@ -58,7 +58,7 @@ class AdapterProvision {
               annotations: {
                   'run.googleapis.com/launch-stage': 'BETA'
               },
-              name: name,
+              name,
               namespace: this.projectId
             },
             spec: {

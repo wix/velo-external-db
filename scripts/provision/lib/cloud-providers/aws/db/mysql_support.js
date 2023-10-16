@@ -6,7 +6,7 @@ const createDatabase = async(dbName, host, credentials) => {
 
     try {
         connection = mysql.createConnection({
-            host: host,
+            host,
             user: credentials.user,
             password: credentials.passwd,
         })

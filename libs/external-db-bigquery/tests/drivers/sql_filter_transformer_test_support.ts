@@ -42,7 +42,7 @@ export const givenAggregateQueryWith = (having: any, numericColumns: { name: any
     when(filterParser.parseAggregation).calledWith({ postFilteringStep: filter, processingStep: having })
                                        .mockReturnValue({
                                            fieldsStatement: `${groupByColumns.map( escapeIdentifier ).join(', ')}, MAX(${escapeIdentifier(numericColumns[0].name)}) AS ${escapeIdentifier(columnAliases[0])}, SUM(${escapeIdentifier(numericColumns[1].name)}) AS ${escapeIdentifier(columnAliases[1])}`,
-                                           groupByColumns: groupByColumns,
+                                           groupByColumns,
                                            offset: offest,
                                            havingFilter: '',
                                            parameters: [],

@@ -99,7 +99,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const fields = res.rows.map(r => ({ field: r.field, type: r.type })).map(r => this.appendAdditionalRowDetails(r))
         return  {
             id: collectionName,
-            fields: fields,
+            fields,
             capabilities: this.collectionCapabilities(res.rows.map(r => r.field))
         }
     }

@@ -17,7 +17,7 @@ export const appInfoFor = async(operationService: AnyFixMe, configReaderClient: 
     
     
     return {
-        configReaderStatus: configReaderStatus,
+        configReaderStatus,
         authorizationConfigStatus, 
         config,
         dbConnectionStatus: connectionStatus.error || connectionStatus.status,
