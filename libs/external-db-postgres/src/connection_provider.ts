@@ -33,8 +33,8 @@ export default (cfg: PostgresConfig, _poolOptions: postgresPoolOptions) => {
     const schemaProvider = new SchemaProvider(pool)
 
     return { 
-        dataProvider: dataProvider,
-        schemaProvider: schemaProvider,
+        dataProvider,
+        schemaProvider,
         databaseOperations, 
         connection: pool, 
         cleanup: async() => pool.end(() => {}) 

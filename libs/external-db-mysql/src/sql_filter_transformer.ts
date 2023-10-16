@@ -213,7 +213,7 @@ export default class FilterParser implements IMySqlFilterParser {
             fieldsStatement: filterColumnsStr.join(', '),
             groupByColumns,
             havingFilter: filterExpr,
-            parameters: parameters,
+            parameters,
         }
     }
 
@@ -225,8 +225,7 @@ export default class FilterParser implements IMySqlFilterParser {
     }
 
     extractFilterExprAndParams(havingFilter: { filterExpr: any; parameters: any }[]) {
-        return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                                     parameters: parameters }))
+        return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '', parameters }))
                            .concat(EmptyFilter)[0]
     }
 

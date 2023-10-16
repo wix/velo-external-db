@@ -26,7 +26,7 @@ export default class FilterTransformer implements IFilterTransformer {
             const values = filter[wixOperator]
             const res = values.map(this.transform.bind(this))
             return {
-                operator: operator,
+                operator,
                 value: res
             }
         }

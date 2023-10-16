@@ -5,7 +5,7 @@ class GoogleSpreadsheetDoc {
     constructor(spreadsheetId, title) {
         this.spreadsheetId = spreadsheetId
         this.properties = {
-            title: title,
+            title,
         }
         this.sheets = []
         this.namedRanges = []

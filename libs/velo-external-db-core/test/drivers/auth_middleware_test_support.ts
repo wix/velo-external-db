@@ -15,7 +15,7 @@ export const requestBodyWith = (role?: string | undefined, path?: string | undef
 } )
 
 export const signedToken = (payload: Record<string, unknown>, keyid?: string, expiration= '10000ms') => {
-    const options = keyid ? { algorithm: 'ES256', expiresIn: expiration, keyid: keyid } : { algorithm: 'ES256', expiresIn: expiration }
+    const options = keyid ? { algorithm: 'ES256', expiresIn: expiration, keyid } : { algorithm: 'ES256', expiresIn: expiration }
     return jwt.sign(payload, authConfig.authPrivateKey, options as SignOptions)
 }
 

@@ -6,7 +6,7 @@ const startSpinnerWith = async(msg, f, completeMsg) => {
     const spinner = new Spinner({
         text: `\t\t %s ${msg}`,
         stream: process.stderr,
-        onTick: function(msg) {
+        onTick(msg) {
             this.clearLine(this.stream)
             this.stream.write(msg)
         }

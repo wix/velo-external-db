@@ -8,7 +8,7 @@ const setEmulatorOn = () => process.env['SPANNER_EMULATOR_HOST'] = 'localhost:90
 
 export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ projectId: 'test-project', instanceId: 'test-instance', databaseId: 'test-database' })
-    return { pool: connection, schemaProvider, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup }
 }
 
 export const cleanup = async() => {

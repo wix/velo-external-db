@@ -6,7 +6,7 @@ export * as capabilities from '../../src/dynamo_capabilities'
 export const connection = async() => {
     const { connection, schemaProvider, cleanup } = init(connectionConfig(), accessOptions())
 
-    return { pool: connection, schemaProvider, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup }
 }
 
 export const cleanup = async() => {

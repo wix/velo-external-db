@@ -69,7 +69,7 @@ class DbProvision {
         const client = await this.credentialsFor()
         const CreateNewUserRestUrl = `https://sqladmin.googleapis.com/sql/v1beta4/projects/${this.projectId}/instances/${instanceName}/users`
 
-        await client.request({ url: CreateNewUserRestUrl, method: 'POST', data: { name: userName, password: password } })
+        await client.request({ url: CreateNewUserRestUrl, method: 'POST', data: { name: userName, password } })
     }
 
     async createDatabase(instanceName, dbName) {
