@@ -32,6 +32,6 @@ export default class AwsAuthorizationConfigReader implements IConfigReader {
     const { externalConfig, secretMangerError }: {[key:string]: any} = await this.readExternalConfig()
     const { PERMISSIONS }: { PERMISSIONS: any } = { ...process.env, ...externalConfig }
     const config = { PERMISSIONS }
-    return { config, secretMangerError: secretMangerError }
+    return { config, secretMangerError }
   }
 }

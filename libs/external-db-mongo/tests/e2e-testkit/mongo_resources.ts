@@ -7,7 +7,7 @@ export * as capabilities from '../../src/mongo_capabilities'
 export const connection = async() => {
     const { connection, schemaProvider, cleanup } = await init({ connectionUri: 'mongodb://root:pass@localhost/testdb' })
 
-    return { pool: connection, schemaProvider, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup }
 }
 
 export const cleanup = async() => {

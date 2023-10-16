@@ -51,7 +51,7 @@ export const givenAggregateQueryWith = (having: any, numericColumns: any[], colu
                                             [columnAliases[0]]: { $max: `$${c[0]}` },
                                             [columnAliases[1]]: { $sum: `$${c[1]}` }
                                         } }, 
-                                        groupByColumns: groupByColumns,
+                                        groupByColumns,
                                         havingFilter: { $match: {} },
                                        })
 }

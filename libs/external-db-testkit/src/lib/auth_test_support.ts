@@ -18,7 +18,7 @@ export const authInit = () => {
 
 const appendRoleToRequest = (role: string) => (dataRaw: string) => {
     const data = JSON.parse( dataRaw )
-    return JSON.stringify({ ...data, ...{ requestContext: { ...data.requestContext, role: role } } })
+    return JSON.stringify({ ...data, ...{ requestContext: { ...data.requestContext, role } } })
 }
 
 const appendJWTHeaderToRequest = (dataRaw: string, headers: AxiosRequestHeaders) => {

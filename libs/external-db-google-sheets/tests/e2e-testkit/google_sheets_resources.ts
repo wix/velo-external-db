@@ -17,7 +17,7 @@ export const connection = async() => {
         apiPrivateKey: process.env['API_PRIVATE_KEY']
     }
     const { connection, schemaProvider, cleanup } = await init(googleSheetsConfig)
-    return { pool: connection, schemaProvider, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup }
 }   
 
 export const cleanup = async() => {
@@ -37,7 +37,7 @@ export const setActive = () => {
 
 export const enviormentVariables = {
     TYPE: 'google-sheet',
-    SHEET_ID: SHEET_ID
+    SHEET_ID
 }
 
 export const name = 'google-sheets'

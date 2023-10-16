@@ -21,7 +21,7 @@ const dbOperationWithMisconfiguredHost = () => new DatabaseOperations(createPool
 export const dbOperationWithValidDB = () => {
     const { connection, cleanup } = createPool({ } )
     const dbOperations = new DatabaseOperations(connection)
-    return { dbOperations, cleanup: cleanup }
+    return { dbOperations, cleanup }
 }
 
 export const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong password', () => dbOperationWithMisconfiguredPassword()],

@@ -178,7 +178,7 @@ describe('Sql Parser', () => {
                 const filter = {
                     operator: eq as AdapterOperator,
                     fieldName: ctx.fieldName,
-                    value: value
+                    value
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{

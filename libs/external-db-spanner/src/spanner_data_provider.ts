@@ -22,8 +22,8 @@ export default class DataProvider implements IDataProvider {
         const query = {
             sql: `SELECT ${projectionExpr} FROM ${escapeId(collectionName)} ${filterExpr} ${sortExpr} LIMIT @limit OFFSET @skip`,
             params: {
-                skip: skip,
-                limit: limit,
+                skip,
+                limit,
                 ...parameters
             },
         }

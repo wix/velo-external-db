@@ -62,7 +62,7 @@ export default class FilterParser {
             fieldsStatement: filterColumnsStr.join(', '),
             groupByColumns,
             havingFilter: filterExpr,
-            parameters: parameters,
+            parameters,
             offset: offsetAfterAggregation
         }
     }
@@ -80,8 +80,7 @@ export default class FilterParser {
     }
 
     extractFilterExprAndParams(havingFilter: any[], offset: number) {
-        return havingFilter.map(({ filterExpr, parameters, offset }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                                     parameters: parameters, offset }))
+        return havingFilter.map(({ filterExpr, parameters, offset }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '', parameters, offset }))
                            .concat({ ...EmptyFilter, offset: offset ?? 1 })[0]
     }
 
@@ -102,7 +101,7 @@ export default class FilterParser {
                         filter: [ ...o.filter, ...res],
                         offset: res.length === 1 ? res[0].offset : o.offset
                     }
-                }, { filter: [], offset: offset })
+                }, { filter: [], offset })
 
                 const op = operator === and ? ' AND ' : ' OR '
                 return [{
@@ -209,7 +208,7 @@ export default class FilterParser {
         } else if ((operator === eq || operator === ne) && isNull(value)) {
             return {
                 sql: '',
-                offset: offset
+                offset
             }
         }
 
