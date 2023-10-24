@@ -3,15 +3,24 @@ import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName,
 import { givenHideAppInfoEnvIsTrue } from '../drivers/app_info_config_test_support'
 
 const axios = require('axios').create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:3000'
 })
 
 describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
     beforeAll(async() => {
+        process.env.PORT = '3000'
         await setupDb()
-
+        
+        process.env.PORT = '3000'
+        console.log({ port: process.env.PORT })
+        
         await initApp()
+        console.log({ port2: process.env.PORT })
     }, 20000)
+
+    beforeEach(async() => {
+        process.env.PORT = '3000'
+    })
 
     afterAll(async() => await dbTeardown(), 20000)
 
@@ -32,6 +41,9 @@ describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
         })
     })
 
-    afterAll(async() => await teardownApp())
+    afterAll(async() => {
+        await teardownApp()
+        delete process.env.PORT
+    })
 
 })
