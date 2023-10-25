@@ -1,7 +1,6 @@
 import * as path from 'path'
 import * as BPromise from 'bluebird'
 import * as express from 'express'
-import type { Response } from 'express'
 import * as compression from 'compression'
 import { errorMiddleware } from './web/error-middleware'
 import { appInfoFor } from './health/app_info'
@@ -91,14 +90,6 @@ export const createRouter = () => {
     router.use(unless(['/', '/info', '/capabilities', '/favicon.ico', '/provision', '/connectionStatus'], jwtAuthenticator.authorizeJwt()))
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
-
-    const streamCollection = (collection: any[], res: Response) => {
-        res.contentType('application/x-ndjson')
-        collection.forEach(item => {
-            res.write(`${JSON.stringify(item)}\n`)
-        })
-        res.end()
-    }
 
     // *************** INFO **********************
     router.get('/', async(req, res) => {
@@ -271,8 +262,8 @@ export const createRouter = () => {
             
             const data = await schemaService.list(collectionIds)
             const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterGet, data, requestContextFor(Get, req.body, res.locals), customContext)
-            const responseParts = dataAfterAction.collections.map(collection => ({ collection })) 
-            streamCollection(responseParts, res)
+                        
+            res.json({ collections: dataAfterAction.collections })
         } catch (e) {
             next(e)
         }

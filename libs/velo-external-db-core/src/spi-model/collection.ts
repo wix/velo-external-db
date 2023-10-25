@@ -35,31 +35,28 @@ export interface Collection {
     id: string;
     fields: Field[];
     capabilities?: CollectionCapabilities;
+    pagingMode?: PagingMode; 
 }
 
 export interface Field {
     // Identifier of the field.
     key: string;
-    // Value is encrypted when `true`. Global data source capabilities define where encryption takes place.
-    encrypted?: boolean;
     // Type of the field.
     type: FieldType;
     // Defines what kind of operations this field supports.
     // Should be set by datasource itself and ignored in request payload.
     capabilities?: FieldCapabilities;
-    // Additional options for specific field types, should be one of the following
-    singleReferenceOptions?: SingleReferenceOptions;
-    multiReferenceOptions?: MultiReferenceOptions;
+    typeOptions?: { singleReferenceOptions: SingleReferenceOptions }| { multiReferenceOptions: MultiReferenceOptions } ;
 }
 
 export interface SingleReferenceOptions {
     referencedCollectionId?: string;
-    referencedNamespace?: string;
+    includeSupported?: boolean;
 }
 export interface MultiReferenceOptions {
     referencedCollectionId?: string;
-    referencedNamespace?: string;
-    referencingFieldKey?: string;
+    referencedCollectionFieldKey?: string;
+    includeSupported: boolean
 }
     
 export interface FieldCapabilities {
@@ -67,8 +64,6 @@ export interface FieldCapabilities {
     sortable?: boolean;
     // Query operators (e.g. equals, less than) that can be used for this field.
     queryOperators?: QueryOperator[];
-    singleReferenceOptions?: SingleReferenceOptions;
-    multiReferenceOptions?: MultiReferenceOptions;
 }
 
 export enum QueryOperator {
@@ -86,28 +81,11 @@ export enum QueryOperator {
     exists = 'EXISTS',
     urlized = 'URLIZED',
 }
-export interface SingleReferenceOptions {
-    // `true` when datasource supports `include_referenced_items` in query method natively.
-    includeSupported?: boolean;
-}
-export interface MultiReferenceOptions {
-    // `true` when datasource supports `include_referenced_items` in query method natively.
-    includeSupported?: boolean;
-}
+
 
 export interface CollectionCapabilities {
     // Lists data operations supported by collection.
     dataOperations: DataOperation[];
-    // Supported field types.
-    fieldTypes: FieldType[];
-    // Describes what kind of reference capabilities is supported.
-    referenceCapabilities: ReferenceCapabilities;
-    // Lists what kind of modifications this collection accept.
-    collectionOperations: CollectionOperation[];
-    // Defines which indexing operations is supported.
-    indexing: IndexingCapabilityEnum[];
-    // Defines if/how encryption is supported.
-    encryption: Encryption;
 }
 
 export enum DataOperation {
@@ -153,10 +131,55 @@ export enum Encryption {
 export enum FieldType {
     text = 'TEXT',
     number = 'NUMBER',
+    date = 'DATE',
+    dataTime = 'DATETIME',
+    image = 'IMAGE',
     boolean = 'BOOLEAN',
+    document = 'DOCUMENT',
+    url = 'URL',
+    richText = 'RICH_TEXT',
+    video = 'VIDEO',
+    any = 'ANY',
+    arrayString = 'ARRAY_STRING',
+    arrayDocument = 'ARRAY_DOCUMENT',
+    audio = 'AUDIO',
+    time = 'TIME',
+    language = 'LANGUAGE',
+    richContent = 'RICH_CONTENT',
+    mediaGallery = 'MEDIA_GALLERY',
+    address = 'ADDRESS',
+    pageLink = 'PAGE_LINK',
+    reference = 'REFERENCE',
+    multiReference = 'MULTI_REFERENCE',
+    object = 'OBJECT',
+    array = 'ARRAY',
+
+    // TODO: remove
     timestamp = 'TIMESTAMP',
     json = 'JSON',
     longText = 'LONG_TEXT',
     singleReference = 'SINGLE_REFERENCE',
-    multiReference = 'MULTI_REFERENCE',
+}
+
+export interface Permissions {
+    // Lowest role needed to add a collection.
+    insert: Role
+    // Lowest role needed to update a collection.
+    update: Role
+    // Lowest role needed to update a collection.
+    remove: Role
+    // Lowest role needed to query a collection.
+    read: Role
+}
+
+export enum Role {
+    admin = 'ADMIN',
+    siteMemberAuthor = 'SITE_MEMBER_AUTHOR',
+    siteMember = 'SITE_MEMBER',
+    anyone = 'ANYONE'
+}
+
+export enum PagingMode {
+    offset = 'OFFSET',
+    cursor = 'CURSOR',
 }

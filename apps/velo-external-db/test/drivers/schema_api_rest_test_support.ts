@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { InputField } from '@wix-velo/velo-external-db-types'
-import { streamToArray } from '@wix-velo/test-commons'
 import { schemaUtils } from '@wix-velo/velo-external-db-core'
 
 
@@ -17,9 +16,8 @@ export const givenCollection = async(name: string, columns: InputField[], auth: 
 }
 
 export const deleteAllCollections = async(auth: any) => {
-    const res = await axiosClient.post('/collections/get', { collectionIds: [] }, { ...auth, responseType: 'stream' })
-    const dataRes = await streamToArray(res.data) as any []
-    const collectionIds = dataRes.map(d => d.collection.id)
+    const { data } = await axiosClient.post('/collections/get', { collectionIds: [] }, auth)
+    const collectionIds = data.collections.map(d => d.id)
 
     for (const collectionId of collectionIds) {
         await axiosClient.post('/collections/delete', { collectionId }, auth)
@@ -28,12 +26,11 @@ export const deleteAllCollections = async(auth: any) => {
 }
 
 export const retrieveSchemaFor = async(collectionName: string, auth: any) => {
-    const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [collectionName] }, { ...auth, responseType: 'stream' })
-    const [collectionGetRes] = await streamToArray(collectionGetStream.data) as any[]
-    return collectionGetRes
+    const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [collectionName] }, auth)
+    return collectionGetStream.data.collections[0]
 }
 
 export const retrieveAllCollections = async(auth: any) => {
-    const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [] }, { ...auth, responseType: 'stream' })
-    return await streamToArray(collectionGetStream.data) as any[]
+    const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [] }, auth)
+    return collectionGetStream.data.collections
 }

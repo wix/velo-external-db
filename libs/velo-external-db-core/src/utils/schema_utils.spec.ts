@@ -1,5 +1,5 @@
 import * as Chance from 'chance'
-import { InputField } from '@wix-velo/velo-external-db-types'
+import { InputField, FieldType } from '@wix-velo/velo-external-db-types'
 import { Uninitialized } from '@wix-velo/test-commons'
 import { FieldType as VeloFieldTypeEnum } from '../spi-model/collection'
 import { 
@@ -24,10 +24,10 @@ describe('Schema utils functions', () => {
             expect(fieldTypeToWixDataEnum('boolean')).toBe(VeloFieldTypeEnum.boolean)
         })
         test('object type', () => {
-            expect(fieldTypeToWixDataEnum('object')).toBe(VeloFieldTypeEnum.json)
+            expect(fieldTypeToWixDataEnum('object')).toBe(VeloFieldTypeEnum.object)
         })
         test('datetime type', () => {
-            expect(fieldTypeToWixDataEnum('datetime')).toBe(VeloFieldTypeEnum.timestamp)
+            expect(fieldTypeToWixDataEnum('datetime')).toBe(VeloFieldTypeEnum.dataTime)
         })
 
         test('unsupported type will throw an error', () => {
@@ -36,22 +36,33 @@ describe('Schema utils functions', () => {
     })
 
     describe('translate velo field type emun to our field type', () => {
-        test('text type', () => {
-            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.text)).toBe('text')
-        })
-        test('number type', () => {
-            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.number)).toBe('number')
-        })
-        test('boolean type', () => {
-            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.boolean)).toBe('boolean')
-        })
-        test('object type', () => {
-            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.json)).toBe('object')
-        })
-
-        test('datetime type', () => {
-            expect(wixDataEnumToFieldType(VeloFieldTypeEnum.timestamp)).toBe('datetime')
-        })
+        test.each([
+            [VeloFieldTypeEnum.text, FieldType.text],
+            [VeloFieldTypeEnum.url, FieldType.text],
+            [VeloFieldTypeEnum.richText, FieldType.text],
+            [VeloFieldTypeEnum.number, FieldType.number], 
+            [VeloFieldTypeEnum.date, FieldType.datetime],
+            [VeloFieldTypeEnum.dataTime, FieldType.datetime],
+            [VeloFieldTypeEnum.time, FieldType.datetime],
+            [VeloFieldTypeEnum.boolean, FieldType.boolean],
+            [VeloFieldTypeEnum.image, FieldType.object],
+            [VeloFieldTypeEnum.document, FieldType.object],
+            [VeloFieldTypeEnum.video, FieldType.object],
+            [VeloFieldTypeEnum.any, FieldType.object],
+            [VeloFieldTypeEnum.arrayString, FieldType.object],
+            [VeloFieldTypeEnum.arrayDocument, FieldType.object],
+            [VeloFieldTypeEnum.audio, FieldType.object],
+            [VeloFieldTypeEnum.language, FieldType.object],
+            [VeloFieldTypeEnum.richContent, FieldType.object],
+            [VeloFieldTypeEnum.mediaGallery, FieldType.object],
+            [VeloFieldTypeEnum.address, FieldType.object],
+            [VeloFieldTypeEnum.pageLink, FieldType.object],
+            [VeloFieldTypeEnum.reference, FieldType.object],
+            [VeloFieldTypeEnum.object, FieldType.object],
+            [VeloFieldTypeEnum.array, FieldType.object],
+          ])('%s type', (veloType, ourType) => {
+            expect(wixDataEnumToFieldType(veloType)).toBe(ourType)
+          })
 
         test('unsupported type will throw an error', () => {
             // @ts-ignore
@@ -60,23 +71,33 @@ describe('Schema utils functions', () => {
     })
 
     describe('translate velo field type enum to our sub type', () => {
-        test('text type', () => {
-            expect(subtypeToFieldType(VeloFieldTypeEnum.text)).toBe('string')
-        })
-        test('number type', () => {
-            expect(subtypeToFieldType(VeloFieldTypeEnum.number)).toBe('float')
-        })
-        test('boolean type', () => {
-            expect(subtypeToFieldType(VeloFieldTypeEnum.boolean)).toBe('')
-        })
-        test('object type', () => {
-            expect(subtypeToFieldType(VeloFieldTypeEnum.json)).toBe('')
-        })
-
-        test('datetime type', () => {
-            expect(subtypeToFieldType(VeloFieldTypeEnum.timestamp)).toBe('datetime')
-        })
-
+        test.each([
+            [VeloFieldTypeEnum.text, 'string'],
+            [VeloFieldTypeEnum.url, 'string'],
+            [VeloFieldTypeEnum.richText, 'string'],
+            [VeloFieldTypeEnum.number, 'float'],
+            [VeloFieldTypeEnum.date, 'datetime'],
+            [VeloFieldTypeEnum.dataTime, 'datetime'],
+            [VeloFieldTypeEnum.time, 'datetime'],
+            [VeloFieldTypeEnum.boolean, 'boolean'],
+            [VeloFieldTypeEnum.image, 'image'],
+            [VeloFieldTypeEnum.document, 'document'],
+            [VeloFieldTypeEnum.video, 'video'],
+            [VeloFieldTypeEnum.any, 'any'],
+            [VeloFieldTypeEnum.arrayString, 'arrayString'],
+            [VeloFieldTypeEnum.arrayDocument, 'arrayDocument'],
+            [VeloFieldTypeEnum.audio, 'audio'],
+            [VeloFieldTypeEnum.language, 'language'],
+            [VeloFieldTypeEnum.richContent, 'richContent'],
+            [VeloFieldTypeEnum.mediaGallery, 'mediaGallery'],
+            [VeloFieldTypeEnum.address, 'address'],
+            [VeloFieldTypeEnum.pageLink, 'pageLink'],
+            [VeloFieldTypeEnum.reference, 'reference'],
+            [VeloFieldTypeEnum.object, 'object'],
+            [VeloFieldTypeEnum.array, 'array'],
+          ])('%s type', (veloType, ourSubType) => {
+            expect(subtypeToFieldType(veloType)).toBe(ourSubType)
+          })
         test('unsupported type will throw an error', () => {
             // @ts-ignore
             expect(() => wixDataEnumToFieldType(100)).toThrowError()

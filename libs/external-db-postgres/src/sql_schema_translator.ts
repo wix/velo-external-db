@@ -105,9 +105,12 @@ export default class SchemaColumnTranslator {
                 return 'text'
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'boolean'
 
+            case 'object':
             case 'object_':
+            case 'object_object':
                 return 'json'
 
             default:

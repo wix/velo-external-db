@@ -111,5 +111,6 @@ export const randomCollection = (): collectionSpi.Collection => {
     return {
         id: randomCollectionName(),
         fields: [],
+        pagingMode: collectionSpi.PagingMode.offset
     }
 }

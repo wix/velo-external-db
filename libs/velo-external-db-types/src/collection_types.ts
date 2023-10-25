@@ -29,11 +29,16 @@ export enum FieldType {
     multiReference = 'multiReference',
 }
 
+export enum SubFieldType {
+    
+}
+
 export enum CollectionOperation {
     update = 'update',
     remove = 'remove',
 }
 
+// TODO: remove this type
 export enum Encryption {
     notSupported = 'notSupported',
     wixDataNative = 'wixDataNative',
