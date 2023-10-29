@@ -4,7 +4,9 @@ import { SystemTable } from './dynamo_utils'
 import { UpdateCommandInput } from '@aws-sdk/lib-dynamodb/dist-types/commands/UpdateCommand'
 import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb/dist-types/commands/CreateTableCommand'
 
-export const updateColumnsExpression = (collectionName: any, columns: any) => ({
+
+
+export const updateColumnsExpression = (collectionName: any, columns: any): UpdateCommandInput => ({
     TableName: SystemTable,
     Key: {
         tableName: collectionName
@@ -50,7 +52,7 @@ export const changeColumnTypeExpression = (collectionName: string, column: Input
     },
 })
 
-export const createTableExpression = (collectionName: any) => ({
+export const createTableExpression = (collectionName: string): CreateTableCommandInput => ({
     TableName: collectionName,
     KeySchema: [{ AttributeName: '_id', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: '_id', AttributeType: 'S' }],
