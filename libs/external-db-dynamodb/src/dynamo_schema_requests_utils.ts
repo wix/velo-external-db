@@ -1,4 +1,5 @@
 
+import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb'
 import { SystemTable } from './dynamo_utils'
 
 export const removeColumnExpression = (collectionName: any, columns: any) => ({
@@ -31,7 +32,7 @@ export const addColumnExpression = (collectionName: any, column: any) => ({
         ReturnValues: 'UPDATED_NEW'
 })
 
-export const createTableExpression = (collectionName: any) => ({
+export const createTableExpression = (collectionName: any): CreateTableCommandInput => ({
     TableName: collectionName,
     KeySchema: [{ AttributeName: '_id', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: '_id', AttributeType: 'S' }],
