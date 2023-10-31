@@ -92,6 +92,7 @@ export default class SchemaColumnTranslator {
 
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'TINYINT'
 
             default:
