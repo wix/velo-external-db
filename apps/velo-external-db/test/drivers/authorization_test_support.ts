@@ -20,4 +20,7 @@ export const givenCollectionWithVisitorReadPolicy = async(collectionName: string
     await dbTeardown()
     authRoleConfig(collectionName, ['Visitor'], [])
     await initApp()
+    
+    // Fix for tests running in Node 20.
+    await new Promise(resolve => setTimeout(resolve, 5))
 }
