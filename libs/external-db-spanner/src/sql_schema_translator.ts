@@ -94,6 +94,7 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
                 return `STRING${this.parseLength(2 ** 32)}`
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'BOOL'
 
             case 'object_':
