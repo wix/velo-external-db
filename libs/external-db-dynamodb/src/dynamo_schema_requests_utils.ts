@@ -1,7 +1,11 @@
 
 import { SystemTable } from './dynamo_utils'
+import { UpdateCommandInput } from '@aws-sdk/lib-dynamodb/dist-types/commands/UpdateCommand'
+import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb/dist-types/commands/CreateTableCommand'
 
-export const removeColumnExpression = (collectionName: any, columns: any) => ({
+
+
+export const updateColumnsExpression = (collectionName: any, columns: any): UpdateCommandInput => ({
     TableName: SystemTable,
     Key: {
         tableName: collectionName
@@ -16,7 +20,7 @@ export const removeColumnExpression = (collectionName: any, columns: any) => ({
     ReturnValues: 'UPDATED_NEW'
 })
 
-export const addColumnExpression = (collectionName: any, column: any) => ({
+export const addColumnExpression = (collectionName: any, column: any): UpdateCommandInput => ({
         TableName: SystemTable,
         Key: {
             tableName: collectionName
@@ -31,14 +35,14 @@ export const addColumnExpression = (collectionName: any, column: any) => ({
         ReturnValues: 'UPDATED_NEW'
 })
 
-export const createTableExpression = (collectionName: any) => ({
+export const createTableExpression = (collectionName: string): CreateTableCommandInput => ({
     TableName: collectionName,
     KeySchema: [{ AttributeName: '_id', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: '_id', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST'
 })
 
-export const createSystemTableExpression = () => ({
+export const createSystemTableExpression = (): CreateTableCommandInput => ({
     TableName: SystemTable,
     KeySchema: [{ AttributeName: 'tableName', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'tableName', AttributeType: 'S' }],
