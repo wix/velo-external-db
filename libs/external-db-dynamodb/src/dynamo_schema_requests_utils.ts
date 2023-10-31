@@ -5,7 +5,7 @@ import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb/dist-types/com
 
 
 
-export const updateColumnsExpression = (collectionName: any, columns: any): UpdateCommandInput => ({
+export const removeColumnExpression = (collectionName: any, columns: any): UpdateCommandInput => ({
     TableName: SystemTable,
     Key: {
         tableName: collectionName
