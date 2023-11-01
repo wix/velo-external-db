@@ -14,6 +14,7 @@ import {
     responseFieldToWixFormat, 
     compareColumnsInDbAndRequest,
     dataOperationsToWixDataQueryOperators,
+    pagingModeToWixDataPagingMode,
 } from '../utils/schema_utils'
 
 
@@ -104,7 +105,7 @@ export default class SchemaService {
             id: collection.id,
             fields: this.formatFields(collection.fields),
             capabilities: collection.capabilities? this.formatCollectionCapabilities(collection.capabilities) : undefined,
-            pagingMode: collectionSpi.PagingMode.offset
+            pagingMode: pagingModeToWixDataPagingMode(collection.capabilities!.pagingMode)
         }
     }
 

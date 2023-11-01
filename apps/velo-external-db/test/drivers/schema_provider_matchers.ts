@@ -1,5 +1,5 @@
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
-import { ResponseField } from '@wix-velo/velo-external-db-types'
+import { ResponseField, PagingMode, Encryption } from '@wix-velo/velo-external-db-types'
 import { Capabilities, ColumnsCapabilities } from '../types'
 
 export const hasSameSchemaFieldsLike = (fields: ResponseField[]) => expect.arrayContaining(fields.map((f) => expect.objectContaining( f )))
@@ -20,7 +20,8 @@ export const collectionToContainFields = (collectionName: string, fields: Respon
         fieldTypes: capabilities.FieldTypes,
         referenceCapabilities: { supportedNamespaces: [] },
         indexing: [],
-        encryption: 'notSupported'
+        encryption: Encryption.notSupported,
+        pagingMode: PagingMode.offset,
     }
 })
 

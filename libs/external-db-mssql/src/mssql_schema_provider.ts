@@ -1,5 +1,5 @@
 import { ConnectionPool as MSSQLPool } from 'mssql'
-import { CollectionCapabilities, FieldAttributes, InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, Encryption } from '@wix-velo/velo-external-db-types'
+import { CollectionCapabilities, FieldAttributes, InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, Encryption, PagingMode } from '@wix-velo/velo-external-db-types'
 import { SystemFields, validateSystemFields, parseTableData, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes, notThrowingTranslateErrorCodes } from './sql_exception_translator'
@@ -117,6 +117,7 @@ export default class SchemaProvider implements ISchemaProvider {
             referenceCapabilities: { supportedNamespaces: [] },
             indexing: [],
             encryption: Encryption.notSupported,
+            pagingMode: PagingMode.offset
         }
     }
 }

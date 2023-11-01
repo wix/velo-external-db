@@ -1,5 +1,5 @@
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField, FieldType, DataOperation, CollectionOperation } from '@wix-velo/velo-external-db-types'
+import { InputField, ResponseField, FieldType, DataOperation, CollectionOperation, PagingMode } from '@wix-velo/velo-external-db-types'
 import * as collectionSpi from '../spi-model/collection'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
@@ -247,4 +247,13 @@ export const compareColumnsInDbAndRequest = (
     columnsToRemove,
     columnsToChangeType,
   }
+}
+
+export const pagingModeToWixDataPagingMode = (pagingMode: PagingMode): collectionSpi.PagingMode => {
+    switch (pagingMode) {
+        case PagingMode.offset:
+            return collectionSpi.PagingMode.offset
+        case PagingMode.cursor:
+            return collectionSpi.PagingMode.cursor
+    }
 }

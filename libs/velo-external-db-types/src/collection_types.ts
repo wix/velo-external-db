@@ -45,6 +45,11 @@ export enum Encryption {
     dataSourceNative = 'dataSourceNative',
 }
 
+export enum PagingMode {
+    offset = 'offset',
+    cursor = 'cursor',
+}
+
 export type CollectionCapabilities = {
     dataOperations: DataOperation[],
     fieldTypes: FieldType[],
@@ -52,6 +57,7 @@ export type CollectionCapabilities = {
     collectionOperations: CollectionOperation[],
     indexing: IndexingCapabilityEnum[],
     encryption: Encryption,
+    pagingMode: PagingMode,
 }
 
 export type ColumnCapabilities = {

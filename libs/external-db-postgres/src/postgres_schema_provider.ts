@@ -15,6 +15,7 @@ import {
     Encryption,
     InputField,
     ISchemaProvider,
+    PagingMode,
     ResponseField,
     Table
 } from '@wix-velo/velo-external-db-types'
@@ -111,7 +112,8 @@ export default class SchemaProvider implements ISchemaProvider {
             collectionOperations: CollectionOperations,
             referenceCapabilities: { supportedNamespaces: [] },
             indexing: [],
-            encryption: Encryption.notSupported
+            encryption: Encryption.notSupported,
+            pagingMode: PagingMode.offset
         }
     }
 
