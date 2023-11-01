@@ -98,6 +98,7 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
                 return 'BOOL'
 
             case 'object_':
+            case 'object_object':
                 return 'JSON'
 
             default:
