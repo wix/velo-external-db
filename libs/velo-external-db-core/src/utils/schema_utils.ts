@@ -91,14 +91,17 @@ export const subtypeToFieldType = (fieldEnum: collectionSpi.FieldType): string =
             return 'video'
         case collectionSpi.FieldType.any:
             return 'any'
+        // TODO: what about this subtypes?
         case collectionSpi.FieldType.arrayString:
             return 'arrayString'
+         // TODO: what about this subtypes?
         case collectionSpi.FieldType.arrayDocument:
             return 'arrayDocument'
         case collectionSpi.FieldType.audio:
             return 'audio'
         case collectionSpi.FieldType.language:
             return 'language'
+        // TODO: what about this subtypes?  
         case collectionSpi.FieldType.richContent:
             return 'richContent'
         case collectionSpi.FieldType.mediaGallery:

@@ -111,6 +111,17 @@ export default class SchemaColumnTranslator {
             case 'object':
             case 'object_':
             case 'object_object':
+            case 'object_image':
+            case 'object_document':
+            case 'object_video':
+            case 'object_any':
+            case 'object_audio':
+            case 'object_language':
+            case 'object_mediaGallery':
+            case 'object_address':
+            case 'object_pageLink':
+            case 'object_reference':
+            case 'object_multiReference':
                 return 'json'
 
             default:
