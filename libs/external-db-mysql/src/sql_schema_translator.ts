@@ -99,6 +99,7 @@ export default class SchemaColumnTranslato {
                 return 'MEDIUMTEXT'
 
             case 'text_large':
+            case 'text_language':
                 return 'LONGTEXT'
 
             case 'boolean_':
@@ -112,12 +113,14 @@ export default class SchemaColumnTranslato {
             case 'object_video':
             case 'object_any':
             case 'object_audio':
-            case 'object_language':
             case 'object_mediaGallery':
             case 'object_address':
             case 'object_pageLink':
             case 'object_reference':
             case 'object_multiReference':
+            case 'object_arrayString':
+            case 'object_arrayDocument':
+            case 'object_richContent':
                 return 'JSON'
 
             default:

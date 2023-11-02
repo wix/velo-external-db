@@ -31,6 +31,7 @@ export const wixDataEnumToFieldType = (fieldEnum: collectionSpi.FieldType): stri
         case collectionSpi.FieldType.text:
         case collectionSpi.FieldType.url:
         case collectionSpi.FieldType.richText:
+        case collectionSpi.FieldType.language:
             return FieldType.text
         
         case collectionSpi.FieldType.number:
@@ -51,7 +52,6 @@ export const wixDataEnumToFieldType = (fieldEnum: collectionSpi.FieldType): stri
         case collectionSpi.FieldType.arrayString:
         case collectionSpi.FieldType.arrayDocument:
         case collectionSpi.FieldType.audio:
-        case collectionSpi.FieldType.language:
         case collectionSpi.FieldType.richContent:
         case collectionSpi.FieldType.mediaGallery:
         case collectionSpi.FieldType.address:
@@ -73,6 +73,10 @@ export const subtypeToFieldType = (fieldEnum: collectionSpi.FieldType): string =
         case collectionSpi.FieldType.url:
         case collectionSpi.FieldType.richText:
             return 'string'
+        
+        case collectionSpi.FieldType.language:
+            return 'language' 
+
         case collectionSpi.FieldType.number:
             return 'float'
         case collectionSpi.FieldType.date:
@@ -91,17 +95,12 @@ export const subtypeToFieldType = (fieldEnum: collectionSpi.FieldType): string =
             return 'video'
         case collectionSpi.FieldType.any:
             return 'any'
-        // TODO: what about this subtypes?
         case collectionSpi.FieldType.arrayString:
             return 'arrayString'
-         // TODO: what about this subtypes?
         case collectionSpi.FieldType.arrayDocument:
             return 'arrayDocument'
         case collectionSpi.FieldType.audio:
             return 'audio'
-        case collectionSpi.FieldType.language:
-            return 'language'
-        // TODO: what about this subtypes?  
         case collectionSpi.FieldType.richContent:
             return 'richContent'
         case collectionSpi.FieldType.mediaGallery:

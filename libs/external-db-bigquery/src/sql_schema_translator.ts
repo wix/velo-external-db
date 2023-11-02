@@ -89,6 +89,7 @@ export default class SchemaColumnTranslator {
             case 'text_small':
             case 'text_medium':
             case 'text_large':
+            case 'text_language':
                 return 'STRING'
 
             case 'boolean_':
@@ -102,12 +103,14 @@ export default class SchemaColumnTranslator {
             case 'object_video':
             case 'object_any':
             case 'object_audio':
-            case 'object_language':
             case 'object_mediaGallery':
             case 'object_address':
             case 'object_pageLink':
             case 'object_reference':
             case 'object_multiReference':
+            case 'object_arrayString':
+            case 'object_arrayDocument':
+            case 'object_richContent':
                 return 'JSON'
 
             default:
