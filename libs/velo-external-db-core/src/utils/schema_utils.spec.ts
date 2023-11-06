@@ -60,8 +60,8 @@ describe('Schema utils functions', () => {
             [VeloFieldTypeEnum.reference, FieldType.object],
             [VeloFieldTypeEnum.object, FieldType.object],
             [VeloFieldTypeEnum.array, FieldType.object],
-          ])('%s type', (veloType, ourType) => {
-            expect(wixDataEnumToFieldType(veloType)).toBe(ourType)
+          ])('%s type', (veloType, domainType) => {
+            expect(wixDataEnumToFieldType(veloType)).toBe(domainType)
           })
 
         test('unsupported type will throw an error', () => {
@@ -95,8 +95,8 @@ describe('Schema utils functions', () => {
             [VeloFieldTypeEnum.reference, 'reference'],
             [VeloFieldTypeEnum.object, 'object'],
             [VeloFieldTypeEnum.array, 'array'],
-          ])('%s type', (veloType, ourSubType) => {
-            expect(subtypeToFieldType(veloType)).toBe(ourSubType)
+          ])('%s type', (veloType, domainSubType) => {
+            expect(subtypeToFieldType(veloType)).toBe(domainSubType)
           })
         test('unsupported type will throw an error', () => {
             // @ts-ignore

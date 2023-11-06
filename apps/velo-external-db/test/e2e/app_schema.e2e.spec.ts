@@ -85,6 +85,9 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
             const collection = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
 
+            // Check that the column exists
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
+
             const systemFieldsNames = SystemFields.map(f => f.name)
             collection.fields = collection.fields.filter((f: any) => systemFieldsNames.includes(f.key))
 

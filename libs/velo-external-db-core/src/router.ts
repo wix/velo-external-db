@@ -261,8 +261,7 @@ export const createRouter = () => {
             const { collectionIds } = await executeSchemaHooksFor(SchemaActions.BeforeGet, schemaPayloadFor(Get, req.body), requestContextFor(Get, req.body, res.locals), customContext) as schemaSource.ListCollectionsRequest
             
             const data = await schemaService.list(collectionIds)
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterGet, data, requestContextFor(Get, req.body, res.locals), customContext)
-                        
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterGet, data, requestContextFor(Get, req.body, res.locals), customContext)                     
             res.json({ collections: dataAfterAction.collections })
         } catch (e) {
             next(e)

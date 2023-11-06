@@ -26,11 +26,11 @@ export const deleteAllCollections = async(auth: any) => {
 }
 
 export const retrieveSchemaFor = async(collectionName: string, auth: any) => {
-    const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [collectionName] }, auth)
-    return collectionGetStream.data.collections[0]
+    const collectionGetRes = await axiosClient.post('/collections/get', { collectionIds: [collectionName] }, auth)
+    return collectionGetRes.data.collections[0]
 }
 
 export const retrieveAllCollections = async(auth: any) => {
-    const collectionGetStream = await axiosClient.post('/collections/get', { collectionIds: [] }, auth)
-    return collectionGetStream.data.collections
+    const collectionGetRes = await axiosClient.post('/collections/get', { collectionIds: [] }, auth)
+    return collectionGetRes.data.collections
 }

@@ -5,32 +5,42 @@ export type createCollection = (req: CreateCollectionRequest) => Promise<CreateC
 export type updateCollection = (req: UpdateCollectionRequest) => Promise<UpdateCollectionResponse>
 
 export type deleteCollection = (req: DeleteCollectionRequest) => Promise<DeleteCollectionResponse>
+
 export abstract class CollectionService {
 }
+
 export interface ListCollectionsRequest {
     collectionIds: string[];
 }
+
 export interface ListCollectionsResponsePart {
     collection: Collection;
 }
+
 export interface DeleteCollectionRequest {
     collectionId: string;
 }
+
 export interface DeleteCollectionResponse {
     collection: Collection;
 }
+
 export interface CreateCollectionRequest {
     collection: Collection;
 }
+
 export interface CreateCollectionResponse {
     collection: Collection;
 }
+
 export interface UpdateCollectionRequest {
     collection: Collection;
 }
+
 export interface UpdateCollectionResponse {
     collection: Collection;
 }
+
 export interface Collection {
     id: string;
     fields: Field[];
@@ -53,6 +63,7 @@ export interface SingleReferenceOptions {
     referencedCollectionId?: string;
     includeSupported?: boolean;
 }
+
 export interface MultiReferenceOptions {
     referencedCollectionId?: string;
     referencedCollectionFieldKey?: string;

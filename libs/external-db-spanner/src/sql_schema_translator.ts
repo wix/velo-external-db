@@ -82,6 +82,7 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
                 return 'TIMESTAMP'
 
             case 'text_string':
+            case 'text_language':
                 return `STRING${this.parseLength(precision)}`
 
             case 'text_small':
@@ -91,7 +92,7 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
                 return `STRING${this.parseLength(2 ** 16)}`
 
             case 'text_large':
-            case 'text_language':
+
                 return `STRING${this.parseLength(2 ** 32)}`
 
             case 'boolean_':
