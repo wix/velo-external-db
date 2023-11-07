@@ -106,14 +106,14 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
             case 'object_video':
             case 'object_any':
             case 'object_audio':
-            case 'object_mediaGallery':
+            case 'object_mediagallery':
             case 'object_address':
-            case 'object_pageLink':
+            case 'object_pagelink':
             case 'object_reference':
-            case 'object_multiReference':
-            case 'object_arrayString':
-            case 'object_arrayDocument':
-            case 'object_richContent':
+            case 'object_multireference':
+            case 'object_arraystring':
+            case 'object_arraydocument':
+            case 'object_richcontent':
                 return 'JSON'
 
             default:

@@ -86,6 +86,68 @@ describe('Sql Schema Column Translator', () => {
             test('text large', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'large' }) ).toEqual(`${escapeId(ctx.fieldName)} LONGTEXT`)
             })
+            
+            test('text language', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'language' }) ).toEqual(`${escapeId(ctx.fieldName)} TEXT`)
+            })
+        })
+
+        describe('JSON fields', () => {
+            test('obect', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'object' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('image', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'image' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('document', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'image' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('video', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'video' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('audio', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'audio' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('any', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'any' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('mediaGallery', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'mediaGallery' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('address', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'address' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('pageLink', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'pageLink' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('reference', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'reference' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('multiReference', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'multiReference' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('arrayString', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'arrayString' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('arrayDocument', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'document' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
+
+            test('richContent', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'richContent' }) ).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+            })
         })
     })
 
@@ -118,6 +180,14 @@ describe('Sql Schema Column Translator', () => {
             test('date', () => {
                 ['DATE', 'DATETIME', 'TIMESTAMP', 'TIME', 'YEAR'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
+                })
+            })
+        })
+
+        describe('json fields', () => {
+            test('object', () => {
+                ['json'].forEach(t => {
+                    expect( env.schemaTranslator.translateType(t) ).toEqual('object')
                 })
             })
         })

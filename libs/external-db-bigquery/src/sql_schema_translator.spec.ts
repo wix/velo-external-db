@@ -94,18 +94,74 @@ describe('Sql Schema Column Translator', () => {
             test('text large', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'large' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'STRING' })
             })
+
+            test('text language', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'language' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'STRING' })
+            })
         })
 
         describe('other fields', () => {
             test('boolean', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'boolean' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'BOOL' })
             })
+        })
 
-            test('obejct', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+        describe('JSON fields', () => {
+            test('obect', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'object' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
             })
 
+            test('image', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'image' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
 
+            test('document', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'image' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('video', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'video' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('audio', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'audio' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('any', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'any' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('mediaGallery', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'mediaGallery' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('address', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'address' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('pageLink', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'pageLink' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('reference', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'reference' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('multiReference', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'multiReference' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('arrayString', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'arrayString' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('arrayDocument', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'document' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
+
+            test('richContent', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype: 'richContent' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+            })
         })
     })
 

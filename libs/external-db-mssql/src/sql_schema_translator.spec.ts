@@ -86,6 +86,12 @@ describe('Sql Schema Column Translator', () => {
             test('text large', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'large' }) ).toEqual(`${escapeId(ctx.fieldName)} TEXT`)
             })
+
+            test('text language', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'language' }) ).toEqual(`${escapeId(ctx.fieldName)} TEXT`)
+            })
+
+
         })
 
         describe('other fields', () => {
