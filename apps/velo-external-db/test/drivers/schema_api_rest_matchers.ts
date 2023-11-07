@@ -1,5 +1,5 @@
 import { SystemFields, asWixSchemaHeaders } from '@wix-velo/velo-external-db-commons'
-import { InputField, DataOperation, FieldType, CollectionOperation } from '@wix-velo/velo-external-db-types'
+import { InputField, DataOperation } from '@wix-velo/velo-external-db-types'
 import { schemaUtils, collectionSpi } from '@wix-velo/velo-external-db-core'
 import { Capabilities, ColumnsCapabilities } from '../types'
 
@@ -43,9 +43,10 @@ const listToHaveCollection = (collectionName: string) => expect.objectContaining
     schemas: expect.arrayContaining( [ expect.objectContaining( { id: collectionName } ) ] )
 } )
 
-const collectionCapabilities = (collectionOperations: CollectionOperation[], dataOperations: DataOperation[], _fieldTypes: FieldType[]) => ({
+const collectionCapabilities = (dataOperations: DataOperation[]) => ({
     dataOperations: expect.arrayContaining(dataOperations.map(schemaUtils.dataOperationsToWixDataQueryOperators)),
 })
+
 
 const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilities) => ({
     key: field.name,
@@ -62,7 +63,7 @@ export const collectionResponsesWith = (collectionName: string, fields: InputFie
     const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
     return {
         id: collectionName,
-        capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
+        capabilities: collectionCapabilities(dataOperations),
         fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
         pagingMode: collectionSpi.PagingMode.offset
     }
