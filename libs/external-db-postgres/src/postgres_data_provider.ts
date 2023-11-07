@@ -61,6 +61,8 @@ export default class DataProvider implements IDataProvider {
     async delete(collectionName: string, itemIds: string[]): Promise<number> {
         const rs = await this.pool.query(`DELETE FROM ${escapeIdentifier(collectionName)} WHERE _id IN (${prepareStatementVariables(itemIds.length)})`, itemIds)
                              .catch( translateErrorCodes )
+        
+        // @ts-ignore
         return rs.rowCount
     }
 
