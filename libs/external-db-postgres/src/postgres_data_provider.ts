@@ -53,7 +53,7 @@ export default class DataProvider implements IDataProvider {
                                                           .catch( translateErrorCodes )
                                 return rs.rowCount
                         } ) )
-        return res ? res.reduce((sum: number, i: number) => i + sum, 0): 0
+        return res ? res.reduce((sum: number, i: number) => (i ?? 0) + sum, 0): 0
     }
 
     async delete(collectionName: string, itemIds: string[]): Promise<number> {
