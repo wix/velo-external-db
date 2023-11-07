@@ -29,10 +29,6 @@ export enum FieldType {
     multiReference = 'multiReference',
 }
 
-export enum SubFieldType {
-    
-}
-
 export enum CollectionOperation {
     update = 'update',
     remove = 'remove',

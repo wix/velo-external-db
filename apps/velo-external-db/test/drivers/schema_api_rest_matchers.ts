@@ -1,6 +1,6 @@
 import { SystemFields, asWixSchemaHeaders } from '@wix-velo/velo-external-db-commons'
 import { InputField, DataOperation, FieldType, CollectionOperation } from '@wix-velo/velo-external-db-types'
-import { schemaUtils } from '@wix-velo/velo-external-db-core'
+import { schemaUtils, collectionSpi } from '@wix-velo/velo-external-db-core'
 import { Capabilities, ColumnsCapabilities } from '../types'
 
 export const responseWith = (matcher: any) => expect.objectContaining( { data: matcher } )
@@ -64,7 +64,7 @@ export const collectionResponsesWith = (collectionName: string, fields: InputFie
         id: collectionName,
         capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
         fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
-        pagingMode: 'OFFSET'
+        pagingMode: collectionSpi.PagingMode.offset
     }
 }
 
