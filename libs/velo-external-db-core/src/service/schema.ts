@@ -14,7 +14,7 @@ import {
     responseFieldToWixFormat, 
     compareColumnsInDbAndRequest,
     dataOperationsToWixDataQueryOperators,
-    collectionOperationsToWixDataCollectionOperations,
+    pagingModeToWixDataPagingMode,
 } from '../utils/schema_utils'
 
 
@@ -89,6 +89,7 @@ export default class SchemaService {
         return { collection: {
             id: collectionId,
             fields: responseFieldToWixFormat(collectionFields),
+            pagingMode: collectionSpi.PagingMode.offset
         } }
     }
 
@@ -103,14 +104,14 @@ export default class SchemaService {
         return {
             id: collection.id,
             fields: this.formatFields(collection.fields),
-            capabilities: collection.capabilities? this.formatCollectionCapabilities(collection.capabilities) : undefined
+            capabilities: collection.capabilities? this.formatCollectionCapabilities(collection.capabilities) : undefined,
+            pagingMode: pagingModeToWixDataPagingMode(collection.capabilities!.pagingMode)
         }
     }
 
     private formatFields(fields: ResponseField[]): collectionSpi.Field[] {
         return fields.map( field => ({
             key: field.field,
-            encrypted: false,
             type: fieldTypeToWixDataEnum(field.type),
             capabilities: {
                 sortable: field.capabilities? field.capabilities.sortable: undefined, 
@@ -122,12 +123,6 @@ export default class SchemaService {
     private formatCollectionCapabilities(capabilities: CollectionCapabilities): collectionSpi.CollectionCapabilities {
         return {
             dataOperations: capabilities.dataOperations.map(dataOperationsToWixDataQueryOperators),
-            fieldTypes: capabilities.fieldTypes.map(fieldTypeToWixDataEnum),
-            collectionOperations: capabilities.collectionOperations.map(collectionOperationsToWixDataCollectionOperations),
-            // TODO: create functions that translate between the domains.
-            referenceCapabilities: { supportedNamespaces: capabilities.referenceCapabilities.supportedNamespaces },
-            indexing: [],
-            encryption: collectionSpi.Encryption.notSupported
         }
     }
 

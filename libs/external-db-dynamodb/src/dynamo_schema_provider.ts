@@ -4,7 +4,7 @@ import { SystemFields, validateSystemFields, errors, EmptyCapabilities } from '@
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import * as dynamoRequests from './dynamo_schema_requests_utils'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import { CollectionCapabilities, Encryption, InputField, ISchemaProvider, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { CollectionCapabilities, Encryption, InputField, ISchemaProvider, PagingMode, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
 import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadWriteOperations } from './dynamo_capabilities'
 import { supportedOperations } from './supported_operations'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
@@ -178,7 +178,8 @@ export default class SchemaProvider implements ISchemaProvider {
             collectionOperations: CollectionOperations,
             referenceCapabilities: { supportedNamespaces: [] },
             indexing: [],
-            encryption: Encryption.notSupported
+            encryption: Encryption.notSupported,
+            pagingMode: PagingMode.offset
         }
     }
 }

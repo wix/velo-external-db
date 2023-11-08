@@ -10,6 +10,7 @@ import {
     DataOperation,
     Table,
     Encryption,
+    PagingMode,
  } from '@wix-velo/velo-external-db-types'
 
  const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
@@ -68,7 +69,8 @@ export const randomCollectionCapabilities = (): CollectionCapabilities => ({
     encryption: Encryption.notSupported,
     referenceCapabilities: {
         supportedNamespaces: []
-    }
+    },
+    pagingMode: PagingMode.offset
 })
 
 export const randomCollectionName = ():string => chance.word({ length: 5 })

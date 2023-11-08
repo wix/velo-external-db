@@ -34,10 +34,16 @@ export enum CollectionOperation {
     remove = 'remove',
 }
 
+// TODO: remove this type
 export enum Encryption {
     notSupported = 'notSupported',
     wixDataNative = 'wixDataNative',
     dataSourceNative = 'dataSourceNative',
+}
+
+export enum PagingMode {
+    offset = 'offset',
+    cursor = 'cursor',
 }
 
 export type CollectionCapabilities = {
@@ -47,6 +53,7 @@ export type CollectionCapabilities = {
     collectionOperations: CollectionOperation[],
     indexing: IndexingCapabilityEnum[],
     encryption: Encryption,
+    pagingMode: PagingMode,
 }
 
 export type ColumnCapabilities = {

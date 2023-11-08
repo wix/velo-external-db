@@ -1,6 +1,6 @@
 import { SystemFields, asWixSchemaHeaders } from '@wix-velo/velo-external-db-commons'
-import { InputField, DataOperation, FieldType, CollectionOperation } from '@wix-velo/velo-external-db-types'
-import { schemaUtils } from '@wix-velo/velo-external-db-core'
+import { InputField, DataOperation } from '@wix-velo/velo-external-db-types'
+import { schemaUtils, collectionSpi } from '@wix-velo/velo-external-db-core'
 import { Capabilities, ColumnsCapabilities } from '../types'
 
 export const responseWith = (matcher: any) => expect.objectContaining( { data: matcher } )
@@ -43,14 +43,10 @@ const listToHaveCollection = (collectionName: string) => expect.objectContaining
     schemas: expect.arrayContaining( [ expect.objectContaining( { id: collectionName } ) ] )
 } )
 
-const collectionCapabilities = (collectionOperations: CollectionOperation[], dataOperations: DataOperation[], fieldTypes: FieldType[]) => ({
-    collectionOperations: expect.arrayContaining(collectionOperations.map(schemaUtils.collectionOperationsToWixDataCollectionOperations)),
+const collectionCapabilities = (dataOperations: DataOperation[]) => ({
     dataOperations: expect.arrayContaining(dataOperations.map(schemaUtils.dataOperationsToWixDataQueryOperators)),
-    fieldTypes: expect.arrayContaining(fieldTypes.map(schemaUtils.fieldTypeToWixDataEnum)),
-    referenceCapabilities: expect.objectContaining({ supportedNamespaces: [] }),
-    indexing: [],
-    encryption: 'NOT_SUPPORTED'
 })
+
 
 const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilities) => ({
     key: field.name,
@@ -59,7 +55,6 @@ const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilitie
         sortable: columnsCapabilities[field.type].sortable,
         queryOperators: columnsCapabilities[field.type].columnQueryOperators.map(schemaUtils.queryOperatorsToWixDataQueryOperators)
     },
-    encrypted: expect.any(Boolean)
 })
 
 const fieldsWith = (fields: InputField[], columnsCapabilities: ColumnsCapabilities) => expect.toIncludeSameMembers(fields.map(f => filedMatcher(f, columnsCapabilities)))
@@ -67,21 +62,11 @@ const fieldsWith = (fields: InputField[], columnsCapabilities: ColumnsCapabiliti
 export const collectionResponsesWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
     const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
     return {
-        collection: {
-            id: collectionName,
-            capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
-            fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
-        }
+        id: collectionName,
+        capabilities: collectionCapabilities(dataOperations),
+        fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
+        pagingMode: collectionSpi.PagingMode.offset
     }
 }
 
-export const createCollectionResponseWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
-    const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
-    return {
-        collection: {
-            id: collectionName,
-            capabilities: collectionCapabilities(capabilities.CollectionOperations, dataOperations, capabilities.FieldTypes),
-            fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
-        }
-    }
-}
+export const createCollectionResponseWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => collectionResponsesWith(collectionName, fields, capabilities)

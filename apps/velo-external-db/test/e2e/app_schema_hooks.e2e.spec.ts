@@ -130,7 +130,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                         }
                     }
                 })
-                const { collection } = await schema.retrieveSchemaFor(ctx.collectionId, authOwner)
+                const collection = await schema.retrieveSchemaFor(ctx.collectionId, authOwner)
 
                 const collectionToUpdate = { ...collection, fields: [...collection.fields, schemaUtils.InputFieldToWixFormatField({ ...ctx.column, name: 'wrong' })] }
 

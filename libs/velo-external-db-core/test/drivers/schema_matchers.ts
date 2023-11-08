@@ -8,8 +8,9 @@ import {
     fieldTypeToWixDataEnum, 
     queryOperatorsToWixDataQueryOperators,
     dataOperationsToWixDataQueryOperators,
-    collectionOperationsToWixDataCollectionOperations,
 } from '../../src/utils/schema_utils'
+import * as collectionSpi from '../../src/spi-model/collection'
+
 
 const appendAllowedOperationsToDbs = (dbs: any[], allowedSchemaOperations: any) => {
     return dbs.map( (db: { fields: any }) => ({
@@ -51,15 +52,14 @@ export const fieldsToBeInWixFormat = (fields: ResponseField[]) => expect.arrayCo
 
 export const collectionCapabilitiesObjectFor = (collectionsCapabilities: CollectionCapabilities) => expect.objectContaining({
     dataOperations: expect.arrayContaining(collectionsCapabilities.dataOperations.map(d => dataOperationsToWixDataQueryOperators(d))),
-    fieldTypes: expect.arrayContaining(collectionsCapabilities.fieldTypes.map(f => fieldTypeToWixDataEnum(f))),
-    collectionOperations: expect.arrayContaining(collectionsCapabilities.collectionOperations.map(c => collectionOperationsToWixDataCollectionOperations(c))),
 })
 
 export const collectionsInWixFormatFor = (collection: Table) => {
    return expect.objectContaining({
        id: collection.id,
        fields: fieldsToBeInWixFormat(collection.fields),
-       capabilities: collection.capabilities? collectionCapabilitiesObjectFor(collection.capabilities): undefined
+       capabilities: collection.capabilities? collectionCapabilitiesObjectFor(collection.capabilities): undefined,
+       pagingMode: collectionSpi.PagingMode.offset
     })
 }
 

@@ -42,7 +42,7 @@ export default class DataProvider implements IDataProvider {
         return items.length
     }
 
-    async update(collectionName: string, items: Item[]) {
+    async update(collectionName: string, items: Item[]): Promise<number> {
         const updateFields = updateFieldsFor(items[0])
         const updatables = items.map((i: { [x: string]: any }) => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
                                 .map((u: { [x: string]: any }) => asParamArrays( patchDateTime(u) ))
@@ -53,12 +53,16 @@ export default class DataProvider implements IDataProvider {
                                                           .catch( translateErrorCodes )
                                 return rs.rowCount
                         } ) )
-        return res.reduce((sum, i) => i + sum, 0)
+        
+        // @ts-ignore
+        return res.reduce((sum: number, i: number) => i + sum, 0)
     }
 
-    async delete(collectionName: string, itemIds: string[]) {
+    async delete(collectionName: string, itemIds: string[]): Promise<number> {
         const rs = await this.pool.query(`DELETE FROM ${escapeIdentifier(collectionName)} WHERE _id IN (${prepareStatementVariables(itemIds.length)})`, itemIds)
                              .catch( translateErrorCodes )
+        
+        // @ts-ignore
         return rs.rowCount
     }
 
