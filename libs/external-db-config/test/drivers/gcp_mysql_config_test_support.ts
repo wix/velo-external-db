@@ -55,7 +55,7 @@ export const validConfigWithAuthConfig = () => ({
     }  
 })
 
-export const ExpectedProperties = ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD', 'DB', 'ALLOWED_METASITES','PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
+export const ExpectedProperties = ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD', 'DB', 'ALLOWED_METASITES', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 
 export const defineInvalidConfig = () => defineValidConfig({})
 

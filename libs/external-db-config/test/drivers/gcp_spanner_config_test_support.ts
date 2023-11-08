@@ -55,7 +55,7 @@ export const validConfigWithAuthConfig = () => ({
 
 export const defineInvalidConfig = () => defineValidConfig({})
 
-export const ExpectedProperties = ['PROJECT_ID', 'INSTANCE_ID', 'DATABASE_ID', 'ALLOWED_METASITES','PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
+export const ExpectedProperties = ['PROJECT_ID', 'INSTANCE_ID', 'DATABASE_ID', 'ALLOWED_METASITES', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 
 export const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 

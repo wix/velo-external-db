@@ -70,7 +70,7 @@ export const validConfigWithAuthorization = () => ({
     authorization: validAuthorizationConfig.collectionPermissions 
 })
 
-export const ExpectedProperties = ['URI','ALLOWED_METASITES', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
+export const ExpectedProperties = ['URI', 'ALLOWED_METASITES', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 export const RequiredProperties = ['URI', 'ALLOWED_METASITES', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 
 export const reset = () => { 
