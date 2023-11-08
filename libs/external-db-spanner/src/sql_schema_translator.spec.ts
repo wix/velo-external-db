@@ -74,12 +74,37 @@ describe('Sql Schema Column Translator', () => {
             test('text large', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'large' }) ).toEqual(`${escapeId(ctx.fieldName)} STRING(4294967296)`)
             })
+
+            test('text language', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'language' }) ).toEqual(`${escapeId(ctx.fieldName)} STRING(2048)`)
+            })  
         })
 
         describe('other fields', () => {
             test('boolean', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'boolean' }) ).toEqual(`${escapeId(ctx.fieldName)} BOOL`)
             })
+        })
+
+        describe('JSON fields', () => {
+            test.each([
+                ['object'],
+                ['image'],
+                ['document'],
+                ['video'],
+                ['audio'],
+                ['any'],
+                ['mediaGallery'],
+                ['address'],
+                ['pageLink'],
+                ['reference'],
+                ['multiReference'],
+                ['arrayString'],
+                ['arrayDocument'],
+                ['richContent'],
+              ])('%s', (subtype) => {
+                expect(env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype })).toEqual(`${escapeId(ctx.fieldName)} JSON`)
+              })
         })
     })
 
@@ -122,6 +147,12 @@ describe('Sql Schema Column Translator', () => {
                 ['TIMESTAMP'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual({ type: 'datetime', subtype: 'timestamp' })
                 })
+            })
+        })
+
+        describe('object fields', () => {
+            test('obejct', () => {
+                expect( env.schemaTranslator.translateType('json') ).toEqual({ type: 'object' })
             })
         })
 

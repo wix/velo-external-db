@@ -5,7 +5,7 @@ import {
     ISchemaProvider,
     Table,
     SchemaOperations,
-    CollectionCapabilities, Encryption
+    CollectionCapabilities, Encryption, PagingMode
 } from '@wix-velo/velo-external-db-types'
 import { table } from './types'
 import {
@@ -159,7 +159,8 @@ export default class SchemaProvider implements ISchemaProvider {
             collectionOperations: CollectionOperations,
             referenceCapabilities: { supportedNamespaces: [] },
             indexing: [],
-            encryption: Encryption.notSupported
+            encryption: Encryption.notSupported,
+            pagingMode: PagingMode.offset
         }
     }
 }

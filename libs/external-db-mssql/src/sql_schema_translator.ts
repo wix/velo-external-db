@@ -88,10 +88,12 @@ export default class SchemaColumnTranslator {
             case 'text_small':
             case 'text_medium':
             case 'text_large':
+            case 'text_language':
                 return 'TEXT'
 
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'TINYINT'
 
             default:

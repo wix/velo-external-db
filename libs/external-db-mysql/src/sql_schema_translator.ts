@@ -1,14 +1,7 @@
 import { InputField } from '@wix-velo/velo-external-db-types'
 import { escapeId } from './mysql_utils'
 
-
-export interface IMySqlSchemaColumnTranslator {
-    translateType(dbType: string): string
-    dbTypeFor(field: InputField): string
-    columnToDbColumnSql(field: InputField): string
-}
-
-export default class SchemaColumnTranslator implements IMySqlSchemaColumnTranslator {
+export default class SchemaColumnTranslato {
     constructor() {
     }
 
@@ -100,6 +93,7 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
                 return `VARCHAR${this.parseLength(precision)}`
 
             case 'text_small':
+            case 'text_language':
                 return 'TEXT'
 
             case 'text_medium':
@@ -109,9 +103,24 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
                 return 'LONGTEXT'
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'BOOLEAN'
 
             case 'object_':
+            case 'object_object':
+            case 'object_image':
+            case 'object_document':
+            case 'object_video':
+            case 'object_any':
+            case 'object_audio':
+            case 'object_mediagallery':
+            case 'object_address':
+            case 'object_pagelink':
+            case 'object_reference':
+            case 'object_multireference':
+            case 'object_arraystring':
+            case 'object_arraydocument':
+            case 'object_richcontent':
                 return 'JSON'
 
             default:

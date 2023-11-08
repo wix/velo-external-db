@@ -1,22 +1,21 @@
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField, FieldType, DataOperation, CollectionOperation } from '@wix-velo/velo-external-db-types'
+import { InputField, ResponseField, FieldType, DataOperation, CollectionOperation, PagingMode } from '@wix-velo/velo-external-db-types'
 import * as collectionSpi from '../spi-model/collection'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export const fieldTypeToWixDataEnum = ( fieldType: string ): collectionSpi.FieldType => {
     switch (fieldType) {
         case FieldType.text:
-            return collectionSpi.FieldType.text
         case FieldType.longText:
-            return collectionSpi.FieldType.longText
+            return collectionSpi.FieldType.text
         case FieldType.number:
             return collectionSpi.FieldType.number
         case FieldType.boolean:
             return collectionSpi.FieldType.boolean
         case FieldType.object:
-            return collectionSpi.FieldType.json
+            return collectionSpi.FieldType.object
         case FieldType.datetime:
-            return collectionSpi.FieldType.timestamp
+            return collectionSpi.FieldType.dataTime
         case FieldType.singleReference:
             return collectionSpi.FieldType.singleReference
         case FieldType.multiReference:
@@ -30,44 +29,95 @@ export const fieldTypeToWixDataEnum = ( fieldType: string ): collectionSpi.Field
 export const wixDataEnumToFieldType = (fieldEnum: collectionSpi.FieldType): string => {
     switch (fieldEnum) {
         case collectionSpi.FieldType.text:
-        case collectionSpi.FieldType.longText:
+        case collectionSpi.FieldType.url:
+        case collectionSpi.FieldType.richText:
+        case collectionSpi.FieldType.language:
             return FieldType.text
+        
         case collectionSpi.FieldType.number:
             return FieldType.number
-        case collectionSpi.FieldType.timestamp:
+        
+        case collectionSpi.FieldType.date:
+        case collectionSpi.FieldType.dataTime:
+        case collectionSpi.FieldType.time:
             return FieldType.datetime
+       
         case collectionSpi.FieldType.boolean:
             return FieldType.boolean
-        case collectionSpi.FieldType.json:
-            return FieldType.object
 
-        case collectionSpi.FieldType.singleReference:
-        case collectionSpi.FieldType.multiReference:
+        case collectionSpi.FieldType.image:
+        case collectionSpi.FieldType.document:
+        case collectionSpi.FieldType.video:
+        case collectionSpi.FieldType.any:
+        case collectionSpi.FieldType.arrayString:
+        case collectionSpi.FieldType.arrayDocument:
+        case collectionSpi.FieldType.audio:
+        case collectionSpi.FieldType.richContent:
+        case collectionSpi.FieldType.mediaGallery:
+        case collectionSpi.FieldType.address:
+        case collectionSpi.FieldType.pageLink:
+        case collectionSpi.FieldType.reference:
+        case collectionSpi.FieldType.object:
+        case collectionSpi.FieldType.array:
+            return FieldType.object
         default:
             // TODO: throw specific error
             throw new Error(`Unsupported field type: ${fieldEnum}`)
     }
 }
 
+// TODO: create a subtype emun
 export const subtypeToFieldType = (fieldEnum: collectionSpi.FieldType): string => {
     switch (fieldEnum) {
         case collectionSpi.FieldType.text:
-        case collectionSpi.FieldType.longText:
+        case collectionSpi.FieldType.url:
+        case collectionSpi.FieldType.richText:
             return 'string'
+        
+        case collectionSpi.FieldType.language:
+            return 'language' 
+
         case collectionSpi.FieldType.number:
             return 'float'
-        case collectionSpi.FieldType.timestamp:
+        case collectionSpi.FieldType.date:
+        case collectionSpi.FieldType.dataTime:
+        case collectionSpi.FieldType.time:
             return 'datetime'
         case collectionSpi.FieldType.boolean:
-            return ''
-        case collectionSpi.FieldType.json:
-            return ''
-
-        case collectionSpi.FieldType.singleReference:
-        case collectionSpi.FieldType.multiReference:
+            return 'boolean'
+         
+        // Object subtypes
+        case collectionSpi.FieldType.image:
+            return 'image'
+        case collectionSpi.FieldType.document:
+            return 'document'
+        case collectionSpi.FieldType.video:
+            return 'video'
+        case collectionSpi.FieldType.any:
+            return 'any'
+        case collectionSpi.FieldType.arrayString:
+            return 'arrayString'
+        case collectionSpi.FieldType.arrayDocument:
+            return 'arrayDocument'
+        case collectionSpi.FieldType.audio:
+            return 'audio'
+        case collectionSpi.FieldType.richContent:
+            return 'richContent'
+        case collectionSpi.FieldType.mediaGallery:
+            return 'mediaGallery'
+        case collectionSpi.FieldType.address:
+            return 'address'
+        case collectionSpi.FieldType.pageLink:
+            return 'pageLink'
+        case collectionSpi.FieldType.reference:
+            return 'reference'
+        case collectionSpi.FieldType.object:
+            return 'object'
+        case collectionSpi.FieldType.array:
+            return 'array'
         default:
             // TODO: throw specific error
-            throw new Error(`There is no subtype for this type: ${fieldEnum}`)
+            throw new Error(`Unsupported field type: ${fieldEnum}`)
     }
 
 }
@@ -199,4 +249,13 @@ export const compareColumnsInDbAndRequest = (
     columnsToRemove,
     columnsToChangeType,
   }
+}
+
+export const pagingModeToWixDataPagingMode = (pagingMode: PagingMode): collectionSpi.PagingMode => {
+    switch (pagingMode) {
+        case PagingMode.offset:
+            return collectionSpi.PagingMode.offset
+        case PagingMode.cursor:
+            return collectionSpi.PagingMode.cursor
+    }
 }

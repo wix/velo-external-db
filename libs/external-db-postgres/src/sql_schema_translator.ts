@@ -102,16 +102,33 @@ export default class SchemaColumnTranslator {
             case 'text_small':
             case 'text_medium':
             case 'text_large':
+            case 'text_language':
                 return 'text'
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'boolean'
 
+            case 'object':
             case 'object_':
+            case 'object_object':
+            case 'object_image':
+            case 'object_document':
+            case 'object_video':
+            case 'object_any':
+            case 'object_audio':
+            case 'object_mediagallery':
+            case 'object_address':
+            case 'object_pagelink':
+            case 'object_reference':
+            case 'object_multireference':
+            case 'object_arraystring':
+            case 'object_arraydocument':
+            case 'object_richcontent':
                 return 'json'
 
             default:
-                throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)
+                throw new Error(`Unknow type ${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)
 
         }
     }

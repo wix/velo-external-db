@@ -94,18 +94,37 @@ describe('Sql Schema Column Translator', () => {
             test('text large', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'large' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'STRING' })
             })
+
+            test('text language', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'language' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'STRING' })
+            })
         })
 
         describe('other fields', () => {
             test('boolean', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'boolean' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'BOOL' })
             })
+        })
 
-            test('obejct', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object' }) ).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
-            })
-
-
+        describe('JSON fields', () => {
+            test.each([
+                ['object'],
+                ['image'],
+                ['document'],
+                ['video'],
+                ['audio'],
+                ['any'],
+                ['mediaGallery'],
+                ['address'],
+                ['pageLink'],
+                ['reference'],
+                ['multiReference'],
+                ['arrayString'],
+                ['arrayDocument'],
+                ['richContent'],
+              ])('%s', (subtype) => {
+                expect(env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype })).toEqual({ mode: '', name: escapeId(ctx.fieldName), type: 'JSON' })
+              })
         })
     })
 

@@ -1,16 +1,16 @@
 import { Pool as MySqlPool } from 'mysql'
 import { promisify } from 'util'
 import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, CollectionCapabilities, Encryption } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, CollectionCapabilities, Encryption, PagingMode } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes } from './sql_exception_translator'
-import SchemaColumnTranslator, { IMySqlSchemaColumnTranslator } from './sql_schema_translator'
+import  SchemaColumnTranslator from './sql_schema_translator'
 import { escapeId, escapeTable } from './mysql_utils'
 import { MySqlQuery } from './types'
 import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations, ColumnsCapabilities } from './mysql_capabilities'
 
 export default class SchemaProvider implements ISchemaProvider {
     pool: MySqlPool
-    sqlSchemaTranslator: IMySqlSchemaColumnTranslator
+    sqlSchemaTranslator: SchemaColumnTranslator
     query: MySqlQuery
     constructor(pool: any) {
         this.pool = pool
@@ -108,7 +108,8 @@ export default class SchemaProvider implements ISchemaProvider {
             collectionOperations: CollectionOperations,
             referenceCapabilities: { supportedNamespaces: [] },
             indexing: [],
-            encryption: Encryption.notSupported
+            encryption: Encryption.notSupported,
+            pagingMode: PagingMode.offset
         }
     }
 }

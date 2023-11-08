@@ -72,10 +72,9 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         test('collection update - add column', async() => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
 
-            const { collection } = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
+            const collection = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
 
             collection.fields.push(schemaUtils.InputFieldToWixFormatField(ctx.column))
-        
             await axiosClient.post('/collections/update', { collection }, authOwner)
 
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
@@ -84,7 +83,10 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         testIfSupportedOperationsIncludes(supportedOperations, [ RemoveColumn ])('collection update - remove column', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-            const { collection } = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
+            const collection = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
+
+            // Check that the column exists
+            await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.collectionResponsesWith(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
 
             const systemFieldsNames = SystemFields.map(f => f.name)
             collection.fields = collection.fields.filter((f: any) => systemFieldsNames.includes(f.key))
@@ -96,7 +98,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
 
         testIfSupportedOperationsIncludes(supportedOperations, [ ChangeColumnType ])('collection update - change column type', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-            const { collection } = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
+            const collection = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
 
             const columnIndex = collection.fields.findIndex((f: any) => f.key === ctx.column.name)
             collection.fields[columnIndex].type = schemaUtils.fieldTypeToWixDataEnum('number') 

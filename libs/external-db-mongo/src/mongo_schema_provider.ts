@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb'
 import { SystemFields, validateSystemFields, AllSchemaOperations, EmptyCapabilities, errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table, CollectionCapabilities, Encryption } from '@wix-velo/velo-external-db-types'
+import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table, CollectionCapabilities, Encryption, PagingMode } from '@wix-velo/velo-external-db-types'
 import { validateTable, SystemTable, updateExpressionFor, CollectionObject } from './mongo_utils'
 import { CollectionOperations, FieldTypes, ReadWriteOperations, ColumnsCapabilities } from './mongo_capabilities'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
@@ -27,7 +27,8 @@ export default class SchemaProvider implements ISchemaProvider {
             collectionOperations: CollectionOperations,
             encryption: Encryption.notSupported,
             indexing: [],
-            referenceCapabilities: { supportedNamespaces: [] } 
+            referenceCapabilities: { supportedNamespaces: [] },
+            pagingMode: PagingMode.offset
         } 
     }
 

@@ -1,6 +1,6 @@
 import { Dataset } from '@google-cloud/bigquery'
 import { SystemFields, validateSystemFields, parseTableData, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, ResponseField, Table, SchemaOperations, CollectionCapabilities, Encryption } from '@wix-velo/velo-external-db-types'
+import { InputField, ISchemaProvider, ResponseField, Table, SchemaOperations, CollectionCapabilities, Encryption, PagingMode } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes, removeColumnTranslateErrorCodes } from './sql_exception_translator'
 import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations, ColumnsCapabilities } from './bigquery_capabilities'
 import { escapeIdentifier } from './bigquery_utils'
@@ -104,7 +104,8 @@ export default class SchemaProvider implements ISchemaProvider {
             collectionOperations: CollectionOperations,
             referenceCapabilities: { supportedNamespaces: [] },
             indexing: [],
-            encryption: Encryption.notSupported
+            encryption: Encryption.notSupported,
+            pagingMode: PagingMode.offset
         }
     }
 
