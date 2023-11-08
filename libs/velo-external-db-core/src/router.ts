@@ -30,10 +30,10 @@ import { WixDataFacade } from './web/wix_data_facade'
 const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
 const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { externalDatabaseId: string, allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey?: string, appDefId?: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
-                             _externalDbConfigClient: ConfigValidator, _cfg: { externalDatabaseId: string, allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean },
+                             _externalDbConfigClient: ConfigValidator, _cfg: { allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey?: string, appDefId?: string },
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
                              _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks) => {
     schemaService = _schemaService
@@ -86,7 +86,8 @@ export const createRouter = () => {
     router.use(express.json())
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
-    const jwtAuthenticator = new JwtAuthenticator(cfg.externalDatabaseId, cfg.allowedMetasites, new WixDataFacade(cfg.wixDataBaseUrl))
+    // TODO: jwt auth will be fixed in the following PR
+    const jwtAuthenticator = new JwtAuthenticator('', cfg.allowedMetasites, new WixDataFacade(cfg.wixDataBaseUrl))
     router.use(unless(['/', '/info', '/capabilities', '/favicon.ico', '/provision', '/connectionStatus'], jwtAuthenticator.authorizeJwt()))
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
@@ -113,11 +114,6 @@ export const createRouter = () => {
     router.post('/provision', async(req, res) => {
         const { type, vendor } = cfg
         res.json({ type, vendor, protocolVersion: 3, adapterVersion: 'v1' })
-    })
-
-    router.get('/info', async(req, res) => {
-        const { externalDatabaseId } = cfg
-        res.json({ dataSourceId: externalDatabaseId })
     })
 
     router.get('/connectionStatus', async(req, res) => {

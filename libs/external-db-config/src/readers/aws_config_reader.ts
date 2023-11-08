@@ -13,8 +13,8 @@ export class AwsConfigReader implements IConfigReader {
 
   async readConfig() {
     const { config } = await this.readExternalAndLocalConfig()
-    const { host, username, password, DB, EXTERNAL_DATABASE_ID, ALLOWED_METASITES, DB_PORT } = config
-    return { host, user: username, password, db: DB, externalDatabaseId: EXTERNAL_DATABASE_ID, allowedMetasites: ALLOWED_METASITES, port: DB_PORT }
+    const { host, username, password, DB, ALLOWED_METASITES, DB_PORT, JWT_PUBLIC_KEY, APP_DEF_ID } = config
+    return { host, user: username, password, db: DB, allowedMetasites: ALLOWED_METASITES, port: DB_PORT, jwtPublicKey: JWT_PUBLIC_KEY, appDefId: APP_DEF_ID }
   }
 
   async readExternalConfig() {
@@ -29,8 +29,8 @@ export class AwsConfigReader implements IConfigReader {
 
   async readExternalAndLocalConfig() { 
     const { externalConfig, secretMangerError }: {[key: string]: any} = await this.readExternalConfig()
-    const { host, username, password, DB, EXTERNAL_DATABASE_ID, ALLOWED_METASITES, HOST, PASSWORD, USER, DB_PORT }: {[key: string]: string} = { ...process.env, ...externalConfig }
-    const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, EXTERNAL_DATABASE_ID, ALLOWED_METASITES, DB_PORT }
+    const { host, username, password, DB, ALLOWED_METASITES, HOST, PASSWORD, USER, DB_PORT, JWT_PUBLIC_KEY, APP_DEF_ID }: {[key: string]: string} = { ...process.env, ...externalConfig }
+    const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, ALLOWED_METASITES, DB_PORT, JWT_PUBLIC_KEY, APP_DEF_ID }
     return { config, secretMangerError }
   }
 }
@@ -46,15 +46,15 @@ export class AwsDynamoConfigReader implements IConfigReader {
     async readConfig() {
       const { config } = await this.readExternalAndLocalConfig()
       if (process.env['NODE_ENV'] === 'test') {
-        return { region: this.region, externalDatabaseId: config.EXTERNAL_DATABASE_ID, endpoint: process.env['ENDPOINT_URL'] }
+        return { region: this.region, endpoint: process.env['ENDPOINT_URL'], jwtPublicKey: config.JWT_PUBLIC_KEY, appDefId: config.APP_DEF_ID }
       }
-      return { region: this.region, externalDatabaseId: config.EXTERNAL_DATABASE_ID, allowedMetasites: config.ALLOWED_METASITES }
+      return { region: this.region, jwtPublicKey: config.JWT_PUBLIC_KEY, appDefId: config.APP_DEF_ID, allowedMetasites: config.ALLOWED_METASITES }
     }
     
     async readExternalAndLocalConfig() { 
       const { externalConfig, secretMangerError }: {[key: string]: any} = await this.readExternalConfig()
-      const { EXTERNAL_DATABASE_ID = undefined, ALLOWED_METASITES = undefined } = { ...process.env, ...externalConfig }
-      const config = { EXTERNAL_DATABASE_ID, ALLOWED_METASITES }
+      const { ALLOWED_METASITES = undefined, JWT_PUBLIC_KEY = undefined, APP_DEF_ID = undefined } = { ...process.env, ...externalConfig }
+      const config = { JWT_PUBLIC_KEY, APP_DEF_ID, ALLOWED_METASITES }
 
       return { config, secretMangerError }
     }
@@ -90,8 +90,8 @@ export class AwsMongoConfigReader implements IConfigReader {
 
   async readExternalAndLocalConfig() { 
     const { externalConfig, secretMangerError } :{[key: string]: any} = await this.readExternalConfig()
-    const { EXTERNAL_DATABASE_ID, ALLOWED_METASITES, URI }: {EXTERNAL_DATABASE_ID: string, ALLOWED_METASITES: string, URI: string} = { ...process.env, ...externalConfig }
-    const config = { EXTERNAL_DATABASE_ID, ALLOWED_METASITES, URI }
+    const { ALLOWED_METASITES, URI, JWT_PUBLIC_KEY, APP_DEF_ID }: { ALLOWED_METASITES: string, URI: string, JWT_PUBLIC_KEY: string, APP_DEF_ID: string } = { ...process.env, ...externalConfig }
+    const config = { ALLOWED_METASITES, URI, JWT_PUBLIC_KEY, APP_DEF_ID }
 
     return { config, secretMangerError }
   }
@@ -99,8 +99,8 @@ export class AwsMongoConfigReader implements IConfigReader {
   async readConfig() {
     const { config } = await this.readExternalAndLocalConfig()
 
-    const { EXTERNAL_DATABASE_ID, ALLOWED_METASITES, URI } = config
+    const { ALLOWED_METASITES, URI, JWT_PUBLIC_KEY, APP_DEF_ID } = config
 
-    return { externalDatabaseId: EXTERNAL_DATABASE_ID, allowedMetasites: ALLOWED_METASITES, connectionUri: URI }
+    return { allowedMetasites: ALLOWED_METASITES, connectionUri: URI, jwtPublicKey: JWT_PUBLIC_KEY, appDefId: APP_DEF_ID }
   }
 }

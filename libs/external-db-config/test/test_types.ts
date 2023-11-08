@@ -1,16 +1,18 @@
 
 export interface MongoConfig {
     connectionUri?: string
-    externalDatabaseId?: string
     allowedMetasites?: string
     authorization?: any
+    jwtPublicKey?: string
+    appDefId?: string
 }
 
 export interface MongoAwsConfig {
     URI?: string
-    EXTERNAL_DATABASE_ID?: string
     ALLOWED_METASITES?: string
     PERMISSIONS?: string
+    JWT_PUBLIC_KEY?: string
+    APP_DEF_ID?: string
 }
 
 export interface MySqlConfig {
@@ -19,10 +21,10 @@ export interface MySqlConfig {
     user?: string
     password?: string
     db?: string
-    externalDatabaseId?: string
     allowedMetasites?: string
     authorization?: any
-    auth?: any
+    jwtPublicKey?: string
+    appDefId?: string
 }
 
 export interface AwsMysqlConfig {
@@ -30,34 +32,35 @@ export interface AwsMysqlConfig {
     username?: string
     password?: string
     DB?: string
-    EXTERNAL_DATABASE_ID?: string
     ALLOWED_METASITES?: string
     PERMISSIONS?: string
+    JWT_PUBLIC_KEY?: string
+    APP_DEF_ID?: string
 }
 
 export interface CommonConfig {
     type?: string
     vendor?: string
-    secretKey?: string
     hideAppInfo?: boolean
-    externalDatabaseId?: string
     allowedMetasites?: string
+    jwtPublicKey?: string
+    appDefId?: string
 }
 
 export interface FiresStoreConfig {
     projectId?: string
-    externalDatabaseId?: string
     allowedMetasites?: string
     authorization?: any
-    auth?: any
+    jwtPublicKey?: string
+    appDefId?: string
 }
 
 export interface SpannerConfig {
     projectId?: string
     instanceId?: string
     databaseId?: string
-    externalDatabaseId?: string
     allowedMetasites?: string
     authorization?: any
-    auth?: any
+    jwtPublicKey?: string
+    appDefId?: string
 }
