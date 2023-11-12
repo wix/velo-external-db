@@ -4,9 +4,9 @@ import { ExternalDbRouter, Hooks } from '@wix-velo/velo-external-db-core'
 import { engineConnectorFor } from './storage/factory'
 
 const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
-    const { vendor, type: adapterType, externalDatabaseId, allowedMetasites, hideAppInfo } = readCommonConfig()
+    const { vendor, type: adapterType, allowedMetasites, hideAppInfo } = readCommonConfig()
     const configReader = create()
-    const { authorization, ...dbConfig } = await configReader.readConfig()
+    const { authorization, jwtPublicKey, appDefId, ...dbConfig } = await configReader.readConfig()
 
     const { connector: engineConnector, providers, cleanup } = await engineConnectorFor(adapterType, dbConfig)
 
@@ -16,7 +16,8 @@ const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
             authorization: {
                 roleConfig: authorization
             },
-            externalDatabaseId,
+            jwtPublicKey,
+            appDefId,
             allowedMetasites,
             vendor,
             adapterType,

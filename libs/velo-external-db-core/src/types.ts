@@ -82,7 +82,6 @@ export interface SchemaHooks {
 }
 
 export interface ExternalDbRouterConfig {
-    externalDatabaseId: string
     allowedMetasites: string
     authorization?: { roleConfig: RoleConfig }
     vendor?: string
@@ -90,6 +89,8 @@ export interface ExternalDbRouterConfig {
     commonExtended?: boolean
     hideAppInfo?: boolean
     wixDataBaseUrl: string
+    jwtPublicKey?: string
+    appDefId?: string
 }
 
 export type Hooks = {
