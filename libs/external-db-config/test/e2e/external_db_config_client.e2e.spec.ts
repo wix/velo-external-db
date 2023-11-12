@@ -5,7 +5,7 @@ const each = require('jest-each').default
 each(
 [
        ['AZURE', ['mysql', 'postgres']],
-       ['AWS', ['mysql', 'postgres', 'mongo' ]],
+       ['AWS', ['mysql', 'postgres', 'mongo']],
        ['GCP', ['mysql', 'postgres', 'spanner', 'firestore']]
       ]
 ).describe('Config Reader for %s', (vendor: string, engines: string) => {
