@@ -21,11 +21,11 @@ import AggregationTransformer from './converters/aggregation_transformer'
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
-import { JwtAuthenticator } from './web/jwt-auth-middleware'
 import * as dataSource from './spi-model/data_source'
 import * as schemaSource from './spi-model/collection'
 import * as capabilities from './spi-model/capabilities'
-import { WixDataFacade } from './web/wix_data_facade'
+import { JWTVerifier } from './web/jwt-verifier'
+import { JWTVerifierDecoderMiddleware } from './web/jwt-verifier-decoder-middleware'
 
 const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
 const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
@@ -83,12 +83,12 @@ const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, p
 
 export const createRouter = () => {
     const router = express.Router()
-    router.use(express.json())
+    router.use(express.text())
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
-    // TODO: jwt auth will be fixed in the following PR
-    const jwtAuthenticator = new JwtAuthenticator('', cfg.allowedMetasites, new WixDataFacade(cfg.wixDataBaseUrl))
-    router.use(unless(['/', '/info', '/capabilities', '/favicon.ico', '/provision', '/connectionStatus'], jwtAuthenticator.authorizeJwt()))
+    const jwtVerifier = new JWTVerifier(cfg.jwtPublicKey ?? '', cfg.appDefId ?? '')
+    const jwtVerifierDecoderMiddleware = new JWTVerifierDecoderMiddleware(jwtVerifier)
+    router.use(unless(['/', '/info', '/capabilities', '/favicon.ico', '/provision', '/connectionStatus'], jwtVerifierDecoderMiddleware.verifyAndDecodeMiddleware()))
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 

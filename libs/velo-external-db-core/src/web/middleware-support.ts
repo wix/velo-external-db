@@ -3,14 +3,12 @@ import { NextFunction, Request, Response } from 'express'
 import { has, get } from 'nested-property'
 const { UnauthorizedError } = errors
 
-export const unless = function(path: string | any[], _middleware: any) {
+export const unless = function(path: string | any[], middleware: any) {
     return function(req: Request, res: Response, next: NextFunction) {
         if (path.includes(req.path)) {
             return next()
         } else {
-            // TODO: will be replaced with jwt verification in the following PR
-            //return middleware(req, res, next)
-            return next()
+            return middleware(req, res, next)
         }
     }
 }
