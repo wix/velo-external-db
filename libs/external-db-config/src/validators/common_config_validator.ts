@@ -22,7 +22,7 @@ export class CommonConfigValidator {
 
     validateBasic() {
         return {
-            missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['externalDatabaseId', 'allowedMetasites'])
+            missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['jwtPublicKey', 'appDefId', 'allowedMetasites'])
         }
     }
 
@@ -32,7 +32,7 @@ export class CommonConfigValidator {
         return {
             validType,
             validVendor,
-            missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['type', 'vendor', 'externalDatabaseId', 'allowedMetasites'])
+            missingRequiredSecretsKeys: checkRequiredKeys(this.config, ['type', 'vendor', 'jwtPublicKey', 'appDefId', 'allowedMetasites'])
         }
     }
 }
