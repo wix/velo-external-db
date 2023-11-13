@@ -89,8 +89,8 @@ export interface ExternalDbRouterConfig {
     commonExtended?: boolean
     hideAppInfo?: boolean
     wixDataBaseUrl: string
-    jwtPublicKey?: string
-    appDefId?: string
+    jwtPublicKey: string
+    appDefId: string
 }
 
 export type Hooks = {

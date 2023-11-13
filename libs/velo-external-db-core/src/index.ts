@@ -75,4 +75,5 @@ export * as dataSpi from './spi-model/data_source'
 export * as collectionSpi from './spi-model/collection'
 export * as schemaUtils from '../src/utils/schema_utils'
 export * as convertersUtils from './converters/utils'
+export { config } from './roles-config.json'
 export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext, CollectionCapability, decodeBase64 }

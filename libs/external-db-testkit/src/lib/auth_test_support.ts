@@ -13,18 +13,18 @@ export const authInit = () => {
     process.env['APP_DEF_ID'] = authConfig.kid
 }
 
-const appendRoleToRequest = (role: string) => (dataRaw: string) => {
+export const appendRoleToRequest = (role: string) => (dataRaw: string) => {
     const data = JSON.parse( dataRaw )
     return JSON.stringify({ request: data, metadata: { requestContext: { ...data.requestContext, role } } })
 }
 
-const signTokenWith = (privateKey: string, options = { algorithm: 'RS256' }) => (dataRaw: string, headers: AxiosRequestHeaders) => {
+export const signTokenWith = (privateKey: string, appId: string, options = { algorithm: 'RS256' }) => (dataRaw: string, headers: AxiosRequestHeaders) => {
     headers['Content-Type'] = 'text/plain'
     const data = JSON.parse( dataRaw )
     const payload = {
         data,
         iss: TOKEN_ISSUER,
-        aud: process.env['APP_DEF_ID'],
+        aud: appId,
     }
     const signedData = jwt.sign(payload, privateKey, options as jwt.SignOptions)
     return signedData
@@ -33,18 +33,29 @@ const signTokenWith = (privateKey: string, options = { algorithm: 'RS256' }) => 
 
 export const authAdmin = { transformRequest: axios.defaults
                                       .transformRequest
-                                      .concat(appendRoleToRequest('BACKEND_CODE'), signTokenWith(authConfig.authPrivateKey)) }
+                                      .concat(appendRoleToRequest('BACKEND_CODE'), signTokenWith(authConfig.authPrivateKey, authConfig.kid)) }
 
 export const authOwner = { transformRequest: axios.defaults
                                       .transformRequest
-                                      .concat(appendRoleToRequest('OWNER'), signTokenWith(authConfig.authPrivateKey)) }
+                                      .concat(appendRoleToRequest('OWNER'), signTokenWith(authConfig.authPrivateKey, authConfig.kid)) }
 
 export const authVisitor = { transformRequest: axios.defaults
                                       .transformRequest
-                                      .concat(appendRoleToRequest('VISITOR'), signTokenWith(authConfig.authPrivateKey)) }
+                                      .concat(appendRoleToRequest('VISITOR'), signTokenWith(authConfig.authPrivateKey, authConfig.kid)) }
 
 export const authOwnerWithoutJwt = { transformRequest: axios.defaults
                                       .transformRequest
                                       .concat( appendRoleToRequest('OWNER') ) }
+
+export const authOwnerWithWrongJwtPublicKey = { transformRequest: axios.defaults
+                                        .transformRequest
+                                        .concat( appendRoleToRequest('OWNER'), signTokenWith(authConfig.otherAuthPrivateKey, authConfig.kid) ) }
+
+                                    
+export const authOwnerWithWrongAppId= { transformRequest: axios.defaults
+                                        .transformRequest
+                                        .concat( appendRoleToRequest('OWNER'), signTokenWith(authConfig.authPrivateKey, 'wrong-app-id') ) }
+
+                                    
 
 export const errorResponseWith = (status: any, message: string) => ({ response: { data: { description: expect.stringContaining(message) }, status } })
