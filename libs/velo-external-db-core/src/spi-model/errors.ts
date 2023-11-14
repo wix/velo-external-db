@@ -286,6 +286,12 @@ export class ErrorMessage {
             } as InvalidPropertyDetails
         } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
     }
+    static unauthorized(description?: string) {
+        return HttpError.create({
+            code: ApiErrors.WDE0027,
+            description
+        } as ErrorMessage, HttpStatusCode.UNAUTHENTICATED)
+    }
 }
 
 export interface HttpError {

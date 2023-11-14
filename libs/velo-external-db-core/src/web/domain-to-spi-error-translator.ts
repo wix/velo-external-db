@@ -26,6 +26,10 @@ export const domainToSpiErrorTranslator = (err: any) => {
       case domainErrors.ItemDoesNotExists:
         const itemDoesNotExists: domainErrors.ItemDoesNotExists = err
         return ErrorMessage.itemNotFound(itemDoesNotExists.itemId, itemDoesNotExists.collectionName, itemDoesNotExists.message)
+    
+      case domainErrors.UnauthorizedError:
+        const unauthorizedError: domainErrors.UnauthorizedError = err
+        return ErrorMessage.unauthorized(unauthorizedError.message)
         
       default:
         return ErrorMessage.unknownError(err.message, err.status)  
