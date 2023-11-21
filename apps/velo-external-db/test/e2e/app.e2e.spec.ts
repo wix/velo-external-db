@@ -2,9 +2,8 @@ import { authOwner } from '@wix-velo/external-db-testkit'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } from '../resources/e2e_resources'
 import { givenHideAppInfoEnvIsTrue } from '../drivers/app_info_config_test_support'
 
-import { CollectionCapability } from '@wix-velo/velo-external-db-core'
 const axios = require('axios').create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/v3'
 })
 
 describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
@@ -34,10 +33,14 @@ describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
     })
     test('answer capability', async() => {
                                   
-        expect((await axios.get('/capabilities', { }, authOwner)).data).toEqual(expect.objectContaining({ 
-            capabilities: {
-                collection: [CollectionCapability.CREATE]
-            }
+        expect((await axios.post('/capabilities/get', { }, authOwner)).data).toEqual(expect.objectContaining({
+            supportsCollectionModifications: true,
+            supportedFieldTypes: expect.toBeArray(),
+            supportsCollectionDisplayName: false,
+            supportsCollectionDisplayField: false,
+            supportsCollectionPermissions: false,
+            supportsCollectionFieldDisplayName: false,
+            supportsCollectionFieldDescription: false,
          }))
     })
 

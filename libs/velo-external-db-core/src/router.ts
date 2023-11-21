@@ -23,7 +23,6 @@ import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from '.
 import { ConfigValidator } from '@wix-velo/external-db-config'
 import * as dataSource from './spi-model/data_source'
 import * as schemaSource from './spi-model/collection'
-import * as capabilities from './spi-model/capabilities'
 import { JWTVerifier } from './web/jwt-verifier'
 import { JWTVerifierDecoderMiddleware } from './web/jwt-verifier-decoder-middleware'
 
@@ -101,19 +100,23 @@ export const createRouter = () => {
         res.send(appInfoPage)
     })
 
-    router.get('/capabilities', async(req, res) => {
+    router.post('/capabilities/get', async(req, res) => {
         const capabilitiesResponse = {
-            capabilities: {
-                collection: [capabilities.CollectionCapability.CREATE]
-            } as capabilities.Capabilities
-        } as capabilities.GetCapabilitiesResponse
+            supportsCollectionModifications: true,
+            supportedFieldTypes: ['TEXT', 'NUMBER', 'DATE', 'DATETIME', 'BOOLEAN'],
+            supportsCollectionDisplayName: false,
+            supportsCollectionDisplayField: false,
+            supportsCollectionPermissions: false,
+            supportsCollectionFieldDisplayName: false,
+            supportsCollectionFieldDescription: false,
+        }
 
         res.json(capabilitiesResponse)
     })
 
     router.post('/provision', async(req, res) => {
         const { type, vendor } = cfg
-        res.json({ type, vendor, protocolVersion: 3, adapterVersion: 'v1' })
+        res.json({ type, vendor, protocolVersion: 3, adapterVersion: 'v3' })
     })
 
     router.get('/connectionStatus', async(req, res) => {
@@ -122,7 +125,7 @@ export const createRouter = () => {
     })
 
     // *************** Data API **********************
-    router.post('/data/query', async(req, res, next) => {
+    router.post('/items/query', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, query, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeQuery, dataPayloadFor(Query, req.body), requestContextFor(Query, req.body, res.locals), customContext) as dataSource.QueryRequest
@@ -148,7 +151,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/count', async(req, res, next) => {
+    router.post('/items/count', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, filter } = await executeDataHooksFor(DataActions.BeforeCount, dataPayloadFor(Count, req.body), requestContextFor(Count, req.body, res.locals), customContext) as dataSource.CountRequest
@@ -166,7 +169,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/insert', async(req, res, next) => {
+    router.post('/items/insert', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, items } = await executeDataHooksFor(DataActions.BeforeInsert, dataPayloadFor(Insert, req.body), requestContextFor(Insert, req.body, res.locals), customContext) as dataSource.InsertRequest
@@ -181,7 +184,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/update', async(req, res, next) => {
+    router.post('/items/update', async(req, res, next) => {
         
         try {
             const customContext = {}
@@ -197,7 +200,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/remove', async(req, res, next) => {
+    router.post('/items/remove', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, itemIds } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(Remove, req.body), requestContextFor(Remove, req.body, res.locals), customContext) as dataSource.RemoveRequest
@@ -213,7 +216,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/aggregate', async(req, res, next) => {
+    router.post('/items/aggregate', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, initialFilter, aggregation, finalFilter, sort, pagingMethod, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeAggregate,
@@ -234,7 +237,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/data/truncate', async(req, res, next) => {
+    router.post('/items/truncate', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId } = await executeDataHooksFor(DataActions.BeforeTruncate, dataPayloadFor(Truncate, req.body), requestContextFor(Truncate, req.body, res.locals), customContext) as dataSource.TruncateRequest

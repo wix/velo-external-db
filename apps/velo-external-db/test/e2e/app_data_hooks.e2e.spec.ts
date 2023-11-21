@@ -16,7 +16,7 @@ const { Aggregate, UpdateImmediately, DeleteImmediately } = SchemaOperations
 
 
 const axios = require('axios').create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/v3'
 })
 
 describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => {
@@ -93,7 +93,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     }
                 })
 
-                await expect(axios.post('/data/count', data.countRequest(ctx.collectionName, { _id: { $ne: ctx.item._id } }), authOwner)).resolves.toEqual(
+                await expect(axios.post('/items/count', data.countRequest(ctx.collectionName, { _id: { $ne: ctx.item._id } }), authOwner)).resolves.toEqual(
                     matchers.responseWith({ totalCount: 1 }))
             })
 
@@ -129,7 +129,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         }
                     })
 
-                    const response = await axios.post('/data/aggregate',
+                    const response = await axios.post('/items/aggregate',
                         {
                             collectionId: ctx.collectionName,
                             initialFilter: { _id: { $ne: ctx.numberItem._id } },
@@ -172,8 +172,8 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         describe('Write Operations', () => {
             each(testSupportedOperations(supportedOperations, 
                 [
-                    ['insert', 'beforeInsert', '/data/insert'],
-                    ['update', 'beforeUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
+                    ['insert', 'beforeInsert', '/items/insert'],
+                    ['update', 'beforeUpdate', '/items/update', { neededOperations: [UpdateImmediately] }],
                 ]
                 )).test('before %s request - should be able to modify the item', async(operation, hookName, api) => {
                     await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.afterAllColumn, ctx.afterWriteColumn, ctx.afterHookColumn], authOwner)
@@ -258,7 +258,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     }
                 })
 
-                await axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.numberItem]), authOwner)
+                await axios.post('/items/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.numberItem]), authOwner)
 
                 await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
                     items: [],
@@ -290,7 +290,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     }
                 })
 
-                await axios.post('/data/truncate', hooks.writeRequestBodyWith('wrongCollectionId', []), authOwner)
+                await axios.post('/items/truncate', hooks.writeRequestBodyWith('wrongCollectionId', []), authOwner)
 
                 await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
                     items: [],
@@ -371,7 +371,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                     }
                 })
 
-                await expect(axios.post('/data/count', data.countRequest(ctx.collectionName), authOwner)).resolves.toEqual(
+                await expect(axios.post('/items/count', data.countRequest(ctx.collectionName), authOwner)).resolves.toEqual(
                     matchers.responseWith({ totalCount: 3 }))
             })
 
@@ -413,7 +413,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         }
                     })
 
-                    const response = await axios.post('/data/aggregate',
+                    const response = await axios.post('/items/aggregate',
                         {
                             collectionId: ctx.collectionName,
                             initialFilter: { _id: { $eq: ctx.item._id } },
@@ -445,9 +445,9 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
         describe('Write Operations', () => {
             each(testSupportedOperations(supportedOperations, 
             [
-                ['insert', 'afterInsert', '/data/insert'],
-                ['update', 'afterUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
-                ['remove', 'afterRemove', '/data/remove', { neededOperations: [DeleteImmediately] }],
+                ['insert', 'afterInsert', '/items/insert'],
+                ['update', 'afterUpdate', '/items/update', { neededOperations: [UpdateImmediately] }],
+                ['remove', 'afterRemove', '/items/remove', { neededOperations: [DeleteImmediately] }],
             ])).test('after %s request - should be able to modify response', async(operation, hookName, api) => {
                 await schema.givenCollection(ctx.collectionName, [ctx.column, ctx.afterAllColumn, ctx.afterWriteColumn, ctx.afterHookColumn], authOwner)
                 if (operation !== 'insert') {
@@ -515,7 +515,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 }
             })
 
-            await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
+            await expect(axios.post('/items/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
                 errorResponseWith(409, 'message')
             )
         })
@@ -530,7 +530,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 }
             })
 
-            await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
+            await expect(axios.post('/items/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
                 errorResponseWith(500, 'message')
             )
         })
@@ -544,7 +544,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 }
             })
 
-            await expect(axios.post('/data/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
+            await expect(axios.post('/items/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
                 errorResponseWith(500, 'message')
             )
         })
@@ -553,12 +553,12 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
     describe('Custom context, Service context', () => { //skip aggregate if needed!
         each(testSupportedOperations(supportedOperations,
         [ 
-            ['query', 'Read', 'beforeQuery', 'afterQuery', '/data/query'],
-            ['count', 'Read', 'beforeCount', 'afterCount', '/data/count'],
-            ['insert', 'Write', 'beforeInsert', 'afterInsert', '/data/insert'],
-            ['update', 'Write', 'beforeUpdate', 'afterUpdate', '/data/update', { neededOperations: [UpdateImmediately] }],
-            ['remove', 'Write', 'beforeRemove', 'afterRemove', '/data/remove', { neededOperations: [DeleteImmediately] }],
-            ['truncate', 'Write', 'beforeTruncate', 'afterTruncate', '/data/truncate'],
+            ['query', 'Read', 'beforeQuery', 'afterQuery', '/items/query'],
+            ['count', 'Read', 'beforeCount', 'afterCount', '/items/count'],
+            ['insert', 'Write', 'beforeInsert', 'afterInsert', '/items/insert'],
+            ['update', 'Write', 'beforeUpdate', 'afterUpdate', '/items/update', { neededOperations: [UpdateImmediately] }],
+            ['remove', 'Write', 'beforeRemove', 'afterRemove', '/items/remove', { neededOperations: [DeleteImmediately] }],
+            ['truncate', 'Write', 'beforeTruncate', 'afterTruncate', '/items/truncate'],
         ])).test('%s - should be able to modify custom context from each hook, and use service context', async(operation, operationType, beforeHook, afterHook, api) => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             if (operation !== 'insert') {

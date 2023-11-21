@@ -5,7 +5,7 @@ import { authOwnerWithoutJwt, authOwnerWithWrongJwtPublicKey, authVisitor, authO
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } from '../resources/e2e_resources'
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/v3'
 })
 
 
@@ -27,15 +27,15 @@ describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () 
 
     describe('JWT authorization', () => {
         test('should throw if the request is not singed with JWT token', async() => {
-            return expect(axiosInstance.post('data/insert', {}, authOwnerWithoutJwt)).rejects.toThrow('401')
+            return expect(axiosInstance.post('items/insert', {}, authOwnerWithoutJwt)).rejects.toThrow('401')
         })
 
         test('should throw if the request is singed with the wrong public key', async() => {
-            return expect(axiosInstance.post('data/insert', {}, authOwnerWithWrongJwtPublicKey)).rejects.toThrow('401')
+            return expect(axiosInstance.post('items/insert', {}, authOwnerWithWrongJwtPublicKey)).rejects.toThrow('401')
         })
 
         test('should throw if the request is signed with wrong app id', async() => {
-            return expect(axiosInstance.post('data/insert', {}, authOwnerWithWrongAppId)).rejects.toThrow('401')
+            return expect(axiosInstance.post('items/insert', {}, authOwnerWithWrongAppId)).rejects.toThrow('401')
         })
     })
 
