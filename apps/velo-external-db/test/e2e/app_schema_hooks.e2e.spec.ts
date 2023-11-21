@@ -14,7 +14,7 @@ import hooks = require('../drivers/hooks_test_support')
 import * as data from '../drivers/data_api_rest_test_support'
 
 const axiosClient = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/v3'
 })
 
 

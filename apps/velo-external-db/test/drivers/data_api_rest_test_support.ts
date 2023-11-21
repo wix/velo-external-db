@@ -4,7 +4,7 @@ import { dataSpi, convertersUtils } from '@wix-velo/velo-external-db-core'
 
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/v3'
 })
 
 export const insertRequest = (collectionName: string, items: Item[]): dataSpi.InsertRequest => ({
@@ -40,7 +40,7 @@ export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fi
 
 
 export const queryCollectionAsArray = async(collectionName: string, sort: dataSpi.Sorting[], fields: string[], auth: any, filter?: dataSpi.Filter) =>
-    await axiosInstance.post('/data/query',
+    await axiosInstance.post('/items/query',
         queryRequest(collectionName, sort, fields, filter), { transformRequest: auth.transformRequest }).then(res => res.data)
 
 
@@ -48,4 +48,4 @@ export const pagingMetadata = (count: number, total?: number) => ({ count, offse
 
 
 export const givenItems = async(items: Item[], collectionName: string, auth: any) =>
-    await axiosInstance.post('/data/insert', insertRequest(collectionName, items), { transformRequest: auth.transformRequest })
+    await axiosInstance.post('/items/insert', insertRequest(collectionName, items), { transformRequest: auth.transformRequest })

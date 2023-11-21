@@ -4,7 +4,7 @@ import { schemaUtils } from '@wix-velo/velo-external-db-core'
 
 
 const axiosClient = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/v3'
 })
 
 export const givenCollection = async(name: string, columns: InputField[], auth: any) => {

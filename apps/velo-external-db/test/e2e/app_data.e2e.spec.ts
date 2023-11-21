@@ -16,7 +16,7 @@ const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort,
 const chance = Chance()
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/v3'
 })
 
 describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  () => {
@@ -71,7 +71,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     test('insert api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
-        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
+        const response = await axiosInstance.post('/items/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
 
         expect(response.data).toEqual({ results: expect.toIncludeSameMembers(ctx.items) })
     
@@ -84,7 +84,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
 
-        const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
+        const response = await axiosInstance.post('/items/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
 
 
         expect(response.data.results).toEqual([
@@ -109,7 +109,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         
         await schema.givenCollection(ctx.collectionName, ctx.numberColumns, authOwner)
         await data.givenItems([ctx.numberItem, ctx.anotherNumberItem], ctx.collectionName, authOwner) 
-        const response = await axiosInstance.post('/data/aggregate', {
+        const response = await axiosInstance.post('/items/aggregate', {
             collectionId: ctx.collectionName,
             initialFilter: { _id: { $eq: ctx.numberItem._id } },
             aggregation: {
@@ -145,7 +145,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
 await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
-        const response = await axiosInstance.post('/data/remove', { 
+        const response = await axiosInstance.post('/items/remove', { 
             collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
         }, authAdmin)
 
@@ -160,7 +160,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ ctx.items[0] ], ctx.collectionName, authAdmin)
 
-        const response = await axiosInstance.post('/data/remove', { 
+        const response = await axiosInstance.post('/items/remove', { 
             collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
         }, authAdmin)
 
@@ -227,7 +227,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
-        const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
+        const response = await axiosInstance.post('/items/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
 
         expect(response.data.results).toEqual(ctx.modifiedItems)
 
@@ -240,7 +240,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
     testIfSupportedOperationsIncludes(supportedOperations, [ UpdateImmediately ])('update api should return updated items if they exist and if they don\'t, it should return an error object', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items.slice(0, ctx.items.length - 1), ctx.collectionName, authAdmin)
-        const response = await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
+        const response = await axiosInstance.post('/items/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
 
         expect(response.data.results).toEqual([
             ...ctx.modifiedItems.slice(0, ctx.items.length - 1),
@@ -263,7 +263,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
     test('count api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-        await expect( axiosInstance.post('/data/count', data.countRequest(ctx.collectionName), authAdmin) ).resolves.toEqual(
+        await expect( axiosInstance.post('/items/count', data.countRequest(ctx.collectionName), authAdmin) ).resolves.toEqual(
             matchers.responseWith( { totalCount: 2 } ))
     })
 
@@ -271,7 +271,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
     testIfSupportedOperationsIncludes(supportedOperations, [ Truncate ])('truncate api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems([ctx.item, ctx.anotherItem], ctx.collectionName, authAdmin)
-        await axiosInstance.post('/data/truncate', { collectionId: ctx.collectionName }, authAdmin)
+        await axiosInstance.post('/items/truncate', { collectionId: ctx.collectionName }, authAdmin)
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
             items: [],
             pagingMetadata: data.pagingMetadata(0, 0)
@@ -283,7 +283,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         delete ctx.numberItem[ctx.numberColumns[0].name]
         delete ctx.numberItem[ctx.numberColumns[1].name]
         
-        await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.numberItem]), authAdmin)
+        await axiosInstance.post('/items/insert', data.insertRequest(ctx.collectionName, [ctx.numberItem]), authAdmin)
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
             items: expect.toIncludeSameMembers([{
@@ -302,7 +302,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         ctx.numberItem[ctx.numberColumns[0].name] = null
         ctx.numberItem[ctx.numberColumns[1].name] = null
 
-        await axiosInstance.post('/data/update', data.updateRequest(ctx.collectionName, [ctx.numberItem]), authAdmin)
+        await axiosInstance.post('/items/update', data.updateRequest(ctx.collectionName, [ctx.numberItem]), authAdmin)
         
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
@@ -334,7 +334,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
-            const response = await axiosInstance.post('/data/insert', data.insertRequest(ctx.collectionName, [ctx.item]), authAdmin)
+            const response = await axiosInstance.post('/items/insert', data.insertRequest(ctx.collectionName, [ctx.item]), authAdmin)
 
             expect(response.data).toEqual(expect.objectContaining({
                 results: [{
@@ -347,10 +347,10 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         })
 
         each([
-            ['update', '/data/update', data.updateRequest.bind(null, 'nonExistingCollection', [])],
-            ['count', '/data/count', data.countRequest.bind(null, 'nonExistingCollection')],
-            ['insert', '/data/insert', data.insertRequest.bind(null, 'nonExistingCollection', [], false)],
-            ['query', '/data/query', data.queryRequest.bind(null, 'nonExistingCollection', [], undefined)],
+            ['update', '/items/update', data.updateRequest.bind(null, 'nonExistingCollection', [])],
+            ['count', '/items/count', data.countRequest.bind(null, 'nonExistingCollection')],
+            ['insert', '/items/insert', data.insertRequest.bind(null, 'nonExistingCollection', [], false)],
+            ['query', '/items/query', data.queryRequest.bind(null, 'nonExistingCollection', [], undefined)],
         ])
         .test('%s api on non existing collection should fail with WDE0025, 404', async(_, api, request) => {
             let error
@@ -371,7 +371,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             let error
 
-            await axiosInstance.post('/data/query', data.queryRequest(ctx.collectionName, [], undefined, { nonExistingColumn: { $eq: 'value' } }), authAdmin).catch(e => error = e)
+            await axiosInstance.post('/items/query', data.queryRequest(ctx.collectionName, [], undefined, { nonExistingColumn: { $eq: 'value' } }), authAdmin).catch(e => error = e)
 
             expect(error).toBeDefined()
             expect(error.response.status).toEqual(400)
