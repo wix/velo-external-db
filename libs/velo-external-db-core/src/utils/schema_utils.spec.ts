@@ -5,9 +5,10 @@ import { FieldType as VeloFieldTypeEnum } from '../spi-model/collection'
 import { 
     fieldTypeToWixDataEnum, 
     wixDataEnumToFieldType,
-    subtypeToFieldType, 
+    fieldTypeToSubtype, 
     compareColumnsInDbAndRequest,
-    wixFormatFieldToInputFields 
+    wixFormatFieldToInputFields, 
+    fieldKeyToPrecision
 } from './schema_utils'
 const chance = Chance()
 
@@ -96,12 +97,18 @@ describe('Schema utils functions', () => {
             [VeloFieldTypeEnum.object, 'object'],
             [VeloFieldTypeEnum.array, 'array'],
           ])('%s type', (veloType, domainSubType) => {
-            expect(subtypeToFieldType(veloType)).toBe(domainSubType)
+            expect(fieldTypeToSubtype(veloType)).toBe(domainSubType)
           })
         test('unsupported type will throw an error', () => {
             // @ts-ignore
             expect(() => wixDataEnumToFieldType(100)).toThrowError()
         })
+    })
+
+    describe('Precision for columns', () => {
+        test('_id column should have a precision of 50', () => { expect(fieldKeyToPrecision('_id')).toEqual('50') }) 
+        test('_owner column should have a precision of 50', () => { expect(fieldKeyToPrecision('_owner')).toEqual('50') }) 
+        test('other column should not have a precision', () => { expect(fieldKeyToPrecision(ctx.column.name)).toBeUndefined() })
     })
 
     describe('convert wix format fields to our fields', () => {

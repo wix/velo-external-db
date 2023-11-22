@@ -11,6 +11,7 @@ import * as data from '../drivers/data_api_rest_test_support'
 import hooks = require('../drivers/hooks_test_support')
 import * as matchers from '../drivers/schema_api_rest_matchers'
 import each from 'jest-each'
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
 
 const { Aggregate, UpdateImmediately, DeleteImmediately } = SchemaOperations
 

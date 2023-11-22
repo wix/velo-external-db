@@ -67,12 +67,13 @@ export const wixDataEnumToFieldType = (fieldEnum: collectionSpi.FieldType): stri
 }
 
 // TODO: create a subtype emun
-export const subtypeToFieldType = (fieldEnum: collectionSpi.FieldType): string => {
+export const fieldTypeToSubtype = (fieldEnum: collectionSpi.FieldType): string => {
     switch (fieldEnum) {
         case collectionSpi.FieldType.text:
         case collectionSpi.FieldType.url:
         case collectionSpi.FieldType.richText:
             return 'string'
+
         
         case collectionSpi.FieldType.language:
             return 'language' 
@@ -207,10 +208,16 @@ export const responseFieldToWixFormat = (fields: ResponseField[]): collectionSpi
     })
 }
 
+export const fieldKeyToPrecision = (fieldKey: string): number | undefined => {
+    const fieldsWithPrecision = ['_id', '_owner']
+    return fieldsWithPrecision.includes(fieldKey) ? 50 : undefined
+}
+
 export const wixFormatFieldToInputFields = (field: collectionSpi.Field): InputField => ({
     name: field.key,
     type: wixDataEnumToFieldType(field.type),
-    subtype: subtypeToFieldType(field.type)
+    subtype: fieldTypeToSubtype(field.type),
+    precision: fieldKeyToPrecision(field.key)
 })
 
 export const InputFieldToWixFormatField = (field: InputField): collectionSpi.Field => ({

@@ -47,7 +47,7 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async create(collectionName: string, columns: InputField[]): Promise<void> {
-        const dbColumnsSql = [...SystemFields, ...(columns || [])].map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
+        const dbColumnsSql = (columns || []).map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                        .join(', ')
         const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ')
         
