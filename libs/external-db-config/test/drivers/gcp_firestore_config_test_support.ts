@@ -8,9 +8,6 @@ export const defineValidConfig = (config: FiresStoreConfig) => {
     if (config.projectId) {
         process.env['PROJECT_ID'] = config.projectId
     }
-    if (config.allowedMetasites) {
-        process.env['ALLOWED_METASITES'] = config.allowedMetasites
-    }
     if (config.authorization) {
         process.env['PERMISSIONS'] = JSON.stringify( config.authorization )
     }
@@ -24,7 +21,6 @@ export const defineValidConfig = (config: FiresStoreConfig) => {
 
 export const validConfig = (): FiresStoreConfig => ({
     projectId: chance.word(),
-    allowedMetasites: chance.word(),
     jwtPublicKey: chance.word(),
     appDefId: chance.word(),
 })
@@ -45,7 +41,7 @@ export const validConfigWithAuthConfig = () => ({
 
 export const defineInvalidConfig = () => defineValidConfig({})
 
-export const ExpectedProperties = ['PROJECT_ID', 'ALLOWED_METASITES', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
+export const ExpectedProperties = ['PROJECT_ID', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 
 export const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 

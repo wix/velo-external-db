@@ -39,7 +39,7 @@ export class ExternalDbRouter {
         this.isInitialized(connector)
         this.connector = connector
         this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), 
-                                                   new CommonConfigValidator({ allowedMetasites: config.allowedMetasites, vendor: config.vendor, type: config.adapterType, jwtPublicKey: config.jwtPublicKey, appDefId: config.appDefId }, 
+                                                   new CommonConfigValidator({ vendor: config.vendor, type: config.adapterType, jwtPublicKey: config.jwtPublicKey, appDefId: config.appDefId }, 
                                                    config.commonExtended))
         this.config = config
         this.operationService = new OperationService(connector.databaseOperations)
