@@ -41,7 +41,7 @@ export default class DataProvider implements IDataProvider {
                 return res.rowCount
             } ) )
         
-        return res.reduce((sum, i) => i + sum, 0) ?? items.length
+        return res.reduce((sum, i) => i + sum, 0)
     }
 
     async update(collectionName: string, items: Item[]) {
@@ -56,14 +56,14 @@ export default class DataProvider implements IDataProvider {
                                 return rs.rowCount
                         } ) )
         
-        return res.reduce((sum, i) => i + sum, 0) ?? items.length
+        return res.reduce((sum, i) => i + sum, 0)
     }
 
     async delete(collectionName: string, itemIds: string[]) {
         const rs = await this.pool.query(`DELETE FROM ${escapeIdentifier(collectionName)} WHERE _id IN (${prepareStatementVariables(itemIds.length)})`, itemIds)
                              .catch( translateErrorCodes )
         
-        return rs.rowCount ?? itemIds.length
+        return rs.rowCount
     }
 
     async truncate(collectionName: string) {
