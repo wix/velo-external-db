@@ -106,8 +106,8 @@ describe('Schema utils functions', () => {
     })
 
     describe('Precision for columns', () => {
-        test('_id column should have a precision of 50', () => { expect(fieldKeyToPrecision('_id')).toEqual('50') }) 
-        test('_owner column should have a precision of 50', () => { expect(fieldKeyToPrecision('_owner')).toEqual('50') }) 
+        test('_id column should have a precision of 50', () => { expect(fieldKeyToPrecision('_id')).toEqual(50) }) 
+        test('_owner column should have a precision of 50', () => { expect(fieldKeyToPrecision('_owner')).toEqual(50) }) 
         test('other column should not have a precision', () => { expect(fieldKeyToPrecision(ctx.column.name)).toBeUndefined() })
     })
 
