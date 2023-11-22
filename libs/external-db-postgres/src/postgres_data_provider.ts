@@ -21,7 +21,6 @@ export default class DataProvider implements IDataProvider {
         const resultSet = await this.pool.query(`SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`, [...parameters, skip, limit])
                                     .catch( translateErrorCodes )
         
-        //@ts-ignore
         return resultSet.rows
     }
 
@@ -42,8 +41,7 @@ export default class DataProvider implements IDataProvider {
                 return res.rowCount
             } ) )
         
-        //@ts-ignore
-        return res.reduce((sum, i) => i + sum, 0)
+        return res.reduce((sum, i) => i + sum, 0) ?? items.length
     }
 
     async update(collectionName: string, items: Item[]) {
@@ -58,16 +56,14 @@ export default class DataProvider implements IDataProvider {
                                 return rs.rowCount
                         } ) )
         
-        //@ts-ignore
-        return res.reduce((sum, i) => i + sum, 0)
+        return res.reduce((sum, i) => i + sum, 0) ?? items.length
     }
 
     async delete(collectionName: string, itemIds: string[]) {
         const rs = await this.pool.query(`DELETE FROM ${escapeIdentifier(collectionName)} WHERE _id IN (${prepareStatementVariables(itemIds.length)})`, itemIds)
                              .catch( translateErrorCodes )
         
-        //@ts-ignore
-        return rs.rowCount
+        return rs.rowCount ?? itemIds.length
     }
 
     async truncate(collectionName: string) {
