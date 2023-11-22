@@ -39,6 +39,8 @@ export default class DataProvider implements IDataProvider {
                                .catch( translateErrorCodes )
                 return res.rowCount
             } ) )
+
+        // @ts-ignore
         return res.reduce((sum, i) => i + sum, 0)
     }
 
@@ -53,12 +55,16 @@ export default class DataProvider implements IDataProvider {
                                                           .catch( translateErrorCodes )
                                 return rs.rowCount
                         } ) )
+        
+        // @ts-ignore
         return res.reduce((sum, i) => i + sum, 0)
     }
 
     async delete(collectionName: string, itemIds: string[]) {
         const rs = await this.pool.query(`DELETE FROM ${escapeIdentifier(collectionName)} WHERE _id IN (${prepareStatementVariables(itemIds.length)})`, itemIds)
                              .catch( translateErrorCodes )
+        
+        // @ts-ignore
         return rs.rowCount
     }
 
