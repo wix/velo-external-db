@@ -17,9 +17,6 @@ export const defineValidConfig = (config: MongoConfig) => {
     if (config.connectionUri) {
         awsConfig['URI'] = config.connectionUri
     }
-    if (config.allowedMetasites) {
-        awsConfig['ALLOWED_METASITES'] = config.allowedMetasites
-    }
     if (config.authorization) {
         awsConfig['PERMISSIONS'] = JSON.stringify( config.authorization )
     }
@@ -36,9 +33,6 @@ const defineLocalEnvs = (config: MongoConfig) => {
     if (config.connectionUri) {
         process.env['URI'] = config.connectionUri
     }
-    if (config.allowedMetasites) {
-        process.env['ALLOWED_METASITES'] = config.allowedMetasites
-    }
     if (config.authorization) {
         process.env['PERMISSIONS'] = JSON.stringify( config.authorization )
     }
@@ -54,7 +48,6 @@ export const defineInvalidConfig = () => defineValidConfig({})
 
 export const validConfig = () => ({
     connectionUri: chance.word(),
-    allowedMetasites: chance.word(),
     jwtPublicKey: chance.word(),
     appDefId: chance.word(),
 })
@@ -70,8 +63,8 @@ export const validConfigWithAuthorization = () => ({
     authorization: validAuthorizationConfig.collectionPermissions 
 })
 
-export const ExpectedProperties = ['URI', 'ALLOWED_METASITES', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
-export const RequiredProperties = ['URI', 'ALLOWED_METASITES', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
+export const ExpectedProperties = ['URI', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
+export const RequiredProperties = ['URI', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 
 export const reset = () => { 
     mockedAwsSdk.reset()

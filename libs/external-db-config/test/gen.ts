@@ -12,13 +12,11 @@ export const randomConfig = () => ({
 export const randomCommonConfig = () => ({
     jwtPublicKey: chance.guid(),
     appDefId: chance.guid(),
-    allowedMetasites: chance.guid(),
 })
 
 export const randomExtendedCommonConfig = () => ({
     jwtPublicKey: chance.guid(),
     appDefId: chance.guid(),
-    allowedMetasites: chance.guid(),
     vendor: chance.pickone(supportedVendors),
     type: chance.pickone(supportedDBs),
 })

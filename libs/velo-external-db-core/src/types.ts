@@ -82,7 +82,6 @@ export interface SchemaHooks {
 }
 
 export interface ExternalDbRouterConfig {
-    allowedMetasites: string
     authorization?: { roleConfig: RoleConfig }
     vendor?: string
     adapterType?: string

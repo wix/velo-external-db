@@ -26,9 +26,6 @@ export const defineValidConfig = (config: MySqlConfig) => {
     if (config.db) {
         awsConfig['DB'] = config.db
     }
-    if (config.allowedMetasites) {
-        awsConfig['ALLOWED_METASITES'] = config.allowedMetasites
-    }
     if (config.authorization) {
         awsConfig['PERMISSIONS'] = JSON.stringify(config.authorization)
     }
@@ -53,9 +50,6 @@ const defineLocalEnvs = (config: MySqlConfig) => {
     }
     if (config.db) {
         process.env['DB'] = config.db
-    }
-    if (config.allowedMetasites) {
-        process.env['ALLOWED_METASITES'] = config.allowedMetasites
     }
     if (config.authorization) {
         process.env['PERMISSIONS'] = JSON.stringify(config.authorization)
@@ -82,7 +76,6 @@ export const validConfig = (): MySqlConfig => ({
     user: chance.word(),
     password: chance.word(),
     db: chance.word(),
-    allowedMetasites: chance.word(),
     jwtPublicKey: chance.word(),
     appDefId: chance.word(),
 })
@@ -103,8 +96,8 @@ export const validConfigWithAuthConfig = () => ({
     } 
 })
 
-export const ExpectedProperties = ['host', 'username', 'password', 'DB', 'ALLOWED_METASITES', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
-export const RequiredProperties = ['host', 'username', 'password', 'DB', 'ALLOWED_METASITES', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
+export const ExpectedProperties = ['host', 'username', 'password', 'DB', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
+export const RequiredProperties = ['host', 'username', 'password', 'DB', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 
 export const reset = () => { 
     mockedAwsSdk.reset()

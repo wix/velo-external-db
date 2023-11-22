@@ -29,10 +29,10 @@ import { JWTVerifierDecoderMiddleware } from './web/jwt-verifier-decoder-middlew
 const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
 const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { allowedMetasites: string, type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
-                             _externalDbConfigClient: ConfigValidator, _cfg: { allowedMetasites: string, type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string },
+                             _externalDbConfigClient: ConfigValidator, _cfg: { type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string },
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
                              _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks) => {
     schemaService = _schemaService

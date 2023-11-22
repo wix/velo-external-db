@@ -23,4 +23,4 @@ export const splitConfig = (config: {[key: string]: any}) => {
     return { firstPart, secondPart }
 }
 
-export const extendedCommonConfigRequiredProperties = ['jwtPublicKey', 'appDefId', 'allowedMetasites', 'vendor', 'type']
+export const extendedCommonConfigRequiredProperties = ['jwtPublicKey', 'appDefId', 'vendor', 'type']
