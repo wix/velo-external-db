@@ -142,7 +142,7 @@ export default class SchemaColumnTranslato {
         try {
             const parsed = parseInt(length)
             if (isNaN(parsed) || parsed <= 0) {
-                return '(204865535)'
+                return '(2048)'
             }
             return `(${parsed})`
         } catch (e) {
