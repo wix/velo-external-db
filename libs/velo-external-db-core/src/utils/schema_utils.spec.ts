@@ -107,8 +107,8 @@ describe('Schema utils functions', () => {
     })
 
     describe('Precision for columns', () => {
-        test.each(FieldsWithPrecision)('%s column should have a precision of 50', (columnName,) => {
-            expect(fieldKeyToPrecision(columnName)).toEqual(50)
+        test.each(FieldsWithPrecision)('%s column should have a precision of 255', (columnName,) => {
+            expect(fieldKeyToPrecision(columnName)).toEqual(255)
         })
         test('other column should not have a precision', () => { expect(fieldKeyToPrecision(ctx.column.name)).toBeUndefined() })
     })
@@ -126,7 +126,7 @@ describe('Schema utils functions', () => {
                 name: columnName,
                 type: 'text',
                 subtype: 'string',
-                precision: 50,
+                precision: 255,
             })
         })
 

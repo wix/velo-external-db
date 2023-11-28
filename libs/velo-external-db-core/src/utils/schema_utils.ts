@@ -209,7 +209,7 @@ export const responseFieldToWixFormat = (fields: ResponseField[]): collectionSpi
 }
 
 export const fieldKeyToPrecision = (fieldKey: string): number | undefined => {
-    return FieldsWithPrecision.includes(fieldKey) ? 50 : undefined
+    return FieldsWithPrecision.includes(fieldKey) ? 255 : undefined
 }
 
 export const wixFormatFieldToInputFields = (field: collectionSpi.Field): InputField => ({
