@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb'
-import { SystemFields, validateSystemFields, AllSchemaOperations, EmptyCapabilities, errors } from '@wix-velo/velo-external-db-commons'
+import { validateSystemFields, AllSchemaOperations, EmptyCapabilities, errors } from '@wix-velo/velo-external-db-commons'
 import { InputField, ResponseField, ISchemaProvider, SchemaOperations, Table, CollectionCapabilities, Encryption, PagingMode } from '@wix-velo/velo-external-db-types'
 import { validateTable, SystemTable, updateExpressionFor, CollectionObject } from './mongo_utils'
 import { CollectionOperations, FieldTypes, ReadWriteOperations, ColumnsCapabilities } from './mongo_capabilities'
@@ -43,7 +43,7 @@ export default class SchemaProvider implements ISchemaProvider {
         return Object.entries(tables)
                      .map(([collectionName, rs]: [string, any]) => ({
                          id: collectionName,
-                         fields: [...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) ),
+                         fields: rs.fields.map( this.reformatFields.bind(this) ),
                          capabilities: this.collectionCapabilities()
                      }))
 
@@ -139,7 +139,7 @@ export default class SchemaProvider implements ISchemaProvider {
         }
         return {
             id: collectionName,
-            fields: [...SystemFields, ...collection.fields].map( this.reformatFields.bind(this) ),
+            fields: collection.fields.map( this.reformatFields.bind(this) ),
             capabilities: this.collectionCapabilities()
         }
     }
