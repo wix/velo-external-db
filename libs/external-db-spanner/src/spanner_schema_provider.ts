@@ -60,7 +60,8 @@ export default class SchemaProvider implements ISchemaProvider {
                                                                   .map( (c: InputField) => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                   .join(', ')
 
-        await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (${PrimaryKeyFieldName})`, collectionName, CollectionAlreadyExists)
+        // Remind: Spanner doesnt allow to create fields with _ in the beginning, so all the system fields are patched with x in the beginning
+        await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (x${PrimaryKeyFieldName})`, collectionName, CollectionAlreadyExists)
     }
 
     async addColumn(collectionName: string, column: InputField): Promise<void> {
