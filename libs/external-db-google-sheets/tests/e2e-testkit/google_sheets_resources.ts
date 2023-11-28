@@ -4,7 +4,7 @@ const { app: mockServer } = require ('../mock_google_sheets_api')
 import { Server } from 'http'
 
 export const SHEET_ID = '1rNU4Cr7rebYOn-QKpvwTdOxSo5Qf4VPNEyFqPAzBgFA'
-const PORT = 1502
+export const PORT = 1502
 
 let _server: Server
 
@@ -32,12 +32,22 @@ export const shutdownEnv = async() => {
 }
 
 export const setActive = () => {
-    process.env = { ...process.env, ...enviormentVariables }
+    process.env = { ...process.env, ...enviormentVariables,     ...enableCacheEnvs }
+}
+
+export const enableCacheEnvs = {
+    ENABLE_CACHE: 'true',
+    STD_TTL: '15',
+    CHECK_PERIOD: '60'
+}
+
+export const disableCacheEnvs = {
+    ENABLE_CACHE: 'false',
 }
 
 export const enviormentVariables = {
     TYPE: 'google-sheet',
-    SHEET_ID: SHEET_ID
+    SHEET_ID: SHEET_ID,
 }
 
 export const name = 'google-sheets'

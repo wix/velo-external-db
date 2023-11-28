@@ -10,6 +10,20 @@ const doc = new GoogleSpreadsheetDoc('spreadsheet-doc-id', 'spreadsheet-doc-titl
 app.use(express.json())
 app.use('/v4/spreadsheets/', v4SpreadsheetsRouter)
 
+
+// TEST SUPPORT ROUTES
+
+v4SpreadsheetsRouter.post('/test/add_data', (req, res) => {
+    const { sheetTitle, items } = req.body
+    const sheet = doc.getSheet(sheetTitle)
+    
+    items.forEach(item => {
+        sheet.addRows([Object.values(item)], 'A1')
+    })
+    
+    res.send()
+})
+
 // DOC INFO ROUTES
 v4SpreadsheetsRouter.get('/:sheetId/', (_, res) => {
     res.send(doc.docInfo())
@@ -70,8 +84,6 @@ v4SpreadsheetsRouter.put('/:sheetId/values/:sheetName_range', (req, res) => {
 
     res.send(actionRes)
 })
-
-
 
 module.exports = { app, cleanupSheets: doc.cleanupSheets }
 
