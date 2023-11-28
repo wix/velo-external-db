@@ -4,7 +4,8 @@ import {
     parseTableData,
     AllSchemaOperations,
     errors,
-    EmptyCapabilities
+    EmptyCapabilities,
+    PrimaryKeyFieldName
 } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator from './sql_schema_translator'
@@ -54,9 +55,8 @@ export default class SchemaProvider implements ISchemaProvider {
     async create(collectionName: string, _columns: any[]) {
         const columns = _columns || []
         const dbColumnsSql = columns.map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) ).join(', ')
-        const primaryKeySql = '_id'
 
-        await this.pool.query(`CREATE TABLE IF NOT EXISTS ${escapeIdentifier(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`)
+        await this.pool.query(`CREATE TABLE IF NOT EXISTS ${escapeIdentifier(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${PrimaryKeyFieldName}))`)
                   .catch( translateErrorCodes )
     }
 

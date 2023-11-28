@@ -1,4 +1,4 @@
-import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { AdapterOperators, FieldsWithPrecision } from '@wix-velo/velo-external-db-commons'
 import { InputField, ResponseField, FieldType, DataOperation, CollectionOperation, PagingMode } from '@wix-velo/velo-external-db-types'
 import * as collectionSpi from '../spi-model/collection'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
@@ -209,8 +209,7 @@ export const responseFieldToWixFormat = (fields: ResponseField[]): collectionSpi
 }
 
 export const fieldKeyToPrecision = (fieldKey: string): number | undefined => {
-    const fieldsWithPrecision = ['_id', '_owner']
-    return fieldsWithPrecision.includes(fieldKey) ? 50 : undefined
+    return FieldsWithPrecision.includes(fieldKey) ? 50 : undefined
 }
 
 export const wixFormatFieldToInputFields = (field: collectionSpi.Field): InputField => ({

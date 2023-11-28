@@ -1,6 +1,7 @@
 import * as Chance from 'chance'
 import { InputField, FieldType } from '@wix-velo/velo-external-db-types'
-import { Uninitialized } from '@wix-velo/test-commons'
+import { Uninitialized }  from '@wix-velo/test-commons'
+import { FieldsWithPrecision } from '@wix-velo/velo-external-db-commons'
 import { FieldType as VeloFieldTypeEnum } from '../spi-model/collection'
 import { 
     fieldTypeToWixDataEnum, 
@@ -106,8 +107,9 @@ describe('Schema utils functions', () => {
     })
 
     describe('Precision for columns', () => {
-        test('_id column should have a precision of 50', () => { expect(fieldKeyToPrecision('_id')).toEqual(50) }) 
-        test('_owner column should have a precision of 50', () => { expect(fieldKeyToPrecision('_owner')).toEqual(50) }) 
+        test.each(FieldsWithPrecision)('%s column should have a precision of 50', (columnName,) => {
+            expect(fieldKeyToPrecision(columnName)).toEqual(50)
+        })
         test('other column should not have a precision', () => { expect(fieldKeyToPrecision(ctx.column.name)).toBeUndefined() })
     })
 
@@ -117,6 +119,14 @@ describe('Schema utils functions', () => {
                 name: ctx.columnName,
                 type: 'text',
                 subtype: 'string',
+            })
+        })
+        test.each(FieldsWithPrecision)('convert %s field in velo format to our fields with precision property', (columnName) => {
+            expect(wixFormatFieldToInputFields({ key: columnName, type: fieldTypeToWixDataEnum('text') })).toEqual({
+                name: columnName,
+                type: 'text',
+                subtype: 'string',
+                precision: 50,
             })
         })
 
