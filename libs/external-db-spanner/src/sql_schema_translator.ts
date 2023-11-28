@@ -126,11 +126,11 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
         try {
             const parsed = parseInt(length as string)
             if (isNaN(parsed) || parsed <= 0) {
-                return '(65535)'
+                return '(2048)'
             }
             return `(${parsed})`
         } catch (e) {
-            return '(65535)'
+            return '(2048)'
         }
     }
 
