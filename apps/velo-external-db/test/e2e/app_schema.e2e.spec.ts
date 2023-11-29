@@ -48,10 +48,10 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             ]))
         })
 
-        test('collection create - collection without fields', async() => {        
+        test('collection create - collection without fields', async() => {   
             const collection = {
                 id: ctx.collectionName,
-                fields: []
+                fields: schemaUtils.InputFieldsToWixFormatFields(SystemFields)
             }
             await axiosClient.post('/collections/create', { collection }, authOwner)
 
@@ -61,11 +61,10 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         test('collection create - collection with fields', async() => {       
             const collection = {
                 id: ctx.collectionName,
-                fields: [ctx.column].map(schemaUtils.InputFieldToWixFormatField)
+                fields: [...SystemFields, ctx.column].map(schemaUtils.InputFieldToWixFormatField)
             }
-
             await axiosClient.post('/collections/create', { collection }, authOwner)
-
+            
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionName, [...SystemFields, ctx.column], env.capabilities))
         })
 

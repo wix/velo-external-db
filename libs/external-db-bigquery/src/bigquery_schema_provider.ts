@@ -1,5 +1,5 @@
 import { Dataset } from '@google-cloud/bigquery'
-import { SystemFields, validateSystemFields, parseTableData, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
+import { validateSystemFields, parseTableData, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { InputField, ISchemaProvider, ResponseField, Table, SchemaOperations, CollectionCapabilities, Encryption, PagingMode } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes, removeColumnTranslateErrorCodes } from './sql_exception_translator'
 import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations, ColumnsCapabilities } from './bigquery_capabilities'
@@ -42,9 +42,8 @@ export default class SchemaProvider implements ISchemaProvider {
         return [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, FindWithSort, Aggregate, BulkDelete, Truncate ]
     }
 
-    async create(collectionName: string, _columns: InputField[]) {
-        const columns = _columns || []
-        const dbColumnsSql = [...SystemFields, ...columns].map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c, { escapeId: false, precision: false }))
+    async create(collectionName: string, columns: InputField[]) {
+        const dbColumnsSql = columns.map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c, { escapeId: false, precision: false }))
         await this.pool.createTable(collectionName, { schema: dbColumnsSql })
                        .catch(createCollectionTranslateErrorCodes)
     }

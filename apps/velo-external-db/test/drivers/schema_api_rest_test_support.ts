@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { InputField } from '@wix-velo/velo-external-db-types'
 import { schemaUtils } from '@wix-velo/velo-external-db-core'
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
 
 
 const axiosClient = axios.create({
@@ -10,9 +11,10 @@ const axiosClient = axios.create({
 export const givenCollection = async(name: string, columns: InputField[], auth: any) => {
     const collection = {
         id: name,
-        fields: columns.map(schemaUtils.InputFieldToWixFormatField)
+        fields: [...SystemFields, ...columns].map(schemaUtils.InputFieldToWixFormatField)
     }
-    await axiosClient.post('/collections/create', { collection }, auth)
+
+    await axiosClient.post('/collections/create', { collection, fields: SystemFields.map(schemaUtils.InputFieldToWixFormatField) }, auth)
 }
 
 export const deleteAllCollections = async(auth: any) => {

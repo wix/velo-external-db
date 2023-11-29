@@ -6,6 +6,7 @@ import Chance = require('chance')
 import gen = require('../gen')
 import { env, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/provider_resources'
 import { entitiesWithOwnerFieldOnly, entityWithObjectField } from '../drivers/data_provider_matchers'
+import { SystemFields } from '@wix-velo/velo-external-db-commons'
 const chance = new Chance()
 
 describe(`Data API: ${currentDbImplementationName()}`, () => {
@@ -138,7 +139,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
     })
 
     test('insert entity with number', async() => {
-        await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
+        await env.schemaProvider.create(ctx.numericCollectionName, [...SystemFields, ...ctx.numericColumns])
         env.driver.stubEmptyFilterAndSortFor({}, '')
         env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
 
@@ -148,7 +149,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
     })
     
     testIfSupportedOperationsIncludes(supportedOperations, [ FindObject ])('insert entity with object', async() => {
-        await env.schemaProvider.create(ctx.objectCollectionName, [ctx.objectColumn])
+        await env.schemaProvider.create(ctx.objectCollectionName, [...SystemFields, ctx.objectColumn])
         env.driver.stubEmptyFilterAndSortFor({}, '')
         env.driver.givenAllFieldsProjectionFor?.(ctx.projection)
         
@@ -215,7 +216,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api without filter', async() => {
-        await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
+        await env.schemaProvider.create(ctx.numericCollectionName, [...SystemFields, ...ctx.numericColumns])
         await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName, ctx.numberEntityFields)
 
         env.driver.stubEmptyFilterFor(ctx.filter)
@@ -228,7 +229,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api without having', async() => {
-        await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
+        await env.schemaProvider.create(ctx.numericCollectionName, [...SystemFields, ...ctx.numericColumns])
         await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName, ctx.numberEntityFields)
 
         env.driver.stubEmptyFilterFor(ctx.filter)
@@ -241,7 +242,7 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
     })
 
     testIfSupportedOperationsIncludes(supportedOperations, [ Aggregate ])('aggregate api with filter', async() => {
-        await env.schemaProvider.create(ctx.numericCollectionName, ctx.numericColumns)
+        await env.schemaProvider.create(ctx.numericCollectionName, [...SystemFields, ...ctx.numericColumns])
         await givenCollectionWith([ctx.numberEntity, ctx.anotherNumberEntity], ctx.numericCollectionName, ctx.numberEntityFields)
 
         env.driver.givenFilterByIdWith(ctx.numberEntity._id, ctx.filter)
@@ -307,6 +308,6 @@ describe(`Data API: ${currentDbImplementationName()}`, () => {
         ctx.anotherNumberEntity = gen.randomNumberDbEntity(ctx.numericColumns)
         ctx.matchesEntity =  { ...ctx.entity, [ctx.column.name]: gen.randomMatchesValueWithDashes() }
 
-        await env.schemaProvider.create(ctx.collectionName, [ctx.column])
+        await env.schemaProvider.create(ctx.collectionName, [...SystemFields, ctx.column])
     })
 })

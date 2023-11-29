@@ -1,9 +1,10 @@
 import * as Chance from 'chance'
 import { Uninitialized } from '@wix-velo/test-commons'
-import { errors } from '@wix-velo/velo-external-db-commons'
+import { errors, PrimaryKeyField } from '@wix-velo/velo-external-db-commons'
 import SchemaService from './schema'
 import * as driver from '../../test/drivers/schema_provider_test_support'
 import * as schema from '../../test/drivers/schema_information_test_support'
+
 import * as matchers from '../../test/drivers/schema_matchers'
 import * as gen from '../../test/gen'
 import { 
@@ -14,10 +15,10 @@ import {
 } from '../utils/schema_utils'
 import { 
     Table,
-    InputField
+    InputField,
  } from '@wix-velo/velo-external-db-types'
  
-const { collectionsListFor } = matchers
+const { collectionsListFor, collectionsWithReadWriteCapabilitiesInWixFormatFor, collectionsWithReadOnlyCapabilitiesInWixFormatFor } = matchers
 const chance = Chance()
 
 describe('Schema Service', () => {
@@ -31,36 +32,42 @@ describe('Schema Service', () => {
             await expect( env.schemaService.list([]) ).resolves.toEqual(collectionsListFor(ctx.dbsWithIdColumn))
         })
 
-        test('create new collection without fields', async() => {
+        test('create new collection without fields should throw', async() => {
             driver.givenAllSchemaOperations()
             driver.expectCreateOf(ctx.collectionName)
             schema.expectSchemaRefresh()
 
-            await expect(env.schemaService.create({ id: ctx.collectionName, fields: [] })).resolves.toEqual({
-                collection: { id: ctx.collectionName, fields: [] } 
-            })
+            await expect(env.schemaService.create({ id: ctx.collectionName, fields: [] })).rejects.toThrow(errors.InvalidRequest)
+        })
+
+        test('create new collection without _id field should throw', async() => {
+            driver.givenAllSchemaOperations()
+            schema.expectSchemaRefresh()
+            driver.expectCreateWithFieldsOf(ctx.collectionName, [ ctx.column ])
+
+            await expect(env.schemaService.create({ id: ctx.collectionName, fields: InputFieldsToWixFormatFields([ ctx.column ]) })).rejects.toThrow(errors.InvalidRequest)
         })
 
         test('create new collection with fields', async() => {
-            const fields = [{
-                key: ctx.column.name,
-                type: fieldTypeToWixDataEnum(ctx.column.type),
-            }]
+            const fields: InputField[] = [
+                PrimaryKeyField,
+                { ...ctx.column, isPrimary: false, precision: undefined },
+            ]
+
+            const wixedFormatFields = InputFieldsToWixFormatFields(fields)
+
             driver.givenAllSchemaOperations()
             schema.expectSchemaRefresh()            
             driver.expectCreateWithFieldsOf(ctx.collectionName, fields)
     
-            await expect(env.schemaService.create({ id: ctx.collectionName, fields })).resolves.toEqual({
-                collection: { id: ctx.collectionName, fields }
+            await expect(env.schemaService.create({ id: ctx.collectionName, fields: wixedFormatFields })).resolves.toEqual({
+                collection: { id: ctx.collectionName, fields: wixedFormatFields }
             })
+            expect(driver.schemaProvider.create).toBeCalledWith(ctx.collectionName, fields)   
         })
 
         test('update collection - add new columns', async() => { 
-            const newFields = [{
-                key: ctx.column.name,
-                type: fieldTypeToWixDataEnum(ctx.column.type),
-            }]
-
+            const newFields = InputFieldsToWixFormatFields([ ctx.column ])
             driver.givenAllSchemaOperations()
             schema.expectSchemaRefresh()            
             driver.givenFindResults([ { id: ctx.collectionName, fields: [] } ])
@@ -72,7 +79,9 @@ describe('Schema Service', () => {
             expect(driver.schemaProvider.addColumn).toBeCalledWith(ctx.collectionName, {
                 name: ctx.column.name,
                 type: ctx.column.type,
-                subtype: ctx.column.subtype 
+                subtype: ctx.column.subtype,
+                precision: undefined,
+                isPrimary: false,
             })    
             expect(driver.schemaProvider.removeColumn).not.toBeCalled()
             expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
@@ -152,8 +161,19 @@ describe('Schema Service', () => {
 
         })
 
-        // TODO: create a test for the case
-        // test('collections without _id column will have read-only capabilities', async() => {})
+        test('convert collection with read-write capabilities to Wix format', async() => {         
+            schema.givenReadWriteOperationsCapabilitiesFor(ctx.collectionName, [])
+            await expect( env.schemaService.list([ctx.collectionName]) ).resolves.toEqual({ 
+                collections: [collectionsWithReadWriteCapabilitiesInWixFormatFor({ id: ctx.collectionName, fields: [] })] 
+            })
+        })
+
+        test('convert collection with read-only capabilities to Wix format', async() => {         
+            schema.givenReadOnlyOperationsCapabilitiesFor(ctx.collectionName, [])
+            await expect( env.schemaService.list([ctx.collectionName]) ).resolves.toEqual({ 
+                collections: [collectionsWithReadOnlyCapabilitiesInWixFormatFor({ id: ctx.collectionName, fields: [] })] 
+            })
+        })
 
         test('run unsupported operations should throw', async() => {
             schema.expectSchemaRefresh()         

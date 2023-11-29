@@ -9,6 +9,7 @@ import { DbProviders } from '@wix-velo/velo-external-db-types'
 export default ({ projectId }: firestoreConfig): DbProviders<Firestore>  => {
     const firestore = new Firestore({
         projectId,
+        ignoreUndefinedProperties: true 
     })
 
     const databaseOperations = new DatabaseOperations(firestore)

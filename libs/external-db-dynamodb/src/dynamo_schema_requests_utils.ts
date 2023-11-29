@@ -3,7 +3,7 @@ import { InputField } from '@wix-velo/velo-external-db-types'
 import { SystemTable } from './dynamo_utils'
 import { UpdateCommandInput } from '@aws-sdk/lib-dynamodb/dist-types/commands/UpdateCommand'
 import { CreateTableCommandInput } from '@aws-sdk/client-dynamodb/dist-types/commands/CreateTableCommand'
-
+import { PrimaryKeyFieldName } from '@wix-velo/velo-external-db-commons'
 
 
 export const updateColumnsExpression = (collectionName: any, columns: any): UpdateCommandInput => ({
@@ -54,8 +54,8 @@ export const changeColumnTypeExpression = (collectionName: string, column: Input
 
 export const createTableExpression = (collectionName: string): CreateTableCommandInput => ({
     TableName: collectionName,
-    KeySchema: [{ AttributeName: '_id', KeyType: 'HASH' }],
-    AttributeDefinitions: [{ AttributeName: '_id', AttributeType: 'S' }],
+    KeySchema: [{ AttributeName: PrimaryKeyFieldName, KeyType: 'HASH' }],
+    AttributeDefinitions: [{ AttributeName: PrimaryKeyFieldName, AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST'
 })
 
@@ -69,8 +69,8 @@ export const createSystemTableExpression = (): CreateTableCommandInput => ({
 export const insertToSystemTableExpression = (collectionName: any, fields: any) => ({
     TableName: SystemTable, 
     Item: {
-    tableName: collectionName,
-    fields: fields || [] 
+        tableName: collectionName,
+        fields: fields || [] 
     }
 })
 

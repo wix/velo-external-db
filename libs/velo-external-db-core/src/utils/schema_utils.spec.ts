@@ -1,13 +1,15 @@
 import * as Chance from 'chance'
 import { InputField, FieldType } from '@wix-velo/velo-external-db-types'
-import { Uninitialized } from '@wix-velo/test-commons'
+import { Uninitialized }  from '@wix-velo/test-commons'
+import { FieldsWithPrecision, PrimaryKeyFieldName } from '@wix-velo/velo-external-db-commons'
 import { FieldType as VeloFieldTypeEnum } from '../spi-model/collection'
 import { 
     fieldTypeToWixDataEnum, 
     wixDataEnumToFieldType,
-    subtypeToFieldType, 
+    fieldTypeToSubtype, 
     compareColumnsInDbAndRequest,
-    wixFormatFieldToInputFields 
+    wixFormatFieldToInputFields, 
+    fieldKeyToPrecision
 } from './schema_utils'
 const chance = Chance()
 
@@ -96,12 +98,19 @@ describe('Schema utils functions', () => {
             [VeloFieldTypeEnum.object, 'object'],
             [VeloFieldTypeEnum.array, 'array'],
           ])('%s type', (veloType, domainSubType) => {
-            expect(subtypeToFieldType(veloType)).toBe(domainSubType)
+            expect(fieldTypeToSubtype(veloType)).toBe(domainSubType)
           })
         test('unsupported type will throw an error', () => {
             // @ts-ignore
             expect(() => wixDataEnumToFieldType(100)).toThrowError()
         })
+    })
+
+    describe('Precision for columns', () => {
+        test.each(FieldsWithPrecision)('%s column should have a precision of 255', (columnName,) => {
+            expect(fieldKeyToPrecision(columnName)).toEqual(255)
+        })
+        test('other column should not have a precision', () => { expect(fieldKeyToPrecision(ctx.column.name)).toBeUndefined() })
     })
 
     describe('convert wix format fields to our fields', () => {
@@ -110,6 +119,17 @@ describe('Schema utils functions', () => {
                 name: ctx.columnName,
                 type: 'text',
                 subtype: 'string',
+                precision: undefined,
+                isPrimary: false,
+            })
+        })
+        test.each(FieldsWithPrecision)('convert %s field in velo format to our fields with precision property', (columnName) => {
+            expect(wixFormatFieldToInputFields({ key: columnName, type: fieldTypeToWixDataEnum('text') })).toEqual({
+                name: columnName,
+                type: 'text',
+                subtype: 'string',
+                precision: 255,
+                isPrimary: columnName === PrimaryKeyFieldName ? true : false,
             })
         })
 

@@ -88,6 +88,7 @@ describe('Sql Schema Column Translator', () => {
             })
             
             test('text language', () => {
+                
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'language' }) ).toEqual(`${escapeId(ctx.fieldName)} TEXT`)
             })
         })

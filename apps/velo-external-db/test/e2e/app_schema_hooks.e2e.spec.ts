@@ -78,7 +78,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                         }
                     }
                 })
-                await axiosClient.post('/collections/create', { collection: { id: 'wrong', fields: [] } }, authOwner)
+                await axiosClient.post('/collections/create', { collection: { id: 'wrong', fields: schemaUtils.InputFieldsToWixFormatFields(SystemFields) } }, authOwner)
 
                 await expect(schema.retrieveSchemaFor(ctx.collectionId, authOwner)).resolves.toEqual(matchers.createCollectionResponseWith(ctx.collectionId, [...SystemFields], env.capabilities))
             })
@@ -203,7 +203,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
         })
         describe('Write operations', () => {
             each([
-                ['create', 'afterCreate', '/collections/create', []],
+                ['create', 'afterCreate', '/collections/create', SystemFields],
                 ['update', 'afterUpdate', '/collections/update', SystemFields],
                 ['delete', 'afterDelete', '/collections/delete', []]
             ]).test('after %s collection request - should be able to modify the response (collection)', async(operation, hookName, api, fields) => {
@@ -295,7 +295,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
     describe('Custom context, Service context', () => {
         each([
             ['get', 'Read', 'beforeGet', 'afterGet', '/collections/get', []],
-            ['create', 'Write', 'beforeCreate', 'afterCreate', '/collections/create', []],
+            ['create', 'Write', 'beforeCreate', 'afterCreate', '/collections/create', SystemFields],
             ['update', 'Write', 'beforeUpdate', 'afterUpdate', '/collections/update', SystemFields],
             ['delete', 'Write', 'beforeDelete', 'afterDelete', '/collections/delete', []]
         ]).test('%s - should be able to modify custom context from each hook, and use service context', async(operation, operationType, beforeHook, afterHook, api, fields) => {

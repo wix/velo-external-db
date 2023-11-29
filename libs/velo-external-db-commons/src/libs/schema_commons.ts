@@ -2,9 +2,11 @@ import { CannotModifySystemField } from './errors'
 
 import { ResponseField, FieldWithQueryOperators, AsWixSchemaHeaders, AsWixSchema, SchemaOperations } from '@wix-velo/velo-external-db-types'
 
+export const PrimaryKeyFieldName = '_id'
+
 export const SystemFields = [
     {
-        name: '_id', type: 'text', subtype: 'string', precision: '50', isPrimary: true
+        name: PrimaryKeyFieldName, type: 'text', subtype: 'string', precision: 255, isPrimary: true
     },
     {
         name: '_createdDate', type: 'datetime', subtype: 'datetime'
@@ -13,8 +15,12 @@ export const SystemFields = [
         name: '_updatedDate', type: 'datetime', subtype: 'datetime'
     },
     {
-        name: '_owner', type: 'text', subtype: 'string', precision: '50'
+        name: '_owner', type: 'text', subtype: 'string', precision: 255
     }]
+
+export const PrimaryKeyField = SystemFields[0]
+
+export const FieldsWithPrecision = ['_id', '_owner']
 
 export const QueryOperatorsByFieldType = {
     number: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'hasSome'],

@@ -1,5 +1,4 @@
-import { SystemFields, validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
-import { errors } from '@wix-velo/velo-external-db-commons'
+import { validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities, errors } from '@wix-velo/velo-external-db-commons'
 import SchemaColumnTranslator from './sql_schema_translator'
 import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
 import { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, escapeFieldId } from './spanner_utils'
@@ -57,11 +56,13 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async create(collectionName: string, columns: InputField[]): Promise<void> {
-        const dbColumnsSql = [...SystemFields, ...(columns || [])].map( this.fixColumn.bind(this) )
+        const dbColumnsSql = columns.map( this.fixColumn.bind(this) )
                                                                   .map( (c: InputField) => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                   .join(', ')
-        const primaryKeySql = SystemFields.filter(f => f.isPrimary).map(f => escapeFieldId(f.name)).join(', ')
 
+        const primaryKeySql = columns.filter(f => f.isPrimary).map(f => escapeFieldId(f.name)).join(', ')
+
+        // Remind: Spanner doesnt allow to create fields with _ in the beginning, so all the system fields are patched with x in the beginning
         await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (${primaryKeySql})`, collectionName, CollectionAlreadyExists)
     }
 

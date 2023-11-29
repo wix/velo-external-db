@@ -1,5 +1,5 @@
-import { SystemFields, asWixSchemaHeaders } from '@wix-velo/velo-external-db-commons'
-import { InputField, DataOperation } from '@wix-velo/velo-external-db-types'
+import { SystemFields, asWixSchemaHeaders, PrimaryKeyFieldName } from '@wix-velo/velo-external-db-commons'
+import { InputField, DataOperation, } from '@wix-velo/velo-external-db-types'
 import { schemaUtils, collectionSpi } from '@wix-velo/velo-external-db-core'
 import { Capabilities, ColumnsCapabilities } from '../types'
 
@@ -60,7 +60,7 @@ const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilitie
 const fieldsWith = (fields: InputField[], columnsCapabilities: ColumnsCapabilities) => expect.toIncludeSameMembers(fields.map(f => filedMatcher(f, columnsCapabilities)))
 
 export const collectionResponsesWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
-    const dataOperations = fields.map(f => f.name).includes('_id') ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
+    const dataOperations = fields.map(f => f.name).includes(PrimaryKeyFieldName) ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
     return {
         id: collectionName,
         capabilities: collectionCapabilities(dataOperations),

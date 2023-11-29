@@ -63,6 +63,29 @@ export const collectionsInWixFormatFor = (collection: Table) => {
     })
 }
 
+export const collectionsWithReadWriteCapabilitiesInWixFormatFor = (collection: Table) => {
+    return expect.objectContaining({
+        id: collection.id,
+        fields: [],
+        capabilities: { 
+            dataOperations: Object.values(collectionSpi.DataOperation),
+        },
+        pagingMode: collectionSpi.PagingMode.offset
+     })
+ }
+
+ export const collectionsWithReadOnlyCapabilitiesInWixFormatFor = (collection: Table) => {
+    const { query, count, queryReferenced, aggregate } = collectionSpi.DataOperation
+    return expect.objectContaining({
+        id: collection.id,
+        fields: [],
+        capabilities: { 
+            dataOperations: [query, count, queryReferenced, aggregate]
+        },
+        pagingMode: collectionSpi.PagingMode.offset
+     })
+ }
+
 export const collectionsListFor = (collections: Table[]) => {
     return expect.objectContaining({ collections: expect.arrayContaining(collections.map(collectionsInWixFormatFor)) })
 }

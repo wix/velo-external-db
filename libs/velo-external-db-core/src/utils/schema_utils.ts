@@ -1,4 +1,4 @@
-import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { AdapterOperators, FieldsWithPrecision, PrimaryKeyFieldName } from '@wix-velo/velo-external-db-commons'
 import { InputField, ResponseField, FieldType, DataOperation, CollectionOperation, PagingMode } from '@wix-velo/velo-external-db-types'
 import * as collectionSpi from '../spi-model/collection'
 const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
@@ -67,12 +67,13 @@ export const wixDataEnumToFieldType = (fieldEnum: collectionSpi.FieldType): stri
 }
 
 // TODO: create a subtype emun
-export const subtypeToFieldType = (fieldEnum: collectionSpi.FieldType): string => {
+export const fieldTypeToSubtype = (fieldEnum: collectionSpi.FieldType): string => {
     switch (fieldEnum) {
         case collectionSpi.FieldType.text:
         case collectionSpi.FieldType.url:
         case collectionSpi.FieldType.richText:
             return 'string'
+
         
         case collectionSpi.FieldType.language:
             return 'language' 
@@ -207,10 +208,16 @@ export const responseFieldToWixFormat = (fields: ResponseField[]): collectionSpi
     })
 }
 
+export const fieldKeyToPrecision = (fieldKey: string): number | undefined => {
+    return FieldsWithPrecision.includes(fieldKey) ? 255 : undefined
+}
+
 export const wixFormatFieldToInputFields = (field: collectionSpi.Field): InputField => ({
     name: field.key,
     type: wixDataEnumToFieldType(field.type),
-    subtype: subtypeToFieldType(field.type)
+    subtype: fieldTypeToSubtype(field.type),
+    precision: fieldKeyToPrecision(field.key),
+    isPrimary: field.key === PrimaryKeyFieldName,
 })
 
 export const InputFieldToWixFormatField = (field: InputField): collectionSpi.Field => ({

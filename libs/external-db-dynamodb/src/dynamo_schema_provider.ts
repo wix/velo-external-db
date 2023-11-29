@@ -1,6 +1,6 @@
 import { SystemTable, validateTable } from './dynamo_utils'
 import { translateErrorCodes } from './sql_exception_translator'
-import { SystemFields, validateSystemFields, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
+import { validateSystemFields, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import * as dynamoRequests from './dynamo_schema_requests_utils'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
@@ -15,7 +15,7 @@ export default class SchemaProvider implements ISchemaProvider {
     docClient: DynamoDBDocument
     constructor(client: DynamoDB) {
         this.client = client
-        this.docClient = DynamoDBDocument.from(client)
+        this.docClient = DynamoDBDocument.from(client, { marshallOptions: { removeUndefinedValues: true } })
     }
 
     async list(): Promise<Table[]> {
@@ -26,7 +26,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
         return Items ? Items.map((table: { [x:string]: any, tableName?: any, fields?: any }) => ({
             id: table.tableName,
-            fields: [...SystemFields, ...table.fields].map(this.appendAdditionalRowDetails),
+            fields: table.fields.map(this.appendAdditionalRowDetails),
             capabilities: this.collectionCapabilities()
         })) : []
     }
@@ -104,7 +104,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
         return {
             id: collectionName,
-            fields: [...SystemFields, ...collection.fields].map(this.appendAdditionalRowDetails),
+            fields: collection.fields.map(this.appendAdditionalRowDetails),
             capabilities: this.collectionCapabilities()
         }
     }
@@ -136,7 +136,7 @@ export default class SchemaProvider implements ISchemaProvider {
                   .createTable(dynamoRequests.createSystemTableExpression())
     }
 
-    async insertToSystemTable(collectionName: string, fields: any) {        
+    async insertToSystemTable(collectionName: string, fields: any) {     
         await this.docClient
                    .put(dynamoRequests.insertToSystemTableExpression(collectionName, fields))
     }

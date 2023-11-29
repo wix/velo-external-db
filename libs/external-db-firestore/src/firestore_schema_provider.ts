@@ -1,5 +1,5 @@
 import { Firestore } from '@google-cloud/firestore'
-import { SystemFields, validateSystemFields, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
+import { validateSystemFields, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import {
     InputField,
     ISchemaProvider,
@@ -39,7 +39,7 @@ export default class SchemaProvider implements ISchemaProvider {
         return Object.entries(tables)
             .map(([collectionName, rs]: [string, any]) => ({
                 id: collectionName,
-                fields: [...SystemFields, ...rs.fields].map( this.reformatFields.bind(this) ),
+                fields: [...rs.fields].map( this.reformatFields.bind(this) ),
                 capabilities: this.collectionCapabilities()
             }))
     }
@@ -138,7 +138,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
         return {
             id: collectionName,
-            fields: [...SystemFields, ...fields].map( this.reformatFields.bind(this) ),
+            fields: fields.map( this.reformatFields.bind(this) ),
             capabilities: this.collectionCapabilities()
         }
     }
