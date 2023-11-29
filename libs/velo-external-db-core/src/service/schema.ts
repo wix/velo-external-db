@@ -102,13 +102,9 @@ export default class SchemaService {
     }
 
     private async validateFields(fields: collectionSpi.Field[]) {
-        if (!fields.length) {
-            throw new errors.InvalidRequest('Fields are missing')
-        }
-
         const fieldsName = fields.map(field => field.key)
         if (!fieldsName.includes(PrimaryKeyFieldName)) {
-            throw new errors.InvalidRequest(`${PrimaryKeyFieldName} is field is missing`)
+        throw new errors.InvalidRequest(`${PrimaryKeyFieldName} field is missing`)
         }
     }
 

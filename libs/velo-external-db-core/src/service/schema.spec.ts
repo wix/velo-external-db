@@ -1,9 +1,10 @@
 import * as Chance from 'chance'
 import { Uninitialized } from '@wix-velo/test-commons'
-import { PrimaryKeyFieldName, errors } from '@wix-velo/velo-external-db-commons'
+import { errors, PrimaryKeyField } from '@wix-velo/velo-external-db-commons'
 import SchemaService from './schema'
 import * as driver from '../../test/drivers/schema_provider_test_support'
 import * as schema from '../../test/drivers/schema_information_test_support'
+
 import * as matchers from '../../test/drivers/schema_matchers'
 import * as gen from '../../test/gen'
 import { 
@@ -11,13 +12,11 @@ import {
     compareColumnsInDbAndRequest,
     InputFieldsToWixFormatFields,
     InputFieldToWixFormatField,
-    WixFormatFieldsToInputFields
 } from '../utils/schema_utils'
 import { 
     Table,
     InputField,
  } from '@wix-velo/velo-external-db-types'
- import { FieldType as VeloFieldTypeEnum } from '../spi-model/collection'
  
 const { collectionsListFor, collectionsWithReadWriteCapabilitiesInWixFormatFor, collectionsWithReadOnlyCapabilitiesInWixFormatFor } = matchers
 const chance = Chance()
@@ -50,18 +49,21 @@ describe('Schema Service', () => {
         })
 
         test('create new collection with fields', async() => {
-            const fields = [
-                { key: PrimaryKeyFieldName, type: VeloFieldTypeEnum.text },
-                InputFieldToWixFormatField(ctx.column),
+            const fields: InputField[] = [
+                PrimaryKeyField,
+                { ...ctx.column, isPrimary: false, precision: undefined },
             ]
+
+            const wixedFormatFields = InputFieldsToWixFormatFields(fields)
 
             driver.givenAllSchemaOperations()
             schema.expectSchemaRefresh()            
-            driver.expectCreateWithFieldsOf(ctx.collectionName, WixFormatFieldsToInputFields(fields))
+            driver.expectCreateWithFieldsOf(ctx.collectionName, fields)
     
-            await expect(env.schemaService.create({ id: ctx.collectionName, fields })).resolves.toEqual({
-                collection: { id: ctx.collectionName, fields }
+            await expect(env.schemaService.create({ id: ctx.collectionName, fields: wixedFormatFields })).resolves.toEqual({
+                collection: { id: ctx.collectionName, fields: wixedFormatFields }
             })
+            expect(driver.schemaProvider.create).toBeCalledWith(ctx.collectionName, fields)   
         })
 
         test('update collection - add new columns', async() => { 

@@ -21,7 +21,7 @@ export const givenSchemaFieldsFor = (collectionName: string, fields: {field: str
                                             .mockResolvedValue( fields.map(field => ({ field: field.field, type: 'string' })) )
 }
 
-export const givenschemaFor = (collectionName: string, fields: ResponseField[], capabilities: any) => {
+export const givenSchemaFor = (collectionName: string, fields: ResponseField[], capabilities: any) => {
     when(schemaInformation.schemaFor).calledWith(collectionName)
                                            .mockResolvedValue({ id: collectionName, fields, capabilities })
 }

@@ -1,7 +1,7 @@
 import * as Chance from 'chance'
 import { InputField, FieldType } from '@wix-velo/velo-external-db-types'
 import { Uninitialized }  from '@wix-velo/test-commons'
-import { FieldsWithPrecision } from '@wix-velo/velo-external-db-commons'
+import { FieldsWithPrecision, PrimaryKeyFieldName } from '@wix-velo/velo-external-db-commons'
 import { FieldType as VeloFieldTypeEnum } from '../spi-model/collection'
 import { 
     fieldTypeToWixDataEnum, 
@@ -129,7 +129,7 @@ describe('Schema utils functions', () => {
                 type: 'text',
                 subtype: 'string',
                 precision: 255,
-                isPrimary: columnName === '_id' ? true : false,
+                isPrimary: columnName === PrimaryKeyFieldName ? true : false,
             })
         })
 
