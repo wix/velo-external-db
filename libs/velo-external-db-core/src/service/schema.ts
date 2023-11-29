@@ -37,7 +37,7 @@ export default class SchemaService {
     }
 
     async create(collection: collectionSpi.Collection): Promise<collectionSpi.CreateCollectionResponse> {   
-        await this.validateFields(collection.fields)
+        this.validateFields(collection.fields)
         await this.storage.create(collection.id, WixFormatFieldsToInputFields(collection.fields))
         await this.schemaInformation.refresh()
         return { collection }
