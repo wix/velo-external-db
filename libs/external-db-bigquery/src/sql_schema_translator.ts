@@ -1,5 +1,4 @@
 import { InputField } from '@wix-velo/velo-external-db-types'
-import { PrimaryKeyFieldName } from '@wix-velo/velo-external-db-commons'
 import { escapeIdentifier } from './bigquery_utils'
 export default class SchemaColumnTranslator {
 
@@ -48,7 +47,7 @@ export default class SchemaColumnTranslator {
         return { 
             name: options.escapeId ? escapeIdentifier(f.name) : f.name, 
             type: this.dbTypeFor(f, { precision: options.precision }), 
-            mode: f.name === PrimaryKeyFieldName ? 'REQUIRED' : '' 
+            mode: f.isPrimary ? 'REQUIRED' : '' 
         }
     }
 

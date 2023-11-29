@@ -1,6 +1,6 @@
 import { Pool as MySqlPool } from 'mysql'
 import { promisify } from 'util'
-import { validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities, PrimaryKeyFieldName } from '@wix-velo/velo-external-db-commons'
+import { validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table, CollectionCapabilities, Encryption, PagingMode } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes } from './sql_exception_translator'
 import  SchemaColumnTranslator from './sql_schema_translator'
@@ -44,10 +44,11 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async create(collectionName: string, columns: InputField[]): Promise<void> {
-        const dbColumnsSql = (columns || []).map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) ).join(', ')
+        const dbColumnsSql = columns.map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) ).join(', ')
+        const primaryKeySql = columns.filter(f => f.isPrimary).map(f => escapeId(f.name)).join(', ') 
 
-        await this.query(`CREATE TABLE IF NOT EXISTS ${escapeTable(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${PrimaryKeyFieldName}))`,
-                         [...(columns || []).map((c: { name: any }) => c.name)])
+        await this.query(`CREATE TABLE IF NOT EXISTS ${escapeTable(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`,
+                                                                                            columns.map((c: { name: any }) => c.name))
                   .catch( err => translateErrorCodes(err, collectionName) )
     }
 

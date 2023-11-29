@@ -5,7 +5,6 @@ import {
     AllSchemaOperations,
     errors,
     EmptyCapabilities,
-    PrimaryKeyFieldName
 } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
 import SchemaColumnTranslator from './sql_schema_translator'
@@ -52,11 +51,11 @@ export default class SchemaProvider implements ISchemaProvider {
         return AllSchemaOperations
     }
 
-    async create(collectionName: string, _columns: any[]) {
-        const columns = _columns || []
+    async create(collectionName: string, columns: any[]) {
         const dbColumnsSql = columns.map( c => this.sqlSchemaTranslator.columnToDbColumnSql(c) ).join(', ')
+        const primaryKeySql = columns.filter(f => f.isPrimary).map(f => escapeIdentifier(f.name)).join(', ')
 
-        await this.pool.query(`CREATE TABLE IF NOT EXISTS ${escapeIdentifier(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${PrimaryKeyFieldName}))`)
+        await this.pool.query(`CREATE TABLE IF NOT EXISTS ${escapeIdentifier(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`)
                   .catch( translateErrorCodes )
     }
 

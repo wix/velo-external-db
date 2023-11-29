@@ -1,4 +1,4 @@
-import { errors } from '@wix-velo/velo-external-db-commons'
+import { PrimaryKeyFieldName, errors } from '@wix-velo/velo-external-db-commons'
 import { ISchemaProvider, 
     SchemaOperations, 
     ResponseField, 
@@ -36,7 +36,8 @@ export default class SchemaService {
         return { collections: collections.map(this.formatCollection.bind(this)) }
     }
 
-    async create(collection: collectionSpi.Collection): Promise<collectionSpi.CreateCollectionResponse> {                
+    async create(collection: collectionSpi.Collection): Promise<collectionSpi.CreateCollectionResponse> {   
+        // await this.validateFields(collection.fields)
         await this.storage.create(collection.id, WixFormatFieldsToInputFields(collection.fields))
         await this.schemaInformation.refresh()
         return { collection }
@@ -98,6 +99,17 @@ export default class SchemaService {
 
         if (!allowedSchemaOperations.includes(operationName)) 
             throw new errors.UnsupportedSchemaOperation(`Your database doesn't support ${operationName} operation`, collectionName, operationName)
+    }
+
+    private async validateFields(fields: collectionSpi.Field[]) {
+        if (!fields.length) {
+            throw new errors.InvalidRequest('Fields are missing')
+        }
+
+        const fieldsName = fields.map(field => field.key)
+        if (!fieldsName.includes(PrimaryKeyFieldName)) {
+            throw new errors.InvalidRequest('_id field is missing')
+        }
     }
 
     private formatCollection(collection: Table): collectionSpi.Collection {

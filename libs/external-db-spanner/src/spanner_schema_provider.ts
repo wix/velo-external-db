@@ -1,7 +1,7 @@
-import { validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities, errors, PrimaryKeyFieldName } from '@wix-velo/velo-external-db-commons'
+import { validateSystemFields, parseTableData, AllSchemaOperations, EmptyCapabilities, errors } from '@wix-velo/velo-external-db-commons'
 import SchemaColumnTranslator from './sql_schema_translator'
 import { notThrowingTranslateErrorCodes } from './sql_exception_translator'
-import { recordSetToObj, escapeId, patchFieldName, unpatchFieldName } from './spanner_utils'
+import { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, escapeFieldId } from './spanner_utils'
 import { Database as SpannerDb } from '@google-cloud/spanner'
 import { CollectionCapabilities, Encryption, InputField, ISchemaProvider, PagingMode, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
 import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadOnlyOperations, ReadWriteOperations } from './spanner_capabilities'
@@ -56,12 +56,14 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     async create(collectionName: string, columns: InputField[]): Promise<void> {
-        const dbColumnsSql = (columns || []).map( this.fixColumn.bind(this) )
+        const dbColumnsSql = columns.map( this.fixColumn.bind(this) )
                                                                   .map( (c: InputField) => this.sqlSchemaTranslator.columnToDbColumnSql(c) )
                                                                   .join(', ')
 
+        const primaryKeySql = columns.filter(f => f.isPrimary).map(f => escapeFieldId(f.name)).join(', ')
+
         // Remind: Spanner doesnt allow to create fields with _ in the beginning, so all the system fields are patched with x in the beginning
-        await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (x${PrimaryKeyFieldName})`, collectionName, CollectionAlreadyExists)
+        await this.updateSchema(`CREATE TABLE ${escapeId(collectionName)} (${dbColumnsSql}) PRIMARY KEY (${primaryKeySql})`, collectionName, CollectionAlreadyExists)
     }
 
     async addColumn(collectionName: string, column: InputField): Promise<void> {

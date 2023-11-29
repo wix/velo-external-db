@@ -119,6 +119,8 @@ describe('Schema utils functions', () => {
                 name: ctx.columnName,
                 type: 'text',
                 subtype: 'string',
+                precision: undefined,
+                isPrimary: false,
             })
         })
         test.each(FieldsWithPrecision)('convert %s field in velo format to our fields with precision property', (columnName) => {
@@ -127,6 +129,7 @@ describe('Schema utils functions', () => {
                 type: 'text',
                 subtype: 'string',
                 precision: 255,
+                isPrimary: columnName === '_id' ? true : false,
             })
         })
 

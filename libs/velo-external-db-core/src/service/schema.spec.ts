@@ -72,7 +72,9 @@ describe('Schema Service', () => {
             expect(driver.schemaProvider.addColumn).toBeCalledWith(ctx.collectionName, {
                 name: ctx.column.name,
                 type: ctx.column.type,
-                subtype: ctx.column.subtype 
+                subtype: ctx.column.subtype,
+                precision: undefined,
+                isPrimary: false,
             })    
             expect(driver.schemaProvider.removeColumn).not.toBeCalled()
             expect(driver.schemaProvider.changeColumnType).not.toBeCalled()

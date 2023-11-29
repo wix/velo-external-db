@@ -42,8 +42,7 @@ export default class SchemaProvider implements ISchemaProvider {
         return [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, FindWithSort, Aggregate, BulkDelete, Truncate ]
     }
 
-    async create(collectionName: string, _columns: InputField[]) {
-        const columns = _columns || []
+    async create(collectionName: string, columns: InputField[]) {
         const dbColumnsSql = columns.map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c, { escapeId: false, precision: false }))
         await this.pool.createTable(collectionName, { schema: dbColumnsSql })
                        .catch(createCollectionTranslateErrorCodes)
