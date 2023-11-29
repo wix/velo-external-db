@@ -33,11 +33,11 @@ export default class SchemaService {
             await this.storage.list() : 
             await Promise.all(collectionIds.map((collectionName: string) => this.schemaInformation.schemaFor(collectionName)))
 
-        return { collections: collections.map(this.formatCollection.bind(this)) }
+                return { collections: collections.map(this.formatCollection.bind(this)) }
     }
 
     async create(collection: collectionSpi.Collection): Promise<collectionSpi.CreateCollectionResponse> {   
-        // await this.validateFields(collection.fields)
+        await this.validateFields(collection.fields)
         await this.storage.create(collection.id, WixFormatFieldsToInputFields(collection.fields))
         await this.schemaInformation.refresh()
         return { collection }
@@ -108,7 +108,7 @@ export default class SchemaService {
 
         const fieldsName = fields.map(field => field.key)
         if (!fieldsName.includes(PrimaryKeyFieldName)) {
-            throw new errors.InvalidRequest('_id field is missing')
+            throw new errors.InvalidRequest(`${PrimaryKeyFieldName} is field is missing`)
         }
     }
 

@@ -127,7 +127,7 @@ describe ('Schema Aware Data Service', () => {
     })
 
     test('schema without _id - find will trigger find request with projection without _id', async() => {
-        schema.givenSchemaFor(ctx.collectionName, [ctx.column])
+        schema.givenSchemaFieldsFor(ctx.collectionName, [ctx.column])
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter)
         queryValidator.givenValidProjectionForDefaultFieldsOf([ctx.column.field])
 
