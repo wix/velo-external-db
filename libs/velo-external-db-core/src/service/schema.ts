@@ -101,7 +101,7 @@ export default class SchemaService {
             throw new errors.UnsupportedSchemaOperation(`Your database doesn't support ${operationName} operation`, collectionName, operationName)
     }
 
-    private async validateFields(fields: collectionSpi.Field[]) {
+    private validateFields(fields: collectionSpi.Field[]) {
         const fieldsName = fields.map(field => field.key)
         if (!fieldsName.includes(PrimaryKeyFieldName)) {
         throw new errors.InvalidRequest(`${PrimaryKeyFieldName} field is missing`)
