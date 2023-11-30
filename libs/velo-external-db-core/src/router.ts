@@ -100,7 +100,7 @@ export const createRouter = () => {
         res.send(appInfoPage)
     })
 
-    router.post('/capabilities/get', async(req, res) => {
+    router.post('/v3/capabilities/get', async(req, res) => {
         const capabilitiesResponse = {
             supportsCollectionModifications: true,
             supportedFieldTypes: ['TEXT', 'NUMBER', 'DATE', 'DATETIME', 'BOOLEAN'],
@@ -114,7 +114,7 @@ export const createRouter = () => {
         res.json(capabilitiesResponse)
     })
 
-    router.post('/provision', async(req, res) => {
+    router.post('/v3/provision', async(req, res) => {
         const { type, vendor } = cfg
         res.json({ type, vendor, protocolVersion: 3, adapterVersion: 'v3' })
     })
@@ -125,7 +125,7 @@ export const createRouter = () => {
     })
 
     // *************** Data API **********************
-    router.post('/items/query', async(req, res, next) => {
+    router.post('/v3/items/query', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, query, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeQuery, dataPayloadFor(Query, req.body), requestContextFor(Query, req.body, res.locals), customContext) as dataSource.QueryRequest
@@ -151,7 +151,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/items/count', async(req, res, next) => {
+    router.post('/v3/items/count', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, filter } = await executeDataHooksFor(DataActions.BeforeCount, dataPayloadFor(Count, req.body), requestContextFor(Count, req.body, res.locals), customContext) as dataSource.CountRequest
@@ -169,7 +169,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/items/insert', async(req, res, next) => {
+    router.post('/v3/items/insert', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, items } = await executeDataHooksFor(DataActions.BeforeInsert, dataPayloadFor(Insert, req.body), requestContextFor(Insert, req.body, res.locals), customContext) as dataSource.InsertRequest
@@ -184,7 +184,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/items/update', async(req, res, next) => {
+    router.post('/v3/items/update', async(req, res, next) => {
         
         try {
             const customContext = {}
@@ -200,7 +200,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/items/remove', async(req, res, next) => {
+    router.post('/v3/items/remove', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, itemIds } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(Remove, req.body), requestContextFor(Remove, req.body, res.locals), customContext) as dataSource.RemoveRequest
@@ -216,7 +216,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/items/aggregate', async(req, res, next) => {
+    router.post('/v3/items/aggregate', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId, initialFilter, aggregation, finalFilter, sort, pagingMethod, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeAggregate,
@@ -237,7 +237,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/items/truncate', async(req, res, next) => {
+    router.post('/v3/items/truncate', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId } = await executeDataHooksFor(DataActions.BeforeTruncate, dataPayloadFor(Truncate, req.body), requestContextFor(Truncate, req.body, res.locals), customContext) as dataSource.TruncateRequest
@@ -254,7 +254,7 @@ export const createRouter = () => {
 
     // *************** Collections API **********************
 
-    router.post('/collections/get', async(req, res, next) => {
+    router.post('/v3/collections/get', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionIds } = await executeSchemaHooksFor(SchemaActions.BeforeGet, schemaPayloadFor(Get, req.body), requestContextFor(Get, req.body, res.locals), customContext) as schemaSource.ListCollectionsRequest
@@ -268,7 +268,7 @@ export const createRouter = () => {
     })
 
 
-    router.post('/collections/create', async(req, res, next) => {
+    router.post('/v3/collections/create', async(req, res, next) => {
         try {
             const customContext = {}
             const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(Create, req.body), requestContextFor(Create, req.body, res.locals), customContext) as schemaSource.CreateCollectionRequest
@@ -280,7 +280,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/collections/update', async(req, res, next) => {
+    router.post('/v3/collections/update', async(req, res, next) => {
         try {
             const customContext = {}
             const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeUpdate, schemaPayloadFor(UpdateSchema, req.body), requestContextFor(UpdateSchema, req.body, res.locals), customContext) as schemaSource.UpdateCollectionRequest
@@ -292,7 +292,7 @@ export const createRouter = () => {
         }
     })
 
-    router.post('/collections/delete', async(req, res, next) => {
+    router.post('/v3/collections/delete', async(req, res, next) => {
         try {
             const customContext = {}
             const { collectionId } = await executeSchemaHooksFor(SchemaActions.BeforeDelete, schemaPayloadFor(Delete, req.body), requestContextFor(Delete, req.body, res.locals), customContext) as schemaSource.DeleteCollectionRequest
