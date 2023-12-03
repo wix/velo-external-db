@@ -78,7 +78,7 @@ jobs:
           docker tag $IMAGE_NAME $PUBLIC_ECR_URL/$IMAGE_NAME:sha-${GITHUB_SHA}
           
           echo "Pushing image to ECR..."
-          docker push $PUBLIC_ECR_URL/$IMAGE_NAME
+          docker push $PUBLIC_ECR_URL/$IMAGE_NAME  --all-tags
 
           echo "Pushing image to ECR with following tags:"
           echo "::set-output name=image::$PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG"
@@ -104,7 +104,7 @@ jobs:
           docker tag $IMAGE_NAME $DOCKERHUB_REPOSITORY/$IMAGE_NAME:sha-${GITHUB_SHA}
 
           echo "Pushing image to Docker Hub..."
-          docker push $DOCKERHUB_REPOSITORY/$IMAGE_NAME
+          docker push $DOCKERHUB_REPOSITORY/$IMAGE_NAME  --all-tags
 
           echo "Pushing image to Docker Hub with following tags:"
           echo "::set-output name=image::$DOCKERHUB_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG"
@@ -140,7 +140,7 @@ jobs:
           docker tag $IMAGE_NAME gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:sha-${GITHUB_SHA}
 
           echo "Pushing image to GCP container registry..."
-          docker push gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER
+          docker push gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER --all-tags
 
           echo "Pushing image to GCP container registry with following tags:"
           echo "::set-output name=image::gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:$IMAGE_TAG"
