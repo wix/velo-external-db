@@ -126,7 +126,7 @@ export default class SchemaAwareDataService {
     private async projectionFor(collectionName: string, _projection = [] as string[]) {
         const schemaFields = await this.schemaInformation.schemaFieldsFor(collectionName)
         const schemaContainsId = schemaFields.some(f => f.field === '_id')
-        const projection = _projection.length === 0 ? schemaFields.map(f => f.field) : _projection as string[]
+        const projection = ( Array.isArray(_projection) && _projection.length ) ? _projection as string[] : schemaFields.map(f => f.field)
         return schemaContainsId ? Array.from(new Set(['_id', ...projection])) : projection
     }
 }
