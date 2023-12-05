@@ -97,7 +97,7 @@ export default class SchemaColumnTranslator {
                 return 'timestamp'
 
             case 'text_string':
-                return `varchar${this.parseLength(precision)}`
+                return precision ? `varchar${this.parseLength(precision)}` : 'text'
 
             case 'text_small':
             case 'text_medium':
