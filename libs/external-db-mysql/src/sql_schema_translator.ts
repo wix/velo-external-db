@@ -90,7 +90,7 @@ export default class SchemaColumnTranslato {
                 return 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
 
             case 'text_string':
-                return `VARCHAR${this.parseLength(precision)}`
+                return precision ? `VARCHAR${this.parseLength(precision)}` : 'TEXT'
 
             case 'text_small':
             case 'text_language':

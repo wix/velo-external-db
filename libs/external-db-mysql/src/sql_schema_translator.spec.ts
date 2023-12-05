@@ -68,7 +68,7 @@ describe('Sql Schema Column Translator', () => {
 
         describe('string fields', () => {
             test('string', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string' }) ).toEqual(`${escapeId(ctx.fieldName)} VARCHAR(2048)`)
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string' }) ).toEqual(`${escapeId(ctx.fieldName)} TEXT`)
             })
 
             test('string with length', () => {
