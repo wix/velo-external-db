@@ -55,9 +55,17 @@ describe('Sql Schema Column Translator', () => {
         })
 
         describe('string fields', () => {
-            test('string', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string' }) ).toEqual(`${escapeId(ctx.fieldName)} STRING(2048)`)
-            })
+            test.each([
+                'string',
+                'richcontent',
+                'image',
+                'video',
+                'audio',
+                'document',
+                'language',
+            ])('%s', (subtype) => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype }) ).toEqual(`${escapeId(ctx.fieldName)} STRING(2048)`)
+              })
 
             test('string with length', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string', precision: '2055' }) ).toEqual(`${escapeId(ctx.fieldName)} STRING(2055)`)
@@ -88,20 +96,15 @@ describe('Sql Schema Column Translator', () => {
 
         describe('JSON fields', () => {
             test.each([
-                ['object'],
-                ['image'],
-                ['document'],
-                ['video'],
-                ['audio'],
-                ['any'],
-                ['mediaGallery'],
-                ['address'],
-                ['pageLink'],
-                ['reference'],
-                ['multiReference'],
-                ['arrayString'],
-                ['arrayDocument'],
-                ['richContent'],
+                'object',
+                'any',
+                'mediaGallery',
+                'address',
+                'pageLink',
+                'reference',
+                'multiReference',
+                'arrayDocument',
+                'arrayString',
               ])('%s', (subtype) => {
                 expect(env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype })).toEqual(`${escapeId(ctx.fieldName)} JSON`)
               })
