@@ -149,7 +149,7 @@ describe('Sql Schema Column Translator', () => {
             })
 
             test('date', () => {
-                expect( env.schemaTranslator.translateType('DATE') ).toEqual('date3')
+                expect( env.schemaTranslator.translateType('DATE') ).toEqual('date')
            })
         })
 
