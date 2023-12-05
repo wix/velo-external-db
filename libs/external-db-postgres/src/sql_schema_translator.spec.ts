@@ -53,9 +53,17 @@ describe('Sql Schema Column Translator', () => {
         })
 
         describe('string fields', () => {
-            test('string', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} text`)
-            })
+            test.each([
+                'string',
+                'richcontent',
+                'image',
+                'video',
+                'audio',
+                'document',
+                'language',
+            ])('%s', (subtype) => {
+                expect(env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype })).toEqual(`${escapeIdentifier(ctx.fieldName)} text`)
+              })
 
             test('string with length', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string', precision: '2055' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} varchar(2055)`)
@@ -86,20 +94,15 @@ describe('Sql Schema Column Translator', () => {
 
         describe('json fields', () => {
             test.each([
-                ['object'],
-                ['image'],
-                ['document'],
-                ['video'],
-                ['audio'],
-                ['any'],
-                ['mediaGallery'],
-                ['address'],
-                ['pageLink'],
-                ['reference'],
-                ['multiReference'],
-                ['arrayString'],
-                ['arrayDocument'],
-                ['richContent'],
+                'object',
+                'any',
+                'mediaGallery',
+                'address',
+                'pageLink',
+                'reference',
+                'multiReference',
+                'arrayDocument',
+                'arrayString',
               ])('%s', (subtype) => {
                 expect(env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype })).toEqual(`${escapeIdentifier(ctx.fieldName)} json`)
               })
@@ -133,7 +136,13 @@ describe('Sql Schema Column Translator', () => {
 
         describe('date time fields', () => {
             test('date', () => {
-                ['date', 'time', 'timez', 'timestamp', 'timestamptz'].forEach(t => {
+                expect( env.schemaTranslator.translateType('date') ).toEqual('date')
+            })
+            test('time', () => {
+                expect( env.schemaTranslator.translateType('time') ).toEqual('time')
+            })
+            test('datetime', () => {
+                ['timez', 'timestamp', 'timestamptz'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
                 })
             })

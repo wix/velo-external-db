@@ -20,7 +20,11 @@ export const fieldTypeToWixDataEnum = ( fieldType: string ): collectionSpi.Field
             return collectionSpi.FieldType.singleReference
         case FieldType.multiReference:
             return collectionSpi.FieldType.multiReference
-        
+        case FieldType.time:
+            return collectionSpi.FieldType.time
+        case FieldType.date:
+            return collectionSpi.FieldType.date
+
         default:
            throw new Error(`${fieldType} - Unsupported field type`)
     }

@@ -18,14 +18,18 @@ export default class SchemaColumnTranslato {
             case 'float':
             case 'double':
             case 'decimal':
+            case 'year':
                 return 'number'
 
             case 'date':
+                return 'date'
+                
             case 'datetime':
             case 'timestamp':
-            case 'time':
-            case 'year':
                 return 'datetime'
+            
+            case 'time':
+                return 'time'
 
             case 'varchar':
             case 'text':

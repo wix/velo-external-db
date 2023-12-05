@@ -31,6 +31,12 @@ describe('Schema utils functions', () => {
         test('datetime type', () => {
             expect(fieldTypeToWixDataEnum('datetime')).toBe(VeloFieldTypeEnum.dataTime)
         })
+        test('date type', () => {
+            expect(fieldTypeToWixDataEnum('date')).toBe(VeloFieldTypeEnum.date)
+        })
+        test('time type', () => {
+            expect(fieldTypeToWixDataEnum('time')).toBe(VeloFieldTypeEnum.time)
+        })
 
         test('unsupported type will throw an error', () => {
             expect(() => fieldTypeToWixDataEnum('unsupported-type')).toThrowError()
