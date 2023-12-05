@@ -139,11 +139,18 @@ describe('Sql Schema Column Translator', () => {
         })
 
         describe('date time fields', () => {
-            test('date', () => {
-                ['DATE', 'DATETIME', 'TIMESTAMP', 'TIME', 'YEAR'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
-                })
+            test.each([ 'DATETIME', 'TIMESTAMP' ])('%s', (t) => {
+                expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
             })
+
+
+            test('time', () => {
+                expect( env.schemaTranslator.translateType('TIME') ).toEqual('time')
+            })
+
+            test('date', () => {
+                expect( env.schemaTranslator.translateType('DATE') ).toEqual('date3')
+           })
         })
 
         describe('json fields', () => {

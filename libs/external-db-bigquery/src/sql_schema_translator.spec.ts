@@ -158,7 +158,7 @@ describe('Sql Schema Column Translator', () => {
 
         describe('date time fields', () => {
 
-            test.each(['DATETIME', 'TIMESTAMP'])('%t', (t) => {
+            test.each(['DATETIME', 'TIMESTAMP'])('%s', (t) => {
                 expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
             })
 
