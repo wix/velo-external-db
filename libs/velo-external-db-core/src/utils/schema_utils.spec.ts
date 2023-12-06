@@ -31,6 +31,12 @@ describe('Schema utils functions', () => {
         test('datetime type', () => {
             expect(fieldTypeToWixDataEnum('datetime')).toBe(VeloFieldTypeEnum.dataTime)
         })
+        test('date type', () => {
+            expect(fieldTypeToWixDataEnum('date')).toBe(VeloFieldTypeEnum.date)
+        })
+        test('time type', () => {
+            expect(fieldTypeToWixDataEnum('time')).toBe(VeloFieldTypeEnum.time)
+        })
 
         test('unsupported type will throw an error', () => {
             expect(() => fieldTypeToWixDataEnum('unsupported-type')).toThrowError()
@@ -47,15 +53,15 @@ describe('Schema utils functions', () => {
             [VeloFieldTypeEnum.dataTime, FieldType.datetime],
             [VeloFieldTypeEnum.time, FieldType.datetime],
             [VeloFieldTypeEnum.boolean, FieldType.boolean],
-            [VeloFieldTypeEnum.image, FieldType.object],
-            [VeloFieldTypeEnum.document, FieldType.object],
-            [VeloFieldTypeEnum.video, FieldType.object],
+            [VeloFieldTypeEnum.image, FieldType.text],
+            [VeloFieldTypeEnum.document, FieldType.text],
+            [VeloFieldTypeEnum.video, FieldType.text],
             [VeloFieldTypeEnum.any, FieldType.object],
             [VeloFieldTypeEnum.arrayString, FieldType.object],
             [VeloFieldTypeEnum.arrayDocument, FieldType.object],
-            [VeloFieldTypeEnum.audio, FieldType.object],
+            [VeloFieldTypeEnum.audio, FieldType.text],
             [VeloFieldTypeEnum.language, FieldType.text],
-            [VeloFieldTypeEnum.richContent, FieldType.object],
+            [VeloFieldTypeEnum.richContent, FieldType.text],
             [VeloFieldTypeEnum.mediaGallery, FieldType.object],
             [VeloFieldTypeEnum.address, FieldType.object],
             [VeloFieldTypeEnum.pageLink, FieldType.object],
@@ -78,9 +84,9 @@ describe('Schema utils functions', () => {
             [VeloFieldTypeEnum.url, 'string'],
             [VeloFieldTypeEnum.richText, 'string'],
             [VeloFieldTypeEnum.number, 'float'],
-            [VeloFieldTypeEnum.date, 'datetime'],
+            [VeloFieldTypeEnum.date, 'date'],
             [VeloFieldTypeEnum.dataTime, 'datetime'],
-            [VeloFieldTypeEnum.time, 'datetime'],
+            [VeloFieldTypeEnum.time, 'time'],
             [VeloFieldTypeEnum.boolean, 'boolean'],
             [VeloFieldTypeEnum.image, 'image'],
             [VeloFieldTypeEnum.document, 'document'],

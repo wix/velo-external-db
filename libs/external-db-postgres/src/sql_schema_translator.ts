@@ -34,9 +34,12 @@ export default class SchemaColumnTranslator {
                 return 'number'
 
             case 'date':
+                return 'date'
             case 'time':
-            case 'timez':
+                return 'time'
+
             case 'timestamp':
+            case 'timez':
             case 'timestamptz':
                 return 'datetime'
 
@@ -97,6 +100,11 @@ export default class SchemaColumnTranslator {
                 return 'timestamp'
 
             case 'text_string':
+            case 'text_richcontent':
+            case 'text_image':
+            case 'text_video':
+            case 'text_audio':
+            case 'text_document':
                 return precision ? `varchar${this.parseLength(precision)}` : 'text'
 
             case 'text_small':
@@ -109,14 +117,9 @@ export default class SchemaColumnTranslator {
             case 'boolean_boolean':
                 return 'boolean'
 
-            case 'object':
             case 'object_':
             case 'object_object':
-            case 'object_image':
-            case 'object_document':
-            case 'object_video':
             case 'object_any':
-            case 'object_audio':
             case 'object_mediagallery':
             case 'object_address':
             case 'object_pagelink':
@@ -124,7 +127,7 @@ export default class SchemaColumnTranslator {
             case 'object_multireference':
             case 'object_arraystring':
             case 'object_arraydocument':
-            case 'object_richcontent':
+            case 'object_array':
                 return 'json'
 
             default:

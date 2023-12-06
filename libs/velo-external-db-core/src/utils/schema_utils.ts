@@ -20,7 +20,11 @@ export const fieldTypeToWixDataEnum = ( fieldType: string ): collectionSpi.Field
             return collectionSpi.FieldType.singleReference
         case FieldType.multiReference:
             return collectionSpi.FieldType.multiReference
-        
+        case FieldType.time:
+            return collectionSpi.FieldType.time
+        case FieldType.date:
+            return collectionSpi.FieldType.date
+
         default:
            throw new Error(`${fieldType} - Unsupported field type`)
     }
@@ -32,27 +36,27 @@ export const wixDataEnumToFieldType = (fieldEnum: collectionSpi.FieldType): stri
         case collectionSpi.FieldType.url:
         case collectionSpi.FieldType.richText:
         case collectionSpi.FieldType.language:
+        case collectionSpi.FieldType.richContent:
+        case collectionSpi.FieldType.image:
+        case collectionSpi.FieldType.video:
+        case collectionSpi.FieldType.document:
+        case collectionSpi.FieldType.audio:
             return FieldType.text
         
         case collectionSpi.FieldType.number:
             return FieldType.number
         
+        case collectionSpi.FieldType.time:
         case collectionSpi.FieldType.date:
         case collectionSpi.FieldType.dataTime:
-        case collectionSpi.FieldType.time:
             return FieldType.datetime
        
         case collectionSpi.FieldType.boolean:
             return FieldType.boolean
 
-        case collectionSpi.FieldType.image:
-        case collectionSpi.FieldType.document:
-        case collectionSpi.FieldType.video:
         case collectionSpi.FieldType.any:
         case collectionSpi.FieldType.arrayString:
         case collectionSpi.FieldType.arrayDocument:
-        case collectionSpi.FieldType.audio:
-        case collectionSpi.FieldType.richContent:
         case collectionSpi.FieldType.mediaGallery:
         case collectionSpi.FieldType.address:
         case collectionSpi.FieldType.pageLink:
@@ -73,7 +77,7 @@ export const fieldTypeToSubtype = (fieldEnum: collectionSpi.FieldType): string =
         case collectionSpi.FieldType.url:
         case collectionSpi.FieldType.richText:
             return 'string'
-
+        
         
         case collectionSpi.FieldType.language:
             return 'language' 
@@ -81,13 +85,14 @@ export const fieldTypeToSubtype = (fieldEnum: collectionSpi.FieldType): string =
         case collectionSpi.FieldType.number:
             return 'float'
         case collectionSpi.FieldType.date:
+            return 'date'
         case collectionSpi.FieldType.dataTime:
-        case collectionSpi.FieldType.time:
             return 'datetime'
+        case collectionSpi.FieldType.time:
+            return 'time'
         case collectionSpi.FieldType.boolean:
             return 'boolean'
          
-        // Object subtypes
         case collectionSpi.FieldType.image:
             return 'image'
         case collectionSpi.FieldType.document:

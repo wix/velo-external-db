@@ -101,9 +101,11 @@ export const createRouter = () => {
     })
 
     router.post('/v3/capabilities/get', async(req, res) => {
+        const unsupportedFieldTypes = [ schemaSource.FieldType.arrayString, schemaSource.FieldType.reference, schemaSource.FieldType.multiReference, 
+                                        schemaSource.FieldType.arrayDocument, schemaSource.FieldType.array ]
         const capabilitiesResponse = {
             supportsCollectionModifications: true,
-            supportedFieldTypes: ['TEXT', 'NUMBER', 'DATE', 'DATETIME', 'BOOLEAN'],
+            supportedFieldTypes: Object.values(schemaSource.FieldType).filter(t => !unsupportedFieldTypes.includes(t)),
             supportsCollectionDisplayName: false,
             supportsCollectionDisplayField: false,
             supportsCollectionPermissions: false,

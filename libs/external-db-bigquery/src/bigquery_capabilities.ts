@@ -18,4 +18,6 @@ export const ColumnsCapabilities = {
     image: { sortable: false, columnQueryOperators: [] },
     object: { sortable: false, columnQueryOperators: [] },
     datetime: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte] },
+    time: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte] },
+    date: { sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte] },
 }

@@ -20,6 +20,8 @@ export enum CollectionOperationSPI { // rename it
 
 export enum FieldType {
     text = 'text',
+    time = 'time',
+    date = 'date',
     number = 'number',
     boolean = 'boolean',
     datetime = 'datetime',

@@ -18,11 +18,14 @@ export default class SchemaColumnTranslator {
             case 'decimal':
             case 'numeric':
                 return 'number'
-
+                
+            case 'time':
+                return 'time'
             case 'date':
+                return 'date'
+
             case 'datetime':
             case 'datetime2':
-            case 'time':
             case 'datetimeoffset':
             case 'smalldatetime':
                 return 'datetime'
@@ -83,12 +86,17 @@ export default class SchemaColumnTranslator {
                 return 'SMALLDATETIME'
 
             case 'text_string':
+            case 'text_richcontent':
+            case 'text_image':
+            case 'text_video':
+            case 'text_audio':
+            case 'text_document':
+            case 'text_language':
                 return `VARCHAR${this.parseLength(precision)}`
 
             case 'text_small':
             case 'text_medium':
             case 'text_large':
-            case 'text_language':
                 return 'TEXT'
 
 
