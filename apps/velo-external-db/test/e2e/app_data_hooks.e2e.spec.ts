@@ -503,7 +503,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         [ctx.afterAllColumn.name]: true,
                         [ctx.afterWriteColumn.name]: true,
                         [ctx.afterHookColumn.name]: true,
-                    }].map(dataConvertUtils.asWixData)
+                    }].map(dataConvertUtils.asWixDataItem)
                 })
             })
         })

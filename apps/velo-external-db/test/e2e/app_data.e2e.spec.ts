@@ -88,9 +88,9 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
 
         expect(response.data.results).toStrictEqual([
-            dataConvertUtils.asWixData(ctx.items[0]),
+            dataConvertUtils.asWixDataItem(ctx.items[0]),
             { error: { errorCode: 409, errorMessage: expect.toInclude('Item already exists'), data: expect.any(Object) } },
-            ...(ctx.items.slice(2, ctx.items.length).map(dataConvertUtils.asWixData)),
+            ...(ctx.items.slice(2, ctx.items.length).map(dataConvertUtils.asWixDataItem)),
         ])
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
@@ -145,7 +145,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
         }, authAdmin)
 
-        expect(response.data.results).toEqual(expect.toIncludeSameMembers(ctx.items.map(dataConvertUtils.asWixData)))
+        expect(response.data.results).toEqual(expect.toIncludeSameMembers(ctx.items.map(dataConvertUtils.asWixDataItem)))
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
             items: [],
             pagingMetadata: data.pagingMetadata(0, 0)
@@ -161,7 +161,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         }, authAdmin)
 
         expect(response.data.results).toStrictEqual([
-            dataConvertUtils.asWixData(ctx.items[0]),
+            dataConvertUtils.asWixDataItem(ctx.items[0]),
             ...ctx.items.slice(1, ctx.items.length).map(_i => ({
                 error: {
                     errorCode: 404,
@@ -227,7 +227,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
         const response = await axiosInstance.post('/items/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
 
-        expect(response.data.results).toEqual(ctx.modifiedItems.map(dataConvertUtils.asWixData))
+        expect(response.data.results).toEqual(ctx.modifiedItems.map(dataConvertUtils.asWixDataItem))
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
                 items: expect.toIncludeSameMembers(ctx.modifiedItems),
@@ -241,7 +241,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         const response = await axiosInstance.post('/items/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
 
         expect(response.data.results).toEqual([
-            ...(ctx.modifiedItems.slice(0, ctx.items.length - 1).map(dataConvertUtils.asWixData)),
+            ...(ctx.modifiedItems.slice(0, ctx.items.length - 1).map(dataConvertUtils.asWixDataItem)),
             { 
                 error: { 
                     errorCode: 404, 

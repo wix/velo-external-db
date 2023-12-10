@@ -4,6 +4,10 @@ import * as crypto from 'crypto'
 
 
 export const asWixData = (item: Item) => { 
+    return generateIdsIfNeeded(packDates(item))
+}
+
+export const asWixDataItem = (item: Item) => { 
     return { item: generateIdsIfNeeded(packDates(item)) }
 }
 

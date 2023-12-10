@@ -4,7 +4,7 @@ import * as driver from '../../test/drivers/data_provider_test_support'
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import Chance = require('chance')
 import { getByIdFilterFor } from '../utils/data_utils'
-import { asWixData } from '../converters/data_utils'
+import { asWixDataItem } from '../converters/data_utils'
 import { HttpStatusCode } from '../spi-model/errors'
 const chance = new Chance()
 
@@ -71,7 +71,7 @@ describe('Data Service', () => {
     test('bulk insert will insert data into db', async() => {
         driver.expectInsertFor(ctx.entities, ctx.collectionName, ctx.defaultProjection)
 
-        return expect(env.dataService.bulkInsert(ctx.collectionName, ctx.entities, ctx.defaultProjection)).resolves.toEqual({ items: ctx.entities.map(asWixData) })
+        return expect(env.dataService.bulkInsert(ctx.collectionName, ctx.entities, ctx.defaultProjection)).resolves.toEqual({ items: ctx.entities.map(asWixDataItem) })
     })
 
     test('insert already item will return error object', async() => {        
@@ -89,7 +89,7 @@ describe('Data Service', () => {
     test('bulk update will update data into db', async() => {
         driver.expectUpdateFor(ctx.entities, ctx.collectionName)
 
-        return expect(env.dataService.bulkUpdate(ctx.collectionName, ctx.entities)).resolves.toEqual({ items: ctx.entities.map(asWixData) })
+        return expect(env.dataService.bulkUpdate(ctx.collectionName, ctx.entities)).resolves.toEqual({ items: ctx.entities.map(asWixDataItem) })
     })
 
     test('delete by item id', async() => {
@@ -102,7 +102,7 @@ describe('Data Service', () => {
         driver.givenItemsById(ctx.entities, ctx.collectionName, '', 0, 1, ctx.defaultProjection)
         driver.expectDeleteFor(ctx.itemIds, ctx.collectionName)
 
-        return expect(env.dataService.bulkDelete(ctx.collectionName, ctx.entities.map((e: any) => e._id), ctx.defaultProjection)).resolves.toEqual({ items: ctx.entities.map(asWixData) })
+        return expect(env.dataService.bulkDelete(ctx.collectionName, ctx.entities.map((e: any) => e._id), ctx.defaultProjection)).resolves.toEqual({ items: ctx.entities.map(asWixDataItem) })
     })
     
     // eslint-disable-next-line jest/expect-expect
