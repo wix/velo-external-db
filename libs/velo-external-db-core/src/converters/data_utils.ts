@@ -7,6 +7,10 @@ export const asWixData = (item: Item) => {
     return generateIdsIfNeeded(packDates(item))
 }
 
+export const asWixDataItem = (item: Item) => { 
+    return { item: asWixData(item) }
+}
+
 export const generateIdsIfNeeded = (item: Item): ItemWithId => {
     if ('_id' in item)
         return item as ItemWithId
