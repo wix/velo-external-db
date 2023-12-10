@@ -57,7 +57,7 @@ export default class DataService {
     async bulkUpdate(collectionName: string, _items: Item[]) {
         const items = await Promise.all((_items.map( item => this.storage.update(collectionName, [item])
                                                                           // maybe we should throw from data provider if affectedRows equals to 0
-                                                                          .then(affectedRows => affectedRows === 1 ?asWixDataItem(item) : Promise.reject(new domainErrors.ItemDoesNotExists(`Item doesn't exists: ${item._id}`, collectionName, item._id)))
+                                                                          .then(affectedRows => affectedRows === 1 ? asWixDataItem(item) : Promise.reject(new domainErrors.ItemDoesNotExists(`Item doesn't exists: ${item._id}`, collectionName, item._id)))
                                                                           .catch(e => domainToSpiErrorObjectTranslator(e)))
                                          ))
                                          

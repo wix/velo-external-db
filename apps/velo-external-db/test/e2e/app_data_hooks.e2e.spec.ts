@@ -499,11 +499,13 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
 
                 await expect(response.data).toEqual({
                     results: [{
-                        ...ctx.item,
-                        [ctx.afterAllColumn.name]: true,
-                        [ctx.afterWriteColumn.name]: true,
-                        [ctx.afterHookColumn.name]: true,
-                    }].map(dataConvertUtils.asWixDataItem)
+                        item: { 
+                            ...ctx.item, 
+                            [ctx.afterAllColumn.name]: true, 
+                            [ctx.afterWriteColumn.name]: true, 
+                            [ctx.afterHookColumn.name]: true, 
+                        }
+                    }]
                 })
             })
         })
