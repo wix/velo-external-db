@@ -191,7 +191,7 @@ export interface InsertResponse {
 
 // Item that was inserted, updated or removed. MUST be empty in case of error.
 // Error indicating why operation failed for a particular item. MUST be empty in case of success.
-export type DataItemModificationResult = Item | ApplicationError;
+export type DataItemModificationResult = { item: Item } | { error: ApplicationError };
 
 export interface Item {
     [fieldName: string]: string | boolean;

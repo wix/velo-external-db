@@ -6,14 +6,14 @@ const chance = Chance()
 
 describe('Converters', () => {
     test('pack dates will duplicate object and do nothing is date is not there', async() => {
-        expect(asWixData(ctx.obj)).toMatchObject(ctx.obj)
+        expect(asWixData(ctx.obj)).toMatchObject({ item: ctx.obj })
     })
 
     test('pack dates will take all properties with date and convert them to velo date', async() => {
         const objWithJsDates = { ...ctx.obj, [ctx.property]: dateTimeProvider.currentDateTime(),
                                              [ctx.anotherProperty]: dateTimeProvider.currentDateTime() }
 
-        expect(asWixData(objWithJsDates)).toMatchObject( { ...ctx.obj, [ctx.property]: { $date: dateTimeProvider.currentDateTime().toISOString() },
+        expect(asWixData(objWithJsDates).item).toMatchObject( { ...ctx.obj, [ctx.property]: { $date: dateTimeProvider.currentDateTime().toISOString() },
                                                                           [ctx.anotherProperty]: { $date: dateTimeProvider.currentDateTime().toISOString() } } )
     })
 

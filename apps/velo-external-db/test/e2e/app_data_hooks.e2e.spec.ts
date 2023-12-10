@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { authOwner, errorResponseWith } from '@wix-velo/external-db-testkit'
 import { testIfSupportedOperationsIncludes, testSupportedOperations } from '@wix-velo/test-commons'
-import { dataSpi, types as coreTypes, collectionSpi } from '@wix-velo/velo-external-db-core'
-import { DataOperation, InputField, ItemWithId, SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { dataSpi, types as coreTypes, collectionSpi, dataConvertUtils } from '@wix-velo/velo-external-db-core'
+import { DataOperation, InputField, Item, ItemWithId, SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { Uninitialized, gen as genCommon } from '@wix-velo/test-commons'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } from '../resources/e2e_resources'
 import gen = require('../gen')
@@ -187,7 +187,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                             beforeAll: (payload: dataSpi.InsertRequest | dataSpi.UpdateRequest, requestContext: coreTypes.RequestContext, _serviceContext) => {
                                 if (requestContext.operation !== DataOperation.query) {
                                     return {
-                                        ...payload, items: payload.items.map(item => ({
+                                        ...payload, items: payload.items.map( item => ({
                                             ...item,
                                             [ctx.afterAllColumn.name]: true,
                                             [ctx.afterWriteColumn.name]: false,
@@ -460,29 +460,35 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         afterAll: (payload: coreTypes.InsertResponse | coreTypes.UpdateResponse | coreTypes.RemoveResponse, requestContext: coreTypes.RequestContext, _serviceContext) => {
                             if (requestContext.operation !== DataOperation.query) {
                                 return {
-                                    ...payload, results: payload.results.map(item => ({
-                                        ...item,
-                                        [ctx.afterAllColumn.name]: true,
-                                        [ctx.afterWriteColumn.name]: false,
-                                        [ctx.afterHookColumn.name]: false,
+                                    ...payload, results: payload.results.map(({ item }: { item: Item }) => ({
+                                        item: {
+                                            ...item,
+                                            [ctx.afterAllColumn.name]: true,
+                                            [ctx.afterWriteColumn.name]: false,
+                                            [ctx.afterHookColumn.name]: false,
+                                        }
                                     }))
                                 }
                             }
                         },
                         afterWrite: (payload: coreTypes.InsertResponse | coreTypes.UpdateResponse | coreTypes.RemoveResponse, _requestContext, _serviceContext) => {
                             return {
-                                ...payload, results: payload.results.map(item => ({
-                                    ...item,
-                                    [ctx.afterWriteColumn.name]: true,
-                                    [ctx.afterHookColumn.name]: false,
+                                ...payload, results: payload.results.map(({ item }: { item: Item }) => ({
+                                    item: {
+                                        ...item,
+                                        [ctx.afterWriteColumn.name]: true,
+                                        [ctx.afterHookColumn.name]: false,
+                                    }
                                 }))
                             }
                         },
                         [hookName]: (payload, _requestContext, _serviceContext) => {
                             return {
-                                ...payload, results: payload.results.map(item => ({
-                                    ...item,
-                                    [ctx.afterHookColumn.name]: true,
+                                ...payload, results: payload.results.map(({ item }: { item: Item }) => ({
+                                    item: {
+                                        ...item,
+                                        [ctx.afterHookColumn.name]: true,
+                                    }
                                 }))
                             }
                         }
@@ -497,7 +503,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                         [ctx.afterAllColumn.name]: true,
                         [ctx.afterWriteColumn.name]: true,
                         [ctx.afterHookColumn.name]: true,
-                    }]
+                    }].map(dataConvertUtils.asWixData)
                 })
             })
         })

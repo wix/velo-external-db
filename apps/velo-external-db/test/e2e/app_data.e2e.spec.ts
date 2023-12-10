@@ -3,7 +3,7 @@ import each from 'jest-each'
 import * as Chance from 'chance'
 import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes } from '@wix-velo/test-commons'
 import { InputField, SchemaOperations, Item } from '@wix-velo/velo-external-db-types'
-import { dataSpi } from '@wix-velo/velo-external-db-core'
+import { dataSpi, dataConvertUtils } from '@wix-velo/velo-external-db-core'
 import { authAdmin, authOwner, authVisitor } from '@wix-velo/external-db-testkit'
 import * as gen from '../gen'
 import * as schema from '../drivers/schema_api_rest_test_support'
@@ -73,7 +73,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
         const response = await axiosInstance.post('/items/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
 
-        expect(response.data).toEqual({ results: expect.toIncludeSameMembers(ctx.items) })
+        expect(response.data).toEqual({ results: expect.toIncludeSameMembers(ctx.items.map(item => ({ item }))) })
     
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
             items: expect.toIncludeSameMembers(ctx.items),
@@ -87,14 +87,10 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
         const response = await axiosInstance.post('/items/insert', data.insertRequest(ctx.collectionName, ctx.items), authAdmin)
 
 
-        expect(response.data.results).toEqual([
-            ctx.items[0],
-            {
-                errorCode: 409,
-                errorMessage: expect.toInclude('Item already exists'),
-                data: expect.any(Object)
-            },
-            ...ctx.items.slice(2, ctx.items.length),
+        expect(response.data.results).toStrictEqual([
+            dataConvertUtils.asWixData(ctx.items[0]),
+            { error: { errorCode: 409, errorMessage: expect.toInclude('Item already exists'), data: expect.any(Object) } },
+            ...(ctx.items.slice(2, ctx.items.length).map(dataConvertUtils.asWixData)),
         ])
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
@@ -144,12 +140,12 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     testIfSupportedOperationsIncludes(supportedOperations, [ DeleteImmediately ])('bulk delete api', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
-await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
+        await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         const response = await axiosInstance.post('/items/remove', { 
             collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
         }, authAdmin)
 
-        expect(response.data.results).toEqual(expect.toIncludeSameMembers(ctx.items))
+        expect(response.data.results).toEqual(expect.toIncludeSameMembers(ctx.items.map(dataConvertUtils.asWixData)))
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
             items: [],
             pagingMetadata: data.pagingMetadata(0, 0)
@@ -164,12 +160,14 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
             collectionId: ctx.collectionName, itemIds: ctx.items.map(i => i._id) 
         }, authAdmin)
 
-        expect(response.data.results).toEqual([
-            ctx.items[0],
+        expect(response.data.results).toStrictEqual([
+            dataConvertUtils.asWixData(ctx.items[0]),
             ...ctx.items.slice(1, ctx.items.length).map(_i => ({
-                errorCode: 404,
-                errorMessage: expect.toInclude('Item doesn\'t exists'),
-                data: expect.any(Object)
+                error: {
+                    errorCode: 404,
+                    errorMessage: expect.toInclude('Item doesn\'t exists'),
+                    data: expect.any(Object)
+                }
             }))
         ])
 
@@ -229,7 +227,7 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         await data.givenItems(ctx.items, ctx.collectionName, authAdmin)
         const response = await axiosInstance.post('/items/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
 
-        expect(response.data.results).toEqual(ctx.modifiedItems)
+        expect(response.data.results).toEqual(ctx.modifiedItems.map(dataConvertUtils.asWixData))
 
         await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner)).resolves.toEqual({
                 items: expect.toIncludeSameMembers(ctx.modifiedItems),
@@ -243,11 +241,13 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
         const response = await axiosInstance.post('/items/update', data.updateRequest(ctx.collectionName, ctx.modifiedItems),  authAdmin)
 
         expect(response.data.results).toEqual([
-            ...ctx.modifiedItems.slice(0, ctx.items.length - 1),
-            {
-                errorCode: 404,
-                errorMessage: expect.toInclude('Item doesn\'t exists'),
-                data: expect.any(Object)
+            ...(ctx.modifiedItems.slice(0, ctx.items.length - 1).map(dataConvertUtils.asWixData)),
+            { 
+                error: { 
+                    errorCode: 404, 
+                    errorMessage: expect.toInclude('Item doesn\'t exists'), 
+                    data: expect.any(Object) 
+                } 
             }
         ])
 
@@ -337,11 +337,14 @@ await data.givenItems([ ctx.items[1] ], ctx.collectionName, authAdmin)
             const response = await axiosInstance.post('/items/insert', data.insertRequest(ctx.collectionName, [ctx.item]), authAdmin)
 
             expect(response.data).toEqual(expect.objectContaining({
-                results: [{
-                    errorCode: 409,
-                    errorMessage: expect.toInclude('Item already exists'),
-                    data: expect.any(Object)
-                }
+                results: [
+                    {
+                        error: {
+                            errorCode: 409,
+                            errorMessage: expect.toInclude('Item already exists'),
+                            data: expect.any(Object)
+                        }
+                    }
                 ]
             }))
         })
