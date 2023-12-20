@@ -53,6 +53,6 @@ const debuggingDataHooks: coreTypes.DataHooks = {
         const endTime = Date.now()
         const startTime = customContext.startTime
         const duration = endTime - startTime
-        console.log({ duration, payload: customContext.payload, requestContext: customContext.requestContext })
+        console.log(JSON.stringify({ duration, payload: customContext.payload, requestContext: customContext.requestContext }))
     }
 }
