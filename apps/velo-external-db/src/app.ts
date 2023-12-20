@@ -1,6 +1,6 @@
 import express = require('express')
 import { create, readCommonConfig } from '@wix-velo/external-db-config'
-import { ExternalDbRouter, Hooks, DataHooks, DataPayloadBefore, RequestContext, ServiceContext } from '@wix-velo/velo-external-db-core'
+import { ExternalDbRouter, Hooks, types as coreTypes } from '@wix-velo/velo-external-db-core'
 import { engineConnectorFor } from './storage/factory'
 
 const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
@@ -41,15 +41,15 @@ export const createApp = async(wixDataBaseUrl?: string) => {
 }
 
 
-const debuggingDataHooks: DataHooks = {
-    beforeAll: (payload: DataPayloadBefore, requestContext: RequestContext, _serviceContext: ServiceContext, customContext: any) => {
+const debuggingDataHooks: coreTypes.DataHooks = {
+    beforeAll: (payload: coreTypes.DataPayloadBefore, requestContext: coreTypes.RequestContext, _serviceContext: coreTypes.ServiceContext, customContext: any) => {
         const startTime = Date.now()
         customContext.startTime = startTime
         customContext.payload = payload
         customContext.requestContext = requestContext
     },
 
-    afterAll: (_payload: DataPayloadBefore, _requestContext: RequestContext, _serviceContext: ServiceContext, customContext: any) => {
+    afterAll: (_payload: coreTypes.DataPayloadBefore, _requestContext: coreTypes.RequestContext, _serviceContext: coreTypes.ServiceContext, customContext: any) => {
         const endTime = Date.now()
         const startTime = customContext.startTime
         const duration = endTime - startTime
