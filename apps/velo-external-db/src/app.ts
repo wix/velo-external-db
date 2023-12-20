@@ -1,6 +1,6 @@
 import express = require('express')
 import { create, readCommonConfig } from '@wix-velo/external-db-config'
-import { ExternalDbRouter, Hooks } from '@wix-velo/velo-external-db-core'
+import { ExternalDbRouter, Hooks, types as coreTypes } from '@wix-velo/velo-external-db-core'
 import { engineConnectorFor } from './storage/factory'
 
 const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
@@ -32,9 +32,27 @@ const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
 
 export const createApp = async(wixDataBaseUrl?: string) => {
     const app = express()
-    const initConnectorResponse = await initConnector(wixDataBaseUrl)
+    const hooks: Hooks = process.env.DEBUG ? { dataHooks: debuggingDataHooks } : undefined
+    const initConnectorResponse = await initConnector(wixDataBaseUrl, hooks)
     app.use(initConnectorResponse.externalDbRouter.router)
     const server = app.listen(8080, () => console.log('Connector listening on port 8080'))
 
     return { server, ...initConnectorResponse, reload: () => initConnector(wixDataBaseUrl) }
+}
+
+
+const debuggingDataHooks: coreTypes.DataHooks = {
+    beforeAll: (payload: coreTypes.DataPayloadBefore, requestContext: coreTypes.RequestContext, _serviceContext: coreTypes.ServiceContext, customContext: any) => {
+        const startTime = Date.now()
+        customContext.startTime = startTime
+        customContext.payload = payload
+        customContext.requestContext = requestContext
+    },
+
+    afterAll: (_payload: coreTypes.DataPayloadBefore, _requestContext: coreTypes.RequestContext, _serviceContext: coreTypes.ServiceContext, customContext: any) => {
+        const endTime = Date.now()
+        const startTime = customContext.startTime
+        const duration = endTime - startTime
+        console.log({ duration, payload: customContext.payload, requestContext: customContext.requestContext })
+    }
 }
