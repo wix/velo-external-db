@@ -93,7 +93,8 @@ export const createRouter = () => {
 
     //set timeout of 2 minutes per request
     router.use((req, res, next) => {
-        res.setTimeout(120000, () => {
+        const twoMintuesInMs = 120000
+        res.setTimeout(twoMintuesInMs, () => {
             res.status(408).send('Request Timeout')
         })
         next()
