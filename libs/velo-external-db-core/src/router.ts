@@ -91,6 +91,15 @@ export const createRouter = () => {
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
+    //set timeout of 2 minutes per request
+    router.use((req, res, next) => {
+        const twoMintuesInMs = 120000
+        res.setTimeout(twoMintuesInMs, () => {
+            res.status(408).send('Request Timeout')
+        })
+        next()
+    })
+
     // *************** INFO **********************
     router.get('/', async(req, res) => {
         const { hideAppInfo } = cfg
