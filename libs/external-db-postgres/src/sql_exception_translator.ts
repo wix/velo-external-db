@@ -32,7 +32,7 @@ export const notThrowingTranslateErrorCodes = (err: any, collectionName: string,
         case 'EAI_AGAIN':
             return new DbConnectionError('Database host is unavailable.')
         case '22P02':
-            return new CollectionChangeNotSupportedError(err.messag, collectionName, fieldName ?? '')
+            return new CollectionChangeNotSupportedError(err.messag, collectionName, fieldName)
         default :
             console.error(err)
             return new UnrecognizedError(`${err.code}, ${err.message}`)

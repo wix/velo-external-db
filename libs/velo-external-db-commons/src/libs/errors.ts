@@ -125,9 +125,9 @@ export class CollectionChangeNotSupportedError extends BaseHttpError {
     collectionName: string
     fieldName: string
 
-    constructor(message: string, collectionName: string, fieldName: string) {
+    constructor(message: string, collectionName?: string, fieldName?: string) {
         super(message)
-        this.collectionName = collectionName
-        this.fieldName = fieldName
+        this.collectionName = collectionName || ''
+        this.fieldName = fieldName || ''
     }
 }
