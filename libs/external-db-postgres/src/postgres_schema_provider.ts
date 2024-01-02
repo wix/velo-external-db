@@ -56,12 +56,12 @@ export default class SchemaProvider implements ISchemaProvider {
         const primaryKeySql = columns.filter(f => f.isPrimary).map(f => escapeIdentifier(f.name)).join(', ')
 
         await this.pool.query(`CREATE TABLE IF NOT EXISTS ${escapeIdentifier(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`)
-                  .catch( translateErrorCodes )
+                  .catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async drop(collectionName: string) {
         await this.pool.query(`DROP TABLE IF EXISTS ${escapeIdentifier(collectionName)}`)
-                  .catch( translateErrorCodes )
+                  .catch( err => translateErrorCodes(err, collectionName) )
     }
 
 
@@ -69,27 +69,27 @@ export default class SchemaProvider implements ISchemaProvider {
         await validateSystemFields(column.name)
 
         await this.pool.query(`ALTER TABLE ${escapeIdentifier(collectionName)} ADD ${escapeIdentifier(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
-                  .catch( translateErrorCodes )
+                  .catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async changeColumnType(collectionName: string, column: InputField): Promise<void> {
         await validateSystemFields(column.name)
         const query = `ALTER TABLE ${escapeIdentifier(collectionName)} ALTER COLUMN ${escapeIdentifier(column.name)} TYPE ${this.sqlSchemaTranslator.dbTypeFor(column)} USING (${escapeIdentifier(column.name)}::${this.sqlSchemaTranslator.dbTypeFor(column)})`
         await this.pool.query(query)
-            .catch( err => translateErrorCodes(err) )
+            .catch( err => translateErrorCodes(err, collectionName, column.name) )
     }
 
     async removeColumn(collectionName: string, columnName: string) {
         await validateSystemFields(columnName)
 
         await this.pool.query(`ALTER TABLE ${escapeIdentifier(collectionName)} DROP COLUMN ${escapeIdentifier(columnName)}`)
-                         .catch( translateErrorCodes )
+                         .catch( err => translateErrorCodes(err, collectionName) )
 
     }
 
     async describeCollection(collectionName: string): Promise<Table> {
         const res = await this.pool.query('SELECT table_name, column_name AS field, data_type, udt_name AS type, character_maximum_length FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2 ORDER BY table_name', ['public', collectionName])
-                              .catch( translateErrorCodes )
+                              .catch( err => translateErrorCodes(err, collectionName) )
         if (res.rows.length === 0) {
             throw new CollectionDoesNotExists('Collection does not exists', collectionName)
         }

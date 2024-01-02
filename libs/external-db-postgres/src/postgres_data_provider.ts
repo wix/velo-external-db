@@ -20,14 +20,14 @@ export default class DataProvider implements IDataProvider {
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
         const sql = `SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`
         const resultSet = await this.pool.query(sql, [...parameters, skip, limit])
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
         return resultSet.rows
     }
 
     async count(collectionName: string, filter: Filter) {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const resultSet = await this.pool.query(`SELECT COUNT(*) AS num FROM ${escapeIdentifier(collectionName)} ${filterExpr}`, parameters)
-                                         .catch( translateErrorCodes )
+                                         .catch( err => translateErrorCodes(err, collectionName) )
         return parseInt(resultSet.rows[0]['num'], 10)
     }
 
@@ -37,7 +37,7 @@ export default class DataProvider implements IDataProvider {
         const upsertAddon = upsert ? ` ON CONFLICT (_id) DO UPDATE SET ${fields.map(f => `${escapeIdentifier(f.field)} = EXCLUDED.${escapeIdentifier(f.field)}`).join(', ')}` : ''
         const query = `INSERT INTO ${escapeIdentifier(collectionName)} (${escapedFieldsNames}) VALUES ${prepareStatementVariablesForBulkInsert(items.length, fields.length)}${upsertAddon}`
 
-        await this.pool.query(query, itemsAsParams.flat()).catch( translateErrorCodes )
+        await this.pool.query(query, itemsAsParams.flat()).catch( err => translateErrorCodes(err, collectionName) )
 
         return items.length
     }
@@ -50,7 +50,7 @@ export default class DataProvider implements IDataProvider {
         const res = await Promise.all(
                         updatables.map(async(updatable: any) => {
                                 const rs = await this.pool.query(`UPDATE ${escapeIdentifier(collectionName)} SET ${updateFields.map((f, i) => `${escapeIdentifier(f)} = $${i + 1}`).join(', ')} WHERE _id = $${updateFields.length + 1}`, updatable)
-                                                          .catch( translateErrorCodes )
+                                                          .catch( err => translateErrorCodes(err, collectionName) )
                                 return rs.rowCount
                         } ) )
         
@@ -60,14 +60,14 @@ export default class DataProvider implements IDataProvider {
 
     async delete(collectionName: string, itemIds: string[]): Promise<number> {
         const rs = await this.pool.query(`DELETE FROM ${escapeIdentifier(collectionName)} WHERE _id IN (${prepareStatementVariables(itemIds.length)})`, itemIds)
-                             .catch( translateErrorCodes )
+                             .catch( err => translateErrorCodes(err, collectionName) )
         
         // @ts-ignore
         return rs.rowCount
     }
 
     async truncate(collectionName: string) {
-        await this.pool.query(`TRUNCATE ${escapeIdentifier(collectionName)}`).catch( translateErrorCodes )
+        await this.pool.query(`TRUNCATE ${escapeIdentifier(collectionName)}`).catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number): Promise<Item[]> {
@@ -78,7 +78,7 @@ export default class DataProvider implements IDataProvider {
 
         const sql = `SELECT ${fieldsStatement} FROM ${escapeIdentifier(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeIdentifier ).join(', ')} ${filterExpr} ${sortExpr} OFFSET $${offsetAfterAggregation} LIMIT $${offsetAfterAggregation+1}`
         const rs = await this.pool.query(sql, [...whereParameters, ...havingParameters, skip, limit])
-                                  .catch( translateErrorCodes )
+                                  .catch( err => translateErrorCodes(err, collectionName) )
         return rs.rows
     }
 }

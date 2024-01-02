@@ -1,6 +1,6 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { IBaseHttpError } from '@wix-velo/velo-external-db-types'
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists, UnrecognizedError } = errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists, UnrecognizedError, CollectionChangeNotSupportedError } = errors
 
 const extractDuplicatedItem = (error: any) => extractValueFromErrorMessage(error.detail, /Key \(_id\)=\((.*)\) already exists\./)
 
@@ -14,7 +14,7 @@ const extractValueFromErrorMessage = (msg: string, regex: RegExp) => {
     }
 }
 
-export const notThrowingTranslateErrorCodes = (err: any): IBaseHttpError => {
+export const notThrowingTranslateErrorCodes = (err: any, collectionName: string, fieldName?: string): IBaseHttpError => {
     switch (err.code) {
         case '42703':
             return new FieldDoesNotExist('Collection does not contain a field with this name')
@@ -31,13 +31,15 @@ export const notThrowingTranslateErrorCodes = (err: any): IBaseHttpError => {
         case 'ENOTFOUND':
         case 'EAI_AGAIN':
             return new DbConnectionError('Database host is unavailable.')
+        case '22P02':
+            return new CollectionChangeNotSupportedError(err.messag, collectionName, fieldName)
         default :
             console.error(err)
             return new UnrecognizedError(`${err.code}, ${err.message}`)
     }
 }
 
-export const translateErrorCodes = (err: any) => {
-    throw notThrowingTranslateErrorCodes(err)
+export const translateErrorCodes = (err: any, collectionName: string, fieldName?: string) => {
+    throw notThrowingTranslateErrorCodes(err, collectionName, fieldName)
 }
 
