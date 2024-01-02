@@ -1,4 +1,4 @@
-class BaseHttpError extends Error {
+export class BaseHttpError extends Error {
     constructor(message: string) {
         super(message)
     }
@@ -14,7 +14,7 @@ export class CollectionDoesNotExists extends BaseHttpError {
     collectionName: string
     constructor(message: string, collectionName?: string) {
         super(message)
-        this.collectionName = collectionName || ''
+        this.collectionName = collectionName ?? '' 
     }
 }
 
@@ -22,7 +22,7 @@ export class CollectionAlreadyExists extends BaseHttpError {
     collectionName: string
     constructor(message: string, collectionName?: string) {
         super(message)
-        this.collectionName = collectionName || ''
+        this.collectionName = collectionName ?? '' 
     }
 }
 
@@ -32,8 +32,8 @@ export class FieldAlreadyExists extends BaseHttpError {
 
     constructor(message: string, collectionName?: string, fieldName?: string) {
         super(message)
-        this.collectionName = collectionName || ''
-        this.fieldName = fieldName || ''
+        this.collectionName = collectionName ?? '' 
+        this.fieldName = fieldName ?? '' 
     }
 }
 
@@ -43,8 +43,8 @@ export class ItemAlreadyExists extends BaseHttpError {
 
     constructor(message: string, collectionName?: string, itemId?: string) {
         super(message)
-        this.itemId = itemId || ''
-        this.collectionName = collectionName || ''
+        this.itemId = itemId ?? '' 
+        this.collectionName = collectionName ?? '' 
     }
 }
 
@@ -54,8 +54,8 @@ export class ItemDoesNotExists extends BaseHttpError {
 
     constructor(message: string, collectionName?: string, itemId?: string) {
         super(message)
-        this.itemId = itemId || ''
-        this.collectionName = collectionName || ''
+        this.itemId = itemId ?? '' 
+        this.collectionName = collectionName ?? '' 
     }
 }
 
@@ -64,8 +64,8 @@ export class FieldDoesNotExist extends BaseHttpError {
     collectionName: string
     constructor(message: string, collectionName?: string, propertyName?: string) {
         super(message)
-        this.propertyName = propertyName || ''
-        this.collectionName = collectionName || ''
+        this.propertyName = propertyName ?? '' 
+        this.collectionName = collectionName ?? '' 
     }
 }
 
@@ -104,8 +104,8 @@ export class UnsupportedSchemaOperation extends BaseHttpError {
 
     constructor(message: string, collectionName?: string, operation?: string) {
         super(message)
-        this.collectionName = collectionName || ''
-        this.operation = operation || ''
+        this.collectionName = collectionName ?? '' 
+        this.operation = operation ?? '' 
     }
 }
 
@@ -127,7 +127,7 @@ export class CollectionChangeNotSupportedError extends BaseHttpError {
 
     constructor(message: string, collectionName?: string, fieldName?: string) {
         super(message)
-        this.collectionName = collectionName || ''
-        this.fieldName = fieldName || ''
+        this.collectionName = collectionName ?? '' 
+        this.fieldName = fieldName ?? '' 
     }
 }
