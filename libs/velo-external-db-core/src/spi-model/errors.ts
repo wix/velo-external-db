@@ -1,3 +1,121 @@
+class BaseWixError extends Error {
+    collctionName: string
+    httpCode: HttpStatusCode
+    applicationCode: ApiErrors
+
+    constructor(message: string, httpCode: HttpStatusCode, applicationCode: ApiErrors, collectionName: string) {
+        super(message)
+        this.httpCode = httpCode
+        this.applicationCode = applicationCode
+        this.collctionName = collectionName
+    }
+}
+
+export class CollectionNotFoundError extends BaseWixError {
+    data: { collectionId: string }
+
+    constructor(collectionName: string, message: string) {
+        super(message, HttpStatusCode.NOT_FOUND, ApiErrors.WDE0025, collectionName)
+        this.data = { collectionId: collectionName }
+    }
+}
+
+export class CollectionAlreadyExistsError extends BaseWixError {
+    data: { collectionId: string }
+
+    constructor(collectionName: string, message: string) {
+        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0104, collectionName)
+        this.data = { collectionId: collectionName }
+    }
+}
+
+export class ItemNotFoundError extends BaseWixError {
+    data: { itemId: string }
+
+    constructor(collectionName: string, itemId: string, message: string) {
+        super(message, HttpStatusCode.NOT_FOUND, ApiErrors.WDE0073, collectionName)
+        this.data = { itemId }
+    }
+}
+
+export class ItemAlreadyExistsError extends BaseWixError {
+    data: { itemId: string }
+
+    constructor(collectionName: string, itemId: string, message: string) {
+        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0074, collectionName)
+        this.data = { itemId }
+    }
+}
+
+export class ReferenceNotFoundError extends BaseWixError {
+    referringItemId: string
+    referencedItemId: string
+    data: { referringItemId: string, referencedItemId: string }
+
+    constructor(message: string, collectionName: string, referringItemId: string, referencedItemId: string) {
+        super(message, HttpStatusCode.NOT_FOUND, ApiErrors.WDE0029, collectionName)
+        this.referringItemId = referringItemId
+        this.referencedItemId = referencedItemId
+        this.data = { referringItemId, referencedItemId }
+    }
+}
+
+export class ReferenceAlreadyExistsError extends BaseWixError {
+    referringItemId: string
+    referencedItemId: string
+    data: { referringItemId: string, referencedItemId: string }
+
+    constructor(message: string, collectionName: string, referringItemId: string, referencedItemId: string) {
+        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0029, collectionName)
+        this.referringItemId = referringItemId
+        this.referencedItemId = referencedItemId
+        this.data = { referringItemId, referencedItemId }
+    }
+}
+
+export interface ValidationViolation {
+    fieldPath: string;
+    rejectedValue: string;
+    message: string;
+}
+
+export class ValidationError extends BaseWixError {
+    violations: ValidationViolation[]
+    data: { violations: ValidationViolation[] }
+
+    constructor(message: string, collectionName: string, fieldPath: string, rejectedValue: string) {
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0075, collectionName)
+        this.violations = [{ fieldPath, rejectedValue, message }]
+        this.data = { violations: this.violations }
+    }
+}
+
+export interface CollectionChangeNotSupportedErrorItem {
+    fieldKey: string;
+    message: string;
+}
+
+export class CollectionChangeNotSupportedError extends BaseWixError {
+    errors: CollectionChangeNotSupportedErrorItem[]
+    data: { errors: CollectionChangeNotSupportedErrorItem[] }
+
+    constructor(collectionName: string, fieldKey: string, message: string) {
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0119, collectionName)
+        this.errors = [{ fieldKey, message }]
+        this.data = { errors: this.errors }
+    }
+}
+
+export class UnknownError extends BaseWixError {
+    data: { message: string }
+    constructor(message: string) {
+        super(message, HttpStatusCode.INTERNAL, ApiErrors.WDE0054, '')
+        this.data = { message }
+    }
+}
+
+
+
 export class ErrorMessage {
     static unknownError(description?: string, status?: number) {
         return HttpError.create({
