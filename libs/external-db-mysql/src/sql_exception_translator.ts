@@ -1,9 +1,10 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists, UnrecognizedError } = errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, DbConnectionError, ItemAlreadyExists, UnrecognizedError, CollectionChangeNotSupportedError } = errors
 
 const extractDuplicatedColumnName = (error: any) => extractValueFromErrorMessage(error.sqlMessage, /Duplicate column name '(.*)'/)
 const extractDuplicatedItem = (error: any) => extractValueFromErrorMessage(error.sqlMessage, /Duplicate entry '(.*)' for key .*/) 
-const extractUnknownColumn = (error: any) => extractValueFromErrorMessage(error.sqlMessage, /Unknown column '(.*)' in 'field list'/) 
+const extractUnknownColumn = (error: any) => extractValueFromErrorMessage(error.sqlMessage, /Unknown column '(.*)' in 'field list'/)
+const extractColumnNameFromAltertionError = (error: any) => extractValueFromErrorMessage(error.sqlMessage, /column\s['`]([^'`]+)['`]/)
 
 const extractValueFromErrorMessage = (msg: string, regex: RegExp) => {
     try {
@@ -33,6 +34,9 @@ export const notThrowingTranslateErrorCodes = (err: any, collectionName: string)
             return new DbConnectionError(`Access to database denied - host is unavailable, sql message:  ${err.sqlMessage} `)
         case 'ER_DUP_ENTRY': 
             return new ItemAlreadyExists(`Item already exists: ${err.sqlMessage}`, collectionName, extractDuplicatedItem(err))
+        case 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD':
+        case 'WARN_DATA_TRUNCATED':
+            return new CollectionChangeNotSupportedError(err.sqlMessage, collectionName, extractColumnNameFromAltertionError(err))
         default :
             console.error(err)
             return new UnrecognizedError(`${err.code} ${err.sqlMessage}`)
