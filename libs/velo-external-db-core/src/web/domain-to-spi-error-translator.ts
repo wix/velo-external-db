@@ -1,5 +1,5 @@
 import { errors as domainErrors } from '@wix-velo/velo-external-db-commons' 
-import { ItemAlreadyExistsError, CollectionNotFoundError, ItemNotFoundError, CollectionAlreadyExistsError, CollectionChangeNotSupportedError, UnknownError, InvalidPropertyError, UnauthorizedError } from '../spi-model/errors'
+import { ItemAlreadyExistsError, CollectionNotFoundError, ItemNotFoundError, CollectionAlreadyExistsError, CollectionChangeNotSupportedError, UnknownError, InvalidPropertyError, UnauthorizedError, FieldAlreadyExistsError } from '../spi-model/errors'
 
 export const domainToSpiErrorTranslator = (err: domainErrors.BaseHttpError) => {
     switch(err.constructor) {
@@ -11,9 +11,9 @@ export const domainToSpiErrorTranslator = (err: domainErrors.BaseHttpError) => {
         const collectionDoesNotExists = err as domainErrors.CollectionDoesNotExists
         return new CollectionNotFoundError(collectionDoesNotExists.collectionName, collectionDoesNotExists.message)
       
-      // case domainErrors.FieldAlreadyExists:
-      //   const fieldAlreadyExists = err as domainErrors.FieldAlreadyExists
-      //   return ErrorMessage.itemAlreadyExists(fieldAlreadyExists.fieldName, fieldAlreadyExists.collectionName, fieldAlreadyExists.message)
+      case domainErrors.FieldAlreadyExists:
+        const fieldAlreadyExists = err as domainErrors.FieldAlreadyExists
+        return new FieldAlreadyExistsError(fieldAlreadyExists.collectionName, fieldAlreadyExists.fieldName, fieldAlreadyExists.message)
       
       case domainErrors.FieldDoesNotExist:
         const fieldDoesNotExist = err as domainErrors.FieldDoesNotExist
@@ -34,8 +34,6 @@ export const domainToSpiErrorTranslator = (err: domainErrors.BaseHttpError) => {
       case domainErrors.CollectionChangeNotSupportedError:
         const collectionChangeNotSupportedError = err as domainErrors.CollectionChangeNotSupportedError
         return new CollectionChangeNotSupportedError(collectionChangeNotSupportedError.collectionName, collectionChangeNotSupportedError.fieldName, collectionChangeNotSupportedError.message)
-
-    
 
       case domainErrors.UnauthorizedError:
         const unauthorizedError = err as domainErrors.UnauthorizedError
