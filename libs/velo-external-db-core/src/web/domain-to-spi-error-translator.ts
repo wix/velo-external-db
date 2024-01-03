@@ -1,5 +1,5 @@
 import { errors as domainErrors } from '@wix-velo/velo-external-db-commons' 
-import { ItemAlreadyExistsError, CollectionNotFoundError, ItemNotFoundError, CollectionAlreadyExistsError, CollectionChangeNotSupportedError, UnknownError } from '../spi-model/errors'
+import { ItemAlreadyExistsError, CollectionNotFoundError, ItemNotFoundError, CollectionAlreadyExistsError, CollectionChangeNotSupportedError, UnknownError, InvalidPropertyError, UnauthorizedError } from '../spi-model/errors'
 
 export const domainToSpiErrorTranslator = (err: domainErrors.BaseHttpError) => {
     switch(err.constructor) {
@@ -15,9 +15,9 @@ export const domainToSpiErrorTranslator = (err: domainErrors.BaseHttpError) => {
       //   const fieldAlreadyExists = err as domainErrors.FieldAlreadyExists
       //   return ErrorMessage.itemAlreadyExists(fieldAlreadyExists.fieldName, fieldAlreadyExists.collectionName, fieldAlreadyExists.message)
       
-      // case domainErrors.FieldDoesNotExist:
-      //   const fieldDoesNotExist = err as domainErrors.FieldDoesNotExist
-      //   return ErrorMessage.invalidProperty(fieldDoesNotExist.collectionName, fieldDoesNotExist.propertyName, fieldDoesNotExist.message)
+      case domainErrors.FieldDoesNotExist:
+        const fieldDoesNotExist = err as domainErrors.FieldDoesNotExist
+        return new InvalidPropertyError(fieldDoesNotExist.collectionName, fieldDoesNotExist.propertyName, fieldDoesNotExist.message)
   
       // case domainErrors.UnsupportedSchemaOperation:
       //   const unsupportedSchemaOperation = err as domainErrors.UnsupportedSchemaOperation
@@ -37,9 +37,9 @@ export const domainToSpiErrorTranslator = (err: domainErrors.BaseHttpError) => {
 
     
 
-      // case domainErrors.UnauthorizedError:
-      //   const unauthorizedError = err as domainErrors.UnauthorizedError
-      //   return ErrorMessage.unauthorized(unauthorizedError.message)
+      case domainErrors.UnauthorizedError:
+        const unauthorizedError = err as domainErrors.UnauthorizedError
+        return new UnauthorizedError(unauthorizedError.message)
       
       default:
         return new UnknownError(err.message)

@@ -58,4 +58,4 @@ export const authOwnerWithWrongAppId= { transformRequest: axios.defaults
 
                                     
 
-export const errorResponseWith = (status: any, message: string) => ({ response: { data: { description: expect.stringContaining(message) }, status } })
+export const errorResponseWith = (code: any, message: string) => ({ response: { data: { data: { description: expect.stringContaining(message) }, code } } })

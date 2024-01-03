@@ -107,13 +107,31 @@ export class CollectionChangeNotSupportedError extends BaseWixError {
 }
 
 export class UnknownError extends BaseWixError {
-    data: { message: string }
+    data: { description: string }
     constructor(message: string) {
         super(message, HttpStatusCode.INTERNAL, ApiErrors.WDE0054, '')
-        this.data = { message }
+        this.data = { description: message }
     }
 }
 
+
+export class InvalidPropertyError extends BaseWixError {
+    data: { collectionId: string, propertyName: string }
+
+    constructor(collectionName: string, propertyName: string, message: string) {
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0147, collectionName)
+        this.data = { collectionId: collectionName, propertyName }
+    }
+}
+
+
+export class UnauthorizedError extends BaseWixError {
+    data: { description: string }
+    constructor(message: string) {
+        super(message, HttpStatusCode.UNAUTHENTICATED, ApiErrors.WDE0027, '')
+        this.data = { description: message }
+    }
+}
 
 
 export class ErrorMessage {
