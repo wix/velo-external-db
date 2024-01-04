@@ -27,9 +27,7 @@ on:
         type: choice
         description: Container registry folder
         options:
-          - velo-external-db
           - velo-manged-external-db
-          - velo-external-db-test
           - velo-manged-external-db-test
 
 jobs:
