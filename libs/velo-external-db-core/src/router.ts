@@ -201,7 +201,7 @@ export const createRouter = () => {
             const { collectionName } = req.body
             const customContext = {}
             const { items } = await executeDataHooksFor(DataActions.BeforeBulkUpdate, dataPayloadFor(BULK_UPDATE, req.body), requestContextFor(BULK_UPDATE, req.body), customContext)
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
+            roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
             const data = await schemaAwareDataService.bulkUpdate(collectionName, items)
 
             const dataAfterAction = await executeDataHooksFor(DataActions.AfterBulkUpdate, data, requestContextFor(BULK_UPDATE, req.body), customContext)
