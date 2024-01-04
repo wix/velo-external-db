@@ -253,6 +253,7 @@ export const createRouter = () => {
             const customContext = {}
             const { collectionId } = await executeDataHooksFor(DataActions.BeforeTruncate, dataPayloadFor(Truncate, req.body), requestContextFor(Truncate, req.body, res.locals), customContext) as dataSource.TruncateRequest
             
+            
             await schemaAwareDataService.truncate(collectionId)
             await executeDataHooksFor(DataActions.AfterTruncate, {}, requestContextFor(Truncate, req.body, res.locals), customContext)
             
