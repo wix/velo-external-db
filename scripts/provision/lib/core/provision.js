@@ -6,12 +6,12 @@ const { providerFor } = require('../cloud-providers/factory')
 const provisionDb = async(provider, configWriter, { engine, secretId, secretKey, dbName, provisionVariables, dbCredentials, instanceName }) => {
     await startSpinnerWith(`Preparing ${engine} - running preCreate `, async() => await provider.preCreateDb(provisionVariables))
     
-    await startSpinnerWith(`Creating ${engine} DB Instance`, async() => await provider.createDb({ name: instanceName, engine: engine, credentials: dbCredentials, ...provisionVariables }))
+    await startSpinnerWith(`Creating ${engine} DB Instance`, async() => await provider.createDb({ name: instanceName, engine, credentials: dbCredentials, ...provisionVariables }))
     await startSpinnerWith('Waiting for db instance to start', async() => await blockUntil( async() => (await provider.dbStatusAvailable(instanceName, provisionVariables)).available ))
 
     const status = await provider.dbStatusAvailable(instanceName, provisionVariables)
 
-    const secrets = await startSpinnerWith('Writing db config', async() => await configWriter.writeConfig({ secretId: secretId, dbCredentials: dbCredentials, host: status.host, db: dbName, secretKey: secretKey, provisionVariables: provisionVariables, instanceName: instanceName, connectionName: status.connectionName }))
+    const secrets = await startSpinnerWith('Writing db config', async() => await configWriter.writeConfig({ secretId, dbCredentials, host: status.host, db: dbName, secretKey, provisionVariables, instanceName, connectionName: status.connectionName }))
 
     await startSpinnerWith('Provision Velo DB on db instance', async() => await provider.postCreateDb(engine, dbName, status, dbCredentials, provisionVariables, instanceName))
 

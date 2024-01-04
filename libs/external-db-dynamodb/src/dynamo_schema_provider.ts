@@ -1,18 +1,21 @@
-import { SystemTable, validateTable, reformatFields } from './dynamo_utils'
+import { SystemTable, validateTable } from './dynamo_utils'
 import { translateErrorCodes } from './sql_exception_translator'
-import { SystemFields, validateSystemFields, errors } from '@wix-velo/velo-external-db-commons'
+import { validateSystemFields, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import * as dynamoRequests from './dynamo_schema_requests_utils'
 import { DynamoDB } from '@aws-sdk/client-dynamodb'
-import { InputField, ISchemaProvider, ResponseField, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { CollectionCapabilities, Encryption, InputField, ISchemaProvider, PagingMode, SchemaOperations, Table } from '@wix-velo/velo-external-db-types'
+import { CollectionOperations, ColumnsCapabilities, FieldTypes, ReadWriteOperations } from './dynamo_capabilities'
+import { supportedOperations } from './supported_operations'
 const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist } = errors
+
 
 export default class SchemaProvider implements ISchemaProvider {
     client: DynamoDB
     docClient: DynamoDBDocument
     constructor(client: DynamoDB) {
         this.client = client
-        this.docClient = DynamoDBDocument.from(client)
+        this.docClient = DynamoDBDocument.from(client, { marshallOptions: { removeUndefinedValues: true } })
     }
 
     async list(): Promise<Table[]> {
@@ -23,7 +26,8 @@ export default class SchemaProvider implements ISchemaProvider {
 
         return Items ? Items.map((table: { [x:string]: any, tableName?: any, fields?: any }) => ({
             id: table.tableName,
-            fields: [...SystemFields, ...table.fields].map(reformatFields)
+            fields: table.fields.map(this.appendAdditionalRowDetails),
+            capabilities: this.collectionCapabilities()
         })) : []
     }
 
@@ -36,9 +40,7 @@ export default class SchemaProvider implements ISchemaProvider {
     }
 
     supportedOperations(): SchemaOperations[] {
-        const { List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately } = SchemaOperations
-
-        return [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, BulkDelete, Truncate, DeleteImmediately, UpdateImmediately ]
+        return supportedOperations
     }
 
     async create(collectionName: string, columns: InputField[]): Promise<void> {
@@ -71,7 +73,7 @@ export default class SchemaProvider implements ISchemaProvider {
         await validateSystemFields(column.name)
         
         const { fields } = await this.collectionDataFor(collectionName)
-        if (fields.find((f: { name: any }) => f.name === column.name)) {
+        if (fields.find((f) => f.name === column.name)) {
             throw new FieldAlreadyExists('Collection already has a field with the same name')
         }
 
@@ -86,21 +88,41 @@ export default class SchemaProvider implements ISchemaProvider {
 
         const { fields } = await this.collectionDataFor(collectionName)
 
-        if (!fields.some((f: { name: any }) => f.name === columnName)) {
-            throw new FieldDoesNotExist('Collection does not contain a field with this name')
+        if (!fields.some((f) => f.name === columnName)) {
+            throw new FieldDoesNotExist('Collection does not contain a field with this name', collectionName, columnName)
         }
         await this.docClient
-                  .update(dynamoRequests.removeColumnExpression(collectionName, fields.filter((f: { name: any }) => f.name !== columnName)))
+                  .update(dynamoRequests.updateColumnsExpression(collectionName, fields.filter((f: { name: any }) => f.name !== columnName)))
 
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]> {
+    async describeCollection(collectionName: string): Promise<Table> {
         await this.ensureSystemTableExists()
         validateTable(collectionName)
         
         const collection = await this.collectionDataFor(collectionName)
 
-        return [...SystemFields, ...collection.fields].map( reformatFields )
+        return {
+            id: collectionName,
+            fields: collection.fields.map(this.appendAdditionalRowDetails),
+            capabilities: this.collectionCapabilities()
+        }
+    }
+
+    async changeColumnType(collectionName: string, column: InputField): Promise<void> {
+        await this.ensureSystemTableExists()
+        validateTable(collectionName)
+        await validateSystemFields(column.name)
+        
+        const { fields } = await this.collectionDataFor(collectionName)
+
+        if (!fields.some((f) => f.name === column.name)) {
+            throw new FieldDoesNotExist('Collection does not contain a field with this name', collectionName, column.name)
+        }
+        
+        await this.docClient
+                    .update(dynamoRequests.updateColumnsExpression(collectionName, fields.map((f) => f.name === column.name ? column : f)))
+                    
     }
 
     async ensureSystemTableExists() {
@@ -114,7 +136,7 @@ export default class SchemaProvider implements ISchemaProvider {
                   .createTable(dynamoRequests.createSystemTableExpression())
     }
 
-    async insertToSystemTable(collectionName: string, fields: any) {        
+    async insertToSystemTable(collectionName: string, fields: any) {     
         await this.docClient
                    .put(dynamoRequests.insertToSystemTableExpression(collectionName, fields))
     }
@@ -124,13 +146,13 @@ export default class SchemaProvider implements ISchemaProvider {
                   .delete(dynamoRequests.deleteTableFromSystemTableExpression(collectionName))
     }
     
-    async collectionDataFor(collectionName: string, toReturn?: boolean | undefined): Promise<any> {
+    async collectionDataFor(collectionName: string, toReturn?: boolean | undefined) {
         validateTable(collectionName)
         const { Item } = await this.docClient
                                    .get(dynamoRequests.getCollectionFromSystemTableExpression(collectionName))
 
-        if (!Item && !toReturn ) throw new CollectionDoesNotExists('Collection does not exists')
-        return Item
+        if (!Item && !toReturn ) throw new CollectionDoesNotExists('Collection does not exists', collectionName)
+        return Item as { tableName: string, fields: { name: string, type: string, subtype?: string }[] }
     }
 
     async systemTableExists() {
@@ -138,5 +160,26 @@ export default class SchemaProvider implements ISchemaProvider {
                          .describeTable({ TableName: SystemTable })
                          .then(() => true)
                          .catch(() => false)
+    }
+
+
+    private appendAdditionalRowDetails(row: {name: string, type: string}) {        
+        return {
+            field: row.name,
+            type: row.type,
+            capabilities: ColumnsCapabilities[row.type as keyof typeof ColumnsCapabilities] ?? EmptyCapabilities
+        }
+    }
+
+    private collectionCapabilities(): CollectionCapabilities {
+        return {
+            dataOperations: ReadWriteOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported,
+            pagingMode: PagingMode.offset
+        }
     }
 }

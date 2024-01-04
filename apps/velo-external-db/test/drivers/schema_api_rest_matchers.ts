@@ -1,5 +1,7 @@
-import { SystemFields, asWixSchemaHeaders } from '@wix-velo/velo-external-db-commons'
-import { InputField } from '@wix-velo/velo-external-db-types'
+import { SystemFields, asWixSchemaHeaders, PrimaryKeyFieldName } from '@wix-velo/velo-external-db-commons'
+import { InputField, DataOperation, } from '@wix-velo/velo-external-db-types'
+import { schemaUtils, collectionSpi } from '@wix-velo/velo-external-db-core'
+import { Capabilities, ColumnsCapabilities } from '../types'
 
 export const responseWith = (matcher: any) => expect.objectContaining( { data: matcher } )
 
@@ -40,3 +42,31 @@ const toHaveCollections = (collections: string[]) => expect.objectContaining( {
 const listToHaveCollection = (collectionName: string) => expect.objectContaining( {
     schemas: expect.arrayContaining( [ expect.objectContaining( { id: collectionName } ) ] )
 } )
+
+const collectionCapabilities = (dataOperations: DataOperation[]) => ({
+    dataOperations: expect.arrayContaining(dataOperations.map(schemaUtils.dataOperationsToWixDataQueryOperators)),
+})
+
+
+const filedMatcher = (field: InputField, columnsCapabilities: ColumnsCapabilities) => ({
+    key: field.name,
+    type: schemaUtils.fieldTypeToWixDataEnum(field.type),
+    capabilities: {
+        sortable: columnsCapabilities[field.type].sortable,
+        queryOperators: columnsCapabilities[field.type].columnQueryOperators.map(schemaUtils.queryOperatorsToWixDataQueryOperators)
+    },
+})
+
+const fieldsWith = (fields: InputField[], columnsCapabilities: ColumnsCapabilities) => expect.toIncludeSameMembers(fields.map(f => filedMatcher(f, columnsCapabilities)))
+
+export const collectionResponsesWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => {
+    const dataOperations = fields.map(f => f.name).includes(PrimaryKeyFieldName) ? capabilities.ReadWriteOperations : capabilities.ReadOnlyOperations
+    return {
+        id: collectionName,
+        capabilities: collectionCapabilities(dataOperations),
+        fields: fieldsWith(fields, capabilities.ColumnsCapabilities),
+        pagingMode: collectionSpi.PagingMode.offset
+    }
+}
+
+export const createCollectionResponseWith = (collectionName: string, fields: InputField[], capabilities: Capabilities) => collectionResponsesWith(collectionName, fields, capabilities)

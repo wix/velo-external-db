@@ -20,10 +20,13 @@ export default class SchemaColumnTranslator {
             case 'bigdecimal':
                 return 'number'
 
+            case 'time':
+                return 'time'
+            case 'date':
+                return 'date'
+
             case 'timestamp':
             case 'datetime':
-            case 'time':
-            case 'date':
                 return 'datetime'
 
             case 'string':
@@ -33,6 +36,9 @@ export default class SchemaColumnTranslator {
             case 'bool':
             case 'bit':
                 return 'boolean'
+
+            case 'json':
+                return 'object'
 
             default:
                 console.log('Unknown type', type)
@@ -86,10 +92,30 @@ export default class SchemaColumnTranslator {
             case 'text_small':
             case 'text_medium':
             case 'text_large':
+            case 'text_language':
+            case 'text_richcontent':
+            case 'text_image':
+            case 'text_video':
+            case 'text_audio':
+            case 'text_document':
                 return 'STRING'
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'BOOL'
+
+            case 'object_':
+            case 'object_object':
+            case 'object_any':
+            case 'object_mediagallery':
+            case 'object_address':
+            case 'object_pagelink':
+            case 'object_reference':
+            case 'object_multireference':
+            case 'object_arraystring':
+            case 'object_arraydocument':
+            case 'object_array':
+                return 'JSON'
 
             default:
                 throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)

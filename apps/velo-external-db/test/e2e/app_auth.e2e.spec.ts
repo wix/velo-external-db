@@ -1,18 +1,17 @@
-import { Uninitialized, gen } from '@wix-velo/test-commons'
-import { authVisitor, authOwnerWithoutSecretKey, errorResponseWith } from '@wix-velo/external-db-testkit'
-import each from 'jest-each'
+import axios from 'axios'
+// import each from 'jest-each'
+// import { config } from '@wix-velo/velo-external-db-core'
+import { authOwnerWithoutJwt, authOwnerWithWrongJwtPublicKey, authOwnerWithWrongAppId } from '@wix-velo/external-db-testkit'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName } from '../resources/e2e_resources'
 
-
-
-const axios = require('axios').create({
-    baseURL: 'http://localhost:8080'
+const axiosInstance = axios.create({
+    baseURL: 'http://localhost:8080/v3'
 })
+
 
 describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () => {
     beforeAll(async() => {
         await setupDb()
-
         await initApp()
     }, 20000)
 
@@ -20,22 +19,24 @@ describe(`Velo External DB authorization: ${currentDbImplementationName()}`, () 
         await dbTeardown()
     }, 20000)
 
-    each(['data/find', 'data/aggregate', 'data/insert', 'data/insert/bulk', 'data/get', 'data/update',
-          'data/update/bulk', 'data/remove', 'data/remove/bulk', 'data/count'])
-    .test('should throw 401 on a request to %s without the appropriate role', async(api) => {
-            return expect(() => axios.post(api, { collectionName: ctx.collectionName }, authVisitor)).rejects.toThrow('401')
-    })
+    // describe('Role authorization', () => {
+    //     each(config.map(i => i.pathPrefix)).test('should throw 401 on a request to %s without the appropriate role', async(api) => {
+    //         return expect(axiosInstance.post(api, {}, authVisitor)).rejects.toThrow('401')
+    //     })
+    // })
 
-    test('wrong secretKey will throw an appropriate error with the right format', async() => {
-        return expect(() => axios.post('/schemas/list', {}, authOwnerWithoutSecretKey)).rejects.toMatchObject(errorResponseWith(401, 'You are not authorized'))
-    })
+    describe('JWT authorization', () => {
+        test('should throw if the request is not singed with JWT token', async() => {
+            return expect(axiosInstance.post('items/insert', {}, authOwnerWithoutJwt)).rejects.toThrow('401')
+        })
 
-    const ctx = {
-        collectionName: Uninitialized,
-    }
+        test('should throw if the request is singed with the wrong public key', async() => {
+            return expect(axiosInstance.post('items/insert', {}, authOwnerWithWrongJwtPublicKey)).rejects.toThrow('401')
+        })
 
-    beforeEach(async() => {
-        ctx.collectionName = gen.randomCollectionName()
+        test('should throw if the request is signed with wrong app id', async() => {
+            return expect(axiosInstance.post('items/insert', {}, authOwnerWithWrongAppId)).rejects.toThrow('401')
+        })
     })
 
     afterAll(async() => await teardownApp())

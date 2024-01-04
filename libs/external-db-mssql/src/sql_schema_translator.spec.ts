@@ -19,15 +19,15 @@ describe('Sql Schema Column Translator', () => {
             })
 
             test('decimal float', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float' }) ).toEqual(`${escapeId(ctx.fieldName)} FLOAT(5,2)`)
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float' }) ).toEqual(`${escapeId(ctx.fieldName)} DECIMAL(15, 2)`)
             })
 
             test('decimal float with precision', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float', precision: '7, 3' }) ).toEqual(`${escapeId(ctx.fieldName)} FLOAT(7,3)`)
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float', precision: '7, 3' }) ).toEqual(`${escapeId(ctx.fieldName)} DECIMAL(7,3)`)
             })
 
             test('decimal double', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'double' }) ).toEqual(`${escapeId(ctx.fieldName)} REAL(5,2)`)
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'double' }) ).toEqual(`${escapeId(ctx.fieldName)} REAL(15, 2)`)
             })
 
             test('decimal double with precision', () => {
@@ -35,7 +35,7 @@ describe('Sql Schema Column Translator', () => {
             })
 
             test('decimal generic', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'decimal' }) ).toEqual(`${escapeId(ctx.fieldName)} DECIMAL(5,2)`)
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'decimal' }) ).toEqual(`${escapeId(ctx.fieldName)} DECIMAL(15, 2)`)
             })
 
             test('decimal generic with precision', () => {
@@ -67,9 +67,18 @@ describe('Sql Schema Column Translator', () => {
         })
 
         describe('string fields', () => {
-            test('string', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string' }) ).toEqual(`${escapeId(ctx.fieldName)} VARCHAR(2048)`)
-            })
+
+            test.each([
+                'string',
+                'richcontent',
+                'image',
+                'video',
+                'audio',
+                'document',
+                'language',
+            ])('text %s', (subtype) => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype }) ).toEqual(`${escapeId(ctx.fieldName)} VARCHAR(2048)`)
+              })
 
             test('string with length', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string', precision: '2055' }) ).toEqual(`${escapeId(ctx.fieldName)} VARCHAR(2055)`)
@@ -121,10 +130,16 @@ describe('Sql Schema Column Translator', () => {
         })
 
         describe('date time fields', () => {
+            test('time', () => {
+                expect( env.schemaTranslator.translateType('TIME') ).toEqual('time')
+            })
+
             test('date', () => {
-                ['DATE', 'DATETIME', 'DATETIME2', 'TIME', 'DATETIMEOFFSET', 'SMALLDATETIME'].forEach(t => {
-                    expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
-                })
+                expect( env.schemaTranslator.translateType('DATE') ).toEqual('date')
+           })
+
+           test.each([ 'DATETIME', 'DATETIME2', 'DATETIMEOFFSET', 'SMALLDATETIME'])('%s', (t) => {
+            expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
             })
         })
 

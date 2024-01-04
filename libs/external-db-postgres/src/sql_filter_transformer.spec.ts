@@ -177,7 +177,7 @@ describe('Sql Parser', () => {
                 const filter = {
                     operator: eq,
                     fieldName: ctx.fieldName,
-                    value: value
+                    value
                 }
 
                 expect( env.filterParser.parseFilter(filter, ctx.offset) ).toEqual([{
@@ -280,6 +280,26 @@ describe('Sql Parser', () => {
             })
         })
 
+        describe('handle queries on nested fields', () => {
+            test('correctly transform nested field query', () => {
+                const operator = ctx.filterWithoutInclude.operator
+                const filter = {
+                    operator,
+                    fieldName: `${ctx.fieldName}.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}`,
+                    value: ctx.filterWithoutInclude.value
+                }
+
+                const parsedFilter = env.filterParser.parseFilter(filter, ctx.offset)
+
+                expect( parsedFilter ).toEqual([{
+                    filterExpr: `${escapeIdentifier(ctx.fieldName)} ->> '${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}' ${env.filterParser.adapterOperatorToMySqlOperator(operator, ctx.filterWithoutInclude.value)} $${ctx.offset}`,
+                    parameters: [ctx.filterWithoutInclude.value].flat(),
+                    filterColumns: [],
+                    offset: ctx.offset + 1,
+                }])
+            })
+        })
+
         describe('handle multi field operator', () => {
             each([
                 and, or
@@ -342,7 +362,8 @@ describe('Sql Parser', () => {
                         fieldsStatement: escapeIdentifier(ctx.fieldName),
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
-                        parameters: []
+                        parameters: [],
+                        offset: 1,
                     })
                 })
 
@@ -359,6 +380,7 @@ describe('Sql Parser', () => {
                         groupByColumns: [ctx.fieldName, ctx.anotherFieldName],
                         havingFilter: '',
                         parameters: [],
+                        offset: 1,
                     })
                 })
 
@@ -380,6 +402,7 @@ describe('Sql Parser', () => {
                         groupByColumns: [ctx.fieldName],
                         havingFilter: `HAVING AVG(${escapeIdentifier(ctx.anotherFieldName)}) > $${ctx.offset}`,
                         parameters: [ctx.fieldValue],
+                        offset: ctx.offset + 1,
                     })
                 })
 
@@ -401,6 +424,7 @@ describe('Sql Parser', () => {
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
                         parameters: [],
+                        offset: 1,
                     })
                 })
 
@@ -417,6 +441,7 @@ describe('Sql Parser', () => {
                         groupByColumns: [ctx.fieldName],
                         havingFilter: '',
                         parameters: [],
+                        offset: 1,
                     })
                 })
             })
@@ -427,6 +452,8 @@ describe('Sql Parser', () => {
 
     const ctx = {
         fieldName: Uninitialized,
+        nestedFieldName: Uninitialized,
+        anotherNestedFieldName: Uninitialized,
         fieldValue: Uninitialized,
         anotherValue: Uninitialized,
         moreValue: Uninitialized,
@@ -446,6 +473,8 @@ describe('Sql Parser', () => {
 
     beforeEach(() => {
         ctx.fieldName = chance.word()
+        ctx.nestedFieldName = chance.word()
+        ctx.anotherNestedFieldName = chance.word()
         ctx.anotherFieldName = chance.word()
         ctx.moreFieldName = chance.word()
 
@@ -457,6 +486,7 @@ describe('Sql Parser', () => {
 
         ctx.filter = gen.randomWrappedFilter()
         ctx.anotherFilter = gen.randomWrappedFilter()
+        ctx.filterWithoutInclude = gen.randomDomainFilterWithoutInclude()
 
         ctx.offset = chance.natural({ min: 2, max: 20 })
     })

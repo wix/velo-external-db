@@ -2,7 +2,7 @@ const { EC2Client, DescribeSecurityGroupsCommand, AuthorizeSecurityGroupIngressC
 
 class NetworkProvision {
     constructor(credentials, region) {
-        this.ec2Client = new EC2Client({ region: region })
+        this.ec2Client = new EC2Client({ region })
     }
 
     async addSecurityRule(groupId, port) {

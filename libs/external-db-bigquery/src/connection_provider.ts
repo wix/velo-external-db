@@ -15,6 +15,12 @@ export default ({ projectId, databaseId }: BigQueryConfig): DbProviders<Dataset>
     const dataProvider = new DataProvider(pool, filterParser)
     const schemaProvider = new SchemaProvider(pool, { projectId, databaseId })
 
-    return { dataProvider: dataProvider, schemaProvider: schemaProvider, databaseOperations, connection: pool,  cleanup: async() => {} }
+    return { 
+        dataProvider, 
+        schemaProvider, 
+        databaseOperations, 
+        connection: pool, 
+        cleanup: async() => {} 
+    }
 }
 

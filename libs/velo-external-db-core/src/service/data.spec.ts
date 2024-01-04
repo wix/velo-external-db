@@ -4,6 +4,8 @@ import * as driver from '../../test/drivers/data_provider_test_support'
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
 import Chance = require('chance')
 import { getByIdFilterFor } from '../utils/data_utils'
+import { asWixDataItem } from '../converters/data_utils'
+import { HttpStatusCode } from '../spi-model/errors'
 const chance = new Chance()
 
 describe('Data Service', () => {
@@ -12,9 +14,19 @@ describe('Data Service', () => {
         driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
         
-        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)).resolves.toEqual({
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection, true)).resolves.toEqual({
                                                                                                                         items: ctx.entities,
                                                                                                                         totalCount: ctx.total
+                                                                                                                    })
+    })
+
+    test('delegate request to data provider and translate data to velo format with returnTotalCount flag set to false', async() => {
+        driver.givenListResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)
+        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
+        
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection, false)).resolves.toEqual({
+                                                                                                                        items: ctx.entities,
+                                                                                                                        totalCount: undefined
                                                                                                                     })
     })
     
@@ -22,7 +34,7 @@ describe('Data Service', () => {
         driver.givenListResult(ctx.entitiesWithoutId, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)
         driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
         
-        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection)).resolves.toEqual({
+        return expect(env.dataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultProjection, true)).resolves.toEqual({
                                                                                                                         items: ctx.entitiesWithoutId.map((entity: any) => ({ ...entity, _id: expect.any(String) })),
                                                                                                                         totalCount: ctx.total
                                                                                                                     })
@@ -50,16 +62,22 @@ describe('Data Service', () => {
         return expect(env.dataService.getById(ctx.collectionName, ctx.itemId, ctx.defaultProjection)).resolves.toEqual({ item: null })
     })
 
-    test('insert will insert data into db', async() => {
-        driver.expectInsertFor([ctx.entity], ctx.collectionName)
+    test('insert will insert data into db', async() => {        
+        driver.expectInsertFor([ctx.entity], ctx.collectionName,  ctx.defaultProjection)
 
-        return expect(env.dataService.insert(ctx.collectionName, ctx.entity)).resolves.toEqual({ item: ctx.entity })
+        return expect(env.dataService.insert(ctx.collectionName, ctx.entity, ctx.defaultProjection)).resolves.toEqual({ item: ctx.entity })
     })
 
     test('bulk insert will insert data into db', async() => {
-        driver.expectInsertFor(ctx.entities, ctx.collectionName)
+        driver.expectInsertFor(ctx.entities, ctx.collectionName, ctx.defaultProjection)
 
-        return expect(env.dataService.bulkInsert(ctx.collectionName, ctx.entities)).resolves.toEqual({ items: ctx.entities })
+        return expect(env.dataService.bulkInsert(ctx.collectionName, ctx.entities, ctx.defaultProjection)).resolves.toEqual({ items: ctx.entities.map(asWixDataItem) })
+    })
+
+    test('insert already item will return error object', async() => {        
+        driver.expectInsertAlreadyExistsFor([ctx.entity], ctx.collectionName,  ctx.defaultProjection)
+
+        return expect(env.dataService.insert(ctx.collectionName, ctx.entity, ctx.defaultProjection)).resolves.toEqual({ error: { errorCode: HttpStatusCode.ALREADY_EXISTS, errorMessage: expect.any(String), data: expect.any(Object)  } })
     })
 
     test('update will update data into db', async() => {
@@ -71,21 +89,21 @@ describe('Data Service', () => {
     test('bulk update will update data into db', async() => {
         driver.expectUpdateFor(ctx.entities, ctx.collectionName)
 
-        return expect(env.dataService.bulkUpdate(ctx.collectionName, ctx.entities)).resolves.toEqual({ items: ctx.entities })
+        return expect(env.dataService.bulkUpdate(ctx.collectionName, ctx.entities)).resolves.toEqual({ items: ctx.entities.map(asWixDataItem) })
     })
 
     test('delete by item id', async() => {
-        driver.expectDeleteFor([ctx.itemId], ctx.collectionName)
-
-        return expect(env.dataService.delete(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: {} })
+        driver.givenItemsById(([ctx.entity]), ctx.collectionName, '', 0, 1, ctx.defaultProjection)
+        driver.expectDeleteFor([ctx.entity], ctx.collectionName)
+        return expect(env.dataService.delete(ctx.collectionName, ctx.entity._id, ctx.defaultProjection)).resolves.toEqual({ item: ctx.entity })
     })
 
     test('bulk delete by item ids', async() => {
+        driver.givenItemsById(ctx.entities, ctx.collectionName, '', 0, 1, ctx.defaultProjection)
         driver.expectDeleteFor(ctx.itemIds, ctx.collectionName)
 
-        return expect(env.dataService.bulkDelete(ctx.collectionName, ctx.itemIds)).resolves.toEqual({ items: [] })
+        return expect(env.dataService.bulkDelete(ctx.collectionName, ctx.entities.map((e: any) => e._id), ctx.defaultProjection)).resolves.toEqual({ items: ctx.entities.map(asWixDataItem) })
     })
-
     
     // eslint-disable-next-line jest/expect-expect
     test('truncate will clear collection', async() => {
@@ -95,11 +113,11 @@ describe('Data Service', () => {
     })
 
     test('aggregate api', async() => {
-        driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
+        driver.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit)
+        driver.givenCountResult(ctx.total, ctx.collectionName, ctx.filter)
 
-        return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
+        return expect(env.dataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit, true)).resolves.toEqual({ items: ctx.entities, totalCount: ctx.total })
     })
-
 
     const ctx = {
         collectionName: Uninitialized,

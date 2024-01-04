@@ -1,40 +1,61 @@
-import * as Chance from 'chance'
+import { AxiosRequestHeaders } from 'axios'
+import * as jwt from 'jsonwebtoken'
+import { authConfig } from '@wix-velo/test-commons'
 
-const chance = Chance()
 const axios = require('axios').create({
     baseURL: 'http://localhost:8080',
 })
 
-const secretKey = chance.word()
+const TOKEN_ISSUER = 'wix.com'
 
 export const authInit = () => {
-    process.env['SECRET_KEY'] = secretKey
+    process.env['JWT_PUBLIC_KEY'] = authConfig.authPublicKey
+    process.env['APP_DEF_ID'] = authConfig.kid
 }
 
-const appendSecretKeyToRequest = (dataRaw: string) => {
+export const appendRoleToRequest = (role: string) => (dataRaw: string) => {
     const data = JSON.parse( dataRaw )
-    return JSON.stringify({ ...data, ...{ requestContext: { settings: { secretKey: secretKey } } } })
+    return JSON.stringify({ request: data, metadata: { requestContext: { ...data.requestContext, role } } })
 }
 
-const appendRoleToRequest = (role: string) => (dataRaw: string) => {
+export const signTokenWith = (privateKey: string, appId: string, options = { algorithm: 'RS256' }) => (dataRaw: string, headers: AxiosRequestHeaders) => {
+    headers['Content-Type'] = 'text/plain'
     const data = JSON.parse( dataRaw )
-    return JSON.stringify({ ...data, ...{ requestContext: { ...data.requestContext, role: role } } })
+    const payload = {
+        data,
+        iss: TOKEN_ISSUER,
+        aud: appId,
+    }
+    const signedData = jwt.sign(payload, privateKey, options as jwt.SignOptions)
+    return signedData
 }
+
 
 export const authAdmin = { transformRequest: axios.defaults
                                       .transformRequest
-                                      .concat( appendSecretKeyToRequest, appendRoleToRequest('BACKEND_CODE') ) }
+                                      .concat(appendRoleToRequest('BACKEND_CODE'), signTokenWith(authConfig.authPrivateKey, authConfig.kid)) }
 
 export const authOwner = { transformRequest: axios.defaults
                                       .transformRequest
-                                      .concat( appendSecretKeyToRequest, appendRoleToRequest('OWNER' ) ) }
+                                      .concat(appendRoleToRequest('OWNER'), signTokenWith(authConfig.authPrivateKey, authConfig.kid)) }
 
 export const authVisitor = { transformRequest: axios.defaults
                                       .transformRequest
-                                      .concat( appendSecretKeyToRequest, appendRoleToRequest('VISITOR' ) ) }
+                                      .concat(appendRoleToRequest('VISITOR'), signTokenWith(authConfig.authPrivateKey, authConfig.kid)) }
 
-export const authOwnerWithoutSecretKey = { transformRequest: axios.defaults
+export const authOwnerWithoutJwt = { transformRequest: axios.defaults
                                       .transformRequest
-                                      .concat( appendRoleToRequest('OWNER' ) ) }
+                                      .concat( appendRoleToRequest('OWNER') ) }
 
-export const errorResponseWith = (status: any, message: string) => ({ response: { data: { message: expect.stringContaining(message) }, status } })
+export const authOwnerWithWrongJwtPublicKey = { transformRequest: axios.defaults
+                                        .transformRequest
+                                        .concat( appendRoleToRequest('OWNER'), signTokenWith(authConfig.otherAuthPrivateKey, authConfig.kid) ) }
+
+                                    
+export const authOwnerWithWrongAppId= { transformRequest: axios.defaults
+                                        .transformRequest
+                                        .concat( appendRoleToRequest('OWNER'), signTokenWith(authConfig.authPrivateKey, 'wrong-app-id') ) }
+
+                                    
+
+export const errorResponseWith = (status: any, message: string) => ({ response: { data: { description: expect.stringContaining(message) }, status } })

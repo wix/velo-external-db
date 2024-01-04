@@ -1,3 +1,11 @@
+import { 
+    ResponseField,
+    SchemaOperations,
+    ISchemaProvider
+} from './collection_types'
+
+export * from './collection_types'
+
 export enum AdapterOperator { //in velo-external-db-core
     eq = 'eq',
     gt = 'gt',
@@ -14,30 +22,6 @@ export enum AdapterOperator { //in velo-external-db-core
     not = 'not',
     urlized = 'urlized',
     matches = 'matches'
-}
-
-export enum SchemaOperations {
-    List = 'list',
-    ListHeaders = 'listHeaders',
-    Create = 'createCollection',
-    Drop = 'dropCollection',
-    AddColumn = 'addColumn',
-    RemoveColumn = 'removeColumn',
-    Describe = 'describeCollection',
-    FindWithSort = 'findWithSort',
-    Aggregate = 'aggregate',
-    BulkDelete = 'bulkDelete',
-    Truncate = 'truncate',
-    UpdateImmediately = 'updateImmediately',
-    DeleteImmediately = 'deleteImmediately',
-    StartWithCaseSensitive = 'startWithCaseSensitive',
-    StartWithCaseInsensitive = 'startWithCaseInsensitive',
-    Projection = 'projection',
-    FindObject = 'findObject',
-    Matches = 'matches',
-    NotOperator = 'not',
-    IncludeOperator = 'include',
-    FilterByEveryField = 'filterByEveryField',
 }
 
 export type FieldWithQueryOperators = ResponseField & { queryOperators: string[] }
@@ -116,45 +100,15 @@ export type AdapterAggregation = {
 export interface IDataProvider {
     find(collectionName: string, filter: AdapterFilter, sort: any, skip: number, limit: number, projection: string[]): Promise<Item[]>;
     count(collectionName: string, filter: AdapterFilter): Promise<number>;
-    insert(collectionName: string, items: Item[], fields?: ResponseField[]): Promise<number>;
+    insert(collectionName: string, items: Item[], fields?: ResponseField[], upsert?: boolean): Promise<number>;
     update(collectionName: string, items: Item[], fields?: any): Promise<number>;
     delete(collectionName: string, itemIds: string[]): Promise<number>;
     truncate(collectionName: string): Promise<void>;
-    aggregate?(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation): Promise<Item[]>;
+    // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
+    aggregate?(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation, sort?: Sort[], skip?: number, limit?: number ): Promise<Item[]>;
 }
 
-export type TableHeader = {
-    id: string
-}
-
-export type Table = TableHeader & { fields: ResponseField[] }
-
-export type FieldAttributes = {
-    type: string,
-    subtype?: string,
-    precision?: number | string,
-    isPrimary?: boolean,
-}
-
-export type InputField = FieldAttributes & { name: string }
-
-export type ResponseField = FieldAttributes & { field: string }
-
-export interface ISchemaProvider {
-    list(): Promise<Table[]>
-    listHeaders(): Promise<string[]>
-    supportedOperations(): SchemaOperations[]
-    create(collectionName: string, columns?: InputField[]): Promise<void>
-    addColumn(collectionName: string, column: InputField): Promise<void>
-    removeColumn(collectionName: string, columnName: string): Promise<void>
-    describeCollection(collectionName: string): Promise<ResponseField[]>
-    drop(collectionName: string): Promise<void>
-    translateDbTypes?(column: InputField | ResponseField | string): ResponseField | string
-}
-
-export interface IBaseHttpError extends Error {
-    status: number;
-}
+export interface IBaseHttpError extends Error {}
 
 type ValidConnectionResult = { valid: true }
 type InvalidConnectionResult = { valid: false, error: IBaseHttpError }
@@ -224,15 +178,6 @@ export enum WixDataFunction {
     $max = '$max',
     $min = '$min',
     $sum = '$sum',
-}
-
-export type WixDataAggregation = {
-    processingStep: {
-        _id: string |  { [key: string]: any }
-        [key: string]: any
-        // [fieldAlias: string]: {[key in WixDataFunction]: string | number },
-    }
-    postFilteringStep: WixDataFilter
 }
 
 export type WixDataRole = 'OWNER' | 'BACKEND_CODE' | 'MEMBER' | 'VISITOR'

@@ -6,6 +6,7 @@ import { errors } from '@wix-velo/velo-external-db-commons'
 import AggregationTransformer from './aggregation_transformer'
 import { EmptyFilter } from './utils'
 import * as driver from '../../test/drivers/filter_transformer_test_support'
+import { Aggregation } from '../spi-model/data_source'
 const chance = Chance()
 const { InvalidQuery } = errors
 
@@ -17,127 +18,123 @@ describe('Aggregation Transformer', () => {
 
     describe('correctly transform Wix functions to adapter functions', () => {
         each([
-            '$avg', '$max', '$min', '$sum'
+            { wixsFunc: 'average', adaptersFunc: AdapterFunctions.avg },
+            { wixsFunc: 'max', adaptersFunc: AdapterFunctions.max },
+            { wixsFunc: 'min', adaptersFunc: AdapterFunctions.min },
+            { wixsFunc: 'count', adaptersFunc: AdapterFunctions.count },
+            { wixsFunc: 'sum', adaptersFunc: AdapterFunctions.sum },
         ])
-        .test('correctly transform [%s]', (f: string) => {
-            const AdapterFunction = f.substring(1) 
-            expect(env.AggregationTransformer.wixFunctionToAdapterFunction(f)).toEqual((AdapterFunctions as any)[AdapterFunction])
-        })
+            .test('correctly transform [%s]', ({ wixsFunc, adaptersFunc }: { wixsFunc: string, adaptersFunc: string}) => {
+                expect(env.AggregationTransformer.wixFunctionToAdapterFunction(wixsFunc)).toEqual(adaptersFunc)
+            })
 
         test('transform unknown function will throw an exception', () => {
-            expect( () => env.AggregationTransformer.wixFunctionToAdapterFunction('$wrong')).toThrow(InvalidQuery)
+            expect(() => env.AggregationTransformer.wixFunctionToAdapterFunction('wrong')).toThrow(InvalidQuery)
         })
     })
 
     test('single id field without function or postFilter', () => {
-        env.driver.stubEmptyFilterFor(null)
-        
-        const processingStep = { _id: `$${ctx.fieldName}` }
-        const postFilteringStep = null
+        env.driver.stubEmptyFilterForUndefined()
 
-        expect(env.AggregationTransformer.transform({ processingStep, postFilteringStep })).toEqual({
+        const aggregation = { 
+            groupingFields: [ctx.fieldName], 
+            operations: [] 
+        } as Aggregation
+
+        expect(env.AggregationTransformer.transform({ aggregation })).toEqual({
             projection: [{ name: ctx.fieldName }],
             postFilter: EmptyFilter
         })
     })
 
     test('multiple id fields without function or postFilter', () => {
-        env.driver.stubEmptyFilterFor(null)
-        
-        const processingStep = {
-            _id: {
-                field1: `$${ctx.fieldName}`,
-                field2: `$${ctx.anotherFieldName}`
-            }
-        }
-        const postFilteringStep = null
+        env.driver.stubEmptyFilterForUndefined()
 
-        expect(env.AggregationTransformer.transform({ processingStep, postFilteringStep })).toEqual({
+        const aggregation = { 
+            groupingFields: [ctx.fieldName, ctx.anotherFieldName], 
+            operations: [] 
+        } as Aggregation
+
+        expect(env.AggregationTransformer.transform({ aggregation })).toEqual({
             projection: [
-                            { name: ctx.fieldName },
-                            { name: ctx.anotherFieldName }
-                        ],
+                { name: ctx.fieldName },
+                { name: ctx.anotherFieldName }
+            ],
             postFilter: EmptyFilter
         })
     })
 
     test('single id field with function field and without postFilter', () => {
-        env.driver.stubEmptyFilterFor(null)
-        
-        const processingStep = {
-            _id: `$${ctx.fieldName}`,
-            [ctx.fieldAlias]: {
-                    $avg: `$${ctx.anotherFieldName}`
-                }
-        }
-        const postFilteringStep = null
+        env.driver.stubEmptyFilterForUndefined()
 
-        expect(env.AggregationTransformer.transform({ processingStep, postFilteringStep })).toEqual({
+        const aggregation = { 
+            groupingFields: [ctx.fieldName], 
+            operations: [
+                { resultFieldName: ctx.fieldAlias, average: { itemFieldName: ctx.anotherFieldName } }
+            ]
+        } as Aggregation
+
+        expect(env.AggregationTransformer.transform({ aggregation })).toEqual({
             projection: [
-                            { name: ctx.fieldName }, 
-                            { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg }
-                        ],
+                { name: ctx.fieldName },
+                { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg }
+            ],
             postFilter: EmptyFilter
         })
     })
 
     test('single id field with count function and without postFilter', () => {
-        env.driver.stubEmptyFilterFor(null)
+        env.driver.stubEmptyFilterForUndefined()
 
-        const processingStep = {
-            _id: `$${ctx.fieldName}`,
-            [ctx.fieldAlias]: {
-                    $sum: 1
-                }
-        }
-        const postFilteringStep = null
+        const aggregation = { 
+            groupingFields: [ctx.fieldName], 
+            operations: [
+                { resultFieldName: ctx.fieldAlias, count: {} }
+            ] 
+        } as Aggregation
 
-        expect(env.AggregationTransformer.transform({ processingStep, postFilteringStep })).toEqual({
+        expect(env.AggregationTransformer.transform({ aggregation })).toEqual({
             projection: [
-                            { name: ctx.fieldName }, 
-                            { alias: ctx.fieldAlias, function: AdapterFunctions.count, name: '*' }
-                        ],
+                { name: ctx.fieldName },
+                { alias: ctx.fieldAlias, function: AdapterFunctions.count, name: '*' }
+            ],
             postFilter: EmptyFilter
         })
     })
-    
+
     test('multiple function fields and without postFilter', () => {
-        env.driver.stubEmptyFilterFor(null)
+        env.driver.stubEmptyFilterForUndefined()
 
-        const processingStep = {
-            _id: `$${ctx.fieldName}`,
-            [ctx.fieldAlias]: {
-                    $avg: `$${ctx.anotherFieldName}`
-                },
-                [ctx.anotherFieldAlias]: {
-                    $sum: `$${ctx.moreFieldName}`
-                }
-        }
-        const postFilteringStep = null
+        const aggregation = {
+            groupingFields: [ctx.fieldName],
+            operations: [
+                { resultFieldName: ctx.fieldAlias, average: { itemFieldName: ctx.anotherFieldName } }, 
+                { resultFieldName: ctx.anotherFieldAlias, sum: { itemFieldName: ctx.moreFieldName } }
+            ]
+        } as Aggregation
 
-        expect(env.AggregationTransformer.transform({ processingStep, postFilteringStep })).toEqual({
+        expect(env.AggregationTransformer.transform({ aggregation })).toEqual({
             projection: [
-                            { name: ctx.fieldName }, 
-                            { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg },
-                            { name: ctx.moreFieldName, alias: ctx.anotherFieldAlias, function: AdapterFunctions.sum }
-                        ],
+                { name: ctx.fieldName },
+                { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg },
+                { name: ctx.moreFieldName, alias: ctx.anotherFieldAlias, function: AdapterFunctions.sum }
+            ],
             postFilter: EmptyFilter
         })
     })
 
     test('function and postFilter', () => {
         env.driver.givenFilterByIdWith(ctx.id, ctx.filter)
-
-        const processingStep = {
-            _id: `$${ctx.fieldName}`,
-            [ctx.fieldAlias]: {
-                    $avg: `$${ctx.anotherFieldName}`
-                }
-        }
         
-        const postFilteringStep = ctx.filter
+        const aggregation = { 
+            groupingFields: [ctx.fieldName], 
+            operations: [
+                { resultFieldName: ctx.fieldAlias, average: { itemFieldName: ctx.anotherFieldName } }
+            ] 
+        } as Aggregation
+        const finalFilter = ctx.filter
 
-        expect(env.AggregationTransformer.transform({ processingStep, postFilteringStep })).toEqual({
+        expect(env.AggregationTransformer.transform({ aggregation, finalFilter })).toEqual({
             projection: [
                             { name: ctx.fieldName }, 
                             { name: ctx.anotherFieldName, alias: ctx.fieldAlias, function: AdapterFunctions.avg }

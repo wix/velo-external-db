@@ -9,102 +9,119 @@
     <link rel='stylesheet' href='/assets/stylesheets/style.css' />
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+	<script defer src="https://unpkg.com/alpinejs@3.5.0/dist/cdn.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js"></script>
 </head>
 
+<body x-data="{
+	dbConnectionStatus: null,
+	permissionStatus: null,
+	configReaderStatus: null,
+	config: {},
+	imageUrl: '/assets/sad-wix.svg',
+	authorizationStatusColor: 'secondary',
+	connectionColor: 'secondary',
+	configStatusColor: 'secondary',
 
-<%
-const img =  dbConnectionStatus === 'Connected to database successfully' ? '/assets/wix-logo.svg': '/assets/sad-wix.svg' 
-%>
+	
+	openConfigList: false,
+	openRoleConfigList: false,
 
-<body>
 
-	<div class="container">
+	loadingConnectionStatus: true,
+	loadingPermissionStatus: true,
+	loadingConfigReaderStatus: true,
+
+
+
+	init() {
+		fetch('/connectionStatus')
+			.then((response) => response.json())
+			.then((response) => {
+				this.loadingConnectionStatus = false;
+				this.loadingPermissionStatus = false;
+				this.loadingConfigReaderStatus = false;
+				this.dbConnectionStatus = response.dbConnectionStatus;
+				this.permissionStatus = response.authorizationConfigStatus;
+				this.configReaderStatus = response.configReaderStatus;
+				this.config = response.config
+				
+				if (this.dbConnectionStatus === 'Connected to database successfully') {
+					this.imageUrl = '/assets/wix-logo.svg'
+					this.connectionColor = 'success'
+				} else {
+					this.connectionColor = 'danger'
+				}
+
+				this.configStatusColor = this.configReaderStatus === 'External DB Config read successfully' ? 'success' : 'danger'
+
+				switch (this.permissionStatus) {
+					case 'Permissions config read successfully':
+						this.authorizationStatusColor = 'success';
+						break;
+					case 'Permissions config not defined, using default':
+						this.authorizationStatusColor = 'warning';
+						break;
+					
+					default:
+						this.authorizationStatusColor = 'danger';
+				}
+
+			})
+	}}">
+
+
 		<div class="hero">
 			<div style="text-align:center;">
 				<picture>
-					<img src=<%=img%> width="427" height="231">
+					<img x-bind:src="imageUrl" width="427" height="231">
 				</picture>
 			</div>
 		</div>
-		<style>
-			.list-group {
-				width: auto;
-				max-width: 650px;
-				margin: 3rem auto;
-			}
-		</style>
-		
-		
-		<%
-		const connectionColor =  dbConnectionStatus === 'Connected to database successfully' ? 'success': 'danger' 
-		const configStatusColor = configReaderStatus === 'External DB Config read successfully' ? 'success' : 'danger'
-		let authorizationStatusColor
-		if (authorizationConfigStatus === 'Permissions config read successfully') {
-			authorizationStatusColor = 'success'
-		} else if (authorizationConfigStatus === 'Permissions config not defined, using default') {
-			authorizationStatusColor = 'warning'
-		} else {
-			authorizationStatusColor = 'danger'
-		}
-		%>
-		<script>
-			function toggleConfigDisplay() {
-			  let config = document.getElementById("config");
-			  config.style.display === "none" ? config.style.display = "block " : config.style.display = "none";
-			}
-			function toggleAuthorizationDisplay() {
-			  let authorization = document.getElementById("roleConfig");
-			  authorization.style.display === "none" ? authorization.style.display = "block " : authorization.style.display = "none";
-			}
-		</script>
-		
-		<div class="list-group">
-			<button onclick="toggleConfigDisplay()" href="#" class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=configStatusColor%> py-3" aria-current="true">
+
+				
+		<div class="list-group"  style="max-width: 650px; width: auto; margin: 3rem auto; " >
+			<button  x-on:click="openConfigList = !openConfigList"  href="#" x-bind:class="`list-group-item list-group-item-action d-flex gap-3  list-group-item-${configStatusColor} py-3`" aria-current="true">
 				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
 					<path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
 				  </svg>
 				<div class="d-flex gap-2 w-100 justify-content-between">
 					<div>
 						<h6 class="mb-0">DB Config Status</h6>
-						<p class="mb-0 opacity-75">
-							<%= configReaderStatus %>
-						</p>
+						<div x-show="loadingConfigReaderStatus" class="spinner-border" role="status"> </div>
+						<p x-show="!loadingConfigReaderStatus" class="mb-0 opacity-75" x-text="configReaderStatus"></p>
 					</div>
 				</div>
 			</button>
-			<div class="card card-body" id="config" aria-current="true" style="display:none; border:0; padding: 0;">
+			<div   x-ref="config-list"   x-show.important="openConfigList" class="card card-body" id="config" aria-current="true" style="display:none; border:0; padding: 0;" >
 				<ul class="list-group" style="margin:0;">
-				<li class="list-group-item">Host : <%= config.host || config.cloudSqlConnectionName || config.instanceId %></li>
-				<li class="list-group-item">User: <%= config.user  %></li>
-				<li class="list-group-item">Password: <%= config.password %></li>
-				<li class="list-group-item">DB name: <%= config.db || config.databaseId  %></li>
-				<li class="list-group-item">Secret Key: <%= config.secretKey %></li>
+				<li class="list-group-item"  x-text="`Host: ${config.host || config.cloudSqlConnectionName || config.instanceId}`" ></li>
+				<li class="list-group-item"  x-text="`User: ${config.user}`" ></li>
+				<li class="list-group-item"  x-text="`Password: ${config.password}`" ></li>
+				<li class="list-group-item"  x-text="`DB name: ${config.db || config.databaseId}`" ></li>
+				<li class="list-group-item">Secret Key: ********</li>
 			</ul>
 			</div>
 		
-			<button onclick="toggleAuthorizationDisplay()" href="#" class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=authorizationStatusColor%> py-3" aria-current="true">
+			<button  x-on:click="openRoleConfigList = !openRoleConfigList"  href="#" x-bind:class="`list-group-item list-group-item-action d-flex gap-3  list-group-item-${authorizationStatusColor} py-3`" aria-current="true">
 				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
 					<path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
 				  </svg>
 				<div class="d-flex gap-2 w-100 justify-content-between">
 					<div>
 						<h6 class="mb-0">Permissions Config Status</h6>
-						<p class="mb-0 opacity-75">
-							<%= authorizationConfigStatus %>
-						</p>
+						<div x-show="loadingPermissionStatus" class="spinner-border" role="status"> </div>
+						<p x-show="!loadingConnectionStatus" class="mb-0 opacity-75" x-text="permissionStatus"></p>
 					</div>
 				</div>
 			</button>
 		
-
-			<%
-			const authorizationToggleText = Number.isInteger(config.authorization) ? 'The number of permissions rules that were set successfully' : 'Config part that read successfully'
-			%>
-			<div id="roleConfig" style="display: none;" >
-				<%= authorizationToggleText %>
-				<pre style = "background-color:#d9cdcd1f;" aria-current="true" style="display:none; border:0; padding: 0;"><%= JSON.stringify(config.authorization, null, 2) %></pre>
+			<div  class="card card-body" x-show.important="openRoleConfigList"   style="display: none;" >
+				<p x-show="config !== null && Number.isInteger(config.authorization)" class="mb-0 opacity-75">The number of permissions rules that were set successfully</p>
+				<p x-show="config !== null && !Number.isInteger(config.authorization)" class="mb-0 opacity-75">Config part that read successfully</p>
+				<pre x-show="config !== null" style = "background-color:#d9cdcd1f;" aria-current="true" style="display:none; border:0; padding: 0;" x-text="JSON.stringify(config.authorization, null, 2)" ></pre>
 			</div>
-			<div class="list-group-item list-group-item-action d-flex gap-3  list-group-item-<%=connectionColor%> py-3" aria-current="true"> 
+			<div x-bind:class="`list-group-item list-group-item-action d-flex gap-3  list-group-item-${connectionColor} py-3`" aria-current="true"> 
 				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-hdd-stack"
 					viewBox="0 0 16 16">
 					<path
@@ -116,43 +133,11 @@ const img =  dbConnectionStatus === 'Connected to database successfully' ? '/ass
 				<div class="d-flex gap-2 w-100 justify-content-between">
 					<div>
 						<h6 class="mb-0">Connection Status</h6>
-						<p class="mb-0 opacity-75">
-							<%= dbConnectionStatus %>
-						</p>
+						<div x-show="loadingConnectionStatus" class="spinner-border" role="status"></div>
+						<p x-show="!loadingConnectionStatus" class="mb-0 opacity-75" x-text="dbConnectionStatus"></p>
 					</div>
 				</div>
 			</div>
-		
-		
-		
-			<div class="clipboard-example align-items-center w-100 py-2">
-				<div class="input-group mb-3">
-					<span class="input-group-text">Configuration</span>
-					<input id="in01"
-						   type="text"
-						   class="form-control"
-						   aria-describedby="btn01"
-						   value='{"secretKey": "<your-secret-key>"}'
-		
-					>
-					<button id="btn01"
-							data-clipboard-target="#in01"
-							class="btn btn-secondary"
-							type="button"
-							data-clipboard-demo=""
-							data-clipboard-target="#in01"
-							data-bs-toggle="tooltip"
-							data-bs-placement="bottom"
-							title="Copy to Clipboard"
-					>Copy</button>
-					
-				</div>
-			</div>
-			<script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js"></script>
-			<script>
-				let btn = document.getElementById('btn01');
-				let clipboard = new ClipboardJS(btn);
-			</script>
 		</div>		
 	</div>
 </body>

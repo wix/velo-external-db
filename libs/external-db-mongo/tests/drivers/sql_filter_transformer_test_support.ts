@@ -7,6 +7,7 @@ export const filterParser = {
     parseFilter: jest.fn(),
     orderBy: jest.fn(),
     parseAggregation: jest.fn(),
+    orderAggregationBy: jest.fn(),
     selectFieldsFor: jest.fn()
 }
 
@@ -23,6 +24,8 @@ export const stubEmptyFilterFor = (filter: any) => {
 export const stubEmptyOrderByFor = (sort: any) => {
     when(filterParser.orderBy).calledWith(sort)
                               .mockReturnValue(EmptySort)
+    when(filterParser.orderAggregationBy).calledWith(sort)
+                              .mockReturnValue({ $sort: {} })
 }
 
 export const givenOrderByFor = (column: any, sort: any) => {
@@ -48,7 +51,7 @@ export const givenAggregateQueryWith = (having: any, numericColumns: any[], colu
                                             [columnAliases[0]]: { $max: `$${c[0]}` },
                                             [columnAliases[1]]: { $sum: `$${c[1]}` }
                                         } }, 
-                                        groupByColumns: groupByColumns,
+                                        groupByColumns,
                                         havingFilter: { $match: {} },
                                        })
 }
@@ -97,6 +100,7 @@ export const givenIncludeFilterForIdColumn = (filter: any, value: any) =>
 export const reset = () => {
     filterParser.transform.mockClear()
     filterParser.orderBy.mockClear()
+    filterParser.orderAggregationBy.mockClear()
     filterParser.parseAggregation.mockClear()
     filterParser.parseFilter.mockClear()
     filterParser.selectFieldsFor.mockClear()

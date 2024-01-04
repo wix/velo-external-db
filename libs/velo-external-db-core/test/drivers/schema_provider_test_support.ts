@@ -1,5 +1,7 @@
 import { when } from 'jest-when'
-import { AllSchemaOperations } from '@wix-velo/velo-external-db-commons'
+import { AllSchemaOperations, AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { Table } from '@wix-velo/velo-external-db-types'
+const { eq, ne, string_contains, string_begins, string_ends, gt, gte, lt, lte, include } = AdapterOperators
 
 export const schemaProvider = {
     list: jest.fn(),
@@ -8,7 +10,9 @@ export const schemaProvider = {
     create: jest.fn(),
     addColumn: jest.fn(),
     removeColumn: jest.fn(),
-    supportedOperations: jest.fn()
+    supportedOperations: jest.fn(),
+    columnCapabilitiesFor: jest.fn(),
+    changeColumnType: jest.fn(),
 }
 
 export const givenListResult = (dbs: any) =>
@@ -23,11 +27,15 @@ export const givenAdapterSupportedOperationsWith = (operations: any) =>
 export const givenAllSchemaOperations = () =>
     when(schemaProvider.supportedOperations).mockReturnValue(AllSchemaOperations)
 
-export const givenFindResults = (dbs: any[]) =>
-    dbs.forEach((db: { id: any; fields: any }) => when(schemaProvider.describeCollection).calledWith(db.id).mockResolvedValue(db.fields) )
+export const givenFindResults = (tables: Table[]) =>
+    tables.forEach((table) => when(schemaProvider.describeCollection).calledWith(table.id).mockResolvedValue({ id: table.id, fields: table.fields, capabilities: table.capabilities }))
 
 export const expectCreateOf = (collectionName: any) =>
     when(schemaProvider.create).calledWith(collectionName)
+                               .mockResolvedValue(undefined)
+
+export const expectCreateWithFieldsOf = (collectionName: any, column: any) =>
+    when(schemaProvider.create).calledWith(collectionName, column)
                                .mockResolvedValue(undefined)
 
 export const expectCreateColumnOf = (column: any, collectionName: any) =>
@@ -38,6 +46,24 @@ export const expectRemoveColumnOf = (columnName: any, collectionName: any) =>
     when(schemaProvider.removeColumn).calledWith(collectionName, columnName)
                                      .mockResolvedValue(undefined)
 
+export const givenColumnCapabilities = () => {
+    when(schemaProvider.columnCapabilitiesFor).calledWith('text')
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] })
+    when(schemaProvider.columnCapabilitiesFor).calledWith('number')
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte, include] })
+    when(schemaProvider.columnCapabilitiesFor).calledWith('boolean')
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq] })
+    when(schemaProvider.columnCapabilitiesFor).calledWith('url')
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, string_contains, string_begins, string_ends, include, gt, gte, lt, lte] })
+    when(schemaProvider.columnCapabilitiesFor).calledWith('datetime')
+        .mockReturnValue({ sortable: true, columnQueryOperators: [eq, ne, gt, gte, lt, lte] })
+    when(schemaProvider.columnCapabilitiesFor).calledWith('image')
+        .mockReturnValue({ sortable: false, columnQueryOperators: [] })
+    when(schemaProvider.columnCapabilitiesFor).calledWith('object')
+        .mockReturnValue({ sortable: false, columnQueryOperators: [eq, ne] })
+}
+    
+
 export const reset = () => {
     schemaProvider.list.mockClear()
     schemaProvider.listHeaders.mockClear()
@@ -46,4 +72,6 @@ export const reset = () => {
     schemaProvider.addColumn.mockClear()
     schemaProvider.removeColumn.mockClear()
     schemaProvider.supportedOperations.mockClear()
+    schemaProvider.columnCapabilitiesFor.mockClear()
+    schemaProvider.changeColumnType.mockClear()
 }

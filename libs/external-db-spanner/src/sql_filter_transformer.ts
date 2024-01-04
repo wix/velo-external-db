@@ -64,7 +64,7 @@ export default class FilterParser {
             fieldsStatement: filterColumnsStr.join(', '),
             groupByColumns,
             havingFilter: filterExpr,
-            parameters: parameters,
+            parameters,
         }
     }
 
@@ -82,8 +82,7 @@ export default class FilterParser {
 
     extractFilterExprAndParams(havingFilter: SpannerParsedFilter[]) {
         // @ts-ignore - concat
-        return havingFilter.map(({ filterExpr, parameters }: SpannerParsedFilter) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                            parameters: parameters }))
+        return havingFilter.map(({ filterExpr, parameters }: SpannerParsedFilter) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '', parameters }))
                     .concat({ filterExpr: '', parameters: {} })[0]
     }
 
@@ -114,6 +113,16 @@ export default class FilterParser {
                     filterExpr: `NOT (${res2[0].filterExpr})`,
                     parameters: res2[0].parameters
                 }]
+        }
+
+        if (this.isNestedField(fieldName)) {
+            const [nestedFieldName, ...nestedFieldPath] = fieldName.split('.')
+            const literals = this.valueForOperator(nestedFieldName, value, operator, counter).sql
+
+            return [{
+                filterExpr: `JSON_VALUE(${this.inlineVariableIfNeeded(nestedFieldName, inlineFields)}, '$.${nestedFieldPath.join('.')}') ${this.adapterOperatorToMySqlOperator(operator, value)} ${literals}`.trim(),
+                parameters: this.parametersFor(nestedFieldName, value, counter)
+            }]
         }
 
         if (this.isSingleFieldOperator(operator)) {
@@ -154,6 +163,10 @@ export default class FilterParser {
         }
 
         return []
+    }
+
+    isNestedField(fieldName: string) {
+        return fieldName.includes('.')
     }
 
     parametersFor(name: string, value: any, counter: Counter) {

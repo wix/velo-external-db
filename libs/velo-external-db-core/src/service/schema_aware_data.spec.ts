@@ -73,13 +73,15 @@ describe ('Schema Aware Data Service', () => {
     })
 
     test('delete by item id will call data service', async() => {
-        data.deleteResultTo(ctx.itemId, ctx.collectionName)
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        data.deleteResultTo(ctx.itemId, ctx.collectionName, ctx.defaultFields)
 
         return expect(env.schemaAwareDataService.delete(ctx.collectionName, ctx.itemId)).resolves.toEqual({ item: {} })
     })
 
     test('bulk delete by item ids will call data service', async() => {
-        data.bulkDeleteResultTo(ctx.itemIds, ctx.collectionName)
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        data.bulkDeleteResultTo(ctx.itemIds, ctx.collectionName, ctx.defaultFields)
 
         return expect(env.schemaAwareDataService.bulkDelete(ctx.collectionName, ctx.itemIds)).resolves.toEqual({ items: [] })
     })
@@ -95,9 +97,9 @@ describe ('Schema Aware Data Service', () => {
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter) 
         queryValidator.givenValidAggregationForDefaultFieldsOf(ctx.aggregation)
         
-        data.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation)
+        data.givenAggregateResult(ctx.entities, ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit, true)
         
-        return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
+        return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, ctx.aggregation, ctx.sort, ctx.skip, ctx.limit, true)).resolves.toEqual({ items: ctx.entities, totalCount: 0 })
     })
 
     test('schema with _id - find will trigger find request with projection includes _id even if it is not in the projection', async() => {
@@ -105,11 +107,11 @@ describe ('Schema Aware Data Service', () => {
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter) 
         queryValidator.givenValidProjectionForDefaultFieldsOf([ctx.column.field, '_id'])
         
-        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ['_id', ctx.column.field], false)
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ['_id', ctx.column.field])
         patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities)
 
 
-        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field], false)).resolves.toEqual({ 
+        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])).resolves.toEqual({ 
                                                                                                                         items: ctx.patchedEntities,
                                                                                                                         totalCount: ctx.totalCount
                                                                                                                     })
@@ -125,14 +127,14 @@ describe ('Schema Aware Data Service', () => {
     })
 
     test('schema without _id - find will trigger find request with projection without _id', async() => {
-        schema.givenSchemaFor(ctx.collectionName, [ctx.column])
+        schema.givenSchemaFieldsFor(ctx.collectionName, [ctx.column])
         queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter)
         queryValidator.givenValidProjectionForDefaultFieldsOf([ctx.column.field])
 
-        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field], false)
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])
         patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities, [ctx.column])
 
-        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field], false)).resolves.toEqual({
+        return expect(env.schemaAwareDataService.find(ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, [ctx.column.field])).resolves.toEqual({
                                                                                                                         items: ctx.patchedEntities,
                                                                                                                         totalCount: ctx.totalCount
                                                                                                                     })
@@ -165,12 +167,12 @@ describe ('Schema Aware Data Service', () => {
         column: Uninitialized,
     }
 
-    interface Enviorment {
+    interface Environment {
         schemaAwareDataService: SchemaAwareDataService
         dataService: DataService
     }
 
-    const env: Enviorment = {
+    const env: Environment = {
         dataService: Uninitialized,
         schemaAwareDataService: Uninitialized,
     }

@@ -1,11 +1,12 @@
 import * as compose from 'docker-compose'
 import init from '../../src/connection_provider'
 export { supportedOperations } from '../../src/supported_operations'
+export * as capabilities from '../../src/dynamo_capabilities'
 
 export const connection = async() => {
     const { connection, schemaProvider, cleanup } = init(connectionConfig(), accessOptions())
 
-    return { pool: connection, schemaProvider, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup }
 }
 
 export const cleanup = async() => {

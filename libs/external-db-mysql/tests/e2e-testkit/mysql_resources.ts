@@ -3,10 +3,11 @@ import { waitUntil } from 'async-wait-until'
 import init from '../../src/connection_provider'
 export { supportedOperations } from '../../src/supported_operations'
 
+export * as capabilities from '../../src/mysql_capabilities' 
 
 export const connection = () => {
     const { connection, schemaProvider, cleanup } = init({ host: 'localhost', user: 'test-user', password: 'password', db: 'test-db' }, { connectionLimit: 1, queueLimit: 0 })
-    return { pool: connection, schemaProvider, cleanup: cleanup }
+    return { pool: connection, schemaProvider, cleanup }
 }
 
 export const cleanup = async() => {

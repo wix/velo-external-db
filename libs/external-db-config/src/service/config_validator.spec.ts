@@ -10,7 +10,6 @@ describe('Config Reader Client', () => {
 
     test('read config will retrieve config from secret provider and validate retrieved data', async() => {
         driver.givenConfig(ctx.config)
-        driver.givenCommonConfig(ctx.secretKey)
         driver.givenAuthorizationConfig(ctx.authorizationConfig)
 
         expect( env.configValidator.readConfig() ).toEqual(matchers.configResponseFor(ctx.config, ctx.authorizationConfig))
@@ -85,7 +84,7 @@ describe('Config Reader Client', () => {
         configStatus: Uninitialized,
         missingProperties: Uninitialized,
         moreMissingProperties: Uninitialized,
-        secretKey: Uninitialized,
+        externalDatabaseId: Uninitialized,
         authorizationConfig: Uninitialized,
     }
 
@@ -102,7 +101,7 @@ describe('Config Reader Client', () => {
         ctx.configStatus = gen.randomConfig()
         ctx.missingProperties = Array.from({ length: 5 }, () => chance.word())
         ctx.moreMissingProperties = Array.from({ length: 5 }, () => chance.word())
-        ctx.secretKey = chance.guid()
+        ctx.externalDatabaseId = chance.guid()
         env.configValidator = new ConfigValidator(driver.configValidator, driver.authorizationConfigValidator, driver.commonConfigValidator)
     })
 })

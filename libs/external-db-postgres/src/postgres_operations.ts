@@ -12,6 +12,6 @@ export default class DatabaseOperations implements IDatabaseOperations {
     // @ts-ignore
     async validateConnection() {
         return await this.pool.query('SELECT 1').then(() => { return { valid: true } })
-                              .catch((e) => { return { valid: false, error: notThrowingTranslateErrorCodes(e) } })
+                              .catch((e) => { return { valid: false, error: notThrowingTranslateErrorCodes(e, '') } })
     }
 }

@@ -13,56 +13,49 @@ import { testResources as bigquery } from '@wix-velo/external-db-bigquery'
 
 import { E2EResources } from '@wix-velo/external-db-testkit'
 import { Uninitialized } from '@wix-velo/test-commons'
-import { ExternalDbRouter } from '@wix-velo/velo-external-db-core'
-import { Server } from 'http'
-import { ConnectionCleanUp, ISchemaProvider } from '@wix-velo/velo-external-db-types'
 
-interface App {
-    server: Server;
-    schemaProvider: ISchemaProvider;
-    cleanup: ConnectionCleanUp;
-    started: boolean;
-    reload: (hooks?: any) => Promise<{
-        externalDbRouter: ExternalDbRouter;
-    }>;
-    externalDbRouter: ExternalDbRouter;
-}
+import { initWixDataEnv, shutdownWixDataEnv, wixDataBaseUrl } from '../drivers/wix_data_resources'
+import { E2E_ENV } from '../types'
 
-type Internals = () => App
 
-export let env:{
-    app: App,
-    externalDbRouter: ExternalDbRouter,
-    internals: Internals,
-    enviormentVariables: Record<string, string>
-} = {
+export let env: E2E_ENV = {
     app: Uninitialized,
     internals: Uninitialized,
     externalDbRouter: Uninitialized,
-    enviormentVariables: Uninitialized
+    capabilities: Uninitialized,
+    enviormentVariables: Uninitialized,
 }
 
+const createAppWithWixDataBaseUrl = createApp.bind(null, wixDataBaseUrl())
+
 const testSuits = {
-    mysql: new E2EResources(mysql, createApp),
-    postgres: new E2EResources(postgres, createApp),
-    spanner: new E2EResources(spanner, createApp),
-    firestore: new E2EResources(firestore, createApp),
-    mssql: new E2EResources(mssql, createApp),
-    mongo: new E2EResources(mongo, createApp),
+    mysql: new E2EResources(mysql, createAppWithWixDataBaseUrl),
+    postgres: new E2EResources(postgres, createAppWithWixDataBaseUrl),
+    spanner: new E2EResources(spanner, createAppWithWixDataBaseUrl),
+    firestore: new E2EResources(firestore, createAppWithWixDataBaseUrl),
+    mssql: new E2EResources(mssql, createAppWithWixDataBaseUrl),
+    mongo: new E2EResources(mongo, createAppWithWixDataBaseUrl),
     'google-sheet': new E2EResources(googleSheet, createApp),
     airtable: new E2EResources(airtable, createApp),
-    dynamodb: new E2EResources(dynamo, createApp),
-    bigquery: new E2EResources(bigquery, createApp),
+    dynamodb: new E2EResources(dynamo, createAppWithWixDataBaseUrl),
+    bigquery: new E2EResources(bigquery, createAppWithWixDataBaseUrl),
 }
 
 export const testedSuit = () => testSuits[process.env.TEST_ENGINE]
 export const supportedOperations = testedSuit().supportedOperations
 
-export const setupDb = () => testedSuit().setUpDb()
+export const setupDb = async() => {
+    await initWixDataEnv()
+    await testedSuit().setUpDb()
+}
 export const currentDbImplementationName = () => testedSuit().currentDbImplementationName
 export const initApp = async() => {
     env = await testedSuit().initApp()
+    env.capabilities = testedSuit().implementation.capabilities
     env.enviormentVariables = testedSuit().implementation.enviormentVariables
 }
-export const teardownApp = async() => testedSuit().teardownApp()
+export const teardownApp = async() => {
+    await testedSuit().teardownApp()
+    await shutdownWixDataEnv()
+}
 export const dbTeardown = async() => testedSuit().dbTeardown()

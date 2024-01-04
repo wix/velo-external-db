@@ -57,7 +57,7 @@ export default class FilterParser {
             fieldsStatement: filterColumnsStr.join(', '),
             groupByColumns,
             havingFilter: filterExpr,
-            parameters: parameters,
+            parameters,
         }
     }
 
@@ -74,8 +74,7 @@ export default class FilterParser {
     }
 
     extractFilterExprAndParams(havingFilter: any[]) {
-        return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                                    parameters: parameters }))
+        return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '', parameters }))
                            .concat(EmptyFilter)[0]
     }
 
@@ -101,6 +100,13 @@ export default class FilterParser {
                     filterExpr: `NOT (${res2[0].filterExpr})`,
                     parameters: res2[0].parameters
                 }]
+        }
+
+        if (this.isNestedField(fieldName)) {            
+            return [{
+                filterExpr: `JSON_VALUE(${(fieldName)}) ${this.adapterOperatorToMySqlOperator(operator, value)} ${this.valueForOperator(value, operator)}`.trim(),
+                parameters: !isNull(value) ? [this.patchTrueFalseValue(value)] : []
+            }]      
         }
 
         if (this.isSingleFieldOperator(operator)) {
@@ -154,6 +160,10 @@ export default class FilterParser {
 
     isSingleFieldStringOperator(operator: string) {
         return [string_contains, string_begins, string_ends].includes(operator)
+    }
+
+    isNestedField(fieldName: string) {
+        return fieldName.includes('.')
     }
 
     valueForOperator(value: any, operator: string) {

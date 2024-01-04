@@ -4,7 +4,7 @@ class AzureAuthProvider {
   constructor({ clientId, clientSecret, callbackUrl }) {
     this.options = {
       clientID: clientId,
-      clientSecret: clientSecret,
+      clientSecret,
       callbackURL: callbackUrl,
     }
 

@@ -1,60 +1,30 @@
-import { AdapterFilter, InputField, Item, Sort, WixDataFilter, AsWixSchema, AsWixSchemaHeaders, RoleConfig } from '@wix-velo/velo-external-db-types'
+import {  RoleConfig, DataOperation, CollectionOperationSPI } from '@wix-velo/velo-external-db-types'
 import SchemaService from './service/schema'
 import SchemaAwareDataService from './service/schema_aware_data'
+import { AggregateRequest, CountRequest, CountResponse, InsertRequest, QueryRequest, UpdateRequest, RemoveRequest, TruncateRequest, QueryReferencedRequest, QueryResponse, InsertResponse, UpdateResponse, RemoveResponse, TruncateResponse, AggregateResponse } from './spi-model/data_source'
+
+import { Collection, CreateCollectionRequest, DeleteCollectionRequest, ListCollectionsRequest, UpdateCollectionRequest } from './spi-model/collection'
+
+// those types are used by the app data hooks
+export * from './spi-model/data_source'
+
+export type DataPayloadBefore = QueryRequest | CountRequest | QueryReferencedRequest | AggregateRequest | InsertRequest | UpdateRequest | RemoveRequest | TruncateRequest;
+
+export type DataPayloadAfter = QueryResponse | CountResponse  | AggregateResponse | InsertResponse | UpdateResponse | RemoveResponse | TruncateResponse;
 
 
-export interface FindQuery {
-    filter?: WixDataFilter;
-    sort?: Sort;
-    skip?: number;
-    limit?: number;
-    omitTotalCount?: boolean;
+export interface SchemaPayload {
+    collectionId?: string;
+    collectionIds?: string[];
+    collection?: Collection;
+    collections?: Collection[];
 }
-
-export type AggregationQuery = {
-    filter?: WixDataFilter,
-    processingStep?: WixDataFilter,
-    postProcessingStep?: WixDataFilter
-}
-
-export interface Payload {
-    filter?: WixDataFilter | AdapterFilter
-    sort?: Sort;
-    skip?: number;
-    limit?: number;
-    postProcessingStep?: WixDataFilter | AdapterFilter;
-    processingStep?: WixDataFilter | AdapterFilter;
-    postFilteringStep?: WixDataFilter | AdapterFilter;
-    item?: Item;
-    items?: Item[];
-    itemId?: string;
-    itemIds?: string[];
-    schemas?: AsWixSchema[];
-    collectionName?: string;
-    column?: InputField;
-    columnName?: string;
-}
-
-enum ReadOperation {
-    GET = 'GET',
-    FIND = 'FIND',
-}
-
-enum WriteOperation {
-    INSERT = 'INSERT',
-    UPDATE = 'UPDATE',
-    DELETE = 'DELETE',
-}
-
-type Operation = ReadOperation | WriteOperation;
 
 export interface RequestContext {
-    operation: Operation;
-    collectionName: string;
-    instanceId?: string;
-    role?: string;
-    memberId?: string;
-    settings?: any;
+    operation: DataOperation | CollectionOperationSPI
+    collectionId?: string;
+    collectionIds?: string[];
+    metaSiteId: string;
 }
 
 export interface ServiceContext {
@@ -63,65 +33,63 @@ export interface ServiceContext {
 }
 
 
-export type Hook<Payload> = (payload: Payload, requestContext: RequestContext, serviceContext: ServiceContext, customContext?: object) => (Promise<Payload> | Payload | void);
+export type Hook<Payload> = 
+    (payload: Payload, 
+    requestContext: RequestContext, 
+    serviceContext: ServiceContext, 
+    customContext?: object) => (Promise<Payload> | Payload | void);
 
 export interface DataHooks {
-    beforeAll?: Hook<Payload>;
-    afterAll?: Hook<Payload>;
-    beforeRead?: Hook<Payload>;
-    afterRead?: Hook<Payload>;
-    beforeWrite?: Hook<Payload>;
-    afterWrite?: Hook<Payload>;
-    beforeFind?: Hook<FindQuery>
-    afterFind?: Hook<{ items: Item[] }>
-    beforeInsert?: Hook<{ item: Item }>
-    afterInsert?: Hook<{ item: Item }>
-    beforeBulkInsert?: Hook<{ items: Item[] }>
-    afterBulkInsert?: Hook<{ items: Item[] }>
-    beforeUpdate?: Hook<{ item: Item }>
-    afterUpdate?: Hook<{ item: Item }>
-    beforeBulkUpdate?: Hook<{ items: Item[] }>
-    afterBulkUpdate?: Hook<{ items: Item[] }>
-    beforeRemove?: Hook<{ itemId: string }>
-    afterRemove?: Hook<{ itemId: string }>
-    beforeBulkRemove?: Hook<{ itemIds: string[] }>
-    afterBulkRemove?: Hook<{ itemIds: string[] }>
-    beforeAggregate?: Hook<AggregationQuery>
-    afterAggregate?: Hook<{ items: Item[] }>
-    beforeCount?: Hook<WixDataFilter>
-    afterCount?: Hook<{ totalCount: number }>
+    beforeAll?: Hook<DataPayloadBefore>;
+    afterAll?: Hook<DataPayloadAfter>;
+    beforeRead?: Hook<DataPayloadBefore>;
+    afterRead?: Hook<DataPayloadAfter>;
+    beforeWrite?: Hook<DataPayloadBefore>;
+    afterWrite?: Hook<DataPayloadAfter>;
+    beforeQuery?: Hook<QueryRequest>
+    afterQuery?: Hook<QueryResponse>
+    beforeCount?: Hook<CountRequest>
+    afterCount?: Hook<CountResponse>
+    beforeAggregate?: Hook<AggregateRequest>
+    afterAggregate?: Hook<AggregateResponse>
+    beforeInsert?: Hook<InsertRequest>
+    afterInsert?: Hook<InsertResponse>
+    beforeUpdate?: Hook<UpdateRequest>
+    afterUpdate?: Hook<UpdateResponse>
+    beforeRemove?: Hook<RemoveRequest>
+    afterRemove?: Hook<RemoveResponse>
+    beforeTruncate?: Hook<TruncateRequest>
+    afterTruncate?: Hook<void>
 }
 
 export type DataHook = DataHooks[keyof DataHooks];
 
 export interface SchemaHooks {
-    beforeAll?: Hook<Payload>;
-    afterAll?: Hook<Payload>;
-    beforeRead?: Hook<Payload>;
-    afterRead?: Hook<Payload>;
-    beforeWrite?: Hook<Payload>;
-    afterWrite?: Hook<Payload>;
-    beforeList?: Hook<Record<string, never>>
-    afterList?: Hook<{ schemas: AsWixSchema[] }>
-    beforeListHeaders?: Hook<Record<string, never>>
-    afterListHeaders?: Hook<{ schemas: AsWixSchemaHeaders[] }>
-    beforeFind?: Hook<string>
-    afterFind?: Hook<{ schemas: AsWixSchema[] }>
-    beforeCreate?: Hook<{ collectionName: string }>
-    afterCreate?: Hook<Record<string, never>>
-    beforeColumnAdd?: Hook<{ column: InputField }>
-    afterColumnAdd?: Hook<Record<string, never>>
-    beforeColumnRemove?: Hook<{ columnName: string }>
-    afterColumnRemove?: Hook<Record<string, never>>
+    beforeAll?: Hook<SchemaPayload>;
+    afterAll?: Hook<SchemaPayload>;
+    beforeRead?: Hook<SchemaPayload>;
+    afterRead?: Hook<SchemaPayload>;
+    beforeWrite?: Hook<SchemaPayload>;
+    afterWrite?: Hook<SchemaPayload>;
+    beforeGet?: Hook<ListCollectionsRequest>;
+    afterGet?: Hook<{ collections: Collection[] }>;
+    beforeCreate?: Hook<CreateCollectionRequest>;
+    afterCreate?: Hook<{ collection: Collection }>;
+    beforeUpdate?: Hook<UpdateCollectionRequest>;
+    afterUpdate?: Hook<{ collection: Collection }>;
+    beforeDelete?: Hook<DeleteCollectionRequest>;
+    afterDelete?: Hook<{ collection: Collection }>;
 }
 
 export interface ExternalDbRouterConfig {
-    secretKey: string
     authorization?: { roleConfig: RoleConfig }
     vendor?: string
     adapterType?: string
     commonExtended?: boolean
     hideAppInfo?: boolean
+    wixDataBaseUrl: string
+    jwtPublicKey: string
+    appDefId: string
 }
 
 export type Hooks = {

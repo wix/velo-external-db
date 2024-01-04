@@ -14,28 +14,23 @@ export const defineValidConfig = (config: SpannerConfig) => {
     if (config.databaseId) {
         process.env['DATABASE_ID'] = config.databaseId
     }
-    if (config.secretKey) {
-        process.env['SECRET_KEY'] = config.secretKey
-    }
     if (config.authorization) {
         process.env['PERMISSIONS'] = JSON.stringify( config.authorization )
     }
-    if (config.auth?.callbackUrl) {
-        process.env['callbackUrl'] = config.auth.callbackUrl
+    if (config.jwtPublicKey) {
+        process.env['JWT_PUBLIC_KEY'] = config.jwtPublicKey
     }
-    if (config.auth?.clientId) {
-        process.env['clientId'] = config.auth.clientId
-    }
-    if (config.auth?.clientSecret) {
-        process.env['clientSecret'] = config.auth.clientSecret
-    }    
+    if (config.appDefId) {
+        process.env['APP_DEF_ID'] = config.appDefId
+    } 
 }
 
 export const validConfig = (): SpannerConfig => ({
     projectId: chance.word(),
     instanceId: chance.word(),
     databaseId: chance.word(),
-    secretKey: chance.word(),
+    jwtPublicKey: chance.word(),
+    appDefId: chance.word(),
 })
 
 export const validConfigWithAuthorization = (): SpannerConfig => ({
@@ -56,7 +51,7 @@ export const validConfigWithAuthConfig = () => ({
 
 export const defineInvalidConfig = () => defineValidConfig({})
 
-export const ExpectedProperties = ['PROJECT_ID', 'INSTANCE_ID', 'DATABASE_ID', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'PERMISSIONS']
+export const ExpectedProperties = ['PROJECT_ID', 'INSTANCE_ID', 'DATABASE_ID', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 
 export const reset = () => ExpectedProperties.forEach(p => delete process.env[p])
 

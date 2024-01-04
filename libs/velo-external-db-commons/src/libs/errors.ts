@@ -1,90 +1,133 @@
-class BaseHttpError extends Error {
-    status: number
-    constructor(message: string, status: number) {
+export class BaseHttpError extends Error {
+    constructor(message: string) {
         super(message)
-        this.status = status
     }
 }
 
 export class UnauthorizedError extends BaseHttpError {
     constructor(message: string) {
-        super(message, 401)
+        super(message)
     }
 }
 
 export class CollectionDoesNotExists extends BaseHttpError {
-    constructor(message: string) {
-        super(message, 404)
+    collectionName: string
+    constructor(message: string, collectionName?: string) {
+        super(message)
+        this.collectionName = collectionName ?? '' 
     }
 }
 
 export class CollectionAlreadyExists extends BaseHttpError {
-    constructor(message: string) {
-        super(message, 400)
+    collectionName: string
+    constructor(message: string, collectionName?: string) {
+        super(message)
+        this.collectionName = collectionName ?? '' 
     }
 }
 
 export class FieldAlreadyExists extends BaseHttpError {
-    constructor(message: string) {
-        super(message, 400)
+    collectionName: string
+    fieldName: string
+
+    constructor(message: string, collectionName?: string, fieldName?: string) {
+        super(message)
+        this.collectionName = collectionName ?? '' 
+        this.fieldName = fieldName ?? '' 
     }
 }
 
 export class ItemAlreadyExists extends BaseHttpError {
-    constructor(message: string) {
-        super(message, 400)
+    itemId: string
+    collectionName: string
+
+    constructor(message: string, collectionName?: string, itemId?: string) {
+        super(message)
+        this.itemId = itemId ?? '' 
+        this.collectionName = collectionName ?? '' 
+    }
+}
+
+export class ItemDoesNotExists extends BaseHttpError {
+    itemId: string
+    collectionName: string
+
+    constructor(message: string, collectionName?: string, itemId?: string) {
+        super(message)
+        this.itemId = itemId ?? '' 
+        this.collectionName = collectionName ?? '' 
     }
 }
 
 export class FieldDoesNotExist extends BaseHttpError {
-    constructor(message: string) {
-        super(message, 404)
+    propertyName: string
+    collectionName: string
+    constructor(message: string, collectionName?: string, propertyName?: string) {
+        super(message)
+        this.propertyName = propertyName ?? '' 
+        this.collectionName = collectionName ?? '' 
     }
 }
 
 export class CannotModifySystemField extends BaseHttpError {
     constructor(message: string) {
-        super(message, 400)
+        super(message)
     }
 }
 
 export class InvalidQuery extends BaseHttpError {
     constructor(message: string) {
-        super(message, 400)
+        super(message)
     }
 }
 
 export class InvalidRequest extends BaseHttpError {
     constructor(message: string) {
-        super(message, 400)
+        super(message)
     }
 }
 
 export class DbConnectionError extends BaseHttpError {
     constructor(message: string) {
-        super(message, 500)
+        super(message)
     }
 }
 export class ItemNotFound extends BaseHttpError {
     constructor(message: string) {
-        super(message, 404)
+        super(message)
     }
 }
 
-export class UnsupportedOperation extends BaseHttpError {
-    constructor(message: string) {
-        super(message, 405)
+export class UnsupportedSchemaOperation extends BaseHttpError {
+    collectionName: string
+    operation: string
+
+    constructor(message: string, collectionName?: string, operation?: string) {
+        super(message)
+        this.collectionName = collectionName ?? '' 
+        this.operation = operation ?? '' 
     }
 }
 
 export class UnsupportedDatabase extends BaseHttpError {
     constructor(message: string) {
-        super(message, 405)
+        super(message)
     }
 }
 
 export class UnrecognizedError extends BaseHttpError {
     constructor(message: string) {
-        super(`Unrecognized Error: ${message}`, 400)
+        super(`Unrecognized Error: ${message}`)
+    }
+}
+
+export class CollectionChangeNotSupportedError extends BaseHttpError {
+    collectionName: string
+    fieldName: string
+
+    constructor(message: string, collectionName?: string, fieldName?: string) {
+        super(message)
+        this.collectionName = collectionName ?? '' 
+        this.fieldName = fieldName ?? '' 
     }
 }

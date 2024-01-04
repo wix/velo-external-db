@@ -2,31 +2,35 @@ import each from 'jest-each'
 import * as Chance from 'chance'
 import { Uninitialized } from '@wix-velo/test-commons'
 import { randomBodyWith } from '../test/gen'
-import { DataHooksForAction, DataOperations, dataPayloadFor, DataActions } from './data_hooks_utils'
+import { DataHooksForAction, dataPayloadFor, DataActions, requestContextFor } from './data_hooks_utils'
+import { DataOperation } from '@wix-velo/velo-external-db-types'
+
+const { query: Query, insert: Insert, update: Update, remove: Remove, count: Count, aggregate: Aggregate } = DataOperation
+
 const chance = Chance()
 
 describe('Hooks Utils', () => {
     describe('Hooks For Action', () => {
         describe('Before Read', () => {
-            each([DataActions.BeforeFind, DataActions.BeforeAggregate, DataActions.BeforeCount, DataActions.BeforeGetById])
+            each([DataActions.BeforeQuery, DataActions.BeforeAggregate, DataActions.BeforeCount])
                 .test('Hooks action for %s should return appropriate array', (action) => {
                     expect(DataHooksForAction[action]).toEqual(['beforeAll', 'beforeRead', action])
                 })
         })
         describe('After Read', () => {
-            each([DataActions.AfterFind, DataActions.AfterAggregate, DataActions.AfterCount, DataActions.AfterGetById])
+            each([DataActions.AfterQuery, DataActions.AfterAggregate, DataActions.AfterCount])
                 .test('Hooks action for %s should return appropriate array', (action) => {
                     expect(DataHooksForAction[action]).toEqual(['afterAll', 'afterRead', action])
                 })
         })
         describe('Before Write', () => {
-            each([DataActions.BeforeInsert, DataActions.BeforeBulkInsert, DataActions.BeforeUpdate, DataActions.BeforeBulkUpdate, DataActions.BeforeRemove, DataActions.BeforeBulkRemove])
+            each([DataActions.BeforeInsert, DataActions.BeforeUpdate, DataActions.BeforeRemove, DataActions.BeforeTruncate])
                 .test('Hooks action for %s should return appropriate array', (action) => {
                     expect(DataHooksForAction[action]).toEqual(['beforeAll', 'beforeWrite', action])
                 })
         })
         describe('After Write', () => {
-            each([DataActions.AfterInsert, DataActions.AfterBulkInsert, DataActions.AfterUpdate, DataActions.AfterBulkUpdate, DataActions.AfterRemove, DataActions.AfterBulkRemove])
+            each([DataActions.AfterInsert, DataActions.AfterUpdate, DataActions.AfterRemove, DataActions.AfterTruncate])
                 .test('Hooks action for %s should return appropriate array', (action) => {
                     expect(DataHooksForAction[action]).toEqual(['afterAll', 'afterWrite', action])
                 })
@@ -34,75 +38,125 @@ describe('Hooks Utils', () => {
     })
 
     describe('Payload For', () => {
-        test('Payload for Find should return query object', () => {
-            expect(dataPayloadFor(DataOperations.Find, randomBodyWith({ filter: ctx.filter, skip: ctx.skip, limit: ctx.limit, sort: ctx.sort, projection: ctx.projection }))).toEqual({
-                filter: ctx.filter,
-                skip: ctx.skip,
-                limit: ctx.limit,
-                sort: ctx.sort,
-                projection: ctx.projection,
-            })
+        test('Payload for Find should return query request object', () => {
+            expect(dataPayloadFor(Query, ctx.bodyWithAllProps))
+                .toEqual({
+                    collectionId: ctx.collectionId,
+                    query: ctx.query,
+                    includeReferencedItems: ctx.includeReferencedItems,
+                    consistentRead: ctx.consistentRead,
+                    returnTotalCount: ctx.returnTotalCount,
+                })
         })
-        test('Payload for Insert should return item', () => {
-            expect(dataPayloadFor(DataOperations.Insert, randomBodyWith({ item: ctx.item }))).toEqual({ item: ctx.item })
+
+        test('Payload for Insert should return insert request object', () => {
+            expect(dataPayloadFor(Insert, ctx.bodyWithAllProps))
+                .toEqual({
+                    collectionId: ctx.collectionId,
+                    items: ctx.items,
+                })
         })
-        test('Payload for BulkInsert should return items', () => {
-            expect(dataPayloadFor(DataOperations.BulkInsert, randomBodyWith({ items: ctx.items }))).toEqual({ items: ctx.items })
+
+        test('Payload for Update should return update request object', () => {
+            expect(dataPayloadFor(Update, ctx.bodyWithAllProps))
+                .toEqual({
+                    collectionId: ctx.collectionId,
+                    items: ctx.items,
+                })
         })
-        test('Payload for Update should return item', () => {
-            expect(dataPayloadFor(DataOperations.Update, randomBodyWith({ item: ctx.item }))).toEqual({ item: ctx.item })
+
+        test('Payload for Remove should return remove request object', () => {
+            expect(dataPayloadFor(Remove, ctx.bodyWithAllProps))
+                .toEqual({
+                    collectionId: ctx.collectionId,
+                    itemIds: ctx.itemIds,
+                })
         })
-        test('Payload for BulkUpdate should return items', () => {
-            expect(dataPayloadFor(DataOperations.BulkUpdate, randomBodyWith({ items: ctx.items }))).toEqual({ items: ctx.items })
+
+        test('Payload for Count should return count request object', () => {
+            expect(dataPayloadFor(Count, ctx.bodyWithAllProps))
+                .toEqual({
+                    collectionId: ctx.collectionId,
+                    filter: ctx.filter,
+                    consistentRead: ctx.consistentRead,
+                })
         })
-        test('Payload for Remove should return item id', () => {
-            expect(dataPayloadFor(DataOperations.Remove, randomBodyWith({ itemId: ctx.itemId }))).toEqual({ itemId: ctx.itemId })
-        })
-        test('Payload for BulkRemove should return item ids', () => {
-            expect(dataPayloadFor(DataOperations.BulkRemove, randomBodyWith({ itemIds: ctx.itemIds }))).toEqual({ itemIds: ctx.itemIds })
-        })
-        test('Payload for Count should return filter', () => {
-            expect(dataPayloadFor(DataOperations.Count, randomBodyWith({ filter: ctx.filter }))).toEqual({ filter: ctx.filter })
-        })
-        test('Payload for Get should return item id and projection', () => {
-            expect(dataPayloadFor(DataOperations.Get, randomBodyWith({ itemId: ctx.itemId, projection: ctx.projection }))).toEqual({ itemId: ctx.itemId, projection: ctx.projection })
-        })
-        test('Payload for Aggregate should return Aggregation query', () => {
-            expect(dataPayloadFor(DataOperations.Aggregate, randomBodyWith({ filter: ctx.filter, processingStep: ctx.processingStep, postFilteringStep: ctx.postFilteringStep })))
-                .toEqual(
-                    {
-                        filter: ctx.filter,
-                        processingStep: ctx.processingStep,
-                        postFilteringStep: ctx.postFilteringStep
-                    }
-                )
+
+        test('Payload for Aggregate should return aggregate request object', () => {
+            expect(dataPayloadFor(Aggregate, ctx.bodyWithAllProps))
+                .toEqual({
+                    collectionId: ctx.collectionId,
+                    initialFilter: ctx.initialFilter,
+                    aggregation: ctx.aggregation,
+                    finalFilter: ctx.finalFilter,
+                    sort: ctx.sort,
+                    pagingMethod: ctx.pagingMethod,
+                    consistentRead: ctx.consistentRead,
+                    returnTotalCount: ctx.returnTotalCount,
+                })
         })
     })
 
+    describe('requestContextFor', () => {
+        test('should return request context object', () => {
+            expect(requestContextFor(ctx.randomOperation, ctx.bodyWithAllProps, { metaSiteId: ctx.metaSiteId }))
+                .toEqual({
+                    metaSiteId: ctx.metaSiteId,
+                    collectionIds: [ctx.collectionId],
+                    operation: ctx.randomOperation,
+                })
+        })
+    })
 
     const ctx = {
         filter: Uninitialized,
-        limit: Uninitialized,
-        skip: Uninitialized,
         sort: Uninitialized,
-        projection: Uninitialized,
-        item: Uninitialized,
         items: Uninitialized,
-        itemId: Uninitialized,
         itemIds: Uninitialized,
-        processingStep: Uninitialized,
-        postFilteringStep: Uninitialized
+        group: Uninitialized,
+        finalFilter: Uninitialized,
+        distinct: Uninitialized,
+        pagingMethod: Uninitialized,
+        collectionId: Uninitialized,
+        namespace: Uninitialized,
+        query: Uninitialized,
+        includeReferencedItems: Uninitialized,
+        returnTotalCount: Uninitialized,
+        options: Uninitialized,
+        overwriteExisting: Uninitialized,
+        bodyWithAllProps: Uninitialized,
+        cursorPaging: Uninitialized,
+        initialFilter: Uninitialized,
+        randomOperation: Uninitialized,
+        metaSiteId: Uninitialized,
+        consistentRead: Uninitialized,
+        aggregation: Uninitialized,
     }
 
     beforeEach(() => {
         ctx.filter = chance.word()
-        ctx.limit = chance.word()
-        ctx.skip = chance.word()
         ctx.sort = chance.word()
-        ctx.projection = chance.word()
-        ctx.item = chance.word()
         ctx.items = chance.word()
-        ctx.itemId = chance.word()
         ctx.itemIds = chance.word()
+        ctx.group = chance.word()
+        ctx.finalFilter = chance.word()
+        ctx.distinct = chance.word()
+        ctx.pagingMethod = chance.word()
+        ctx.collectionId = chance.word()
+        ctx.namespace = chance.word()
+        ctx.query = chance.word()
+        ctx.includeReferencedItems = chance.word()
+        ctx.returnTotalCount = chance.word()
+        ctx.options = chance.word()
+        ctx.overwriteExisting = chance.word()
+        ctx.cursorPaging = chance.word()
+        ctx.initialFilter = chance.word()
+        ctx.consistentRead = chance.word()
+        ctx.aggregation = chance.word()
+        ctx.bodyWithAllProps = randomBodyWith({
+            ...ctx
+        })
+        ctx.randomOperation = chance.pickone([Query, Insert, Update, Remove, Count, Aggregate])
+        ctx.metaSiteId = chance.word()
     })
 })

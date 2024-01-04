@@ -1,14 +1,17 @@
-import { isObject } from '@wix-velo/velo-external-db-commons'
-import { AdapterAggregation, AdapterFunctions, FieldProjection, FunctionProjection } from '@wix-velo/velo-external-db-types'
+import { AdapterAggregation, AdapterFunctions } from '@wix-velo/velo-external-db-types'
 import { IFilterTransformer } from './filter_transformer'
-import { projectionFieldFor, projectionFunctionFor } from './utils'
+import { projectionFunctionFor } from './utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
+import { Operation, Aggregation, Filter } from '../spi-model/data_source'
 const { InvalidQuery } = errors
 
+type TransformAggregationParams = {
+    aggregation: Aggregation
+    finalFilter?: Filter
+}
+
 interface IAggregationTransformer {
-    transform(aggregation: any): AdapterAggregation
-    extractProjectionFunctions(functionsObj: { [x: string]: { [s: string]: string | number } }): FunctionProjection[]
-    extractProjectionFields(fields: { [fieldName: string]: string } | string): FieldProjection[]
+    transform(aggregation: TransformAggregationParams): AdapterAggregation
     wixFunctionToAdapterFunction(wixFunction: string): AdapterFunctions
 }
 
@@ -18,13 +21,13 @@ export default class AggregationTransformer implements IAggregationTransformer {
         this.filterTransformer = filterTransformer
     }
 
-    transform({ processingStep, postFilteringStep }: any): AdapterAggregation {        
-        const { _id: fields, ...functions } = processingStep
+    transform({ aggregation, finalFilter }: TransformAggregationParams): AdapterAggregation {        
+        const { groupingFields: fields, operations } = aggregation
 
-        const projectionFields = this.extractProjectionFields(fields)
-        const projectionFunctions = this.extractProjectionFunctions(functions)
-
-        const postFilter = this.filterTransformer.transform(postFilteringStep)
+        const projectionFields = fields.map(f => ({ name: f }))
+        const projectionFunctions = this.operationToProjectionFunctions(operations)
+        
+        const postFilter = this.filterTransformer.transform(finalFilter)
 
         const projection = [...projectionFields, ...projectionFunctions]
 
@@ -34,48 +37,34 @@ export default class AggregationTransformer implements IAggregationTransformer {
         }
     }
 
-    extractProjectionFunctions(functionsObj: { [x: string]: { [s: string]: string | number } }) {
-        const projectionFunctions: { name: any; alias: any; function: any }[] = []
-        Object.keys(functionsObj)
-              .forEach(fieldAlias => {
-                  Object.entries(functionsObj[fieldAlias])
-                        .forEach(([func, field]) => {
-                            projectionFunctions.push(projectionFunctionFor(field, fieldAlias, this.wixFunctionToAdapterFunction(func)))
-                        })
-                })
-
-        return projectionFunctions
-    }
-
-    extractProjectionFields(fields: { [fieldName: string]: string } | string) {
-        const projectionFields = []
-
-        if (isObject(fields)) {
-            projectionFields.push(...Object.values(fields).map(f => projectionFieldFor(f)) )
-        } else {
-            projectionFields.push(projectionFieldFor(fields))
-        }
-        
-        return projectionFields
+    operationToProjectionFunctions(operations: Operation[]) {
+        /*
+            Operations item looks like this: { resultFieldName: 'myAvg', average: { itemFieldName: 'myFieldName' } }
+            So after extraction the variables are as follows: resultFieldName(alias): MyAvg, func: average, fieldName: myFieldName
+        */
+        return operations.map(operation => {
+            const { resultFieldName, ...calculate } = operation
+            const [func, fieldNameItem] = Object.entries(calculate)[0]
+            const field = fieldNameItem.itemFieldName        
+            return projectionFunctionFor(field, resultFieldName, this.wixFunctionToAdapterFunction(func))
+        })
     }
 
     wixFunctionToAdapterFunction(func: string): AdapterFunctions {
-        return this.wixFunctionToAdapterFunctionString(func) as AdapterFunctions
-    }
-
-    private wixFunctionToAdapterFunctionString(func: string): string {
         switch (func) {
-            case '$avg':
+            case 'average':
                 return AdapterFunctions.avg
-            case '$max':
+            case 'max':
                 return AdapterFunctions.max
-            case '$min':
+            case 'min':
                 return AdapterFunctions.min
-            case '$sum':
+            case 'sum':
                 return AdapterFunctions.sum
-            
+            case 'count':
+                return AdapterFunctions.count
             default:
                 throw new InvalidQuery(`Unrecognized function ${func}`)
         }
+
     }
 }

@@ -1,5 +1,5 @@
 import each from 'jest-each'
-import Chance = require('chance')
+import * as Chance from 'chance'
 import { AdapterOperators, errors } from '@wix-velo/velo-external-db-commons'
 import { AdapterFunctions } from '@wix-velo/velo-external-db-types'
 import { Uninitialized, gen } from '@wix-velo/test-commons'
@@ -141,7 +141,7 @@ describe('Sql Parser', () => {
                 const filter = {
                     operator: eq,
                     fieldName: ctx.fieldName,
-                    value: value
+                    value
                 }
 
                 expect(env.filterParser.parseFilter(filter)).toEqual([{
@@ -416,6 +416,28 @@ describe('Sql Parser', () => {
                         havingFilter: { $match: {} },
                     })
                 })
+
+                test('orderAggregationBy', () => {
+                    expect(env.filterParser.orderAggregationBy([
+                        { fieldName: ctx.fieldName, direction: ctx.direction },
+                    ])).toEqual({
+                        $sort: { 
+                            [ctx.fieldName]: ctx.direction === 'asc' ? 1 : -1 
+                        }
+                    })
+
+                    expect(env.filterParser.orderAggregationBy([
+                        { fieldName: ctx.fieldName, direction: ctx.direction },
+                        { fieldName: ctx.anotherFieldName, direction: ctx.anotherDirection },
+                    ])).toEqual({
+                        $sort: { 
+                            [ctx.fieldName]: ctx.direction === 'asc' ? 1 : -1,
+                            [ctx.anotherFieldName]: ctx.anotherDirection === 'asc' ? 1 : -1 
+                        }
+                    })
+
+
+                })
             })
 
         })
@@ -423,16 +445,18 @@ describe('Sql Parser', () => {
     })
 
     interface Context {
-        fieldName: any
-        fieldValue: any
-        anotherValue: any
-        moreValue: any
-        fieldListValue: any
-        anotherFieldName: any
-        moreFieldName: any
-        filter: any
-        anotherFilter: any
-        offset: any
+        fieldName: string
+        fieldValue: string
+        anotherValue: string
+        moreValue: string
+        fieldListValue: string[]
+        anotherFieldName: string
+        moreFieldName: string
+        filter: { fieldName: string; operator: string; value: string | string[] }
+        anotherFilter: { fieldName: string; operator: string; value: string | string[]; }
+        offset: number
+        direction: 'asc' | 'desc'
+        anotherDirection: 'asc' | 'desc'
     }
 
     const ctx : Context = {
@@ -446,6 +470,8 @@ describe('Sql Parser', () => {
         filter: Uninitialized,
         anotherFilter: Uninitialized,
         offset: Uninitialized,
+        direction: Uninitialized,
+        anotherDirection: Uninitialized,
     }
 
     interface Enviorment {
@@ -470,6 +496,9 @@ describe('Sql Parser', () => {
         ctx.anotherFilter = gen.randomWrappedFilter()
 
         ctx.offset = chance.natural({ min: 2, max: 20 })
+
+        ctx.direction = chance.pickone(['asc', 'desc'])
+        ctx.anotherDirection = chance.pickone(['asc', 'desc'])
     })
 
     beforeAll(function() {

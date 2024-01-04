@@ -21,21 +21,18 @@ import * as bigquery from '@wix-velo/external-db-bigquery'
 
 import * as googleSheet from '@wix-velo/external-db-google-sheets'
 
-import { AnyFixMe, ConnectionCleanUp, IDataProvider, ISchemaProvider } from '@wix-velo/velo-external-db-types'
+import { ProviderResourcesEnv } from '../types'
 
 // const googleSheet = require('@wix-velo/external-db-google-sheets')
 // const googleSheetTestEnv = require('./engines/google_sheets_resources')
 
-export const env: {
-    dataProvider: IDataProvider
-    schemaProvider: ISchemaProvider
-    cleanup: ConnectionCleanUp
-    driver: AnyFixMe
-} = {
+
+export const env: ProviderResourcesEnv = {
     dataProvider: Uninitialized,
     schemaProvider: Uninitialized,
     cleanup: Uninitialized,
     driver: Uninitialized,
+    capabilities: Uninitialized,
 }
 
 const dbInit = async(impl: any) => {
@@ -48,6 +45,7 @@ const dbInit = async(impl: any) => {
     env.dataProvider = new impl.DataProvider(pool, driver.filterParser)
     env.schemaProvider = new impl.SchemaProvider(pool, testResources.schemaProviderTestVariables?.() )
     env.driver = driver
+    env.capabilities = impl.testResources.capabilities
     env.cleanup = cleanup
 }
 
@@ -56,6 +54,7 @@ export const dbTeardown = async() => {
     env.dataProvider = Uninitialized
     env.schemaProvider = Uninitialized
     env.driver = Uninitialized
+    env.capabilities = Uninitialized
 }
 
 const postgresTestEnvInit = async() => await dbInit(postgres)
@@ -70,15 +69,15 @@ const bigqueryTestEnvInit = async() => await dbInit(bigquery)
 const googleSheetTestEnvInit = async() => await dbInit(googleSheet)
 
 const testSuits = {
-    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.testResources.supportedOperations),
-    postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.testResources.supportedOperations),
-    spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.testResources.supportedOperations),
-    firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.testResources.supportedOperations),
-    mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.testResources.supportedOperations),
-    mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.testResources.supportedOperations),
+    mysql: suiteDef('MySql', mysqlTestEnvInit, mysql.testResources),
+    postgres: suiteDef('Postgres', postgresTestEnvInit, postgres.testResources),
+    spanner: suiteDef('Spanner', spannerTestEnvInit, spanner.testResources),
+    firestore: suiteDef('Firestore', firestoreTestEnvInit, firestore.testResources),
+    mssql: suiteDef('Sql Server', mssqlTestEnvInit, mssql.testResources),
+    mongo: suiteDef('Mongo', mongoTestEnvInit, mongo.testResources),
     airtable: suiteDef('Airtable', airTableTestEnvInit, airtable.testResources.supportedOperations),
-    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.testResources.supportedOperations),
-    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.testResources.supportedOperations),
+    dynamodb: suiteDef('DynamoDb', dynamoTestEnvInit, dynamo.testResources),
+    bigquery: suiteDef('BigQuery', bigqueryTestEnvInit, bigquery.testResources),
     'google-sheet': suiteDef('Google-Sheet', googleSheetTestEnvInit, googleSheet.supportedOperations),
 }
 
