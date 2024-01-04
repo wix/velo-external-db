@@ -34,9 +34,12 @@ export default class SchemaColumnTranslator {
                 return 'number'
 
             case 'date':
+                return 'date'
             case 'time':
-            case 'timez':
+                return 'time'
+
             case 'timestamp':
+            case 'timez':
             case 'timestamptz':
                 return 'datetime'
 
@@ -97,21 +100,38 @@ export default class SchemaColumnTranslator {
                 return 'timestamp'
 
             case 'text_string':
-                return `varchar${this.parseLength(precision)}`
+            case 'text_richcontent':
+            case 'text_image':
+            case 'text_video':
+            case 'text_audio':
+            case 'text_document':
+                return precision ? `varchar${this.parseLength(precision)}` : 'text'
 
             case 'text_small':
             case 'text_medium':
             case 'text_large':
+            case 'text_language':
                 return 'text'
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'boolean'
 
             case 'object_':
+            case 'object_object':
+            case 'object_any':
+            case 'object_mediagallery':
+            case 'object_address':
+            case 'object_pagelink':
+            case 'object_reference':
+            case 'object_multireference':
+            case 'object_arraystring':
+            case 'object_arraydocument':
+            case 'object_array':
                 return 'json'
 
             default:
-                throw new Error(`${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)
+                throw new Error(`Unknow type ${type.toLowerCase()}_${(subtype || '').toLowerCase()}`)
 
         }
     }

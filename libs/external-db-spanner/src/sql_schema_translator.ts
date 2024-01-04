@@ -82,6 +82,12 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
                 return 'TIMESTAMP'
 
             case 'text_string':
+            case 'text_richcontent':
+            case 'text_image':
+            case 'text_video':
+            case 'text_audio':
+            case 'text_document':
+            case 'text_language':
                 return `STRING${this.parseLength(precision)}`
 
             case 'text_small':
@@ -94,9 +100,20 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
                 return `STRING${this.parseLength(2 ** 32)}`
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'BOOL'
 
             case 'object_':
+            case 'object_object':
+            case 'object_any':
+            case 'object_mediagallery':
+            case 'object_address':
+            case 'object_pagelink':
+            case 'object_reference':
+            case 'object_multireference':
+            case 'object_arraystring':
+            case 'object_arraydocument':
+            case 'object_array':
                 return 'JSON'
 
             default:

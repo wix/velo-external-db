@@ -1,14 +1,16 @@
 
 export interface MongoConfig {
     connectionUri?: string
-    secretKey?: string
     authorization?: any
+    jwtPublicKey?: string
+    appDefId?: string
 }
 
 export interface MongoAwsConfig {
     URI?: string
-    SECRET_KEY?: string
     PERMISSIONS?: string
+    JWT_PUBLIC_KEY?: string
+    APP_DEF_ID?: string
 }
 
 export interface MySqlConfig {
@@ -17,9 +19,9 @@ export interface MySqlConfig {
     user?: string
     password?: string
     db?: string
-    secretKey?: string
     authorization?: any
-    auth?: any
+    jwtPublicKey?: string
+    appDefId?: string
 }
 
 export interface AwsMysqlConfig {
@@ -27,29 +29,31 @@ export interface AwsMysqlConfig {
     username?: string
     password?: string
     DB?: string
-    SECRET_KEY?: string
     PERMISSIONS?: string
+    JWT_PUBLIC_KEY?: string
+    APP_DEF_ID?: string
 }
 
 export interface CommonConfig {
     type?: string
     vendor?: string
-    secretKey?: string
     hideAppInfo?: boolean
+    jwtPublicKey?: string
+    appDefId?: string
 }
 
 export interface FiresStoreConfig {
     projectId?: string
-    secretKey?: string
     authorization?: any
-    auth?: any
+    jwtPublicKey?: string
+    appDefId?: string
 }
 
 export interface SpannerConfig {
     projectId?: string
     instanceId?: string
     databaseId?: string
-    secretKey?: string
     authorization?: any
-    auth?: any
+    jwtPublicKey?: string
+    appDefId?: string
 }

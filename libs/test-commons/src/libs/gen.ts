@@ -1,5 +1,6 @@
 import * as Chance from 'chance'
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
+import { Item } from '@wix-velo/velo-external-db-types'
 const { eq, gt, gte, include, lt, lte, ne, string_begins, string_ends, string_contains } = AdapterOperators 
 
 const chance = Chance()
@@ -48,8 +49,8 @@ export const randomCollections = () => randomArrayOf( randomCollectionName )
 
 export const randomFieldName = () => chance.word({ length: 5 })
 
-export const randomEntity = (columns?: any[]) => {
-    const entity : {[x:string]: any} = {
+export const randomEntity = (columns?: string[]) => {
+    const entity : Item = {
         _id: chance.guid(),
         _createdDate: veloDate(),
         _updatedDate: veloDate(),
@@ -65,7 +66,7 @@ export const randomEntity = (columns?: any[]) => {
 }
 
 export const randomNumberEntity = (columns: any[]) => {
-    const entity : {[x:string]: any} = {
+    const entity : Item = {
         _id: chance.guid(),
         _createdDate: veloDate(),
         _updatedDate: veloDate(),
@@ -94,8 +95,10 @@ export const randomObjectFromArray = (array: any[]) => array[chance.integer({ mi
 
 export const randomAdapterOperator = () => ( chance.pickone([ne, lt, lte, gt, gte, include, eq, string_contains, string_begins, string_ends]) )
 
-export const randomWrappedFilter = (_fieldName?: string) => {
-    const operator = randomAdapterOperator()
+export const randomAdapterOperatorWithoutInclude = () => ( chance.pickone([ne, lt, lte, gt, gte, eq, string_contains, string_begins, string_ends]) )
+
+export const randomWrappedFilter = (_fieldName?: string, _operator?: string) => { // TODO: rename to randomDomainFilter
+    const operator = _operator ?? randomAdapterOperator()
     const fieldName =  _fieldName ?? chance.word()
     const value = operator === AdapterOperators.include ? [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()] : chance.word()
     return {
@@ -103,4 +106,8 @@ export const randomWrappedFilter = (_fieldName?: string) => {
         operator,
         value
     }
+}
+
+export const randomDomainFilterWithoutInclude = (_fieldName?: string) => {
+    return randomWrappedFilter(_fieldName || chance.word(), randomAdapterOperatorWithoutInclude())
 }

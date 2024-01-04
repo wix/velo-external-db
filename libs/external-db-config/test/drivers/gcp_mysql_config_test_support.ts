@@ -17,20 +17,14 @@ export const defineValidConfig = (config: MySqlConfig) => {
     if (config.db) {
         process.env['DB'] = config.db
     }
-    if (config.secretKey) {
-        process.env['SECRET_KEY'] = config.secretKey
-    }
     if (config.authorization) {
         process.env['PERMISSIONS'] = JSON.stringify( config.authorization )
     }
-    if (config.auth?.callbackUrl) {
-        process.env['callbackUrl'] = config.auth.callbackUrl
+    if (config.jwtPublicKey) {
+        process.env['JWT_PUBLIC_KEY'] = config.jwtPublicKey
     }
-    if (config.auth?.clientId) {
-        process.env['clientId'] = config.auth.clientId
-    }
-    if (config.auth?.clientSecret) {
-        process.env['clientSecret'] = config.auth.clientSecret
+    if (config.appDefId) {
+        process.env['APP_DEF_ID'] = config.appDefId
     }
 }
 
@@ -39,7 +33,8 @@ export const validConfig = (): MySqlConfig => ({
     user: chance.word(),
     password: chance.word(),
     db: chance.word(),
-    secretKey: chance.word(),
+    jwtPublicKey: chance.word(),
+    appDefId: chance.word(),
 })
 
 export const validConfigWithAuthorization = () => ({
@@ -56,7 +51,7 @@ export const validConfigWithAuthConfig = () => ({
     }  
 })
 
-export const ExpectedProperties = ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD', 'DB', 'SECRET_KEY', 'callbackUrl', 'clientId', 'clientSecret', 'PERMISSIONS']
+export const ExpectedProperties = ['CLOUD_SQL_CONNECTION_NAME', 'USER', 'PASSWORD', 'DB', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 
 export const defineInvalidConfig = () => defineValidConfig({})
 

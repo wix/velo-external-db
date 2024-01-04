@@ -11,7 +11,7 @@ const batchGetValuesResponse = (spreadsheetId, sheet, range, majorDimension, val
       {
         range: `${sheet}!${range}`,
         majorDimension: `${majorDimension}`,
-        values: values
+        values
       }
     ]
 })
@@ -21,7 +21,7 @@ const spreadsheet = (spreadsheetId, title, sheets = []) => ({
     properties: {
       title: `${title}`
     },
-    sheets: sheets
+    sheets
 })
 
 const updateValuesResponse = (spreadsheetId, sheet, range, updatedRows, updatedColumns, updatedCells) => ({

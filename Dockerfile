@@ -1,5 +1,5 @@
 # Compile stage
-FROM node:lts-slim 
+FROM node:20-slim
 WORKDIR /usr/lib/app
 
 # Copy the project dir
@@ -13,7 +13,7 @@ RUN npm install
 RUN nx run-many --target=build --all
 
 
-FROM node:lts-alpine
+FROM node:20-alpine
 
 WORKDIR /usr/lib/app
 

@@ -53,6 +53,15 @@ export default class FilterParser implements IMySqlFilterParser {
                 }]
         }
 
+        if (this.isNestedField(fieldName)) {
+            const [nestedFieldName, ...nestedFieldPath] = fieldName.split('.')
+            
+            return [{
+                filterExpr: `${escapeId(nestedFieldName)} ->> '$.${nestedFieldPath.join('.')}' ${this.adapterOperatorToMySqlOperator(operator, value)} ${this.valueForOperator(value, operator)}`.trim(),
+                parameters: !isNull(value) ? [].concat( this.patchTrueFalseValue(value) ) : []
+            }]          
+        }
+
         if (this.isSingleFieldOperator(operator)) {
             return [{
                 filterExpr: `${escapeId(fieldName)} ${this.adapterOperatorToMySqlOperator(operator, value)} ${this.valueForOperator(value, operator)}`.trim(),
@@ -92,6 +101,10 @@ export default class FilterParser implements IMySqlFilterParser {
 
     isSingleFieldStringOperator(operator: any) {
         return [string_contains, string_begins, string_ends].includes(operator)
+    }
+
+    isNestedField(fieldName: string) {
+        return fieldName.includes('.')
     }
 
     valueForOperator(value: string | any[], operator: any) {
@@ -200,7 +213,7 @@ export default class FilterParser implements IMySqlFilterParser {
             fieldsStatement: filterColumnsStr.join(', '),
             groupByColumns,
             havingFilter: filterExpr,
-            parameters: parameters,
+            parameters,
         }
     }
 
@@ -212,8 +225,7 @@ export default class FilterParser implements IMySqlFilterParser {
     }
 
     extractFilterExprAndParams(havingFilter: { filterExpr: any; parameters: any }[]) {
-        return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '',
-                                                                     parameters: parameters }))
+        return havingFilter.map(({ filterExpr, parameters }) => ({ filterExpr: filterExpr !== '' ? `HAVING ${filterExpr}` : '', parameters }))
                            .concat(EmptyFilter)[0]
     }
 

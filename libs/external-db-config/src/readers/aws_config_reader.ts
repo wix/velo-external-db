@@ -13,8 +13,8 @@ export class AwsConfigReader implements IConfigReader {
 
   async readConfig() {
     const { config } = await this.readExternalAndLocalConfig()
-    const { host, username, password, DB, SECRET_KEY, DB_PORT } = config
-    return { host: host, user: username, password: password, db: DB, secretKey: SECRET_KEY, port: DB_PORT }
+    const { host, username, password, DB, DB_PORT, JWT_PUBLIC_KEY, APP_DEF_ID } = config
+    return { host, user: username, password, db: DB, port: DB_PORT, jwtPublicKey: JWT_PUBLIC_KEY, appDefId: APP_DEF_ID }
   }
 
   async readExternalConfig() {
@@ -29,8 +29,8 @@ export class AwsConfigReader implements IConfigReader {
 
   async readExternalAndLocalConfig() { 
     const { externalConfig, secretMangerError }: {[key: string]: any} = await this.readExternalConfig()
-    const { host, username, password, DB, SECRET_KEY, HOST, PASSWORD, USER, DB_PORT }: {[key: string]: string} = { ...process.env, ...externalConfig }
-    const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, SECRET_KEY, DB_PORT }
+    const { host, username, password, DB, HOST, PASSWORD, USER, DB_PORT, JWT_PUBLIC_KEY, APP_DEF_ID }: {[key: string]: string} = { ...process.env, ...externalConfig }
+    const config = {  host: host || HOST, username: username || USER, password: password || PASSWORD, DB, DB_PORT, JWT_PUBLIC_KEY, APP_DEF_ID }
     return { config, secretMangerError }
   }
 }
@@ -46,17 +46,17 @@ export class AwsDynamoConfigReader implements IConfigReader {
     async readConfig() {
       const { config } = await this.readExternalAndLocalConfig()
       if (process.env['NODE_ENV'] === 'test') {
-        return { region: this.region, secretKey: config.SECRET_KEY, endpoint: process.env['ENDPOINT_URL'] }
+        return { region: this.region, endpoint: process.env['ENDPOINT_URL'], jwtPublicKey: config.JWT_PUBLIC_KEY, appDefId: config.APP_DEF_ID }
       }
-      return { region: this.region, secretKey: config.SECRET_KEY }
+      return { region: this.region, jwtPublicKey: config.JWT_PUBLIC_KEY, appDefId: config.APP_DEF_ID }
     }
     
     async readExternalAndLocalConfig() { 
       const { externalConfig, secretMangerError }: {[key: string]: any} = await this.readExternalConfig()
-      const { SECRET_KEY = undefined } = { ...process.env, ...externalConfig }
-      const config = { SECRET_KEY }
+      const { JWT_PUBLIC_KEY = undefined, APP_DEF_ID = undefined } = { ...process.env, ...externalConfig }
+      const config = { JWT_PUBLIC_KEY, APP_DEF_ID }
 
-      return { config, secretMangerError: secretMangerError }
+      return { config, secretMangerError }
     }
 
     async readExternalConfig() {
@@ -90,17 +90,17 @@ export class AwsMongoConfigReader implements IConfigReader {
 
   async readExternalAndLocalConfig() { 
     const { externalConfig, secretMangerError } :{[key: string]: any} = await this.readExternalConfig()
-    const { SECRET_KEY, URI }: {SECRET_KEY: string, URI: string} = { ...process.env, ...externalConfig }
-    const config = { SECRET_KEY, URI }
+    const { URI, JWT_PUBLIC_KEY, APP_DEF_ID }: { URI: string, JWT_PUBLIC_KEY: string, APP_DEF_ID: string } = { ...process.env, ...externalConfig }
+    const config = { URI, JWT_PUBLIC_KEY, APP_DEF_ID }
 
-    return { config, secretMangerError: secretMangerError }
+    return { config, secretMangerError }
   }
 
   async readConfig() {
     const { config } = await this.readExternalAndLocalConfig()
 
-    const { SECRET_KEY, URI } = config
+    const { URI, JWT_PUBLIC_KEY, APP_DEF_ID } = config
 
-    return { secretKey: SECRET_KEY, connectionUri: URI }
+    return { connectionUri: URI, jwtPublicKey: JWT_PUBLIC_KEY, appDefId: APP_DEF_ID }
   }
 }

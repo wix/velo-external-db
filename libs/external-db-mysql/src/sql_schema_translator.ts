@@ -1,14 +1,7 @@
 import { InputField } from '@wix-velo/velo-external-db-types'
 import { escapeId } from './mysql_utils'
 
-
-export interface IMySqlSchemaColumnTranslator {
-    translateType(dbType: string): string
-    dbTypeFor(field: InputField): string
-    columnToDbColumnSql(field: InputField): string
-}
-
-export default class SchemaColumnTranslator implements IMySqlSchemaColumnTranslator {
+export default class SchemaColumnTranslato {
     constructor() {
     }
 
@@ -25,14 +18,18 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
             case 'float':
             case 'double':
             case 'decimal':
+            case 'year':
                 return 'number'
 
             case 'date':
+                return 'date'
+                
             case 'datetime':
             case 'timestamp':
-            case 'time':
-            case 'year':
                 return 'datetime'
+            
+            case 'time':
+                return 'time'
 
             case 'varchar':
             case 'text':
@@ -97,9 +94,15 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
                 return 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
 
             case 'text_string':
-                return `VARCHAR${this.parseLength(precision)}`
+            case 'text_richcontent':
+            case 'text_image':
+            case 'text_video':
+            case 'text_audio':
+            case 'text_document':
+                return precision ? `VARCHAR${this.parseLength(precision)}` : 'TEXT'
 
             case 'text_small':
+            case 'text_language':
                 return 'TEXT'
 
             case 'text_medium':
@@ -109,9 +112,20 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
                 return 'LONGTEXT'
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'BOOLEAN'
 
             case 'object_':
+            case 'object_object':
+            case 'object_any':
+            case 'object_mediagallery':
+            case 'object_address':
+            case 'object_pagelink':
+            case 'object_reference':
+            case 'object_multireference':
+            case 'object_arraystring':
+            case 'object_arraydocument':
+            case 'object_array':
                 return 'JSON'
 
             default:
@@ -125,7 +139,7 @@ export default class SchemaColumnTranslator implements IMySqlSchemaColumnTransla
             const parsed = precision.split(',').map((s: string) => s.trim()).map((s: string) => parseInt(s))
             return `(${parsed.join(',')})`
         } catch (e) {
-            return '(5,2)'
+            return '(15,2)'
         }
     }
 

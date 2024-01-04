@@ -18,11 +18,14 @@ export default class SchemaColumnTranslator {
             case 'decimal':
             case 'numeric':
                 return 'number'
-
+                
+            case 'time':
+                return 'time'
             case 'date':
+                return 'date'
+
             case 'datetime':
             case 'datetime2':
-            case 'time':
             case 'datetimeoffset':
             case 'smalldatetime':
                 return 'datetime'
@@ -61,13 +64,11 @@ export default class SchemaColumnTranslator {
 
             case 'number_bigint':
                 return 'BIGINT'
-
-            case 'number_float':
-                return `FLOAT${this.parsePrecision(precision)}`
-
+  
             case 'number_double':
                 return `REAL${this.parsePrecision(precision)}`
 
+            case 'number_float':
             case 'number_decimal':
                 return `DECIMAL${this.parsePrecision(precision)}`
 
@@ -85,6 +86,12 @@ export default class SchemaColumnTranslator {
                 return 'SMALLDATETIME'
 
             case 'text_string':
+            case 'text_richcontent':
+            case 'text_image':
+            case 'text_video':
+            case 'text_audio':
+            case 'text_document':
+            case 'text_language':
                 return `VARCHAR${this.parseLength(precision)}`
 
             case 'text_small':
@@ -94,6 +101,7 @@ export default class SchemaColumnTranslator {
 
 
             case 'boolean_':
+            case 'boolean_boolean':
                 return 'TINYINT'
 
             default:
@@ -107,7 +115,7 @@ export default class SchemaColumnTranslator {
             const parsed = precision.split(',').map((s: string) => s.trim()).map((s: string) => parseInt(s))
             return `(${parsed.join(',')})`
         } catch (e) {
-            return '(5,2)'
+            return '(15, 2)'
         }
     }
 

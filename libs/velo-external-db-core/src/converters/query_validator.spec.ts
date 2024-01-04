@@ -6,7 +6,7 @@ import { queryAdapterOperatorsFor } from './query_validator_utils'
 import QueryValidator from './query_validator'
 import Chance = require('chance')
 const chance = Chance()
-const { InvalidQuery } = errors
+const { FieldDoesNotExist, InvalidQuery } = errors
 
 describe('Query Validator', () => {
     beforeAll(() => {
@@ -24,14 +24,14 @@ describe('Query Validator', () => {
         })
     
     
-        test('will throw InvalidQuery if filter fields doesn\'t exist', () => {
+        test('will throw FieldDoesNotExist if filter fields doesn\'t exist', () => {
             const filter = {
                 fieldName: 'wrong',
                 operator: ctx.validOperatorForType,
                 value: ctx.value
             }
 
-            expect ( () => env.queryValidator.validateFilter([{ field: ctx.fieldName, type: ctx.type }], filter)).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateFilter([{ field: ctx.fieldName, type: ctx.type }], filter)).toThrow(FieldDoesNotExist)
         })
 
         test('will not throw if use allowed operator for type', () => {
@@ -68,7 +68,7 @@ describe('Query Validator', () => {
         })
 
         test('should throw Invalid if _id fields doesn\'t exist', () => {
-            expect ( () => env.queryValidator.validateGetById([{ field: ctx.fieldName, type: ctx.type }], '0')).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateGetById([{ field: ctx.fieldName, type: ctx.type }], '0')).toThrow(FieldDoesNotExist)
         })  
     })
 
@@ -114,7 +114,7 @@ describe('Query Validator', () => {
             expect ( () => env.queryValidator.validateAggregation([{ field: ctx.fieldName, type: ctx.type }], aggregation)).not.toThrow()
         })
         
-        test('will throw Invalid Query with filter on non exist field', () => {
+        test('will throw FieldDoesNotExist with filter on non exist field', () => {
             const aggregation = {
                 projection: [{ name: ctx.fieldName, alias: ctx.anotherFieldName }],
                 postFilter: {
@@ -123,15 +123,15 @@ describe('Query Validator', () => {
                     value: ctx.value
                 }
             }
-            expect ( () => env.queryValidator.validateAggregation([{ field: ctx.fieldName, type: ctx.type }], aggregation)).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateAggregation([{ field: ctx.fieldName, type: ctx.type }], aggregation)).toThrow(FieldDoesNotExist)
         })
         
-        test('will throw Invalid Query with projection with non exist field', () => {
+        test('will throw FieldDoesNotExist with projection with non exist field', () => {
             const aggregation = {
                 projection: [{ name: 'wrong' }],
                 postFilter: EmptyFilter
             }
-            expect ( () => env.queryValidator.validateAggregation([{ field: ctx.fieldName, type: ctx.type }], aggregation)).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateAggregation([{ field: ctx.fieldName, type: ctx.type }], aggregation)).toThrow(FieldDoesNotExist)
         })
         
     })
@@ -142,9 +142,9 @@ describe('Query Validator', () => {
             expect ( () => env.queryValidator.validateProjection([{ field: ctx.fieldName, type: ctx.type }], projection)).not.toThrow()
         })
 
-        test('will throw Invalid Query if projection fields doesn\'t exist', () => {
+        test('will throw FieldDoesNotExist if projection fields doesn\'t exist', () => {
             const projection = ['wrong']
-            expect ( () => env.queryValidator.validateProjection([{ field: ctx.fieldName, type: ctx.type }], projection)).toThrow(InvalidQuery)
+            expect ( () => env.queryValidator.validateProjection([{ field: ctx.fieldName, type: ctx.type }], projection)).toThrow(FieldDoesNotExist)
         })
     })
 

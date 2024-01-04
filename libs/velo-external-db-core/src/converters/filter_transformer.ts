@@ -1,7 +1,8 @@
 import { AdapterOperators, isObject, patchVeloDateValue } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter } from './utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { AdapterFilter, AdapterOperator, WixDataFilter, WixDataMultiFieldOperators, } from '@wix-velo/velo-external-db-types'
+import { AdapterFilter, AdapterOperator, Sort, WixDataFilter, WixDataMultiFieldOperators, } from '@wix-velo/velo-external-db-types'
+import { Sorting } from '../spi-model/data_source'
 const { InvalidQuery } = errors
 
 export interface IFilterTransformer {
@@ -25,20 +26,32 @@ export default class FilterTransformer implements IFilterTransformer {
             const values = filter[wixOperator]
             const res = values.map(this.transform.bind(this))
             return {
-                operator: operator,
+                operator,
                 value: res
             }
         }
         
         const fieldName = Object.keys(filter)[0]
-        const wixOperator = Object.keys(filter[fieldName])[0]
+        const { value, operator: wixOperator } = this.valueAndOperatorFromFilter(filter, fieldName)
         const operator = this.wixOperatorToAdapterOperator(wixOperator)
-        const value = filter[fieldName][wixOperator]           
         return { 
             operator: operator as AdapterOperator,
             fieldName,
             value: patchVeloDateValue(value)  
         }
+    }
+
+    transformSort(sort: any): Sort[] {
+        if (!this.isSortArray(sort)) {
+            return []
+        }
+
+        return (sort as Sorting[]).map(sorting => {
+            return {
+                fieldName: sorting.fieldName,
+                direction: sorting.order.toLowerCase() as 'asc' | 'desc'
+            }
+        })
     }
 
     isMultipleFieldOperator(filter: WixDataFilter) {
@@ -90,4 +103,31 @@ export default class FilterTransformer implements IFilterTransformer {
         return (!filter || !isObject(filter) || Object.keys(filter)[0] === undefined)
     }
 
+    isSortArray(sort: any): boolean {
+        
+        if (!Array.isArray(sort)) {
+            return false
+        }
+        return sort.every((s: any) => {
+            return this.isSortObject(s)
+        })   
+    }
+
+    isSortObject(sort:any): boolean {
+        return sort.fieldName && sort.order
+    }
+
+    valueAndOperatorFromFilter(filter: any, fieldName: string) {
+        // there are two options:
+        // { fieldName: { operator: value } }
+        // or
+        // { fieldName: value }
+        const filterValue = filter[fieldName]
+        const operator = isObject(filterValue) ? Object.keys(filterValue)[0] : '$eq'
+        const value = isObject(filterValue) ? filterValue[operator] : filterValue
+        return {
+            operator,
+            value
+        }
+    }
 }

@@ -55,7 +55,7 @@ const batchRecordUpdate = [
                 const fields = req.body.typecast ? { typecasted: true } : record.fields
                 return {
                     id: record.id,
-                    fields: fields,
+                    fields,
                 }
             }),
         })

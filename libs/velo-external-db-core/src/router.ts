@@ -5,31 +5,34 @@ import * as compression from 'compression'
 import { errorMiddleware } from './web/error-middleware'
 import { appInfoFor } from './health/app_info'
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { extractRole } from './web/auth-role-middleware'
+
 import { config } from './roles-config.json'
-import { secretKeyAuthMiddleware } from './web/auth-middleware'
 import { authRoleMiddleware } from './web/auth-role-middleware'
 import { unless, includes } from './web/middleware-support'
 import { getAppInfoPage } from './utils/router_utils'
-import { DataHooksForAction, DataOperations, dataPayloadFor, DataActions, requestContextFor } from './data_hooks_utils'
-import { SchemaHooksForAction, SchemaOperations, schemaPayloadFor, SchemaActions } from './schema_hooks_utils'
+import { requestContextFor, DataActions, dataPayloadFor, DataHooksForAction } from './data_hooks_utils'
+import { SchemaActions, SchemaHooksForAction, schemaPayloadFor } from './schema_hooks_utils'
 import SchemaService from './service/schema'
 import OperationService from './service/operation'
-import { AnyFixMe } from '@wix-velo/velo-external-db-types'
+import { AnyFixMe, CollectionOperationSPI, DataOperation } from '@wix-velo/velo-external-db-types'
 import SchemaAwareDataService from './service/schema_aware_data'
 import FilterTransformer from './converters/filter_transformer'
 import AggregationTransformer from './converters/aggregation_transformer'
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { DataHooks, Hooks, RequestContext, SchemaHooks, ServiceContext } from './types'
 import { ConfigValidator } from '@wix-velo/external-db-config'
+import * as dataSource from './spi-model/data_source'
+import * as schemaSource from './spi-model/collection'
+import { JWTVerifier } from './web/jwt-verifier'
+import { JWTVerifierDecoderMiddleware } from './web/jwt-verifier-decoder-middleware'
 
-const { InvalidRequest, ItemNotFound } = errors
-const { Find: FIND, Insert: INSERT, BulkInsert: BULK_INSERT, Update: UPDATE, BulkUpdate: BULK_UPDATE, Remove: REMOVE, BulkRemove: BULK_REMOVE, Aggregate: AGGREGATE, Count: COUNT, Get: GET } = DataOperations
+const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
+const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { secretKey?: any; type?: any; vendor?: any, hideAppInfo?: boolean }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer, roleAuthorizationService: RoleAuthorizationService, dataHooks: DataHooks, schemaHooks: SchemaHooks
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
-                             _externalDbConfigClient: ConfigValidator, _cfg: { secretKey?: string, type?: string, vendor?: string, hideAppInfo?: boolean },
+                             _externalDbConfigClient: ConfigValidator, _cfg: { type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string },
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
                              _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks) => {
     schemaService = _schemaService
@@ -39,7 +42,7 @@ export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _s
     schemaAwareDataService = _schemaAwareDataService
     filterTransformer = _filterTransformer
     aggregationTransformer = _aggregationTransformer
-    roleAuthorizationService = _roleAuthorizationService
+    // roleAuthorizationService = _roleAuthorizationService
     dataHooks = _hooks?.dataHooks || {}
     schemaHooks = _hooks?.schemaHooks || {}
 }
@@ -50,13 +53,13 @@ const serviceContext = (): ServiceContext => ({
 })
 
 
-const executeDataHooksFor = async(action: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
+const executeDataHooksFor = async<T>(action: string, payload: T, requestContext: RequestContext, customContext: any): Promise<T> => {
     return BPromise.reduce(DataHooksForAction[action], async(lastHookResult: AnyFixMe, hookName: string) => {
         return await executeHook(dataHooks, hookName, lastHookResult, requestContext, customContext)
     }, payload)
 }
 
-const executeSchemaHooksFor = async(action: string, payload: any, requestContext: RequestContext, customContext: any) => {
+const executeSchemaHooksFor = async<T>(action: string, payload: T, requestContext: RequestContext, customContext: any): Promise<T> => {
     return BPromise.reduce(SchemaHooksForAction[action], async(lastHookResult: any, hookName: string) => {
         return await executeHook(schemaHooks, hookName, lastHookResult, requestContext, customContext)
     }, payload)
@@ -71,7 +74,7 @@ const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, p
             return payloadAfterHook || payload
         } catch (e: any) {
             if (e.status) throw e
-            throw new InvalidRequest(e.message || e)
+            throw new errors.UnrecognizedError(e.message || e)
         }
     }
     return payload
@@ -79,12 +82,23 @@ const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, p
 
 export const createRouter = () => {
     const router = express.Router()
-    router.use(express.json())
+    router.use(express.text())
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
-    router.use(unless(['/', '/provision', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: cfg.secretKey })))
+    const jwtVerifier = new JWTVerifier(cfg.jwtPublicKey, cfg.appDefId)
+    const jwtVerifierDecoderMiddleware = new JWTVerifierDecoderMiddleware(jwtVerifier)
+    router.use(unless(['/', '/info', '/capabilities', '/favicon.ico', '/provision', '/connectionStatus'], jwtVerifierDecoderMiddleware.verifyAndDecodeMiddleware()))
 
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
+
+    //set timeout of 2 minutes per request
+    router.use((req, res, next) => {
+        const twoMintuesInMs = 120000
+        res.setTimeout(twoMintuesInMs, () => {
+            res.status(408).send('Request Timeout')
+        })
+        next()
+    })
 
     // *************** INFO **********************
     router.get('/', async(req, res) => {
@@ -95,269 +109,212 @@ export const createRouter = () => {
         res.send(appInfoPage)
     })
 
-    router.post('/provision', async(req, res) => {
+    router.post('/v3/capabilities/get', async(req, res) => {
+        const unsupportedFieldTypes = [ schemaSource.FieldType.arrayString, schemaSource.FieldType.reference, schemaSource.FieldType.multiReference, 
+                                        schemaSource.FieldType.arrayDocument, schemaSource.FieldType.array ]
+        const capabilitiesResponse = {
+            supportsCollectionModifications: true,
+            supportedFieldTypes: Object.values(schemaSource.FieldType).filter(t => !unsupportedFieldTypes.includes(t)),
+            supportsCollectionDisplayName: false,
+            supportsCollectionDisplayField: false,
+            supportsCollectionPermissions: false,
+            supportsCollectionFieldDisplayName: false,
+            supportsCollectionFieldDescription: false,
+        }
+
+        res.json(capabilitiesResponse)
+    })
+
+    router.post('/v3/provision', async(req, res) => {
         const { type, vendor } = cfg
-        res.json({ type, vendor, protocolVersion: 2 })
+        res.json({ type, vendor, protocolVersion: 3, adapterVersion: 'v3' })
+    })
+
+    router.get('/connectionStatus', async(req, res) => {
+        const appInfo = await appInfoFor(operationService, externalDbConfigClient, cfg.hideAppInfo)
+        res.json({ ...appInfo })
     })
 
     // *************** Data API **********************
-    router.post('/data/find', async(req, res, next) => {
+    router.post('/v3/items/query', async(req, res, next) => {
         try {
-            const { collectionName } = req.body
             const customContext = {}
-            const { filter, sort, skip, limit, projection, omitTotalCount } = await executeDataHooksFor(DataActions.BeforeFind, dataPayloadFor(FIND, req.body), requestContextFor(FIND, req.body), customContext)
+            const { collectionId, query, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeQuery, dataPayloadFor(Query, req.body), requestContextFor(Query, req.body, res.locals), customContext) as dataSource.QueryRequest
 
-            await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.find(collectionName, filterTransformer.transform(filter), sort, skip, limit, projection, omitTotalCount)
+            const offset = query.pagingMethod ? query.pagingMethod.offset : 0
+            const limit = query.pagingMethod ? query.pagingMethod.limit : 50
 
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterFind, data, requestContextFor(FIND, req.body), customContext)
-            res.json(dataAfterAction)
+            const data = await schemaAwareDataService.find(
+                collectionId,
+                filterTransformer.transform(query.filter),
+                filterTransformer.transformSort(query.sort),
+                offset,
+                limit,
+                query.fields,
+                returnTotalCount
+            )
+
+            const { items, totalCount } = await executeDataHooksFor(DataActions.AfterQuery, data, requestContextFor(Query, req.body, res.locals), customContext)
+
+            res.json({ items, pagingMetadata: { count: items.length, offset, total: totalCount } })
         } catch (e) {
             next(e)
         }
     })
 
-    router.post('/data/aggregate', async(req, res, next) => {
+    router.post('/v3/items/count', async(req, res, next) => {
         try {
-            const { collectionName } = req.body
             const customContext = {}
-            const { filter, processingStep, postFilteringStep } = await executeDataHooksFor(DataActions.BeforeAggregate, dataPayloadFor(AGGREGATE, req.body), requestContextFor(AGGREGATE, req.body), customContext)
-            await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.aggregate(collectionName, filterTransformer.transform(filter), aggregationTransformer.transform({ processingStep, postFilteringStep }))
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(AGGREGATE, req.body), customContext)
-            res.json(dataAfterAction)
+            const { collectionId, filter } = await executeDataHooksFor(DataActions.BeforeCount, dataPayloadFor(Count, req.body), requestContextFor(Count, req.body, res.locals), customContext) as dataSource.CountRequest
+
+            const data = await schemaAwareDataService.count(
+                collectionId,
+                filterTransformer.transform(filter),
+            )
+
+            const { totalCount } = await executeDataHooksFor(DataActions.AfterCount, data, requestContextFor(Count, req.body, res.locals), customContext)
+
+            res.json({ totalCount })
         } catch (e) {
             next(e)
         }
     })
 
-
-    router.post('/data/insert', async(req, res, next) => {
+    router.post('/v3/items/insert', async(req, res, next) => {
         try {
-            const { collectionName } = req.body
             const customContext = {}
-            const { item } = await executeDataHooksFor(DataActions.BeforeInsert, dataPayloadFor(INSERT, req.body), requestContextFor(INSERT, req.body), customContext)
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.insert(collectionName, item)
+            const { collectionId, items } = await executeDataHooksFor(DataActions.BeforeInsert, dataPayloadFor(Insert, req.body), requestContextFor(Insert, req.body, res.locals), customContext) as dataSource.InsertRequest
+            
+            const data = await schemaAwareDataService.bulkInsert(collectionId, items)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, { results: data.items }, requestContextFor(Insert, req.body, res.locals), customContext)
 
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterInsert, data, requestContextFor(INSERT, req.body), customContext)
-            res.json(dataAfterAction)
+
+            res.json({ results: dataAfterAction.results })
         } catch (e) {
             next(e)
         }
     })
 
-    router.post('/data/insert/bulk', async(req, res, next) => {
+    router.post('/v3/items/update', async(req, res, next) => {
+        
         try {
-            const { collectionName } = req.body
             const customContext = {}
-            const { items } = await executeDataHooksFor(DataActions.BeforeBulkInsert, dataPayloadFor(BULK_INSERT, req.body), requestContextFor(BULK_INSERT, req.body), customContext)
+            const { collectionId, items } = await executeDataHooksFor(DataActions.BeforeUpdate, dataPayloadFor(Update, req.body), requestContextFor(Update, req.body, res.locals), customContext) as dataSource.UpdateRequest
 
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.bulkInsert(collectionName, items)
+            const data = await schemaAwareDataService.bulkUpdate(collectionId, items)
 
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterBulkInsert, data, requestContextFor(BULK_INSERT, req.body), customContext)
-            res.json(dataAfterAction)
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterUpdate, { results: data.items }, requestContextFor(Update, req.body, res.locals), customContext)
+
+            res.json({ results: dataAfterAction.results })
         } catch (e) {
             next(e)
         }
     })
 
-    router.post('/data/get', async(req, res, next) => {
+    router.post('/v3/items/remove', async(req, res, next) => {
         try {
-            const { collectionName } = req.body
             const customContext = {}
-            const { itemId, projection } = await executeDataHooksFor(DataActions.BeforeGetById, dataPayloadFor(GET, req.body), requestContextFor(GET, req.body), customContext)
-            await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.getById(collectionName, itemId, projection)
+            const { collectionId, itemIds } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(Remove, req.body), requestContextFor(Remove, req.body, res.locals), customContext) as dataSource.RemoveRequest
 
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterGetById, data, requestContextFor(GET, req.body), customContext)
-            if (!dataAfterAction.item) {
-                throw new ItemNotFound('Item not found')
-            }
-            res.json(dataAfterAction)
+            const data = await schemaAwareDataService.bulkDelete(collectionId, itemIds)
+
+            const dataAfterAction = await executeDataHooksFor(DataActions.AfterRemove, { results: data.items }, requestContextFor(Remove, req.body, res.locals), customContext)
+
+
+            res.json({ results: dataAfterAction.results })
         } catch (e) {
             next(e)
         }
     })
 
-    router.post('/data/update', async(req, res, next) => {
+    router.post('/v3/items/aggregate', async(req, res, next) => {
         try {
-            const { collectionName } = req.body
             const customContext = {}
-            const { item } = await executeDataHooksFor(DataActions.BeforeUpdate, dataPayloadFor(UPDATE, req.body), requestContextFor(UPDATE, req.body), customContext)
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.update(collectionName, item)
+            const { collectionId, initialFilter, aggregation, finalFilter, sort, pagingMethod, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeAggregate,
+                 dataPayloadFor(Aggregate, req.body), requestContextFor(Aggregate, req.body, res.locals), customContext) as dataSource.AggregateRequest
 
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterUpdate, data, requestContextFor(UPDATE, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
+            const offset = pagingMethod ? pagingMethod.offset : 0
+            const limit = pagingMethod ? pagingMethod.limit : 50
+
+            const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), 
+                                                                aggregationTransformer.transform({ aggregation, finalFilter }), 
+                                                                filterTransformer.transformSort(sort), offset, limit, returnTotalCount)
+                                                                
+            const { items, totalCount: total } = await executeDataHooksFor(DataActions.AfterAggregate, data, requestContextFor(Aggregate, req.body, res.locals), customContext)
+
+            res.json({ items, pagingMetadata: { count: items.length, offset, total } })
+        } catch (e) {            
             next(e)
         }
     })
 
-    router.post('/data/update/bulk', async(req, res, next) => {
+    router.post('/v3/items/truncate', async(req, res, next) => {
         try {
-            const { collectionName } = req.body
             const customContext = {}
-            const { items } = await executeDataHooksFor(DataActions.BeforeBulkUpdate, dataPayloadFor(BULK_UPDATE, req.body), requestContextFor(BULK_UPDATE, req.body), customContext)
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.bulkUpdate(collectionName, items)
-
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterBulkUpdate, data, requestContextFor(BULK_UPDATE, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-
-    router.post('/data/remove', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { itemId } = await executeDataHooksFor(DataActions.BeforeRemove, dataPayloadFor(REMOVE, req.body), requestContextFor(REMOVE, req.body), customContext)
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.delete(collectionName, itemId)
-
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterRemove, data, requestContextFor(REMOVE, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-
-    router.post('/data/remove/bulk', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { itemIds } = await executeDataHooksFor(DataActions.BeforeBulkRemove, dataPayloadFor(BULK_REMOVE, req.body), requestContextFor(BULK_REMOVE, req.body), customContext)
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.bulkDelete(collectionName, itemIds)
-
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterBulkRemove, data, requestContextFor(BULK_REMOVE, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-
-    router.post('/data/count', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { filter } = await executeDataHooksFor(DataActions.BeforeCount, dataPayloadFor(COUNT, req.body), requestContextFor(COUNT, req.body), customContext)
-            await roleAuthorizationService.authorizeRead(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.count(collectionName, filterTransformer.transform(filter))
-
-            const dataAfterAction = await executeDataHooksFor(DataActions.AfterCount, data, requestContextFor(COUNT, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-
-    router.post('/data/truncate', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            await roleAuthorizationService.authorizeWrite(collectionName, extractRole(req.body))
-            const data = await schemaAwareDataService.truncate(collectionName)
-            res.json(data)
+            const { collectionId } = await executeDataHooksFor(DataActions.BeforeTruncate, dataPayloadFor(Truncate, req.body), requestContextFor(Truncate, req.body, res.locals), customContext) as dataSource.TruncateRequest
+            
+            await schemaAwareDataService.truncate(collectionId)
+            await executeDataHooksFor(DataActions.AfterTruncate, {}, requestContextFor(Truncate, req.body, res.locals), customContext)
+            
+            res.json({})
         } catch (e) {
             next(e)
         }
     })
     // ***********************************************
 
+    // *************** Collections API **********************
 
-    // *************** Schema API **********************
-    router.post('/schemas/list', async(req, res, next) => {
+    router.post('/v3/collections/get', async(req, res, next) => {
         try {
             const customContext = {}
-            await executeSchemaHooksFor(SchemaActions.BeforeList, schemaPayloadFor(SchemaOperations.List, req.body), requestContextFor(SchemaOperations.List, req.body), customContext)
+            const { collectionIds } = await executeSchemaHooksFor(SchemaActions.BeforeGet, schemaPayloadFor(Get, req.body), requestContextFor(Get, req.body, res.locals), customContext) as schemaSource.ListCollectionsRequest
+            
+            const data = await schemaService.list(collectionIds)
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterGet, data, requestContextFor(Get, req.body, res.locals), customContext)                     
+            res.json({ collections: dataAfterAction.collections })
+        } catch (e) {
+            next(e)
+        }
+    })
 
-            const data = await schemaService.list()
 
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterList, data, requestContextFor(SchemaOperations.List, req.body), customContext)
+    router.post('/v3/collections/create', async(req, res, next) => {
+        try {
+            const customContext = {}
+            const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(Create, req.body), requestContextFor(Create, req.body, res.locals), customContext) as schemaSource.CreateCollectionRequest
+            const data = await schemaService.create(collection)
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterCreate, data, requestContextFor(Create, req.body, res.locals), customContext)
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
     })
 
-    router.post('/schemas/list/headers', async(req, res, next) => {
+    router.post('/v3/collections/update', async(req, res, next) => {
         try {
             const customContext = {}
-            await executeSchemaHooksFor(SchemaActions.BeforeListHeaders, schemaPayloadFor(SchemaOperations.ListHeaders, req.body), requestContextFor(SchemaOperations.ListHeaders, req.body), customContext)
-            const data = await schemaService.listHeaders()
-
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterListHeaders, data, requestContextFor(SchemaOperations.ListHeaders, req.body), customContext)
+            const { collection } = await executeSchemaHooksFor(SchemaActions.BeforeUpdate, schemaPayloadFor(UpdateSchema, req.body), requestContextFor(UpdateSchema, req.body, res.locals), customContext) as schemaSource.UpdateCollectionRequest
+            const data = await schemaService.update(collection)
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterUpdate, data, requestContextFor(UpdateSchema, req.body, res.locals), customContext)
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
     })
 
-    router.post('/schemas/find', async(req, res, next) => {
+    router.post('/v3/collections/delete', async(req, res, next) => {
         try {
             const customContext = {}
-            const { schemaIds } = await executeSchemaHooksFor(SchemaActions.BeforeFind, schemaPayloadFor(SchemaOperations.Find, req.body), requestContextFor(SchemaOperations.Find, req.body), customContext)
-
-            if (schemaIds && schemaIds.length > 10) {
-                throw new InvalidRequest('Too many schemas requested')
-            }
-            const data = await schemaService.find(schemaIds)
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterFind, data, requestContextFor(SchemaOperations.Find, req.body), customContext)
+            const { collectionId } = await executeSchemaHooksFor(SchemaActions.BeforeDelete, schemaPayloadFor(Delete, req.body), requestContextFor(Delete, req.body, res.locals), customContext) as schemaSource.DeleteCollectionRequest
+            const data = await schemaService.delete(collectionId)
+            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterDelete, data, requestContextFor(Delete, req.body, res.locals), customContext)
             res.json(dataAfterAction)
         } catch (e) {
             next(e)
         }
     })
 
-    router.post('/schemas/create', async(req, res, next) => {
-        try {
-            const customContext = {}
-            const { collectionName } = await executeSchemaHooksFor(SchemaActions.BeforeCreate, schemaPayloadFor(SchemaOperations.Create, req.body), requestContextFor(SchemaOperations.Create, req.body), customContext)
-            const data = await schemaService.create(collectionName)
-
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterCreate, data, requestContextFor(SchemaOperations.Create, req.body), customContext)
-
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-
-    router.post('/schemas/column/add', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { column } = await executeSchemaHooksFor(SchemaActions.BeforeColumnAdd, schemaPayloadFor(SchemaOperations.ColumnAdd, req.body), requestContextFor(SchemaOperations.ColumnAdd, req.body), customContext)
-
-            const data = await schemaService.addColumn(collectionName, column)
-
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterColumnAdd, data, requestContextFor(SchemaOperations.ColumnAdd, req.body), customContext)
-
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-
-    router.post('/schemas/column/remove', async(req, res, next) => {
-        try {
-            const { collectionName } = req.body
-            const customContext = {}
-            const { columnName } = await executeSchemaHooksFor(SchemaActions.BeforeColumnRemove, schemaPayloadFor(SchemaOperations.ColumnRemove, req.body), requestContextFor(SchemaOperations.ColumnRemove, req.body), customContext)
-
-            const data = await schemaService.removeColumn(collectionName, columnName)
-
-            const dataAfterAction = await executeSchemaHooksFor(SchemaActions.AfterColumnRemove, data, requestContextFor(SchemaOperations.ColumnRemove, req.body), customContext)
-            res.json(dataAfterAction)
-        } catch (e) {
-            next(e)
-        }
-    })
-    // ***********************************************
 
     router.use(errorMiddleware)
 

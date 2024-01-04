@@ -11,7 +11,7 @@ export const shouldRunOnlyOn = (impl: string[], current: string) => impl.include
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-ignore
-export const testIfSupportedOperationsIncludes = (supportedOperations: SchemaOperations[], operation: string[]): any => operation.every((o: any) => supportedOperations.includes(o)) ? test : test.skip 
+export const testIfSupportedOperationsIncludes = (supportedOperations: SchemaOperations[], operation: string[]): any => operation.every((o: any) => supportedOperations.includes(o)) ? test : test.skip
 
 export const testSupportedOperations = (supportedOperations: SchemaOperations[], arrayTable: any[][]): string[][] => {
     return arrayTable.filter(i => {
@@ -19,3 +19,4 @@ export const testSupportedOperations = (supportedOperations: SchemaOperations[],
         return !isObject(lastItem) || lastItem['neededOperations'].every((i: any) => supportedOperations.includes(i))
     })
 }
+

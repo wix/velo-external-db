@@ -23,25 +23,13 @@ describe('Sql Schema Column Translator', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} decimal`)
             })
 
-    //         test('decimal float with precision', () => {
-    //             expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'float', precision: '7, 3'}) ).toEqual(`${escapeIdentifier(ctx.fieldName)} FLOAT(7,3)`)
-    //         })
-
             test('decimal double', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'double' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} double precision`)
             })
 
-    //         test('decimal double with precision', () => {
-    //             expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'double', precision: '7, 3' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} DOUBLE(7,3)`)
-    //         })
-
             test('decimal generic', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'decimal' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} real`)
             })
-
-    //         test('decimal generic with precision', () => {
-    //             expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'number', subtype: 'decimal', precision: '7, 3' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} DECIMAL(7,3)`)
-    //         })
         })
 
         describe('date time fields', () => {
@@ -61,16 +49,21 @@ describe('Sql Schema Column Translator', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'datetime', subtype: 'time' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} time`)
             })
 
-            // test('year', () => {
-            //     expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'datetime', subtype: 'year' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} YEAR`)
-            // })
 
         })
 
         describe('string fields', () => {
-            test('string', () => {
-                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} varchar(2048)`)
-            })
+            test.each([
+                'string',
+                'richcontent',
+                'image',
+                'video',
+                'audio',
+                'document',
+                'language',
+            ])('%s', (subtype) => {
+                expect(env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype })).toEqual(`${escapeIdentifier(ctx.fieldName)} text`)
+              })
 
             test('string with length', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'string', precision: '2055' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} varchar(2055)`)
@@ -87,12 +80,32 @@ describe('Sql Schema Column Translator', () => {
             test('text large', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'large' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} text`)
             })
+
+            test('text language', () => {
+                expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'text', subtype: 'language' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} text`)
+            })
         })
 
         describe('other fields', () => {
             test('boolean', () => {
                 expect( env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'boolean' }) ).toEqual(`${escapeIdentifier(ctx.fieldName)} boolean`)
             })
+        })
+
+        describe('json fields', () => {
+            test.each([
+                'object',
+                'any',
+                'mediaGallery',
+                'address',
+                'pageLink',
+                'reference',
+                'multiReference',
+                'arrayDocument',
+                'arrayString',
+              ])('%s', (subtype) => {
+                expect(env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype })).toEqual(`${escapeIdentifier(ctx.fieldName)} json`)
+              })
         })
     })
 
@@ -123,9 +136,21 @@ describe('Sql Schema Column Translator', () => {
 
         describe('date time fields', () => {
             test('date', () => {
-                ['date', 'time', 'timez', 'timestamp', 'timestamptz'].forEach(t => {
+                expect( env.schemaTranslator.translateType('date') ).toEqual('date')
+            })
+            test('time', () => {
+                expect( env.schemaTranslator.translateType('time') ).toEqual('time')
+            })
+            test('datetime', () => {
+                ['timez', 'timestamp', 'timestamptz'].forEach(t => {
                     expect( env.schemaTranslator.translateType(t) ).toEqual('datetime')
                 })
+            })
+        })
+
+        describe('json fields', () => {
+            test('object', () => {
+                expect( env.schemaTranslator.translateType('json') ).toEqual('object')
             })
         })
 

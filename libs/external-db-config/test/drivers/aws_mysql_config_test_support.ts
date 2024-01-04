@@ -26,11 +26,14 @@ export const defineValidConfig = (config: MySqlConfig) => {
     if (config.db) {
         awsConfig['DB'] = config.db
     }
-    if (config.secretKey) {
-        awsConfig['SECRET_KEY'] = config.secretKey
-    }
     if (config.authorization) {
         awsConfig['PERMISSIONS'] = JSON.stringify(config.authorization)
+    }
+    if (config.jwtPublicKey) {
+        awsConfig['JWT_PUBLIC_KEY'] = config.jwtPublicKey
+    }
+    if (config.appDefId) {
+        awsConfig['APP_DEF_ID'] = config.appDefId
     }
     mockedAwsSdk.on(GetSecretValueCommand).resolves({ SecretString: JSON.stringify(awsConfig) })
 }
@@ -48,11 +51,14 @@ const defineLocalEnvs = (config: MySqlConfig) => {
     if (config.db) {
         process.env['DB'] = config.db
     }
-    if (config.secretKey) {
-        process.env['SECRET_KEY'] = config.secretKey
-    }
     if (config.authorization) {
         process.env['PERMISSIONS'] = JSON.stringify(config.authorization)
+    }
+    if (config.jwtPublicKey) {
+        process.env['JWT_PUBLIC_KEY'] = config.jwtPublicKey
+    }
+    if (config.appDefId) {
+        process.env['APP_DEF_ID'] = config.appDefId
     }
 }
 
@@ -70,7 +76,8 @@ export const validConfig = (): MySqlConfig => ({
     user: chance.word(),
     password: chance.word(),
     db: chance.word(),
-    secretKey: chance.word(),
+    jwtPublicKey: chance.word(),
+    appDefId: chance.word(),
 })
 
 export const validConfigWithAuthorization = (): MySqlConfig => ({
@@ -89,8 +96,8 @@ export const validConfigWithAuthConfig = () => ({
     } 
 })
 
-export const ExpectedProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY', 'PERMISSIONS']
-export const RequiredProperties = ['host', 'username', 'password', 'DB', 'SECRET_KEY']
+export const ExpectedProperties = ['host', 'username', 'password', 'DB', 'PERMISSIONS', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
+export const RequiredProperties = ['host', 'username', 'password', 'DB', 'JWT_PUBLIC_KEY', 'APP_DEF_ID']
 
 export const reset = () => { 
     mockedAwsSdk.reset()

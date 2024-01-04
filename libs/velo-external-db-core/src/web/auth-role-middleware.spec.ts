@@ -13,8 +13,6 @@ describe('Auth Role Middleware', () => {
         permittedRole: Uninitialized,
         notPermittedRole: Uninitialized,
         next: Uninitialized,
-        secretKey: Uninitialized,
-        
     }
 
     const env = {
@@ -41,12 +39,12 @@ describe('Auth Role Middleware', () => {
     })
 
     test('should allow request with permitted role on request', () => {
-        env.auth(driver.requestBodyWith(ctx.secretKey, ctx.permittedRole), Uninitialized, ctx.next)
+        env.auth(driver.requestBodyWith(ctx.permittedRole), Uninitialized, ctx.next)
 
         expect(ctx.next).toHaveBeenCalled()
     })
 
     test('should not allow request with permitted role on request', () => {
-        expect( () => env.auth(driver.requestBodyWith(ctx.secretKey, ctx.notPermittedRole), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
+        expect( () => env.auth(driver.requestBodyWith(ctx.notPermittedRole), Uninitialized, ctx.next) ).toThrow(UnauthorizedError)
     })
 })

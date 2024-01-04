@@ -11,9 +11,9 @@ describe('MySqlConfigValidator', () => {
         expect(env.CommonConfigValidator.validate()).toEqual({ missingRequiredSecretsKeys: [] })
     })
 
-    test('not extended common config validator will return if secretKey is missing', () => {
+    test('not extended common config validator will return if jwtPublicKey or appDefId are missing', () => {
         env.CommonConfigValidator = new CommonConfigValidator({})
-        expect(env.CommonConfigValidator.validate()).toEqual({ missingRequiredSecretsKeys: ['secretKey'] })
+        expect(env.CommonConfigValidator.validate()).toEqual({ missingRequiredSecretsKeys: ['jwtPublicKey', 'appDefId'] })
     })
 
     each(

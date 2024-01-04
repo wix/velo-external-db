@@ -154,7 +154,7 @@ describe('Sql Parser', () => {
                 const filter = {
                     operator: eq,
                     fieldName: ctx.fieldName,
-                    value: value
+                    value
                 }
 
                 expect( env.filterParser.parseFilter(filter) ).toEqual([{
@@ -202,6 +202,29 @@ describe('Sql Parser', () => {
                     }])
 
                 })
+            })
+        })
+
+        describe('handle queries on nested fields', () => {
+            test('correctly transform nested field query', () => {
+                const operator = ctx.filterWithoutInclude.operator
+                const filter = {
+                    operator,
+                    fieldName: `${ctx.fieldName}.${ctx.nestedFieldName}.${ctx.anotherNestedFieldName}`,
+                    value: ctx.filterWithoutInclude.value
+                }
+
+                expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                    filterExpr: {
+                        FilterExpression: `#${ctx.fieldName}0.#${ctx.nestedFieldName}1.#${ctx.anotherNestedFieldName}2 ${env.filterParser.adapterOperatorToDynamoOperator(operator)} :${ctx.fieldName}0`,
+                        ExpressionAttributeNames: {
+                            [`#${ctx.fieldName}0`]: ctx.fieldName,
+                            [`#${ctx.nestedFieldName}1`]: ctx.nestedFieldName,
+                            [`#${ctx.anotherNestedFieldName}2`]: ctx.anotherNestedFieldName
+                        },
+                        ExpressionAttributeValues: { [`:${ctx.fieldName}0`]: ctx.filterWithoutInclude.value }
+                    }
+                }])
             })
         })
 
@@ -276,9 +299,13 @@ describe('Sql Parser', () => {
         fieldListValue: Uninitialized,
         anotherFieldName: Uninitialized,
         moreFieldName: Uninitialized,
+        nestedFieldName: Uninitialized,
+        anotherNestedFieldName: Uninitialized,
         filter: Uninitialized,
         idFilterNotEqual: Uninitialized,
         anotherFilter: Uninitialized,
+        filterWithoutInclude: Uninitialized,
+
     }
 
 
@@ -292,6 +319,8 @@ describe('Sql Parser', () => {
         ctx.fieldName = chance.word()
         ctx.anotherFieldName = chance.word()
         ctx.moreFieldName = chance.word()
+        ctx.nestedFieldName = chance.word()
+        ctx.anotherNestedFieldName = chance.word()
 
         ctx.fieldValue = chance.word()
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
@@ -299,6 +328,7 @@ describe('Sql Parser', () => {
         ctx.filter = gen.randomWrappedFilter()
         ctx.idFilterNotEqual = idFilter({ withoutEqual: true })
         ctx.anotherFilter = gen.randomWrappedFilter()
+        ctx.filterWithoutInclude = gen.randomDomainFilterWithoutInclude()
     })
 
     beforeAll(function() {

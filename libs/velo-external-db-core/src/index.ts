@@ -16,6 +16,8 @@ import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } from '@wix-velo/external-db-config'
 import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
+import { CollectionCapability } from './spi-model/capabilities'
+import { decodeBase64 } from './utils/base64_utils'
 
 export class ExternalDbRouter {
     connector: DbConnector
@@ -36,7 +38,9 @@ export class ExternalDbRouter {
     constructor({ connector, config, hooks }: { connector: DbConnector, config: ExternalDbRouterConfig, hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks}}) {
         this.isInitialized(connector)
         this.connector = connector
-        this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), new CommonConfigValidator({ secretKey: config.secretKey, vendor: config.vendor, type: config.adapterType }, config.commonExtended))
+        this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), 
+                                                   new CommonConfigValidator({ vendor: config.vendor, type: config.adapterType, jwtPublicKey: config.jwtPublicKey, appDefId: config.appDefId }, 
+                                                   config.commonExtended))
         this.config = config
         this.operationService = new OperationService(connector.databaseOperations)
         this.schemaInformation = new CacheableSchemaInformation(connector.schemaProvider)
@@ -66,4 +70,11 @@ export class ExternalDbRouter {
     }
 }
 
-export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext }
+export * as types from './types'
+export * as dataSpi from './spi-model/data_source'
+export * as collectionSpi from './spi-model/collection'
+export * as schemaUtils from '../src/utils/schema_utils'
+export * as dataConvertUtils from './converters/data_utils'
+export * as convertersUtils from './converters/utils'
+export { config } from './roles-config.json'
+export { DataService, SchemaService, OperationService, CacheableSchemaInformation, FilterTransformer, AggregationTransformer, QueryValidator, SchemaAwareDataService, ItemTransformer, Hooks, ServiceContext, CollectionCapability, decodeBase64 }

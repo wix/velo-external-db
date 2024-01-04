@@ -1,7 +1,8 @@
 import { Dataset } from '@google-cloud/bigquery'
-import { SystemFields, validateSystemFields, parseTableData, errors } from '@wix-velo/velo-external-db-commons'
-import { InputField, ISchemaProvider, ResponseField, Table, SchemaOperations } from '@wix-velo/velo-external-db-types'
+import { validateSystemFields, parseTableData, errors, EmptyCapabilities } from '@wix-velo/velo-external-db-commons'
+import { InputField, ISchemaProvider, ResponseField, Table, SchemaOperations, CollectionCapabilities, Encryption, PagingMode } from '@wix-velo/velo-external-db-types'
 import { translateErrorCodes, createCollectionTranslateErrorCodes, addColumnTranslateErrorCodes, removeColumnTranslateErrorCodes } from './sql_exception_translator'
+import { CollectionOperations, FieldTypes, ReadOnlyOperations, ReadWriteOperations, ColumnsCapabilities } from './bigquery_capabilities'
 import { escapeIdentifier } from './bigquery_utils'
 import SchemaColumnTranslator from './sql_schema_translator'
 import { BigQueryConfig } from './types'
@@ -25,7 +26,8 @@ export default class SchemaProvider implements ISchemaProvider {
         return Object.entries(tables)
                         .map(([collectionName, rs]) => ({
                             id: collectionName,
-                            fields: rs.map( this.translateDbTypes.bind(this) )
+                            fields: rs.map(this.appendAdditionalRowDetails.bind(this)),
+                            capabilities: this.collectionCapabilities(rs.map(r => r.field))
                         }))
     }
 
@@ -40,9 +42,8 @@ export default class SchemaProvider implements ISchemaProvider {
         return [ List, ListHeaders, Create, Drop, AddColumn, RemoveColumn, Describe, FindWithSort, Aggregate, BulkDelete, Truncate ]
     }
 
-    async create(collectionName: string, _columns: InputField[]) {
-        const columns = _columns || []
-        const dbColumnsSql = [...SystemFields, ...columns].map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c, { escapeId: false, precision: false }))
+    async create(collectionName: string, columns: InputField[]) {
+        const dbColumnsSql = columns.map(c => this.sqlSchemaTranslator.columnToDbColumnSql(c, { escapeId: false, precision: false }))
         await this.pool.createTable(collectionName, { schema: dbColumnsSql })
                        .catch(createCollectionTranslateErrorCodes)
     }
@@ -67,20 +68,44 @@ export default class SchemaProvider implements ISchemaProvider {
                        .catch(removeColumnTranslateErrorCodes)
     }
 
-    async describeCollection(collectionName: string): Promise<ResponseField[]> {        
-        const res = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${escapeIdentifier(`${this.projectId}.${this.databaseId}`)}.INFORMATION_SCHEMA.COLUMNS WHERE table_name='${collectionName}'`)
-                                   .catch(translateErrorCodes)
-
-        if (res[0].length === 0) {
-            throw new errors.CollectionDoesNotExists('Collection does not exists')
-        }
-
-        return res[0].map( this.translateDbTypes.bind(this) )
+    async changeColumnType(_collectionName: string, _column: InputField): Promise<void> {
+        throw new Error('Change column type is not supported')
     }
 
-    translateDbTypes(row: ResponseField) {
-        row.type = this.sqlSchemaTranslator.translateType(row.type)
-        return row
+    async describeCollection(collectionName: string): Promise<Table> {        
+        const [res] = await this.pool.query(`SELECT table_name, column_name AS field, data_type as type, FROM ${escapeIdentifier(`${this.projectId}.${this.databaseId}`)}.INFORMATION_SCHEMA.COLUMNS WHERE table_name='${collectionName}'`)
+                                   .catch(translateErrorCodes)
+        
+        if (res.length === 0) {
+            throw new errors.CollectionDoesNotExists('Collection does not exists', collectionName)
+        }
+
+        return {
+            id: collectionName,
+            fields: res.map(this.appendAdditionalRowDetails.bind(this)),
+            capabilities: this.collectionCapabilities(res.map(r => r.field))
+        }
+
+    }
+    private appendAdditionalRowDetails(row: {field: string, type: string}) : ResponseField {
+        const type = this.sqlSchemaTranslator.translateType(row.type)
+        return {
+            field: row.field,
+            type,
+            capabilities: ColumnsCapabilities[type] ?? EmptyCapabilities
+        }
+    }
+    
+    private collectionCapabilities(fieldNames: string[]): CollectionCapabilities {
+        return {
+            dataOperations: fieldNames.includes('_id') ? ReadWriteOperations : ReadOnlyOperations,
+            fieldTypes: FieldTypes,
+            collectionOperations: CollectionOperations,
+            referenceCapabilities: { supportedNamespaces: [] },
+            indexing: [],
+            encryption: Encryption.notSupported,
+            pagingMode: PagingMode.offset
+        }
     }
 
 }

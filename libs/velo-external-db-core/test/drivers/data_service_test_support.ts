@@ -17,9 +17,9 @@ export const dataService = {
 
 const systemFields = SystemFields.map(({ name, type, subtype }) => ({ field: name, type, subtype }) )
 
-export const givenListResult = (entities: any, totalCount: any, forCollectionName: any, filter: any, sort: any, skip: any, limit: any, projection: any, omitTotalCount: any) => 
+export const givenListResult = (entities: any, totalCount: any, forCollectionName: any, filter: any, sort: any, skip: any, limit: any, projection: any, omitTotalCount?: boolean) =>
     when(dataService.find).calledWith(forCollectionName, filter, sort, skip, limit, projection, omitTotalCount)
-                          .mockResolvedValue( { items: entities, totalCount: omitTotalCount? undefined: totalCount } )
+                          .mockResolvedValue( { items: entities, totalCount } )
 
 export const givenCountResult = (totalCount: any, forCollectionName: any, filter: any) =>
     when(dataService.count).calledWith(forCollectionName, filter)
@@ -35,7 +35,7 @@ export const givenInsertResult = (item: any, forCollectionName: any) =>
 
 export const givenBulkInsertResult = (items: any, forCollectionName: any) =>
     when(dataService.bulkInsert).calledWith(forCollectionName, items, systemFields)
-                             .mockResolvedValue({ items: items })
+                             .mockResolvedValue({ items })
 
 export const givenUpdateResult = (item: any, forCollectionName: any) => 
     when(dataService.update).calledWith(forCollectionName, item)
@@ -45,20 +45,20 @@ export const givenBulkUpdateResult = (items: any, forCollectionName: any) =>
     when(dataService.bulkUpdate).calledWith(forCollectionName, items)
                             .mockResolvedValue({ items })
 
-export const deleteResultTo = (itemId: any, forCollectionName: any) => 
-    when(dataService.delete).calledWith(forCollectionName, itemId)
+export const deleteResultTo = (itemId: any, forCollectionName: any, projection: any) => 
+    when(dataService.delete).calledWith(forCollectionName, itemId, projection)
                             .mockResolvedValue({ item: {} })
 
-export const bulkDeleteResultTo = (itemIds: any, forCollectionName: any) => 
-    when(dataService.bulkDelete).calledWith(forCollectionName, itemIds)
+export const bulkDeleteResultTo = (itemIds: any, forCollectionName: any, projection: any) => 
+    when(dataService.bulkDelete).calledWith(forCollectionName, itemIds, projection)
                                 .mockResolvedValue({ items: [] })
 
 export const truncateResultTo = (forCollectionName: any) => 
     when(dataService.truncate).calledWith(forCollectionName)
                               .mockResolvedValue(1)
 
-export const givenAggregateResult = (items: any, forCollectionName: any, filter: any, aggregation: any) =>    
-    when(dataService.aggregate).calledWith(forCollectionName, filter, aggregation)
+export const givenAggregateResult = (items: any, forCollectionName: any, filter: any, aggregation: any, sort: any, skip: any, limit: any, returnTotalCount = true) =>    
+    when(dataService.aggregate).calledWith(forCollectionName, filter, aggregation, sort, skip, limit, returnTotalCount)
                                .mockResolvedValue({ items, totalCount: 0 })
 
 export const reset = () => {

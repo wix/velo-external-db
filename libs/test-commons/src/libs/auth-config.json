@@ -1,0 +1,9 @@
+{
+  "authConfig": {
+    "kid": "7968bd02-7c7d-446e-83c5-5c993c20a140",
+    "authPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEdnP+fQMJYtljus9pnpEWT02T0uqF\nUacdoxL19vmQdii4DAj+S0pbJ/owcc7HsPvNwhJvIwFtk/4Cm+OYp7fXSQ==\n-----END PUBLIC KEY-----",
+    "authPrivateKey": "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEINoWtnYgw8ZcsZkgWDBxAcJF0ziCI4SOVuK17DrQFCWYoAoGCCqGSM49\nAwEHoUQDQgAEdnP+fQMJYtljus9pnpEWT02T0uqFUacdoxL19vmQdii4DAj+S0pb\nJ/owcc7HsPvNwhJvIwFtk/4Cm+OYp7fXSQ==\n-----END EC PRIVATE KEY-----",
+    "otherAuthPublicKey": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEC0QSOeblgUZjrKzxsLwJ/gcTFV+/\nTIhuEDxhpNaAnY1AvqFuANfCJ++aCWMjmhp1Fy9BZ6pi/lxVJAF4fpMqtw==\n-----END PUBLIC KEY-----",
+    "otherAuthPrivateKey": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOQIBAAJAbcyXwdpGC435MK3+YrondHjQgU6ev6IIi0BUxstX2N0kWSIjZveu\nv7yrpLHmE5kiFmIK2QQJJB2fBgvFe1rREQIDAQABAkA+BAjTHQ3jCNVugVflO299\ngZ+C6X0Qj9xzimpXvhJoEgF2h46MymRdxhIBjFdk27RiNbCcxSO+/9ihXgpRFJYB\nAiEAuAyC3I9deFYhivwDyY8SylXtJM6amrM9VDYfWe6VqOkCIQCYuTkNRYgOoYZv\nx56c+ssbLsPi+wvegXMUFcGEEOZN6QIhAJSGxDRqHew21errZcMLCwbuQOorMOkX\nLK8A3lwdBfnBAh9YSryw74G486jE9qK8HkFNdbvJfVlfSXc+JVW7BAohAiEArZNb\nPzT+UboIuTYSyPElaCV8wLmJ88m5t+NwlNSfsqs=\n-----END RSA PRIVATE KEY-----"
+  }
+}

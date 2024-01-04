@@ -12,7 +12,7 @@ const dbOperationWithMisconfiguredDatabaseId = () => new DatabaseOperations(crea
 export const dbOperationWithValidDB = () => {
     const { connection, cleanup } = createPool({ databaseId: 'testDB' })
     const dbOperations = new DatabaseOperations(connection)
-    return { dbOperations, cleanup: cleanup }
+    return { dbOperations, cleanup }
 }
 
 export const misconfiguredDbOperationOptions = () => ([   ['pool connection with wrong databaseId', () => dbOperationWithMisconfiguredDatabaseId()]])

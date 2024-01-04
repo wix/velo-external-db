@@ -1,112 +1,98 @@
-import { Item, WixDataFilter } from '@wix-velo/velo-external-db-types'
-import { AggregationQuery, FindQuery, RequestContext } from './types'
-
+import { DataOperation } from '@wix-velo/velo-external-db-types'
+import { AggregateRequest, CountRequest, InsertRequest, QueryRequest, UpdateRequest, RemoveRequest, TruncateRequest } from './spi-model/data_source'
+import { RequestContext } from './types'
 
 export const DataHooksForAction: { [key: string]: string[] } = {
-    beforeFind: ['beforeAll', 'beforeRead', 'beforeFind'],
-    afterFind: ['afterAll', 'afterRead', 'afterFind'],
-    beforeInsert: ['beforeAll', 'beforeWrite', 'beforeInsert'],
-    afterInsert: ['afterAll', 'afterWrite', 'afterInsert'],
-    beforeBulkInsert: ['beforeAll', 'beforeWrite', 'beforeBulkInsert'],
-    afterBulkInsert: ['afterAll', 'afterWrite', 'afterBulkInsert'],
-    beforeUpdate: ['beforeAll', 'beforeWrite', 'beforeUpdate'],
-    afterUpdate: ['afterAll', 'afterWrite', 'afterUpdate'],
-    beforeBulkUpdate: ['beforeAll', 'beforeWrite', 'beforeBulkUpdate'],
-    afterBulkUpdate: ['afterAll', 'afterWrite', 'afterBulkUpdate'],
-    beforeRemove: ['beforeAll', 'beforeWrite', 'beforeRemove'],
-    afterRemove: ['afterAll', 'afterWrite', 'afterRemove'],
-    beforeBulkRemove: ['beforeAll', 'beforeWrite', 'beforeBulkRemove'],
-    afterBulkRemove: ['afterAll', 'afterWrite', 'afterBulkRemove'],
-    beforeAggregate: ['beforeAll', 'beforeRead', 'beforeAggregate'],
-    afterAggregate: ['afterAll', 'afterRead', 'afterAggregate'],
+    beforeQuery: ['beforeAll', 'beforeRead', 'beforeQuery'],
+    afterQuery: ['afterAll', 'afterRead', 'afterQuery'],
     beforeCount: ['beforeAll', 'beforeRead', 'beforeCount'],
     afterCount: ['afterAll', 'afterRead', 'afterCount'],
-    beforeGetById: ['beforeAll', 'beforeRead', 'beforeGetById'],
-    afterGetById: ['afterAll', 'afterRead', 'afterGetById'],
+    beforeAggregate: ['beforeAll', 'beforeRead', 'beforeAggregate'],
+    afterAggregate: ['afterAll', 'afterRead', 'afterAggregate'],
+    beforeInsert: ['beforeAll', 'beforeWrite', 'beforeInsert'],
+    afterInsert: ['afterAll', 'afterWrite', 'afterInsert'],
+    beforeUpdate: ['beforeAll', 'beforeWrite', 'beforeUpdate'],
+    afterUpdate: ['afterAll', 'afterWrite', 'afterUpdate'],
+    beforeRemove: ['beforeAll', 'beforeWrite', 'beforeRemove'],
+    afterRemove: ['afterAll', 'afterWrite', 'afterRemove'],
+    beforeTruncate: ['beforeAll', 'beforeWrite', 'beforeTruncate'],
+    afterTruncate: ['afterAll', 'afterWrite', 'afterTruncate'],
+}
+
+export enum DataActions {
+    BeforeQuery = 'beforeQuery',
+    AfterQuery = 'afterQuery',
+    BeforeCount = 'beforeCount',
+    AfterCount = 'afterCount',
+    BeforeAggregate = 'beforeAggregate',
+    AfterAggregate = 'afterAggregate',
+    BeforeInsert = 'beforeInsert',
+    AfterInsert = 'afterInsert',
+    BeforeUpdate = 'beforeUpdate',
+    AfterUpdate = 'afterUpdate',
+    BeforeRemove = 'beforeRemove',
+    AfterRemove = 'afterRemove',
+    BeforeTruncate = 'beforeTruncate',
+    AfterTruncate = 'afterTruncate',
 }
 
 
-export enum DataOperations {
-    Find = 'find',
-    Insert = 'insert',
-    BulkInsert = 'bulkInsert',
-    Update = 'update',
-    BulkUpdate = 'bulkUpdate',
-    Remove = 'remove',
-    BulkRemove = 'bulkRemove',
-    Aggregate = 'aggregate',
-    Count = 'count',
-    Get = 'getById',
-}
-
-export const DataActions = {
-    BeforeFind: 'beforeFind',
-    AfterFind: 'afterFind',
-    BeforeInsert: 'beforeInsert',
-    AfterInsert: 'afterInsert',
-    BeforeBulkInsert: 'beforeBulkInsert',
-    AfterBulkInsert: 'afterBulkInsert',
-    BeforeUpdate: 'beforeUpdate',
-    AfterUpdate: 'afterUpdate',
-    BeforeBulkUpdate: 'beforeBulkUpdate',
-    AfterBulkUpdate: 'afterBulkUpdate',
-    BeforeRemove: 'beforeRemove',
-    AfterRemove: 'afterRemove',
-    BeforeBulkRemove: 'beforeBulkRemove',
-    AfterBulkRemove: 'afterBulkRemove',
-    BeforeAggregate: 'beforeAggregate',
-    AfterAggregate: 'afterAggregate',
-    BeforeCount: 'beforeCount',
-    AfterCount: 'afterCount',
-    BeforeGetById: 'beforeGetById',
-    AfterGetById: 'afterGetById',
-    BeforeAll: 'beforeAll',
-    AfterAll: 'afterAll',
-    BeforeRead: 'beforeRead',
-    AfterRead: 'afterRead',
-    BeforeWrite: 'beforeWrite',
-    AfterWrite: 'afterWrite'
-}
-
-export const dataPayloadFor = (operation: DataOperations, body: any) => {
+export const dataPayloadFor = (operation: DataOperation, body: any) => {
     switch (operation) {
-        case DataOperations.Find:
+        case DataOperation.query:
             return {
+                collectionId: body.collectionId,
+                query: body.query,
+                includeReferencedItems: body.includeReferencedItems, // not supported
+                consistentRead: body.consistentRead,
+                returnTotalCount: body.returnTotalCount,
+            } as QueryRequest
+        case DataOperation.count:
+            return {
+                collectionId: body.collectionId,
                 filter: body.filter,
-                limit: body.limit,
-                skip: body.skip,
+                consistentRead: body.consistentRead,
+            } as CountRequest
+        case DataOperation.aggregate:
+            return {
+                collectionId: body.collectionId,
+                initialFilter: body.initialFilter,
+                aggregation: body.aggregation,
+                finalFilter: body.finalFilter,
                 sort: body.sort,
-                projection: body.projection,
-                omitTotalCount: body.omitTotalCount
-            } as FindQuery
-        case DataOperations.Insert:
-        case DataOperations.Update:
-            return { item: body.item as Item }
-        case DataOperations.BulkInsert:
-        case DataOperations.BulkUpdate:
-            return { items: body.items as Item[] }
-        case DataOperations.Get:
-            return { itemId: body.itemId, projection: body.projection }
-        case DataOperations.Remove:
-            return { itemId: body.itemId as string }
-        case DataOperations.BulkRemove:
-            return { itemIds: body.itemIds as string[] }
-        case DataOperations.Aggregate:
+                pagingMethod: body.pagingMethod,
+                consistentRead: body.consistentRead,
+                returnTotalCount: body.returnTotalCount,
+            } as AggregateRequest
+
+        case DataOperation.insert:
             return {
-                filter: body.filter,
-                processingStep: body.processingStep,
-                postFilteringStep: body.postFilteringStep
-            } as AggregationQuery
-        case DataOperations.Count:
-            return { filter: body.filter as WixDataFilter }
+                collectionId: body.collectionId,
+                items: body.items,
+            } as InsertRequest
+        case DataOperation.update:
+            return {
+                collectionId: body.collectionId,
+                items: body.items,
+            } as UpdateRequest
+        case DataOperation.remove:
+            return {
+                collectionId: body.collectionId,
+                itemIds: body.itemIds,
+            } as RemoveRequest
+        case DataOperation.truncate:
+            return {
+                collectionId: body.collectionId,
+            } as TruncateRequest
+        default:
+            return {
+                collectionId: body.collectionId,
+            }
     }
 }
 
-export const requestContextFor = (operation: any, body: any): RequestContext => ({ 
+export const requestContextFor = (operation: any, body: any, { metaSiteId }: Record<string, any>): RequestContext => ({ 
     operation, 
-    collectionName: body.collectionName, 
-    instanceId: body.requestContext.instanceId,
-    memberId: body.requestContext.memberId,
-    role: body.requestContext.role,
-    settings: body.requestContext.settings
+    collectionIds: body.collectionIds || [body.collectionId],
+    metaSiteId
 })

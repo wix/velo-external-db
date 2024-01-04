@@ -3,6 +3,7 @@ import init from '../../src/connection_provider'
 
 export { supportedOperations } from '../../src/supported_operations'
 
+export * as capabilities from '../../src/firestore_capabilities'
 
 const setEmulatorOn = () => process.env['FIRESTORE_EMULATOR_HOST'] = 'localhost:8082'
 

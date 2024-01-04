@@ -1,12 +1,12 @@
 
 import { Uninitialized } from '@wix-velo/test-commons'
 import { create } from '../../src/factory'
-import awsMySql = require('./aws_mysql_config_test_support')
-import awsMongo = require('./aws_mongo_config_test_support')
-import azureMySql = require('./azure_mysql_config_test_support')
-import gcpMySql = require('./gcp_mysql_config_test_support')
-import gcpSpanner = require('./gcp_spanner_config_test_support')
-import gcpFirestore = require('./gcp_firestore_config_test_support')
+import * as awsMySql from './aws_mysql_config_test_support'
+import * as awsMongo from './aws_mongo_config_test_support'
+import * as azureMySql from './azure_mysql_config_test_support'
+import * as gcpMySql from './gcp_mysql_config_test_support'
+import * as gcpSpanner from './gcp_spanner_config_test_support'
+import * as gcpFirestore from './gcp_firestore_config_test_support'
 
 export const env = {
     configReader: Uninitialized,

@@ -4,7 +4,7 @@ import { promisify } from 'util'
 import { asParamArrays, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
 import { wildCardWith } from './mysql_utils'
-import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, Sort } from '@wix-velo/velo-external-db-types'
 import { IMySqlFilterParser } from './sql_filter_transformer'
 import { MySqlQuery } from './types'
 
@@ -26,7 +26,7 @@ export default class DataProvider implements IDataProvider {
         const sql = `SELECT ${projectionExpr} FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
 
         const resultset = await this.query(sql, [...parameters, skip, limit])
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
         return resultset
     }
 
@@ -34,17 +34,18 @@ export default class DataProvider implements IDataProvider {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const sql = `SELECT COUNT(*) AS num FROM ${escapeTable(collectionName)} ${filterExpr}`
         const resultset = await this.query(sql, parameters)
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
         return resultset[0]['num']
     }
 
-    async insert(collectionName: string, items: Item[], fields: any[]): Promise<number> {
+    async insert(collectionName: string, items: Item[], fields: any[], upsert?: boolean): Promise<number> {
         const escapedFieldsNames = fields.map( (f: { field: any }) => escapeId(f.field)).join(', ')
-        const sql = `INSERT INTO ${escapeTable(collectionName)} (${escapedFieldsNames}) VALUES ?`
+        const op = upsert ? 'REPLACE' : 'INSERT'
+        const sql = `${op} INTO ${escapeTable(collectionName)} (${escapedFieldsNames}) VALUES ?`
         
         const data = items.map((item: Item) => asParamArrays( patchItem(item) ) )
         const resultset = await this.query(sql, [data])
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
         return resultset.affectedRows
     }
 
@@ -57,29 +58,30 @@ export default class DataProvider implements IDataProvider {
         
         // @ts-ignore
         const resultset = await this.query(queries, [].concat(...updatables))
-                                    .catch( translateErrorCodes )
+                                    .catch( err => translateErrorCodes(err, collectionName) )
 
-        return Array.isArray(resultset) ? resultset.reduce((s, r) => s + r.changedRows, 0) : resultset.changedRows
+        return Array.isArray(resultset) ? resultset.reduce((s, r) => s + r.affectedRows, 0) : resultset.affectedRows
     }
 
     async delete(collectionName: string, itemIds: string[]): Promise<number> {
         const sql = `DELETE FROM ${escapeTable(collectionName)} WHERE _id IN (${wildCardWith(itemIds.length, '?')})`
         const rs = await this.query(sql, itemIds)
-                             .catch( translateErrorCodes )
+                             .catch( err => translateErrorCodes(err, collectionName) )
         return rs.affectedRows
     }
 
     async truncate(collectionName: string): Promise<void> {
-        await this.query(`TRUNCATE ${escapeTable(collectionName)}`).catch( translateErrorCodes )
+        await this.query(`TRUNCATE ${escapeTable(collectionName)}`).catch( err => translateErrorCodes(err, collectionName) )
     }
 
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation): Promise<Item[]> {
+    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort: Sort[], skip: number, limit: number): Promise<Item[]> {
         const { filterExpr: whereFilterExpr, parameters: whereParameters } = this.filterParser.transform(filter)
         const { fieldsStatement, groupByColumns, havingFilter, parameters } = this.filterParser.parseAggregation(aggregation)
+        const { sortExpr } = this.filterParser.orderBy(sort)
 
-        const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter}`
-        const resultset = await this.query(sql, [...whereParameters, ...parameters])
-                                    .catch( translateErrorCodes )
+        const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter} ${sortExpr} LIMIT ?, ?`
+        const resultset = await this.query(sql, [...whereParameters, ...parameters, skip, limit])
+                                    .catch( err => translateErrorCodes(err, collectionName) )
         return resultset
     }
 }
