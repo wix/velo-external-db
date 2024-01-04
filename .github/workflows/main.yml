@@ -57,7 +57,7 @@ jobs:
       - name: Use Node.js 20
         uses: actions/setup-node@v2
         with:
-          node-version: 20/*
+          node-version: 20
 
       - name: Restore Dependencies
         uses: actions/cache@v2
