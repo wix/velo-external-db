@@ -58,7 +58,7 @@ export const authOwnerWithWrongAppId= { transformRequest: axios.defaults
 
                                     
 
-export const errorResponseWith = (code: any, message: string) => ({ response: { data: { data: { description: expect.stringContaining(message) }, code } } })
+export const errorResponseWith = (code: any, message: string, httpStatusCode: number) => ({ response: { data: { data: { description: expect.stringContaining(message) }, code  }, status: httpStatusCode } })
 
 export const collectionChangeNotSupportedErrorResponseWith = (fieldsName: string[]) => ({ response: { data: { data: { errors: fieldsName.map(f => ({ fieldKey: f, message: expect.any(String) })) }, code: 'WDE0119' } } })
 

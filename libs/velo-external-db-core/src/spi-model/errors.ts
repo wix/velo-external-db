@@ -108,8 +108,8 @@ export class CollectionChangeNotSupportedError extends BaseWixError {
 
 export class UnknownError extends BaseWixError {
     data: { description: string }
-    constructor(message: string) {
-        super(message, HttpStatusCode.INTERNAL, ApiErrors.WDE0054, '')
+    constructor(message: string, httpCode: number =  HttpStatusCode.INTERNAL) {
+        super(message, httpCode, ApiErrors.WDE0054, '')
         this.data = { description: message }
     }
 }

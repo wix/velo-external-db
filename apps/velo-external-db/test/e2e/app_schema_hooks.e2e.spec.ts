@@ -251,13 +251,14 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
                 schemaHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
                         const error = new Error('message')
+                        error['status'] = 409
                         throw error
                     }
                 }
             })
 
             await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
-                errorResponseWith('WDE0054', 'message')
+                errorResponseWith('WDE0054', 'message', 409)
             )
         })
 
@@ -272,7 +273,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             })
 
             await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
-                errorResponseWith('WDE0054', 'message')
+                errorResponseWith('WDE0054', 'message', 500)
             )
         })
 
@@ -286,7 +287,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             })
 
             await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
-                errorResponseWith('WDE0054', 'message')
+                errorResponseWith('WDE0054', 'message', 500)
             )
         })
     })

@@ -1,7 +1,7 @@
 import { errors as domainErrors } from '@wix-velo/velo-external-db-commons' 
 import { ItemAlreadyExistsError, CollectionNotFoundError, ItemNotFoundError, CollectionAlreadyExistsError, CollectionChangeNotSupportedError, UnknownError, InvalidPropertyError, UnauthorizedError, FieldAlreadyExistsError } from '../spi-model/errors'
 
-export const domainToSpiErrorTranslator = (err: domainErrors.BaseHttpError) => {
+export const domainToSpiErrorTranslator = (err: any) => {
     switch(err.constructor) {
       case domainErrors.ItemAlreadyExists: 
         const itemAlreadyExists = err as domainErrors.ItemAlreadyExists
@@ -40,7 +40,7 @@ export const domainToSpiErrorTranslator = (err: domainErrors.BaseHttpError) => {
         return new UnauthorizedError(unauthorizedError.message)
       
       default:
-        return new UnknownError(err.message)
+        return new UnknownError(err.message, err.status)
     }
   }
 

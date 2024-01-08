@@ -518,13 +518,14 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
                 dataHooks: {
                     beforeAll: (_payload, _requestContext, _serviceContext) => {
                         const error = new Error('message')
+                        error['status'] = '409'
                         throw error
                     }
                 }
             })
 
             await expect(axios.post('/items/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
-                errorResponseWith('WDE0054', 'message')
+                errorResponseWith('WDE0054', 'message', 409)
             )
         })
 
@@ -539,7 +540,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             })
 
             await expect(axios.post('/items/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
-                errorResponseWith('WDE0054', 'message')
+                errorResponseWith('WDE0054', 'message', 500)
             )
         })
 
@@ -553,7 +554,7 @@ describe(`Velo External DB Data Hooks: ${currentDbImplementationName()}`, () => 
             })
 
             await expect(axios.post('/items/remove', hooks.writeRequestBodyWith(ctx.collectionName, [ctx.item]), authOwner)).rejects.toMatchObject(
-                errorResponseWith('WDE0054', 'message')
+                errorResponseWith('WDE0054', 'message', 500)
             )
         })
     })
