@@ -1,5 +1,6 @@
 import { errors as domainErrors } from '@wix-velo/velo-external-db-commons' 
-import { ItemAlreadyExistsError, CollectionNotFoundError, ItemNotFoundError, CollectionAlreadyExistsError, CollectionChangeNotSupportedError, UnknownError, InvalidPropertyError, UnauthorizedError, FieldAlreadyExistsError } from '../spi-model/errors'
+import { ItemAlreadyExistsError, CollectionNotFoundError, ItemNotFoundError, CollectionAlreadyExistsError, CollectionChangeNotSupportedError, 
+  UnknownError, InvalidPropertyError, UnauthorizedError, FieldAlreadyExistsError, UnsupportedSchemaOperation } from '../spi-model/errors'
 
 export const domainToSpiErrorTranslator = (err: any) => {
     switch(err.constructor) {
@@ -19,9 +20,9 @@ export const domainToSpiErrorTranslator = (err: any) => {
         const fieldDoesNotExist = err as domainErrors.FieldDoesNotExist
         return new InvalidPropertyError(fieldDoesNotExist.collectionName, fieldDoesNotExist.propertyName, fieldDoesNotExist.message)
   
-      // case domainErrors.UnsupportedSchemaOperation:
-      //   const unsupportedSchemaOperation = err as domainErrors.UnsupportedSchemaOperation
-      //   return ErrorMessage.operationIsNotSupportedByCollection(unsupportedSchemaOperation.collectionName, unsupportedSchemaOperation.operation, unsupportedSchemaOperation.message)
+      case domainErrors.UnsupportedSchemaOperation:
+        const unsupportedSchemaOperation = err as domainErrors.UnsupportedSchemaOperation
+        return new UnsupportedSchemaOperation(unsupportedSchemaOperation.collectionName, unsupportedSchemaOperation.operation, unsupportedSchemaOperation.message)
       
       case domainErrors.CollectionAlreadyExists:
         const collectionAlreadyExists = err as domainErrors.CollectionAlreadyExists

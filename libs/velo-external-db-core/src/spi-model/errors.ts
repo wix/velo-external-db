@@ -142,6 +142,15 @@ export class FieldAlreadyExistsError extends BaseWixError {
     }
 }
 
+export class UnsupportedSchemaOperation extends BaseWixError {
+    data: { collectionId: string, operation: string }
+
+    constructor(collectionName: string, operation: string, message: string) {
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0119, collectionName)
+        this.data = { collectionId: collectionName, operation }
+    }
+}
+
 
 export enum ApiErrors {
     // Unknown error
