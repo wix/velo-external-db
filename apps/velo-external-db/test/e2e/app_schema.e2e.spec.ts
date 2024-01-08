@@ -3,9 +3,10 @@ import { Uninitialized, gen as genCommon, testIfSupportedOperationsIncludes } fr
 import { InputField, SchemaOperations } from '@wix-velo/velo-external-db-types'
 const { RemoveColumn, ChangeColumnType } = SchemaOperations
 import * as schema from '../drivers/schema_api_rest_test_support'
+import * as data from '../drivers/data_api_rest_test_support'
 import * as matchers from '../drivers/schema_api_rest_matchers'
 import { schemaUtils } from '@wix-velo/velo-external-db-core'
-import { authOwner } from '@wix-velo/external-db-testkit'
+import { authOwner, collectionChangeNotSupportedErrorResponseWith } from '@wix-velo/external-db-testkit'
 import * as gen from '../gen'
 import Chance = require('chance')
 import axios from 'axios'
@@ -111,6 +112,21 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
             await schema.givenCollection(ctx.collectionName, [], authOwner)
             await axiosClient.post('/collections/delete', { collectionId: ctx.collectionName }, authOwner)
             await expect(schema.retrieveSchemaFor(ctx.collectionName, authOwner)).rejects.toThrow('404')
+        })
+
+        describe('error handling', () => {
+            if (['mysql', 'postgres'].includes(currentDbImplementationName())) {
+                test('should throw "CollectionChangeNotSupported" error on failed collection alteration', async() => {
+                    await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+                    await data.givenItems([ctx.item], ctx.collectionName, authOwner)
+                    const collection = await schema.retrieveSchemaFor(ctx.collectionName, authOwner)
+        
+                    const columnIndex = collection.fields.findIndex((f: any) => f.key === ctx.column.name)
+                    collection.fields[columnIndex].type = schemaUtils.fieldTypeToWixDataEnum('number') 
+
+                    await expect(axiosClient.post('/collections/update', { collection }, authOwner)).rejects.toMatchObject(collectionChangeNotSupportedErrorResponseWith([ ctx.column.name ]))
+                })
+            } 
         })
     })
 
