@@ -1,7 +1,8 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CollectionAlreadyExists, DbConnectionError, ItemAlreadyExists } = errors
+const { CollectionDoesNotExists, FieldAlreadyExists, FieldDoesNotExist, CollectionAlreadyExists, 
+    DbConnectionError, ItemAlreadyExists, CollectionChangeNotSupportedError } = errors
 
-export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string) => {
+export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string, fieldName?: string) => {
     if (err.number) {
         switch (err.number) {
             case 4902:
@@ -14,6 +15,8 @@ export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string
                 return new FieldDoesNotExist('Collection does not contain a field with this name', collectionName)
             case 2714:
                 return new CollectionAlreadyExists('Collection already exists', collectionName)
+            case 8114:
+                return new CollectionChangeNotSupportedError(`${err.message}`, collectionName, fieldName)
             default:
                 return new Error(`default ${err.message}`)
         }
@@ -30,8 +33,8 @@ export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string
     }
 }
 
-export const translateErrorCodes = (err: any, collectionName?: string) => {
-    throw notThrowingTranslateErrorCodes(err, collectionName)
+export const translateErrorCodes = (err: any, collectionName?: string, fieldName?: string) => {
+    throw notThrowingTranslateErrorCodes(err, collectionName, fieldName)
 }
 
 

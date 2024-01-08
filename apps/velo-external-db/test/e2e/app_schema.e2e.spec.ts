@@ -115,7 +115,7 @@ describe(`Schema REST API: ${currentDbImplementationName()}`,  () => {
         })
 
         describe('error handling', () => {
-            if (['mysql', 'postgres'].includes(currentDbImplementationName())) {
+            if (['mysql', 'postgres', 'mssql'].includes(currentDbImplementationName())) {
                 test('should throw "CollectionChangeNotSupported" error on failed collection alteration', async() => {
                     await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
                     await data.givenItems([ctx.item], ctx.collectionName, authOwner)

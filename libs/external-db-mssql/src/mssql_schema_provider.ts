@@ -96,7 +96,7 @@ export default class SchemaProvider implements ISchemaProvider {
     async changeColumnType(collectionName: string, column: InputField): Promise<void> {
         await validateSystemFields(column.name)
         await this.sql.query(`ALTER TABLE ${escapeTable(collectionName)} ALTER COLUMN ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
-                      .catch(translateErrorCodes)
+                      .catch(err => translateErrorCodes(err, collectionName, column.name))
     }
 
     private appendAdditionalRowDetails(row: { field: string} & FieldAttributes): ResponseField {
