@@ -1,320 +1,146 @@
-export class ErrorMessage {
-    static unknownError(description?: string, status?: number) {
-        return HttpError.create({
-            code: ApiErrors.WDE0054,
-            description
-        } as ErrorMessage, status || HttpStatusCode.INTERNAL)
-    }
-
-    static operationTimeLimitExceeded(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0028,
-            description
-        } as ErrorMessage, HttpStatusCode.RESOURCE_EXHAUSTED)
-    }
-
-    static invalidUpdate(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0007,
-            description
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static operationIsNotSupportedByCollection(collectionName: string, operation: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0119,
-            description,
-            data: {
-                collectionName,
-                operation
-            } as UnsupportedByCollectionDetails
-        } as ErrorMessage, HttpStatusCode.FAILED_PRECONDITION)
-    }
-
-    static operationIsNotSupportedByDataSource(collectionName: string, operation: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0120,
-            description,
-            data: {
-                collectionName,
-                operation
-            } as UnsupportedByCollectionDetails
-        } as ErrorMessage, HttpStatusCode.FAILED_PRECONDITION)
-    }
-
-    static itemAlreadyExists(itemId: string, collectionName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0074,
-            description,
-            data: {
-                itemId,
-                collectionId: collectionName
-            } as InvalidItemDetails
-        } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
-    }
-
-    static uniqIndexConflict(itemId: string, collectionName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0123,
-            description,
-            data: {
-                itemId,
-                collectionId: collectionName
-            } as InvalidItemDetails
-        } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
-    }
-
-    static documentTooLargeToIndex(itemId: string, collectionName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0133,
-            description,
-            data: {
-                itemId,
-                collectionId: collectionName
-            } as InvalidItemDetails
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static dollarPrefixedFieldNameNotAllowed(itemId: string, collectionName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0134,
-            description,
-            data: {
-                itemId,
-                collectionId: collectionName
-            } as InvalidItemDetails
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static requestPerMinuteQuotaExceeded(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0014,
-            description
-        } as ErrorMessage, HttpStatusCode.RESOURCE_EXHAUSTED)
-    }
-
-    static processingTimeQuotaExceeded(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0122,
-            description
-        } as ErrorMessage, HttpStatusCode.RESOURCE_EXHAUSTED)
-    }
-
-    static storageSpaceQuotaExceeded(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0091,
-            description
-        } as ErrorMessage, HttpStatusCode.RESOURCE_EXHAUSTED)
-    }
-
-    static documentIsTooLarge(itemId: string, collectionName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0009,
-            description,
-            data: {
-                itemId,
-                collectionId: collectionName
-            } as InvalidItemDetails
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static itemNotFound(itemId: string, collectionName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0073,
-            description,
-            data: {
-                itemId,
-                collectionId: collectionName
-            } as InvalidItemDetails
-        } as ErrorMessage, HttpStatusCode.NOT_FOUND)
-    }
-
-    static collectionNotFound(collectionName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0025,
-            description,
-            data: {
-                collectionId: collectionName
-            } as InvalidCollectionDetails
-        } as ErrorMessage, HttpStatusCode.NOT_FOUND)
-    }
-
-    static collectionDeleted(collectionName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0026,
-            description,
-            data: {
-                collectionId: collectionName
-            } as InvalidCollectionDetails
-        } as ErrorMessage, HttpStatusCode.NOT_FOUND)
-    }
-
-    static propertyDeleted(collectionName: string, propertyName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0024,
-            description,
-            data: {
-                collectionId: collectionName,
-                propertyName
-            } as InvalidPropertyDetails
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static userDoesNotHavePermissionToPerformAction(collectionName: string, operation: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0027,
-            description,
-            data: {
-                collectionName,
-                operation
-            } as PermissionDeniedDetails
-        } as ErrorMessage, HttpStatusCode.PERMISSION_DENIED)
-    }
-
-    static genericRequestValidationError(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0075,
-            description
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static notAMultiReferenceProperty(collectionName: string, propertyName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0020,
-            description,
-            data: {
-                collectionId: collectionName,
-                propertyName
-            } as InvalidPropertyDetails
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    } 
-
-    static datasetIsTooLargeToSort(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0092,
-            description
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static payloadIsToolarge(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0109,
-            description
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static sortingByMultipleArrayFieldsIsNotSupported(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0121,
-            description
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static offsetPagingIsNotSupported(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0082,
-            description
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-
-    static referenceAlreadyExists(collectionName: string, propertyName: string, referencingItemId: string, referencedItemId: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0029,
-            description,
-            data: {
-                collectionName,
-                propertyName,
-                referencingItemId,
-                referencedItemId
-            } as InvalidReferenceDetails
-        } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
-    }
-
-    static unknownErrorWhileBuildingCollectionIndex(collectionName: string, itemId?: string, details?: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0112,
-            description,
-            data: {
-                collectionName,
-                itemId,
-                details,
-            } as IndexingFailureDetails
-        } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
-    }
-
-    static duplicateKeyErrorWhileBuildingCollectionIndex(collectionName: string, itemId?: string, details?: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0113,
-            description,
-            data: {
-                collectionName,
-                itemId,
-                details,
-            } as IndexingFailureDetails
-        } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
-    }
-
-    static documentTooLargeWhileBuildingCollectionIndex(collectionName: string, itemId?: string, details?: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0114,
-            description,
-            data: {
-                collectionName,
-                itemId,
-                details,
-            } as IndexingFailureDetails
-        } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
-    }
-
-    static collectionAlreadyExists(collectionName: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0104,
-            description,
-            data: {
-                collectionId: collectionName
-            } as InvalidCollectionDetails
-        } as ErrorMessage, HttpStatusCode.ALREADY_EXISTS)
-    }
-
-    static invalidProperty(collectionName: string, propertyName?: string, description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0147,
-            description,
-            data: {
-                collectionId: collectionName,
-                propertyName
-            } as InvalidPropertyDetails
-        } as ErrorMessage, HttpStatusCode.INVALID_ARGUMENT)
-    }
-    static unauthorized(description?: string) {
-        return HttpError.create({
-            code: ApiErrors.WDE0027,
-            description
-        } as ErrorMessage, HttpStatusCode.UNAUTHENTICATED)
-    }
-}
-
-export interface HttpError {
-    message: ErrorMessage,
+class BaseWixError extends Error {
+    collctionName: string
     httpCode: HttpStatusCode
-}
+    applicationCode: ApiErrors
 
-export class HttpError {
-    static create(message: ErrorMessage, httpCode: HttpStatusCode) {
-        return {
-            message,
-            httpCode
-        } as HttpError
+    constructor(message: string, httpCode: HttpStatusCode, applicationCode: ApiErrors, collectionName: string) {
+        super(message)
+        this.httpCode = httpCode
+        this.applicationCode = applicationCode
+        this.collctionName = collectionName
     }
 }
 
-export interface ErrorMessage {
-    code: ApiErrors,
-    description?: string,
-    data: object
+export class CollectionNotFoundError extends BaseWixError {
+    data: { collectionId: string }
+
+    constructor(collectionName: string, message: string) {
+        super(message, HttpStatusCode.NOT_FOUND, ApiErrors.WDE0025, collectionName)
+        this.data = { collectionId: collectionName }
+    }
+}
+
+export class CollectionAlreadyExistsError extends BaseWixError {
+    data: { collectionId: string }
+
+    constructor(collectionName: string, message: string) {
+        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0104, collectionName)
+        this.data = { collectionId: collectionName }
+    }
+}
+
+export class ItemNotFoundError extends BaseWixError {
+    data: { itemId: string }
+
+    constructor(collectionName: string, itemId: string, message: string) {
+        super(message, HttpStatusCode.NOT_FOUND, ApiErrors.WDE0073, collectionName)
+        this.data = { itemId }
+    }
+}
+
+export class ItemAlreadyExistsError extends BaseWixError {
+    data: { itemId: string }
+
+    constructor(collectionName: string, itemId: string, message: string) {
+        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0074, collectionName)
+        this.data = { itemId }
+    }
+}
+
+export class ReferenceNotFoundError extends BaseWixError {
+    referringItemId: string
+    referencedItemId: string
+    data: { referringItemId: string, referencedItemId: string }
+
+    constructor(message: string, collectionName: string, referringItemId: string, referencedItemId: string) {
+        super(message, HttpStatusCode.NOT_FOUND, ApiErrors.WDE0029, collectionName)
+        this.referringItemId = referringItemId
+        this.referencedItemId = referencedItemId
+        this.data = { referringItemId, referencedItemId }
+    }
+}
+
+export class ReferenceAlreadyExistsError extends BaseWixError {
+    referringItemId: string
+    referencedItemId: string
+    data: { referringItemId: string, referencedItemId: string }
+
+    constructor(message: string, collectionName: string, referringItemId: string, referencedItemId: string) {
+        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0029, collectionName)
+        this.referringItemId = referringItemId
+        this.referencedItemId = referencedItemId
+        this.data = { referringItemId, referencedItemId }
+    }
+}
+
+export interface ValidationViolation {
+    fieldPath: string;
+    rejectedValue: string;
+    message: string;
+}
+
+export class ValidationError extends BaseWixError {
+    violations: ValidationViolation[]
+    data: { violations: ValidationViolation[] }
+
+    constructor(message: string, collectionName: string, fieldPath: string, rejectedValue: string) {
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0075, collectionName)
+        this.violations = [{ fieldPath, rejectedValue, message }]
+        this.data = { violations: this.violations }
+    }
+}
+
+export interface CollectionChangeNotSupportedErrorItem {
+    fieldKey: string;
+    message: string;
+}
+
+export class CollectionChangeNotSupportedError extends BaseWixError {
+    errors: CollectionChangeNotSupportedErrorItem[]
+    data: { errors: CollectionChangeNotSupportedErrorItem[] }
+
+    constructor(collectionName: string, fieldKey: string, message: string) {
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0119, collectionName)
+        this.errors = [{ fieldKey, message }]
+        this.data = { errors: this.errors }
+    }
+}
+
+export class UnknownError extends BaseWixError {
+    data: { description: string }
+    constructor(message: string) {
+        super(message, HttpStatusCode.INTERNAL, ApiErrors.WDE0054, '')
+        this.data = { description: message }
+    }
 }
 
 
+export class InvalidPropertyError extends BaseWixError {
+    data: { collectionId: string, propertyName: string }
+
+    constructor(collectionName: string, propertyName: string, message: string) {
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0147, collectionName)
+        this.data = { collectionId: collectionName, propertyName }
+    }
+}
+
+
+export class UnauthorizedError extends BaseWixError {
+    data: { description: string }
+    constructor(message: string) {
+        super(message, HttpStatusCode.UNAUTHENTICATED, ApiErrors.WDE0027, '')
+        this.data = { description: message }
+    }
+}
+
+export class FieldAlreadyExistsError extends BaseWixError {
+    data: { collectionId: string, fieldName: string }
+
+    constructor(collectionName: string, fieldName: string, message: string) {
+        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0123, collectionName)
+        this.data = { collectionId: collectionName, fieldName }
+    }
+}
 
 
 export enum ApiErrors {
@@ -428,35 +254,3 @@ export enum HttpStatusCode {
     // DATA_LOSS = 14; // 500
     // UNIMPLEMENTED = 15; // 501
   }
-
-
-interface UnsupportedByCollectionDetails {
-    collectionName: string
-    operation: string
-}
-interface InvalidItemDetails {
-    itemId: string
-    collectionId: string
-}
-interface InvalidCollectionDetails {
-    collectionId: string
-}
-interface InvalidPropertyDetails {
-    collectionId: string
-    propertyName: string
-}
-interface PermissionDeniedDetails {
-    collectionName: string
-    operation: string
-}
-interface InvalidReferenceDetails {
-    collectionName: string
-    propertyName: string
-    referencingItemId: string
-    referencedItemId: string
-}
-interface IndexingFailureDetails {
-    collectionName: string
-    itemId?: string
-    details?: string
-}

@@ -26,22 +26,24 @@ describe('Error Middleware', () => {
       errorMiddleware(err, null, ctx.res)
 
       expect(ctx.res.status).toHaveBeenCalledWith(500)
-      expect(ctx.res.send).toHaveBeenCalledWith( { description: err.message, code: 'WDE0054' } )
+      expect(ctx.res.send).toHaveBeenCalledWith( { data: { description: err.message }, code: 'WDE0054' } )
     })
 
-    test('converts exceptions to http error response', () => {
-      Object.values(errors)
-            .forEach(Exception => {
-              const err = new Exception(chance.word())
+    test.each(Object.entries(errors))('converts %s to http error response', (ExceptionName, ExceptionClass) => {
+              const err = new ExceptionClass(chance.word())
               errorMiddleware(err, null, ctx.res)
               const spiError = domainToSpiErrorTranslator(err)
-              // expect(ctx.res.status).toHaveBeenCalledWith(err.status)
-              expect(ctx.res.send).toHaveBeenCalledWith( spiError.message )
+
+              expect(ctx.res.status).toHaveBeenCalledWith(spiError.httpCode)
+              expect(ctx.res.send).toHaveBeenCalledWith({
+                data: spiError.data,
+                code: spiError.applicationCode
+              })
 
               ctx.res.status.mockClear()
               ctx.res.send.mockClear()
 
       })
-    })
+
   })
 })
