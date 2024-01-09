@@ -1,48 +1,57 @@
 import { errors as domainErrors } from '@wix-velo/velo-external-db-commons' 
-import { ErrorMessage } from '../spi-model/errors'
+import { ItemAlreadyExistsError, CollectionNotFoundError, ItemNotFoundError, CollectionAlreadyExistsError, CollectionChangeNotSupportedError, 
+  UnknownError, InvalidPropertyError, UnauthorizedError, FieldAlreadyExistsError, UnsupportedSchemaOperation } from '../spi-model/errors'
 
 export const domainToSpiErrorTranslator = (err: any) => {
     switch(err.constructor) {
       case domainErrors.ItemAlreadyExists: 
-        const itemAlreadyExists: domainErrors.ItemAlreadyExists = err
-        return ErrorMessage.itemAlreadyExists(itemAlreadyExists.itemId, itemAlreadyExists.collectionName, itemAlreadyExists.message)
+        const itemAlreadyExists = err as domainErrors.ItemAlreadyExists
+        return new ItemAlreadyExistsError(itemAlreadyExists.collectionName, itemAlreadyExists.itemId, itemAlreadyExists.message)
   
       case domainErrors.CollectionDoesNotExists:
-        const collectionDoesNotExists: domainErrors.CollectionDoesNotExists = err
-        return ErrorMessage.collectionNotFound(collectionDoesNotExists.collectionName, collectionDoesNotExists.message)
+        const collectionDoesNotExists = err as domainErrors.CollectionDoesNotExists
+        return new CollectionNotFoundError(collectionDoesNotExists.collectionName, collectionDoesNotExists.message)
       
       case domainErrors.FieldAlreadyExists:
-        const fieldAlreadyExists: domainErrors.FieldAlreadyExists = err
-        return ErrorMessage.itemAlreadyExists(fieldAlreadyExists.fieldName, fieldAlreadyExists.collectionName, fieldAlreadyExists.message)
+        const fieldAlreadyExists = err as domainErrors.FieldAlreadyExists
+        return new FieldAlreadyExistsError(fieldAlreadyExists.collectionName, fieldAlreadyExists.fieldName, fieldAlreadyExists.message)
       
       case domainErrors.FieldDoesNotExist:
-        const fieldDoesNotExist: domainErrors.FieldDoesNotExist = err
-        return ErrorMessage.invalidProperty(fieldDoesNotExist.collectionName, fieldDoesNotExist.propertyName, fieldDoesNotExist.message)
+        const fieldDoesNotExist = err as domainErrors.FieldDoesNotExist
+        return new InvalidPropertyError(fieldDoesNotExist.collectionName, fieldDoesNotExist.propertyName, fieldDoesNotExist.message)
   
       case domainErrors.UnsupportedSchemaOperation:
-        const unsupportedSchemaOperation: domainErrors.UnsupportedSchemaOperation = err
-        return ErrorMessage.operationIsNotSupportedByCollection(unsupportedSchemaOperation.collectionName, unsupportedSchemaOperation.operation, unsupportedSchemaOperation.message)
+        const unsupportedSchemaOperation = err as domainErrors.UnsupportedSchemaOperation
+        return new UnsupportedSchemaOperation(unsupportedSchemaOperation.collectionName, unsupportedSchemaOperation.operation, unsupportedSchemaOperation.message)
+      
+      case domainErrors.CollectionAlreadyExists:
+        const collectionAlreadyExists = err as domainErrors.CollectionAlreadyExists
+        return new CollectionAlreadyExistsError(collectionAlreadyExists.collectionName, collectionAlreadyExists.message)
       
       case domainErrors.ItemDoesNotExists:
-        const itemDoesNotExists: domainErrors.ItemDoesNotExists = err
-        return ErrorMessage.itemNotFound(itemDoesNotExists.itemId, itemDoesNotExists.collectionName, itemDoesNotExists.message)
-    
+        const itemDoesNotExists = err as domainErrors.ItemDoesNotExists
+        return new ItemNotFoundError(itemDoesNotExists.collectionName, itemDoesNotExists.itemId, itemDoesNotExists.message)
+
+      case domainErrors.CollectionChangeNotSupportedError:
+        const collectionChangeNotSupportedError = err as domainErrors.CollectionChangeNotSupportedError
+        return new CollectionChangeNotSupportedError(collectionChangeNotSupportedError.collectionName, collectionChangeNotSupportedError.fieldName, collectionChangeNotSupportedError.message)
+
       case domainErrors.UnauthorizedError:
-        const unauthorizedError: domainErrors.UnauthorizedError = err
-        return ErrorMessage.unauthorized(unauthorizedError.message)
-        
+        const unauthorizedError = err as domainErrors.UnauthorizedError
+        return new UnauthorizedError(unauthorizedError.message)
+      
       default:
-        return ErrorMessage.unknownError(err.message, err.status)  
+        return new UnknownError(err.message, err.status)
     }
   }
 
   export const domainToSpiErrorObjectTranslator = (err: any) => {
-    const { message, httpCode } = domainToSpiErrorTranslator(err)
+    const error = domainToSpiErrorTranslator(err)
     return { 
       error: {
-        errorCode: httpCode,
-        errorMessage: message.description,
-        data: message.data
+        errorCode: error.httpCode,
+        errorMessage: error.message,
+        data: error.data,
       }
     }
   }
