@@ -25,7 +25,7 @@ export interface QueryV2 {
     sort?: Sorting[];
     fields: string[];
     // TODO: implement CursorPaging type in the code
-    pagingMethod: Paging;
+    paging: Paging;
 }
 
 
@@ -156,7 +156,7 @@ export interface AggregateRequest {
     sort?: Sorting[]
     // Paging
     // TODO: implement CursorPaging type in the code
-    pagingMethod: Paging;
+    paging: Paging;
     // Indicates if the query should be strongly consistent in case data source works in eventually consistent mode.
     // In other words, when a query is executed, it will always reflect the latest changes made to the data.
     // TODO: currently not supported, maybe it will be implemented in the future

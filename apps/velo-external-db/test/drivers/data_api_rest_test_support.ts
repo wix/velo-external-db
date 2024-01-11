@@ -29,7 +29,7 @@ export const queryRequest = (collectionName: string, sort: dataSpi.Sorting[], fi
         filter: filter ?? convertersUtils.EmptyFilter,
         sort,
         fields,
-        pagingMethod: {
+        paging: {
             limit: 25,
             offset: 0,
         },
