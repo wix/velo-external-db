@@ -1,7 +1,7 @@
 # Wix Velo External Database Adaptor Terraform provision
 
 <!-- TOC -->
-- [Wix Velo External Database Adaptor Terraform provision](#wix-velo-external-database-adapter-terraform-provision)
+- [Wix Velo External Database Adaptor Terraform provision](#wix-velo-external-database-adaptor-terraform-provision)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
     - [Azure](#azure)
