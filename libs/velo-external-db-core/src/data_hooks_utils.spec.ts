@@ -90,7 +90,7 @@ describe('Hooks Utils', () => {
                     aggregation: ctx.aggregation,
                     finalFilter: ctx.finalFilter,
                     sort: ctx.sort,
-                    pagingMethod: ctx.pagingMethod,
+                    paging: ctx.paging,
                     consistentRead: ctx.consistentRead,
                     returnTotalCount: ctx.returnTotalCount,
                 })
@@ -116,7 +116,7 @@ describe('Hooks Utils', () => {
         group: Uninitialized,
         finalFilter: Uninitialized,
         distinct: Uninitialized,
-        pagingMethod: Uninitialized,
+        paging: Uninitialized,
         collectionId: Uninitialized,
         namespace: Uninitialized,
         query: Uninitialized,
@@ -141,7 +141,7 @@ describe('Hooks Utils', () => {
         ctx.group = chance.word()
         ctx.finalFilter = chance.word()
         ctx.distinct = chance.word()
-        ctx.pagingMethod = chance.word()
+        ctx.paging = chance.word()
         ctx.collectionId = chance.word()
         ctx.namespace = chance.word()
         ctx.query = chance.word()

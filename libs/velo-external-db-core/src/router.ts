@@ -141,8 +141,8 @@ export const createRouter = () => {
             const customContext = {}
             const { collectionId, query, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeQuery, dataPayloadFor(Query, req.body), requestContextFor(Query, req.body, res.locals), customContext) as dataSource.QueryRequest
 
-            const offset = query.pagingMethod ? query.pagingMethod.offset : 0
-            const limit = query.pagingMethod ? query.pagingMethod.limit : 50
+            const offset = query.paging ? query.paging.offset : 0
+            const limit = query.paging ? query.paging.limit : 50
 
             const data = await schemaAwareDataService.find(
                 collectionId,
@@ -230,11 +230,11 @@ export const createRouter = () => {
     router.post('/v3/items/aggregate', async(req, res, next) => {
         try {
             const customContext = {}
-            const { collectionId, initialFilter, aggregation, finalFilter, sort, pagingMethod, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeAggregate,
+            const { collectionId, initialFilter, aggregation, finalFilter, sort, paging, returnTotalCount } = await executeDataHooksFor(DataActions.BeforeAggregate,
                  dataPayloadFor(Aggregate, req.body), requestContextFor(Aggregate, req.body, res.locals), customContext) as dataSource.AggregateRequest
 
-            const offset = pagingMethod ? pagingMethod.offset : 0
-            const limit = pagingMethod ? pagingMethod.limit : 50
+            const offset = paging ? paging.offset : 0
+            const limit = paging ? paging.limit : 50
 
             const data = await schemaAwareDataService.aggregate(collectionId, filterTransformer.transform(initialFilter), 
                                                                 aggregationTransformer.transform({ aggregation, finalFilter }), 

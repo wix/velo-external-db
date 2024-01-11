@@ -60,7 +60,7 @@ export const dataPayloadFor = (operation: DataOperation, body: any) => {
                 aggregation: body.aggregation,
                 finalFilter: body.finalFilter,
                 sort: body.sort,
-                pagingMethod: body.pagingMethod,
+                paging: body.paging,
                 consistentRead: body.consistentRead,
                 returnTotalCount: body.returnTotalCount,
             } as AggregateRequest
