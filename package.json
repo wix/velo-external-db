@@ -62,6 +62,7 @@
     "passport-oauth2": "^1.6.1",
     "pg": "8.7.3",
     "pg-escape": "^0.2.0",
+    "pino": "^8.17.2",
     "sqlstring": "^2.3.3",
     "tslib": "^2.3.0",
     "tsqlstring": "^1.0.1",

@@ -8,7 +8,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/external-db-logger",
-        "main": "libs/external-db-logger/src/index.ts",
+        "main": "libs/external-db-logger/index.ts",
         "tsConfig": "libs/external-db-logger/tsconfig.lib.json",
         "assets": ["libs/external-db-logger/*.md"],
         "buildableProjectDepsInPackageJsonType": "dependencies"
