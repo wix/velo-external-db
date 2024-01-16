@@ -10,6 +10,7 @@ import QueryValidator from './converters/query_validator'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { initServices, createRouter } from './router'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
+import { Logger } from '@wix-velo/external-db-logger'
 import { DataHooks, ExternalDbRouterConfig, Hooks, SchemaHooks, ServiceContext } from './types'
 import ItemTransformer = require('./converters/item_transformer')
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
@@ -18,6 +19,14 @@ import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
 import { CollectionCapability } from './spi-model/capabilities'
 import { decodeBase64 } from './utils/base64_utils'
+
+interface ExternalDbRouterConstructorParams { 
+    connector: DbConnector;
+    config: ExternalDbRouterConfig;
+    logger: Logger;
+    hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks};
+}
+
 
 export class ExternalDbRouter {
     connector: DbConnector
@@ -35,9 +44,11 @@ export class ExternalDbRouter {
     cleanup: ConnectionCleanUp
     router: Router
     config: ExternalDbRouterConfig
-    constructor({ connector, config, hooks }: { connector: DbConnector, config: ExternalDbRouterConfig, hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks}}) {
+    logger: Logger
+    constructor({ connector, config, hooks, logger }: ExternalDbRouterConstructorParams) {
         this.isInitialized(connector)
         this.connector = connector
+        this.logger = logger
         this.configValidator = new ConfigValidator(connector.configValidator,
                                                    new AuthorizationConfigValidator(config.authorization), 
                                                    new CommonConfigValidator({ vendor: config.vendor, type: config.adapterType, jwtPublicKey: config.jwtPublicKey, appDefId: config.appDefId }, 
@@ -66,6 +77,7 @@ export class ExternalDbRouter {
 
     isInitialized(connector: DbConnector) {
         if (!connector.initialized) {
+            this.logger.error('Connector must be initialized before being used')
             throw new Error('Connector must be initialized before being used')
         }
     }

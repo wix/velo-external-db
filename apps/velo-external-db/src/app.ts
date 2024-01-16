@@ -14,6 +14,7 @@ const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
 
     const externalDbRouter = new ExternalDbRouter({
         connector: engineConnector,
+        logger,
         config: {
             authorization: {
                 roleConfig: authorization
