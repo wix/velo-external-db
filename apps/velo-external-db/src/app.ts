@@ -10,7 +10,7 @@ const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
     const configReader = create()
     const { authorization, jwtPublicKey, appDefId, ...dbConfig } = await configReader.readConfig()
 
-    const { connector: engineConnector, providers, cleanup } = await engineConnectorFor(adapterType, dbConfig)
+    const { connector: engineConnector, providers, cleanup } = await engineConnectorFor(adapterType, dbConfig, logger)
 
     const externalDbRouter = new ExternalDbRouter({
         connector: engineConnector,

@@ -1,3 +1,4 @@
+import { Logger } from '@wix-velo/external-db-logger'
 import { ConnectionCleanUp, DbProviders, IConfigValidator, IDatabaseOperations, IDataProvider, ISchemaProvider } from '@wix-velo/velo-external-db-types'
 
 
@@ -12,9 +13,15 @@ export default class DbConnector {
     cleanup!: ConnectionCleanUp
     configValidator!: IConfigValidator
     type!: string
-    constructor(configValidator: any, init: (config: any, ...args: any) => Promise<DbProviders<any>> | DbProviders<any>) {
+    logger?: Logger
+    constructor(
+                configValidator: any, 
+                init: (config: any, ...args: any) => Promise<DbProviders<any>> | DbProviders<any>,
+                Logger?: Logger
+                ) {
         this.initialized = false
         this.configValidatorProvider = configValidator
+        this.logger = Logger
         this.init = init
     }
 
