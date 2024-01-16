@@ -36,7 +36,7 @@ export class Logger {
     this.logger.warn(message, data)
   }
 
-  error(message: string, error: any, data?: any): void {
+  error(message: string, error?: any, data?: any): void {
     this.logger.error(message, error, data)
   }
 }
