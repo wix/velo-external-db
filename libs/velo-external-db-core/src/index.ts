@@ -14,7 +14,6 @@ import { DataHooks, ExternalDbRouterConfig, Hooks, SchemaHooks, ServiceContext }
 import ItemTransformer = require('./converters/item_transformer')
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
 import { ConfigValidator, AuthorizationConfigValidator, CommonConfigValidator } from '@wix-velo/external-db-config'
-import { Logger } from '@wix-velo/external-db-logger'
 import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
 import { CollectionCapability } from './spi-model/capabilities'
@@ -36,12 +35,11 @@ export class ExternalDbRouter {
     cleanup: ConnectionCleanUp
     router: Router
     config: ExternalDbRouterConfig
-    logger: Logger
     constructor({ connector, config, hooks }: { connector: DbConnector, config: ExternalDbRouterConfig, hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks}}) {
         this.isInitialized(connector)
-        this.logger = new Logger()
         this.connector = connector
-        this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), 
+        this.configValidator = new ConfigValidator(connector.configValidator,
+                                                   new AuthorizationConfigValidator(config.authorization), 
                                                    new CommonConfigValidator({ vendor: config.vendor, type: config.adapterType, jwtPublicKey: config.jwtPublicKey, appDefId: config.appDefId }, 
                                                    config.commonExtended))
         this.config = config

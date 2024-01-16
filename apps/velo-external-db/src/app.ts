@@ -1,9 +1,11 @@
 import express = require('express')
+import { Logger } from '@wix-velo/external-db-logger'
 import { create, readCommonConfig } from '@wix-velo/external-db-config'
 import { ExternalDbRouter, Hooks, types as coreTypes } from '@wix-velo/velo-external-db-core'
 import { engineConnectorFor } from './storage/factory'
 
 const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
+    const logger = new Logger()
     const { vendor, type: adapterType, hideAppInfo, readOnlySchema } = readCommonConfig()
     const configReader = create()
     const { authorization, jwtPublicKey, appDefId, ...dbConfig } = await configReader.readConfig()
@@ -27,7 +29,7 @@ const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
         hooks,
     })
 
-    return { externalDbRouter, cleanup: async() => await cleanup(), schemaProvider: providers.schemaProvider }
+    return { externalDbRouter, cleanup: async() => await cleanup(), schemaProvider: providers.schemaProvider, logger }
 }
 
 export const createApp = async(wixDataBaseUrl?: string) => {
@@ -35,7 +37,7 @@ export const createApp = async(wixDataBaseUrl?: string) => {
     const hooks: Hooks = process.env.DEBUG ? { dataHooks: debuggingDataHooks } : undefined
     const initConnectorResponse = await initConnector(wixDataBaseUrl, hooks)
     app.use(initConnectorResponse.externalDbRouter.router)
-    const server = app.listen(8080, () => initConnectorResponse.externalDbRouter.logger.info('Listening on port 8080'))
+    const server = app.listen(8080, () => initConnectorResponse.logger.info('Listening on port 8080'))
 
     return { server, ...initConnectorResponse, reload: () => initConnector(wixDataBaseUrl) }
 }
