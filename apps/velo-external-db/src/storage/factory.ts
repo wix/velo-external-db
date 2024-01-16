@@ -1,7 +1,7 @@
 import { Logger } from '@wix-velo/external-db-logger'
 import { DatabaseFactoryResponse } from '@wix-velo/velo-external-db-commons'
 
-export const engineConnectorFor = async(_type: string, config: any, _logger?: Logger): Promise<DatabaseFactoryResponse> => {
+export const engineConnectorFor = async(_type: string, config: any, logger?: Logger): Promise<DatabaseFactoryResponse> => {
     const type = _type || ''
     switch ( type.toLowerCase() ) {
         case 'postgres': {
@@ -22,7 +22,7 @@ export const engineConnectorFor = async(_type: string, config: any, _logger?: Lo
         }
         case 'mysql': {
             const { mySqlFactory } = require('@wix-velo/external-db-mysql')
-            return await mySqlFactory(config)
+            return await mySqlFactory(config, logger)
         }
         case 'mongo': {
             const { mongoFactory } = require('@wix-velo/external-db-mongo')

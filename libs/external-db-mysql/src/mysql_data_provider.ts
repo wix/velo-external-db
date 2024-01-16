@@ -7,14 +7,17 @@ import { wildCardWith } from './mysql_utils'
 import { IDataProvider, AdapterFilter as Filter, NonEmptyAdapterAggregation as Aggregation, Item, Sort } from '@wix-velo/velo-external-db-types'
 import { IMySqlFilterParser } from './sql_filter_transformer'
 import { MySqlQuery } from './types'
+import { Logger } from '@wix-velo/external-db-logger'
 
 export default class DataProvider implements IDataProvider {
     filterParser: IMySqlFilterParser
     pool: MySqlPool
     query: MySqlQuery
-    constructor(pool: any, filterParser: any) {
+    logger?: Logger
+    constructor(pool: any, filterParser: any, logger?: Logger) {
         this.filterParser = filterParser
         this.pool = pool
+        this.logger = logger
 
         this.query = promisify(this.pool.query).bind(this.pool)
     }
@@ -24,6 +27,8 @@ export default class DataProvider implements IDataProvider {
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
         const sql = `SELECT ${projectionExpr} FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
+
+        this.logger?.info('find', { collectionName, filter, sort, skip, limit, projection, sql, parameters })
 
         const resultset = await this.query(sql, [...parameters, skip, limit])
                                     .catch( err => translateErrorCodes(err, collectionName) )

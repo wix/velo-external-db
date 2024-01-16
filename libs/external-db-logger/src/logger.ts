@@ -19,15 +19,15 @@ export class Logger implements ILogger {
   }
 
   debug(message: string, data?: Data): void {
-    this.logger.debug(message, data)
+    this.logger.debug({ data }, message)
   }
 
   info(message: string, data?: Data): void {
-    this.logger.info(message, data)
+    this.logger.info({ data }, message)
   }
 
   warn(message: string, data?: Data): void {
-    this.logger.warn(message, data)
+    this.logger.warn({ data }, message)
   }
 
   error(message: string, error?: LoggerError, data?: Data): void {

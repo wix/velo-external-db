@@ -5,7 +5,7 @@ import { ConnectionCleanUp, DbProviders, IConfigValidator, IDatabaseOperations, 
 export default class DbConnector {
     initialized: boolean
     configValidatorProvider: any
-    init: (config: any, ...args: any) => Promise<DbProviders<any>> | DbProviders<any>
+    init: (config: any, option: any, logger?: Logger) => Promise<DbProviders<any>> | DbProviders<any>
     dataProvider!: IDataProvider
     schemaProvider!: ISchemaProvider
     databaseOperations!: IDatabaseOperations
@@ -25,8 +25,8 @@ export default class DbConnector {
         this.init = init
     }
 
-    async initialize(config: any, options: any) {
-        const { dataProvider, schemaProvider, databaseOperations, connection, cleanup } = await this.init(config, options)
+    async initialize(config: any, options: any, logger?: Logger) {
+        const { dataProvider, schemaProvider, databaseOperations, connection, cleanup } = await this.init(config, options, logger)
         this.dataProvider = dataProvider
         this.schemaProvider = schemaProvider
         this.databaseOperations = databaseOperations
