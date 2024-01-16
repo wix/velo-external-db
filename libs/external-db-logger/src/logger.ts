@@ -1,13 +1,7 @@
 import pino from 'pino'
+import { ILogger, LogLevel, Data, LoggerError } from './types'
 
-export enum LogLevel {
-    DEBUG = 'debug',
-    INFO = 'info',
-    WARN = 'warn',
-    ERROR = 'error',
-}
-
-export class Logger {
+export class Logger implements ILogger {
     private logLevel: LogLevel
     private logger: pino.Logger
 
@@ -24,19 +18,19 @@ export class Logger {
       })
   }
 
-  debug(message: string, data?: any): void {
+  debug(message: string, data?: Data): void {
     this.logger.debug(message, data)
   }
 
-  info(message: string, data?: any): void {
+  info(message: string, data?: Data): void {
     this.logger.info(message, data)
   }
 
-  warn(message: string, data?: any): void {
+  warn(message: string, data?: Data): void {
     this.logger.warn(message, data)
   }
 
-  error(message: string, error?: any, data?: any): void {
+  error(message: string, error?: LoggerError, data?: Data): void {
     this.logger.error(message, error, data)
   }
 }
