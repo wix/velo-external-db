@@ -258,7 +258,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             })
 
             await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
-                errorResponseWith('WDE0054', 'message', 409)
+                errorResponseWith('UNKNOWN_ERROR', 'message', 409)
             )
         })
 
@@ -273,7 +273,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             })
 
             await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
-                errorResponseWith('WDE0054', 'message', 500)
+                errorResponseWith('UNKNOWN_ERROR', 'message', 500)
             )
         })
 
@@ -287,7 +287,7 @@ describe(`Velo External DB Schema Hooks: ${currentDbImplementationName()}`, () =
             })
 
             await expect(axiosClient.post('/collections/delete', hooks.collectionWriteRequestBodyWith({ id: ctx.collectionId, fields: [] }), authOwner)).rejects.toMatchObject(
-                errorResponseWith('WDE0054', 'message', 500)
+                errorResponseWith('UNKNOWN_ERROR', 'message', 500)
             )
         })
     })
