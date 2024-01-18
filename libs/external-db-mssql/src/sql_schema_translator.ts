@@ -86,7 +86,6 @@ export default class SchemaColumnTranslator {
                 return 'SMALLDATETIME'
 
             case 'text_string':
-            case 'text_richcontent':
             case 'text_image':
             case 'text_video':
             case 'text_audio':

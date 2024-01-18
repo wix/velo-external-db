@@ -57,7 +57,6 @@ describe('Sql Schema Column Translator', () => {
         describe('string fields', () => {
             test.each([
                 'string',
-                'richcontent',
                 'image',
                 'video',
                 'audio',
@@ -105,6 +104,7 @@ describe('Sql Schema Column Translator', () => {
                 'multiReference',
                 'arrayDocument',
                 'arrayString',
+                'richcontent',
               ])('%s', (subtype) => {
                 expect(env.schemaTranslator.columnToDbColumnSql({ name: ctx.fieldName, type: 'object', subtype })).toEqual(`${escapeId(ctx.fieldName)} JSON`)
               })

@@ -93,7 +93,6 @@ export default class SchemaColumnTranslator {
             case 'text_medium':
             case 'text_large':
             case 'text_language':
-            case 'text_richcontent':
             case 'text_image':
             case 'text_video':
             case 'text_audio':
@@ -114,6 +113,7 @@ export default class SchemaColumnTranslator {
             case 'object_multireference':
             case 'object_arraystring':
             case 'object_arraydocument':
+            case 'object_richcontent':
             case 'object_array':
                 return 'JSON'
 

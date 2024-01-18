@@ -70,7 +70,6 @@ describe('Sql Schema Column Translator', () => {
 
             test.each([
                 'string',
-                'richcontent',
                 'image',
                 'video',
                 'audio',
