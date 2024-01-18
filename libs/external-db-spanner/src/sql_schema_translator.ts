@@ -82,7 +82,6 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
                 return 'TIMESTAMP'
 
             case 'text_string':
-            case 'text_richcontent':
             case 'text_image':
             case 'text_video':
             case 'text_audio':
@@ -114,6 +113,7 @@ export default class SchemaColumnTranslator implements ISpannerSchemaColumnTrans
             case 'object_arraystring':
             case 'object_arraydocument':
             case 'object_array':
+            case 'object_richcontent':
                 return 'JSON'
 
             default:
