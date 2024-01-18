@@ -36,7 +36,6 @@ export const wixDataEnumToFieldType = (fieldEnum: collectionSpi.FieldType): stri
         case collectionSpi.FieldType.url:
         case collectionSpi.FieldType.richText:
         case collectionSpi.FieldType.language:
-        case collectionSpi.FieldType.richContent:
         case collectionSpi.FieldType.image:
         case collectionSpi.FieldType.video:
         case collectionSpi.FieldType.document:
@@ -63,6 +62,7 @@ export const wixDataEnumToFieldType = (fieldEnum: collectionSpi.FieldType): stri
         case collectionSpi.FieldType.reference:
         case collectionSpi.FieldType.object:
         case collectionSpi.FieldType.array:
+        case collectionSpi.FieldType.richContent:
             return FieldType.object
         default:
             // TODO: throw specific error

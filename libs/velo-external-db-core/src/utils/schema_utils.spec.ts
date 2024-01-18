@@ -61,7 +61,7 @@ describe('Schema utils functions', () => {
             [VeloFieldTypeEnum.arrayDocument, FieldType.object],
             [VeloFieldTypeEnum.audio, FieldType.text],
             [VeloFieldTypeEnum.language, FieldType.text],
-            [VeloFieldTypeEnum.richContent, FieldType.text],
+            [VeloFieldTypeEnum.richContent, FieldType.object],
             [VeloFieldTypeEnum.mediaGallery, FieldType.object],
             [VeloFieldTypeEnum.address, FieldType.object],
             [VeloFieldTypeEnum.pageLink, FieldType.object],
