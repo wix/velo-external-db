@@ -89,7 +89,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
 
         expect(response.data.results).toStrictEqual([
             { item: ctx.items[0] },
-            { error: { errorCode: 409, errorMessage: expect.toInclude('Item already exists'), data: expect.any(Object) } },
+            { error: { errorCode: 'ITEM_ALREADY_EXISTS', errorMessage: expect.toInclude('Item already exists'), data: expect.any(Object) } },
             ...(ctx.items.slice(2, ctx.items.length).map( item => ({ item }) )),
         ])
 
@@ -164,7 +164,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             { item: ctx.items[0] },
             ...ctx.items.slice(1, ctx.items.length).map(_i => ({
                 error: {
-                    errorCode: 404,
+                    errorCode: 'ITEM_NOT_FOUND',
                     errorMessage: expect.toInclude('Item doesn\'t exists'),
                     data: expect.any(Object)
                 }
@@ -244,7 +244,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             ...(ctx.modifiedItems.slice(0, ctx.items.length - 1).map( item => ({ item }))),
             { 
                 error: { 
-                    errorCode: 404, 
+                    errorCode: 'ITEM_NOT_FOUND', 
                     errorMessage: expect.toInclude('Item doesn\'t exists'), 
                     data: expect.any(Object) 
                 } 
@@ -330,7 +330,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
     })
 
     describe('error handling', () => {
-        testIfSupportedOperationsIncludes(supportedOperations, [PrimaryKey])('insert api with duplicate _id should fail with ITEM_NOT_FOUND, 409', async() => {
+        testIfSupportedOperationsIncludes(supportedOperations, [PrimaryKey])('insert api with duplicate _id should fail with ITEM_NOT_FOUND', async() => {
             await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
             await data.givenItems([ctx.item], ctx.collectionName, authAdmin)
 
@@ -340,7 +340,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
                 results: [
                     {
                         error: {
-                            errorCode: 409,
+                            errorCode: 'ITEM_ALREADY_EXISTS',
                             errorMessage: expect.toInclude('Item already exists'),
                             data: expect.any(Object)
                         }
@@ -355,7 +355,7 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
             ['insert', '/items/insert', data.insertRequest.bind(null, 'nonExistingCollection', [], false)],
             ['query', '/items/query', data.queryRequest.bind(null, 'nonExistingCollection', [], undefined)],
         ])
-        .test('%s api on non existing collection should fail with WDE0025, 404', async(_, api, request) => {
+        .test('%s api on non existing collection should fail with WDE0025, ITEM_NOT_FOUND', async(_, api, request) => {
             let error
 
             await axiosInstance.post(api, request(), authAdmin).catch(e => error = e)
