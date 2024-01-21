@@ -49,7 +49,7 @@ export const domainToSpiErrorTranslator = (err: any) => {
     const error = domainToSpiErrorTranslator(err)
     return { 
       error: {
-        errorCode: error.httpCode,
+        errorCode: error.errorCode,
         errorMessage: error.message,
         data: error.data,
       }

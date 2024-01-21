@@ -263,7 +263,7 @@ export enum HttpStatusCode {
     // UNIMPLEMENTED = 15; // 501
   }
 
-  enum ErrorCodes {
+  export enum ErrorCodes {
     ITEM_ALREADY_EXISTS = 'ITEM_ALREADY_EXISTS',
     ITEM_NOT_FOUND = 'ITEM_NOT_FOUND',
     COLLECTION_ALREADY_EXISTS = 'COLLECTION_ALREADY_EXISTS',
