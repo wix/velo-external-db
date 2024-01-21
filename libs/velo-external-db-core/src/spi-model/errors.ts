@@ -1,12 +1,12 @@
 class BaseWixError extends Error {
     collctionName: string
     httpCode: HttpStatusCode
-    applicationCode: ApiErrors
+    errorCode: ErrorCodes
 
-    constructor(message: string, httpCode: HttpStatusCode, applicationCode: ApiErrors, collectionName: string) {
+    constructor(message: string, httpCode: HttpStatusCode, errorCode: ErrorCodes, collectionName: string) {
         super(message)
         this.httpCode = httpCode
-        this.applicationCode = applicationCode
+        this.errorCode = errorCode
         this.collctionName = collectionName
     }
 }
@@ -15,7 +15,7 @@ export class CollectionNotFoundError extends BaseWixError {
     data: { collectionId: string }
 
     constructor(collectionName: string, message: string) {
-        super(message, HttpStatusCode.NOT_FOUND, ApiErrors.WDE0025, collectionName)
+        super(message, HttpStatusCode.NOT_FOUND, ErrorCodes.COLLECTION_NOT_FOUND, collectionName)
         this.data = { collectionId: collectionName }
     }
 }
@@ -24,7 +24,7 @@ export class CollectionAlreadyExistsError extends BaseWixError {
     data: { collectionId: string }
 
     constructor(collectionName: string, message: string) {
-        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0104, collectionName)
+        super(message, HttpStatusCode.ALREADY_EXISTS, ErrorCodes.COLLECTION_ALREADY_EXISTS, collectionName)
         this.data = { collectionId: collectionName }
     }
 }
@@ -33,7 +33,7 @@ export class ItemNotFoundError extends BaseWixError {
     data: { itemId: string }
 
     constructor(collectionName: string, itemId: string, message: string) {
-        super(message, HttpStatusCode.NOT_FOUND, ApiErrors.WDE0073, collectionName)
+        super(message, HttpStatusCode.NOT_FOUND, ErrorCodes.ITEM_NOT_FOUND, collectionName)
         this.data = { itemId }
     }
 }
@@ -42,7 +42,7 @@ export class ItemAlreadyExistsError extends BaseWixError {
     data: { itemId: string }
 
     constructor(collectionName: string, itemId: string, message: string) {
-        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0074, collectionName)
+        super(message, HttpStatusCode.ALREADY_EXISTS, ErrorCodes.ITEM_ALREADY_EXISTS, collectionName)
         this.data = { itemId }
     }
 }
@@ -53,7 +53,7 @@ export class ReferenceNotFoundError extends BaseWixError {
     data: { referringItemId: string, referencedItemId: string }
 
     constructor(message: string, collectionName: string, referringItemId: string, referencedItemId: string) {
-        super(message, HttpStatusCode.NOT_FOUND, ApiErrors.WDE0029, collectionName)
+        super(message, HttpStatusCode.NOT_FOUND, ErrorCodes.REFERENCE_NOT_FOUND, collectionName)
         this.referringItemId = referringItemId
         this.referencedItemId = referencedItemId
         this.data = { referringItemId, referencedItemId }
@@ -66,7 +66,7 @@ export class ReferenceAlreadyExistsError extends BaseWixError {
     data: { referringItemId: string, referencedItemId: string }
 
     constructor(message: string, collectionName: string, referringItemId: string, referencedItemId: string) {
-        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0029, collectionName)
+        super(message, HttpStatusCode.ALREADY_EXISTS, ErrorCodes.REFERENCE_ALREADY_EXISTS, collectionName)
         this.referringItemId = referringItemId
         this.referencedItemId = referencedItemId
         this.data = { referringItemId, referencedItemId }
@@ -84,7 +84,7 @@ export class ValidationError extends BaseWixError {
     data: { violations: ValidationViolation[] }
 
     constructor(message: string, collectionName: string, fieldPath: string, rejectedValue: string) {
-        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0075, collectionName)
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ErrorCodes.VALIDATION_ERROR, collectionName)
         this.violations = [{ fieldPath, rejectedValue, message }]
         this.data = { violations: this.violations }
     }
@@ -100,7 +100,7 @@ export class CollectionChangeNotSupportedError extends BaseWixError {
     data: { errors: CollectionChangeNotSupportedErrorItem[] }
 
     constructor(collectionName: string, fieldKey: string, message: string) {
-        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0119, collectionName)
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ErrorCodes.COLLECTION_CHANGE_NOT_SUPPORTED, collectionName)
         this.errors = [{ fieldKey, message }]
         this.data = { errors: this.errors }
     }
@@ -109,17 +109,16 @@ export class CollectionChangeNotSupportedError extends BaseWixError {
 export class UnknownError extends BaseWixError {
     data: { description: string }
     constructor(message: string, httpCode: number =  HttpStatusCode.INTERNAL) {
-        super(message, httpCode, ApiErrors.WDE0054, '')
+        super(message, httpCode, ErrorCodes.UNKNOWN_ERROR, '')
         this.data = { description: message }
     }
 }
 
-
-export class InvalidPropertyError extends BaseWixError {
+export class FieldDoesNotExist extends BaseWixError {
     data: { collectionId: string, propertyName: string }
 
     constructor(collectionName: string, propertyName: string, message: string) {
-        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0147, collectionName)
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ErrorCodes.FIELD_DOESNT_EXIST, collectionName)
         this.data = { collectionId: collectionName, propertyName }
     }
 }
@@ -128,7 +127,7 @@ export class InvalidPropertyError extends BaseWixError {
 export class UnauthorizedError extends BaseWixError {
     data: { description: string }
     constructor(message: string) {
-        super(message, HttpStatusCode.UNAUTHENTICATED, ApiErrors.WDE0027, '')
+        super(message, HttpStatusCode.UNAUTHENTICATED, ErrorCodes.UNAUTHORIZED, '')
         this.data = { description: message }
     }
 }
@@ -137,7 +136,7 @@ export class FieldAlreadyExistsError extends BaseWixError {
     data: { collectionId: string, fieldName: string }
 
     constructor(collectionName: string, fieldName: string, message: string) {
-        super(message, HttpStatusCode.ALREADY_EXISTS, ApiErrors.WDE0123, collectionName)
+        super(message, HttpStatusCode.ALREADY_EXISTS, ErrorCodes.FIELD_ALREADY_EXISTS, collectionName)
         this.data = { collectionId: collectionName, fieldName }
     }
 }
@@ -146,7 +145,7 @@ export class UnsupportedSchemaOperation extends BaseWixError {
     data: { collectionId: string, operation: string }
 
     constructor(collectionName: string, operation: string, message: string) {
-        super(message, HttpStatusCode.INVALID_ARGUMENT, ApiErrors.WDE0119, collectionName)
+        super(message, HttpStatusCode.INVALID_ARGUMENT, ErrorCodes.UNSUPPORTED_OPERATION, collectionName)
         this.data = { collectionId: collectionName, operation }
     }
 }
@@ -262,4 +261,21 @@ export enum HttpStatusCode {
     // DEADLINE_EXEEDED = 13; // 504
     // DATA_LOSS = 14; // 500
     // UNIMPLEMENTED = 15; // 501
+  }
+
+  export enum ErrorCodes {
+    ITEM_ALREADY_EXISTS = 'ITEM_ALREADY_EXISTS',
+    ITEM_NOT_FOUND = 'ITEM_NOT_FOUND',
+    COLLECTION_ALREADY_EXISTS = 'COLLECTION_ALREADY_EXISTS',
+    COLLECTION_NOT_FOUND = 'COLLECTION_NOT_FOUND',
+    REFERENCE_ALREADY_EXISTS = 'REFERENCE_ALREADY_EXISTS',
+    REFERENCE_NOT_FOUND = 'REFERENCE_NOT_FOUND',
+    VALIDATION_ERROR = 'VALIDATION_ERROR',
+    COLLECTION_CHANGE_NOT_SUPPORTED = 'COLLECTION_CHANGE_NOT_SUPPORTED',
+    // These errors are not in the official SPI
+    FIELD_DOESNT_EXIST = 'FIELD_DOESNT_EXIST',
+    FIELD_ALREADY_EXISTS = 'FIELD_ALREADY_EXISTS',
+    UNAUTHORIZED = 'UNAUTHORIZED',
+    UNSUPPORTED_OPERATION = 'UNSUPPORTED_OPERATION',
+    UNKNOWN_ERROR = 'UNKNOWN_ERROR'
   }

@@ -26,7 +26,7 @@ describe('Error Middleware', () => {
       errorMiddleware(err, null, ctx.res)
 
       expect(ctx.res.status).toHaveBeenCalledWith(500)
-      expect(ctx.res.send).toHaveBeenCalledWith( { data: { description: err.message }, code: 'WDE0054' } )
+      expect(ctx.res.send).toHaveBeenCalledWith( { data: { description: err.message }, errorCode: 'UNKNOWN_ERROR' } )
     })
 
     test.each(Object.entries(errors))('converts %s to http error response', (ExceptionName, ExceptionClass) => {
@@ -37,7 +37,7 @@ describe('Error Middleware', () => {
               expect(ctx.res.status).toHaveBeenCalledWith(spiError.httpCode)
               expect(ctx.res.send).toHaveBeenCalledWith({
                 data: spiError.data,
-                code: spiError.applicationCode
+                errorCode: spiError.errorCode
               })
 
               ctx.res.status.mockClear()
