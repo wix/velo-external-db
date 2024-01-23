@@ -81,7 +81,6 @@ export default class SchemaAwareDataService {
         return await this.dataService.truncate(collectionName)
     }
     
-    // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
     async aggregate(collectionName: string, filter: Filter, _aggregation: Aggregation, sort: Sort[], skip: number, limit: number, returnTotalCount?: boolean) {
         if (this.isEmptyAggregation(_aggregation)) {
             return await this.find(collectionName, filter, sort, skip ?? 0, limit ?? 50, undefined, returnTotalCount)
