@@ -2,7 +2,7 @@ import { Pool } from 'pg'
 import { escapeIdentifier, prepareStatementVariables, prepareStatementVariablesForBulkInsert } from './postgres_utils'
 import { asParamArrays, patchDateTime, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { translateErrorCodes } from './sql_exception_translator'
-import { IDataProvider, AdapterFilter as Filter, Sort, Item, AdapterAggregation as Aggregation, ResponseField } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, Sort, Item, NonEmptyAdapterAggregation as Aggregation, ResponseField } from '@wix-velo/velo-external-db-types'
 import FilterParser from './sql_filter_transformer'
 
 export default class DataProvider implements IDataProvider {

@@ -1,4 +1,4 @@
-import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Item, ItemWithId, ResponseField, Sort } from '@wix-velo/velo-external-db-types'
+import { AdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, Item, ItemWithId, ResponseField, Sort, NonEmptyAdapterAggregation } from '@wix-velo/velo-external-db-types'
 import QueryValidator from '../converters/query_validator'
 import DataService from './data'
 import CacheableSchemaInformation from './schema_information'
@@ -82,7 +82,11 @@ export default class SchemaAwareDataService {
     }
     
     // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
-    async aggregate(collectionName: string, filter: Filter, aggregation: Aggregation, sort?: Sort[], skip?: number, limit?: number, returnTotalCount?: boolean) {
+    async aggregate(collectionName: string, filter: Filter, _aggregation: Aggregation, sort: Sort[], skip: number, limit: number, returnTotalCount?: boolean) {
+        if (this.isEmptyAggregation(_aggregation)) {
+            return await this.find(collectionName, filter, sort, skip ?? 0, limit ?? 50, undefined, returnTotalCount)
+        }
+        const aggregation = _aggregation as NonEmptyAdapterAggregation
         await this.validateAggregation(collectionName, aggregation)
         await this.validateFilter(collectionName, filter)
         return await this.dataService.aggregate(collectionName, filter, aggregation, sort, skip, limit, returnTotalCount)
@@ -98,7 +102,7 @@ export default class SchemaAwareDataService {
         await this.queryValidator.validateGetById(fields, itemId)
     }
 
-    async validateAggregation(collectionName: string, aggregation: Aggregation) {
+    async validateAggregation(collectionName: string, aggregation: NonEmptyAdapterAggregation) {
         const fields = await this.schemaInformation.schemaFieldsFor(collectionName)
         this.queryValidator.validateAggregation(fields, aggregation)
     }
@@ -128,5 +132,9 @@ export default class SchemaAwareDataService {
         const schemaContainsId = schemaFields.some(f => f.field === '_id')
         const projection = ( Array.isArray(_projection) && _projection.length ) ? _projection as string[] : schemaFields.map(f => f.field)
         return schemaContainsId ? Array.from(new Set(['_id', ...projection])) : projection
+    }
+
+    private isEmptyAggregation(aggregation: Aggregation) {
+        return Object.keys(aggregation).length === 0
     }
 }

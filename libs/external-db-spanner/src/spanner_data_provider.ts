@@ -1,6 +1,6 @@
 import { recordSetToObj, escapeId, patchFieldName, unpatchFieldName, patchFloat, extractFloatFields } from './spanner_utils'
 import { translateErrorCodes } from './sql_exception_translator'
-import { IDataProvider, AdapterFilter as Filter, AdapterAggregation as Aggregation, Item, Sort } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, NonEmptyAdapterAggregation as Aggregation, Item, Sort } from '@wix-velo/velo-external-db-types'
 import { Database as SpannerDb } from '@google-cloud/spanner'
 import FilterParser from './sql_filter_transformer'
 

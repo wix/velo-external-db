@@ -1,4 +1,4 @@
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, NotEmptyAdapterFilter, AdapterFunctions } from '@wix-velo/velo-external-db-types'
+import { AdapterFilter as Filter, NonEmptyAdapterAggregation as Aggregation, AdapterOperator, Sort, NotEmptyAdapterFilter, AdapterFunctions } from '@wix-velo/velo-external-db-types'
 import { EmptyFilter, EmptySort, isObject, isEmptyFilter, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { escapeIdentifier } from './bigquery_utils'
