@@ -92,10 +92,14 @@ export type FunctionProjection = {
 export type Projection = FieldProjection | FunctionProjection    
 
 
-export type AdapterAggregation = {
+export type NonEmptyAdapterAggregation = {
     projection: Projection[],
     postFilter: AdapterFilter,
 }
+
+export type AdapterAggregation = NonEmptyAdapterAggregation | EmptyAggregation
+
+export type EmptyAggregation = Record<string, never>
 
 export interface IDataProvider {
     find(collectionName: string, filter: AdapterFilter, sort: any, skip: number, limit: number, projection: string[]): Promise<Item[]>;
@@ -105,7 +109,7 @@ export interface IDataProvider {
     delete(collectionName: string, itemIds: string[]): Promise<number>;
     truncate(collectionName: string): Promise<void>;
     // sort, skip, limit are not really optional, after we'll implement in all the data providers we can remove the ?
-    aggregate?(collectionName: string, filter: AdapterFilter, aggregation: AdapterAggregation, sort?: Sort[], skip?: number, limit?: number ): Promise<Item[]>;
+    aggregate?(collectionName: string, filter: AdapterFilter, aggregation: NonEmptyAdapterAggregation, sort?: Sort[], skip?: number, limit?: number ): Promise<Item[]>;
 }
 
 export interface IBaseHttpError extends Error {}

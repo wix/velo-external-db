@@ -1,6 +1,6 @@
 import { Firestore, WriteBatch, Query, DocumentData } from '@google-cloud/firestore'
 import {
-    AdapterAggregation,
+    NonEmptyAdapterAggregation,
     AdapterFilter,
     IDataProvider,
     Item,
@@ -98,7 +98,7 @@ export default class DataProvider implements IDataProvider {
         })
     }
 
-    aggregate(_collectionName: string, _filter: AdapterFilter, _aggregation: AdapterAggregation): Promise<Item[]> {
+    aggregate(_collectionName: string, _filter: AdapterFilter, _aggregation: NonEmptyAdapterAggregation): Promise<Item[]> {
         throw new Error('Unsupported method')
     }
 }

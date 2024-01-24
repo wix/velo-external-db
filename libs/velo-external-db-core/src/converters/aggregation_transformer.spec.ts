@@ -33,6 +33,9 @@ describe('Aggregation Transformer', () => {
         })
     })
 
+    test('empty aggregation', () => {
+        expect(env.AggregationTransformer.transform({})).toEqual({})
+    })
     test('single id field without function or postFilter', () => {
         env.driver.stubEmptyFilterForUndefined()
 

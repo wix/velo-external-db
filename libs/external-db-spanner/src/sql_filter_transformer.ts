@@ -1,5 +1,5 @@
 import { errors } from '@wix-velo/velo-external-db-commons'
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, FunctionProjection, NotEmptyAdapterFilter as NotEmptyFilter, AdapterFunctions } from '@wix-velo/velo-external-db-types'
+import { AdapterFilter as Filter, NonEmptyAdapterAggregation as Aggregation, AdapterOperator, Sort, FunctionProjection, NotEmptyAdapterFilter as NotEmptyFilter, AdapterFunctions } from '@wix-velo/velo-external-db-types'
 import { EmptyFilter, EmptySort, isObject, AdapterOperators, isEmptyFilter, extractGroupByNames, extractProjectionFunctionsObjects, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { escapeId, patchFieldName, escapeFieldId, validateLiteralWithCounter, nameWithCounter } from './spanner_utils'
 import { SpannerParsedFilter } from './types'

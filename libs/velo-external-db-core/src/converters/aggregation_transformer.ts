@@ -1,4 +1,4 @@
-import { AdapterAggregation, AdapterFunctions } from '@wix-velo/velo-external-db-types'
+import { EmptyAggregation, AdapterFunctions, AdapterAggregation } from '@wix-velo/velo-external-db-types'
 import { IFilterTransformer } from './filter_transformer'
 import { projectionFunctionFor } from './utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
@@ -6,12 +6,12 @@ import { Operation, Aggregation, Filter } from '../spi-model/data_source'
 const { InvalidQuery } = errors
 
 type TransformAggregationParams = {
-    aggregation: Aggregation
+    aggregation?: Aggregation
     finalFilter?: Filter
 }
 
 interface IAggregationTransformer {
-    transform(aggregation: TransformAggregationParams): AdapterAggregation
+    transform(aggregation: TransformAggregationParams): AdapterAggregation 
     wixFunctionToAdapterFunction(wixFunction: string): AdapterFunctions
 }
 
@@ -22,6 +22,10 @@ export default class AggregationTransformer implements IAggregationTransformer {
     }
 
     transform({ aggregation, finalFilter }: TransformAggregationParams): AdapterAggregation {        
+        if (!aggregation) {
+            return {} as EmptyAggregation
+        }
+        
         const { groupingFields: fields, operations } = aggregation
 
         const projectionFields = fields.map(f => ({ name: f }))

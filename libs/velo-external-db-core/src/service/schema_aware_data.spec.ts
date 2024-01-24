@@ -140,6 +140,16 @@ describe ('Schema Aware Data Service', () => {
                                                                                                                     })
     })
 
+    test('aggregation with empty aggregation will trigger find request', async() => {
+        schema.givenDefaultSchemaFor(ctx.collectionName)
+        queryValidator.givenValidFilterForDefaultFieldsOf(ctx.filter)
+        
+        data.givenListResult(ctx.entities, ctx.totalCount, ctx.collectionName, ctx.filter, ctx.sort, ctx.skip, ctx.limit, ctx.defaultFields, true)
+        patcher.givenPatchedBooleanFieldsWith(ctx.patchedEntities, ctx.entities)
+
+        return expect(env.schemaAwareDataService.aggregate(ctx.collectionName, ctx.filter, {}, ctx.sort, ctx.skip, ctx.limit, true)).resolves.toEqual({ items: ctx.patchedEntities, totalCount: ctx.totalCount })
+    })
+
 
     const ctx = {
         collectionName: Uninitialized,

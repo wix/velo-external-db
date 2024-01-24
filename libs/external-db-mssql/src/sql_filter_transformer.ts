@@ -1,5 +1,5 @@
 import { EmptyFilter, EmptySort, isObject, AdapterOperators, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex, errors } from '@wix-velo/velo-external-db-commons'
-import { AdapterFilter as Filter, AdapterAggregation as Aggregation, AdapterOperator, Sort, FunctionProjection, NotEmptyAdapterFilter as NotEmptyFilter, AdapterFunctions } from '@wix-velo/velo-external-db-types'
+import { AdapterFilter as Filter, NonEmptyAdapterAggregation as Aggregation, AdapterOperator, Sort, FunctionProjection, NotEmptyAdapterFilter as NotEmptyFilter, AdapterFunctions } from '@wix-velo/velo-external-db-types'
 import { escapeId, validateLiteralWithCounter, patchFieldNameWithCounter } from './mssql_utils'
 import { MSSQLParsedFilter } from './types'
 const { InvalidQuery } = errors

@@ -1,5 +1,5 @@
 import { Dataset } from '@google-cloud/bigquery'
-import { IDataProvider, AdapterFilter as Filter, Item, AdapterAggregation as Aggregation, Sort } from '@wix-velo/velo-external-db-types'
+import { IDataProvider, AdapterFilter as Filter, Item, NonEmptyAdapterAggregation as Aggregation, Sort } from '@wix-velo/velo-external-db-types'
 import { asParamArrays, updateFieldsFor } from '@wix-velo/velo-external-db-commons'
 import { unPatchDateTime, patchDateTime, escapeIdentifier, patchObjectValueOfItems } from './bigquery_utils'
 import FilterParser from './sql_filter_transformer'
