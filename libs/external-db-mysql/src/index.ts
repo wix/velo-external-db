@@ -11,13 +11,14 @@ import { DatabaseFactoryResponse, DbConnector } from '@wix-velo/velo-external-db
 import init from './connection_provider'
 import { MySqlConfig } from './types'
 import { Logger } from '@wix-velo/external-db-logger'
+import { ILogger } from '@wix-velo/external-db-logger'
 
 export const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 export const opsDriver = () => require('../tests/drivers/db_operations_test_support')
 
 
 export class MySqlConnector extends DbConnector {
-    constructor(logger: Logger) {
+    constructor(logger: ILogger) {
         super(MySqlConfigValidator, init)
         this.type = 'mysql'
         this.logger = logger
