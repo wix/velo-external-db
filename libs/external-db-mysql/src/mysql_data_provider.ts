@@ -28,7 +28,7 @@ export default class DataProvider implements IDataProvider {
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
         const sql = `SELECT ${projectionExpr} FROM ${escapeTable(collectionName)} ${filterExpr} ${sortExpr} LIMIT ?, ?`
 
-        this.logger?.info('find', { sql, parameters })
+        this.logger?.debug('mysql-find', { sql, parameters })
 
         const resultset = await this.query(sql, [...parameters, skip, limit])
                                     .catch( err => translateErrorCodes(err, collectionName) )
@@ -39,7 +39,7 @@ export default class DataProvider implements IDataProvider {
         const { filterExpr, parameters } = this.filterParser.transform(filter)
         const sql = `SELECT COUNT(*) AS num FROM ${escapeTable(collectionName)} ${filterExpr}`
 
-        this.logger?.info('count', { sql, parameters })
+        this.logger?.debug('mysql-count', { sql, parameters })
         const resultset = await this.query(sql, parameters)
                                     .catch( err => translateErrorCodes(err, collectionName) )
         return resultset[0]['num']
@@ -52,7 +52,7 @@ export default class DataProvider implements IDataProvider {
         
         const data = items.map((item: Item) => asParamArrays( patchItem(item) ) )
 
-        this.logger?.info('insert', { sql, parameters: data })
+        this.logger?.debug('mysql-insert', { sql, parameters: data })
 
         const resultset = await this.query(sql, [data])
                                     .catch( err => translateErrorCodes(err, collectionName) )
@@ -66,7 +66,7 @@ export default class DataProvider implements IDataProvider {
         const updatables: Item[] = items.map((i: Item) => [...updateFields, '_id'].reduce((obj, key) => ({ ...obj, [key]: i[key] }), {}) )
                                 .map((u: Item) => asParamArrays( patchItem(u) ))
 
-        this.logger?.info('update', { sql: queries, parameters: updatables })
+        this.logger?.debug('mysql-update', { sql: queries, parameters: updatables })
         
         // @ts-ignore
         const resultset = await this.query(queries, [].concat(...updatables))
@@ -78,7 +78,7 @@ export default class DataProvider implements IDataProvider {
     async delete(collectionName: string, itemIds: string[]): Promise<number> {
         const sql = `DELETE FROM ${escapeTable(collectionName)} WHERE _id IN (${wildCardWith(itemIds.length, '?')})`
 
-        this.logger?.info('delete', { sql, parameters: itemIds })
+        this.logger?.debug('mysql-delete', { sql, parameters: itemIds })
 
         const rs = await this.query(sql, itemIds)
                              .catch( err => translateErrorCodes(err, collectionName) )
@@ -87,7 +87,7 @@ export default class DataProvider implements IDataProvider {
 
     async truncate(collectionName: string): Promise<void> {
         const sql = `TRUNCATE ${escapeTable(collectionName)}`
-        this.logger?.info('truncate', { sql })
+        this.logger?.debug('mysql-truncate', { sql })
         await this.query(`TRUNCATE ${escapeTable(collectionName)}`).catch( err => translateErrorCodes(err, collectionName) )
     }
 
@@ -98,7 +98,7 @@ export default class DataProvider implements IDataProvider {
 
         const sql = `SELECT ${fieldsStatement} FROM ${escapeTable(collectionName)} ${whereFilterExpr} GROUP BY ${groupByColumns.map( escapeId ).join(', ')} ${havingFilter} ${sortExpr} LIMIT ?, ?`
         
-        this.logger?.info('aggregate', { sql, parameters: [...whereParameters, ...parameters, skip, limit] })
+        this.logger?.debug('mysql-aggregate', { sql, parameters: [...whereParameters, ...parameters, skip, limit] })
         
         const resultset = await this.query(sql, [...whereParameters, ...parameters, skip, limit])
                                     .catch( err => translateErrorCodes(err, collectionName) )

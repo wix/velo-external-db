@@ -27,7 +27,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const currentDb = this.pool.config.connectionConfig.database
         const sql = 'SELECT TABLE_NAME as table_name, COLUMN_NAME as field, DATA_TYPE as type FROM information_schema.columns WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, ORDINAL_POSITION'
 
-        this.logger?.info('list', { sql, parameters: currentDb })
+        this.logger?.debug('mysql-list', { sql, parameters: currentDb })
 
         const data = await this.query(sql, currentDb)
         const tables: {[x:string]: { field: string, type: string}[]} = parseTableData( data )
@@ -44,7 +44,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const currentDb = this.pool.config.connectionConfig.database
         const sql = 'SELECT TABLE_NAME as table_name FROM information_schema.tables WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME'
 
-        this.logger?.info('listHeaders', { sql, parameters: currentDb })
+        this.logger?.debug('mysql-listHeaders', { sql, parameters: currentDb })
         const data = await this.query(sql, currentDb)
         return data.map( (rs: { table_name: any }) => rs.table_name )
     }
@@ -59,7 +59,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const sql = `CREATE TABLE IF NOT EXISTS ${escapeTable(collectionName)} (${dbColumnsSql}, PRIMARY KEY (${primaryKeySql}))`
         const parameters = columns.map( c => c.name )
 
-        this.logger?.info('create table', { sql, parameters })
+        this.logger?.debug('mysql-create table', { sql, parameters })
         await this.query(sql, parameters)
                   .catch( err => translateErrorCodes(err, collectionName) )
     }
@@ -67,7 +67,7 @@ export default class SchemaProvider implements ISchemaProvider {
     async drop(collectionName: string): Promise<void> {
         const sql = `DROP TABLE IF EXISTS ${escapeTable(collectionName)}`
 
-        this.logger?.info('drop table', { sql })
+        this.logger?.debug('mysql-drop table', { sql })
         await this.query(`DROP TABLE IF EXISTS ${escapeTable(collectionName)}`)
                   .catch( err => translateErrorCodes(err, collectionName) )
     }
@@ -75,7 +75,7 @@ export default class SchemaProvider implements ISchemaProvider {
     async addColumn(collectionName: string, column: InputField): Promise<void> {
         await validateSystemFields(column.name)
         const sql = `ALTER TABLE ${escapeTable(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`
-        this.logger?.info('add column', { sql })
+        this.logger?.debug('mysql-add column', { sql })
         await this.query(`ALTER TABLE ${escapeTable(collectionName)} ADD ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`)
                   .catch( err => translateErrorCodes(err, collectionName) )
     }
@@ -83,13 +83,15 @@ export default class SchemaProvider implements ISchemaProvider {
     async changeColumnType(collectionName: string, column: InputField): Promise<void> {
         await validateSystemFields(column.name)
         const sql = `ALTER TABLE ${escapeTable(collectionName)} MODIFY ${escapeId(column.name)} ${this.sqlSchemaTranslator.dbTypeFor(column)}`
-        this.logger?.info('change column type', { sql })
+        this.logger?.debug('mysql-change column type', { sql })
         await this.query(sql)
                   .catch( err => translateErrorCodes(err, collectionName) )
     }
 
     async removeColumn(collectionName: string, columnName: string): Promise<void> {
         await validateSystemFields(columnName)
+        const sql = `ALTER TABLE ${escapeTable(collectionName)} DROP COLUMN ${escapeId(columnName)}`
+        this.logger?.debug('mysql-remove column', { sql })
         return await this.query(`ALTER TABLE ${escapeTable(collectionName)} DROP COLUMN ${escapeId(columnName)}`)
                          .catch( err => translateErrorCodes(err, collectionName) )
     }
@@ -100,7 +102,7 @@ export default class SchemaProvider implements ISchemaProvider {
             Type: string,
         }
         const sql = `DESCRIBE ${escapeTable(collectionName)}`
-        this.logger?.info('describe table', { sql })
+        this.logger?.debug('mysql-describe table', { sql })
         const res: describeTableResponse[] = await this.query(`DESCRIBE ${escapeTable(collectionName)}`)
                                                        .catch( err => translateErrorCodes(err, collectionName) )
         const fields = res.map(r => ({ field: r.Field, type: r.Type })).map(this.appendAdditionalRowDetails.bind(this))

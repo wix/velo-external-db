@@ -59,19 +59,23 @@ const serviceContext = (): ServiceContext => ({
 
 
 const executeDataHooksFor = async<T>(action: string, payload: T, requestContext: RequestContext, customContext: any): Promise<T> => {
-    logger?.info(`data params before ${action} hook`, payload as any)
+    logger?.debug(`Data params before ${action} hook`, payload as any)
     return BPromise.reduce(DataHooksForAction[action], async(lastHookResult: AnyFixMe, hookName: string) => {
         return await executeHook(dataHooks, hookName, lastHookResult, requestContext, customContext)
     }, payload).then( res => {
-        logger?.info(`data params after ${action} hook`, res as any)
+        logger?.debug(`data params after ${action} hook`, res as any)
         return res
     })
 }
 
 const executeSchemaHooksFor = async<T>(action: string, payload: T, requestContext: RequestContext, customContext: any): Promise<T> => {
+    logger?.debug(`Schema params before ${action} hook`, payload as any)
     return BPromise.reduce(SchemaHooksForAction[action], async(lastHookResult: any, hookName: string) => {
         return await executeHook(schemaHooks, hookName, lastHookResult, requestContext, customContext)
-    }, payload)
+    }, payload).then( res => {
+        logger?.debug(`Schema params after ${action} hook`, res as any)
+        return res
+    })
 }
 
 const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
