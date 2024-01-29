@@ -38,7 +38,7 @@ export const createApp = async(wixDataBaseUrl?: string) => {
     const hooks: Hooks = process.env.DEBUG ? { dataHooks: debuggingDataHooks } : undefined
     const initConnectorResponse = await initConnector(wixDataBaseUrl, hooks)
     app.use(initConnectorResponse.externalDbRouter.router)
-    const server = app.listen(8080, () => initConnectorResponse.logger.info('Listening on port 8080'))
+    const server = app.listen(8080, () => initConnectorResponse.logger?.info('Listening on port 8080'))
 
     return { server, ...initConnectorResponse, reload: () => initConnector(wixDataBaseUrl) }
 }

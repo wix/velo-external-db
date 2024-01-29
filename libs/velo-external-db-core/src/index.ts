@@ -23,7 +23,7 @@ import { decodeBase64 } from './utils/base64_utils'
 interface ExternalDbRouterConstructorParams { 
     connector: DbConnector;
     config: ExternalDbRouterConfig;
-    logger: Logger;
+    logger?: Logger;
     hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks};
 }
 
@@ -44,7 +44,7 @@ export class ExternalDbRouter {
     cleanup: ConnectionCleanUp
     router: Router
     config: ExternalDbRouterConfig
-    logger: Logger
+    logger?: Logger
     constructor({ connector, config, hooks, logger }: ExternalDbRouterConstructorParams) {
         this.isInitialized(connector)
         this.connector = connector
@@ -67,17 +67,17 @@ export class ExternalDbRouter {
         this.roleAuthorizationService = new RoleAuthorizationService(config.authorization?.roleConfig?.collectionPermissions) 
         this.cleanup = connector.cleanup
 
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks, logger)
         this.router = createRouter()
     }
 
     reloadHooks(hooks?: Hooks) {
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks || {})
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks || {}, this.logger)
     }
 
     isInitialized(connector: DbConnector) {
         if (!connector.initialized) {
-            this.logger.error('Connector must be initialized before being used')
+            this.logger?.error('Connector must be initialized before being used')
             throw new Error('Connector must be initialized before being used')
         }
     }

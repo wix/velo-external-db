@@ -2,7 +2,7 @@
 
 export type LoggerError = any;
 
-export type Data = Record<string, unknown>;
+export type Data = Record<string, unknown> | undefined;
 
 export enum LogLevel {
     DEBUG = 'debug',
