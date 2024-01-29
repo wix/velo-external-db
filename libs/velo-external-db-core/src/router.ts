@@ -38,7 +38,7 @@ let logger: ILogger
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
                              _externalDbConfigClient: ConfigValidator, _cfg: RouterConfig,
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
-                             _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks, _logger: ILogger) => {
+                             _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks, _logger: ILogger | undefined) => {
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient
