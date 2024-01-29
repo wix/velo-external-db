@@ -23,7 +23,7 @@ describe('Error Middleware', () => {
     test('converts unknown error with message and default status code of 500', () => {
       const err = new Error(chance.word())
 
-      errorMiddleware(err, null, ctx.res)
+      errorMiddleware()(err, null, ctx.res)
 
       expect(ctx.res.status).toHaveBeenCalledWith(500)
       expect(ctx.res.send).toHaveBeenCalledWith( { data: { description: err.message }, errorCode: 'UNKNOWN_ERROR' } )
@@ -31,7 +31,7 @@ describe('Error Middleware', () => {
 
     test.each(Object.entries(errors))('converts %s to http error response', (ExceptionName, ExceptionClass) => {
               const err = new ExceptionClass(chance.word())
-              errorMiddleware(err, null, ctx.res)
+              errorMiddleware()(err, null, ctx.res)
               const spiError = domainToSpiErrorTranslator(err)
 
               expect(ctx.res.status).toHaveBeenCalledWith(spiError.httpCode)
