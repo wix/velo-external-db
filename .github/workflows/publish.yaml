@@ -6,17 +6,17 @@ on:
       gcp:
         type: boolean
         description: GCP container registry
-        default: true
+        default: false
 
       aws:
         type: boolean
         description: AWS ECR container registry
-        default: true
+        default: false
 
       dockerHub:
         type: boolean
         description: Docker container registry
-        default: true
+        default: false
 
       image-tag:
         type: string
