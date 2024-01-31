@@ -22,7 +22,6 @@ const initConnector = async(wixDataBaseUrl?: string, hooks?: Hooks) => {
             adapterType,
             commonExtended: true,
             hideAppInfo,
-            wixDataBaseUrl: wixDataBaseUrl || 'https://www.wixapis.com/wix-data',
             readOnlySchema,
         },
         hooks,
