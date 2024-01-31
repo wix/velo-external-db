@@ -9,6 +9,7 @@ export * as testResources from '../tests/e2e-testkit/mysql_resources'
 import { MySqlConfigValidator } from './mysql_config_validator'
 import { DatabaseFactoryResponse, DbConnector } from '@wix-velo/velo-external-db-commons'
 import init from './connection_provider'
+import { MySqlConfig } from './types'
 
 export const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
 export const opsDriver = () => require('../tests/drivers/db_operations_test_support')
@@ -21,7 +22,7 @@ export class MySqlConnector extends DbConnector {
     }
 }
 
-export const mySqlFactory = async(config: any, options: any): Promise<DatabaseFactoryResponse> => {
+export const mySqlFactory = async(config: MySqlConfig, options: any): Promise<DatabaseFactoryResponse> => {
     const connector = new MySqlConnector()
     const { connection, cleanup, ...providers } = await connector.initialize(config, options)
     return { connector, connection, providers, cleanup }
