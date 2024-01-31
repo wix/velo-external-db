@@ -28,11 +28,11 @@ import { JWTVerifierDecoderMiddleware } from './web/jwt-verifier-decoder-middlew
 
 const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
 const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
-
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: { type?: any; vendor?: any, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string }, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
+type RouterConfig = { type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string, readOnlySchema?: boolean }
+let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: RouterConfig, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
-                             _externalDbConfigClient: ConfigValidator, _cfg: { type?: string, vendor?: string, wixDataBaseUrl: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string },
+                             _externalDbConfigClient: ConfigValidator, _cfg: RouterConfig,
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
                              _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks) => {
     schemaService = _schemaService
@@ -113,7 +113,7 @@ export const createRouter = () => {
         const unsupportedFieldTypes = [ schemaSource.FieldType.arrayString, schemaSource.FieldType.reference, schemaSource.FieldType.multiReference, 
                                         schemaSource.FieldType.arrayDocument, schemaSource.FieldType.array ]
         const capabilitiesResponse = {
-            supportsCollectionModifications: true,
+            supportsCollectionModifications: cfg.readOnlySchema ? false : true,
             supportedFieldTypes: Object.values(schemaSource.FieldType).filter(t => !unsupportedFieldTypes.includes(t)),
             supportsCollectionDisplayName: false,
             supportsCollectionDisplayField: false,

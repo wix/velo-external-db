@@ -87,6 +87,7 @@ export interface ExternalDbRouterConfig {
     adapterType?: string
     commonExtended?: boolean
     hideAppInfo?: boolean
+    readOnlySchema?: boolean
     wixDataBaseUrl: string
     jwtPublicKey: string
     appDefId: string
