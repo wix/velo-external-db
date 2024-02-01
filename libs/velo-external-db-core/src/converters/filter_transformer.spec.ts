@@ -193,6 +193,28 @@ describe('Filter Transformer', () => {
                 value: ctx.fieldValue
             })
         })
+
+        test('correctly transform short syntax filter with object value', () => {
+            const filter = {
+                [ctx.fieldName]: ctx.objectValue
+            }
+            expect(env.FilterTransformer.transform(filter)).toEqual({
+                fieldName: ctx.fieldName,
+                operator: env.FilterTransformer.wixOperatorToAdapterOperator('$eq'),
+                value: ctx.objectValue
+            })
+        })
+
+        test('correctly transform short syntax filter with encrypted value', () => {
+            const filter = {
+                [ctx.fieldName]: { $encrypted: ctx.fieldValue }
+            }
+            expect(env.FilterTransformer.transform(filter)).toEqual({
+                fieldName: ctx.fieldName,
+                operator: env.FilterTransformer.wixOperatorToAdapterOperator('$eq'),
+                value: { $encrypted: ctx.fieldValue }
+            })
+        })
     })
 
     interface Enviorment {
@@ -211,7 +233,8 @@ describe('Filter Transformer', () => {
         fieldValue: Uninitialized,
         operator: Uninitialized,
         fieldListValue: Uninitialized,
-        veloDate: Uninitialized
+        veloDate: Uninitialized,
+        objectValue: Uninitialized
     }
 
     beforeEach(() => {
@@ -223,6 +246,7 @@ describe('Filter Transformer', () => {
         ctx.operator = gen.randomOperator() as WixDataMultiFieldOperators | WixDataSingleFieldOperators
         ctx.fieldListValue = [chance.word(), chance.word(), chance.word(), chance.word(), chance.word()]
         ctx.veloDate = genCommon.veloDate()
+        ctx.objectValue = genCommon.randomObject()
     })
 })
 

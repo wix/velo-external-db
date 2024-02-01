@@ -118,16 +118,25 @@ export default class FilterTransformer implements IFilterTransformer {
     }
 
     valueAndOperatorFromFilter(filter: any, fieldName: string) {
-        // there are two options:
-        // { fieldName: { operator: value } }
-        // or
-        // { fieldName: value }
         const filterValue = filter[fieldName]
-        const operator = isObject(filterValue) ? Object.keys(filterValue)[0] : '$eq'
-        const value = isObject(filterValue) ? filterValue[operator] : filterValue
+        if (isObject(filterValue) && this.isOperator(Object.keys(filterValue)[0])) {
+            // Object.keys(filterValue)[0] is an operator
+            const operator = Object.keys(filterValue)[0]
+            const value = filterValue[operator]
+            return {
+                operator,
+                value
+            }
+        }
+        const operator = '$eq'
+        const value = filterValue
         return {
             operator,
             value
         }
+    }
+
+    private isOperator(operator: string) {
+        return operator.startsWith('$') && operator !== '$encrypted'
     }
 }
