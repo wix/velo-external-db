@@ -120,7 +120,6 @@ export default class FilterTransformer implements IFilterTransformer {
     valueAndOperatorFromFilter(filter: any, fieldName: string) {
         const filterValue = filter[fieldName]
         if (isObject(filterValue) && this.isOperator(Object.keys(filterValue)[0])) {
-            // Object.keys(filterValue)[0] is an operator
             const operator = Object.keys(filterValue)[0]
             const value = filterValue[operator]
             return {
