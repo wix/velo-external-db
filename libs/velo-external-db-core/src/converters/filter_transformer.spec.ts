@@ -234,7 +234,7 @@ describe('Filter Transformer', () => {
         operator: Uninitialized,
         fieldListValue: Uninitialized,
         veloDate: Uninitialized,
-        objectValue: Uninitialized
+        objectValue: Uninitialized,
     }
 
     beforeEach(() => {
