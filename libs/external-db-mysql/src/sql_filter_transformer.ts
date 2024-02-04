@@ -1,4 +1,4 @@
-import { errors } from '@wix-velo/velo-external-db-commons'
+import { errors, isDate } from '@wix-velo/velo-external-db-commons'
 import { AdapterFilter as Filter, NonEmptyAdapterAggregation as Aggregation, AdapterOperator, Sort, NotEmptyAdapterFilter as NotEmptyFilter, AdapterFunctions } from '@wix-velo/velo-external-db-types'
 import { EmptyFilter, EmptySort, isObject, AdapterOperators, extractGroupByNames, extractProjectionFunctionsObjects, isEmptyFilter, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { wildCardWith, escapeId } from './mysql_utils'
@@ -61,6 +61,28 @@ export default class FilterParser implements IMySqlFilterParser {
                 parameters: !isNull(value) ? [].concat( this.patchTrueFalseValue(value) ) : []
             }]          
         }
+        
+        if (operator === urlized) {
+            return [{
+                filterExpr: `LOWER(${escapeId(fieldName)}) RLIKE ?`,
+                parameters: [value.map((s: string) => s.toLowerCase()).join('[- ]')]
+            }]
+        }
+        
+        if (operator === matches) {
+            const ignoreCase = value.ignoreCase ? 'LOWER' : ''
+            return [{
+                filterExpr: `${ignoreCase}(${escapeId(fieldName)}) RLIKE ${ignoreCase}(?)`,
+                parameters: [specArrayToRegex(value.spec)]
+            }]
+        }
+
+        if (operator === eq && isObject(value) && !isDate(value)) {
+            return [{
+                filterExpr: `JSON_CONTAINS(${escapeId(fieldName)}, ?)`,
+                parameters: [JSON.stringify(value)]
+            }]
+        }
 
         if (this.isSingleFieldOperator(operator)) {
             return [{
@@ -75,23 +97,7 @@ export default class FilterParser implements IMySqlFilterParser {
                 parameters: [this.valueForStringOperator(operator, value)]
             }]
         }
-
-
-        if (operator === urlized) {
-            return [{
-                filterExpr: `LOWER(${escapeId(fieldName)}) RLIKE ?`,
-                parameters: [value.map((s: string) => s.toLowerCase()).join('[- ]')]
-            }]
-        }
         
-        if (operator === matches) {
-            const ignoreCase = value.ignoreCase ? 'LOWER' : ''
-            return [{
-                filterExpr: `${ignoreCase}(${escapeId(fieldName)}) RLIKE ${ignoreCase}(?)`,
-                parameters: [specArrayToRegex(value.spec)]
-            }]
-        }   
-
         return []
     }
 
@@ -116,7 +122,6 @@ export default class FilterParser implements IMySqlFilterParser {
         } else if ((operator === eq || operator === ne) && isNull(value)) {
             return ''
         }
-
         return '?'
     }
 

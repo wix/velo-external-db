@@ -271,7 +271,20 @@ describe('Sql Parser', () => {
                 })
             })
 
-            describe('handle queries on nested fields', () => {
+            describe('handle queries on objects', () => {
+                test('correctly transform fully object match query', () => {
+                    const filter = {
+                        operator: eq,
+                        fieldName: ctx.fieldName,
+                        value: { a: 1, b: 2, c: 3 }
+                    }
+
+                    expect( env.filterParser.parseFilter(filter) ).toEqual([{
+                        filterExpr: `JSON_CONTAINS(${escapeId(ctx.fieldName)}, ?)`,
+                        parameters: [JSON.stringify(filter.value)]
+                    }])
+                })
+                
                 test('correctly transform nested field query', () => {
                     const operator = ctx.filterWithoutInclude.operator
                     const filter = {

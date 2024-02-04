@@ -11,7 +11,7 @@ import * as matchers from '../drivers/schema_api_rest_matchers'
 import * as data from '../drivers/data_api_rest_test_support'
 import * as authorization from '../drivers/authorization_test_support'
 import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, supportedOperations } from '../resources/e2e_resources'
-const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields, PrimaryKey, AtomicBulkInsert } = SchemaOperations
+const { UpdateImmediately, DeleteImmediately, Truncate, Aggregate, FindWithSort, Projection, FilterByEveryField, QueryNestedFields, PrimaryKey, AtomicBulkInsert, FindObject } = SchemaOperations
 
 const chance = Chance()
 
@@ -311,6 +311,20 @@ describe(`Velo External DB Data REST API: ${currentDbImplementationName()}`,  ()
                 [ctx.numberColumns[0].name]: null,
                 [ctx.numberColumns[1].name]: null,
             }]),
+            pagingMetadata: data.pagingMetadata(1, 1)
+        })
+    })
+
+    testIfSupportedOperationsIncludes(supportedOperations, [ FindObject ])('query on object fields', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.objectColumn], authOwner)
+        await data.givenItems([ctx.objectItem], ctx.collectionName, authAdmin)
+
+        const filter = {
+            [ctx.objectColumn.name]: ctx.objectItem[ctx.objectColumn.name]
+        }
+
+        await expect(data.queryCollectionAsArray(ctx.collectionName, [], undefined, authOwner, filter)).resolves.toEqual({
+            items: expect.toIncludeSameMembers([ctx.objectItem]),
             pagingMetadata: data.pagingMetadata(1, 1)
         })
     })
