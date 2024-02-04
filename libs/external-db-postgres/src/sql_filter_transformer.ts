@@ -1,5 +1,5 @@
 import { NonEmptyAdapterAggregation as Aggregation, AdapterFilter as Filter, AnyFixMe, NotEmptyAdapterFilter as NotEmptyFilter, Sort, AdapterFunctions } from '@wix-velo/velo-external-db-types' 
-import { errors } from '@wix-velo/velo-external-db-commons'
+import { errors, isDate } from '@wix-velo/velo-external-db-commons'
 import { EmptyFilter, EmptySort, isObject, AdapterOperators, extractProjectionFunctionsObjects, extractGroupByNames, isEmptyFilter, isNull, specArrayToRegex } from '@wix-velo/velo-external-db-commons'
 import { escapeIdentifier } from './postgres_utils'
 import { ParsedFilter } from './types'
@@ -131,6 +131,25 @@ export default class FilterParser {
             }]
         }
 
+        if (operator === matches) {
+            const ignoreCase = value.ignoreCase ? 'LOWER' : ''
+            return [{
+                filterExpr: `${ignoreCase}(${escapeIdentifier(fieldName)}) ~ ${ignoreCase}($${offset})`,
+                filterColumns: [],
+                offset: offset + 1,
+                parameters: [specArrayToRegex(value.spec)]
+            }]
+        }
+
+        if (operator === eq && isObject(value) && !isDate(value)) {
+            return [{
+                filterExpr: `${escapeIdentifier(fieldName)}::jsonb @> $${offset}::jsonb`,
+                filterColumns: [],
+                offset: offset + 1,
+                parameters: [JSON.stringify(value)]
+            }]
+        }
+
         if (this.isSingleFieldOperator(operator)) {
             const params = this.valueForOperator(value, operator, offset)
 
@@ -149,16 +168,6 @@ export default class FilterParser {
                 filterColumns: [],
                 offset: offset + 1,
                 parameters: [this.valueForStringOperator(operator, value)]
-            }]
-        }
-
-        if (operator === matches) {
-            const ignoreCase = value.ignoreCase ? 'LOWER' : ''
-            return [{
-                filterExpr: `${ignoreCase}(${escapeIdentifier(fieldName)}) ~ ${ignoreCase}($${offset})`,
-                filterColumns: [],
-                offset: offset + 1,
-                parameters: [specArrayToRegex(value.spec)]
             }]
         }
 
