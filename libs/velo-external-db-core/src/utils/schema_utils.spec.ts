@@ -138,7 +138,15 @@ describe('Schema utils functions', () => {
                 isPrimary: columnName === PrimaryKeyFieldName ? true : false,
             })
         })
+    })
 
+    describe('convert encrypted fields to object', () => {
+        test('convert encrypted fields to object', () => {
+            expect(wixFormatFieldToInputFields({ key: ctx.columnName, type: fieldTypeToWixDataEnum('text'), encrypted: true })).toEqual({
+                name: ctx.columnName,
+                type: 'object'
+            })
+        })
     })
 
     describe('compare columns in db and request function', () => {

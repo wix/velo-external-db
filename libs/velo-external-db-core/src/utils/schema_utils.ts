@@ -217,12 +217,18 @@ export const fieldKeyToPrecision = (fieldKey: string): number | undefined => {
     return FieldsWithPrecision.includes(fieldKey) ? 255 : undefined
 }
 
-export const wixFormatFieldToInputFields = (field: collectionSpi.Field): InputField => ({
+export const wixFormatFieldToInputFields = (field: collectionSpi.Field): InputField => ( field.encrypted ? encryptedInputField(field.key) : 
+{
     name: field.key,
     type: wixDataEnumToFieldType(field.type),
     subtype: fieldTypeToSubtype(field.type),
     precision: fieldKeyToPrecision(field.key),
     isPrimary: field.key === PrimaryKeyFieldName,
+})
+
+export const encryptedInputField = (fieldName: string): InputField => ({
+    name: fieldName,
+    type: FieldType.object,
 })
 
 export const InputFieldToWixFormatField = (field: InputField): collectionSpi.Field => ({
