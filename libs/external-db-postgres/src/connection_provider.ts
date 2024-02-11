@@ -5,10 +5,11 @@ import DataProvider  from './postgres_data_provider'
 import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './postgres_operations'
 import { PostgresConfig, postgresPoolOptions } from './types'
+import { ILogger } from '@wix-velo/external-db-logger'
 
 types.setTypeParser(builtins.NUMERIC, val => parseFloat(val))
 
-export default (cfg: PostgresConfig, _poolOptions: postgresPoolOptions) => {
+export default (cfg: PostgresConfig, _poolOptions: postgresPoolOptions, logger?: ILogger) => {
     const config = {
         host: cfg.host,
         user: cfg.user,
@@ -29,8 +30,8 @@ export default (cfg: PostgresConfig, _poolOptions: postgresPoolOptions) => {
     const pool = new Pool({ ...config, ...poolOptions })
 
     const databaseOperations = new DatabaseOperations(pool)
-    const dataProvider = new DataProvider(pool, filterParser)
-    const schemaProvider = new SchemaProvider(pool)
+    const dataProvider = new DataProvider(pool, filterParser, logger)
+    const schemaProvider = new SchemaProvider(pool, logger)
 
     return { 
         dataProvider,

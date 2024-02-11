@@ -25,16 +25,20 @@ import * as dataSource from './spi-model/data_source'
 import * as schemaSource from './spi-model/collection'
 import { JWTVerifier } from './web/jwt-verifier'
 import { JWTVerifierDecoderMiddleware } from './web/jwt-verifier-decoder-middleware'
+import { ILogger } from '@wix-velo/external-db-logger'
 
 const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
 const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
 type RouterConfig = { type?: string, vendor?: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string, readOnlySchema?: boolean }
+
 let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: RouterConfig, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
+let logger: ILogger | undefined
+
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
                              _externalDbConfigClient: ConfigValidator, _cfg: RouterConfig,
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
-                             _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks) => {
+                             _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks, _logger: ILogger | undefined) => {
     schemaService = _schemaService
     operationService = _operationService
     externalDbConfigClient = _externalDbConfigClient
@@ -45,6 +49,7 @@ export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _s
     // roleAuthorizationService = _roleAuthorizationService
     dataHooks = _hooks?.dataHooks || {}
     schemaHooks = _hooks?.schemaHooks || {}
+    logger = _logger
 }
 
 const serviceContext = (): ServiceContext => ({
@@ -54,15 +59,23 @@ const serviceContext = (): ServiceContext => ({
 
 
 const executeDataHooksFor = async<T>(action: string, payload: T, requestContext: RequestContext, customContext: any): Promise<T> => {
+    logger?.debug(`Data params before ${action} hook`, payload as any)
     return BPromise.reduce(DataHooksForAction[action], async(lastHookResult: AnyFixMe, hookName: string) => {
         return await executeHook(dataHooks, hookName, lastHookResult, requestContext, customContext)
-    }, payload)
+    }, payload).then( res => {
+        logger?.debug(`data params after ${action} hook`, res as any)
+        return res
+    })
 }
 
 const executeSchemaHooksFor = async<T>(action: string, payload: T, requestContext: RequestContext, customContext: any): Promise<T> => {
+    logger?.debug(`Schema params before ${action} hook`, payload as any)
     return BPromise.reduce(SchemaHooksForAction[action], async(lastHookResult: any, hookName: string) => {
         return await executeHook(schemaHooks, hookName, lastHookResult, requestContext, customContext)
-    }, payload)
+    }, payload).then( res => {
+        logger?.debug(`Schema params after ${action} hook`, res as any)
+        return res
+    })
 }
 
 const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, payload: AnyFixMe, requestContext: RequestContext, customContext: any) => {
@@ -96,6 +109,7 @@ export const createRouter = () => {
     router.use((req, res, next) => {
         const twoMintuesInMs = 120000
         res.setTimeout(twoMintuesInMs, () => {
+            logger?.warn('Request Timeout', { url: req.url, method: req.method })
             res.status(408).send('Request Timeout')
         })
         next()
@@ -317,7 +331,7 @@ export const createRouter = () => {
     })
 
 
-    router.use(errorMiddleware)
+    router.use(errorMiddleware(logger))
 
     return router
 }

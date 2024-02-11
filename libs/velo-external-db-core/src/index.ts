@@ -10,6 +10,7 @@ import QueryValidator from './converters/query_validator'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { initServices, createRouter } from './router'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
+import { ILogger } from '@wix-velo/external-db-logger'
 import { DataHooks, ExternalDbRouterConfig, Hooks, SchemaHooks, ServiceContext } from './types'
 import ItemTransformer = require('./converters/item_transformer')
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
@@ -18,6 +19,14 @@ import { ConnectionCleanUp } from '@wix-velo/velo-external-db-types'
 import { Router } from 'express'
 import { CollectionCapability } from './spi-model/capabilities'
 import { decodeBase64 } from './utils/base64_utils'
+
+interface ExternalDbRouterConstructorParams { 
+    connector: DbConnector;
+    config: ExternalDbRouterConfig;
+    logger?: ILogger;
+    hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks};
+}
+
 
 export class ExternalDbRouter {
     connector: DbConnector
@@ -35,10 +44,13 @@ export class ExternalDbRouter {
     cleanup: ConnectionCleanUp
     router: Router
     config: ExternalDbRouterConfig
-    constructor({ connector, config, hooks }: { connector: DbConnector, config: ExternalDbRouterConfig, hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks}}) {
+    logger?: ILogger
+    constructor({ connector, config, hooks, logger }: ExternalDbRouterConstructorParams) {
         this.isInitialized(connector)
         this.connector = connector
-        this.configValidator = new ConfigValidator(connector.configValidator, new AuthorizationConfigValidator(config.authorization), 
+        this.logger = logger
+        this.configValidator = new ConfigValidator(connector.configValidator,
+                                                   new AuthorizationConfigValidator(config.authorization), 
                                                    new CommonConfigValidator({ vendor: config.vendor, type: config.adapterType, jwtPublicKey: config.jwtPublicKey, appDefId: config.appDefId }, 
                                                    config.commonExtended))
         this.config = config
@@ -55,12 +67,12 @@ export class ExternalDbRouter {
         this.roleAuthorizationService = new RoleAuthorizationService(config.authorization?.roleConfig?.collectionPermissions) 
         this.cleanup = connector.cleanup
 
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks, logger)
         this.router = createRouter()
     }
 
     reloadHooks(hooks?: Hooks) {
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks || {})
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks || {}, this.logger)
     }
 
     isInitialized(connector: DbConnector) {

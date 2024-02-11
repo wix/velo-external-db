@@ -33,6 +33,7 @@
       "@wix-velo/velo-external-db-commons": [ "libs/velo-external-db-commons/src/index.ts" ],
       "@wix-velo/velo-external-db-core": [ "libs/velo-external-db-core/src/index.ts" ],
       "@wix-velo/velo-external-db-types": ["libs/velo-external-db-types/src/index.ts"],
+      "@wix-velo/external-db-logger": [ "libs/external-db-logger/index.ts" ],
       "velo-external-db": [ "apps/velo-external-db/src/app.ts" ]
     }
   },

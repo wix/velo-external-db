@@ -1,10 +1,13 @@
+import { ILogger } from '@wix-velo/external-db-logger'
 import { InputField } from '@wix-velo/velo-external-db-types' 
-import { escapeIdentifier } from './postgres_utils'
+import { escapeIdentifier,  } from './postgres_utils'
 
 
 export default class SchemaColumnTranslator {
+    logger?: ILogger
 
-    public constructor() {
+    public constructor(logger?: ILogger) {
+        this.logger = logger
     }
 
     translateType(dbType: string) {
@@ -59,7 +62,7 @@ export default class SchemaColumnTranslator {
                 return 'object'    
 
             default:
-                console.log('Unknown type', type)
+                this.logger ? this.logger.warn(`Unknown type ${type} returning default type - text`) : console.log(`Unknown type ${type} returning default type - text`)
                 return 'text'
         }
     }
