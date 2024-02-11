@@ -57,6 +57,7 @@ export interface Field {
     // Should be set by datasource itself and ignored in request payload.
     capabilities?: FieldCapabilities;
     typeOptions?: { singleReferenceOptions: SingleReferenceOptions }| { multiReferenceOptions: MultiReferenceOptions } ;
+    encrypted?: boolean;
 }
 
 export interface SingleReferenceOptions {
