@@ -85,6 +85,7 @@ export const createRouter = () => {
     router.use(express.text())
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
+    router.use(express.json({ limit: '4mb' }))
     const jwtVerifier = new JWTVerifier(cfg.jwtPublicKey, cfg.appDefId)
     const jwtVerifierDecoderMiddleware = new JWTVerifierDecoderMiddleware(jwtVerifier)
     router.use(unless(['/', '/info', '/capabilities', '/favicon.ico', '/provision', '/connectionStatus'], jwtVerifierDecoderMiddleware.verifyAndDecodeMiddleware()))
