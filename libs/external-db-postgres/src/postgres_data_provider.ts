@@ -19,6 +19,8 @@ export default class DataProvider implements IDataProvider {
         const { sortExpr } = this.filterParser.orderBy(sort)
         const projectionExpr = this.filterParser.selectFieldsFor(projection)
         const sql = `SELECT ${projectionExpr} FROM ${escapeIdentifier(collectionName)} ${filterExpr} ${sortExpr} OFFSET $${offset} LIMIT $${offset + 1}`
+        console.log({ sqlExpression: sql, parameters: [...parameters, skip, limit] })
+        
         const resultSet = await this.pool.query(sql, [...parameters, skip, limit])
                                     .catch( err => translateErrorCodes(err, collectionName) )
         return resultSet.rows

@@ -280,7 +280,23 @@ describe('Sql Parser', () => {
             })
         })
 
-        describe('handle queries on nested fields', () => {
+        describe('handle queries on object fields', () => {
+            test('correctly transform fully object match query', () => {
+                const filter = {
+                    operator: eq,
+                    fieldName: ctx.fieldName,
+                    value: { a: 1, b: 2, c: 3 }
+                }
+
+                const parsedFilter = env.filterParser.parseFilter(filter, ctx.offset)
+
+                expect( parsedFilter ).toEqual([{
+                    filterExpr: `${escapeIdentifier(ctx.fieldName)}::jsonb @> $${ctx.offset}::jsonb`,
+                    parameters: [JSON.stringify(filter.value)],
+                    filterColumns: [],
+                    offset: ctx.offset + 1,
+                }])
+            })
             test('correctly transform nested field query', () => {
                 const operator = ctx.filterWithoutInclude.operator
                 const filter = {
