@@ -21,6 +21,12 @@ export interface SchemaPayload {
 }
 
 export interface Metadata {
+    requestId: string,
+    instanceId: string,
+    identity: Identity,    
+}
+
+export interface Identity { 
     type?: string,
     siteMemberId?: string,
     siteVisitorId?: string,
