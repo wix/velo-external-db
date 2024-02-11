@@ -5,12 +5,12 @@ export class Logger implements ILogger {
     private logLevel: LogLevel
     private logger: pino.Logger
 
-  constructor(level = LogLevel.DEBUG) {
-    this.logLevel = level
+  constructor() {
+    this.logLevel = process.env['LOG_LEVEL']?.toLocaleLowerCase() as LogLevel || LogLevel.WARN
     this.logger = pino({
         base: {},
         timestamp: false,
-        level,
+        level: this.logLevel,
         messageKey: 'message',
         formatters: {
           level: (label) => ({  
