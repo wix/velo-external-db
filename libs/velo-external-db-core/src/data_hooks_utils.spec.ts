@@ -99,11 +99,11 @@ describe('Hooks Utils', () => {
 
     describe('requestContextFor', () => {
         test('should return request context object', () => {
-            expect(requestContextFor(ctx.randomOperation, ctx.bodyWithAllProps, { metaSiteId: ctx.metaSiteId }))
+            expect(requestContextFor(ctx.randomOperation, ctx.bodyWithAllProps))
                 .toEqual({
-                    metaSiteId: ctx.metaSiteId,
                     collectionIds: [ctx.collectionId],
                     operation: ctx.randomOperation,
+                    metadata: ctx.metadata,
                 })
         })
     })
@@ -131,6 +131,7 @@ describe('Hooks Utils', () => {
         metaSiteId: Uninitialized,
         consistentRead: Uninitialized,
         aggregation: Uninitialized,
+        metadata: Uninitialized,
     }
 
     beforeEach(() => {
@@ -153,6 +154,7 @@ describe('Hooks Utils', () => {
         ctx.initialFilter = chance.word()
         ctx.consistentRead = chance.word()
         ctx.aggregation = chance.word()
+        ctx.metadata = chance.word()
         ctx.bodyWithAllProps = randomBodyWith({
             ...ctx
         })

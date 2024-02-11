@@ -91,8 +91,8 @@ export const dataPayloadFor = (operation: DataOperation, body: any) => {
     }
 }
 
-export const requestContextFor = (operation: any, body: any, { metaSiteId }: Record<string, any>): RequestContext => ({ 
+export const requestContextFor = (operation: any, body: any): RequestContext => ({ 
     operation, 
     collectionIds: body.collectionIds || [body.collectionId],
-    metaSiteId
+    metadata: body.metadata
 })

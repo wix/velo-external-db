@@ -12,7 +12,7 @@ describe('Jwt Verifier Decoder Middleware', () => {
     test('given valid token, should decode and override request body', async() => {
         driver.givenValidToken(ctx.token, ctx.decodedToken)
         env.JwtVerifierDecoderMiddleware.verifyAndDecodeMiddleware()(ctx.req, ctx.res, ctx.next)
-        expect(ctx.req.body).toEqual({ ...ctx.decodedToken.request, requestContext: ctx.decodedToken.metadata })
+        expect(ctx.req.body).toEqual({ ...ctx.decodedToken.request, metadata: ctx.decodedToken.metadata })
     })
 
     test('given invalid token, should throw error', async() => {

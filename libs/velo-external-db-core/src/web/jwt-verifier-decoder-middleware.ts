@@ -13,7 +13,7 @@ export class JWTVerifierDecoderMiddleware {
             try {
                 const { request, metadata } = this.jwtVerifier.verifyAndDecode(req.body)
                 req.body = request
-                req.body.requestContext = metadata
+                req.body.metadata = metadata
                 next()
             }
             catch (error) {

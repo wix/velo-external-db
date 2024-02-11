@@ -20,11 +20,19 @@ export interface SchemaPayload {
     collections?: Collection[];
 }
 
+export interface Metadata {
+    type?: string,
+    siteMemberId?: string,
+    siteVisitorId?: string,
+    userId?: string,
+    applicationId?: string,
+}
+
 export interface RequestContext {
     operation: DataOperation | CollectionOperationSPI
     collectionId?: string;
     collectionIds?: string[];
-    metaSiteId: string;
+    metadata: Metadata
 }
 
 export interface ServiceContext {
