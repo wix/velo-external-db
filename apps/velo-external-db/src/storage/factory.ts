@@ -6,7 +6,7 @@ export const engineConnectorFor = async(_type: string, config: any, logger?: Log
     switch ( type.toLowerCase() ) {
         case 'postgres': {
             const { postgresFactory } = require('@wix-velo/external-db-postgres')
-            return await postgresFactory(config)
+            return await postgresFactory(config, logger)
         }
         case 'spanner': {
             const { spannerFactory } = require('@wix-velo/external-db-spanner')

@@ -1,6 +1,7 @@
 import init from './connection_provider'
 import { PostgresConfigValidator } from './postgres_config_validator'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
+import { ILogger } from '@wix-velo/external-db-logger'
 
 export { default as SchemaProvider } from'./postgres_schema_provider'
 export { default as DataProvider } from'./postgres_data_provider'
@@ -13,15 +14,16 @@ export const opsDriver = () => require('../tests/drivers/db_operations_test_supp
 export * as testResources from '../tests/e2e-testkit/postgres_resources'
 
 export class PostgresConnector extends DbConnector {
-    constructor() {
+    constructor(logger: ILogger) {
         //@ts-ignore - todo: fix this
         super(PostgresConfigValidator, init)
         this.type = 'postgres'
+        this.logger = logger
     }
 }
 
-export const postgresFactory = async(config: any, options: any) => {
-    const connector = new PostgresConnector()
-    const { connection, cleanup, ...providers } = await connector.initialize(config, options)
+export const postgresFactory = async(config: any, logger: ILogger, options: any) => {
+    const connector = new PostgresConnector(logger)
+    const { connection, cleanup, ...providers } = await connector.initialize(config, options, logger)
     return { connector, connection, providers, cleanup }
 }
