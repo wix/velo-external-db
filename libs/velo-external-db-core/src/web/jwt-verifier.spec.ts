@@ -11,7 +11,10 @@ describe('JWT Verifier', () => {
     test('should authorize when JWT valid', async() => {
         const token = signedToken({ ...ctx.basicValidPayload, data: ctx.data })
         const decoded = env.jwtVerifier.verifyAndDecode(token)
-        expect(decoded).toEqual(ctx.requestPayload)
+        expect(decoded).toEqual({
+            request: ctx.requestPayload,
+            metadata: ctx.metadata,
+        })
     })
 
     test('should throw when JWT is missing', async() => {
@@ -44,6 +47,7 @@ describe('JWT Verifier', () => {
         basicValidPayload: Record<string, unknown>
         appDefId: string
         requestPayload: string
+        metadata: string
         data: Record<string, unknown>
     }
 
@@ -52,6 +56,7 @@ describe('JWT Verifier', () => {
         appDefId: Uninitialized,
         requestPayload: Uninitialized,
         data: Uninitialized,
+        metadata: Uninitialized,
     }
 
     interface Env {
@@ -65,8 +70,9 @@ describe('JWT Verifier', () => {
     beforeEach(() => {
         ctx.appDefId = chance.word()
         ctx.requestPayload = chance.word()
+        ctx.metadata = chance.word()
         ctx.basicValidPayload = { iss: TOKEN_ISSUER, aud: ctx.appDefId }
-        ctx.data = { request: ctx.requestPayload }
+        ctx.data = { request: ctx.requestPayload, metadata: ctx.metadata }
         env.jwtVerifier = new JWTVerifier(authConfig.authPublicKey, ctx.appDefId)
     })
 })

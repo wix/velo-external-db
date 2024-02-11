@@ -12,7 +12,7 @@ describe('Jwt Verifier Decoder Middleware', () => {
     test('given valid token, should decode and override request body', async() => {
         driver.givenValidToken(ctx.token, ctx.decodedToken)
         env.JwtVerifierDecoderMiddleware.verifyAndDecodeMiddleware()(ctx.req, ctx.res, ctx.next)
-        expect(ctx.req.body).toEqual(ctx.decodedToken)
+        expect(ctx.req.body).toEqual({ ...ctx.decodedToken.request, requestContext: ctx.decodedToken.metadata })
     })
 
     test('given invalid token, should throw error', async() => {
@@ -33,7 +33,7 @@ describe('Jwt Verifier Decoder Middleware', () => {
         req: Request
         res: Response
         next: jest.Mock
-        decodedToken: Record<string, unknown>
+        decodedToken: any
         errorMsgFromVerifier: string
     }
 
@@ -54,7 +54,10 @@ describe('Jwt Verifier Decoder Middleware', () => {
         } as Request
         ctx.res = genCommon.randomObject() as Response
         ctx.next = jest.fn()
-        ctx.decodedToken = genCommon.randomObject()
+        ctx.decodedToken = {
+            request: genCommon.randomObject(),
+            metadata: genCommon.randomObject(),
+        }
         ctx.errorMsgFromVerifier = chance.string()
 
         env.JwtVerifierDecoderMiddleware = new JWTVerifierDecoderMiddleware(driver.jwtVerifier)

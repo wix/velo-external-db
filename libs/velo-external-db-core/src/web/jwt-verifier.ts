@@ -24,8 +24,11 @@ export class JWTVerifier {
                 audience: this.appDefId,
             })
 
-            if (decodedToken && decodedToken.data && decodedToken.data.request) {
-                return decodedToken.data.request
+            if (decodedToken && decodedToken.data) {
+                return {
+                    request: decodedToken.data.request,
+                    metadata: decodedToken.data.metadata,
+                }
             } else {
                 throw new UnauthorizedError('Authorization failed')
             }

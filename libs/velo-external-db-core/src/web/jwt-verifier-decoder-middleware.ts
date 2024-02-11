@@ -11,7 +11,9 @@ export class JWTVerifierDecoderMiddleware {
     verifyAndDecodeMiddleware() {
         return (req: Request, res: Response, next: NextFunction) => {
             try {
-                req.body = this.jwtVerifier.verifyAndDecode(req.body)
+                const { request, metadata } = this.jwtVerifier.verifyAndDecode(req.body)
+                req.body = request
+                req.body.requestContext = metadata
                 next()
             }
             catch (error) {
