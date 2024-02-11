@@ -144,11 +144,12 @@ export const createRouter = () => {
 
             const offset = query.paging ? query.paging.offset : 0
             const limit = query.paging ? query.paging.limit : 50
+            const sort: dataSource.Sorting[] = query.sort ? query.sort : [{ fieldName: '_id', order: dataSource.SortOrder.ASC }]
 
             const data = await schemaAwareDataService.find(
                 collectionId,
                 filterTransformer.transform(query.filter),
-                filterTransformer.transformSort(query.sort),
+                filterTransformer.transformSort(sort),
                 offset,
                 limit,
                 query.fields,
