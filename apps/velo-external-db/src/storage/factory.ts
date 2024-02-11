@@ -1,7 +1,7 @@
-import { Logger } from '@wix-velo/external-db-logger'
+import { ILogger } from '@wix-velo/external-db-logger'
 import { DatabaseFactoryResponse } from '@wix-velo/velo-external-db-commons'
 
-export const engineConnectorFor = async(_type: string, config: any, logger?: Logger): Promise<DatabaseFactoryResponse> => {
+export const engineConnectorFor = async(_type: string, config: any, logger?: ILogger): Promise<DatabaseFactoryResponse> => {
     const type = _type || ''
     switch ( type.toLowerCase() ) {
         case 'postgres': {

@@ -10,7 +10,6 @@ import { MySqlConfigValidator } from './mysql_config_validator'
 import { DatabaseFactoryResponse, DbConnector } from '@wix-velo/velo-external-db-commons'
 import init from './connection_provider'
 import { MySqlConfig } from './types'
-import { Logger } from '@wix-velo/external-db-logger'
 import { ILogger } from '@wix-velo/external-db-logger'
 
 export const driver = () => require('../tests/drivers/sql_filter_transformer_test_support')
@@ -25,7 +24,7 @@ export class MySqlConnector extends DbConnector {
     }
 }
 
-export const mySqlFactory = async(config: MySqlConfig, logger: Logger, options: any): Promise<DatabaseFactoryResponse> => {
+export const mySqlFactory = async(config: MySqlConfig, logger: ILogger, options: any): Promise<DatabaseFactoryResponse> => {
     const connector = new MySqlConnector(logger)
     const { connection, cleanup, ...providers } = await connector.initialize(config, options, logger)
     return { connector, connection, providers, cleanup }

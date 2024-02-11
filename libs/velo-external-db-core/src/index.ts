@@ -10,7 +10,7 @@ import QueryValidator from './converters/query_validator'
 import SchemaAwareDataService from './service/schema_aware_data'
 import { initServices, createRouter } from './router'
 import { DbConnector } from '@wix-velo/velo-external-db-commons'
-import { Logger } from '@wix-velo/external-db-logger'
+import { ILogger } from '@wix-velo/external-db-ILogger'
 import { DataHooks, ExternalDbRouterConfig, Hooks, SchemaHooks, ServiceContext } from './types'
 import ItemTransformer = require('./converters/item_transformer')
 import { RoleAuthorizationService } from '@wix-velo/external-db-security'
@@ -23,7 +23,7 @@ import { decodeBase64 } from './utils/base64_utils'
 interface ExternalDbRouterConstructorParams { 
     connector: DbConnector;
     config: ExternalDbRouterConfig;
-    logger?: Logger;
+    ILogger?: ILogger;
     hooks: {schemaHooks?: SchemaHooks, dataHooks?: DataHooks};
 }
 
@@ -44,11 +44,11 @@ export class ExternalDbRouter {
     cleanup: ConnectionCleanUp
     router: Router
     config: ExternalDbRouterConfig
-    logger?: Logger
-    constructor({ connector, config, hooks, logger }: ExternalDbRouterConstructorParams) {
+    ILogger?: ILogger
+    constructor({ connector, config, hooks, ILogger }: ExternalDbRouterConstructorParams) {
         this.isInitialized(connector)
         this.connector = connector
-        this.logger = logger
+        this.ILogger = ILogger
         this.configValidator = new ConfigValidator(connector.configValidator,
                                                    new AuthorizationConfigValidator(config.authorization), 
                                                    new CommonConfigValidator({ vendor: config.vendor, type: config.adapterType, jwtPublicKey: config.jwtPublicKey, appDefId: config.appDefId }, 
@@ -67,17 +67,17 @@ export class ExternalDbRouter {
         this.roleAuthorizationService = new RoleAuthorizationService(config.authorization?.roleConfig?.collectionPermissions) 
         this.cleanup = connector.cleanup
 
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks, logger)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks, ILogger)
         this.router = createRouter()
     }
 
     reloadHooks(hooks?: Hooks) {
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks || {}, this.logger)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks || {}, this.ILogger)
     }
 
     isInitialized(connector: DbConnector) {
         if (!connector.initialized) {
-            this.logger?.error('Connector must be initialized before being used')
+            this.ILogger?.error('Connector must be initialized before being used')
             throw new Error('Connector must be initialized before being used')
         }
     }
