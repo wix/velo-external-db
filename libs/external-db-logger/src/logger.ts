@@ -13,7 +13,10 @@ export class Logger implements ILogger {
         level,
         messageKey: 'message',
         formatters: {
-          level: (label) => ({ level: label.toUpperCase() }),
+          level: (label, number) => ({  
+            severity: label.toUpperCase(),
+            level: number,
+          }),
         },
       })
   }
