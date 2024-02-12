@@ -95,10 +95,9 @@ const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, p
 
 export const createRouter = () => {
     const router = express.Router()
-    router.use(express.text())
+    router.use(express.text({ limit: '4mb' }))
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
-    router.use(express.json({ limit: '4mb' }))
     const jwtVerifier = new JWTVerifier(cfg.jwtPublicKey, cfg.appDefId)
     const jwtVerifierDecoderMiddleware = new JWTVerifierDecoderMiddleware(jwtVerifier)
     router.use(unless(['/', '/info', '/capabilities', '/favicon.ico', '/provision', '/connectionStatus'], jwtVerifierDecoderMiddleware.verifyAndDecodeMiddleware()))
