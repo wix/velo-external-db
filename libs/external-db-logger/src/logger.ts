@@ -6,7 +6,7 @@ export class Logger implements ILogger {
     private logger: pino.Logger
 
   constructor() {
-    this.logLevel = process.env['LOG_LEVEL']?.toLocaleLowerCase() as LogLevel || LogLevel.WARN
+    this.logLevel = process.env['LOG_LEVEL']?.toLocaleLowerCase() as LogLevel || LogLevel.INFO
     this.logger = pino({
         base: {},
         timestamp: false,
@@ -33,6 +33,6 @@ export class Logger implements ILogger {
   }
 
   error(message: string, error?: LoggerError, data?: Data): void {
-    this.logger.error(message, error, data)
+    this.logger.error(error, message, data)
   }
 }
