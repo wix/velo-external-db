@@ -5,6 +5,7 @@ import { ILogger } from '@wix-velo/external-db-logger'
 export const errorMiddleware = (logger?: ILogger) => (err: any, _req: any, res: Response, _next?: NextFunction) => {
   if (process.env['NODE_ENV'] !== 'test') {
     logger?.error(err.message, err)
+    console.error(err)
   }
 
   const error = domainToSpiErrorTranslator(err)
