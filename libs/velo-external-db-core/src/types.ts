@@ -26,12 +26,14 @@ export interface Metadata {
     identity: Identity,    
 }
 
+export type IdentityType = 'WIX_USER' | 'ANONYMOUS_VISITOR' | 'MEMBER' | 'APP'
+
 export interface Identity { 
-    type?: string,
-    siteMemberId?: string,
-    siteVisitorId?: string,
-    userId?: string,
-    applicationId?: string,
+    identityType?: IdentityType,
+    wixUserId?: string,
+    anonymousVisitorId?: string,
+    memberId?: string,
+    appId?: string,
 }
 
 export interface RequestContext {
