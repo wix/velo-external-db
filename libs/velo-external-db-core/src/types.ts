@@ -20,11 +20,27 @@ export interface SchemaPayload {
     collections?: Collection[];
 }
 
+export interface Metadata {
+    requestId: string,
+    instanceId: string,
+    identity: Identity,    
+}
+
+export type IdentityType = 'WIX_USER' | 'ANONYMOUS_VISITOR' | 'MEMBER' | 'APP'
+
+export interface Identity { 
+    identityType?: IdentityType,
+    wixUserId?: string,
+    anonymousVisitorId?: string,
+    memberId?: string,
+    appId?: string,
+}
+
 export interface RequestContext {
     operation: DataOperation | CollectionOperationSPI
     collectionId?: string;
     collectionIds?: string[];
-    metaSiteId: string;
+    metadata: Metadata
 }
 
 export interface ServiceContext {
