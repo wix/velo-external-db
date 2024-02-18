@@ -89,6 +89,7 @@ export const createRouter = () => {
         const NinetySecondsInMs = 90 * 1000
         res.setTimeout(NinetySecondsInMs, () => {
             console.warn(`Request has timed out - ${req.method} ${req.url}`)
+            console.dir({ body: req.body }, { depth: 3 })
             res.status(408).send('Request Timeout')
         })
         next()
