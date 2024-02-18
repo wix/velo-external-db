@@ -84,6 +84,17 @@ export const createRouter = () => {
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
     router.use(unless(['/', '/provision', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: cfg.secretKey })))
 
+    //set timeout of 1.5 minutes per request
+    router.use((req, res, next) => {
+        const NinetySecondsInMs = 90 * 1000
+        res.setTimeout(NinetySecondsInMs, () => {
+            console.warn(`Request has timed out - ${req.method} ${req.url}`)
+            console.dir({ body: req.body }, { depth: 3 })
+            res.status(408).send('Request Timeout')
+        })
+        next()
+    })
+
     config.forEach(({ pathPrefix, roles }) => router.use(includes([pathPrefix], authRoleMiddleware({ roles }))))
 
     // *************** INFO **********************
