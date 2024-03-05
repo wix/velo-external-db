@@ -335,17 +335,17 @@ export const createRouter = () => {
 
         // *************** Indexes API **********************
 
-        router.post('/indexes/list', async(req, res, next) => {
+        router.post('/v3/indexes/list', async(req, res, next) => {
             try {
                 const { dataCollectionId: collectionId } = req.body as ListIndexesRequest
                 const indexes = await indexService.list(collectionId)
-                res.json({ indexes })
+                res.json(indexes)
             } catch (e) {
                 next(e)
             }
         })
     
-        router.post('/indexes/create', async(req, res, next) => {
+        router.post('/v3/indexes/create', async(req, res, next) => {
             try {
                 const { dataCollectionId: collectionId, index } = req.body as CreateIndexRequest
                 const createdIndex = await indexService.create(collectionId, index)
@@ -357,7 +357,7 @@ export const createRouter = () => {
             }
         })
     
-        router.post('/indexes/remove', async(req, res, next) => {
+        router.post('/v3/indexes/remove', async(req, res, next) => {
             try {
                 const { dataCollectionId: collectionId, indexName } = req.body as RemoveIndexRequest
                 await indexService.remove(collectionId, indexName)

@@ -5,6 +5,7 @@ import FilterParser from './sql_filter_transformer'
 import DatabaseOperations from './mysql_operations'
 import { MySqlConfig } from './types'
 import { ILogger } from '@wix-velo/external-db-logger'
+import IndexProvider from './mysql_index_provider'
 
 
 export default (cfg: MySqlConfig, _poolOptions: Record<string, unknown>, logger?: ILogger)  => {
@@ -32,6 +33,7 @@ export default (cfg: MySqlConfig, _poolOptions: Record<string, unknown>, logger?
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser, logger)
     const schemaProvider = new SchemaProvider(pool, logger)
+    const indexProvider = new IndexProvider(pool)
 
-    return { dataProvider, schemaProvider, databaseOperations, connection: pool, cleanup: async() => await pool.end() }
+    return { dataProvider, schemaProvider, databaseOperations, indexProvider, connection: pool, cleanup: async() => await pool.end() }
 }

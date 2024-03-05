@@ -1,13 +1,14 @@
+import axios from 'axios'
 import waitUntil from 'async-wait-until'
 import { indexSpi } from '@wix-velo/velo-external-db-core'
 
-const axios = require('axios').create({
-    baseURL: 'http://localhost:8080'
+const axiosInstance = axios.create({
+    baseURL: 'http://localhost:8080/v3'
 })
 
 export const givenIndexes = async(collectionName: string, indexes: indexSpi.Index[], auth: any) => {
     for (const index of indexes) {
-        await axios.post('/indexes/create', { dataCollectionId: collectionName, index } as indexSpi.CreateIndexRequest, auth)
+        await axiosInstance.post('/v3/indexes/create', { dataCollectionId: collectionName, index } as indexSpi.CreateIndexRequest, auth)
     }
     await Promise.all(indexes.map(index => indexCreated(collectionName, index.name, auth)))
 }
@@ -19,4 +20,5 @@ const indexCreated = async(collectionName: string, indexName: string, auth: any)
     })
 }
 
-export const retrieveIndexesFor = async(collectionName: string, auth: any) => await axios.post('/indexes/list', { dataCollectionId: collectionName }, { transformRequest: auth.transformRequest })
+export const retrieveIndexesFor = async(collectionName: string, auth: any) => await 
+axiosInstance.post('/indexes/list', { dataCollectionId: collectionName }, { transformRequest: auth.transformRequest }).then(res => res.data)
