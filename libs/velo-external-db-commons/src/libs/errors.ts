@@ -131,3 +131,16 @@ export class CollectionChangeNotSupportedError extends BaseHttpError {
         this.fieldName = fieldName ?? '' 
     }
 }
+
+
+export class IndexAlreadyExists extends BaseHttpError {
+    constructor(message: string) {
+        super(message)
+    }
+}
+
+export class IndexDoesNotExist extends BaseHttpError {
+    constructor(message: string) {
+        super(message)
+    }
+}

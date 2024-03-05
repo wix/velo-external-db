@@ -84,6 +84,7 @@ export class ExternalDbRouter {
 
 export * as types from './types'
 export * as dataSpi from './spi-model/data_source'
+export * as indexSpi from './spi-model/indexing'
 export * as collectionSpi from './spi-model/collection'
 export * as schemaUtils from '../src/utils/schema_utils'
 export * as dataConvertUtils from './converters/data_utils'

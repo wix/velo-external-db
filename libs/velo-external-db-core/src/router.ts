@@ -13,6 +13,7 @@ import { getAppInfoPage } from './utils/router_utils'
 import { requestContextFor, DataActions, dataPayloadFor, DataHooksForAction } from './data_hooks_utils'
 import { SchemaActions, SchemaHooksForAction, schemaPayloadFor } from './schema_hooks_utils'
 import SchemaService from './service/schema'
+import IndexService from './service/indexing'
 import OperationService from './service/operation'
 import { AnyFixMe, CollectionOperationSPI, DataOperation } from '@wix-velo/velo-external-db-types'
 import SchemaAwareDataService from './service/schema_aware_data'
@@ -31,16 +32,17 @@ const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update
 const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
 type RouterConfig = { type?: string, vendor?: string, hideAppInfo?: boolean, jwtPublicKey: string, appDefId: string, readOnlySchema?: boolean }
 
-let schemaService: SchemaService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: RouterConfig, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
+let schemaService: SchemaService, indexService: IndexService, operationService: OperationService, externalDbConfigClient: ConfigValidator, schemaAwareDataService: SchemaAwareDataService, cfg: RouterConfig, filterTransformer: FilterTransformer, aggregationTransformer: AggregationTransformer,  dataHooks: DataHooks, schemaHooks: SchemaHooks //roleAuthorizationService: RoleAuthorizationService,
 let logger: ILogger | undefined
 
 
 export const initServices = (_schemaAwareDataService: SchemaAwareDataService, _schemaService: SchemaService, _operationService: OperationService,
-                             _externalDbConfigClient: ConfigValidator, _cfg: RouterConfig,
+                             _indexService: IndexService, _externalDbConfigClient: ConfigValidator, _cfg: RouterConfig,
                              _filterTransformer: FilterTransformer, _aggregationTransformer: AggregationTransformer,
                              _roleAuthorizationService: RoleAuthorizationService, _hooks: Hooks, _logger: ILogger | undefined) => {
     schemaService = _schemaService
     operationService = _operationService
+    indexService = _indexService
     externalDbConfigClient = _externalDbConfigClient
     cfg = _cfg
     schemaAwareDataService = _schemaAwareDataService
@@ -330,6 +332,40 @@ export const createRouter = () => {
         }
     })
 
+        // *************** Indexes API **********************
+
+        router.post('/indexes/list', async(req, res, next) => {
+            try {
+                const { dataCollectionId: collectionId } = req.body as ListIndexesRequest
+                const indexes = await indexService.list(collectionId)
+                streamCollection(indexes, res)
+            } catch (e) {
+                next(e)
+            }
+        })
+    
+        router.post('/indexes/create', async(req, res, next) => {
+            try {
+                const { dataCollectionId: collectionId, index } = req.body as CreateIndexRequest
+                const createdIndex = await indexService.create(collectionId, index)
+                res.json({
+                    index: createdIndex
+                })
+            } catch (e) {
+                next(e)
+            }
+        })
+    
+        router.post('/indexes/remove', async(req, res, next) => {
+            try {
+                const { dataCollectionId: collectionId, indexName } = req.body as RemoveIndexRequest
+                await indexService.remove(collectionId, indexName)
+                res.json({})
+            } catch (e) {
+                next(e)
+            }
+        })
+        // ***********************************************
 
     router.use(errorMiddleware(logger))
 

@@ -1,12 +1,12 @@
 
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
-import { collectionSpi, schemaUtils } from '@wix-velo/velo-external-db-core'
+import { collectionSpi, schemaUtils, indexSpi } from '@wix-velo/velo-external-db-core'
 import { 
     InputField,
  } from '@wix-velo/velo-external-db-types'
 import { DomainIndex, DomainIndexStatus } from '@wix-velo/velo-external-db-types'
-import { Index as SpiIndex } from '../src/spi-model/indexing'
 import * as Chance from 'chance'
+const {IndexFieldOrder} = indexSpi
 
 const chance = Chance()
 
@@ -135,7 +135,7 @@ export const randomDomainIndex = (): DomainIndex => ({
     status: DomainIndexStatus.ACTIVE,
 })
 
-export const randomSpiIndex = (): SpiIndex => ({
+export const randomSpiIndex = (): indexSpi.Index => ({
     name: chance.word(),
     fields: randomArrayOf(() => ({
         name: chance.word(),
@@ -144,3 +144,12 @@ export const randomSpiIndex = (): SpiIndex => ({
     unique: chance.bool(),
     caseInsensitive: chance.bool(),
 })
+
+export const spiIndexFor = (_collectionName: string, columns: string[]): indexSpi.Index => { 
+    return {
+        name: chance.word(),
+        fields: columns.map((column: string) => ({ path: column, order: chance.pickone([IndexFieldOrder.ASC, IndexFieldOrder.DESC]) })),
+        unique: chance.bool(),
+        caseInsensitive: chance.bool(),
+    }
+}
