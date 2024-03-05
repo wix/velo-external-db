@@ -6,9 +6,9 @@ const axiosInstance = axios.create({
     baseURL: 'http://localhost:8080/v3'
 })
 
-export const givenIndexes = async(collectionName: string, indexes: indexSpi.Index[], auth: any) => {
+export const givenIndexes = async(collectionName: string, indexes: indexSpi.Index[], auth: any) => {    
     for (const index of indexes) {
-        await axiosInstance.post('/v3/indexes/create', { dataCollectionId: collectionName, index } as indexSpi.CreateIndexRequest, auth)
+        await axiosInstance.post('/indexes/create', { dataCollectionId: collectionName, index } as indexSpi.CreateIndexRequest, auth)
     }
     await Promise.all(indexes.map(index => indexCreated(collectionName, index.name, auth)))
 }

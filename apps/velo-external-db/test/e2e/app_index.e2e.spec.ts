@@ -11,7 +11,7 @@ const chance = new Chance()
 import { eventually } from '../utils/eventually'
 
 const axiosServer = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/v3'
 })
 
 
