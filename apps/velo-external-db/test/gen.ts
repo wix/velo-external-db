@@ -6,7 +6,7 @@ import {
  } from '@wix-velo/velo-external-db-types'
 import { DomainIndex, DomainIndexStatus } from '@wix-velo/velo-external-db-types'
 import * as Chance from 'chance'
-const {IndexFieldOrder} = indexSpi
+const { IndexFieldOrder } = indexSpi
 
 const chance = Chance()
 
