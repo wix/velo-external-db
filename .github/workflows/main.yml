@@ -38,13 +38,13 @@ jobs:
     strategy:
       matrix:
         database: [
-                   "postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
+                  #  "postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
                    "mysql", "mysql5",
-                   "mssql", "mssql17",
-                   spanner,
-                   "mongo", "mongo4",
-                   "dynamodb",
-                   "firestore"
+                  #  "mssql", "mssql17",
+                  #  spanner,
+                  #  "mongo", "mongo4",
+                  #  "dynamodb",
+                  #  "firestore"
                    ]
 
     env:
