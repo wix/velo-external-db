@@ -27,6 +27,7 @@ import * as schemaSource from './spi-model/collection'
 import { JWTVerifier } from './web/jwt-verifier'
 import { JWTVerifierDecoderMiddleware } from './web/jwt-verifier-decoder-middleware'
 import { ILogger } from '@wix-velo/external-db-logger'
+import { CreateIndexRequest, ListIndexesRequest, RemoveIndexRequest } from './spi-model/indexing'
 
 const { query: Query, count: Count, aggregate: Aggregate, insert: Insert, update: Update, remove: Remove, truncate: Truncate } = DataOperation
 const { Get, Create, Update: UpdateSchema, Delete } = CollectionOperationSPI
@@ -338,7 +339,7 @@ export const createRouter = () => {
             try {
                 const { dataCollectionId: collectionId } = req.body as ListIndexesRequest
                 const indexes = await indexService.list(collectionId)
-                streamCollection(indexes, res)
+                res.json({ indexes })
             } catch (e) {
                 next(e)
             }

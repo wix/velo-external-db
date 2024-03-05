@@ -1,6 +1,7 @@
 'use strict'
 
 import DataService from './service/data'
+import IndexService from './service/indexing'
 import CacheableSchemaInformation from './service/schema_information'
 import SchemaService from './service/schema'
 import OperationService from './service/operation'
@@ -45,6 +46,7 @@ export class ExternalDbRouter {
     router: Router
     config: ExternalDbRouterConfig
     logger?: ILogger
+    indexService: IndexService
     constructor({ connector, config, hooks, logger }: ExternalDbRouterConstructorParams) {
         this.isInitialized(connector)
         this.connector = connector
@@ -60,6 +62,7 @@ export class ExternalDbRouter {
         this.aggregationTransformer = new AggregationTransformer(this.filterTransformer)
         this.queryValidator = new QueryValidator()
         this.dataService = new DataService(connector.dataProvider)
+        this.indexService = new IndexService(connector.indexProvider)
         this.itemTransformer = new ItemTransformer()
         this.schemaAwareDataService = new SchemaAwareDataService(this.dataService, this.queryValidator, this.schemaInformation, this.itemTransformer)
         this.schemaService = new SchemaService(connector.schemaProvider, this.schemaInformation)
@@ -67,12 +70,12 @@ export class ExternalDbRouter {
         this.roleAuthorizationService = new RoleAuthorizationService(config.authorization?.roleConfig?.collectionPermissions) 
         this.cleanup = connector.cleanup
 
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks, logger)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.indexService, this.configValidator, { ...config, type: connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks, logger)
         this.router = createRouter()
     }
 
     reloadHooks(hooks?: Hooks) {
-        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks || {}, this.logger)
+        initServices(this.schemaAwareDataService, this.schemaService, this.operationService, this.indexService, this.configValidator, { ...this.config, type: this.connector.type }, this.filterTransformer, this.aggregationTransformer, this.roleAuthorizationService, hooks || {}, this.logger)
     }
 
     isInitialized(connector: DbConnector) {

@@ -1,4 +1,3 @@
-import { streamToArray } from '@wix-velo/test-commons'
 import waitUntil from 'async-wait-until'
 import { indexSpi } from '@wix-velo/velo-external-db-core'
 
@@ -20,5 +19,4 @@ const indexCreated = async(collectionName: string, indexName: string, auth: any)
     })
 }
 
-export const retrieveIndexesFor = async(collectionName: string, auth: any) => axios.post('/indexes/list', { dataCollectionId: collectionName }, { responseType: 'stream', ...auth })
-    .then(response => streamToArray(response.data))
+export const retrieveIndexesFor = async(collectionName: string, auth: any) => await axios.post('/indexes/list', { dataCollectionId: collectionName }, { transformRequest: auth.transformRequest })
