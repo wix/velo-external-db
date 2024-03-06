@@ -33,7 +33,7 @@ export default (cfg: MySqlConfig, _poolOptions: Record<string, unknown>, logger?
     const filterParser = new FilterParser()
     const dataProvider = new DataProvider(pool, filterParser, logger)
     const schemaProvider = new SchemaProvider(pool, logger)
-    const indexProvider = new IndexProvider(pool)
+    const indexProvider = new IndexProvider(pool, logger)
 
     return { dataProvider, schemaProvider, databaseOperations, indexProvider, connection: pool, cleanup: async() => await pool.end() }
 }

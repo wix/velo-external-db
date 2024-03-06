@@ -1,6 +1,7 @@
 import { promisify } from 'util'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { DomainIndex, IIndexProvider, DomainIndexStatus } from '@wix-velo/velo-external-db-types'
+import { ILogger } from '@wix-velo/external-db-logger'
 import { Pool as MySqlPool } from 'mysql'
 import { MySqlQuery } from './types'
 import { escapeId, escapeTable } from './mysql_utils'
@@ -8,9 +9,11 @@ import { escapeId, escapeTable } from './mysql_utils'
 export default class IndexProvider implements IIndexProvider {
     pool: MySqlPool
     query: MySqlQuery
+    logger?: ILogger
     failedIndexes: { [x: string]: DomainIndex } = {}
-    constructor(pool: any) {
+    constructor(pool: any, logger?: ILogger) {
         this.pool = pool
+        this.logger = logger
         this.query = promisify(this.pool.query).bind(this.pool)
     }
 
@@ -46,7 +49,7 @@ export default class IndexProvider implements IIndexProvider {
 
     private async getActiveIndexesFor(collectionName: string): Promise<{ [x: string]: DomainIndex }> {
         const res = await this.query(`SHOW INDEXES FROM ${escapeTable(collectionName)}`)
-            .catch(this.translateErrorCodes)
+                              .catch(this.translateErrorCodes)
         const indexes: { [x: string]: DomainIndex } = {}
 
         res.forEach((r: { Key_name: string; Column_name: string; Non_unique: number }) => {
@@ -98,7 +101,7 @@ export default class IndexProvider implements IIndexProvider {
     private async returnStatusAfterXSeconds(x: number, promise: Promise<any>, index: DomainIndex): Promise<DomainIndexStatus> {
         return new Promise((resolve, reject) => {
             promise.catch((e: any) => {
-                console.log('failed to create index', e)
+                this.logger?.error('failed to create index', e)
                 this.failedIndexes[index.name] = ({ ...index, status: DomainIndexStatus.FAILED, error: this.translateErrorCodes(e) })
                 reject(this.translateErrorCodes(e))
             })
