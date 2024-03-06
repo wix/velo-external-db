@@ -1,6 +1,8 @@
 import * as Chance from 'chance'
 import { AdapterOperators } from '@wix-velo/velo-external-db-commons'
 import { gen as genCommon } from '@wix-velo/test-commons'
+import { DomainIndex, DomainIndexStatus } from '@wix-velo/velo-external-db-types'
+import { Index } from '../src/spi-model/indexing'
 import { 
     CollectionCapabilities,
     CollectionOperation,
@@ -107,4 +109,24 @@ export const deleteRandomKeyObject = (obj: { [x: string]: any }) => {
 export const randomBodyWith = (obj: any) => ({
     ...genCommon.randomObject(),
     ...obj
+})
+
+export const randomDomainIndex = (): DomainIndex => ({
+    name: chance.word(),
+    columns: randomArrayOf(() => chance.word()),
+    isUnique: chance.bool(),
+    caseInsensitive: chance.bool(),
+    order: chance.pickone(['ASC', 'DESC']),
+    status: DomainIndexStatus.ACTIVE,
+})
+
+
+export const randomSpiIndex = (): Index => ({
+    name: chance.word(),
+    fields: randomArrayOf(() => ({
+        name: chance.word(),
+        order: chance.pickone(['ASC', 'DESC']),
+    })),
+    unique: chance.bool(),
+    caseInsensitive: chance.bool(),
 })
