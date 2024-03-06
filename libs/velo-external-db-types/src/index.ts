@@ -3,7 +3,7 @@ import {
     SchemaOperations,
     ISchemaProvider,
 } from './collection_types'
-import { IIndexProvider } from '@wix-velo/velo-external-db-types'
+import { IIndexProvider } from './indexing_types'
 export * from './collection_types'
 export * from './indexing_types'
 
