@@ -14,6 +14,10 @@ const indexWith = (index: indexSpi.Index, extraProps: Partial<indexSpi.Index>) =
     ...extraProps
 })
 
+export const failedIndexCreationResponse = (index: indexSpi.Index) => expect.objectContaining({
+    index: indexWith(index, { status: IndexStatus.FAILED }) 
+})
+
 
 export const listIndexResponseWithDefaultIndex = () =>
     expect.arrayContaining([toHaveDefaultIndex()])

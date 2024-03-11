@@ -9,6 +9,8 @@ import * as gen from '../gen'
 import axios from 'axios'
 const chance = new Chance()
 import { eventually } from '../utils/eventually'
+import { InputField } from '@wix-velo/velo-external-db-types'
+import { indexSpi } from '@wix-velo/velo-external-db-core'
 
 const axiosServer = axios.create({
     baseURL: 'http://localhost:8080/v3'
@@ -53,14 +55,24 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
         )
     })
 
-    test('create with existing index', async() => {
+    test('creation of index on existing index should return the index with status failed', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await index.givenIndexes(ctx.collectionName, [ctx.index], authOwner)
 
-        await expect(axiosServer.post('/indexes/create', {
+        await eventually(async() => await expect(axiosServer.post('/indexes/create', {
             dataCollectionId: ctx.collectionName,
             index: ctx.index
-        }, authOwner)).rejects.toThrow()
+        }, authOwner).then(res => res.data)).resolves.toEqual(matchers.failedIndexCreationResponse(ctx.index)
+    ))
+    })
+
+    test('creation of index with invalid column should return the index with status failed', async() => {
+        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
+        
+        await eventually(async() => await expect(axiosServer.post('/indexes/create', {
+            dataCollectionId: ctx.collectionName,
+            index: ctx.invalidIndex
+        }, authOwner).then(res => res.data)).resolves.toEqual(matchers.failedIndexCreationResponse(ctx.invalidIndex)))
     })
 
     test('remove', async() => {
@@ -75,26 +87,18 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
         await expect(index.retrieveIndexesFor(ctx.collectionName, authOwner)).resolves.not.toEqual(matchers.listIndexResponseWith([ctx.index]))
     })
 
-
-    test('get failed indexes', async() => {
-        await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        
-        await axiosServer.post('/indexes/create', {
-            dataCollectionId: ctx.collectionName,
-            index: ctx.invalidIndex
-        }, authOwner).catch(_e => {})
-        
-
-        await eventually(async() =>
-            await expect(index.retrieveIndexesFor(ctx.collectionName, authOwner)).resolves.toEqual(matchers.listIndexResponseWithFailedIndex(ctx.invalidIndex))
-        )
-    })
-
     afterAll(async() => {
         await teardownApp()
     })
 
-    const ctx = {
+    interface Ctx {
+        collectionName: string
+        column: InputField
+        index: indexSpi.Index
+        invalidIndex: indexSpi.Index
+    }
+
+    const ctx: Ctx = {
         collectionName: Uninitialized,
         column: Uninitialized,
         index: Uninitialized,

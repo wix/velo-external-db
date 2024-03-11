@@ -10,7 +10,6 @@ export default class IndexProvider implements IIndexProvider {
     pool: MySqlPool
     query: MySqlQuery
     logger?: ILogger
-    failedIndexes: { [x: string]: DomainIndex } = {}
     constructor(pool: any, logger?: ILogger) {
         this.pool = pool
         this.logger = logger
@@ -20,7 +19,7 @@ export default class IndexProvider implements IIndexProvider {
     async list(collectionName: string): Promise<DomainIndex[]> {
         const activeIndexes = await this.getActiveIndexesFor(collectionName)
         const inProgressIndexes = await this.getInProgressIndexesFor(collectionName)
-        const indexes = { ...this.failedIndexes, ...inProgressIndexes, ...activeIndexes }
+        const indexes = { ...inProgressIndexes, ...activeIndexes }
         return Object.values(indexes)
     }
 
@@ -36,8 +35,9 @@ export default class IndexProvider implements IIndexProvider {
         
         const createIndexPromise = this.query(`CREATE ${unique} INDEX ${escapeId(index.name)} ON ${escapeTable(collectionName)} (${columnsToIndex.map((col: { name: string, partialString: string }) => `${escapeId(col.name)}${col.partialString}`)})`)
         
-        const status = await this.returnStatusAfterXSeconds(1, createIndexPromise, index)
-
+        
+        const status = await this.returnStatusAfterXSeconds(1, createIndexPromise)        
+                
         return { ...index, status }
     }
 
@@ -98,12 +98,11 @@ export default class IndexProvider implements IIndexProvider {
         return
     }
 
-    private async returnStatusAfterXSeconds(x: number, promise: Promise<any>, index: DomainIndex): Promise<DomainIndexStatus> {
-        return new Promise((resolve, reject) => {
+    private async returnStatusAfterXSeconds(x: number, promise: Promise<any>): Promise<DomainIndexStatus> {
+        return new Promise((resolve, _reject) => {
             promise.catch((e: any) => {
                 this.logger?.error('failed to create index', e)
-                this.failedIndexes[index.name] = ({ ...index, status: DomainIndexStatus.FAILED, error: this.translateErrorCodes(e) })
-                reject(this.translateErrorCodes(e))
+                resolve(DomainIndexStatus.FAILED)
             })
 
             setTimeout(() => {
