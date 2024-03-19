@@ -44,10 +44,7 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
 
         // in-progress
-        await expect(axiosServer.post('/indexes/create', {
-            dataCollectionId: ctx.collectionName,
-            index: ctx.index
-        }, authOwner)).resolves.toEqual(matchers.createIndexResponseWith(ctx.index))
+        await expect(index.createIndexFor(ctx.collectionName, ctx.index, authOwner)).resolves.toEqual(matchers.createIndexResponseWith(ctx.index))
 
         // active
         await eventually(async() =>
@@ -68,22 +65,16 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
 
     test('creation of index with invalid column should return the index with status failed', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
-        
-        await eventually(async() => await expect(axiosServer.post('/indexes/create', {
-            dataCollectionId: ctx.collectionName,
-            index: ctx.invalidIndex
-        }, authOwner).then(res => res.data)).resolves.toEqual(matchers.failedIndexCreationResponse(ctx.invalidIndex)))
+
+        await eventually(async() => await expect(index.createIndexFor(ctx.collectionName, ctx.invalidIndex, authOwner)).resolves.toEqual(matchers.failedIndexCreationResponse(ctx.invalidIndex)))
     })
 
     test('remove', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await index.givenIndexes(ctx.collectionName, [ctx.index], authOwner)
 
-        await expect(axiosServer.post('/indexes/remove', {
-            dataCollectionId: ctx.collectionName,
-            indexName: ctx.index.name
-        }, authOwner)).resolves.toEqual(matchers.removeIndexResponse()).catch()
-
+        await expect( index.removeIndexFor(ctx.collectionName, ctx.index.name, authOwner)).resolves.toEqual(matchers.removeIndexResponse())
+            
         await expect(index.retrieveIndexesFor(ctx.collectionName, authOwner)).resolves.not.toEqual(matchers.listIndexResponseWith([ctx.index]))
     })
 

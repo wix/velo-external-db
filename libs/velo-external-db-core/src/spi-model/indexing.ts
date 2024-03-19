@@ -20,13 +20,13 @@ export interface Index {
 }
 
 export enum IndexStatus {
-    UNKNOWN = 0,
-    BUILDING = 1,
-    ACTIVE = 2,
-    DROPPING = 3,
-    DROPPED = 4,
-    FAILED = 5,
-    INVALID = 6
+    UNKNOWN = 'UNKNOWN',
+    BUILDING = 'BUILDING',
+    ACTIVE = 'ACTIVE',
+    DROPPING = 'DROPPING',
+    DROPPED = 'DROPPED',
+    FAILED = 'FAILED',
+    INVALID = 'INVALID'
 }
 
 export interface IndexField {
@@ -45,50 +45,29 @@ export enum IndexFieldOrder {
 
 interface ApplicationError {
     code: string,
-    description: string,
+    errorMessage: string,
     data: any
 }
 
-export abstract class IndexingService {
-    abstract List(req: ListIndexesRequest): Promise<ListIndexesResponse> //stream of Indexes
-    abstract Create(req: CreateIndexRequest): Promise<CreateIndexResponse>
-    abstract Remove(req: RemoveIndexRequest): Promise<RemoveIndexResponse>
-}
-
 export interface ListIndexesRequest {
-    // collection to list indexes from
-    dataCollectionId: string;
-    // optional namespace assigned to collection/installation
-    namespace?: string;
-    // slower read but consistent with recent updates
-    consistentRead: boolean;
+    collectionId: string;
 }
 
 export interface ListIndexesResponse {
-    // stream of Indexes
     index: Index[];
 }
 
 export interface CreateIndexRequest {
-    // collection to list indexes from
-    dataCollectionId: string;
-    // optional namespace assigned to collection/installation
-    namespace?: string;
-    // index definition
+    collectionId: string;
     index: Index;
 }
 
 export interface CreateIndexResponse {
-    // created index and it's status
     index: Index;
 }
 
 export interface RemoveIndexRequest {
-    // collection to delete index from
-    dataCollectionId: string;
-    // optional namespace assigned to collection/installation
-    namespace?: string;
-    // index name
+    collectionId: string;
     indexName: string;
 }
 

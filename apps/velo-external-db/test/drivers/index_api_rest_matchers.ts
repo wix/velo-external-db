@@ -1,9 +1,6 @@
 import { indexSpi } from '@wix-velo/velo-external-db-core'
 const { IndexFieldOrder, IndexStatus } = indexSpi
 
-const responseWith = (matcher: any) => expect.objectContaining({ data: matcher })
-
-
 const indexWith = (index: indexSpi.Index, extraProps: Partial<indexSpi.Index>) => ({
     ...index,
     fields: index.fields.map(field => ({
@@ -14,7 +11,7 @@ const indexWith = (index: indexSpi.Index, extraProps: Partial<indexSpi.Index>) =
     ...extraProps
 })
 
-export const failedIndexCreationResponse = (index: indexSpi.Index) => expect.objectContaining({
+export const failedIndexCreationResponse = (index: indexSpi.Index) => ({
     index: indexWith(index, { status: IndexStatus.FAILED }) 
 })
 
@@ -41,9 +38,9 @@ export const toHaveDefaultIndex = () => ({
 })
 
 
-export const createIndexResponseWith = (index: indexSpi.Index) => responseWith(({ index: indexWith(index, { status: IndexStatus.BUILDING }) }))
+export const createIndexResponseWith = (index: indexSpi.Index) => ({ index: indexWith(index, { status: IndexStatus.BUILDING }) })
 
-export const removeIndexResponse = () => responseWith(({}))
+export const removeIndexResponse = () => (({}))
 
 export const listIndexResponseWithFailedIndex = (index: indexSpi.Index) => {
     return expect.arrayContaining([indexWith(index, { status: IndexStatus.FAILED })])
