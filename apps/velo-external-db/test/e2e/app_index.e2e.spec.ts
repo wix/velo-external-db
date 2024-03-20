@@ -52,7 +52,7 @@ describe(`Velo External DB Index API: ${currentDbImplementationName()}`, () => {
         )
     })
 
-    test('creation of index on existing index should return the index with status failed', async() => {
+    test('create an index on a column that already has an existing index, should return the index with status failed', async() => {
         await schema.givenCollection(ctx.collectionName, [ctx.column], authOwner)
         await index.givenIndexes(ctx.collectionName, [ctx.index], authOwner)
 
