@@ -30,8 +30,10 @@ export default class IndexProvider implements IIndexProvider {
                 partialString: await this.partialStringFor(col, collectionName)
             }
         }))
-        
-        const createIndexPromise = this.pool.query(`CREATE ${unique} INDEX ${escapeIdentifier(index.name)} ON ${escapeIdentifier(collectionName)} (${columnsToIndex.map((col: { name: string, partialString: string }) => `${escapeIdentifier(col.name)}${col.partialString}`)})`)
+
+        const sql = `CREATE ${unique} INDEX ${escapeIdentifier(index.name)} ON ${escapeIdentifier(collectionName)} (${columnsToIndex.map((col: { name: string, partialString: string }) => `${escapeIdentifier(col.name)}${col.partialString}`)})`
+        this.logger?.debug('postgres-create-index', { sql })
+        const createIndexPromise = this.pool.query(sql)
         
         const status = await this.returnStatusAfterXSeconds(1, createIndexPromise, index)
 
@@ -39,13 +41,17 @@ export default class IndexProvider implements IIndexProvider {
     }
 
     async remove(collectionName: string, indexName: string): Promise<void> {
-        await this.pool.query(`DROP INDEX ${escapeIdentifier(indexName)}`)
-            .catch(e => { throw this.translateErrorCodes(e) })
+        const sql = `DROP INDEX ${escapeIdentifier(indexName)}`
+        this.logger?.debug('postgres-remove-index', { sql })
+        await this.pool.query(sql)
+                       .catch(e => { throw this.translateErrorCodes(e) })
     }
 
 
     private async getActiveIndexesFor(collectionName: string): Promise<{ [x: string]: DomainIndex }> {
-        const { rows } = await this.pool.query('SELECT * FROM pg_indexes WHERE schemaname = current_schema() AND tablename = $1', [collectionName])
+        const sql = 'SELECT * FROM pg_indexes WHERE schemaname = current_schema() AND tablename = $1'
+        this.logger?.debug('postgres-get-active-indexes', { sql, parameters: [collectionName] })
+        const { rows } = await this.pool.query(sql, [collectionName])
                                         .catch(err => { throw this.translateErrorCodes(err) })
 
         
