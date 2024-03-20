@@ -32,9 +32,10 @@ export default class IndexProvider implements IIndexProvider {
                 partialString: await this.partialStringFor(col, collectionName)
             }
         }))
-        
-        const createIndexPromise = this.query(`CREATE ${unique} INDEX ${escapeId(index.name)} ON ${escapeTable(collectionName)} (${columnsToIndex.map((col: { name: string, partialString: string }) => `${escapeId(col.name)}${col.partialString}`)})`)
-        
+
+        const sql = `CREATE ${unique} INDEX ${escapeId(index.name)} ON ${escapeTable(collectionName)} (${columnsToIndex.map((col: { name: string, partialString: string }) => `${escapeId(col.name)}${col.partialString}`)})`
+        this.logger?.debug('mysql-create-index', { sql })
+        const createIndexPromise = this.query(sql)
         
         const status = await this.returnStatusAfterXSeconds(1, createIndexPromise)        
                 
@@ -42,13 +43,17 @@ export default class IndexProvider implements IIndexProvider {
     }
 
     async remove(collectionName: string, indexName: string): Promise<void> {
-        await this.query(`DROP INDEX ${escapeId(indexName)} ON ${escapeTable(collectionName)}`)
+        const sql = `DROP INDEX ${escapeId(indexName)} ON ${escapeTable(collectionName)}`
+        this.logger?.debug('mysql-remove-index', { sql })
+        await this.query(sql)
             .catch(e => { throw this.translateErrorCodes(e) })
     }
 
 
     private async getActiveIndexesFor(collectionName: string): Promise<{ [x: string]: DomainIndex }> {
-        const res = await this.query(`SHOW INDEXES FROM ${escapeTable(collectionName)}`)
+        const sql = `SHOW INDEXES FROM ${escapeTable(collectionName)}`
+        this.logger?.debug('mysql-getActiveIndexesFor', { sql })
+        const res = await this.query(sql)
                               .catch(this.translateErrorCodes)
         const indexes: { [x: string]: DomainIndex } = {}
 
@@ -70,6 +75,8 @@ export default class IndexProvider implements IIndexProvider {
 
     private async getInProgressIndexesFor(collectionName: string): Promise<{ [x: string]: DomainIndex }> {
         const databaseName = this.pool.config.connectionConfig.database
+        const sql = 'SELECT * FROM information_schema.processlist WHERE db = ? AND info LIKE \'CREATE%INDEX%\''
+        this.logger?.debug('mysql-getInProgressIndexesFor', { sql, parameters: databaseName })
         const inProgressIndexes = await this.query('SELECT * FROM information_schema.processlist WHERE db = ? AND info LIKE \'CREATE%INDEX%\'', [databaseName])
         const domainIndexesForCollection = inProgressIndexes.map((r: any) => this.extractIndexFromQueryForCollection(collectionName, r.INFO)).filter(Boolean) as DomainIndex[]
         return domainIndexesForCollection.reduce((acc, index) => {
