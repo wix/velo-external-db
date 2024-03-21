@@ -20,6 +20,7 @@ For a detailed guide to installing and integrating this adaptor on Google Cloud 
 
 The external database adaptor is a Node.js server that implements the [wix-data SPI](https://www.wix.com/velo/reference/spis/external-database-collections). The server communicates with the database using the database's native protocol. It then translates the data into wix-data format and communicates with the Wix site via the wix-data SPI. 
 ![Architecture diagram](https://d2x3xhvgiqkx42.cloudfront.net/12345678-1234-1234-1234-1234567890ab/11e10e4f-b84d-4136-a5a9-6109fab0b7d7/2021/02/28/2ea08bbb-fd80-4867-a96e-f1e6ace75200/3a60c87f-2a76-4070-8cd2-88061df85565.png)
+
 The Wix-Data SPI is a REST over HTTPS protocol in which the Wix site forwards database operations to the adaptor (1), which translates them to native DB operations (2). The adaptor calls the external database (3), gets the response (4), translates the response back to the wix-data protocol (5), and responds to the SPI request (6).
   
 
