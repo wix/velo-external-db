@@ -15,7 +15,7 @@ export const givenIndexes = async(collectionName: string, indexes: indexSpi.Inde
 
 const indexCreated = async(collectionName: string, indexName: string, auth: any) => {
     await waitUntil(async() => {
-        const indexes = await retrieveIndexesFor(collectionName, auth) as indexSpi.Index[]
+        const { indexes } = await retrieveIndexesFor(collectionName, auth) as indexSpi.ListIndexesResponse
         return indexes.some(index => index.name === indexName)
     })
 }

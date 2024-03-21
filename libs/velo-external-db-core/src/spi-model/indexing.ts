@@ -53,8 +53,8 @@ export interface ListIndexesRequest {
     collectionId: string;
 }
 
-export interface ListIndexesResponse {
-    index: Index[];
+export type ListIndexesResponse = {
+    indexes: Index[];
 }
 
 export interface CreateIndexRequest {

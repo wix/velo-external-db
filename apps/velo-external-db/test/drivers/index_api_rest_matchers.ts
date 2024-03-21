@@ -16,13 +16,15 @@ export const failedIndexCreationResponse = (index: indexSpi.Index) => ({
 })
 
 
-export const listIndexResponseWithDefaultIndex = () =>
-    expect.arrayContaining([toHaveDefaultIndex()])
+export const listIndexResponseWithDefaultIndex = () => ({
+    indexes: expect.arrayContaining([toHaveDefaultIndex()])
+})
 
-export const listIndexResponseWith = (indexes: indexSpi.Index[]) =>
-    expect.arrayContaining(
+export const listIndexResponseWith = (indexes: indexSpi.Index[]) => ({
+    indexes: expect.arrayContaining(
         [...indexes.map((index: indexSpi.Index) => indexWith(index, { status: IndexStatus.ACTIVE }))]
     )
+})
 
 export const toHaveDefaultIndex = () => ({
     name: expect.any(String),

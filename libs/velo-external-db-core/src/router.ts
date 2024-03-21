@@ -333,13 +333,13 @@ export const createRouter = () => {
         }
     })
 
-        // *************** Indexes API **********************
+    // *************** Indexes API **********************
 
         router.post('/v3/indexes/list', async(req, res, next) => {
             try {
                 const { collectionId } = req.body as ListIndexesRequest
                 const indexes = await indexService.list(collectionId)
-                res.json(indexes)
+                res.json({ indexes })
             } catch (e) {
                 next(e)
             }
