@@ -24,14 +24,7 @@ export default class IndexProvider implements IIndexProvider {
     async create(collectionName: string, index: DomainIndex): Promise<DomainIndex> {
         const unique = index.isUnique ? 'UNIQUE' : ''
 
-        const columnsToIndex = await Promise.all(index.columns.map(async(col: string) => {
-            return {
-                name: col,
-                partialString: await this.partialStringFor(col, collectionName)
-            }
-        }))
-
-        const sql = `CREATE ${unique} INDEX ${escapeIdentifier(index.name)} ON ${escapeIdentifier(collectionName)} (${columnsToIndex.map((col: { name: string, partialString: string }) => `${escapeIdentifier(col.name)}${col.partialString}`)})`
+        const sql = `CREATE ${unique} INDEX ${escapeIdentifier(index.name)} ON ${escapeIdentifier(collectionName)} (${index.columns.map((col: string) => `${escapeIdentifier(col)}`)})`
         this.logger?.debug('postgres-create-index', { sql })
         const createIndexPromise = this.pool.query(sql)
         
@@ -86,44 +79,8 @@ export default class IndexProvider implements IIndexProvider {
     }
 
     private async getInProgressIndexesFor(_collectionName: string): Promise<{ [x: string]: DomainIndex }> {
-        // const query = `
-        // SELECT 
-        // now()::TIME(0) AS "Current Time",
-        // a.query,
-        // p.phase,
-        // round(p.blocks_done / p.blocks_total::numeric * 100, 2) AS "% Done",
-        // p.blocks_total,
-        // p.blocks_done,
-        // p.tuples_total,
-        // p.tuples_done,
-        // ai.schemaname,
-        // ai.relname AS tablename,
-        // ai.indexrelname AS "Index Name"
-        // FROM pg_stat_progress_create_index p
-        // JOIN pg_stat_activity a ON p.pid = a.pid
-        // LEFT JOIN pg_stat_all_indexes ai ON ai.relid = p.relid AND ai.indexrelid = p.index_relid
-        // WHERE ai.relname = $1;
-        // `
-        // const query2 = `
-        // SELECT *
-        // FROM pg_stat_activity
-        // WHERE state LIKE '%vacuum%' OR state LIKE '%autovacuum%';
-        // `
-
-
-        // const { rows } = await this.pool.query(query2)
-        // .catch(err => { throw this.translateErrorCodes(err) })
-        // console.dir({
-        //     rows
-        // }, { depth: null })
+        // TODO: find a way to find indexes that are in creation state.
         return {}
-        // const databaseName = this.pool.config.connectionConfig.database
-        // const inProgressIndexes = await this.query('SELECT * FROM information_schema.processlist WHERE db = ? AND info LIKE \'CREATE%INDEX%\'', [databaseName])
-        // const domainIndexesForCollection = inProgressIndexes.map((r: any) => this.extractIndexFromQueryForCollection(collectionName, r.INFO)).filter(Boolean) as DomainIndex[]
-        // return domainIndexesForCollection.reduce((acc, index) => {
-        //     acc[index.name] = index
-        //     return acc
-        // }, {} as { [x: string]: DomainIndex })
     }
 
     private async returnStatusAfterXSeconds(x: number, promise: Promise<any>, _index: DomainIndex): Promise<DomainIndexStatus> {
@@ -151,20 +108,6 @@ export default class IndexProvider implements IIndexProvider {
         }
     }
 
-    private async partialStringFor(_col: string, _collectionName: string) {
-        return ''
-        // const typeResp = await this.query('SELECT DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?', [collectionName, col]).catch(_e => [])
-        // const type = typeResp[0]?.DATA_TYPE
-
-        // if (this.isTextType(type)) {
-        //     const lengthResp = await this.query('SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?', [collectionName, col])
-        //     const length = lengthResp[0].CHARACTER_MAXIMUM_LENGTH
-        //     if (length) {
-        //         return length > 767 ? '(767)' : `(${length})` // 767 is the max length for a text index
-        //     }
-        // }
-        // return ''
-    }
 
 
 }
