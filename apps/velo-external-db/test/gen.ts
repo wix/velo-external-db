@@ -1,8 +1,12 @@
 
 import { SystemFields } from '@wix-velo/velo-external-db-commons'
-import { collectionSpi, schemaUtils } from '@wix-velo/velo-external-db-core'
-import { InputField } from '@wix-velo/velo-external-db-types'
+import { collectionSpi, schemaUtils, indexSpi } from '@wix-velo/velo-external-db-core'
+import { 
+    InputField,
+ } from '@wix-velo/velo-external-db-types'
+import { DomainIndex, DomainIndexStatus } from '@wix-velo/velo-external-db-types'
 import * as Chance from 'chance'
+const { IndexFieldOrder } = indexSpi
 
 const chance = Chance()
 
@@ -27,7 +31,14 @@ export const randomDbEntity = (columns: string[]) => {
     return entity
 }
 
-
+export const randomArrayOf= <T>(gen: any): T[] => {
+    const arr = []
+    const num = chance.natural({ min: 2, max: 20 })
+    for (let i = 0; i < num; i++) {
+        arr.push(gen())
+    }
+    return arr
+}
 
 export const randomDbEntities = (columns: string[]) => {
     const num = chance.natural({ min: 2, max: 20 })
@@ -112,5 +123,33 @@ export const randomCollection = (): collectionSpi.Collection => {
         id: randomCollectionName(),
         fields: schemaUtils.InputFieldsToWixFormatFields(SystemFields),
         pagingMode: collectionSpi.PagingMode.offset
+    }
+}
+
+export const randomDomainIndex = (): DomainIndex => ({
+    name: chance.word(),
+    columns: randomArrayOf(() => chance.word()),
+    isUnique: chance.bool(),
+    caseInsensitive: chance.bool(),
+    order: chance.pickone(['ASC', 'DESC']),
+    status: DomainIndexStatus.ACTIVE,
+})
+
+export const randomSpiIndex = (): indexSpi.Index => ({
+    name: chance.word(),
+    fields: randomArrayOf(() => ({
+        name: chance.word(),
+        order: chance.pickone(['ASC', 'DESC']),
+    })),
+    unique: chance.bool(),
+    caseInsensitive: chance.bool(),
+})
+
+export const spiIndexFor = (_collectionName: string, columns: string[]): indexSpi.Index => { 
+    return {
+        name: chance.word(),
+        fields: columns.map((column: string) => ({ path: column, order: chance.pickone([IndexFieldOrder.ASC, IndexFieldOrder.DESC]) })),
+        unique: chance.bool(),
+        caseInsensitive: chance.bool(),
     }
 }

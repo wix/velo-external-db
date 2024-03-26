@@ -1,10 +1,11 @@
 import { 
     ResponseField,
     SchemaOperations,
-    ISchemaProvider
+    ISchemaProvider,
 } from './collection_types'
-
+import { IIndexProvider } from './indexing_types'
 export * from './collection_types'
+export * from './indexing_types'
 
 export enum AdapterOperator { //in velo-external-db-core
     eq = 'eq',
@@ -130,6 +131,7 @@ export type ConnectionCleanUp = () => Promise<void> | void
 export type DbProviders<T> = {
     dataProvider: IDataProvider
     schemaProvider: ISchemaProvider
+    indexProvider?: IIndexProvider
     databaseOperations: IDatabaseOperations
     connection: T
     cleanup: ConnectionCleanUp

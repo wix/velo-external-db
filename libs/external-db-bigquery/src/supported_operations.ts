@@ -7,6 +7,7 @@ const notSupportedOperations = [
     SchemaOperations.StartWithCaseInsensitive,
     SchemaOperations.PrimaryKey,
     SchemaOperations.ChangeColumnType,
+    SchemaOperations.Indexing,
 ]
 
 export const supportedOperations = AllSchemaOperations.filter(op => !notSupportedOperations.includes(op))

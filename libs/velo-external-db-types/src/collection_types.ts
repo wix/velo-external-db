@@ -104,6 +104,7 @@ export enum SchemaOperations {
     NonAtomicBulkInsert = 'NonAtomicBulkInsert',
     AtomicBulkInsert = 'AtomicBulkInsert',
     PrimaryKey = 'PrimaryKey',
+    Indexing = 'Indexing',
 }
 
 export type InputField = FieldAttributes & { name: string }
