@@ -132,11 +132,12 @@ export const createRouter = () => {
         const capabilitiesResponse = {
             supportsCollectionModifications: cfg.readOnlySchema ? false : true,
             supportedFieldTypes: Object.values(schemaSource.FieldType).filter(t => !unsupportedFieldTypes.includes(t)),
-            supportsCollectionDisplayName: false,
-            supportsCollectionDisplayField: false,
-            supportsCollectionPermissions: false,
-            supportsCollectionFieldDisplayName: false,
-            supportsCollectionFieldDescription: false,
+            indexptions: {
+                supportsIndexes: indexService.storage ? true : false,
+                maxNumberOfRegularIndexesPerCollection: 10,
+                maxNumberOfUniqueIndexesPerCollection: 10,
+                maxNumberOfIndexesPerCollection: 20,
+            } 
         }
 
         res.json(capabilitiesResponse)
