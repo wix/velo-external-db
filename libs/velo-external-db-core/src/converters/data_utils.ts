@@ -6,12 +6,19 @@ export const asWixData = (item: Item) => {
     return generateIdsIfNeeded(packDates(item))
 }
 
+const replaceNonAlphanumeric = (str: string) => {
+    // Replace non-alphanumeric characters with dashes
+    return str.replace(/[^a-zA-Z0-9]/g, '-')
+}
+
 export const generateIdsIfNeeded = (item: Item): ItemWithId => {
     if ('_id' in item)
         return item as ItemWithId
     const sha = crypto.createHash('sha1')
     const fieldsConcat = Object.values(item).join('')
-    return { ...item, _id: sha.update(fieldsConcat).digest('base64') }
+    const base64Digest = sha.update(fieldsConcat).digest('base64')
+    const validId = replaceNonAlphanumeric(base64Digest)
+    return { ...item, _id: validId }
 }
 
 const packDates = (item: Item) => Object.entries(item)
