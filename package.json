@@ -2,8 +2,8 @@
   "name": "velo-external-database-adapter",
   "scripts": {
     "start": "nx serve",
-    "start:dev": "nx run velo-external-db:serve",
-    "build:dev": "nx run-many --target=build --all",
+    "start:dev": "echo test && nx run velo-external-db:serve",
+    "build:dev": "echo test && nx run-many --target=build --all",
     "build:full-image": "nx run velo-external-db:build-image ",
     "lint": "eslint --cache ./",
     "lint:fix": "eslint --cache --fix ./",
