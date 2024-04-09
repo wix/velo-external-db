@@ -1,5 +1,5 @@
 import { Pool } from 'pg'
-import { escapeIdentifier } from './postgres_utils'
+import { escapeIdentifier, extractIndexFromIndexQueryForCollection } from './postgres_utils'
 import { errors } from '@wix-velo/velo-external-db-commons'
 import { DomainIndex, IIndexProvider, DomainIndexStatus } from '@wix-velo/velo-external-db-types'
 import { ILogger } from '@wix-velo/external-db-logger'
@@ -78,10 +78,31 @@ export default class IndexProvider implements IIndexProvider {
         return indexs
     }
 
-    private async getInProgressIndexesFor(_collectionName: string): Promise<{ [x: string]: DomainIndex }> {
-        // TODO: find a way to find indexes that are in creation state.
-        return {}
+    private async getInProgressIndexesFor(collectionName: string): Promise<{ [x: string]: DomainIndex }> {
+        const sql = `
+        SELECT query
+        FROM pg_stat_activity
+        WHERE
+            -- get only the queries that are creating indexes
+            (query ILIKE 'CREATE INDEX%' OR query ILIKE 'CREATE UNIQUE INDEX%')
+            --   get only the queries that are creating indexes on collectionName table
+            AND (query LIKE '%${collectionName}(%')
+            --   get only the queries that are active
+            AND state = 'active'
+        GROUP BY query;
+        `
+        this.logger?.debug('postgres-getInProgressIndexesFor', { sql })
+        const { rows } = await this.pool.query(sql)
+                                        .catch(err => { throw this.translateErrorCodes(err) })
+        const domainIndexesForCollection = rows.map((r: { query: string }) => extractIndexFromIndexQueryForCollection(r.query))
+
+        return domainIndexesForCollection.reduce((acc, index) => {
+            acc[index.name] = index
+            return acc
+        }, {} as { [x: string]: DomainIndex })
     }
+
+
 
     private async returnStatusAfterXSeconds(x: number, promise: Promise<any>, _index: DomainIndex): Promise<DomainIndexStatus> {
         return new Promise((resolve, _reject) => {
