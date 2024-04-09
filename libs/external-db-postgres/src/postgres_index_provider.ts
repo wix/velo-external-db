@@ -84,9 +84,7 @@ export default class IndexProvider implements IIndexProvider {
         FROM pg_stat_activity
         WHERE
             (query ILIKE 'CREATE INDEX%' OR query ILIKE 'CREATE UNIQUE INDEX%')
-            --   get only the queries that are creating indexes on collectionName table
             AND (query LIKE '%${escapeIdentifier(collectionName)}(%')
-            --   get only the queries that are active
             AND state = 'active'
         GROUP BY query;
         `
