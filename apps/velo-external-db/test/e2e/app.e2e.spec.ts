@@ -1,5 +1,6 @@
 import { authOwner } from '@wix-velo/external-db-testkit'
-import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env } from '../resources/e2e_resources'
+import { initApp, teardownApp, dbTeardown, setupDb, currentDbImplementationName, env, supportedOperations } from '../resources/e2e_resources'
+import { SchemaOperations } from '@wix-velo/velo-external-db-types'
 import { givenHideAppInfoEnvIsTrue } from '../drivers/app_info_config_test_support'
 
 const axios = require('axios').create({
@@ -36,11 +37,12 @@ describe(`Velo External DB: ${currentDbImplementationName()}`,  () => {
         expect((await axios.post('/v3/capabilities/get', { }, authOwner)).data).toEqual(expect.objectContaining({
             supportsCollectionModifications: true,
             supportedFieldTypes: expect.toBeArray(),
-            supportsCollectionDisplayName: false,
-            supportsCollectionDisplayField: false,
-            supportsCollectionPermissions: false,
-            supportsCollectionFieldDisplayName: false,
-            supportsCollectionFieldDescription: false,
+            indexptions: {
+                supportsIndexes: supportedOperations.includes(SchemaOperations.Indexing),
+                maxNumberOfRegularIndexesPerCollection: 10,
+                maxNumberOfUniqueIndexesPerCollection: 10,
+                maxNumberOfIndexesPerCollection: 20,
+            },
          }))
     })
 

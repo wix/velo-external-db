@@ -8,7 +8,8 @@ const notSupportedOperations = [
     SchemaOperations.FindObject,
     SchemaOperations.IncludeOperator,
     SchemaOperations.Matches,
-    SchemaOperations.NonAtomicBulkInsert
+    SchemaOperations.NonAtomicBulkInsert,
+    SchemaOperations.Indexing,
 ]
 
 

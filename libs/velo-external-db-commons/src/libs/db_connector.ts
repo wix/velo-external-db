@@ -1,5 +1,5 @@
 import { ILogger } from '@wix-velo/external-db-logger'
-import { ConnectionCleanUp, DbProviders, IConfigValidator, IDatabaseOperations, IDataProvider, ISchemaProvider } from '@wix-velo/velo-external-db-types'
+import { ConnectionCleanUp, DbProviders, IConfigValidator, IDatabaseOperations, IDataProvider, ISchemaProvider, IIndexProvider } from '@wix-velo/velo-external-db-types'
 
 
 export default class DbConnector {
@@ -8,6 +8,7 @@ export default class DbConnector {
     init: (config: any, option: any, logger?: ILogger) => Promise<DbProviders<any>> | DbProviders<any>
     dataProvider!: IDataProvider
     schemaProvider!: ISchemaProvider
+    indexProvider?: IIndexProvider
     databaseOperations!: IDatabaseOperations
     connection: any
     cleanup!: ConnectionCleanUp
@@ -26,7 +27,8 @@ export default class DbConnector {
     }
 
     async initialize(config: any, options: any, logger?: ILogger) {
-        const { dataProvider, schemaProvider, databaseOperations, connection, cleanup } = await this.init(config, options, logger)
+        const { dataProvider, schemaProvider, databaseOperations, indexProvider, connection, cleanup } = await this.init(config, options, logger)
+        this.indexProvider = indexProvider
         this.dataProvider = dataProvider
         this.schemaProvider = schemaProvider
         this.databaseOperations = databaseOperations
