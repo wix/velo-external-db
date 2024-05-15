@@ -18,7 +18,7 @@ export default (cfg: PostgresConfig, _poolOptions: postgresPoolOptions) => {
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 10000,
-        ssl: process.env['SSL'] === 'true' ? { rejectUnauthorized: false } : {},
+        ssl: process.env['SSL'] === 'true' ? { rejectUnauthorized: false } : undefined,
     }
     const poolOptions = _poolOptions || {}
 
