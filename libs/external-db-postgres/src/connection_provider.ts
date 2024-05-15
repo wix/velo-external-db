@@ -26,7 +26,7 @@ export default (cfg: PostgresConfig, _poolOptions: postgresPoolOptions) => {
     }
 
     const filterParser = new FilterParser()
-    const pool = new Pool({ ...config, ...poolOptions })
+    const pool = new Pool({ ...config, ...poolOptions, ssl: { rejectUnauthorized: false } })
 
     const databaseOperations = new DatabaseOperations(pool)
     const dataProvider = new DataProvider(pool, filterParser)
