@@ -29,7 +29,7 @@ export default class SchemaProvider implements ISchemaProvider {
 
         this.logger?.debug('mysql-list', { sql, parameters: currentDb })
 
-        const data = await this.query(sql, currentDb)
+        const data = await this.query(sql, [currentDb])
         const tables: {[x:string]: { field: string, type: string}[]} = parseTableData( data )
 
         return Object.entries(tables)
@@ -45,7 +45,7 @@ export default class SchemaProvider implements ISchemaProvider {
         const sql = 'SELECT TABLE_NAME as table_name FROM information_schema.tables WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME'
 
         this.logger?.debug('mysql-listHeaders', { sql, parameters: currentDb })
-        const data = await this.query(sql, currentDb)
+        const data = await this.query(sql, [currentDb])
         return data.map( (rs: { table_name: any }) => rs.table_name )
     }
 
