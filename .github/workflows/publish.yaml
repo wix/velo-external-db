@@ -135,11 +135,11 @@ jobs:
           gcloud auth configure-docker -q
 
           # Setting image tag to image tag input
-          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test:$IMAGE_TAG
+          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test/$IMAGE_NAME:$IMAGE_TAG
           # Setting image to with github branch name
-          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test:branch-${GITHUB_REF##*/}
+          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test/$IMAGE_NAME:branch-${GITHUB_REF##*/}
           # Setting image to with github sha
-          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test:sha-${GITHUB_SHA}
+          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test/$IMAGE_NAME:sha-${GITHUB_SHA}
 
           echo "Pushing image to GCP container registry..."
           docker push us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test --all-tags
