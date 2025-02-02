@@ -40,7 +40,7 @@ jobs:
         database: [
                    "postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
                    "mysql", "mysql5",
-                   "mssql", "mssql17",
+                   "mssql",
                    spanner,
                    "mongo", "mongo4",
                    "dynamodb",
@@ -65,7 +65,7 @@ jobs:
             node_modules
             */*/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
-          
+
       - name: Downloading Image
         if: ${{ ( matrix.database != 'google-sheets') }}
         run: |

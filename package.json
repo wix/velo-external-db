@@ -52,7 +52,7 @@
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.3",
     "mongodb": "^4.6.0",
-    "mssql": "^8.1.0",
+    "mssql": "^11.0.1",
     "mysql": "^2.18.1",
     "nested-property": "^4.0.0",
     "node-cache": "^5.1.2",
@@ -111,7 +111,7 @@
     "prettier": "^2.5.1",
     "rewire": "^6.0.0",
     "ts-jest": "27.1.4",
-    "ts-node": "9.1.1",
+    "ts-node": "^10.9.2",
     "typescript": "^4.9.5",
     "uuid-validate": "^0.0.3"
   },
