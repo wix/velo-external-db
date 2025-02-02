@@ -78,6 +78,8 @@ jobs:
           cd apps/velo-external-db/test/resources
           docker compose up --detach ${{ matrix.database }}
           sleep 5
+          docker ps
+          
 
       - name: Installing Dependencies
         run: npm install
