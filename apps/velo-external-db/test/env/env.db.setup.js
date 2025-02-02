@@ -101,7 +101,6 @@ const cleanup = async(testEngine) => {
 }
 
 module.exports = async() => {
-    await sleep(2000)
     const testEngine = process.env.TEST_ENGINE
     if (ci.LocalDev() || ci.engineWithoutDocker(testEngine)) {
         await initEnv(testEngine)
