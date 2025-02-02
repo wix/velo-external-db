@@ -142,7 +142,7 @@ jobs:
           docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test/$IMAGE_NAME:sha-${GITHUB_SHA}
 
           echo "Pushing image to GCP container registry..."
-          docker push us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test --all-tags
+          docker push us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test/$IMAGE_NAME:$IMAGE_TAG
 
           echo "Pushing image to GCP container registry with following tags:"
           echo "::set-output name=image::gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:$IMAGE_TAG"
