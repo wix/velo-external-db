@@ -28,7 +28,6 @@ services:
 
   mssql17:
     image: mcr.microsoft.com/mssql/server:2017-latest
-    container_name: mssql17
     ports:
       - 1433:1433
     environment:
