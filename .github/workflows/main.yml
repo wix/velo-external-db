@@ -38,14 +38,14 @@ jobs:
     strategy:
       matrix:
         database: [
-          "postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
-          "mysql", "mysql5",
-          "mssql",
-          spanner,
-          "mongo", "mongo4",
-          "dynamodb",
-          "firestore"
-        ]
+                   "postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
+                   "mysql", "mysql5",
+                   "mssql",
+                   spanner,
+                   "mongo", "mongo4",
+                   "dynamodb",
+                   "firestore"
+                   ]
 
     env:
       API_PRIVATE_KEY: ${{ secrets.API_PRIVATE_KEY }}
@@ -77,14 +77,6 @@ jobs:
         run: |
           cd apps/velo-external-db/test/resources
           docker compose up --detach ${{ matrix.database }}
-          sleep 10
-          docker ps
-
-
-      - name: Docker logs of mssql
-        if: ${{ ( matrix.database == 'mssql17') }}
-        run: |
-          docker logs mssql17
 
       - name: Installing Dependencies
         run: npm install
