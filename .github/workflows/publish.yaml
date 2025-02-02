@@ -125,14 +125,8 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Docker Auth
-        id: docker-auth
-        uses: 'docker/login-action@v1'
-        if: github.event.inputs.gcp == 'true'
-        with:
-          username: 'oauth2accesstoken'
-          password: '${{ steps.auth.outputs.access_token }}'
-          registry: 'us-docker.pkg.dev'
-
+        run: |-
+          gcloud auth configure-docker us-docker.pkg.dev --quiet
 
       # Push image to Google Container Registry
       - name: Tag and push image to GCP container registry
