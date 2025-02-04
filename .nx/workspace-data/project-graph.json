@@ -1,0 +1,1957 @@
+{
+  "nodes": {
+    "@wix-velo/external-db-google-sheets": {
+      "name": "@wix-velo/external-db-google-sheets",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-google-sheets",
+        "sourceRoot": "libs/external-db-google-sheets/src",
+        "name": "@wix-velo/external-db-google-sheets",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-google-sheets"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-google-sheets",
+              "main": "libs/external-db-google-sheets/src/index.ts",
+              "tsConfig": "libs/external-db-google-sheets/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-google-sheets/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-google-sheets {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-google-sheets"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-google-sheets/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-google-sheets"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-google-sheets/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/velo-external-db-commons": {
+      "name": "@wix-velo/velo-external-db-commons",
+      "type": "lib",
+      "data": {
+        "root": "libs/velo-external-db-commons",
+        "sourceRoot": "libs/velo-external-db-commons/src",
+        "name": "@wix-velo/velo-external-db-commons",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/velo-external-db-commons"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/velo-external-db-commons",
+              "main": "libs/velo-external-db-commons/src/index.ts",
+              "tsConfig": "libs/velo-external-db-commons/tsconfig.lib.json",
+              "assets": [
+                "libs/velo-external-db-commons/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/velo-external-db-commons {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/velo-external-db-commons"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/velo-external-db-commons/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/velo-external-db-commons"
+            ],
+            "options": {
+              "jestConfig": "libs/velo-external-db-commons/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/velo-external-db-types": {
+      "name": "@wix-velo/velo-external-db-types",
+      "type": "lib",
+      "data": {
+        "root": "libs/velo-external-db-types",
+        "sourceRoot": "libs/velo-external-db-types/src",
+        "name": "@wix-velo/velo-external-db-types",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/velo-external-db-types"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/velo-external-db-types",
+              "main": "libs/velo-external-db-types/src/index.ts",
+              "tsConfig": "libs/velo-external-db-types/tsconfig.lib.json",
+              "assets": [
+                "libs/velo-external-db-types/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/velo-external-db-types {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/velo-external-db-types"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/velo-external-db-types/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/velo-external-db-types"
+            ],
+            "options": {
+              "jestConfig": "libs/velo-external-db-types/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-firestore": {
+      "name": "@wix-velo/external-db-firestore",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-firestore",
+        "sourceRoot": "libs/external-db-firestore/src",
+        "name": "@wix-velo/external-db-firestore",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-firestore"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-firestore",
+              "main": "libs/external-db-firestore/src/index.ts",
+              "tsConfig": "libs/external-db-firestore/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-firestore/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-firestore {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-firestore"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-firestore/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-firestore"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-firestore/jest.config.js",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/velo-external-db-core": {
+      "name": "@wix-velo/velo-external-db-core",
+      "type": "lib",
+      "data": {
+        "root": "libs/velo-external-db-core",
+        "sourceRoot": "libs/velo-external-db-core/src",
+        "name": "@wix-velo/velo-external-db-core",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/velo-external-db-core"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/velo-external-db-core",
+              "main": "libs/velo-external-db-core/src/index.ts",
+              "tsConfig": "libs/velo-external-db-core/tsconfig.lib.json",
+              "assets": [
+                "libs/velo-external-db-core/*.md",
+                "libs/velo-external-db-core/src/assets/**/*",
+                "libs/velo-external-db-core/src/views/**/*",
+                "libs/velo-external-db-core/src/*.json"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/velo-external-db-core {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/velo-external-db-core"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/velo-external-db-core/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/velo-external-db-core"
+            ],
+            "options": {
+              "jestConfig": "libs/velo-external-db-core/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-airtable": {
+      "name": "@wix-velo/external-db-airtable",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-airtable",
+        "sourceRoot": "libs/external-db-airtable/src",
+        "name": "@wix-velo/external-db-airtable",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-airtable"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-airtable",
+              "main": "libs/external-db-airtable/src/index.ts",
+              "tsConfig": "libs/external-db-airtable/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-airtable/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-airtable {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-airtable"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-airtable/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-airtable"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-airtable/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-bigquery": {
+      "name": "@wix-velo/external-db-bigquery",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-bigquery",
+        "sourceRoot": "libs/external-db-bigquery/src",
+        "name": "@wix-velo/external-db-bigquery",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-bigquery"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-bigquery",
+              "main": "libs/external-db-bigquery/src/index.js",
+              "tsConfig": "libs/external-db-bigquery/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-bigquery/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-bigquery {args.ver} {args.tag} {args.update}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-bigquery"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-bigquery/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-bigquery"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-bigquery/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-dynamodb": {
+      "name": "@wix-velo/external-db-dynamodb",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-dynamodb",
+        "sourceRoot": "libs/external-db-dynamodb/src",
+        "name": "@wix-velo/external-db-dynamodb",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-dynamodb"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-dynamodb",
+              "main": "libs/external-db-dynamodb/src/index.ts",
+              "tsConfig": "libs/external-db-dynamodb/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-dynamodb/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-dynamodb {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-dynamodb"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-dynamodb/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-dynamodb"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-dynamodb/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-postgres": {
+      "name": "@wix-velo/external-db-postgres",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-postgres",
+        "sourceRoot": "libs/external-db-postgres/src",
+        "name": "@wix-velo/external-db-postgres",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-postgres"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-postgres",
+              "main": "libs/external-db-postgres/src/index.ts",
+              "tsConfig": "libs/external-db-postgres/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-postgres/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-postgres {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-postgres"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-postgres/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-postgres"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-postgres/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-security": {
+      "name": "@wix-velo/external-db-security",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-security",
+        "sourceRoot": "libs/external-db-security/src",
+        "name": "@wix-velo/external-db-security",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-security"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-security",
+              "main": "libs/external-db-security/src/index.js",
+              "tsConfig": "libs/external-db-security/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-security/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-security {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-security"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-security/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-security"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-security/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-spanner": {
+      "name": "@wix-velo/external-db-spanner",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-spanner",
+        "sourceRoot": "libs/external-db-spanner/src",
+        "name": "@wix-velo/external-db-spanner",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-spanner"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-spanner",
+              "main": "libs/external-db-spanner/src/index.ts",
+              "tsConfig": "libs/external-db-spanner/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-spanner/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-spanner {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-spanner"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-spanner/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-spanner"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-spanner/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-testkit": {
+      "name": "@wix-velo/external-db-testkit",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-testkit",
+        "sourceRoot": "libs/external-db-testkit/src",
+        "name": "@wix-velo/external-db-testkit",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-testkit"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-testkit",
+              "main": "libs/external-db-testkit/src/index.ts",
+              "tsConfig": "libs/external-db-testkit/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-testkit/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-testkit {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-testkit"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-testkit/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-testkit"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-testkit/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-config": {
+      "name": "@wix-velo/external-db-config",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-config",
+        "sourceRoot": "libs/external-db-config/src",
+        "name": "@wix-velo/external-db-config",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-config"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-config",
+              "main": "libs/external-db-config/src/index.js",
+              "tsConfig": "libs/external-db-config/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-config/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-config {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-config"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-config/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-config"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-config/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-logger": {
+      "name": "@wix-velo/external-db-logger",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-logger",
+        "sourceRoot": "libs/external-db-logger/src",
+        "name": "@wix-velo/external-db-logger",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-logger"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-logger",
+              "main": "libs/external-db-logger/index.ts",
+              "tsConfig": "libs/external-db-logger/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-logger/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-logger {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-logger"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-logger/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-logger"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-logger/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-mongo": {
+      "name": "@wix-velo/external-db-mongo",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-mongo",
+        "sourceRoot": "libs/external-db-mongo/src",
+        "name": "@wix-velo/external-db-mongo",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-mongo"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-mongo",
+              "main": "libs/external-db-mongo/src/index.js",
+              "tsConfig": "libs/external-db-mongo/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-mongo/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-mongo {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-mongo"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-mongo/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-mongo"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-mongo/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-mssql": {
+      "name": "@wix-velo/external-db-mssql",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-mssql",
+        "sourceRoot": "libs/external-db-mssql/src",
+        "name": "@wix-velo/external-db-mssql",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-mssql"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-mssql",
+              "main": "libs/external-db-mssql/src/index.ts",
+              "tsConfig": "libs/external-db-mssql/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-mssql/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-mssql {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-mssql"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-mssql/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-mssql"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-mssql/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/external-db-mysql": {
+      "name": "@wix-velo/external-db-mysql",
+      "type": "lib",
+      "data": {
+        "root": "libs/external-db-mysql",
+        "sourceRoot": "libs/external-db-mysql/src",
+        "name": "@wix-velo/external-db-mysql",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/external-db-mysql"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/external-db-mysql",
+              "main": "libs/external-db-mysql/src/index.ts",
+              "tsConfig": "libs/external-db-mysql/tsconfig.lib.json",
+              "assets": [
+                "libs/external-db-mysql/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/external-db-mysql {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-mysql"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/external-db-mysql/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/external-db-mysql"
+            ],
+            "options": {
+              "jestConfig": "libs/external-db-mysql/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    },
+    "velo-external-db": {
+      "name": "velo-external-db",
+      "type": "app",
+      "data": {
+        "root": "apps/velo-external-db",
+        "name": "velo-external-db",
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "sourceRoot": "apps/velo-external-db/src",
+        "projectType": "application",
+        "tags": [],
+        "targets": {
+          "build": {
+            "executor": "@nrwl/node:webpack",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/apps/velo-external-db",
+              "main": "apps/velo-external-db/src/main.ts",
+              "tsConfig": "apps/velo-external-db/tsconfig.app.json",
+              "generatePackageJson": true,
+              "progress": true,
+              "buildLibsFromSource": true,
+              "assets": [
+                {
+                  "glob": "**/*",
+                  "input": "libs/velo-external-db-core/src/views",
+                  "output": "./views"
+                },
+                {
+                  "glob": "**/*",
+                  "input": "libs/velo-external-db-core/src/assets",
+                  "output": "./assets"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/velo-external-db/src/environments/environment.ts",
+                  "with": "apps/velo-external-db/src/environments/environment.prod.ts"
+                },
+                {
+                  "replace": "libs/velo-external-db-core/src/utils/router_utils.ts",
+                  "with": "libs/velo-external-db-core/src/utils/router_utils.build.ts"
+                }
+              ]
+            },
+            "configurations": {
+              "production": {
+                "optimization": true,
+                "inspect": false
+              }
+            },
+            "parallelism": true
+          },
+          "serve": {
+            "executor": "@nrwl/node:node",
+            "options": {
+              "buildTarget": "velo-external-db:build"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "apps/velo-external-db/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/apps/velo-external-db"
+            ],
+            "options": {
+              "jestConfig": "apps/velo-external-db/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "implicitDependencies": []
+      }
+    },
+    "@wix-velo/test-commons": {
+      "name": "@wix-velo/test-commons",
+      "type": "lib",
+      "data": {
+        "root": "libs/test-commons",
+        "sourceRoot": "libs/test-commons/src",
+        "name": "@wix-velo/test-commons",
+        "tags": [
+          "npm:public"
+        ],
+        "metadata": {
+          "targetGroups": {},
+          "js": {
+            "packageName": "@wix-velo/test-commons"
+          }
+        },
+        "targets": {
+          "nx-release-publish": {
+            "executor": "@nx/js:release-publish",
+            "dependsOn": [
+              "^nx-release-publish"
+            ],
+            "options": {},
+            "configurations": {},
+            "parallelism": true
+          },
+          "build": {
+            "executor": "@nrwl/js:tsc",
+            "outputs": [
+              "{options.outputPath}"
+            ],
+            "options": {
+              "outputPath": "dist/libs/test-commons",
+              "main": "libs/test-commons/src/index.ts",
+              "tsConfig": "libs/test-commons/tsconfig.lib.json",
+              "assets": [
+                "libs/test-commons/*.md"
+              ],
+              "buildableProjectDepsInPackageJsonType": "dependencies"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "publish": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publish.mjs @wix-velo/test-commons {args.ver} {args.tag}"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "publishCi": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+              "command": "node tools/scripts/publishCi.mjs @wix-velo/test-commons"
+            },
+            "dependsOn": [
+              {
+                "projects": "self",
+                "target": "build"
+              }
+            ],
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+              "{options.outputFile}"
+            ],
+            "options": {
+              "lintFilePatterns": [
+                "libs/test-commons/**/*.ts"
+              ]
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+              "coverage/libs/test-commons"
+            ],
+            "options": {
+              "jestConfig": "libs/test-commons/jest.config.ts",
+              "passWithNoTests": true
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "$schema": "../../node_modules/nx/schemas/project-schema.json",
+        "projectType": "library",
+        "implicitDependencies": []
+      }
+    }
+  },
+  "externalNodes": {},
+  "dependencies": {
+    "@wix-velo/external-db-google-sheets": [],
+    "@wix-velo/velo-external-db-commons": [],
+    "@wix-velo/velo-external-db-types": [],
+    "@wix-velo/external-db-firestore": [],
+    "@wix-velo/velo-external-db-core": [],
+    "@wix-velo/external-db-airtable": [],
+    "@wix-velo/external-db-bigquery": [],
+    "@wix-velo/external-db-dynamodb": [],
+    "@wix-velo/external-db-postgres": [],
+    "@wix-velo/external-db-security": [],
+    "@wix-velo/external-db-spanner": [],
+    "@wix-velo/external-db-testkit": [],
+    "@wix-velo/external-db-config": [],
+    "@wix-velo/external-db-logger": [],
+    "@wix-velo/external-db-mongo": [],
+    "@wix-velo/external-db-mssql": [],
+    "@wix-velo/external-db-mysql": [],
+    "velo-external-db": [],
+    "@wix-velo/test-commons": []
+  },
+  "version": "6.0"
+}

@@ -1,0 +1,2796 @@
+{
+  "version": "6.0",
+  "nxVersion": "20.4.0",
+  "pathMappings": {
+    "@wix-velo/external-db-config": [
+      "libs/external-db-config/src/index.ts"
+    ],
+    "@wix-velo/external-db-mysql": [
+      "libs/external-db-mysql/src/index.ts"
+    ],
+    "@wix-velo/external-db-postgres": [
+      "libs/external-db-postgres/src/index.ts"
+    ],
+    "@wix-velo/external-db-mssql": [
+      "libs/external-db-mssql/src/index.ts"
+    ],
+    "@wix-velo/external-db-spanner": [
+      "libs/external-db-spanner/src/index.ts"
+    ],
+    "@wix-velo/external-db-mongo": [
+      "libs/external-db-mongo/src/index.ts"
+    ],
+    "@wix-velo/external-db-firestore": [
+      "libs/external-db-firestore/src/index.ts"
+    ],
+    "@wix-velo/external-db-dynamodb": [
+      "libs/external-db-dynamodb/src/index.ts"
+    ],
+    "@wix-velo/external-db-google-sheets": [
+      "libs/external-db-google-sheets/src/index.ts"
+    ],
+    "@wix-velo/external-db-airtable": [
+      "libs/external-db-airtable/src/index.ts"
+    ],
+    "@wix-velo/external-db-bigquery": [
+      "libs/external-db-bigquery/src/index.ts"
+    ],
+    "@wix-velo/external-db-security": [
+      "libs/external-db-security/src/index.ts"
+    ],
+    "@wix-velo/external-db-testkit": [
+      "libs/external-db-testkit/src/index.ts"
+    ],
+    "@wix-velo/test-commons": [
+      "libs/test-commons/src/index.ts"
+    ],
+    "@wix-velo/velo-external-db-commons": [
+      "libs/velo-external-db-commons/src/index.ts"
+    ],
+    "@wix-velo/velo-external-db-core": [
+      "libs/velo-external-db-core/src/index.ts"
+    ],
+    "@wix-velo/velo-external-db-types": [
+      "libs/velo-external-db-types/src/index.ts"
+    ],
+    "@wix-velo/external-db-logger": [
+      "libs/external-db-logger/index.ts"
+    ],
+    "velo-external-db": [
+      "apps/velo-external-db/src/app.ts"
+    ]
+  },
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {
+      "@wix-velo/velo-external-db-core": [
+        {
+          "file": "libs/velo-external-db-core/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/velo-external-db-core/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "libs/velo-external-db-core/.nvmrc",
+          "hash": "20467680281893951"
+        },
+        {
+          "file": "libs/velo-external-db-core/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/velo-external-db-core/jest.config.ts",
+          "hash": "2523986737337223248"
+        },
+        {
+          "file": "libs/velo-external-db-core/package.json",
+          "hash": "7430179674674273052"
+        },
+        {
+          "file": "libs/velo-external-db-core/project.json",
+          "hash": "16540463809395020771"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/assets/cloud_bg.svg",
+          "hash": "5285489776594963423"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/assets/cloudy-bg.svg",
+          "hash": "11089174551333930367"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/assets/dark_bg.svg",
+          "hash": "7783085934860447368"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/assets/lightbulb_icon.svg",
+          "hash": "3075373261539223605"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/assets/sad-unicorn.svg",
+          "hash": "13754649353290728057"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/assets/sad-wix.svg",
+          "hash": "10074941152694226291"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/assets/stylesheets/style.css",
+          "hash": "14919546902275752328"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/assets/wix-logo.svg",
+          "hash": "17256044619764390652"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/aggregation_transformer.spec.ts",
+          "hash": "12133747157935774014"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/aggregation_transformer.ts",
+          "hash": "13957762480646244938"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/data_utils.spec.ts",
+          "hash": "16199396689714240886"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/data_utils.ts",
+          "hash": "11901207521302869631"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/filter_transformer.spec.ts",
+          "hash": "16419227147480572398"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/filter_transformer.ts",
+          "hash": "11983159299910264951"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/item_transformer.js",
+          "hash": "7645426629603375042"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/item_transformer.spec.ts",
+          "hash": "18074028946830179404"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/query_validator.spec.ts",
+          "hash": "16616909163282834519"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/query_validator.ts",
+          "hash": "4857341232974669620"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/query_validator_utils.spec.ts",
+          "hash": "3214000491693575725"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/query_validator_utils.ts",
+          "hash": "13063260184437108411"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/converters/utils.ts",
+          "hash": "2512068301318985185"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/data_hooks_utils.spec.ts",
+          "hash": "10111617466708326977"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/data_hooks_utils.ts",
+          "hash": "3329000827062875168"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/health/app_info.spec.ts",
+          "hash": "367959273680755541"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/health/app_info.ts",
+          "hash": "7069189774833858234"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/index.ts",
+          "hash": "18269065387545976431"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/roles-config.json",
+          "hash": "12225209149874525026"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/router.ts",
+          "hash": "18132863375094044060"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/schema_hooks_utils.spec.ts",
+          "hash": "5593552430189843395"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/schema_hooks_utils.ts",
+          "hash": "15253804626555691621"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/data.spec.ts",
+          "hash": "3076226148641366646"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/data.ts",
+          "hash": "6459416357675453806"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/indexing.spec.ts",
+          "hash": "12220061167615357958"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/indexing.ts",
+          "hash": "5489135596994308560"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/operation.spec.ts",
+          "hash": "11778585352332904802"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/operation.ts",
+          "hash": "14606243556354694940"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/schema.spec.ts",
+          "hash": "16601697635790562951"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/schema.ts",
+          "hash": "9637923174049762781"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/schema_aware_data.spec.ts",
+          "hash": "13102982284184254177"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/schema_aware_data.ts",
+          "hash": "8732932886015501098"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/schema_information.spec.ts",
+          "hash": "8343813626914721560"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/service/schema_information.ts",
+          "hash": "11675013321668107470"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/spi-model/capabilities.ts",
+          "hash": "6524685108912284868"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/spi-model/collection.ts",
+          "hash": "16750895719473368397"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/spi-model/data_source.ts",
+          "hash": "6522216648834549809"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/spi-model/errors.ts",
+          "hash": "16126382527408835367"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/spi-model/filter.ts",
+          "hash": "14947220679121651337"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/spi-model/indexing.ts",
+          "hash": "2092439135834464825"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/types.ts",
+          "hash": "12974033802223264179"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/utils/base64_utils.ts",
+          "hash": "2225850346079594673"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/utils/data_utils.ts",
+          "hash": "7585864146089116599"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/utils/date_time_provider.js",
+          "hash": "8180454671289150585"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/utils/router_utils.build.ts",
+          "hash": "4596560557042513149"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/utils/router_utils.ts",
+          "hash": "7422406066268762976"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/utils/schema_utils.spec.ts",
+          "hash": "9552687225059911420"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/utils/schema_utils.ts",
+          "hash": "7483785200580668945"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/views/error.ejs",
+          "hash": "14396906341790606064"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/views/index-without-data.ejs",
+          "hash": "3311293165279303712"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/views/index.ejs",
+          "hash": "4340607852537346821"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/views/login.ejs",
+          "hash": "17300561342566197405"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/views/partials/details.ejs",
+          "hash": "4990114826028218699"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/auth-role-middleware.spec.ts",
+          "hash": "661573538739414688"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/auth-role-middleware.ts",
+          "hash": "9987823694926599522"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/domain-to-spi-error-translator.ts",
+          "hash": "12402798763969523750"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/error-middleware.spec.ts",
+          "hash": "17116283407215807911"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/error-middleware.ts",
+          "hash": "9964255552323047225"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/jwt-verifier-decoder-middleware.spec.ts",
+          "hash": "8865044672847427219"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/jwt-verifier-decoder-middleware.ts",
+          "hash": "18351328446637536123"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/jwt-verifier-test-support.ts",
+          "hash": "7129644033329903995"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/jwt-verifier.spec.ts",
+          "hash": "9589940385337373778"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/jwt-verifier.ts",
+          "hash": "15234834247956970864"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/middleware-support.ts",
+          "hash": "13557706733002851382"
+        },
+        {
+          "file": "libs/velo-external-db-core/src/web/wix_data_facade.ts",
+          "hash": "12205394708243094678"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/aggregation_transformer_test_support.ts",
+          "hash": "5810246140370993364"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/app_info_test_support.ts",
+          "hash": "5490550425836850615"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/auth_middleware_test_support.ts",
+          "hash": "16310885517069618636"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/data_provider_test_support.ts",
+          "hash": "577552713757507896"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/data_service_test_support.ts",
+          "hash": "12508217327441647172"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/date_time_provider_test_support.js",
+          "hash": "4821156164015662526"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/filter_transformer_test_support.ts",
+          "hash": "4427580389664476241"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/index_provider_test_support.ts",
+          "hash": "7709223928884677310"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/item_patcher_test_support.ts",
+          "hash": "10406658340479942170"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/operation_provider_test_support.ts",
+          "hash": "5150084531138662690"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/query_validator_test_support.ts",
+          "hash": "6534392893249467954"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/schema_information_test_support.ts",
+          "hash": "5360598769437014765"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/schema_matchers.ts",
+          "hash": "9543478352055934767"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/drivers/schema_provider_test_support.ts",
+          "hash": "2787876967488052085"
+        },
+        {
+          "file": "libs/velo-external-db-core/test/gen.ts",
+          "hash": "17036435464462119572"
+        },
+        {
+          "file": "libs/velo-external-db-core/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/velo-external-db-core/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/velo-external-db-core/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-logger": [
+        {
+          "file": "libs/external-db-logger/.eslintrc.json",
+          "hash": "11340856286167880730"
+        },
+        {
+          "file": "libs/external-db-logger/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-logger/index.ts",
+          "hash": "5199518392160594338"
+        },
+        {
+          "file": "libs/external-db-logger/jest.config.ts",
+          "hash": "14176919682901889618"
+        },
+        {
+          "file": "libs/external-db-logger/package.json",
+          "hash": "5041548166307359013"
+        },
+        {
+          "file": "libs/external-db-logger/project.json",
+          "hash": "16941980680938212623"
+        },
+        {
+          "file": "libs/external-db-logger/src/logger.ts",
+          "hash": "2960857644676307402"
+        },
+        {
+          "file": "libs/external-db-logger/src/types.ts",
+          "hash": "1846368253782453145"
+        },
+        {
+          "file": "libs/external-db-logger/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-logger/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-logger/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-security": [
+        {
+          "file": "libs/external-db-security/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-security/.gitignore",
+          "hash": "9183275580747984470"
+        },
+        {
+          "file": "libs/external-db-security/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-security/jest.config.ts",
+          "hash": "7827468490345701373"
+        },
+        {
+          "file": "libs/external-db-security/package.json",
+          "hash": "9020505735724886229"
+        },
+        {
+          "file": "libs/external-db-security/project.json",
+          "hash": "12424520072620614727"
+        },
+        {
+          "file": "libs/external-db-security/src/auth-providers/aws_auth_provider.js",
+          "hash": "15725514768638514504"
+        },
+        {
+          "file": "libs/external-db-security/src/auth-providers/azure_auth_provider.js",
+          "hash": "16161295716988782330"
+        },
+        {
+          "file": "libs/external-db-security/src/auth-providers/factory.js",
+          "hash": "10739341924406702438"
+        },
+        {
+          "file": "libs/external-db-security/src/auth-providers/gcp_auth_provider.js",
+          "hash": "6237205889579607008"
+        },
+        {
+          "file": "libs/external-db-security/src/auth-providers/stub_auth_provider.js",
+          "hash": "9365320880996795060"
+        },
+        {
+          "file": "libs/external-db-security/src/index.ts",
+          "hash": "6656333296212518658"
+        },
+        {
+          "file": "libs/external-db-security/src/services/role_authorization.spec.ts",
+          "hash": "9770137779989727220"
+        },
+        {
+          "file": "libs/external-db-security/src/services/role_authorization.ts",
+          "hash": "1274154721525747430"
+        },
+        {
+          "file": "libs/external-db-security/src/test/gen.ts",
+          "hash": "428030000618398824"
+        },
+        {
+          "file": "libs/external-db-security/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-security/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-security/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "velo-external-db": [
+        {
+          "file": "apps/velo-external-db/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "apps/velo-external-db/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "apps/velo-external-db/.nvmrc",
+          "hash": "20467680281893951"
+        },
+        {
+          "file": "apps/velo-external-db/.travis.yml",
+          "hash": "10672396710002236919"
+        },
+        {
+          "file": "apps/velo-external-db/Dockerfile",
+          "hash": "3780879210766859947"
+        },
+        {
+          "file": "apps/velo-external-db/collection-level-roles-config.json",
+          "hash": "9174725010265529237"
+        },
+        {
+          "file": "apps/velo-external-db/jest.config.ts",
+          "hash": "18093440467729301658"
+        },
+        {
+          "file": "apps/velo-external-db/project.json",
+          "hash": "5717374348746529129"
+        },
+        {
+          "file": "apps/velo-external-db/roles-config.json",
+          "hash": "12225209149874525026"
+        },
+        {
+          "file": "apps/velo-external-db/src/app.ts",
+          "hash": "2805383620465788200"
+        },
+        {
+          "file": "apps/velo-external-db/src/auth/auth_request_handlers.js",
+          "hash": "148674257650946306"
+        },
+        {
+          "file": "apps/velo-external-db/src/auth/auth_router.js",
+          "hash": "865309430670346692"
+        },
+        {
+          "file": "apps/velo-external-db/src/environments/environment.prod.ts",
+          "hash": "15193672490511024794"
+        },
+        {
+          "file": "apps/velo-external-db/src/environments/environment.ts",
+          "hash": "6218873095919086094"
+        },
+        {
+          "file": "apps/velo-external-db/src/global.d.ts",
+          "hash": "4449013164853179275"
+        },
+        {
+          "file": "apps/velo-external-db/src/main.ts",
+          "hash": "6407821321835975355"
+        },
+        {
+          "file": "apps/velo-external-db/src/storage/factory.ts",
+          "hash": "7928056596988674221"
+        },
+        {
+          "file": "apps/velo-external-db/src/storage/stub-db/init.ts",
+          "hash": "15564883300153274780"
+        },
+        {
+          "file": "apps/velo-external-db/src/storage/stub-db/providers.ts",
+          "hash": "5230938589457821490"
+        },
+        {
+          "file": "apps/velo-external-db/src/storage/stub-db/stub-connector.ts",
+          "hash": "12341739666867559869"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/app_info_config_test_support.ts",
+          "hash": "16978394674722631253"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/authorization_test_support.ts",
+          "hash": "18437892809623969541"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/data_api_rest_test_support.ts",
+          "hash": "9560046707421780658"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/data_provider_matchers.ts",
+          "hash": "728883873667439787"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/hooks_test_support.ts",
+          "hash": "11415686419629777297"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/index_api_rest_matchers.ts",
+          "hash": "11646193514122119272"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/index_api_rest_test_support.ts",
+          "hash": "15476573653105540132"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/schema_api_rest_matchers.ts",
+          "hash": "5837259980793293594"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/schema_api_rest_test_support.ts",
+          "hash": "13678370767915041807"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/schema_provider_matchers.ts",
+          "hash": "6626190709709657650"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/wix_data_resources.ts",
+          "hash": "9047906185709662848"
+        },
+        {
+          "file": "apps/velo-external-db/test/drivers/wix_data_testkit.ts",
+          "hash": "3982982238203428932"
+        },
+        {
+          "file": "apps/velo-external-db/test/e2e/app.e2e.spec.ts",
+          "hash": "5447755889420310156"
+        },
+        {
+          "file": "apps/velo-external-db/test/e2e/app_auth.e2e.spec.ts",
+          "hash": "15360057464738704576"
+        },
+        {
+          "file": "apps/velo-external-db/test/e2e/app_data.e2e.spec.ts",
+          "hash": "15224509873323190520"
+        },
+        {
+          "file": "apps/velo-external-db/test/e2e/app_data_hooks.e2e.spec.ts",
+          "hash": "15995649714975702727"
+        },
+        {
+          "file": "apps/velo-external-db/test/e2e/app_index.e2e.spec.ts",
+          "hash": "7356402582797505539"
+        },
+        {
+          "file": "apps/velo-external-db/test/e2e/app_schema.e2e.spec.ts",
+          "hash": "3815683631330674796"
+        },
+        {
+          "file": "apps/velo-external-db/test/e2e/app_schema_hooks.e2e.spec.ts",
+          "hash": "2000327655357410616"
+        },
+        {
+          "file": "apps/velo-external-db/test/env/ci_utils.ts",
+          "hash": "12656994942362807711"
+        },
+        {
+          "file": "apps/velo-external-db/test/env/env.db.setup.js",
+          "hash": "1521481302468227779"
+        },
+        {
+          "file": "apps/velo-external-db/test/env/env.db.teardown.js",
+          "hash": "1365323576630387821"
+        },
+        {
+          "file": "apps/velo-external-db/test/gen.ts",
+          "hash": "2764155169890975414"
+        },
+        {
+          "file": "apps/velo-external-db/test/resources/docker-compose.yaml",
+          "hash": "1531885913155580110"
+        },
+        {
+          "file": "apps/velo-external-db/test/resources/e2e_resources.ts",
+          "hash": "17937525069475049243"
+        },
+        {
+          "file": "apps/velo-external-db/test/resources/engines/init-mongo.js",
+          "hash": "4880080328180479029"
+        },
+        {
+          "file": "apps/velo-external-db/test/resources/operations_resources.ts",
+          "hash": "14751653035946510421"
+        },
+        {
+          "file": "apps/velo-external-db/test/resources/provider_resources.ts",
+          "hash": "11399463943678748080"
+        },
+        {
+          "file": "apps/velo-external-db/test/resources/test_suite_definition.ts",
+          "hash": "6566451062560901660"
+        },
+        {
+          "file": "apps/velo-external-db/test/storage/data_provider.spec.ts",
+          "hash": "9002989096595908919"
+        },
+        {
+          "file": "apps/velo-external-db/test/storage/database_operation.spec.ts",
+          "hash": "1729313303727830369"
+        },
+        {
+          "file": "apps/velo-external-db/test/storage/schema_provider.spec.ts",
+          "hash": "6605961059894468352"
+        },
+        {
+          "file": "apps/velo-external-db/test/types.ts",
+          "hash": "10696058255757189193"
+        },
+        {
+          "file": "apps/velo-external-db/test/utils/eventually.ts",
+          "hash": "6506582411422277581"
+        },
+        {
+          "file": "apps/velo-external-db/tsconfig.app.json",
+          "hash": "12985986488342520583"
+        },
+        {
+          "file": "apps/velo-external-db/tsconfig.json",
+          "hash": "9065644730702627795"
+        },
+        {
+          "file": "apps/velo-external-db/tsconfig.spec.json",
+          "hash": "6866190378161164090"
+        }
+      ],
+      "@wix-velo/external-db-mssql": [
+        {
+          "file": "libs/external-db-mssql/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-mssql/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "libs/external-db-mssql/.nvmrc",
+          "hash": "20467680281893951"
+        },
+        {
+          "file": "libs/external-db-mssql/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-mssql/jest.config.ts",
+          "hash": "10033214514769614340"
+        },
+        {
+          "file": "libs/external-db-mssql/package.json",
+          "hash": "6201893643537752889"
+        },
+        {
+          "file": "libs/external-db-mssql/project.json",
+          "hash": "7273830412008153923"
+        },
+        {
+          "file": "libs/external-db-mssql/src/connection_provider.ts",
+          "hash": "3273434237782532356"
+        },
+        {
+          "file": "libs/external-db-mssql/src/index.ts",
+          "hash": "16318283351960208296"
+        },
+        {
+          "file": "libs/external-db-mssql/src/mssql_capabilities.ts",
+          "hash": "1245363276855093256"
+        },
+        {
+          "file": "libs/external-db-mssql/src/mssql_config_validator.ts",
+          "hash": "15045098368653898449"
+        },
+        {
+          "file": "libs/external-db-mssql/src/mssql_data_provider.ts",
+          "hash": "314981688607054338"
+        },
+        {
+          "file": "libs/external-db-mssql/src/mssql_operations.ts",
+          "hash": "13078807512392286206"
+        },
+        {
+          "file": "libs/external-db-mssql/src/mssql_schema_provider.ts",
+          "hash": "3686347797464962449"
+        },
+        {
+          "file": "libs/external-db-mssql/src/mssql_utils.spec.ts",
+          "hash": "14027521746556602215"
+        },
+        {
+          "file": "libs/external-db-mssql/src/mssql_utils.ts",
+          "hash": "10171704289738411028"
+        },
+        {
+          "file": "libs/external-db-mssql/src/sql_exception_translator.ts",
+          "hash": "13991822168361375396"
+        },
+        {
+          "file": "libs/external-db-mssql/src/sql_filter_transformer.spec.ts",
+          "hash": "10282115269267306127"
+        },
+        {
+          "file": "libs/external-db-mssql/src/sql_filter_transformer.ts",
+          "hash": "15795348247985584307"
+        },
+        {
+          "file": "libs/external-db-mssql/src/sql_schema_translator.spec.ts",
+          "hash": "18274717975522247172"
+        },
+        {
+          "file": "libs/external-db-mssql/src/sql_schema_translator.ts",
+          "hash": "4935904310223824598"
+        },
+        {
+          "file": "libs/external-db-mssql/src/supported_operations.ts",
+          "hash": "5057339637718845778"
+        },
+        {
+          "file": "libs/external-db-mssql/src/types.ts",
+          "hash": "17088474628673516635"
+        },
+        {
+          "file": "libs/external-db-mssql/tests/drivers/db_operations_test_support.ts",
+          "hash": "11374365698826693242"
+        },
+        {
+          "file": "libs/external-db-mssql/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "8130512336557545515"
+        },
+        {
+          "file": "libs/external-db-mssql/tests/e2e-testkit/docker-compose.yaml",
+          "hash": "12303759366972136767"
+        },
+        {
+          "file": "libs/external-db-mssql/tests/e2e-testkit/mssql_resources.ts",
+          "hash": "3376089256652642950"
+        },
+        {
+          "file": "libs/external-db-mssql/tsconfig.json",
+          "hash": "10851991045108564529"
+        },
+        {
+          "file": "libs/external-db-mssql/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-mssql/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/test-commons": [
+        {
+          "file": "libs/test-commons/.eslintrc.json",
+          "hash": "11340856286167880730"
+        },
+        {
+          "file": "libs/test-commons/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/test-commons/jest.config.ts",
+          "hash": "1044620371787489095"
+        },
+        {
+          "file": "libs/test-commons/package.json",
+          "hash": "15791140341688338718"
+        },
+        {
+          "file": "libs/test-commons/project.json",
+          "hash": "3388688552688419049"
+        },
+        {
+          "file": "libs/test-commons/src/index.ts",
+          "hash": "11272997682597552638"
+        },
+        {
+          "file": "libs/test-commons/src/libs/auth-config.json",
+          "hash": "1297323217286875015"
+        },
+        {
+          "file": "libs/test-commons/src/libs/gen.ts",
+          "hash": "2785368086285298514"
+        },
+        {
+          "file": "libs/test-commons/src/libs/test-commons.ts",
+          "hash": "7617274478871482300"
+        },
+        {
+          "file": "libs/test-commons/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/test-commons/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/test-commons/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-postgres": [
+        {
+          "file": "libs/external-db-postgres/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-postgres/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "libs/external-db-postgres/.nvmrc",
+          "hash": "20467680281893951"
+        },
+        {
+          "file": "libs/external-db-postgres/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-postgres/jest.config.ts",
+          "hash": "13409828030933569237"
+        },
+        {
+          "file": "libs/external-db-postgres/package.json",
+          "hash": "15144835999316595529"
+        },
+        {
+          "file": "libs/external-db-postgres/project.json",
+          "hash": "10327868332562259657"
+        },
+        {
+          "file": "libs/external-db-postgres/src/config_validator.spec.ts",
+          "hash": "12897231357865333908"
+        },
+        {
+          "file": "libs/external-db-postgres/src/connection_provider.ts",
+          "hash": "8749251839070507595"
+        },
+        {
+          "file": "libs/external-db-postgres/src/index.ts",
+          "hash": "5687203994123584345"
+        },
+        {
+          "file": "libs/external-db-postgres/src/postgres_capabilities.ts",
+          "hash": "4892626776520222299"
+        },
+        {
+          "file": "libs/external-db-postgres/src/postgres_config_validator.ts",
+          "hash": "14953153842221367845"
+        },
+        {
+          "file": "libs/external-db-postgres/src/postgres_data_provider.ts",
+          "hash": "5761381526426638988"
+        },
+        {
+          "file": "libs/external-db-postgres/src/postgres_index_provider.ts",
+          "hash": "11539738714100207204"
+        },
+        {
+          "file": "libs/external-db-postgres/src/postgres_operations.ts",
+          "hash": "10496269244145714640"
+        },
+        {
+          "file": "libs/external-db-postgres/src/postgres_schema_provider.ts",
+          "hash": "14155920384388562177"
+        },
+        {
+          "file": "libs/external-db-postgres/src/postgres_utils.spec.ts",
+          "hash": "196584181350115074"
+        },
+        {
+          "file": "libs/external-db-postgres/src/postgres_utils.ts",
+          "hash": "8357778812102577884"
+        },
+        {
+          "file": "libs/external-db-postgres/src/sql_exception_translator.ts",
+          "hash": "15498440273132475435"
+        },
+        {
+          "file": "libs/external-db-postgres/src/sql_filter_transformer.spec.ts",
+          "hash": "15876272826354412614"
+        },
+        {
+          "file": "libs/external-db-postgres/src/sql_filter_transformer.ts",
+          "hash": "2664834475537566443"
+        },
+        {
+          "file": "libs/external-db-postgres/src/sql_schema_translator.spec.ts",
+          "hash": "9732333109079296788"
+        },
+        {
+          "file": "libs/external-db-postgres/src/sql_schema_translator.ts",
+          "hash": "9563024525583846924"
+        },
+        {
+          "file": "libs/external-db-postgres/src/supported_operations.ts",
+          "hash": "10025261101410647216"
+        },
+        {
+          "file": "libs/external-db-postgres/src/types.ts",
+          "hash": "4894055228325734842"
+        },
+        {
+          "file": "libs/external-db-postgres/tests/drivers/db_operations_test_support.ts",
+          "hash": "296734920809846131"
+        },
+        {
+          "file": "libs/external-db-postgres/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "7419733465330630293"
+        },
+        {
+          "file": "libs/external-db-postgres/tests/e2e-testkit/docker-compose.yaml",
+          "hash": "842272160390485036"
+        },
+        {
+          "file": "libs/external-db-postgres/tests/e2e-testkit/postgres_resources.ts",
+          "hash": "16667248649057416491"
+        },
+        {
+          "file": "libs/external-db-postgres/tests/gen.ts",
+          "hash": "1163528707722599539"
+        },
+        {
+          "file": "libs/external-db-postgres/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-postgres/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-postgres/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-mysql": [
+        {
+          "file": "libs/external-db-mysql/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-mysql/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "libs/external-db-mysql/.nvmrc",
+          "hash": "20467680281893951"
+        },
+        {
+          "file": "libs/external-db-mysql/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-mysql/jest.config.ts",
+          "hash": "10980827311659795114"
+        },
+        {
+          "file": "libs/external-db-mysql/package.json",
+          "hash": "10204537112876687570"
+        },
+        {
+          "file": "libs/external-db-mysql/project.json",
+          "hash": "15777389639785327078"
+        },
+        {
+          "file": "libs/external-db-mysql/src/config_validator.spec.ts",
+          "hash": "17041445634125810773"
+        },
+        {
+          "file": "libs/external-db-mysql/src/connection_provider.ts",
+          "hash": "8643407479561335484"
+        },
+        {
+          "file": "libs/external-db-mysql/src/index.ts",
+          "hash": "10321630354130689343"
+        },
+        {
+          "file": "libs/external-db-mysql/src/mysql_capabilities.ts",
+          "hash": "8280162205023190862"
+        },
+        {
+          "file": "libs/external-db-mysql/src/mysql_config_validator.ts",
+          "hash": "1093246791879999353"
+        },
+        {
+          "file": "libs/external-db-mysql/src/mysql_data_provider.ts",
+          "hash": "18273442600706600532"
+        },
+        {
+          "file": "libs/external-db-mysql/src/mysql_index_provider.ts",
+          "hash": "13715907430636251119"
+        },
+        {
+          "file": "libs/external-db-mysql/src/mysql_operations.ts",
+          "hash": "6644820056573002720"
+        },
+        {
+          "file": "libs/external-db-mysql/src/mysql_schema_provider.ts",
+          "hash": "14862827992514814037"
+        },
+        {
+          "file": "libs/external-db-mysql/src/mysql_utils.spec.ts",
+          "hash": "4175570116087940011"
+        },
+        {
+          "file": "libs/external-db-mysql/src/mysql_utils.ts",
+          "hash": "10399577269675014364"
+        },
+        {
+          "file": "libs/external-db-mysql/src/sql_exception_translator.ts",
+          "hash": "5616729709210311937"
+        },
+        {
+          "file": "libs/external-db-mysql/src/sql_filter_transformer.spec.ts",
+          "hash": "17948164962979319669"
+        },
+        {
+          "file": "libs/external-db-mysql/src/sql_filter_transformer.ts",
+          "hash": "7887293673043706336"
+        },
+        {
+          "file": "libs/external-db-mysql/src/sql_schema_translator.spec.ts",
+          "hash": "6316813576726764301"
+        },
+        {
+          "file": "libs/external-db-mysql/src/sql_schema_translator.ts",
+          "hash": "16533897522211596450"
+        },
+        {
+          "file": "libs/external-db-mysql/src/supported_operations.ts",
+          "hash": "10025261101410647216"
+        },
+        {
+          "file": "libs/external-db-mysql/src/types.ts",
+          "hash": "11071033517288166944"
+        },
+        {
+          "file": "libs/external-db-mysql/tests/drivers/db_operations_test_support.ts",
+          "hash": "10813868159162654682"
+        },
+        {
+          "file": "libs/external-db-mysql/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "14064257484481577231"
+        },
+        {
+          "file": "libs/external-db-mysql/tests/e2e-testkit/docker-compose.yaml",
+          "hash": "8177533057208354371"
+        },
+        {
+          "file": "libs/external-db-mysql/tests/e2e-testkit/mysql_resources.ts",
+          "hash": "2427615123538141013"
+        },
+        {
+          "file": "libs/external-db-mysql/tests/gen.ts",
+          "hash": "8584704251288496110"
+        },
+        {
+          "file": "libs/external-db-mysql/tsconfig.json",
+          "hash": "7286956766930579162"
+        },
+        {
+          "file": "libs/external-db-mysql/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-mysql/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-airtable": [
+        {
+          "file": "libs/external-db-airtable/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-airtable/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "libs/external-db-airtable/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-airtable/jest.config.ts",
+          "hash": "13617081838907518378"
+        },
+        {
+          "file": "libs/external-db-airtable/package.json",
+          "hash": "5317078127665084032"
+        },
+        {
+          "file": "libs/external-db-airtable/project.json",
+          "hash": "12384366844533833309"
+        },
+        {
+          "file": "libs/external-db-airtable/src/airtable_config_validator.ts",
+          "hash": "5843532981900918816"
+        },
+        {
+          "file": "libs/external-db-airtable/src/airtable_data_provider.ts",
+          "hash": "3486923401643111956"
+        },
+        {
+          "file": "libs/external-db-airtable/src/airtable_operations.ts",
+          "hash": "12449873658494685596"
+        },
+        {
+          "file": "libs/external-db-airtable/src/airtable_schema_provider.ts",
+          "hash": "5444795881153354320"
+        },
+        {
+          "file": "libs/external-db-airtable/src/airtable_utils.ts",
+          "hash": "16924981011948761021"
+        },
+        {
+          "file": "libs/external-db-airtable/src/connection_provider.ts",
+          "hash": "5656100882438462884"
+        },
+        {
+          "file": "libs/external-db-airtable/src/index.ts",
+          "hash": "17265640552625878573"
+        },
+        {
+          "file": "libs/external-db-airtable/src/sql_exception_translator.ts",
+          "hash": "4234559177210638890"
+        },
+        {
+          "file": "libs/external-db-airtable/src/sql_filter_transformer.spec.ts",
+          "hash": "9892572822314514366"
+        },
+        {
+          "file": "libs/external-db-airtable/src/sql_filter_transformer.ts",
+          "hash": "11531770593611267650"
+        },
+        {
+          "file": "libs/external-db-airtable/src/sql_schema_translator.spec.ts",
+          "hash": "4949603696354143777"
+        },
+        {
+          "file": "libs/external-db-airtable/src/sql_schema_translator.ts",
+          "hash": "4275155478450765878"
+        },
+        {
+          "file": "libs/external-db-airtable/src/supported_operations.ts",
+          "hash": "16763187056679790291"
+        },
+        {
+          "file": "libs/external-db-airtable/tests/drivers/air_table_base.js",
+          "hash": "5140306840726880282"
+        },
+        {
+          "file": "libs/external-db-airtable/tests/drivers/air_table_mock_utils.js",
+          "hash": "5887015854482411007"
+        },
+        {
+          "file": "libs/external-db-airtable/tests/drivers/air_table_table.js",
+          "hash": "3135168189134052942"
+        },
+        {
+          "file": "libs/external-db-airtable/tests/drivers/db_operations_test_support.ts",
+          "hash": "11392251059749537181"
+        },
+        {
+          "file": "libs/external-db-airtable/tests/drivers/mock_air_table.js",
+          "hash": "5433592974435924488"
+        },
+        {
+          "file": "libs/external-db-airtable/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "405103529929102342"
+        },
+        {
+          "file": "libs/external-db-airtable/tests/e2e-testkit/airtable_resources.ts",
+          "hash": "53866672091906482"
+        },
+        {
+          "file": "libs/external-db-airtable/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-airtable/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-airtable/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-dynamodb": [
+        {
+          "file": "libs/external-db-dynamodb/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-dynamodb/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "libs/external-db-dynamodb/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-dynamodb/jest.config.ts",
+          "hash": "6016811641922193621"
+        },
+        {
+          "file": "libs/external-db-dynamodb/package.json",
+          "hash": "11942022289408047948"
+        },
+        {
+          "file": "libs/external-db-dynamodb/project.json",
+          "hash": "10474612589431489858"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/connection_provider.ts",
+          "hash": "8867783425443297972"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/dynamo_capabilities.ts",
+          "hash": "2580751383950341694"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/dynamo_config_validator.ts",
+          "hash": "4964897122473350708"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/dynamo_data_provider.ts",
+          "hash": "14968822334676812371"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/dynamo_data_requests_utils.ts",
+          "hash": "15026677908902722916"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/dynamo_operations.ts",
+          "hash": "11347938620839299548"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/dynamo_schema_provider.ts",
+          "hash": "3185816991661215346"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/dynamo_schema_requests_utils.ts",
+          "hash": "14276048011704329201"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/dynamo_utils.spec.ts",
+          "hash": "13830362928393649517"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/dynamo_utils.ts",
+          "hash": "8817298278499491038"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/index.ts",
+          "hash": "3091604121486623571"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/sql_exception_translator.ts",
+          "hash": "14576398056637169816"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/sql_filter_transformer.spec.ts",
+          "hash": "6680393944979098064"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/sql_filter_transformer.ts",
+          "hash": "16656214714143585796"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/supported_operations.ts",
+          "hash": "9597857842308775579"
+        },
+        {
+          "file": "libs/external-db-dynamodb/src/types.ts",
+          "hash": "7374384305174507211"
+        },
+        {
+          "file": "libs/external-db-dynamodb/tests/drivers/db_operations_test_support.ts",
+          "hash": "10907592720156360965"
+        },
+        {
+          "file": "libs/external-db-dynamodb/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "10586525307466603930"
+        },
+        {
+          "file": "libs/external-db-dynamodb/tests/e2e-testkit/docker-compose.yaml",
+          "hash": "15063983766030409898"
+        },
+        {
+          "file": "libs/external-db-dynamodb/tests/e2e-testkit/dynamodb_resources.ts",
+          "hash": "17807808433199430472"
+        },
+        {
+          "file": "libs/external-db-dynamodb/tests/gen.ts",
+          "hash": "12588646422579433423"
+        },
+        {
+          "file": "libs/external-db-dynamodb/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-dynamodb/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-dynamodb/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-mongo": [
+        {
+          "file": "libs/external-db-mongo/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-mongo/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "libs/external-db-mongo/.nvmrc",
+          "hash": "20467680281893951"
+        },
+        {
+          "file": "libs/external-db-mongo/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-mongo/jest.config.ts",
+          "hash": "1436488268994192052"
+        },
+        {
+          "file": "libs/external-db-mongo/package.json",
+          "hash": "9142452975431048667"
+        },
+        {
+          "file": "libs/external-db-mongo/project.json",
+          "hash": "142681733541165474"
+        },
+        {
+          "file": "libs/external-db-mongo/src/connection_provider.ts",
+          "hash": "13181987786915527058"
+        },
+        {
+          "file": "libs/external-db-mongo/src/exception_translator.ts",
+          "hash": "17686474967244795277"
+        },
+        {
+          "file": "libs/external-db-mongo/src/index.ts",
+          "hash": "5794932033982671197"
+        },
+        {
+          "file": "libs/external-db-mongo/src/mongo_capabilities.ts",
+          "hash": "11762208399593940473"
+        },
+        {
+          "file": "libs/external-db-mongo/src/mongo_config_validator.ts",
+          "hash": "13047796348326290671"
+        },
+        {
+          "file": "libs/external-db-mongo/src/mongo_data_provider.ts",
+          "hash": "16637882963861027530"
+        },
+        {
+          "file": "libs/external-db-mongo/src/mongo_operations.ts",
+          "hash": "8510595291632596437"
+        },
+        {
+          "file": "libs/external-db-mongo/src/mongo_schema_provider.ts",
+          "hash": "15853272628292305442"
+        },
+        {
+          "file": "libs/external-db-mongo/src/mongo_utils.spec.ts",
+          "hash": "15905224368379647831"
+        },
+        {
+          "file": "libs/external-db-mongo/src/mongo_utils.ts",
+          "hash": "825316032898476496"
+        },
+        {
+          "file": "libs/external-db-mongo/src/sql_filter_transformer.spec.ts",
+          "hash": "17547462577090186285"
+        },
+        {
+          "file": "libs/external-db-mongo/src/sql_filter_transformer.ts",
+          "hash": "12405186397712777289"
+        },
+        {
+          "file": "libs/external-db-mongo/src/supported_operations.ts",
+          "hash": "483544810829942833"
+        },
+        {
+          "file": "libs/external-db-mongo/src/types.ts",
+          "hash": "13613648188065578170"
+        },
+        {
+          "file": "libs/external-db-mongo/tests/drivers/db_operations_test_support.ts",
+          "hash": "634447973520909987"
+        },
+        {
+          "file": "libs/external-db-mongo/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "17450111940575459576"
+        },
+        {
+          "file": "libs/external-db-mongo/tests/e2e-testkit/docker-compose.yaml",
+          "hash": "18179716067501944451"
+        },
+        {
+          "file": "libs/external-db-mongo/tests/e2e-testkit/init-mongo.js",
+          "hash": "4880080328180479029"
+        },
+        {
+          "file": "libs/external-db-mongo/tests/e2e-testkit/mongo_resources.ts",
+          "hash": "351126333218379999"
+        },
+        {
+          "file": "libs/external-db-mongo/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-mongo/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-mongo/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-bigquery": [
+        {
+          "file": "libs/external-db-bigquery/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-bigquery/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-bigquery/jest.config.ts",
+          "hash": "18229942156034637148"
+        },
+        {
+          "file": "libs/external-db-bigquery/package.json",
+          "hash": "6069404363267153241"
+        },
+        {
+          "file": "libs/external-db-bigquery/project.json",
+          "hash": "1979427427240575880"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/bigquery_capabilities.ts",
+          "hash": "13999043843025890604"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/bigquery_config_validator.ts",
+          "hash": "6745963448688764211"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/bigquery_data_provider.ts",
+          "hash": "5285533491340356452"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/bigquery_operations.ts",
+          "hash": "15124911042412400724"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/bigquery_schema_provider.ts",
+          "hash": "9803140432689000151"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/bigquery_utils.spec.ts",
+          "hash": "11720701454685124098"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/bigquery_utils.ts",
+          "hash": "13971623184286166965"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/bigquery_utils_test_support.ts",
+          "hash": "5374618833777856978"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/connection_provider.ts",
+          "hash": "6356199889257083892"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/index.ts",
+          "hash": "13975020234299176143"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/sql_exception_translator.ts",
+          "hash": "1336615705760780293"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/sql_filter_transformer.spec.ts",
+          "hash": "2953179480776781761"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/sql_filter_transformer.ts",
+          "hash": "18184734034228135931"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/sql_schema_translator.spec.ts",
+          "hash": "17831742054229236000"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/sql_schema_translator.ts",
+          "hash": "6154084456081190314"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/supported_operations.ts",
+          "hash": "9700480374755083097"
+        },
+        {
+          "file": "libs/external-db-bigquery/src/types.ts",
+          "hash": "1747493589883000965"
+        },
+        {
+          "file": "libs/external-db-bigquery/tests/drivers/db_operations_test_support.ts",
+          "hash": "9799804923307080836"
+        },
+        {
+          "file": "libs/external-db-bigquery/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "6225326788360223927"
+        },
+        {
+          "file": "libs/external-db-bigquery/tests/e2e-testkit/bigquery_resources.ts",
+          "hash": "7606018537911367954"
+        },
+        {
+          "file": "libs/external-db-bigquery/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-bigquery/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-bigquery/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-firestore": [
+        {
+          "file": "libs/external-db-firestore/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-firestore/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "libs/external-db-firestore/.nvmrc",
+          "hash": "20467680281893951"
+        },
+        {
+          "file": "libs/external-db-firestore/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-firestore/jest.config.js",
+          "hash": "6286680619812255769"
+        },
+        {
+          "file": "libs/external-db-firestore/package.json",
+          "hash": "7752692097392388562"
+        },
+        {
+          "file": "libs/external-db-firestore/project.json",
+          "hash": "5083297269578434328"
+        },
+        {
+          "file": "libs/external-db-firestore/src/connection_provider.ts",
+          "hash": "12771578323605646000"
+        },
+        {
+          "file": "libs/external-db-firestore/src/firestore_capabilities.ts",
+          "hash": "15393201888469521553"
+        },
+        {
+          "file": "libs/external-db-firestore/src/firestore_config_validator.ts",
+          "hash": "18237885727192100924"
+        },
+        {
+          "file": "libs/external-db-firestore/src/firestore_data_provider.ts",
+          "hash": "879661216473352359"
+        },
+        {
+          "file": "libs/external-db-firestore/src/firestore_operations.ts",
+          "hash": "3105243166764381212"
+        },
+        {
+          "file": "libs/external-db-firestore/src/firestore_schema_provider.ts",
+          "hash": "4919974019281282743"
+        },
+        {
+          "file": "libs/external-db-firestore/src/firestore_utils.ts",
+          "hash": "9372093417731685983"
+        },
+        {
+          "file": "libs/external-db-firestore/src/index.ts",
+          "hash": "15898841129140624778"
+        },
+        {
+          "file": "libs/external-db-firestore/src/sql_exception_translator.ts",
+          "hash": "14085979311627219520"
+        },
+        {
+          "file": "libs/external-db-firestore/src/sql_filter_transformer.spec.ts",
+          "hash": "9741031668147917398"
+        },
+        {
+          "file": "libs/external-db-firestore/src/sql_filter_transformer.ts",
+          "hash": "8745615772770480617"
+        },
+        {
+          "file": "libs/external-db-firestore/src/supported_operations.ts",
+          "hash": "7259878393299000952"
+        },
+        {
+          "file": "libs/external-db-firestore/src/types.ts",
+          "hash": "9370643237307773457"
+        },
+        {
+          "file": "libs/external-db-firestore/tests/drivers/broken_creds.json",
+          "hash": "217209783974776487"
+        },
+        {
+          "file": "libs/external-db-firestore/tests/drivers/db_operations_test_support.ts",
+          "hash": "16329927163961160346"
+        },
+        {
+          "file": "libs/external-db-firestore/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "9043801694103980502"
+        },
+        {
+          "file": "libs/external-db-firestore/tests/e2e-testkit/docker-compose.yaml",
+          "hash": "9981883220479420245"
+        },
+        {
+          "file": "libs/external-db-firestore/tests/e2e-testkit/firestore_resources.ts",
+          "hash": "8245853524145143006"
+        },
+        {
+          "file": "libs/external-db-firestore/tests/gen.ts",
+          "hash": "1745178426038399064"
+        },
+        {
+          "file": "libs/external-db-firestore/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-firestore/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-firestore/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-spanner": [
+        {
+          "file": "libs/external-db-spanner/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-spanner/.gitignore",
+          "hash": "8774871110392669708"
+        },
+        {
+          "file": "libs/external-db-spanner/.nvmrc",
+          "hash": "20467680281893951"
+        },
+        {
+          "file": "libs/external-db-spanner/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-spanner/jest.config.ts",
+          "hash": "2265294106346182440"
+        },
+        {
+          "file": "libs/external-db-spanner/package.json",
+          "hash": "18199411765191559952"
+        },
+        {
+          "file": "libs/external-db-spanner/project.json",
+          "hash": "6116479401315593127"
+        },
+        {
+          "file": "libs/external-db-spanner/src/connection_provider.ts",
+          "hash": "9821041600723435595"
+        },
+        {
+          "file": "libs/external-db-spanner/src/escaping.spec.ts",
+          "hash": "2948190155317006398"
+        },
+        {
+          "file": "libs/external-db-spanner/src/index.ts",
+          "hash": "9656316097433706100"
+        },
+        {
+          "file": "libs/external-db-spanner/src/spanner_capabilities.ts",
+          "hash": "12075457275413034204"
+        },
+        {
+          "file": "libs/external-db-spanner/src/spanner_config_validator.ts",
+          "hash": "10538770735304807158"
+        },
+        {
+          "file": "libs/external-db-spanner/src/spanner_data_provider.ts",
+          "hash": "7412787290461060469"
+        },
+        {
+          "file": "libs/external-db-spanner/src/spanner_operations.ts",
+          "hash": "5085932407241447182"
+        },
+        {
+          "file": "libs/external-db-spanner/src/spanner_schema_provider.ts",
+          "hash": "6086984915952568853"
+        },
+        {
+          "file": "libs/external-db-spanner/src/spanner_utils.spec.ts",
+          "hash": "12703248863716187489"
+        },
+        {
+          "file": "libs/external-db-spanner/src/spanner_utils.ts",
+          "hash": "11090402586249145838"
+        },
+        {
+          "file": "libs/external-db-spanner/src/sql_exception_translator.ts",
+          "hash": "15610234508507648599"
+        },
+        {
+          "file": "libs/external-db-spanner/src/sql_filter_transformer.spec.ts",
+          "hash": "13646478651182631925"
+        },
+        {
+          "file": "libs/external-db-spanner/src/sql_filter_transformer.ts",
+          "hash": "2235354575491708960"
+        },
+        {
+          "file": "libs/external-db-spanner/src/sql_schema_translator.spec.ts",
+          "hash": "8532929347433028168"
+        },
+        {
+          "file": "libs/external-db-spanner/src/sql_schema_translator.ts",
+          "hash": "8449482393943119495"
+        },
+        {
+          "file": "libs/external-db-spanner/src/supported_operations.ts",
+          "hash": "2388334533247804122"
+        },
+        {
+          "file": "libs/external-db-spanner/src/types.ts",
+          "hash": "1637784079591981093"
+        },
+        {
+          "file": "libs/external-db-spanner/tests/drivers/db_operations_test_support.ts",
+          "hash": "6108183256296265284"
+        },
+        {
+          "file": "libs/external-db-spanner/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "15012857755897178174"
+        },
+        {
+          "file": "libs/external-db-spanner/tests/e2e-testkit/docker-compose.yaml",
+          "hash": "4892349253989780344"
+        },
+        {
+          "file": "libs/external-db-spanner/tests/e2e-testkit/spanner_resources.ts",
+          "hash": "16689522318086321949"
+        },
+        {
+          "file": "libs/external-db-spanner/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-spanner/tsconfig.lib.json",
+          "hash": "18272785575431227651"
+        },
+        {
+          "file": "libs/external-db-spanner/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-google-sheets": [
+        {
+          "file": "libs/external-db-google-sheets/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-google-sheets/.gitignore",
+          "hash": "357228959539327168"
+        },
+        {
+          "file": "libs/external-db-google-sheets/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-google-sheets/jest.config.ts",
+          "hash": "12943433722098388421"
+        },
+        {
+          "file": "libs/external-db-google-sheets/package.json",
+          "hash": "15016890762477545811"
+        },
+        {
+          "file": "libs/external-db-google-sheets/project.json",
+          "hash": "1022672795812082403"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/connection_provider.ts",
+          "hash": "18286482734070280137"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/google_sheet_config_validator.ts",
+          "hash": "15831682418167271878"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/google_sheet_data_provider.ts",
+          "hash": "8638059856734032302"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/google_sheet_exception_translator.ts",
+          "hash": "4610090094889434293"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/google_sheet_operations.ts",
+          "hash": "11142902591721400777"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/google_sheet_schema_provider.ts",
+          "hash": "3015427575314310218"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/google_sheet_utils.ts",
+          "hash": "11813086824180565057"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/index.ts",
+          "hash": "14863452232044477492"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/supported_operations.ts",
+          "hash": "8856820281789240311"
+        },
+        {
+          "file": "libs/external-db-google-sheets/src/types.ts",
+          "hash": "2619358009131553838"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/drivers/db_operations_test_support.ts",
+          "hash": "13701245577500346657"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/drivers/sql_filter_transformer_test_support.ts",
+          "hash": "10561532924507367156"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/e2e-testkit/google_sheets_resources.ts",
+          "hash": "1757399291213282172"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/google_sheet_doc_class.js",
+          "hash": "6854515656435632015"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/google_sheet_sheet_class.js",
+          "hash": "8341269223954934247"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/google_sheets_test_utils.js",
+          "hash": "5248973076373882897"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/mock-server.js",
+          "hash": "16517563366179427487"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/mock_google_sheets_api.js",
+          "hash": "1517146619494820316"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/sql_filter_transformer_test_support.js",
+          "hash": "10627643371515648113"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tests/templates.js",
+          "hash": "10969704132043545313"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-google-sheets/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-config": [
+        {
+          "file": "libs/external-db-config/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-config/.gitignore",
+          "hash": "16159327480686919679"
+        },
+        {
+          "file": "libs/external-db-config/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-config/jest.config.ts",
+          "hash": "4657309206972041505"
+        },
+        {
+          "file": "libs/external-db-config/package.json",
+          "hash": "15662614601927881553"
+        },
+        {
+          "file": "libs/external-db-config/project.json",
+          "hash": "9182365589664325373"
+        },
+        {
+          "file": "libs/external-db-config/src/factory.ts",
+          "hash": "10472603422591412706"
+        },
+        {
+          "file": "libs/external-db-config/src/index.ts",
+          "hash": "11260397859380576517"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/auth-deprecated/aws_auth_config_reader.js",
+          "hash": "803362527682874459"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/auth-deprecated/azure_auth_config_reader.js",
+          "hash": "9947664838364916184"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/auth-deprecated/gcp_auth_config_reader.js",
+          "hash": "8611783102376176700"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/authorization_config_reader.ts",
+          "hash": "7470675934206297081"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/aws_authorization_config_reader.ts",
+          "hash": "15628400803792683098"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/aws_config_reader.ts",
+          "hash": "2617314529786953053"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/azure_config_reader.ts",
+          "hash": "5555660881015609171"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/common_config_reader.ts",
+          "hash": "7493082151698209661"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/gcp_config_reader.ts",
+          "hash": "9426564986457814576"
+        },
+        {
+          "file": "libs/external-db-config/src/readers/stub_config_reader.ts",
+          "hash": "15747478213150245484"
+        },
+        {
+          "file": "libs/external-db-config/src/service/config_reader.ts",
+          "hash": "11261160913553413754"
+        },
+        {
+          "file": "libs/external-db-config/src/service/config_validator.spec.ts",
+          "hash": "3012956229411599377"
+        },
+        {
+          "file": "libs/external-db-config/src/service/config_validator_matchers.ts",
+          "hash": "3851704470529558574"
+        },
+        {
+          "file": "libs/external-db-config/src/types.ts",
+          "hash": "17315602466286991484"
+        },
+        {
+          "file": "libs/external-db-config/src/utils/config_utils.spec.ts",
+          "hash": "7935230755148022633"
+        },
+        {
+          "file": "libs/external-db-config/src/utils/config_utils.ts",
+          "hash": "16274234004220731957"
+        },
+        {
+          "file": "libs/external-db-config/src/validators/authorization_config_validator.ts",
+          "hash": "6528452553626594768"
+        },
+        {
+          "file": "libs/external-db-config/src/validators/common_config_validator.spec.ts",
+          "hash": "13558397071054152267"
+        },
+        {
+          "file": "libs/external-db-config/src/validators/common_config_validator.ts",
+          "hash": "11646877434374131380"
+        },
+        {
+          "file": "libs/external-db-config/src/validators/config_validator.ts",
+          "hash": "10447872762631716631"
+        },
+        {
+          "file": "libs/external-db-config/test/drivers/aws_mongo_config_test_support.ts",
+          "hash": "5152207748526227069"
+        },
+        {
+          "file": "libs/external-db-config/test/drivers/aws_mysql_config_test_support.ts",
+          "hash": "6954504159256322874"
+        },
+        {
+          "file": "libs/external-db-config/test/drivers/azure_mysql_config_test_support.ts",
+          "hash": "14322863697008195733"
+        },
+        {
+          "file": "libs/external-db-config/test/drivers/common_config_test_support.ts",
+          "hash": "7984480187291909320"
+        },
+        {
+          "file": "libs/external-db-config/test/drivers/external_config_reader_e2e_test_support.ts",
+          "hash": "2797086899172516568"
+        },
+        {
+          "file": "libs/external-db-config/test/drivers/external_db_config_test_support.ts",
+          "hash": "1541725788067817781"
+        },
+        {
+          "file": "libs/external-db-config/test/drivers/gcp_firestore_config_test_support.ts",
+          "hash": "14476081996015741567"
+        },
+        {
+          "file": "libs/external-db-config/test/drivers/gcp_mysql_config_test_support.ts",
+          "hash": "7910997447363892243"
+        },
+        {
+          "file": "libs/external-db-config/test/drivers/gcp_spanner_config_test_support.ts",
+          "hash": "6480253659914915987"
+        },
+        {
+          "file": "libs/external-db-config/test/e2e/external_db_config_client.e2e.spec.ts",
+          "hash": "2189860548876474380"
+        },
+        {
+          "file": "libs/external-db-config/test/e2e/external_db_config_client_matcher.ts",
+          "hash": "8253159240856950687"
+        },
+        {
+          "file": "libs/external-db-config/test/gen.ts",
+          "hash": "16740098496408685081"
+        },
+        {
+          "file": "libs/external-db-config/test/provider/config_reader_service.spec.ts",
+          "hash": "1343795774236956828"
+        },
+        {
+          "file": "libs/external-db-config/test/test_types.ts",
+          "hash": "14927431782240043516"
+        },
+        {
+          "file": "libs/external-db-config/test/test_utils.ts",
+          "hash": "11872604418577914668"
+        },
+        {
+          "file": "libs/external-db-config/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-config/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/external-db-config/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/velo-external-db-commons": [
+        {
+          "file": "libs/velo-external-db-commons/.eslintrc.json",
+          "hash": "867751369536640794"
+        },
+        {
+          "file": "libs/velo-external-db-commons/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/velo-external-db-commons/jest.config.ts",
+          "hash": "6360669966460822556"
+        },
+        {
+          "file": "libs/velo-external-db-commons/package.json",
+          "hash": "14152149667490197930"
+        },
+        {
+          "file": "libs/velo-external-db-commons/project.json",
+          "hash": "14159077773851556069"
+        },
+        {
+          "file": "libs/velo-external-db-commons/src/index.ts",
+          "hash": "11384432786619695730"
+        },
+        {
+          "file": "libs/velo-external-db-commons/src/libs/config_commons.ts",
+          "hash": "13019815596255166605"
+        },
+        {
+          "file": "libs/velo-external-db-commons/src/libs/data_commons.ts",
+          "hash": "5685333035171900933"
+        },
+        {
+          "file": "libs/velo-external-db-commons/src/libs/db_connector.ts",
+          "hash": "7571049260374806780"
+        },
+        {
+          "file": "libs/velo-external-db-commons/src/libs/errors.ts",
+          "hash": "15640774045791061774"
+        },
+        {
+          "file": "libs/velo-external-db-commons/src/libs/schema_commons.ts",
+          "hash": "13567898106734976961"
+        },
+        {
+          "file": "libs/velo-external-db-commons/src/libs/types.ts",
+          "hash": "1333164597374428270"
+        },
+        {
+          "file": "libs/velo-external-db-commons/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/velo-external-db-commons/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/velo-external-db-commons/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/velo-external-db-types": [
+        {
+          "file": "libs/velo-external-db-types/.eslintrc.json",
+          "hash": "11340856286167880730"
+        },
+        {
+          "file": "libs/velo-external-db-types/jest.config.ts",
+          "hash": "8641912179441549962"
+        },
+        {
+          "file": "libs/velo-external-db-types/package.json",
+          "hash": "3573159296144636606"
+        },
+        {
+          "file": "libs/velo-external-db-types/project.json",
+          "hash": "4670243057868772408"
+        },
+        {
+          "file": "libs/velo-external-db-types/src/collection_types.ts",
+          "hash": "6032437689366152748"
+        },
+        {
+          "file": "libs/velo-external-db-types/src/index.ts",
+          "hash": "1985632693930487854"
+        },
+        {
+          "file": "libs/velo-external-db-types/src/indexing_types.ts",
+          "hash": "17732593816268977747"
+        },
+        {
+          "file": "libs/velo-external-db-types/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/velo-external-db-types/tsconfig.lib.json",
+          "hash": "16432598719217471820"
+        },
+        {
+          "file": "libs/velo-external-db-types/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ],
+      "@wix-velo/external-db-testkit": [
+        {
+          "file": "libs/external-db-testkit/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "libs/external-db-testkit/README.md",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "libs/external-db-testkit/jest.config.ts",
+          "hash": "10723478976141701731"
+        },
+        {
+          "file": "libs/external-db-testkit/package.json",
+          "hash": "485750480090091904"
+        },
+        {
+          "file": "libs/external-db-testkit/project.json",
+          "hash": "244345052229022896"
+        },
+        {
+          "file": "libs/external-db-testkit/src/index.ts",
+          "hash": "14560649685868870099"
+        },
+        {
+          "file": "libs/external-db-testkit/src/lib/auth_test_support.ts",
+          "hash": "13214726131522543349"
+        },
+        {
+          "file": "libs/external-db-testkit/src/lib/docker_support.js",
+          "hash": "7264301242354172706"
+        },
+        {
+          "file": "libs/external-db-testkit/src/lib/e2e_resources.ts",
+          "hash": "17837654843887271632"
+        },
+        {
+          "file": "libs/external-db-testkit/tsconfig.json",
+          "hash": "8235438660901607162"
+        },
+        {
+          "file": "libs/external-db-testkit/tsconfig.lib.json",
+          "hash": "14752751989749065986"
+        },
+        {
+          "file": "libs/external-db-testkit/tsconfig.spec.json",
+          "hash": "10595040461224341030"
+        }
+      ]
+    },
+    "nonProjectFiles": [
+      {
+        "file": ".dockerignore",
+        "hash": "16259394606299231757"
+      },
+      {
+        "file": ".eslintignore",
+        "hash": "15077420774254355744"
+      },
+      {
+        "file": ".eslintrc.json",
+        "hash": "10760072541617458727"
+      },
+      {
+        "file": ".github/workflows/lint.yml",
+        "hash": "15179935046799621719"
+      },
+      {
+        "file": ".github/workflows/main.yml",
+        "hash": "13340257501998090477"
+      },
+      {
+        "file": ".github/workflows/npm-publish.yaml",
+        "hash": "5342770132873425269"
+      },
+      {
+        "file": ".github/workflows/publish-slim-version.yaml",
+        "hash": "4208629746598163036"
+      },
+      {
+        "file": ".github/workflows/publish.yaml",
+        "hash": "1252295339094714581"
+      },
+      {
+        "file": ".github/workflows/script.js",
+        "hash": "15090161258418362577"
+      },
+      {
+        "file": ".github/workflows/update-npm-packages.yml",
+        "hash": "13174745241352735696"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "865043874469152233"
+      },
+      {
+        "file": ".husky/.gitignore",
+        "hash": "10106645302852536800"
+      },
+      {
+        "file": ".husky/pre-commit",
+        "hash": "3256474109941491088"
+      },
+      {
+        "file": ".nvmrc",
+        "hash": "20467680281893951"
+      },
+      {
+        "file": "Dockerfile",
+        "hash": "13807025642329699210"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "3322240253594547947"
+      },
+      {
+        "file": "README.md",
+        "hash": "4203658700499356833"
+      },
+      {
+        "file": "jest.config.ts",
+        "hash": "8883870756985430929"
+      },
+      {
+        "file": "jest.preset.js",
+        "hash": "3068050589996444654"
+      },
+      {
+        "file": "lint-staged.config.js",
+        "hash": "3025525464266941206"
+      },
+      {
+        "file": "nx.json",
+        "hash": "1693728208307404651"
+      },
+      {
+        "file": "package.json",
+        "hash": "8869246766021151644"
+      },
+      {
+        "file": "scripts/data-tools/.gitignore",
+        "hash": "6159561824636396022"
+      },
+      {
+        "file": "scripts/data-tools/lib/adapter/data.js",
+        "hash": "1195051856683250747"
+      },
+      {
+        "file": "scripts/data-tools/lib/adapter/schema.js",
+        "hash": "15215609974621580649"
+      },
+      {
+        "file": "scripts/data-tools/lib/cli/display.js",
+        "hash": "16723856784987064780"
+      },
+      {
+        "file": "scripts/data-tools/lib/cli/user-input.js",
+        "hash": "14126248569171917660"
+      },
+      {
+        "file": "scripts/data-tools/lib/core/process.js",
+        "hash": "15776886052716538761"
+      },
+      {
+        "file": "scripts/data-tools/lib/generator/data.js",
+        "hash": "11874831666077360726"
+      },
+      {
+        "file": "scripts/data-tools/lib/generator/schema.js",
+        "hash": "13732828258120633977"
+      },
+      {
+        "file": "scripts/data-tools/lib/index.js",
+        "hash": "14161891566274536532"
+      },
+      {
+        "file": "scripts/data-tools/lib/utils/request.js",
+        "hash": "1523516868866328262"
+      },
+      {
+        "file": "scripts/data-tools/lib/utils/utils.js",
+        "hash": "12123721787090127088"
+      },
+      {
+        "file": "scripts/data-tools/package.json",
+        "hash": "9350375866189194903"
+      },
+      {
+        "file": "scripts/provision/.gitignore",
+        "hash": "6159561824636396022"
+      },
+      {
+        "file": "scripts/provision/README.MD",
+        "hash": "12737754176476473051"
+      },
+      {
+        "file": "scripts/provision/lib/auth/default_credentials.js",
+        "hash": "10504251640366450412"
+      },
+      {
+        "file": "scripts/provision/lib/cli/display.js",
+        "hash": "11234739729669429863"
+      },
+      {
+        "file": "scripts/provision/lib/cli/user-input.js",
+        "hash": "8894922193487226726"
+      },
+      {
+        "file": "scripts/provision/lib/cli/validators.js",
+        "hash": "4361392478240080682"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/aws_adapter_provision.js",
+        "hash": "8417804712379688158"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/aws_config_writer.js",
+        "hash": "13881820397144184126"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/aws_db_provision.js",
+        "hash": "8405487655384051966"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/aws_network_provision.js",
+        "hash": "7200203753742995844"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/aws_permissions_provision.js",
+        "hash": "4630507806787494681"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/aws_ui_utils.js",
+        "hash": "16918227041073028878"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/db/factory.js",
+        "hash": "3919823932068880101"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/db/mssql_support.js",
+        "hash": "16781794198945763280"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/db/mysql_support.js",
+        "hash": "4488744719554225174"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/db/postgres_support.js",
+        "hash": "4018128233380691977"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/aws/index.js",
+        "hash": "2949922170185401006"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/azure_adapter_provision.js",
+        "hash": "4576498665834817029"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/azure_config_writer.js",
+        "hash": "6328696228576277831"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/azure_db_provision.js",
+        "hash": "12845003455931663522"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/azure_network.js",
+        "hash": "4138864641339494726"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/azure_permissions_provision.js",
+        "hash": "4630507806787494681"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/azure_ui_utils.js",
+        "hash": "930035694268381239"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/db/factory.js",
+        "hash": "2441110825320975278"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/db/mysql_support.js",
+        "hash": "11480171495961159437"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/db/postgres_support.js",
+        "hash": "5846392333596438088"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/index.js",
+        "hash": "8516976510805523084"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/azure/utils.js",
+        "hash": "14443049118671111251"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/factory.js",
+        "hash": "8506109509344056341"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/gcp/gcp_adapter_provision.js",
+        "hash": "6787203726967138050"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/gcp/gcp_config_writer.js",
+        "hash": "13447376337018010439"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/gcp/gcp_db_provision.js",
+        "hash": "5847564733459259233"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/gcp/gcp_network_provision.js",
+        "hash": "14422349534234805795"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/gcp/gcp_permissions_provision.js",
+        "hash": "15538403011481384618"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/gcp/gcp_ui_utils.js",
+        "hash": "6756556343134402225"
+      },
+      {
+        "file": "scripts/provision/lib/cloud-providers/gcp/index.js",
+        "hash": "17466593885795650551"
+      },
+      {
+        "file": "scripts/provision/lib/core/provision.js",
+        "hash": "10413580199237575654"
+      },
+      {
+        "file": "scripts/provision/lib/index.js",
+        "hash": "2553640422783858396"
+      },
+      {
+        "file": "scripts/provision/lib/utils/password_utils.js",
+        "hash": "2711529959890767849"
+      },
+      {
+        "file": "scripts/provision/lib/utils/utils.js",
+        "hash": "18196846197779526165"
+      },
+      {
+        "file": "scripts/provision/package.json",
+        "hash": "8682339618567157105"
+      },
+      {
+        "file": "scripts/terraform/.gitignore",
+        "hash": "5146723022072164320"
+      },
+      {
+        "file": "scripts/terraform/README.MD",
+        "hash": "1167396955904537960"
+      },
+      {
+        "file": "scripts/terraform/azure/mysql/main.tf",
+        "hash": "9552977635433061313"
+      },
+      {
+        "file": "scripts/terraform/azure/mysql/outputs.tf",
+        "hash": "7791881985580078447"
+      },
+      {
+        "file": "scripts/terraform/azure/mysql/variables.tf",
+        "hash": "9986076809590620886"
+      },
+      {
+        "file": "scripts/terraform/azure/postgres/main.tf",
+        "hash": "10102639793114577903"
+      },
+      {
+        "file": "scripts/terraform/azure/postgres/outputs.tf",
+        "hash": "7791881985580078447"
+      },
+      {
+        "file": "scripts/terraform/azure/postgres/variables.tf",
+        "hash": "9986076809590620886"
+      },
+      {
+        "file": "scripts/terraform/gcp/main.tf",
+        "hash": "4850220664860013023"
+      },
+      {
+        "file": "scripts/terraform/gcp/outputs.tf",
+        "hash": "17150784747508510181"
+      },
+      {
+        "file": "scripts/terraform/gcp/variables.tf",
+        "hash": "5093403500459434416"
+      },
+      {
+        "file": "scripts/terraform/package.json",
+        "hash": "11512817849094238671"
+      },
+      {
+        "file": "supported-operations-table.md",
+        "hash": "10731283225223927605"
+      },
+      {
+        "file": "tools/scripts/publish.mjs",
+        "hash": "13323982398354893404"
+      },
+      {
+        "file": "tools/scripts/publishCi.mjs",
+        "hash": "8649512954776031229"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "4038871771242806302"
+      },
+      {
+        "file": "workspace.json",
+        "hash": "604726221029337740"
+      }
+    ]
+  }
+}
