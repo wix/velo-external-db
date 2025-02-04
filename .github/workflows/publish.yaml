@@ -125,6 +125,7 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Docker Auth
+        if: github.event.inputs.gcp == 'true'
         run: |-
           gcloud auth configure-docker us-docker.pkg.dev --quiet
 
