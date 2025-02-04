@@ -1,0 +1,25 @@
+name: Update npm Packages and Create PR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-dep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      - name: Update dependencies
+        run: |
+          npx -p npm-check-updates ncu -u
+          npm install
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: Update dependencies
+          title: Update dependencies
+          body: |
+            - Dependency updates
+          branch: update-dependencies
