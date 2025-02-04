@@ -51,7 +51,7 @@ jobs:
       # Build docker image
       - name: Build Docker image
         id: build-image
-        run: docker build -t $IMAGE_NAME .
+        run:  docker build -t $IMAGE_NAME .
 
       # Login to Public ECR
       - name: Login to Public ECR
@@ -135,14 +135,14 @@ jobs:
           gcloud auth configure-docker -q
 
           # Setting image tag to image tag input
-          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test/$IMAGE_NAME:$IMAGE_TAG
+          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER/$IMAGE_NAME:$IMAGE_TAG
           # Setting image to with github branch name
-          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test/$IMAGE_NAME:branch-${GITHUB_REF##*/}
+          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER/$IMAGE_NAME:branch-${GITHUB_REF##*/}
           # Setting image to with github sha
-          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test/$IMAGE_NAME:sha-${GITHUB_SHA}
+          docker tag $IMAGE_NAME us-docker.pkg.dev/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER/$IMAGE_NAME:sha-${GITHUB_SHA}
 
           echo "Pushing image to GCP container registry..."
-          docker push us-docker.pkg.dev/$GCP_PROJECT_ID/velo-external-db-test/$IMAGE_NAME:$IMAGE_TAG
+          docker push us-docker.pkg.dev/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER/$IMAGE_NAME --all-tags
 
           echo "Pushing image to GCP container registry with following tags:"
           echo "::set-output name=image::gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:$IMAGE_TAG"
