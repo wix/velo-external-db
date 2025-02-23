@@ -29,11 +29,13 @@ on:
         options:
           - velo-manged-external-db
           - velo-manged-external-db-test
+          - velo-external-db
+          - velo-external-db-testing
 
 jobs:
   Build-and-push:
     runs-on: ubuntu-latest
-  
+
     env:
       ECR_REPOSITORY: ${{ secrets.AWS_REPO_NAME }}
       PUBLIC_ECR_URL: ${{ secrets.AWS_REPO_URL }}
@@ -46,7 +48,7 @@ jobs:
 
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # Build docker image
       - name: Build Docker image
@@ -89,7 +91,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: Tag and push the image to Docker Hub
         if: github.event.inputs.dockerHub == 'true'
         id: dockerhub-push-image
@@ -113,16 +115,21 @@ jobs:
       - id: auth
         name: Authenticate to Google Cloud
         if: github.event.inputs.gcp == 'true'
-        uses: 'google-github-actions/auth@v0'
+        uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
       # Set up Cloud SDK
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v2
         if: github.event.inputs.gcp == 'true'
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Docker Auth
+        if: github.event.inputs.gcp == 'true'
+        run: |-
+          gcloud auth configure-docker us-docker.pkg.dev --quiet
 
       # Push image to Google Container Registry
       - name: Tag and push image to GCP container registry
