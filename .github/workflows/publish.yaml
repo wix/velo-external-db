@@ -6,22 +6,36 @@ on:
       gcp:
         type: boolean
         description: GCP container registry
-        default: true
+        default: false
 
       aws:
         type: boolean
         description: AWS ECR container registry
-        default: true
+        default: false
 
       dockerHub:
         type: boolean
         description: Docker container registry
-        default: true
+        default: false
+
+      image-tag:
+        type: string
+        description: Image tag
+        default: latest
+
+      container-registry-folder:
+        type: choice
+        description: Container registry folder
+        options:
+          - velo-manged-external-db
+          - velo-manged-external-db-test
+          - velo-external-db
+          - velo-external-db-testing
 
 jobs:
   Build-and-push:
     runs-on: ubuntu-latest
-  
+
     env:
       ECR_REPOSITORY: ${{ secrets.AWS_REPO_NAME }}
       PUBLIC_ECR_URL: ${{ secrets.AWS_REPO_URL }}
@@ -29,12 +43,12 @@ jobs:
       DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
       GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      CONTAINER_REGISTRY_FOLDER: ${{ secrets.GCP_CONTAINER_REGISTRY_FOLDER }}
-      IMAGE_TAG: latest
+      IMAGE_TAG: ${{ github.event.inputs.image-tag }}
+      CONTAINER_REGISTRY_FOLDER: ${{ github.event.inputs.container-registry-folder }}
 
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # Build docker image
       - name: Build Docker image
@@ -56,10 +70,20 @@ jobs:
         if: github.event.inputs.aws == 'true'
         id: aws-push-image
         run: |
-          docker tag $IMAGE_NAME:$IMAGE_TAG $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
+          # Setting image tag to image tag input
+          docker tag $IMAGE_NAME $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
+          # Setting image to with github branch name 
+          docker tag $IMAGE_NAME $PUBLIC_ECR_URL/$IMAGE_NAME:branch-${GITHUB_REF##*/}
+          # Setting image to with github sha
+          docker tag $IMAGE_NAME $PUBLIC_ECR_URL/$IMAGE_NAME:sha-${GITHUB_SHA}
+          
           echo "Pushing image to ECR..."
-          docker push $PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG
+          docker push $PUBLIC_ECR_URL/$IMAGE_NAME  --all-tags
+
+          echo "Pushing image to ECR with following tags:"
           echo "::set-output name=image::$PUBLIC_ECR_URL/$IMAGE_NAME:$IMAGE_TAG"
+          echo "::set-output name=image::$PUBLIC_ECR_URL/$IMAGE_NAME:branch-${GITHUB_REF##*/}"
+          echo "::set-output name=image::$PUBLIC_ECR_URL/$IMAGE_NAME:sha-${GITHUB_SHA}"
 
       - name: Login to Docker Hub
         if: github.event.inputs.dockerHub == 'true'
@@ -67,35 +91,63 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: Tag and push the image to Docker Hub
         if: github.event.inputs.dockerHub == 'true'
         id: dockerhub-push-image
         run: |
+          # Setting image tag to image tag input
           docker tag $IMAGE_NAME $DOCKERHUB_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+          # Setting image to with github branch name
+          docker tag $IMAGE_NAME $DOCKERHUB_REPOSITORY/$IMAGE_NAME:branch-${GITHUB_REF##*/}
+          # Setting image to with github sha
+          docker tag $IMAGE_NAME $DOCKERHUB_REPOSITORY/$IMAGE_NAME:sha-${GITHUB_SHA}
+
           echo "Pushing image to Docker Hub..."
-          docker push $DOCKERHUB_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+          docker push $DOCKERHUB_REPOSITORY/$IMAGE_NAME  --all-tags
+
+          echo "Pushing image to Docker Hub with following tags:"
           echo "::set-output name=image::$DOCKERHUB_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG"
+          echo "::set-output name=image::$DOCKERHUB_REPOSITORY/$IMAGE_NAME:branch-${GITHUB_REF##*/}"
+          echo "::set-output name=image::$DOCKERHUB_REPOSITORY/$IMAGE_NAME:sha-${GITHUB_SHA}"
 
       #  Authenticate to Google Cloud
       - id: auth
         name: Authenticate to Google Cloud
         if: github.event.inputs.gcp == 'true'
-        uses: 'google-github-actions/auth@v0'
+        uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
       # Set up Cloud SDK
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v2
         if: github.event.inputs.gcp == 'true'
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Docker Auth
+        if: github.event.inputs.gcp == 'true'
+        run: |-
+          gcloud auth configure-docker us-docker.pkg.dev --quiet
 
       # Push image to Google Container Registry
       - name: Tag and push image to GCP container registry
         if: github.event.inputs.gcp == 'true'
         run: |
           gcloud auth configure-docker -q
-          docker tag $IMAGE_NAME:$IMAGE_TAG gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER
-          docker push gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:$IMAGE_TAG
+
+          # Setting image tag to image tag input
+          docker tag $IMAGE_NAME gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:$IMAGE_TAG
+          # Setting image to with github branch name
+          docker tag $IMAGE_NAME gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:branch-${GITHUB_REF##*/}
+          # Setting image to with github sha
+          docker tag $IMAGE_NAME gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:sha-${GITHUB_SHA}
+
+          echo "Pushing image to GCP container registry..."
+          docker push gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER --all-tags
+
+          echo "Pushing image to GCP container registry with following tags:"
+          echo "::set-output name=image::gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:$IMAGE_TAG"
+          echo "::set-output name=image::gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:branch-${GITHUB_REF##*/}"
+          echo "::set-output name=image::gcr.io/$GCP_PROJECT_ID/$CONTAINER_REGISTRY_FOLDER:sha-${GITHUB_SHA}"
