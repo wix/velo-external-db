@@ -41,7 +41,7 @@ jobs:
                    "postgres", "postgres13", "postgres12", "postgres11", "postgres10", "postgres9",
                    "spanner",
                    "mysql", "mysql5",
-                   "mssql", "mssql17",
+                   "mssql",
                    "mongo", "mongo4",
                    "firestore",
                    "dynamodb",
