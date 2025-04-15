@@ -79,8 +79,6 @@ const executeHook = async(hooks: DataHooks | SchemaHooks, _actionName: string, p
 
 export const createRouter = () => {
     const router = express.Router()
-    router.use(express.json({ limit: '4mb' }))
-    router.use(express.urlencoded({ limit: '4mb', extended: true }))
     router.use(compression())
     router.use('/assets', express.static(path.join(__dirname, 'assets')))
     router.use(unless(['/', '/provision', '/favicon.ico'], secretKeyAuthMiddleware({ secretKey: cfg.secretKey })))
