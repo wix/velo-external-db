@@ -1,7 +1,6 @@
-package-lock.json
-
 config.json
 schemas.json
+yarn.lock
 .gcloudignore
 .eslint
 .idea
