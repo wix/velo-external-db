@@ -25,16 +25,16 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
 
       - name: Installing Dependencies
-        run: npm install
+        run: yarn install --frozen-lockfile
 
       - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
+        run: yarn build:dev
 
       - name: Testing
-        run: npm run test:core
+        run: yarn test:core
 
   test_databases:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
 
       - name: Downloading Image
         if: ${{ ( matrix.database != 'google-sheets') }}
@@ -82,13 +82,13 @@ jobs:
           docker compose up --detach ${{ matrix.database }}
 
       - name: Installing Dependencies
-        run: npm install
+        run: yarn install --frozen-lockfile
 
       - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
+        run: yarn build:dev
 
       - name: Testing
-        run: npm run test:${{ matrix.database }}
+        run: yarn test:${{ matrix.database }}
 
       - name: Stop Container
         if: ${{ ( matrix.database != 'google-sheets') }}

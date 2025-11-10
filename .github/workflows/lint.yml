@@ -17,11 +17,11 @@ jobs:
           node-version: lts/*
 
       - name: Installing Dependencies
-        run: npm install
+        run: yarn install --frozen-lockfile
 
       - name: Install dependencies of the homemade packages.
-        run: npm run build:dev
+        run: yarn build:dev
 
       - name: Linting
-        run: npm run lint
+        run: yarn lint
 

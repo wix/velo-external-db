@@ -20,9 +20,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Installing NX
-        run: npm install -g nx
+        run: yarn global add nx
 
-      - run: npm install 
+      - run: yarn install --frozen-lockfile
      
       - name: publish to npm
         run: |

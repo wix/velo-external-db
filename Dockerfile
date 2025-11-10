@@ -6,8 +6,8 @@ WORKDIR /usr/lib/app
 COPY . .
 
 # Install NX and project dependencies
-RUN npm install -g nx
-RUN npm install 
+RUN yarn global add nx
+RUN yarn install --frozen-lockfile
 
 # Build the JS files
 RUN nx run-many --target=build --all
@@ -21,7 +21,7 @@ WORKDIR /usr/lib/app
 COPY --from=0 /usr/lib/app/dist/apps/velo-external-db .
 
 # Install dependencies
-RUN npm install --production
+RUN yarn install --production --frozen-lockfile
 
 # Run the app
 CMD node ./main.js
