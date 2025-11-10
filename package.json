@@ -1,5 +1,6 @@
 {
   "name": "velo-external-database-adapter",
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "start": "nx serve",
     "start:dev": "nx run velo-external-db:serve",
