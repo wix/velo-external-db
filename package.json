@@ -39,6 +39,7 @@
     "@google-cloud/bigquery": "^5.12.0",
     "@google-cloud/firestore": "^5.0.2",
     "@google-cloud/spanner": "^5.18.0",
+    "@typespec/ts-http-runtime": "^0.3.2",
     "airtable": "^0.11.4",
     "ajv": "^6.12.6",
     "async-wait-until": "^2.0.12",
