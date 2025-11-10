@@ -21,4 +21,9 @@ export default {
     setupFilesAfterEnv: ['jest-extended/all'],
     coverageDirectory: '../../coverage/apps/ex-db-template',
     maxWorkers: 1,
+    moduleNameMapper: {
+        '^@typespec/ts-http-runtime/internal/logger$': '@typespec/ts-http-runtime/dist/commonjs/logger/internal.js',
+        '^@typespec/ts-http-runtime/internal/util$': '@typespec/ts-http-runtime/dist/commonjs/util/internal.js',
+        '^@typespec/ts-http-runtime/internal/policies$': '@typespec/ts-http-runtime/dist/commonjs/policies/internal.js',
+    },
 }
