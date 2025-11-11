@@ -29,7 +29,7 @@ export const configPattern = {
     required: ['collectionPermissions']
 }
 
-export const isJson = (str: any) => { try { JSON.parse(str); return true } catch (e) { return false } }
+export const isJson = (str: any) => { try { JSON.parse(str); return true } catch { return false } }
 
 export const jsonParser = (str: string) => {
     let parsed = JSON.parse(str)

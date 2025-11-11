@@ -6,7 +6,7 @@ const getAppInfoTemplate = async(hideAppInfo?: boolean) => { // TODO: fix this h
     const fileName = hideAppInfo ? 'index-without-data.ejs' : 'index.ejs' 
     try {
         return await fs.readFile(path.join( __dirname, '..', 'views', fileName), 'utf8')
-    } catch (err) {
+    } catch {
         return await fs.readFile(path.join( __dirname, 'views', fileName), 'utf8')
     }
 
