@@ -3,7 +3,7 @@
   "scripts": {
     "start": "nx serve",
     "start:dev": "nx run velo-external-db:serve",
-    "build:dev": "nx run-many --target=build --all",
+    "build:dev": "nx run-many --target=build --all --parallel=1",
     "build:full-image": "nx run velo-external-db:build-image ",
     "lint": "eslint --cache ./",
     "lint:fix": "eslint --cache --fix ./",
@@ -65,7 +65,7 @@
     "pino": "^8.17.2",
     "sqlstring": "^2.3.3",
     "trier-promise": "^1.0.1",
-    "tslib": "^2.3.0",
+    "tslib": "^2.8.1",
     "tsqlstring": "^1.0.1",
     "uuid": "^8.3.2"
   },

@@ -13,6 +13,7 @@
     "**/*.test.js",
     "test/**/*",
     "tests/**/*",
+    "**/test/**/*",
     "**/*_test_support.ts",
     "**/*_matchers.ts"
   ]
