@@ -1,5 +1,5 @@
 // path aliases within jest global setup/teardown
-import { registerTsProject } from 'nx/src/utils/register'
+const { registerTsProject } = require('nx/src/plugins/js/utils/register')
 registerTsProject('.', 'tsconfig.base.json')
 
 

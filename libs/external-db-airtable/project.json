@@ -1,58 +1,67 @@
 {
+  "name": "@wix-velo/external-db-airtable",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/external-db-airtable/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/external-db-airtable",
         "main": "libs/external-db-airtable/src/index.ts",
         "tsConfig": "libs/external-db-airtable/tsconfig.lib.json",
-        "assets": [ "libs/external-db-airtable/*.md" ],
+        "assets": [
+          "libs/external-db-airtable/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
     "publish": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs @wix-velo/external-db-airtable {args.ver} {args.tag}"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "publishCi": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-airtable"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": [ "{options.outputFile}" ],
+      "executor": "@nx/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-airtable/**/*.ts" ]
+        "lintFilePatterns": [
+          "libs/external-db-airtable/**/*.ts"
+        ]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-airtable" ],
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/external-db-airtable"
+      ],
       "options": {
         "jestConfig": "libs/external-db-airtable/jest.config.ts",
         "passWithNoTests": true
       }
     }
-  },
-  "tags": []
+  }
 }
