@@ -6,7 +6,7 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/node:webpack",
+      "executor": "@nx/js:tsc",
       "outputs": [
         "{options.outputPath}"
       ],
@@ -15,8 +15,6 @@
         "main": "apps/velo-external-db/src/main.ts",
         "tsConfig": "apps/velo-external-db/tsconfig.app.json",
         "generatePackageJson": true,
-        "progress": true,
-        "buildLibsFromSource": true,
         "assets": [
           {
             "glob": "**/*",

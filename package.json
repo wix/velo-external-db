@@ -76,6 +76,7 @@
     "@nx/jest": "19.8.4",
     "@nx/linter": "19.8.4",
     "@nx/node": "19.8.4",
+    "@nx/webpack": "19.8.4",
     "@nx/workspace": "19.8.4",
     "@types/bluebird": "^3.5.36",
     "@types/chance": "^1.1.3",
