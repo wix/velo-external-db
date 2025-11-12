@@ -1,58 +1,67 @@
 {
+  "name": "@wix-velo/external-db-dynamodb",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/external-db-dynamodb/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/external-db-dynamodb",
         "main": "libs/external-db-dynamodb/src/index.ts",
         "tsConfig": "libs/external-db-dynamodb/tsconfig.lib.json",
-        "assets": [ "libs/external-db-dynamodb/*.md" ],
+        "assets": [
+          "libs/external-db-dynamodb/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
     "publish": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs @wix-velo/external-db-dynamodb {args.ver} {args.tag}"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "publishCi": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-dynamodb"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": [ "{options.outputFile}" ],
+      "executor": "@nx/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-dynamodb/**/*.ts" ]
+        "lintFilePatterns": [
+          "libs/external-db-dynamodb/**/*.ts"
+        ]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-dynamodb" ],
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/external-db-dynamodb"
+      ],
       "options": {
         "jestConfig": "libs/external-db-dynamodb/jest.config.ts",
         "passWithNoTests": true
       }
     }
-  },
-  "tags": []
+  }
 }

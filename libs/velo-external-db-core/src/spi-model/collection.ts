@@ -116,7 +116,7 @@ export enum DataOperation {
 export interface ReferenceCapabilities {
     supportedNamespaces?: string[];
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CollectionOperationEnum {
 }
 
@@ -125,7 +125,7 @@ export enum CollectionOperation {
     remove = 'REMOVE',
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IndexingCapabilityEnum {
 }
 

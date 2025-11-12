@@ -1,60 +1,67 @@
 {
+  "name": "@wix-velo/external-db-mssql",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/external-db-mssql/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/external-db-mssql",
         "main": "libs/external-db-mssql/src/index.ts",
         "tsConfig": "libs/external-db-mssql/tsconfig.lib.json",
-        "assets": [ "libs/external-db-mssql/*.md" ],
+        "assets": [
+          "libs/external-db-mssql/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
     "publish": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs @wix-velo/external-db-mssql {args.ver} {args.tag}"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "publishCi": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-mssql"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "outputs": [
         "{options.outputFile}"
       ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-mssql/**/*.ts" ]
+        "lintFilePatterns": [
+          "libs/external-db-mssql/**/*.ts"
+        ]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-mssql" ],
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/external-db-mssql"
+      ],
       "options": {
         "jestConfig": "libs/external-db-mssql/jest.config.ts",
         "passWithNoTests": true
       }
     }
-  },
-  "tags": []
+  }
 }

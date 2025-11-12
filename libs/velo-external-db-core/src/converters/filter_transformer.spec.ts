@@ -118,6 +118,7 @@ describe('Filter Transformer', () => {
         })
     })
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     describe('handle multi field operator', () => {
         each([
             '$and', '$or'

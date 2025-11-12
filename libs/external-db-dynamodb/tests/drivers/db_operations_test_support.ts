@@ -12,13 +12,15 @@ const createConnection = (_config: any) => {
 }
 
 const dbOperationWithMisconfiguredAwsAccessKeyId = () => {
-    delete process.env['AWS_ACCESS_KEY_ID']
-    return new DatabaseOperations(createConnection(config()).connection)
+    // Use an invalid endpoint to force connection failure
+    const _config = { ...config(), endpoint: 'http://localhost:9999' }
+    return new DatabaseOperations(createConnection(_config).connection)
 }
 
 const dbOperationWithMisconfiguredAwsSecretAccessKey = () => {
-    delete process.env['AWS_SECRET_ACCESS_KEY']
-    return new DatabaseOperations(createConnection(config()).connection)
+    // Use an invalid endpoint to force connection failure
+    const _config = { ...config(), endpoint: 'http://invalid-host:8000' }
+    return new DatabaseOperations(createConnection(_config).connection)
 } 
 
 const dbOperationWithMisconfiguredRegion = () => { 

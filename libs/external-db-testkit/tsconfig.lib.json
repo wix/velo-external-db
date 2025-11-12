@@ -10,6 +10,11 @@
     "jest.config.ts",
     "**/*.spec.ts",
     "**/*.test.ts",
-    "**/*.test.js"
+    "**/*.test.js",
+    "test/**/*",
+    "tests/**/*",
+    "**/test/**/*",
+    "**/*_test_support.ts",
+    "**/*_matchers.ts"
   ]
 }
