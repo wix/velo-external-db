@@ -5,7 +5,6 @@ schemas.json
 .gcloudignore
 .eslint
 .idea
-.vscode
 packages/.DS_Store
 .DS_Store
 .eslintcache
@@ -21,3 +20,4 @@ node_modules
 
 .nx/cache
 .nx/workspace-data
+config.bat
