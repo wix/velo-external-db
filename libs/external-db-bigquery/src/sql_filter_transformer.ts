@@ -128,7 +128,7 @@ export default class FilterParser {
             const ignoreCase = value.ignoreCase ? 'LOWER' : ''
             return [{
                 filterExpr: `REGEXP_CONTAINS(${ignoreCase}(${escapeIdentifier(fieldName)}), ${ignoreCase}(?))`,
-                parameters: [specArrayToRegex(value.spec)]
+                parameters: [`^${specArrayToRegex(value.spec)}$`]
             }]
         }
 

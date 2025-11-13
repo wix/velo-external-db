@@ -150,7 +150,7 @@ export default class FilterParser {
             const literals = this.valueForOperator(fieldName, value, operator, counter).sql
             return [{
                 filterExpr: `${ignoreCase}(${escapeId(fieldName)}) LIKE ${ignoreCase}(${literals})`,
-                parameters: this.parametersFor(fieldName, specArrayToRegex(value.spec), counter)
+                parameters: this.parametersFor(fieldName, `^${specArrayToRegex(value.spec)}$`, counter)
             }]
         }
 

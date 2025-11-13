@@ -149,7 +149,7 @@ export default class FilterParser {
             const literals = this.valueForOperator(fieldName, value, operator, counter).sql
             return [{
                 filterExpr: `REGEXP_CONTAINS (${ignoreCase}(${escapeId(fieldName)}), ${ignoreCase}(${literals}))`,
-                parameters: this.parametersFor(fieldName, specArrayToRegex(value.spec), counter)
+                parameters: this.parametersFor(fieldName, `^${specArrayToRegex(value.spec)}$`, counter)
             }]
         }
 
