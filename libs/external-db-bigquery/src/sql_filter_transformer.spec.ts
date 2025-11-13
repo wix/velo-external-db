@@ -256,7 +256,7 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `REGEXP_CONTAINS(LOWER(${escapeId(ctx.fieldName)}), LOWER(?))`,
-                        parameters: [`${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}`]
+                        parameters: [`^${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}$`]
                     }])   
                 })
                 
@@ -276,7 +276,7 @@ describe('Sql Parser', () => {
 
                     expect( env.filterParser.parseFilter(filter) ).toEqual([{
                         filterExpr: `REGEXP_CONTAINS((${escapeId(ctx.fieldName)}), (?))`,
-                        parameters: [`${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}`]
+                        parameters: [`^${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}$`]
                     }])   
                 })
             })
