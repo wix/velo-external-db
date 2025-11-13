@@ -8,7 +8,15 @@ describe(`Check Pool Connection: ${currentDbImplementationName()}`, () => {
         setupDb()
     })
 
-    each(misconfiguredDbOperationOptions())
+    // DynamoDB Local doesn't validate credentials, so skip credential tests for it
+    const misconfiguredOptions = misconfiguredDbOperationOptions().filter(([message]) => {
+        if (currentDbImplementationName() === 'DynamoDb') {
+            return !message.includes('AWS_ACCESS_KEY_ID') && !message.includes('AWS_SECRET_ACCESS_KEY')
+        }
+        return true
+    })
+
+    each(misconfiguredOptions)
     .test('%s will return DbConnectionError', async(_message, givenMisconfiguredDbOperation) => {
         const dbOperation = await givenMisconfiguredDbOperation()
 

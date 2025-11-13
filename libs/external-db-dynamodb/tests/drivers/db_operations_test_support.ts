@@ -13,12 +13,16 @@ const createConnection = (_config: any) => {
 
 const dbOperationWithMisconfiguredAwsAccessKeyId = () => {
     delete process.env['AWS_ACCESS_KEY_ID']
-    return new DatabaseOperations(createConnection(config()).connection)
+    delete process.env['AWS_SECRET_ACCESS_KEY']
+    const _config = { ...config(), credentials: { accessKeyId: '', secretAccessKey: 'TestSecretAccessKey' } }
+    return new DatabaseOperations(createConnection(_config).connection)
 }
 
 const dbOperationWithMisconfiguredAwsSecretAccessKey = () => {
     delete process.env['AWS_SECRET_ACCESS_KEY']
-    return new DatabaseOperations(createConnection(config()).connection)
+    delete process.env['AWS_ACCESS_KEY_ID']
+    const _config = { ...config(), credentials: { accessKeyId: 'TestAccessKeyId', secretAccessKey: '' } }
+    return new DatabaseOperations(createConnection(_config).connection)
 } 
 
 const dbOperationWithMisconfiguredRegion = () => { 
