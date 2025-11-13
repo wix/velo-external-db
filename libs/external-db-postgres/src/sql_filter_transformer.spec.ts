@@ -252,7 +252,7 @@ describe('Sql Parser', () => {
                         filterExpr: `LOWER(${escapeIdentifier(ctx.fieldName)}) ~ LOWER($${ctx.offset})`,
                         filterColumns: [],
                         offset: ctx.offset + 1,
-                        parameters: [`${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}`]
+                        parameters: [`^${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}$`]
                     }])   
                 })
 
@@ -274,7 +274,7 @@ describe('Sql Parser', () => {
                         filterExpr: `(${escapeIdentifier(ctx.fieldName)}) ~ ($${ctx.offset})`,
                         filterColumns: [],
                         offset: ctx.offset + 1,
-                        parameters: [`${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}`]
+                        parameters: [`^${ctx.fieldValue}[${ctx.anotherValue}]${ctx.moreValue}$`]
                     }])   
                 })
             })

@@ -146,7 +146,7 @@ export default class FilterParser {
                 filterExpr: `${ignoreCase}(${escapeIdentifier(fieldName)}) ~ ${ignoreCase}($${offset})`,
                 filterColumns: [],
                 offset: offset + 1,
-                parameters: [specArrayToRegex(value.spec)]
+                parameters: [`^${specArrayToRegex(value.spec)}$`]
             }]
         }
 

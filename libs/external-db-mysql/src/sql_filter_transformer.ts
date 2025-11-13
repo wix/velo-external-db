@@ -79,7 +79,7 @@ export default class FilterParser implements IMySqlFilterParser {
             const ignoreCase = value.ignoreCase ? 'LOWER' : ''
             return [{
                 filterExpr: `${ignoreCase}(${escapeId(fieldName)}) RLIKE ${ignoreCase}(?)`,
-                parameters: [specArrayToRegex(value.spec)]
+                parameters: [`^${specArrayToRegex(value.spec)}$`]
             }]
         }   
 

@@ -213,7 +213,7 @@ describe('Sql Parser', () => {
 
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
                         filterExpr: { [ctx.fieldName]: { 
-                                                            $regex: `${ctx.fieldValue.toLowerCase()}[${ctx.anotherValue.toLowerCase()}]${ctx.moreValue.toLowerCase()}`, 
+                                                            $regex: `^${ctx.fieldValue.toLowerCase()}[${ctx.anotherValue.toLowerCase()}]${ctx.moreValue.toLowerCase()}$`, 
                                                             $options: 'i' 
                                                        } 
                                     }
@@ -236,7 +236,7 @@ describe('Sql Parser', () => {
 
                     expect(env.filterParser.parseFilter(filter)).toEqual([{
                         filterExpr: { [ctx.fieldName]: { 
-                                                            $regex: `${ctx.fieldValue.toLowerCase()}[${ctx.anotherValue.toLowerCase()}]${ctx.moreValue.toLowerCase()}`, 
+                                                            $regex: `^${ctx.fieldValue.toLowerCase()}[${ctx.anotherValue.toLowerCase()}]${ctx.moreValue.toLowerCase()}$`, 
                                                             $options: '' 
                                                        } 
                                     }
