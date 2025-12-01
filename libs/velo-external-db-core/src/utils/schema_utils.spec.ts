@@ -39,7 +39,7 @@ describe('Schema utils functions', () => {
         })
 
         test('unsupported type will throw an error', () => {
-            expect(() => fieldTypeToWixDataEnum('unsupported-type')).toThrowError()
+            expect(() => fieldTypeToWixDataEnum('unsupported-type')).toThrow()
         })
     })
 
@@ -74,7 +74,7 @@ describe('Schema utils functions', () => {
 
         test('unsupported type will throw an error', () => {
             // @ts-ignore
-            expect(() => wixDataEnumToFieldType(100)).toThrowError()
+            expect(() => wixDataEnumToFieldType(100)).toThrow()
         })
     })
 
@@ -108,7 +108,7 @@ describe('Schema utils functions', () => {
           })
         test('unsupported type will throw an error', () => {
             // @ts-ignore
-            expect(() => wixDataEnumToFieldType(100)).toThrowError()
+            expect(() => wixDataEnumToFieldType(100)).toThrow()
         })
     })
 

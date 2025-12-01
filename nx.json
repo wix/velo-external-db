@@ -1,13 +1,5 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx/tasks-runners/default",
-      "options": {
-        "cacheableOperations": [ "build", "test", "lint", "package", "prepare" ]
-      }
-    }
-  },
   "targetDependencies": {
     "build": [
       {
@@ -28,8 +20,23 @@
       }
     ]
   },
-  "affected": {
-    "defaultBase": "master"
+  "defaultProject": "velo-external-db",
+  "targetDefaults": {
+    "build": {
+      "cache": true
+    },
+    "test": {
+      "cache": true
+    },
+    "lint": {
+      "cache": true
+    },
+    "package": {
+      "cache": true
+    },
+    "prepare": {
+      "cache": true
+    }
   },
-  "defaultProject": "velo-external-db"
+  "defaultBase": "master"
 }

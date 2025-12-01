@@ -1,58 +1,67 @@
 {
+  "name": "@wix-velo/velo-external-db-commons",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/velo-external-db-commons/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/velo-external-db-commons",
         "main": "libs/velo-external-db-commons/src/index.ts",
         "tsConfig": "libs/velo-external-db-commons/tsconfig.lib.json",
-        "assets": ["libs/velo-external-db-commons/*.md"],
+        "assets": [
+          "libs/velo-external-db-commons/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
     "publish": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs @wix-velo/velo-external-db-commons {args.ver} {args.tag}"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "publishCi": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publishCi.mjs @wix-velo/velo-external-db-commons"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "executor": "@nx/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["libs/velo-external-db-commons/**/*.ts"]
+        "lintFilePatterns": [
+          "libs/velo-external-db-commons/**/*.ts"
+        ]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/velo-external-db-commons"],
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/velo-external-db-commons"
+      ],
       "options": {
         "jestConfig": "libs/velo-external-db-commons/jest.config.ts",
         "passWithNoTests": true
       }
     }
-  },
-  "tags": []
+  }
 }

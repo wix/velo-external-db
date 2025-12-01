@@ -63,7 +63,7 @@ describe('Schema Service', () => {
             await expect(env.schemaService.create({ id: ctx.collectionName, fields: wixedFormatFields })).resolves.toEqual({
                 collection: { id: ctx.collectionName, fields: wixedFormatFields }
             })
-            expect(driver.schemaProvider.create).toBeCalledWith(ctx.collectionName, fields)   
+            expect(driver.schemaProvider.create).toHaveBeenCalledWith(ctx.collectionName, fields)   
         })
 
         test('update collection - add new columns', async() => { 
@@ -75,16 +75,16 @@ describe('Schema Service', () => {
             await env.schemaService.update({ id: ctx.collectionName, fields: newFields })
 
 
-            expect(driver.schemaProvider.addColumn).toBeCalledTimes(1)    
-            expect(driver.schemaProvider.addColumn).toBeCalledWith(ctx.collectionName, {
+            expect(driver.schemaProvider.addColumn).toHaveBeenCalledTimes(1)    
+            expect(driver.schemaProvider.addColumn).toHaveBeenCalledWith(ctx.collectionName, {
                 name: ctx.column.name,
                 type: ctx.column.type,
                 subtype: ctx.column.subtype,
                 precision: undefined,
                 isPrimary: false,
             })    
-            expect(driver.schemaProvider.removeColumn).not.toBeCalled()
-            expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
+            expect(driver.schemaProvider.removeColumn).not.toHaveBeenCalled()
+            expect(driver.schemaProvider.changeColumnType).not.toHaveBeenCalled()
         })
 
         test('update collection - add new column to non empty collection', async() => {
@@ -105,9 +105,9 @@ describe('Schema Service', () => {
 
             const { columnsToAdd } = compareColumnsInDbAndRequest(currentFields, wantedFields)
 
-            columnsToAdd.forEach(c => expect(driver.schemaProvider.addColumn).toBeCalledWith(ctx.collectionName, c))
-            expect(driver.schemaProvider.removeColumn).not.toBeCalled()   
-            expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
+            columnsToAdd.forEach(c => expect(driver.schemaProvider.addColumn).toHaveBeenCalledWith(ctx.collectionName, c))
+            expect(driver.schemaProvider.removeColumn).not.toHaveBeenCalled()   
+            expect(driver.schemaProvider.changeColumnType).not.toHaveBeenCalled()
         })
 
         test('update collection - remove column', async() => {
@@ -127,9 +127,9 @@ describe('Schema Service', () => {
 
             await env.schemaService.update({ id: ctx.collectionName, fields: [] })
 
-            columnsToRemove.forEach(c => expect(driver.schemaProvider.removeColumn).toBeCalledWith(ctx.collectionName, c))
-            expect(driver.schemaProvider.addColumn).not.toBeCalled()
-            expect(driver.schemaProvider.changeColumnType).not.toBeCalled()
+            columnsToRemove.forEach(c => expect(driver.schemaProvider.removeColumn).toHaveBeenCalledWith(ctx.collectionName, c))
+            expect(driver.schemaProvider.addColumn).not.toHaveBeenCalled()
+            expect(driver.schemaProvider.changeColumnType).not.toHaveBeenCalled()
 
         })
 
@@ -155,9 +155,9 @@ describe('Schema Service', () => {
 
             await env.schemaService.update({ id: ctx.collectionName, fields: [changedColumnType] })
             
-            columnsToChangeType.forEach(c => expect(driver.schemaProvider.changeColumnType).toBeCalledWith(ctx.collectionName, c))
-            expect(driver.schemaProvider.addColumn).not.toBeCalled()
-            expect(driver.schemaProvider.removeColumn).not.toBeCalled()
+            columnsToChangeType.forEach(c => expect(driver.schemaProvider.changeColumnType).toHaveBeenCalledWith(ctx.collectionName, c))
+            expect(driver.schemaProvider.addColumn).not.toHaveBeenCalled()
+            expect(driver.schemaProvider.removeColumn).not.toHaveBeenCalled()
 
         })
 

@@ -222,6 +222,7 @@ export interface TruncateRequest {
     collectionId: string;
 }
   
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TruncateResponse {}
 
 // TODO: will be changed in references SPI implementation pr 
@@ -278,6 +279,7 @@ export interface ReferenceMask {
 }
 
 // TODO: will be changed in references SPI implementation pr 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface RemoveReferencesResponse {}
 
 export interface ApplicationError {

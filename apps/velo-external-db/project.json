@@ -1,43 +1,58 @@
 {
+  "name": "velo-external-db",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/velo-external-db/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
-      "outputs": [ "{options.outputPath}" ],
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/velo-external-db",
         "main": "apps/velo-external-db/src/main.ts",
         "tsConfig": "apps/velo-external-db/tsconfig.app.json",
         "generatePackageJson": true,
-        "progress": true,
-        "buildLibsFromSource": true,
         "assets": [
-          { "glob": "**/*", "input": "libs/velo-external-db-core/src/views", "output": "./views" },
-          { "glob": "**/*", "input": "libs/velo-external-db-core/src/assets", "output": "./assets" }
+          {
+            "glob": "**/*",
+            "input": "libs/velo-external-db-core/src/views",
+            "output": "./views"
+          },
+          {
+            "glob": "**/*",
+            "input": "libs/velo-external-db-core/src/assets",
+            "output": "./assets"
+          }
         ],
         "fileReplacements": [
-          { "replace": "apps/velo-external-db/src/environments/environment.ts", "with": "apps/velo-external-db/src/environments/environment.prod.ts" },
-          { "replace": "libs/velo-external-db-core/src/utils/router_utils.ts", "with": "libs/velo-external-db-core/src/utils/router_utils.build.ts" }
+          {
+            "replace": "apps/velo-external-db/src/environments/environment.ts",
+            "with": "apps/velo-external-db/src/environments/environment.prod.ts"
+          },
+          {
+            "replace": "libs/velo-external-db-core/src/utils/router_utils.ts",
+            "with": "libs/velo-external-db-core/src/utils/router_utils.build.ts"
+          }
         ]
       },
       "configurations": {
         "production": {
           "optimization": true,
           "inspect": false
-
         }
       }
     },
     "serve": {
-      "executor": "@nrwl/node:node",
+      "executor": "@nx/node:node",
       "options": {
         "buildTarget": "velo-external-db:build"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "outputs": [
         "{options.outputFile}"
       ],
@@ -48,18 +63,17 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": [
-        "coverage/apps/velo-external-db"
+        "{workspaceRoot}/coverage/apps/velo-external-db"
       ],
       "options": {
         "jestConfig": "apps/velo-external-db/jest.config.ts",
         "passWithNoTests": true
       }
-    }, 
-
+    },
     "build-image": {
-      "builder": "@nrwl/workspace:run-commands",
+      "builder": "@nx/workspace:run-commands",
       "options": {
         "commands": [
           "nx run velo-external-db:build",
@@ -68,6 +82,5 @@
         "parallel": false
       }
     }
-  },
-  "tags": []
+  }
 }

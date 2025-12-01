@@ -10,7 +10,7 @@
     "parserOptions": {
         "ecmaVersion": 12
     },
-    "plugins": ["jest", "@nrwl/nx"],
+    "plugins": ["jest", "@nx"],
     "rules": {
         
     },
@@ -18,7 +18,7 @@
         {
           "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
           "rules": {
-            "@nrwl/nx/enforce-module-boundaries": [
+            "@nx/enforce-module-boundaries": [
               "error",
               {
                 "enforceBuildableLibDependency": true,
@@ -35,12 +35,12 @@
         },
         {
           "files": ["*.ts", "*.tsx"],
-          "extends": ["plugin:@nrwl/nx/typescript"],
+          "extends": ["plugin:@nx/typescript"],
           "rules": {}
         },
         {
           "files": ["*.js", "*.jsx", "*.ts"],
-          "extends": ["plugin:@nrwl/nx/javascript"],
+          "extends": ["plugin:@nx/javascript"],
           "rules": {
             "@typescript-eslint/no-empty-function": "off",
             "no-case-declarations": "off",
@@ -64,6 +64,18 @@
             "eol-last": [ "error", "always" ], 
             "@typescript-eslint/no-empty-interface": "off",
             "object-shorthand": ["warn", "always"]
+          }
+        },
+        {
+          "files": ["**/test/**/*.ts", "**/test/**/*.js", "**/*.spec.ts", "**/*.test.ts"],
+          "rules": {
+            "@nx/enforce-module-boundaries": "off"
+          }
+        },
+        {
+          "files": ["apps/velo-external-db/test/**/*.ts"],
+          "rules": {
+            "@nx/enforce-module-boundaries": "off"
           }
         }
       ]

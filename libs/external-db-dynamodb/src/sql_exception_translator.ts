@@ -17,6 +17,16 @@ export const notThrowingTranslateErrorCodes = (err: any, collectionName?: string
             }
     }
 
+    // Handle network connection errors
+    if (err.code === 'ECONNREFUSED' || err.code === 'ENOTFOUND' || err.code === 'ETIMEDOUT') {
+        return new DbConnectionError(`Connection error: ${err.message}`)
+    }
+
+    // Handle AWS SDK wrapped errors
+    if (err.message && (err.message.includes('ECONNREFUSED') || err.message.includes('ENOTFOUND') || err.message.includes('ETIMEDOUT') || err.message.includes('AggregateError'))) {
+        return new DbConnectionError(`Connection error: ${err.message}`)
+    }
+
     switch (err.message) {
         case 'Region is missing':
             return new DbConnectionError('Region is missing')

@@ -1,58 +1,67 @@
 {
+  "name": "@wix-velo/external-db-bigquery",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/external-db-bigquery/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": [ "{options.outputPath}" ],
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/external-db-bigquery",
         "main": "libs/external-db-bigquery/src/index.js",
         "tsConfig": "libs/external-db-bigquery/tsconfig.lib.json",
-        "assets": [ "libs/external-db-bigquery/*.md" ],
+        "assets": [
+          "libs/external-db-bigquery/*.md"
+        ],
         "buildableProjectDepsInPackageJsonType": "dependencies"
       }
     },
     "publish": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs @wix-velo/external-db-bigquery {args.ver} {args.tag} {args.update}"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "publishCi": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "node tools/scripts/publishCi.mjs @wix-velo/external-db-bigquery"
       },
       "dependsOn": [
         {
-          "projects": "self",
           "target": "build"
         }
       ]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": [ "{options.outputFile}" ],
+      "executor": "@nx/linter:eslint",
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": [ "libs/external-db-bigquery/**/*.ts" ]
+        "lintFilePatterns": [
+          "libs/external-db-bigquery/**/*.ts"
+        ]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": [ "coverage/libs/external-db-bigquery" ],
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/external-db-bigquery"
+      ],
       "options": {
         "jestConfig": "libs/external-db-bigquery/jest.config.ts",
         "passWithNoTests": true
       }
     }
-  },
-  "tags": []
+  }
 }
