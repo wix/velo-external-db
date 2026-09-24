@@ -177,7 +177,7 @@ resource "azurerm_app_service" "veloAppService" {
     resource_group_name = azurerm_resource_group.resourceGroup.name
     app_service_plan_id = azurerm_app_service_plan.veloAppServicePlan.id
     site_config {
-        linux_fx_version = "DOCKER|veloex/velo-external-db:latest"
+        linux_fx_version = "DOCKER|gcr.io/wix-velo-api/velo-external-db"
     }
 
     identity {

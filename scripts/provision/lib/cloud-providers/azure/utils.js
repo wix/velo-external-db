@@ -12,6 +12,6 @@ const provisionVariables = {
 
 const refFromKeyVault = (keyVaultName, secretName) => `@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${secretName})`
 
-const DockerImage = 'DOCKER|veloex/velo-external-db:latest'
+const DockerImage = 'DOCKER|gcr.io/wix-velo-api/velo-external-db'
 
 module.exports = { provisionVariables, refFromKeyVault, DockerImage }
